@@ -347,75 +347,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>הפעל פריסט PTZ</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג שכבת טקסט</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג בפריסת אזעקה</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון הסתיים</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>שרת  &apos;%1סיים את גיבוי הארכיון</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>אירוע כללי ב %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>פורט כניסה: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון הסתיים בהצלחה</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>מודול קלט/פלט %1 התנתק</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>קונפליקט בכתובת: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון נכשל: אין כונני איחסון זמינים עם מספיק מקום פנוי</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון נכשל: שגיאה בכונן הגיבוי</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון נכשל: לא ניתן לפתוח את הקבצים לקריאה</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון נכשל: לא ניתן ליצור קבצים לכתיבה</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון נכשל: שגיאה בקטלוג הקבצים</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי הארכיון הסתיים, אבל לא באופן מלא מאחר וזמן סיום הגיבוי הגיע. המידע גובה ל %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון בוטל על ידי משתמש. המידע גובה ל %1</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>הקלטה על מודולי קלט/פלט אינה מאופשרת:</translation>
     </message>
 </context>
 <context>
@@ -578,55 +578,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאת חיבור מצלמה. %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>יש לנסות לאתחל את מודול הקלט/פלט, לאחר מכן להחזיר את הגדרות היצרן בדף האינטרנט.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>יש לוודא שמודול הקלט/פלט מחובר לרשת. נסה לאתחל את המודול.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לנתח את תגובת מודול הקלט/פלט. Url %1 שם בקשה %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>נסה תחילה, להפעיל הקלטה (אם היא כבויה) ולהוריד את קצב התמונות בהגדרות מודול הקלט/פלט.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>במידה וזה אינו עוזר, החזר הגדרות יצרן בדף האינטרנט של מודול הקלט/פלט.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>בקשת מודול קלט/פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאת מודול קלט/פלט שאינה ידועה.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>מידע לא תקין התקבל ממודול קלט/פלט %1.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>יותר מידי שגיאות מדיה. למידע נוסף פתח את חלון תקלות מודול הקלט/פלט.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>כעת מתבצע תהליך איתחול ההתקן.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>כעת מתבצע תהליך איתחול המצלמה.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>כעת מתבצע תהליך איתחול מודול הקלט/פלט.</translation>
     </message>
 </context>
 <context>
@@ -648,7 +648,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>כשלון בפתיחת סייר הקבצים.</translation>
     </message>
 </context>
 <context>
@@ -663,11 +663,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לאתחל את מקודד האודיו.</translation>
     </message>
 </context>
 <context>
@@ -705,7 +705,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לאתחל את מקודד הוידאו.</translation>
     </message>
 </context>
 <context>
@@ -867,11 +867,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. שגיאת בסיס נתונים.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. מידע לא תקין התקבל. פנה למרכז התמיכה ודווח על התקלה.</translation>
     </message>
 </context>
 <context>
@@ -952,33 +952,33 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>מודול קלט/פלט אחד</numerusform>
+            <numerusform>%n מודולי קלט/פלט</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>מודול קלט/פלט אחד</numerusform>
+            <numerusform>%n מודולי קלט/פלט</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>מודולי קלט פלט</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>מודולי קלט פלט</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">מודול קלט/פלט</translation>
+        <translation>מודול קלט/פלט</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>מודול קלט/פלט</translation>
     </message>
 </context>
 <context>
@@ -1106,7 +1106,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה בכתיבת קובץ.אין מספיק מקום פנוי.</translation>
     </message>
 </context>
 <context>
@@ -1171,7 +1171,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה שהוסרה</translation>
     </message>
 </context>
 </TS>

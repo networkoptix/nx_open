@@ -14,7 +14,13 @@ class NX_NETWORK_API AsyncClient
 public:
     enum Protocol { TCP, UDP };
 
-    virtual ~AsyncClient() {}
+    AsyncClient() = default;
+    virtual ~AsyncClient();
+
+    AsyncClient( const AsyncClient& ) = delete;
+    AsyncClient( AsyncClient&& ) = delete;
+    AsyncClient& operator=( const AsyncClient& ) = delete;
+    AsyncClient& operator=( AsyncClient&& ) = delete;
 
     //! Simple SOAP call
     struct NX_NETWORK_API Message

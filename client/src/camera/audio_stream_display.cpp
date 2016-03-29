@@ -24,6 +24,7 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_isConvertMethodInitialized(false),
     m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
     m_startBufferingTime(AV_NOPTS_VALUE),
+    m_lastAudioTime(AV_NOPTS_VALUE),
     m_audioQueueMutex(QnMutex::Recursive),
     m_blockedTimeValue(AV_NOPTS_VALUE)
 {}

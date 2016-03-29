@@ -1,5 +1,6 @@
 #include "mobile_client_roles.h"
 
+#include <nx/utils/log/assert.h>
 
 QByteArray Qn::roleName(int role) {
     switch (role) {
@@ -16,7 +17,7 @@ QByteArray Qn::roleName(int role) {
     case IpAddressRole:
         return "ipAddress";
     default:
-        Q_ASSERT_X(0, "Unsupported role", Q_FUNC_INFO);
+        NX_ASSERT(0, "Unsupported role", Q_FUNC_INFO);
     }
     return QByteArray();
 }

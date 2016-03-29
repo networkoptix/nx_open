@@ -11,12 +11,7 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 
-#ifndef Q_OS_WIN
 #include "utils/media/audioformat.h"
-#else
-#include <QtMultimedia/QAudioFormat>
-#define QnAudioFormat QAudioFormat
-#endif
 
 typedef struct ALCdevice_struct ALCdevice;
 typedef struct ALCcontext_struct ALCcontext;

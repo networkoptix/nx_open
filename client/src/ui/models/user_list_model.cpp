@@ -232,22 +232,14 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
             return user->isLdap() ? tr("LDAP user") : tr("Normal user");
         case EnabledColumn:
             return user->isEnabled() ? tr("Enabled") : tr("Disabled");
-        case EditIconColumn:
-            return tr("Edit user");
         default:
             break;
         } // switch (column)
         break;
     case Qt::DecorationRole:
         switch (index.column()) {
-        case EditIconColumn:
-            return qnSkin->icon("edit.png");
         case LdapColumn:
             if (user->isLdap())
-                return qnSkin->icon("done.png");
-            break;
-        case EnabledColumn:
-            if (user->isEnabled())
                 return qnSkin->icon("done.png");
             break;
         default:
@@ -281,7 +273,9 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         break;
     case Qt::CheckStateRole:
         if (index.column() == CheckBoxColumn)
-            return d->checkedUsers.contains(user);
+            return d->checkedUsers.contains(user) ? Qt::Checked : Qt::Unchecked;
+        else if (index.column() == EnabledColumn)
+            return user->isEnabled() ? Qt::Checked : Qt::Unchecked;
         break;
     default:
         break;
@@ -308,7 +302,7 @@ QVariant QnUserListModel::headerData(int section, Qt::Orientation orientation, i
     case LdapColumn:
         return tr("LDAP");
     case EnabledColumn:
-        return tr("Enabled");
+        return QString();
     default:
         return QString();
     }
@@ -372,8 +366,8 @@ bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex 
     QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     QnUserResourcePtr rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-    Q_ASSERT(leftUser);
-    Q_ASSERT(rightUser);
+    NX_ASSERT(leftUser);
+    NX_ASSERT(rightUser);
 
     if (!rightUser)
         return true;

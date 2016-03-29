@@ -8,7 +8,7 @@
 
 #include "rest/server/json_rest_handler.h"
 
-
+struct CloudCredentialsData;
 class QnSaveCloudSystemCredentialsHandler
 :
     public QnJsonRestHandler
@@ -16,11 +16,14 @@ class QnSaveCloudSystemCredentialsHandler
     Q_OBJECT
 
 public:
-    virtual int executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
+    virtual int executePost(
+        const QString& path,
+        const QnRequestParams& params,
+        const QByteArray& body,
+        QnJsonRestResult& result,
         const QnRestConnectionProcessor*);
+
+    int execute(const CloudCredentialsData& data, QnJsonRestResult& result);
 };
 
 #endif  //SAVE_CLOUD_SYSTEM_CREDENTIALS_H

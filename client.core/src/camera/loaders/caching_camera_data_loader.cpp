@@ -25,7 +25,7 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     m_enabled(true),
     m_resource(resource)
 {
-    Q_ASSERT_X(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
+    NX_ASSERT(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
     init();
     initLoaders();
 
@@ -80,7 +80,7 @@ void QnCachingCameraDataLoader::initLoaders() {
         if (loader) {           
             connect(loader, &QnAbstractCameraDataLoader::ready,         this,  [this, dataType](const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle){ 
                 Q_UNUSED(handle);
-                Q_ASSERT_X(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
+                NX_ASSERT(updatedPeriod.isInfinite(), Q_FUNC_INFO, "We are always loading till very end.");
                 at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
             });
 
@@ -143,7 +143,7 @@ QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePe
 
 void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
     QnAbstractCameraDataLoaderPtr loader = m_loaders[periodType];
-    Q_ASSERT_X(loader, Q_FUNC_INFO, "Loader must always exists");
+    NX_ASSERT(loader, Q_FUNC_INFO, "Loader must always exists");
     if(!loader) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
@@ -164,7 +164,7 @@ void QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
         }
         break;
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
 }

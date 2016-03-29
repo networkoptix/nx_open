@@ -5,6 +5,7 @@
     <?define webkit = "${webkit}"?>
 
     <?define customization = "${customization}"?>
+    <?define uriProtocol = "${uri.protocol}"?>
 
     <?define releaseVersionFull = "${release.version}.${buildNumber}"?>
     <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
@@ -27,11 +28,11 @@
 
 
     <?if $(var.arch) = x86?>
-    <?define ProgramFilesFolder = "ProgramFilesFolder"?>
-    <?define SystemFolderActual = "SystemFolder"?>
+        <?define ProgramFilesFolder = "ProgramFilesFolder"?>
+        <?define SystemFolderActual = "SystemFolder"?>
     <?else?>
-    <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
-    <?define SystemFolderActual = "System64Folder"?>
+        <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+        <?define SystemFolderActual = "System64Folder"?>
     <?endif?>
 
     <!-- Wix Variables -->

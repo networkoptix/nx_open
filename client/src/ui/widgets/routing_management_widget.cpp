@@ -2,7 +2,6 @@
 #include "ui_routing_management_widget.h"
 
 #include <QtWidgets/QInputDialog>
-#include <QtWidgets/QMessageBox>
 
 #include "api/app_server_connection.h"
 
@@ -19,7 +18,9 @@
 #include <ui/common/read_only.h>
 #include "ui/models/resource_list_model.h"
 #include "ui/models/server_addresses_model.h"
-#include "ui/style/warning_style.h"
+#include "ui/style/custom_style.h"
+#include <ui/delegates/switch_item_delegate.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <nx/network/socket_common.h>
 #include "utils/common/string.h"
@@ -33,6 +34,26 @@ namespace {
     class SortedServersProxyModel : public QSortFilterProxyModel {
     public:
         SortedServersProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
+
+        QVariant headerData(int section, Qt::Orientation orientation, int role) const
+        {
+            Q_UNUSED(orientation)
+
+            switch (role)
+            {
+            case Qt::DisplayRole:
+            case Qt::ToolTipRole:
+                if (section == 0)
+                    return tr("Server");
+                break;
+
+            default:
+                break;
+            }
+
+            return QVariant();
+        }
+
     protected:
         bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
             QString leftString = left.data(sortRole()).toString();
@@ -168,7 +189,11 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_changes(new RoutingManagementChanges)
 {
     ui->setupUi(this);
+
+    ui->addressesView->setItemDelegateForColumn(QnServerAddressesModel::InUseColumn, new QnSwitchItemDelegate(this));
+
     setWarningStyle(ui->warningLabel);
+
     setHelpTopic(this, Qn::Administration_RoutingManagement_Help);
 
     m_serverListModel = new QnResourceListModel(this);
@@ -188,9 +213,13 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_sortedServerAddressesModel->sort(QnServerAddressesModel::AddressColumn);
     m_sortedServerAddressesModel->setSourceModel(m_serverAddressesModel);
     ui->addressesView->setModel(m_sortedServerAddressesModel);
-    ui->addressesView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->addressesView->horizontalHeader()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
-    ui->addressesView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
+    ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
+    ui->addressesView->header()->setSectionsMovable(false);
+
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    scrollBar->setUseItemViewPaddingWhenVisible(true);
+    ui->addressesView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);
@@ -201,7 +230,6 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
-
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 
@@ -341,7 +369,7 @@ void QnRoutingManagementWidget::updateFromModel() {
 void QnRoutingManagementWidget::updateUi() {
     QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
 
-    ui->addButton->setEnabled(ui->serversView->currentIndex().isValid()&& !isReadOnly());
+    ui->buttonsWidget->setVisible(ui->serversView->currentIndex().isValid() && !isReadOnly());
     ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
@@ -439,10 +467,10 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
 void QnRoutingManagementWidget::reportUrlEditingError(int error) {
     switch (error) {
     case QnServerAddressesModel::InvalidUrl:
-        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        QnMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
         break;
     case QnServerAddressesModel::ExistingUrl:
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        QnMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         break;
     }
 }

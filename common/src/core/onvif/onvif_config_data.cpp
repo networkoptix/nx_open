@@ -24,5 +24,5 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnOnvifConfigDataP
 }
 
 void serialize(QnJsonContext *, const QnOnvifConfigDataPtr &, QJsonValue *) {
-    assert(false); /* Not supported for now. */
+    NX_ASSERT(false); /* Not supported for now. */
 }

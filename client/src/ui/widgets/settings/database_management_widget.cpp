@@ -1,7 +1,6 @@
 #include "database_management_widget.h"
 #include "ui_database_management_widget.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/log/log.h>
@@ -67,7 +66,7 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
 
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for writing.").arg(fileName));
+        QnMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for writing.").arg(fileName));
         return;
     }
 
@@ -95,14 +94,14 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     if( errorCode != ec2::ErrorCode::ok )
     {
         NX_LOG( lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR );
-        QMessageBox::information(this, tr("Information"), tr("Failed to dump server database to %1.").arg(fileName));
+        QnMessageBox::information(this, tr("Information"), tr("Failed to dump server database to %1.").arg(fileName));
         return;
     }
 
     file.write( databaseData );
     file.close();
 
-    QMessageBox::information(this, tr("Information"), tr("Database was successfully backed up into file '%1'.").arg(fileName));
+    QnMessageBox::information(this, tr("Information"), tr("Database was successfully backed up into file '%1'.").arg(fileName));
 }
 
 void QnDatabaseManagementWidget::at_restoreButton_clicked() {
@@ -118,12 +117,12 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
 
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for reading.").arg(fileName));
+        QnMessageBox::critical(this, tr("Error"), tr("Could not open file '%1' for reading.").arg(fileName));
         return;
     }
 
-    if (QMessageBox::warning(this, tr("Warning"), tr("Are you sure you would like to restore the database? All existing data will be lost."),
-                             QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+    if (QnMessageBox::warning(this, tr("Warning"), tr("Are you sure you would like to restore the database? All existing data will be lost."),
+                             QDialogButtonBox::Ok, QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel) {
         file.close();
         return;
     }
@@ -148,7 +147,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     };
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn) {
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
             tr("Information"),
             tr("You need to connect to a server prior to backup start."));
         return;
@@ -160,13 +159,13 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         return; // TODO: #Elric make non-cancelable.   TODO: #ak is running request finish OK?
 
     if( errorCode == ec2::ErrorCode::ok ) {
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
                                  tr("Information"),
-                                 tr("Database was successfully restored from file '%1'. Media server will be restarted.").arg(fileName));
-        menu()->trigger(Qn::ReconnectAction);
+                                 tr("Database was successfully restored from file '%1'. Server will be restarted.").arg(fileName));
+        menu()->trigger(QnActions::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore Server database from file '%1'. %2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
-        QMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
+        QnMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
                               .arg(fileName));
     }
 }

@@ -1,12 +1,12 @@
 #include "server_message_processor.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/webpage_resource.h>
 
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
@@ -20,6 +20,7 @@
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
+#include <nx_ec/managers/abstract_server_manager.h>
 #include "api/app_server_connection.h"
 #include "network/router.h"
 #include <network/module_finder.h>
@@ -40,44 +41,16 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     QnCommonMessageProcessor::updateResource(resource);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
-    const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
-    const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
-    const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
-    const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
-    const bool isStorage = dynamic_cast<const QnStorageResource*>(resource.data()) != nullptr;
-    const bool isLayout = !resource.dynamicCast<QnLayoutResource>().isNull();
-    const bool isWebPage = !resource.dynamicCast<QnWebPageResource>().isNull();
-
-    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout && !isWebPage)
-        return;
-
-    //storing all servers' cameras too
-    // If camera from other server - marking it
-
-    if (isCamera)
+    if (resource.dynamicCast<QnVirtualCameraResource>())
     {
         if (resource->getParentId() != ownMediaServer->getId())
             resource->addFlags( Qn::foreigner );
-        else {
-#if 0
-            QnResourceTypePtr thirdPartyType = qnResTypePool->getResourceTypeByName("THIRD_PARTY Camera");
-            QnResourceTypePtr desktopCameraType = qnResTypePool->getResourceTypeByName("SERVER_DESKTOP_CAMERA");
-            if (thirdPartyType && desktopCameraType &&
-                resource->getTypeId() != desktopCameraType->getId() && resource->getTypeId() != thirdPartyType->getId())
-            {
-                resource->setTypeId(thirdPartyType->getId());
-                QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-                QnVirtualCameraResourceList cameras;
-                cameras << camera;
-                m_connection->getCameraManager()->save(cameras, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-            }
-#endif
-        }
     }
 
-    if (isServer)
+    if (resource.dynamicCast<QnMediaServerResource>())
     {
-        if (resource->getId() == ownMediaServer->getId()) {
+        if (resource->getId() == ownMediaServer->getId())
+        {
             ec2::ApiMediaServerData ownData;
 
             ec2::ApiMediaServerData newData;
@@ -85,18 +58,21 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
             ec2::fromResourceToApi(ownMediaServer, ownData);
             ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
 
-            if (ownData != newData) {
-                QnMediaServerResourcePtr savedServer;
-                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownMediaServer, &savedServer);
+            if (ownData != newData)
+            {
+                QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(ownData);
                 return;
             }
 
             // We are always online
-            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined) {
+            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined)
+            {
                 qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
                 resource->setStatus(Qn::Online);
             }
-        } else {
+        }
+        else
+        {
             resource->addFlags(Qn::foreigner);
         }
     }
@@ -107,15 +83,11 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     else
         qnResPool->addResource(resource);
 
-    if (m_delayedOnlineStatus.contains(resId)) {
+    if (m_delayedOnlineStatus.contains(resId))
+    {
         m_delayedOnlineStatus.remove(resId);
         resource->setStatus(Qn::Online);
     }
-}
-
-void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
-{
-    QnCommonMessageProcessor::afterRemovingResource(id);
 }
 
 void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection) {
@@ -136,7 +108,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-        this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(systemName, sysIdTime, tranLogTime); });
+        this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(nx::SystemName(systemName), sysIdTime, tranLogTime); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -262,12 +234,22 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(resourceId);
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
     bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
-    if (isOwnServer) {
-        QnMediaServerResourcePtr savedServer;
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(mServer->getId(), Qn::Online);
+    if (isOwnServer)
+    {
+        ec2::ApiMediaServerData apiServer;
+        ec2::fromResourceToApi(mServer, apiServer);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(apiServer);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(apiServer.id, Qn::Online);
     }
-    else if (isOwnStorage && !storage->isExternal() && storage->isWritable()) {
-        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnStorageResourceList() << storage);
+    else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
+    {
+        ec2::ApiStorageDataList apiStorages;
+        fromResourceListToApi(QnStorageResourceList() << storage, apiStorages);
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(apiStorages);
     }
+}
+
+QnResourceFactory* QnServerMessageProcessor::getResourceFactory() const
+{
+    return QnResourceDiscoveryManager::instance();
 }

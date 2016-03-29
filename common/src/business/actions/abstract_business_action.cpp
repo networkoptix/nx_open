@@ -2,9 +2,6 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <core/resource/resource.h>
-#include <core/resource_management/resource_pool.h>
-
 #include <business/business_strings_helper.h>
 #include <utils/common/model_functions.h>
 
@@ -57,7 +54,7 @@ namespace QnBusiness {
             return true;
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
             return false;
         }
     }
@@ -84,7 +81,7 @@ namespace QnBusiness {
             return true;
 
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
             break;
         }
         return false;
@@ -149,7 +146,7 @@ namespace QnBusiness {
             << SayTextAction
             << ExecutePtzPresetAction
             << ShowTextOverlayAction
-            << ShowOnAlarmLayoutAction            
+            << ShowOnAlarmLayoutAction
             ;
         return result;
     }
@@ -157,7 +154,7 @@ namespace QnBusiness {
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
     m_actionType(actionType),
-    m_toggleState(QnBusiness::UndefinedState), 
+    m_toggleState(QnBusiness::UndefinedState),
     m_receivedFromRemoteHost(false),
     m_runtimeParams(runtimeParams),
     m_aggregationCount(1)
@@ -169,7 +166,7 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 }
 
 QnBusiness::ActionType QnAbstractBusinessAction::actionType() const {
-    return m_actionType; 
+    return m_actionType;
 }
 
 void QnAbstractBusinessAction::setResources(const QVector<QnUuid>& resources) {
@@ -178,6 +175,17 @@ void QnAbstractBusinessAction::setResources(const QVector<QnUuid>& resources) {
 
 const QVector<QnUuid>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
+}
+
+QVector<QnUuid> QnAbstractBusinessAction::getSourceResources() const
+{
+    NX_ASSERT(m_params.useSource, Q_FUNC_INFO, "Method should be called only when corresponding parameter is set.");
+    QVector<QnUuid> result;
+    result << m_runtimeParams.eventResourceId;
+    for (const QnUuid &extra: m_runtimeParams.metadata.cameraRefs)
+        if (!result.contains(extra))
+            result << extra;
+    return result;
 }
 
 void QnAbstractBusinessAction::setParams(const QnBusinessActionParameters& params) {

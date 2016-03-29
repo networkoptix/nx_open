@@ -319,54 +319,6 @@ to view more bookmarks</source>
 <context>
     <name>QnActionManager</name>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-    <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
-    </message>
-    <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>Del</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
         <source>Low</source>
         <translation>Baixo</translation>
     </message>
@@ -419,44 +371,12 @@ to view more bookmarks</source>
         <translation>Ir para Ao Vivo</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Fit in View</source>
         <translation>Ajustar </translation>
     </message>
     <message>
         <source>Close</source>
         <translation>Fechar</translation>
-    </message>
-    <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -479,20 +399,8 @@ to view more bookmarks</source>
         <translation>Pequeno</translation>
     </message>
     <message>
-        <source>Space</source>
-        <translation>Espaço</translation>
-    </message>
-    <message>
         <source>Layout...</source>
         <translation>Layout...</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Contador Decremento Debug</translation>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
@@ -503,20 +411,8 @@ to view more bookmarks</source>
         <translation>Desmarcar Notificações</translation>
     </message>
     <message>
-        <source>Increment Debug Counter</source>
-        <translation>Contador de incremento Debug</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Diminuir Recursos</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>Calibrar PTZ</translation>
     </message>
     <message>
         <source>To Start</source>
@@ -599,16 +495,8 @@ to view more bookmarks</source>
         <translation>Salvar Posição Atual...</translation>
     </message>
     <message>
-        <source>Show Resource Pool</source>
-        <translation>Mostrar Lista Recursos</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Melhoria de Imagem...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
     </message>
     <message>
         <source>Monitor</source>
@@ -617,54 +505,6 @@ to view more bookmarks</source>
     <message>
         <source>Save Current Layout As...</source>
         <translation>Salvar Layout Atual Como...</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl+N</translation>
-    </message>
-    <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl+P</translation>
-    </message>
-    <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl+P</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -703,10 +543,6 @@ to view more bookmarks</source>
         <translation>Salvar Layout</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+D</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delayed Open Video Wall</source>
         <translation type="unfinished"></translation>
     </message>
@@ -743,19 +579,11 @@ to view more bookmarks</source>
         <translation type="unfinished">Conectar a um Servidor...</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Video Wall...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -768,10 +596,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>System Administration...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -851,20 +675,12 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ctrl+Alt+T</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Disable Background Animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Voltar</translation>
     </message>
     <message>
         <source>To End</source>
@@ -915,18 +731,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Get PTZ Position</source>
-        <translation>Ver posição PTZ</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Painel de Controle Debug</translation>
-    </message>
-    <message>
         <source>Next Frame</source>
         <translation>Próximo Quadro</translation>
     </message>
@@ -967,32 +771,12 @@ to view more bookmarks</source>
         <translation>Mostrar Procura Movimento/Smart</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Preview Search...</source>
         <translation>Prévia deProcura...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
     </message>
     <message>
         <source>How-to Videos and FAQ...</source>
@@ -1035,16 +819,8 @@ to view more bookmarks</source>
         <translation>Abrir em Nova Aba</translation>
     </message>
     <message>
-        <source>Ctrl+Down</source>
-        <translation>Ctrl+Down</translation>
-    </message>
-    <message>
         <source>Maximize</source>
         <translation>Maximizar</translation>
-    </message>
-    <message>
-        <source>Ctrl+Left</source>
-        <translation>Ctrl+Left</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1123,10 +899,6 @@ to view more bookmarks</source>
         <translation>Layout aberto...</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Ctrl+Up</translation>
-    </message>
-    <message>
         <source>90 degrees</source>
         <translation>90 graus</translation>
     </message>
@@ -1149,10 +921,6 @@ to view more bookmarks</source>
     <message>
         <source>Instant Drop Resources</source>
         <translation>Recursos instantâneos</translation>
-    </message>
-    <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
     </message>
     <message>
         <source>Select All</source>
@@ -1221,22 +989,6 @@ to view more bookmarks</source>
     <message>
         <source>Open in New Window</source>
         <translation>Abrir em Nova Janela</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Ctrl+Right</translation>
     </message>
     <message>
         <source>Go To Saved Position</source>
@@ -1384,10 +1136,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1975,9 +1723,12 @@ to view more bookmarks</source>
         <source>Source camera</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
@@ -5088,17 +4839,26 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -5858,13 +5618,19 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
@@ -6924,9 +6690,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

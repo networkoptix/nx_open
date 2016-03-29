@@ -2,13 +2,15 @@
 
 #include <utils/common/model_functions.h>
 
-namespace {
+namespace
+{
     const QString localKey                  (lit("local"));
     const QString formatKey                 (lit("format"));
     const QString extraFormattingKey        (lit("extraFormatting"));
 
-    Qn::SerializationFormat defaultFormat() {
-#ifdef _DEBUG
+    Qn::SerializationFormat defaultFormat()
+    {
+#ifdef _DEBUG_PROTOCOL
         return Qn::JsonFormat;
 #else
         return Qn::UbjsonFormat;

@@ -170,12 +170,12 @@
     <message>
         <location/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>ถึง</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>เซิร์ฟเวอร์ทั้งหมดออฟไลน์ ข้อมูลการตรวจสอบจะไม่สามารถใช้ได้.</translation>
     </message>
 </context>
 <context>
@@ -183,32 +183,32 @@
     <message>
         <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
         <source>Backup Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลตามตารางเวลา ...</translation>
     </message>
     <message>
         <location/>
         <source>Execute backup on the following days:</source>
-        <translation type="unfinished"></translation>
+        <translation>ดำเนินการสำรองข้อมูลในวันต่อไปนี้:</translation>
     </message>
     <message>
         <location/>
         <source>Finish:</source>
-        <translation type="unfinished"></translation>
+        <translation>เสร็จสิ้น:</translation>
     </message>
     <message>
         <location/>
         <source>Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มต้น:</translation>
     </message>
     <message>
         <location/>
         <source>Limit Bandwidth to:</source>
-        <translation type="unfinished"></translation>
+        <translation>จำกัด Bandwidth ไปที่:</translation>
     </message>
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Mbit/s</translation>
     </message>
 </context>
 <context>
@@ -216,27 +216,27 @@
     <message>
         <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>ระยะเวลาคงที่:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>วินาที</translation>
     </message>
     <message>
         <location/>
         <source>Tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tags:</translation>
     </message>
     <message>
         <location/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>ก่อนการบันทึก:</translation>
     </message>
     <message>
         <location/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>โพสต์การบันทึก :</translation>
     </message>
 </context>
 <context>
@@ -244,32 +244,32 @@
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
         <source>&amp;Name</source>
-        <translation type="unfinished">&amp;ชื่อ</translation>
+        <translation>&amp;ชื่อ</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished">&amp;หมดเวลา</translation>
+        <translation>&amp;หมดเวลา</translation>
     </message>
     <message>
         <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished">&amp;T &amp; ags</translation>
+        <translation>&amp;T &amp; ags</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished">&amp;รายละเอียด</translation>
+        <translation>&amp;รายละเอียด</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>รายการของแท็กหารด้วยเครื่องหมายจุลภาคหรือช่องว่าง</translation>
     </message>
     <message>
         <location/>
         <source>Popular tags</source>
-        <translation type="unfinished"></translation>
+        <translation>แท็กยอดนิยม</translation>
     </message>
 </context>
 <context>
@@ -277,27 +277,27 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>รีเฟรช</translation>
     </message>
     <message>
         <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;กล้องอื่นๆ&gt;</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">เซิร์ฟเวอร์ทั้งหมดออฟไลน์ บันทึกจะไม่สามารถใช้ได้.</translation>
+        <translation>เซิร์ฟเวอร์ทั้งหมดออฟไลน์ บันทึกจะไม่สามารถใช้ได้.</translation>
     </message>
     <message>
         <location/>
         <source>Bookmark Log</source>
-        <translation type="unfinished"></translation>
+        <translation>การบันทึก บุ๊คมาร์ค</translation>
     </message>
 </context>
 <context>
@@ -484,12 +484,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
         <source>Category</source>
-        <translation type="unfinished">ประเภท</translation>
+        <translation>ประเภท</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>รีเฟรส</translation>
     </message>
 </context>
 <context>
@@ -502,7 +502,7 @@
     <message>
         <location/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>กล้องนี้ยังไม่มีการตั้งค่าขั้นสูง</translation>
     </message>
 </context>
 <context>
@@ -886,7 +886,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>ตำแหน่ง &amp;PTZ:</translation>
     </message>
 </context>
 <context>
@@ -1004,21 +1004,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl +E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>การตั้งค่าระบบ</translation>
     </message>
@@ -1034,43 +1019,33 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>&amp;Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;การเตือนภัย/กฎเหตุการณ์...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;บันทึกเหตุการณ์...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Health Monitoring...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;การตรวจสอบสภาวะ ...</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>ตรวจสอบเส้นทาง ...</translation>
     </message>
     <message>
         <location/>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดตรวจสอบเส้นทางการบันทึก</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;บุ๊กมาร์ ...</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1068,7 @@
     <message>
         <location/>
         <source>Default Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>หมุนเริ่มต้น:</translation>
     </message>
 </context>
 <context>
@@ -1303,7 +1278,7 @@
     <message>
         <location/>
         <source>This license type requires a higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>ใบอนุญาตประเภทนี้ต้องใช้ซอฟต์แวร์รุ่นที่สูงขึ้น.</translation>
     </message>
 </context>
 <context>
@@ -1572,7 +1547,7 @@
     <message>
         <location/>
         <source>Time Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>โหมดเวลา:</translation>
     </message>
 </context>
 <context>
@@ -1867,7 +1842,7 @@
     <message>
         <location/>
         <source>You will be reconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณจะได้รับการเชื่อมต่ออีกครั้ง.</translation>
     </message>
 </context>
 <context>
@@ -1999,7 +1974,7 @@
     <message>
         <location/>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>ไม่สามารถตรวจสอบการปรับปรุงบนอินเทอร์เน็ต.</translation>
     </message>
 </context>
 <context>
@@ -2122,7 +2097,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>กรุณารอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน ...</translation>
     </message>
 </context>
 <context>
@@ -2464,17 +2439,17 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation type="unfinished"></translation>
+        <translation>สำหรับ</translation>
     </message>
     <message>
         <location/>
         <source>Force Alarm Layout opening</source>
-        <translation type="unfinished"></translation>
+        <translation>เปิดหน้าต่างแจ้งเตือน</translation>
     </message>
     <message>
         <location/>
         <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>ยังแสดงให้เห็นกล้องแหล่งที่มา</translation>
     </message>
 </context>
 <context>
@@ -2482,27 +2457,27 @@
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>วินาที</translation>
     </message>
     <message>
         <location/>
         <source>Display text for:</source>
-        <translation type="unfinished"></translation>
+        <translation>แสดงข้อความสำหรับ:</translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation type="unfinished"></translation>
+        <translation>ใช้ข้อความที่กำหนดเอง:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for prolonged events</source>
-        <translation type="unfinished"></translation>
+        <translation>กฎข้อที่จะทำงานเฉพาะสำหรับเหตุการณ์ที่เกิดขึ้นเป็นเวลานาน</translation>
     </message>
     <message>
         <location/>
         <source>Also show on source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>ยังแสดงให้เห็นในกล้องแหล่งที่มา</translation>
     </message>
 </context>
 <context>
@@ -2678,7 +2653,7 @@
     <message>
         <location/>
         <source>I/O ports</source>
-        <translation type="unfinished"></translation>
+        <translation>พอร์ต I/O</translation>
     </message>
 </context>
 <context>
@@ -2686,62 +2661,63 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished">SMTP &amp;Server:</translation>
+        <translatorcomment>SMTP &amp;Server:</translatorcomment>
+        <translation>SMTP &amp;Server:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished">&amp;ผู้ใช้งาน:</translation>
+        <translation>&amp;ผู้ใช้งาน:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;รหัสผ่าน:</translation>
+        <translation>&amp;รหัสผ่าน:</translation>
     </message>
     <message>
         <location/>
         <source>Email:</source>
-        <translation type="unfinished">อีเมล:</translation>
+        <translation>อีเมล:</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished">&amp;พอร์ต:</translation>
+        <translation>&amp;พอร์ต:</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">การเชื่อมต่อไม่มีการป้องกัน</translation>
+        <translation>การเชื่อมต่อไม่มีการป้องกัน</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished">(แนะนำ)</translation>
+        <translation>(แนะนำ)</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">เชื่อมต่อที่ปลอดภัยโดยใช้ TLS.</translation>
+        <translation>เชื่อมต่อที่ปลอดภัยโดยใช้ TLS.</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">เชื่อมต่อที่ปลอดภัยโดยใช้ SSL.</translation>
+        <translation>เชื่อมต่อที่ปลอดภัยโดยใช้ SSL.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;ลายเซ็นระบบ:</translation>
+        <translation>&amp;ลายเซ็นระบบ:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">ป้อนรายละเอียดของระบบสั้น ๆ ที่นี่.</translation>
+        <translation>ป้อนรายละเอียดของระบบสั้น ๆ ที่นี่.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">ลายเซ็นทีมช่วยเหลือ:</translation>
+        <translation>ลายเซ็นทีมช่วยเหลือ:</translation>
     </message>
 </context>
 <context>
@@ -2767,27 +2743,27 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;อีเมล์l:</translation>
+        <translation>&amp;อีเมล:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;รหัสผ่าน:</translation>
+        <translation>&amp;รหัสผ่าน:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;ลายเซ็นระบบ:</translation>
+        <translation>&amp;ลายเซ็นระบบ:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">ป้อนรายละเอียดของระบบสั้น ๆ ที่นี่.</translation>
+        <translation>ป้อนรายละเอียดของระบบสั้น ๆ ที่นี่.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">ลายเซ็นทีมช่วยเหลือ:</translation>
+        <translation>ลายเซ็นทีมช่วยเหลือ:</translation>
     </message>
 </context>
 <context>
@@ -2795,42 +2771,42 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
-        <translation type="unfinished">เซิร์ฟเวอร์:</translation>
+        <translation>เซิร์ฟเวอร์:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">พอร์ต:</translation>
+        <translation>พอร์ต:</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished">ชื่อผู้ใช้:</translation>
+        <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
         <location/>
         <source>Security:</source>
-        <translation type="unfinished">ความปลอดภัย:</translation>
+        <translation>ความปลอดภัย:</translation>
     </message>
     <message>
         <location/>
         <source>Progress:</source>
-        <translation type="unfinished">ความคืบหน้า:</translation>
+        <translation>ความคืบหน้า:</translation>
     </message>
     <message>
         <location/>
         <source>Result:</source>
-        <translation type="unfinished">เหตุผล:</translation>
+        <translation>เหตุผล:</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished">ตกลง</translation>
+        <translation>ตกลง</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">ยกเลิก</translation>
+        <translation>ยกเลิก</translation>
     </message>
 </context>
 <context>
@@ -2838,94 +2814,94 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
+        <translation>สร้างดัชนีเอกสารเก่า</translation>
     </message>
     <message>
         <location/>
         <source>Backup progress</source>
-        <translation type="unfinished"></translation>
+        <translation>ความคืบหน้าของการสำรองข้อมูล</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">ยกเลิก</translation>
+        <translation>ยกเลิก</translation>
     </message>
     <message>
         <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
+        <translation>เริ่มการสำรองข้อมูลในตอนนี้</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">ยกเลิกการเลือก พื้นที่จัดเก็บ จะทำให้อะไร แต่การเขียนหยุด
+        <translation>ยกเลิกการเลือก พื้นที่จัดเก็บ จะทำให้อะไร แต่การเขียนหยุด
 มันจะไม่ปฏิเสธการลบภาพที่เก่าแก่ที่สุดจากไดรฟ์.</translation>
     </message>
     <message>
         <location/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">เพิ่มหน่วยความจำภายนอก...</translation>
+        <translation>เพิ่มหน่วยความจำภายนอก...</translation>
     </message>
     <message>
         <location/>
         <source>Main Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>สถานที่จัดเก็บหลัก</translation>
     </message>
     <message>
         <location/>
         <source>Backup Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>สถานที่จัดเก็บสำรอง</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>ดำเนินการสำรองข้อมูล</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>กำหนดตารางเวลา ...</translation>
     </message>
     <message>
         <location/>
         <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation type="unfinished"></translation>
+        <translation>คุณไม่ได้กำหนดจัดเก็บสำรองข้อมูลใด ๆ การสำรองข้อมูลจะไม่ถูกดำเนินการ.</translation>
     </message>
     <message>
         <location/>
         <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>การจัดเก็บสำรองสามารถใช้ได้ถ้ามี 2 ที่หรือมากกว่าไดรฟ์จัดเก็บข้อมูลที่ถูกต้องในระบบ.</translation>
     </message>
     <message>
         <location/>
         <source>Global Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าการสำรองข้อมูลทั่วโลก</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From:</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองข้อมูลเอกสารเก่าจาก:</translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>การสำรองคุณภาพ:</translation>
     </message>
     <message>
         <location/>
         <source>&lt;Select at least one camera&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;เลือก อย่างน้อยหนึ่งกล้อง&gt; </translation>
     </message>
     <message>
         <location/>
         <source>Server Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>การตั้งค่าสำรองข้อมูลเซิฟเวอร์</translation>
     </message>
     <message>
         <location/>
         <source>Backup Time Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup Time Label</translation>
     </message>
 </context>
 <context>
@@ -2933,7 +2909,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
         <source>Cancel</source>
-        <translation type="unfinished">ยกเลิก</translation>
+        <translation>ยกเลิก</translation>
     </message>
 </context>
 <context>
@@ -2984,7 +2960,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished">คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
+        <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
     </message>
 </context>
 <context>

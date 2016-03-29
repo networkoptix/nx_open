@@ -1,47 +1,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client.bin</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client Executable</name>
+    <name>NX Witness Client Executable</name>
 
     <properties>
         <guid>${client.bin.guid}</guid>
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip -lcloud_db_client</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar -ludt</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
-        <!--Global defines-->
+
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
+        <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
+
         <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
+
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox</rdep.packages>
     </properties>
 
     <dependencies>
@@ -61,7 +49,16 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>     
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -88,24 +85,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client/pom.xml</systemPath>
-        </dependency>
+        </dependency>           
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>webkit-win</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>webkit</name>
-                    <value>!false</value>
-                </property>
-            </activation>
-            <properties>
-                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-            </properties>
-        </profile>
-    </profiles>
 </project>

@@ -15,6 +15,7 @@
 #include <condition_variable>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <mutex>
 
 #define QN_NO_KEYWORD_UNUSED
@@ -24,6 +25,7 @@
 
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_properties.h>
+#include <utils/common/cpp14.h>
 #include <utils/common/synctime.h>
 #include <network/multicodec_rtp_reader.h>
 #include <nx/streaming/rtsp_client.h>
@@ -46,7 +48,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP )
     QnSyncTime syncTimeInstance;
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
-    resource->setId( QUuid::createUuid().toString() );
+    resource->setId( QUuid::createUuid() );
     resource->setName( "DummyRes" );
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -323,7 +325,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
 }
 
 
-namespace 
+namespace
 {
     class AsyncReadHandler
     {
@@ -519,7 +521,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
     testFile.close();
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );
-    resource->setId( QUuid::createUuid().toString() );
+    resource->setId( QUuid::createUuid() );
     resource->setName( "DummyRes" );
     QAuthenticator auth;
     auth.setUser( "root" );
@@ -533,7 +535,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
         std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader(
             new QnMulticodecRtpReader(
                 resource,
-                std::unique_ptr<BufferSocket>(new BufferSocket(testData))) );
+                std::make_unique<nx::network::BufferSocket>(testData)) );
         rtspStreamReader->setRequest( rtspUrl );
         ASSERT_TRUE( rtspStreamReader->openStream() );
 

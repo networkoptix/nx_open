@@ -30,13 +30,15 @@
 #include "core/resource/user_resource.h"
 #include "database/db_manager.h"
 #include "http/custom_headers.h"
-#include "version.h"
 #include "settings.h"
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
 //#define USE_JSON
+#ifndef USE_JSON
 #define ENCODE_TO_BASE64
+#endif
+#define AGGREGATE_TRANSACTIONS_BEFORE_SEND
 //#define PIPELINE_POST_REQUESTS
 
 
@@ -82,6 +84,9 @@ namespace ConnectionType
 
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
+//following value is for VERY slow networks and VERY large transactions (e.g., some large image)
+    //Connection keep-alive timeout is not influenced by this value
+static const std::chrono::minutes kSocketSendTimeout(23);
 const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
 const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
@@ -137,7 +142,9 @@ QnTransactionTransport::QnTransactionTransport(
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
-    if( !m_outgoingDataSocket->setSendTimeout(m_idleConnectionTimeout.count()) )
+    using namespace std::chrono;
+    if (!m_outgoingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count()))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QnLog::EC2_TRAN_LOG,
@@ -150,7 +157,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
 
-    auto keepAliveHeaderIter = request.headers.find("Keep-Alive");
+    auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
     if (keepAliveHeaderIter != request.headers.end())
     {
         nx_http::header::KeepAlive keepAliveHeader;
@@ -458,7 +465,7 @@ void QnTransactionTransport::close()
     closeSocket();
     {
         QnMutexLocker lock( &m_mutex );
-        assert( !m_incomingDataSocket && !m_outgoingDataSocket );
+        NX_ASSERT( !m_incomingDataSocket && !m_outgoingDataSocket );
         m_readSync = false;
         m_writeSync = false;
     }
@@ -522,7 +529,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
     m_httpClient->addAdditionalHeader(
-        "Keep-Alive",
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
             std::chrono::duration_cast<std::chrono::seconds>(
                 m_tcpKeepAliveTimeout)).toString());
@@ -584,7 +591,7 @@ bool QnTransactionTransport::tryAcquireConnecting(const QnUuid& remoteGuid, bool
 {
     QnMutexLocker lock( &m_staticMutex );
 
-    Q_ASSERT(!remoteGuid.isNull());
+    NX_ASSERT(!remoteGuid.isNull());
 
     bool isExist = m_existConn.contains(remoteGuid);
     isExist |= isOriginator ?  m_connectingConn.value(remoteGuid).first : m_connectingConn.value(remoteGuid).second;
@@ -680,7 +687,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     if (m_state >= QnTransactionTransport::Closed)
         return;
 
-    assert( m_state == ReadyForStreaming );
+    NX_ASSERT( m_state == ReadyForStreaming );
 
     //parsing and processing input data
     if( !m_incomingTransactionStreamParser->processData( m_readBuffer ) )
@@ -718,7 +725,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
                     transportHeader,
                     serializedTran ) )
             {
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error deserializing JSON data from peer %1. Disconnecting...").
                     arg(m_remotePeer.id.toString()), cl_logWARNING);
                 setStateNoLock( State::Error );
@@ -733,7 +740,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
                     transportHeader,
                     serializedTran ) )
             {
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error deserializing Ubjson data from peer %1. Disconnecting...").
                     arg(m_remotePeer.id.toString()), cl_logWARNING);
                 setStateNoLock( State::Error );
@@ -748,7 +755,7 @@ void QnTransactionTransport::receivedTransactionNonSafe( const QnByteArrayConstR
             return;
     }
 
-    Q_ASSERT( !transportHeader.processedPeers.empty() );
+    NX_ASSERT( !transportHeader.processedPeers.empty() );
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
         arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
     emit gotTransaction( m_remotePeer.dataFormat, serializedTran, transportHeader);
@@ -811,7 +818,7 @@ void QnTransactionTransport::transactionProcessed()
         return;
     }
 
-    assert( m_incomingDataSocket || m_outgoingDataSocket );
+    NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
 
     m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
     scheduleAsyncRead();
@@ -829,8 +836,8 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
 {
     QnMutexLocker lk( &m_mutex );
 
-    assert( m_peerRole == prAccepting );
-    assert( m_connectionType != ConnectionType::bidirectional );
+    NX_ASSERT( m_peerRole == prAccepting );
+    NX_ASSERT( m_connectionType != ConnectionType::bidirectional );
 
     m_incomingDataSocket = std::move(socket);
 
@@ -845,7 +852,20 @@ void QnTransactionTransport::setIncomingTransactionChannelSocket(
     startListeningNonSafe();
 }
 
-void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> invokeBeforeWait )
+void QnTransactionTransport::lock()
+{
+    QnMutexLocker lk(&m_mutex);
+    ++m_waiterCount;
+}
+
+void QnTransactionTransport::unlock()
+{
+    QnMutexLocker lk(&m_mutex);
+    --m_waiterCount;
+    m_cond.wakeAll();    //signalling that we are not waiting anymore
+}
+
+void QnTransactionTransport::waitForNewTransactionsReady()
 {
     QnMutexLocker lk( &m_mutex );
 
@@ -853,16 +873,11 @@ void QnTransactionTransport::waitForNewTransactionsReady( std::function<void()> 
         return;
 
     //waiting for some transactions to be processed
-    ++m_waiterCount;
-    if( invokeBeforeWait )
-        invokeBeforeWait();
     while( (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME && m_state != Closed) ||
             m_state < ReadyForStreaming)
     {
         m_cond.wait( lk.mutex() );
     }
-    --m_waiterCount;
-    m_cond.wakeAll();    //signalling that we are not waiting anymore
 }
 
 void QnTransactionTransport::connectionFailure()
@@ -895,7 +910,7 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
 
     if( m_peerRole == prAccepting )
     {
-        assert( m_outgoingDataSocket );
+        NX_ASSERT( m_outgoingDataSocket );
         m_outgoingDataSocket->registerTimer(
             m_tcpKeepAliveTimeout.count(),
             std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, 0) );
@@ -941,6 +956,7 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
 QUrl QnTransactionTransport::generatePostTranUrl()
 {
+    //return m_postTranBaseUrl;
     QUrl postTranUrl = m_postTranBaseUrl;
     postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
     return postTranUrl;
@@ -983,10 +999,12 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
 {
-    assert( !m_dataToSend.empty() );
+    NX_ASSERT( !m_dataToSend.empty() );
 
+#ifdef AGGREGATE_TRANSACTIONS_BEFORE_SEND
     if( m_base64EncodeOutgoingTransactions )
         aggregateOutgoingTransactionsNonSafe();
+#endif  //AGGREGATE_TRANSACTIONS_BEFORE_SEND
 
     DataToSend& dataCtx = m_dataToSend.front();
 
@@ -1039,7 +1057,7 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
                         &request,
                         m_httpAuthCacheItem ) )
                 {
-                    Q_ASSERT( false );
+                    NX_ASSERT( false );
                 }
 
                 request.headers.emplace( "Date", dateTimeToHTTPFormat(QDateTime::currentDateTime()) );
@@ -1068,13 +1086,15 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
     }
     else  //m_peerRole == prOriginating
     {
-        assert( m_peerRole == prOriginating && m_connectionType != ConnectionType::bidirectional );
+        NX_ASSERT( m_peerRole == prOriginating && m_connectionType != ConnectionType::bidirectional );
 
         //using http client just to authenticate on server
         if( !m_outgoingTranClient )
         {
+            using namespace std::chrono;
             m_outgoingTranClient = nx_http::AsyncHttpClient::create();
-            m_outgoingTranClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
+            m_outgoingTranClient->setSendTimeoutMs(
+                duration_cast<milliseconds>(kSocketSendTimeout).count());   //it can take a long time to send large transactions
             m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,
@@ -1126,7 +1146,7 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
         m_dataToSend.pop_front();
         return setStateNoLock( State::Error );
     }
-    assert( bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size() );
+    NX_ASSERT( bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size() );
 
     m_dataToSend.pop_front();
     if( m_dataToSend.empty() )
@@ -1202,7 +1222,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
     if (itrRuntimeGuid != client->response()->headers.end())
         m_remotePeer.instanceId = QnUuid(itrRuntimeGuid->second);
 
-    Q_ASSERT(!m_remotePeer.instanceId.isNull());
+    NX_ASSERT(!m_remotePeer.instanceId.isNull());
     m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server peers only
     #ifdef USE_JSON
         m_remotePeer.dataFormat = Qn::JsonFormat;
@@ -1266,7 +1286,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
             setState(ConnectingStage2);
-            assert( data.isEmpty() );
+            NX_ASSERT( data.isEmpty() );
         }
         else {
             QnMutexLocker lk( &m_mutex );
@@ -1295,7 +1315,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
         }
 
-        auto keepAliveHeaderIter = m_httpClient->response()->headers.find("Keep-Alive");
+        auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
         if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
         {
             nx_http::header::KeepAlive keepAliveHeader;
@@ -1343,7 +1363,7 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
-    Q_ASSERT( m_peerRole == prOriginating );
+    NX_ASSERT( m_peerRole == prOriginating );
     if( !m_incomingTransactionStreamParser->processData( data ) )
     {
         NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error processing incoming data (4) from peer %1. Disconnecting...").
@@ -1417,7 +1437,7 @@ void QnTransactionTransport::processChunkExtensions( const nx_http::HttpHeaders&
 void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data)
 {
     QnMutexLocker lk( &m_mutex );
-    assert(m_extraData.isEmpty());
+    NX_ASSERT(m_extraData.isEmpty());
     m_extraData = data;
 }
 
@@ -1427,7 +1447,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         return false;
 
     QnTransactionTransportHeader header(_header);
-    assert(header.processedPeers.contains(m_localPeer.id));
+    NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
     header.fillSequence();
     switch (m_remotePeer.dataFormat) {
     case Qn::JsonFormat:
@@ -1476,7 +1496,6 @@ bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value co
     case ApiCommand::getUsers:
     case ApiCommand::saveLayouts:
     case ApiCommand::getLayouts:
-    case ApiCommand::saveResource:
     case ApiCommand::removeResource:
     case ApiCommand::removeCamera:
     case ApiCommand::removeMediaServer:
@@ -1515,13 +1534,15 @@ void QnTransactionTransport::scheduleAsyncRead()
 
 void QnTransactionTransport::startListeningNonSafe()
 {
-    assert( m_incomingDataSocket || m_outgoingDataSocket );
+    NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
     m_httpStreamReader.resetState();
 
     if( m_incomingDataSocket )
     {
+        using namespace std::chrono;
         m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_incomingDataSocket->setSendTimeout(SOCKET_TIMEOUT);
+        m_incomingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count());
         m_incomingDataSocket->setNonBlockingMode(true);
         using namespace std::placeholders;
         m_lastReceiveTimer.restart();
@@ -1536,7 +1557,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
 {
     QnMutexLocker lk( &m_mutex );
 
-    assert( client == m_outgoingTranClient );
+    NX_ASSERT( client == m_outgoingTranClient );
 
     if( client->failed() || !client->response() )
     {
@@ -1606,7 +1627,7 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
     if( nxUsernameHeaderIter != client->request().headers.end() )
         m_outgoingClientHeaders.emplace_back( *nxUsernameHeaderIter );
 
-    assert( !m_outgoingDataSocket );
+    NX_ASSERT( !m_outgoingDataSocket );
     m_outgoingDataSocket = client->takeSocket();
     m_outgoingTranClient.reset();
 

@@ -26,6 +26,13 @@ static const qint64 USEC_PER_MS = 1000;
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
+    const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
+    //TODO #ak AuthMethod::videowall is used here to imply existing class
+        //QnAuthMethodRestrictionList with no change, since release 2.5 is coming.
+        //Proper types will be introduced in 2.6
+    if (!(allowedMethods & AuthMethod::videowall))
+        return; //not processing url
+
     const QUrlQuery urlQuery( request->requestLine.url.query() );
 
     if( urlQuery.hasQueryItem( Qn::SERVER_GUID_HEADER_NAME ) ||
@@ -49,7 +56,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         findCameraUniqueID( *request, urlQuery, &cameraRes ) )
     {
         //detecting owner of res and adding SERVER_GUID_HEADER_NAME
-        Q_ASSERT( cameraRes );
+        NX_ASSERT( cameraRes );
 
         //checking for the time requested to select desired server
         qint64 timestampMs = -1;
@@ -65,7 +72,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 QnVirtualCameraResourcePtr virtualCameraRes = cameraRes.dynamicCast<QnVirtualCameraResource>();
                 if( virtualCameraRes )
                 {
-                    QnMediaServerResourcePtr mediaServer = 
+                    QnMediaServerResourcePtr mediaServer =
                         qnCameraHistoryPool->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
@@ -86,6 +93,11 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
     }
 }
 
+void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
+{
+    m_restrictionList.deny(pathWildcardMask, AuthMethod::videowall);
+}
+
 bool QnAutoRequestForwarder::findCameraGuid(
     const nx_http::Request& request,
     const QUrlQuery& urlQuery,
@@ -93,16 +105,16 @@ bool QnAutoRequestForwarder::findCameraGuid(
 {
     QnUuid cameraGuid;
 
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter = 
+    nx_http::HttpHeaders::const_iterator xCameraGuidIter =
         request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     if( xCameraGuidIter != request.headers.end() )
-        cameraGuid = xCameraGuidIter->second;
+        cameraGuid = QnUuid::fromStringSafe(xCameraGuidIter->second);
 
     if( cameraGuid.isNull() )
-        cameraGuid = request.getCookieValue( Qn::CAMERA_GUID_HEADER_NAME );
+        cameraGuid = QnUuid::fromStringSafe(request.getCookieValue( Qn::CAMERA_GUID_HEADER_NAME ));
 
     if( cameraGuid.isNull() )
-        cameraGuid = urlQuery.queryItemValue( Qn::CAMERA_GUID_HEADER_NAME );
+        cameraGuid = QnUuid::fromStringSafe(urlQuery.queryItemValue( Qn::CAMERA_GUID_HEADER_NAME ));
 
     if( cameraGuid.isNull() )
         return false;

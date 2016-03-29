@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage) {
+    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs) {
 
         mediaserver.getUser().then(function(user){
             if(!user.isOwner){
@@ -15,7 +15,10 @@ angular.module('webadminApp')
             $scope.session.method = {
                 name:'/api/pingSystem',
                 data:'',
-                params:'{\n\t"password":"admin",\n\t"url":"http://demo.networkoptix.com:7001/"\n}',
+                params: JSON.stringify({
+                    password: 'admin',
+                    url: 'http://demo.networkoptix.com:7001/'
+                }, null,  '\t '),
                 method:'POST'
             };
         }
@@ -27,11 +30,11 @@ angular.module('webadminApp')
         $scope.getDebugUrl = function(){
 
             var params = $scope.session.method.params;
-            if(params && params!='') {
+            if(params && params !== '') {
                 try {
                     params = JSON.parse(params);
                 } catch (a) {
-                    return "GET-params is not a valid json object: " + a;
+                    return  'GET-params is not a valid json object:  ' + a;
                 }
             }
 
@@ -40,36 +43,36 @@ angular.module('webadminApp')
 
         $scope.testMethod = function(){
             var data = $scope.session.method.data;
-            if(data && data!='') {
+            if(data && data !== '') {
                 try {
                     data = JSON.parse(data);
                 } catch (a) {
                     console.error(a);
-                    alert("POST-params is not a valid json object");
+                    dialogs.alert( 'POST-params is not a valid json object ');
                     return;
                 }
             }
 
             var params = $scope.session.method.params;
-            if(params && params!='') {
+            if(params && params !== '') {
                 try {
                     params = JSON.parse(params);
                 } catch (a) {
                     console.error(a);
-                    alert("GET-params is not a valid json object");
+                    dialogs.alert( 'GET-params is not a valid json object ');
                     return;
                 }
             }
 
 
             mediaserver.debugFunction($scope.session.method.method, $scope.session.method.name, params, data).then(function(success){
-                $scope.result.status = success.status + ": " + success.statusText;
-                $scope.result.result = JSON.stringify(success.data, null, "\t");
+                $scope.result.status = success.status +  ':  ' + success.statusText;
+                $scope.result.result = JSON.stringify(success.data, null,  '\t ');
             },function(error){
-                $scope.result.status = error.status + ": " + error.statusText;
-                $scope.result.result =  "Error:" + JSON.stringify(error.data, null, "\t");
+                $scope.result.status = error.status +  ':  ' + error.statusText;
+                $scope.result.result =   'Error: ' + JSON.stringify(error.data, null,  '\t ');
             });
-        }
+        };
 
 
     });

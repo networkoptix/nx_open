@@ -1,9 +1,101 @@
 #include "string.h"
 
+#include <QtXml/QDomDocument>
+
 #include <cmath>
 
 #include "util.h"
+#include <nx/utils/log/assert.h>
 
+namespace
+{
+    QString replaceNewLineToBrTag(const QString &text)
+    {
+        static const auto kNewLineSymbol = L'\n';
+        static const auto kNewLineTag = lit("<br>");
+
+        return text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    }
+
+
+    // @brief Tries to elide node text
+    // @return Resulting text length
+    int elideTextNode(QDomNode &node
+        , int maxLength
+        , const QString &tail)
+    {
+        auto textNode = node.toText();
+        if (textNode.isNull())
+            return 0;
+
+        const auto text = textNode.nodeValue();
+        const auto textSize = text.size();
+        if (textSize <= maxLength)
+            return textSize;
+
+        const auto elided = elideString(text, maxLength);
+        textNode.setNodeValue(elided);
+        return maxLength;
+    }
+
+    // @brief Tries to elide node (element) text.
+    // @return Resulting text length
+    int elideDomNode(QDomNode &node
+        , int maxLength
+        , const QString &tail)
+    {
+        // if specified node is text - elide it
+        if (auto len = elideTextNode(node, maxLength, tail))
+            return len;
+
+        int currentLength = 0;
+        QList<QDomNode> forRemove;
+        for (auto child = node.firstChild(); !child.isNull(); child = child.nextSibling())
+        {
+            if (currentLength >= maxLength)
+            {
+                // Removes all elements that are not fit to length
+                forRemove.append(child);
+                continue;
+            }
+
+            // Tries to elide text node
+            if (currentLength < maxLength)
+            {
+                if (auto length = elideTextNode(child, maxLength - currentLength, tail))
+                {
+                    currentLength += length;
+                    continue;
+                }
+            }
+
+            // if it is not text node, try to parse whole element
+            const auto elem = child.toElement();
+            if (elem.isNull())
+            {
+                // If it is not element (comment or some specific data) - skip it
+                continue;
+            }
+
+            const int textLength = elem.text().size();
+            if ((currentLength + textLength) <= maxLength)
+            {
+                // Text length of element (and all its child elements) is less then maximum
+                currentLength += textLength;
+                continue;
+            }
+
+            currentLength += elideDomNode(child, maxLength - currentLength, tail);
+        }
+
+        // Removes all elements that are not fit
+        for(auto child: forRemove)
+            node.removeChild(child);
+
+        return currentLength;
+    };
+
+}
 
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement) {
     if(!symbols)
@@ -365,8 +457,8 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 }
 
 void naturalStringCompareTestCase(const QString &l, const QString &r, int value) {
-    assert(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
-    assert(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
+    NX_ASSERT(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
+    NX_ASSERT(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
 }
 
 void naturalStringCompareTest() {
@@ -400,11 +492,14 @@ QString htmlBold(const QString &source) {
     return lit("<b>%1</b>").arg(source);
 }
 
-QString elideString(const QString &source, int maxLength, const QString &tail) {
+QString elideString(const QString &source, int maxLength, const QString &tail)
+{
+    if (source.length() <= maxLength)
+        return source;
+
     const auto tailLength = tail.length();
-    return source.length() <= maxLength
-        ? source
-        : source.left(maxLength - tailLength) + tail;
+    const auto elidedText = source.left(maxLength > tailLength ? maxLength - tailLength : 0);
+    return (elidedText + tail);
 }
 
 QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBold /*= false */, bool isItalic /*= false*/ ) {
@@ -416,14 +511,38 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     const QString boldValue = (isBold ? lit("bold") : lit("normal"));
     const QString italicValue (isItalic ? lit("italic") : lit("normal"));
 
-    static const auto kNewLineSymbol = L'\n';
-    static const auto kNewLineTag = lit("<br>");
-
-    const auto newFormattedText = text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    const auto newFormattedText = replaceNewLineToBrTag(text);
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
 QString makeHref(const QString &text, const QUrl &url)
 {
     return lit("<a href=\"%2\">%1</a>").arg(text, url.toString());
+}
+
+QString elideHtml(const QString &html, int maxLength, const QString &tail)
+{
+    QDomDocument dom;
+    dom.setContent(replaceNewLineToBrTag(html));
+    auto root = dom.documentElement();
+    elideDomNode(root, maxLength, tail);
+    return dom.toString();
+}
+
+QByteArray generateRandomName(int length)
+{
+    static const char kAlphaAndDigits[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    static const size_t kDigitsCount = 10;
+    static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
+
+    if (!length)
+        return QByteArray();
+
+    QByteArray str;
+    str.resize(length);
+    str[0] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
+    for (int i = 1; i < length; ++i)
+        str[i] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
+
+    return str;
 }

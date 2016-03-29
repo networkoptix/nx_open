@@ -4,8 +4,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
-#include <QtWidgets/QMessageBox>
-
 #include <common/common_module.h>
 
 #include <licensing/license.h>
@@ -13,7 +11,7 @@
 #include <ui/common/palette.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/product_features.h>
@@ -48,9 +46,9 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
 
-    connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
-    connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
-    connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
+    connect(ui->onlineKeyEdit,              &QLineEdit::textChanged,        this,   &QnLicenseWidget::updateControls);
+    connect(ui->tabWidget,                  &QTabWidget::currentChanged,    this,   &QnLicenseWidget::at_tabWidget_currentChanged);
+    connect(ui->browseLicenseFileButton,    &QPushButton::clicked,          this,   &QnLicenseWidget::at_browseLicenseFileButton_clicked);
 
     connect(ui->activateLicenseButton,      &QPushButton::clicked,              this,   [this] {
         setState(Waiting);
@@ -63,7 +61,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 
     connect(ui->copyHwidButton, &QPushButton::clicked,  this, [this] {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
+        QnMessageBox::information(this, tr("Success"), tr("Hardware ID copied to clipboard."));
     });
 
     connect(ui->pasteKeyButton, &QPushButton::clicked,  this, [this] {
@@ -99,11 +97,11 @@ void QnLicenseWidget::setState(State state) {
 }
 
 bool QnLicenseWidget::isOnline() const {
-    return ui->activationTypeComboBox->currentIndex() == 0;
+    return ui->tabWidget->currentWidget() == ui->onlinePage;
 }
 
 void QnLicenseWidget::setOnline(bool online) {
-    ui->activationTypeComboBox->setCurrentIndex(online ? 0 : 1);
+    ui->tabWidget->setCurrentWidget(online ? ui->onlinePage : ui->manualPage);
 }
 
 bool QnLicenseWidget::isFreeLicenseAvailable() const {
@@ -155,10 +153,10 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
         ui->retranslateUi(this);
 }
 
-void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
+void QnLicenseWidget::at_tabWidget_currentChanged() {
     bool isOnline = this->isOnline();
 
-    ui->stackedWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
+    ui->tabWidget->setCurrentWidget(isOnline ? ui->onlinePage : ui->manualPage);
     ui->activateFreeLicenseButton->setVisible(m_freeLicenseAvailable && isOnline);
 
     updateControls();
@@ -176,7 +174,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Error"), tr("Could not open the file %1").arg(fileName));
+        QnMessageBox::warning(this, tr("Error"), tr("Could not open the file %1").arg(fileName));
         return;
     }
 

@@ -23,7 +23,7 @@
             </condition>
 
             <condition resName="request.path">
-                <set value="/account/reset_password" resName="authenticated" resValue="true"/>
+                <set value="/cdb/account/reset_password" resName="authenticated" resValue="true"/>
             </condition>
         </sequence>
 
@@ -36,8 +36,8 @@
                     <set resName="authorized" resValue="false"/>
                     <set resName="resultCode" resValue="accountNotActivated"/>
                     <condition resName="request.path">
-                        <set value="/account/activate" resName="authorized" resValue="true"/>
-                        <!-- <set value="/account/get" resName="authorized" resValue="true"/> -->
+                        <set value="/cdb/account/activate" resName="authorized" resValue="true"/>
+                        <!-- <set value="/cdb/account/get" resName="authorized" resValue="true"/> -->
                     </condition>
                 </sequence>
                 <sequence value="3">
@@ -50,24 +50,24 @@
             <condition resName="authorized">
                 <!-- following section forbids authorization on some conditions -->
                 <condition value="true" resName="request.path">
-                    <sequence value="/account/register">
+                    <sequence value="/cdb/account/register">
                         <!--
                         This request must be allowed for cloud portal only
                         <set resName="authorized" resValue="false"/>
                         -->
                     </sequence>
-                    <sequence value="/account/activate">
+                    <sequence value="/cdb/account/activate">
                         <!--
                         This request must be allowed for cloud portal only
                         <set resName="authorized" resValue="false"/>
                         -->
                     </sequence>
-                    <condition value="/system/get" resName="systemID" matchType="presence">
+                    <condition value="/cdb/system/get" resName="systemID" matchType="presence">
                         <condition value="true" resName="auth.accountRightsOnSystem">
                             <set value="none" resName="authorized" resValue="false"/>
                         </condition>
                     </condition>
-                    <condition value="/system/get_cloud_users" resName="systemID" matchType="presence">
+                    <condition value="/cdb/system/get_cloud_users" resName="systemID" matchType="presence">
                         <sequence value="true">
                             <set resName="authorized" resValue="false"/>
                             <condition resName="auth.accountRightsOnSystem">
@@ -79,7 +79,7 @@
                         </sequence>
                         <!-- request is allowed for account only -->
                     </condition>
-                    <condition value="/system/get_access_role_list" resName="systemID" matchType="presence">
+                    <condition value="/cdb/system/get_access_role_list" resName="systemID" matchType="presence">
                         <sequence value="false">
                             <set resName="authorized" resValue="false"/>
                             <set resName="resultCode" resValue="badRequest"/>
@@ -94,7 +94,7 @@
                             </condition>
                         </sequence>
                     </condition>
-                    <sequence value="/system/share">
+                    <sequence value="/cdb/system/share">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
@@ -144,14 +144,14 @@
                             <set value="owner" resName="authorized" resValue="false"/>
                         </condition>
                     </sequence>
-                    <sequence value="/system/bind">
+                    <sequence value="/cdb/system/bind">
                         <!-- check system is already bound -->
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountEmail" matchType="presence">
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
-                    <sequence value="/system/unbind">
+                    <sequence value="/cdb/system/unbind">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>

@@ -12,6 +12,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/controls/bookmark_tags_control.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/help/help_topics.h>
 
 #include <utils/common/string.h>
 #include <utils/common/delayed.h>
@@ -326,10 +327,22 @@ namespace
         , const QColor &commonTextColor
         , QGraphicsLinearLayout *layout)
     {
-        if (tags.empty())
+        enum { kMaxTags = 16 };
+
+        QnCameraBookmarkTags validTags;
+        for (const QString &tag: tags)
+        {
+            if (tag.isEmpty())
+                continue;
+            validTags << tag;
+            if (validTags.size() >= kMaxTags)
+                break;
+        }
+
+        if (validTags.empty())
             return insertionIndex;
 
-        const auto tagsControl = new QnBookmarkTagsControl(tags, this);
+        const auto tagsControl = new QnBookmarkTagsControl(validTags, this);
 
         QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked
             , this, [this](const QString &tag)
@@ -347,11 +360,11 @@ namespace
         buttonsLayout->setSpacing(0);
 
         const auto createButton =
-            [this, bookmark](const char *iconName , int eventId)
+            [this, bookmark](const QString &statisticsAlias, const char *iconName , int eventId)
         {
             enum { kSize = 30 };
 
-            auto button = new QnImageButtonWidget(this);
+            auto button = new QnImageButtonWidget(statisticsAlias, this);
             button->setIcon(qnSkin->icon(iconName));
             button->setClickableButtons(Qt::LeftButton);
             button->setMaximumSize(kSize, kSize);
@@ -365,17 +378,20 @@ namespace
             return button;
         };
 
-        buttonsLayout->addItem(createButton("bookmark/tooltip/play.png"
+        buttonsLayout->addItem(createButton(lit("bookmark_tooltip_play")
+            , "bookmark/tooltip/play.png"
             , kBookmarkPlayActionEventId));
 
         if (!m_viewer->readOnly())
         {
-            buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png"
+            buttonsLayout->addItem(createButton(lit("bookmark_tooltip_edit")
+                , "bookmark/tooltip/edit.png"
                 , kBookmarkEditActionEventId));
 
             enum { kSpacerStretch = 1000 };
             buttonsLayout->addStretch(kSpacerStretch);
-            buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png"
+            buttonsLayout->addItem(createButton(lit("bookmark_tooltip_delete")
+                , "bookmark/tooltip/delete.png"
                 , kBookmarkRemoveActionEventId));
         }
         return buttonsLayout;
@@ -401,14 +417,8 @@ namespace
         position = createLabel(position, elideString(bookmark.description, kMaxBodyLength)
             , colors.text, this, bookmarkItemsLayout, kDescriptionLabelIndex);
 
-        if (!bookmark.tags.empty())
-        {
-            enum { kMaxTags = 16 };
-            const auto &trimmedTags = (bookmark.tags.size() <= kMaxTags ? bookmark.tags
-                : QnCameraBookmarkTags::fromList(bookmark.tags.toList().mid(0, kMaxTags)));
 
-            position = createTagsControl(position, trimmedTags, colors.text, bookmarkItemsLayout);
-        }
+        position = createTagsControl(position, bookmark.tags, colors.text, bookmarkItemsLayout);
 
         if (position)
             insertButtonsSeparator(colors.buttonsSeparator, position, this, bookmarkItemsLayout);
@@ -845,6 +855,12 @@ bool QnBookmarksViewer::readOnly() const
 void QnBookmarksViewer::setReadOnly(bool readonly)
 {
     m_impl->setReadOnly(readonly);
+}
+
+int QnBookmarksViewer::helpTopicAt(const QPointF &pos) const
+{
+    Q_UNUSED(pos);
+    return Qn::Bookmarks_Usage_Help;
 }
 
 void QnBookmarksViewer::setTargetTimestamp(qint64 timestamp)

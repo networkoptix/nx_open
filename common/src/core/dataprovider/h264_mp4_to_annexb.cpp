@@ -88,7 +88,7 @@ void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
     const QnAbstractMediaDataPtr& data,
     std::basic_string<quint8>* const seqHeader )
 {
-    assert(data->context);
+    NX_ASSERT(data->context);
     const unsigned char* p = data->context->getExtradata();
 
     //sps & pps is in the extradata, parsing it...

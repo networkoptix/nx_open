@@ -1,7 +1,5 @@
 #include "abstract_media_stream_data_provider.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
@@ -19,7 +17,7 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = res;
-    Q_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
+    NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
     m_isCamera = dynamic_cast<const QnPhysicalCameraResource*>(res.data()) != nullptr;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
@@ -122,7 +120,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
         {
             if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
             {
-                Q_ASSERT(false);
+                NX_ASSERT(false);
                 return false;
             }
 
@@ -153,6 +151,12 @@ const QnMediaStreamStatistics* QnAbstractMediaStreamDataProvider::getStatistics(
     return &m_stat[channel];
 }
 
+int QnAbstractMediaStreamDataProvider::getNumberOfChannels() const
+{
+    NX_ASSERT(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    return m_numberOfchannels ? m_numberOfchannels : 1;
+}
+
 float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
 {
     float rez = 0;
@@ -167,8 +171,7 @@ float QnAbstractMediaStreamDataProvider::getFrameRate() const
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getFrameRate();
 
-    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
-    return rez / (m_numberOfchannels ? m_numberOfchannels : 1);
+    return rez / getNumberOfChannels();
 }
 
 float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
@@ -177,8 +180,7 @@ float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getAverageGopSize();
 
-    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
-    return rez / (m_numberOfchannels ? m_numberOfchannels : 1);
+    return rez / getNumberOfChannels();
 }
 
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
@@ -192,14 +194,16 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {
         // correct packets timestamp if we have got several packets very fast
-
+        int channel = media->channelNumber;
+        if (media->dataType == QnAbstractMediaData::AUDIO)
+            channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
         if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
         {
             resetTimeCheck();
         }
-        else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE)
+        else if ((quint64)m_lastMediaTime[channel] != AV_NOPTS_VALUE)
         {
-            qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
+            qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
@@ -210,10 +214,10 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
                     cl_logDEBUG1);
 
-                media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
+                media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }
         }
-        m_lastMediaTime[media->channelNumber] = media->timestamp;
+        m_lastMediaTime[channel] = media->timestamp;
     }
 }
 
@@ -226,5 +230,3 @@ CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStream
 {
     return CameraDiagnostics::NotImplementedResult();
 }
-
-#endif // ENABLE_DATA_PROVIDERS

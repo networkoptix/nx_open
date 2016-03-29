@@ -8,52 +8,101 @@
 #include <camera/camera_bookmark_aggregation.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_bookmarks_cache.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 
+#include <camera/bookmark_queries_cache.h>
+#include <camera/camera_bookmarks_query.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <utils/common/scoped_timer.h>
+
 namespace
 {
-    enum { kMaxBookmarksOnTimeline = 10000 };
+    enum
+    {
+        kMaxStaticBookmarksCount = 5000
+        , kMaxTimelineBookmarksConut = 500
+    };
 
-    enum { kTimelineMinWindowChangeMs = 60000 };
+    void updateQueryWindowExtended(const QnCameraBookmarksQueryPtr &query
+        , qint64 startTimeMs
+        , qint64 endTimeMs)
+    {
+        enum { kTimelineMinWindowChangeMs = 20 * 1000 };
+        enum { kTimlineWindowShiftSize = kTimelineMinWindowChangeMs * 3};
+
+        auto filter = query->filter();
+        const auto newWindow = helpers::extendTimeWindow(startTimeMs, endTimeMs
+            , kTimlineWindowShiftSize, kTimlineWindowShiftSize);
+        const bool shouldChange = helpers::isTimeWindowChanged(startTimeMs, endTimeMs
+            , filter.startTimeMs, filter.endTimeMs, kTimelineMinWindowChangeMs);
+
+        if (!shouldChange)
+            return;
+
+        filter.startTimeMs = startTimeMs;
+        filter.endTimeMs = endTimeMs;
+        query->setFilter(filter);
+    }
+
+    void updateQuerySparing(const QnCameraBookmarksQueryPtr &query
+        , const QnBookmarkSparsingOptions &options)
+    {
+        auto filter = query->filter();
+        filter.sparsing = options;
+        query->setFilter(filter);
+    }
 }
-
-// TODO: add switch on/off bookmarks mode helper
 
 QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_bookmarksCache(new QnWorkbenchBookmarksCache(kMaxBookmarksOnTimeline
-        , QnBookmarkSortOrder::defaultOrder, QnBookmarkSparsingOptions(true, 0)
-        , kTimelineMinWindowChangeMs, parent))
-    , m_mergeHelper(new QnBookmarkMergeHelper())
     , m_aggregation(new QnCameraBookmarkAggregation())
+    , m_mergeHelper(new QnBookmarkMergeHelper())
+    , m_queriesCache(new QnBookmarkQueriesCache())
+    , m_timelineQuery()
     , m_currentCamera()
+
+    , m_updateStaticQueriesTimer(new QTimer())
     , m_delayedTimer()
     , m_delayedUpdateCounter()
+    , m_timlineFilter()
 {
+    m_timlineFilter.sparsing.used = true;
+    m_timlineFilter.limit = kMaxTimelineBookmarksConut;
+
+    connect(qnResPool, &QnResourcePool::resourceAdded
+        , this, &QnTimelineBookmarksWatcher::onResourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved
+        , this, &QnTimelineBookmarksWatcher::onResourceRemoved);
+
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged
         , this, &QnTimelineBookmarksWatcher::updateCurrentCamera);
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged
         , this, &QnTimelineBookmarksWatcher::updateCurrentCamera);
-    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::bookmarksChanged
-        , this, &QnTimelineBookmarksWatcher::onBookmarksChanged);
+
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved
         , this, &QnTimelineBookmarksWatcher::onBookmarkRemoved);
 
-    // TODO: #ynikitenkov Remove dependency from time slider?
+    // TODO: #ynikitenkov Remove dependency from time slider? and metrics below to navigator?
     connect(navigator()->timeSlider(), &QnTimeSlider::windowChanged
         , this, &QnTimelineBookmarksWatcher::onTimelineWindowChanged);
     connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixelChanged, this, [this]()
     {
-        const auto sparsing = QnBookmarkSparsingOptions(true
+        m_timlineFilter.sparsing = QnBookmarkSparsingOptions(true
             , navigator()->timeSlider()->msecsPerPixel());
-        m_bookmarksCache->setsparsing(sparsing);
+        if (m_timelineQuery)
+            updateQuerySparing(m_timelineQuery, m_timlineFilter.sparsing);
     });
-
     navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper);
+
+    enum { kUpdateStaticQueriesIntervalMs = 5 * 60 * 1000};
+    m_updateStaticQueriesTimer->setInterval(kUpdateStaticQueriesIntervalMs);
+    connect(m_updateStaticQueriesTimer, &QTimer::timeout
+        , m_queriesCache, &QnBookmarkQueriesCache::refreshQueries);
+    m_updateStaticQueriesTimer->start();
 }
 
 QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()
@@ -70,7 +119,49 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
     const QnVirtualCameraResourcePtr &camera
     , qint64 positionMs)
 {
-    return helpers::bookmarksAtPosition(m_bookmarksCache->bookmarks(camera), positionMs);
+    if (!m_queriesCache->hasQuery(camera))
+        return QnCameraBookmarkList();
+
+    if (camera == m_currentCamera)
+        return helpers::bookmarksAtPosition(m_aggregation->bookmarkList(), positionMs);
+
+    const auto &query = m_queriesCache->getOrCreateQuery(camera);
+    const auto &bookmarks = query->cachedBookmarks();
+
+    return helpers::bookmarksAtPosition(bookmarks, positionMs);
+}
+
+void QnTimelineBookmarksWatcher::onResourceAdded(const QnResourcePtr &resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    const auto query = m_queriesCache->getOrCreateQuery(camera);
+    connect(query, &QnCameraBookmarksQuery::bookmarksChanged, this
+        , [this, camera](const QnCameraBookmarkList & /*bookmarks */)
+    {
+        tryUpdateTimelineBookmarks(camera);
+    });
+
+    auto filter = query->filter();
+    filter.limit = kMaxStaticBookmarksCount;
+    filter.sparsing.used = true;
+    query->setFilter(filter);
+}
+
+void QnTimelineBookmarksWatcher::onResourceRemoved(const QnResourcePtr &resource)
+{
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    if (!m_queriesCache->hasQuery(camera))
+        return;
+
+    const auto query = m_queriesCache->getOrCreateQuery(camera);
+    disconnect(query, &QnCameraBookmarksQuery::bookmarksChanged, this, nullptr);
+    m_queriesCache->removeQueryByCamera(camera);
 }
 
 void QnTimelineBookmarksWatcher::updateCurrentCamera()
@@ -90,33 +181,48 @@ void QnTimelineBookmarksWatcher::onBookmarkRemoved(const QnUuid &id)
         m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
 }
 
-void QnTimelineBookmarksWatcher::onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
-    , const QnCameraBookmarkList &bookmarks)
+void QnTimelineBookmarksWatcher::tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera)
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (m_currentCamera != camera)
         return;
 
-    m_aggregation->setBookmarkList(bookmarks);
+    if (!m_currentCamera)
+    {
+        m_aggregation->clear();
+        m_mergeHelper->setBookmarks(QnCameraBookmarkList());
+        return;
+    }
+
+    const auto staticQuery = m_queriesCache->getOrCreateQuery(m_currentCamera);
+    m_aggregation->setBookmarkList(staticQuery->cachedBookmarks());
+    m_aggregation->mergeBookmarkList(m_timelineQuery->cachedBookmarks());
+
     m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
 }
 
 void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs
     , qint64 endTimeMs)
 {
+    if (!m_timelineQuery)
+        return;
+
+    if (!startTimeMs || !endTimeMs || (startTimeMs > endTimeMs))
+        return;
+
     const auto delayedUpdateWindow = [this, startTimeMs, endTimeMs]()
     {
         m_delayedTimer.reset(); // Have to reset manually to prevent double deletion
 
-        static const qint64 kMinStartTime = 0;
-        static const qint64 kMaxEndTime = std::numeric_limits<qint64>::max();
+        m_timlineFilter.startTimeMs = startTimeMs;
+        m_timlineFilter.endTimeMs = endTimeMs;
 
-        const qint64 windowStartMs = (startTimeMs > kTimelineMinWindowChangeMs
-            ? startTimeMs - kTimelineMinWindowChangeMs : kMinStartTime);
-        const qint64 windowEndMs = (kMaxEndTime - kTimelineMinWindowChangeMs > endTimeMs
-            ? endTimeMs + kTimelineMinWindowChangeMs : kMaxEndTime);
-        m_bookmarksCache->setWindow(QnTimePeriod::fromInterval(windowStartMs, windowEndMs));
-        m_delayedUpdateCounter.invalidate();
-        m_delayedUpdateCounter.start();
+        if (!m_timelineQuery)
+            return;
+
+        m_delayedUpdateCounter.restart();
+        updateQueryWindowExtended(m_timelineQuery, startTimeMs, endTimeMs);
     };
 
     enum { kMaxUpdateTimeMs = 5000};
@@ -132,10 +238,28 @@ void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs
 
 void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourcePtr &camera)
 {
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     if (m_currentCamera == camera)
         return;
 
     m_currentCamera = camera;
-    m_aggregation->setBookmarkList(m_bookmarksCache->bookmarks(m_currentCamera));
-    m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
+
+    if (m_timelineQuery)
+        disconnect(m_timelineQuery, nullptr, this, nullptr);
+
+    if (m_currentCamera)
+    {
+        m_timelineQuery = qnCameraBookmarksManager->createQuery(
+            QnVirtualCameraResourceSet() << m_currentCamera, m_timlineFilter);
+
+        connect(m_timelineQuery, &QnCameraBookmarksQuery::bookmarksChanged, this
+            , [this](const QnCameraBookmarkList & /*bookmarks*/)
+        {
+            if (m_currentCamera)
+                tryUpdateTimelineBookmarks(m_currentCamera);
+        });
+    }
+
+    tryUpdateTimelineBookmarks(m_currentCamera);
 }

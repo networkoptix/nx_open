@@ -1,10 +1,11 @@
 #ifndef CLOUD_DATA_PROVIDER_H
 #define CLOUD_DATA_PROVIDER_H
 
+#include <cdb/connection.h>
 #include <nx/utils/timermanager.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
-#include <cdb/connection.h>
+
 
 namespace nx {
 namespace hpm {
@@ -21,6 +22,7 @@ public:
         String authKey;
         bool mediatorEnabled;
 
+        System();
         System(
             String authKey_,
             bool mediatorEnabled_ = false);

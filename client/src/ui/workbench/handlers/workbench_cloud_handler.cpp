@@ -7,6 +7,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <client/client_settings.h>
+
 #include <ui/actions/actions.h>
 #include <ui/dialogs/login_to_cloud_dialog.h>
 
@@ -24,7 +25,7 @@ public:
     void at_openCloudManagementUrlAction_triggered();
 
 public:
-    QScopedPointer<QnLoginToCloudDialog> loginToCloudDialog;
+    QPointer<QnLoginToCloudDialog> loginToCloudDialog;
 };
 
 QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject *parent)
@@ -34,10 +35,13 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject *parent)
 {
     Q_D(QnWorkbenchCloudHandler);
 
-    connect(action(Qn::LoginToCLoud),           &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered);
-    connect(action(Qn::LogoutFromCloud),        &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_logoutFromCloudAction_triggered);
-    connect(action(Qn::OpenCloudMainUrl),       &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudMainUrlAction_triggered);
-    connect(action(Qn::OpenCloudManagementUrl), &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudManagementUrlAction_triggered);
+    connect(action(QnActions::LoginToCLoud),           &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered);
+    connect(action(QnActions::LogoutFromCloud),        &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_logoutFromCloudAction_triggered);
+    connect(action(QnActions::OpenCloudMainUrl),       &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudMainUrlAction_triggered);
+    connect(action(QnActions::OpenCloudManagementUrl), &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudManagementUrlAction_triggered);
+
+    connect(action(QnActions::OpenCloudRegisterUrl), &QAction::triggered, this,
+        []() { QDesktopServices::openUrl(QnCloudUrlHelper::createAccountUrl()); });
 }
 
 QnWorkbenchCloudHandler::~QnWorkbenchCloudHandler()
@@ -56,13 +60,13 @@ void QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered()
 
     if (!loginToCloudDialog)
     {
-        loginToCloudDialog.reset(new QnLoginToCloudDialog(q->mainWindow()));
+        loginToCloudDialog = new QnLoginToCloudDialog(q->mainWindow());
         loginToCloudDialog->setLogin(qnSettings->cloudLogin());
         loginToCloudDialog->show();
 
         connect(loginToCloudDialog, &QnLoginToCloudDialog::finished, this, [this]()
         {
-            loginToCloudDialog.reset();
+            loginToCloudDialog->deleteLater();
         });
     }
 

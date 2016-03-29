@@ -48,7 +48,7 @@ QVariant QnLdapUserListModel::data(const QModelIndex &index, int role) const {
         break;    
     case Qt::CheckStateRole:
         if (index.column() == CheckBoxColumn)
-            return m_checkedUserLogins.contains(user.login);
+            return m_checkedUserLogins.contains(user.login) ? Qt::Checked : Qt::Unchecked;
         break;
     case LoginRole:
         return user.login;

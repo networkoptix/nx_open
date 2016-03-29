@@ -10,7 +10,7 @@
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_controller_pool.h>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
@@ -50,15 +50,15 @@ void QnPtzRestHandler::asyncExecutor(const QString& sequence, AsyncFunc function
     function();
 
     m_asyncExecMutex.lock();
-    
-    while (AsyncFunc nextFunction = m_workers[sequence].nextCommand) 
+
+    while (AsyncFunc nextFunction = m_workers[sequence].nextCommand)
     {
         m_workers[sequence].nextCommand = AsyncFunc();
         m_asyncExecMutex.unlock();
         nextFunction();
         m_asyncExecMutex.lock();
     }
-    
+
     m_workers.remove(sequence);
     m_asyncExecMutex.unlock();
 }
@@ -83,7 +83,7 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
     Qn::PtzCommand command;
     QString resourceId;
     if(
-        !requireParameter(params, lit("command"), result, &command) || 
+        !requireParameter(params, lit("command"), result, &command) ||
         !requireParameter(params, lit("resourceId"), result, &resourceId) ||
         !requireParameter(params, lit("sequenceId"), result, &sequenceId, true) ||
         !requireParameter(params, lit("sequenceNumber"), result, &sequenceNumber, true)
@@ -92,7 +92,7 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
     }
 
     QString hash = QString(lit("%1-%2")).arg(params.value("resourceId")).arg(params.value("sequenceId"));
-    
+
     QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(resourceId).dynamicCast<QnVirtualCameraResource>();
     if(!camera) {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Camera resource '%1' not found.").arg(resourceId));
@@ -144,8 +144,8 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
 int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal xSpeed, ySpeed, zSpeed;
     if(
-        !requireParameter(params, lit("xSpeed"), result, &xSpeed) || 
-        !requireParameter(params, lit("ySpeed"), result, &ySpeed) || 
+        !requireParameter(params, lit("xSpeed"), result, &xSpeed) ||
+        !requireParameter(params, lit("ySpeed"), result, &ySpeed) ||
         !requireParameter(params, lit("zSpeed"), result, &zSpeed)
     ) {
         return CODE_INVALID_PARAMETER;
@@ -173,15 +173,15 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
     Qn::PtzCommand command;
     qreal xPos, yPos, zPos, speed;
     if(
-        !requireParameter(params, lit("command"), result, &command) || 
-        !requireParameter(params, lit("xPos"), result, &xPos) || 
-        !requireParameter(params, lit("yPos"), result, &yPos) || 
+        !requireParameter(params, lit("command"), result, &command) ||
+        !requireParameter(params, lit("xPos"), result, &xPos) ||
+        !requireParameter(params, lit("yPos"), result, &yPos) ||
         !requireParameter(params, lit("zPos"), result, &zPos) ||
         !requireParameter(params, lit("speed"), result, &speed)
     ) {
         return CODE_INVALID_PARAMETER;
     }
-    
+
     QVector3D position(xPos, yPos, zPos);
     if(!controller->absoluteMove(command == Qn::AbsoluteDeviceMovePtzCommand ? Qn::DevicePtzCoordinateSpace : Qn::LogicalPtzCoordinateSpace, position, speed))
         return CODE_INTERNAL_ERROR;
@@ -192,16 +192,16 @@ int QnPtzRestHandler::executeAbsoluteMove(const QnPtzControllerPtr &controller, 
 int QnPtzRestHandler::executeViewportMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     qreal viewportTop, viewportLeft, viewportBottom, viewportRight, aspectRatio, speed;
     if(
-        !requireParameter(params, lit("viewportTop"),       result, &viewportTop) || 
-        !requireParameter(params, lit("viewportLeft"),      result, &viewportLeft) || 
+        !requireParameter(params, lit("viewportTop"),       result, &viewportTop) ||
+        !requireParameter(params, lit("viewportLeft"),      result, &viewportLeft) ||
         !requireParameter(params, lit("viewportBottom"),    result, &viewportBottom) ||
-        !requireParameter(params, lit("viewportRight"),     result, &viewportRight) || 
+        !requireParameter(params, lit("viewportRight"),     result, &viewportRight) ||
         !requireParameter(params, lit("aspectRatio"),       result, &aspectRatio) ||
         !requireParameter(params, lit("speed"),             result, &speed)
     ) {
         return CODE_INVALID_PARAMETER;
     }
-    
+
     QRectF viewport(QPointF(viewportLeft, viewportTop), QPointF(viewportRight, viewportBottom));
     if(!controller->viewportMove(aspectRatio, viewport, speed))
         return CODE_INTERNAL_ERROR;
@@ -367,7 +367,7 @@ int QnPtzRestHandler::executeRunAuxilaryCommand(const QnPtzControllerPtr &contro
     QnPtzAuxilaryTrait trait;
     QString data;
     if(
-        !requireParameter(params, lit("trait"),     result, &trait) || 
+        !requireParameter(params, lit("trait"),     result, &trait) ||
         !requireParameter(params, lit("data"),      result, &data)
     ) {
             return CODE_INVALID_PARAMETER;

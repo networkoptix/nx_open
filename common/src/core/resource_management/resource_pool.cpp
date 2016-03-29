@@ -28,7 +28,7 @@ namespace {
 }
 
 QnResourcePool::QnResourcePool(QObject *parent) :
-    QObject(parent),
+    base_type(parent),
     m_resourcesMtx(QnMutex::Recursive),
     m_tranInProgress(false)
 {
@@ -72,8 +72,8 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     for (const QnResourcePtr &resource: resources)
     {
-        assert(resource->toSharedPointer()); /* Getting an assert here? Did you forget to use QnSharedResourcePointer? */
-        assert(!resource->getId().isNull());
+        NX_ASSERT(resource->toSharedPointer()); /* Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer? */
+        NX_ASSERT(!resource->getId().isNull());
 
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
@@ -108,15 +108,15 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if (resource.dynamicCast<QnNetworkResource>() &&
             resource->getTypeId() == qnResTypePool->desktopCameraResourceType()->getId()) {
             qDebug() << "desktop camera added to resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
-            connect(resource.data(), &QnResource::statusChanged, this, [this, resource] {
+            connect(resource, &QnResource::statusChanged, this, [this, resource] {
                 qDebug() << "desktop camera status changed" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId() << resource->getStatus();
             });
         }
 #endif
 
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(statusChanged(const QnResourcePtr &)),     Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),      this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
-        connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),    this, SIGNAL(resourceChanged(const QnResourcePtr &)),   Qt::QueuedConnection);
+        connect(resource, &QnResource::statusChanged,      this, &QnResourcePool::statusChanged,     Qt::QueuedConnection);
+        connect(resource, &QnResource::statusChanged,      this, &QnResourcePool::resourceChanged,   Qt::QueuedConnection);
+        connect(resource, &QnResource::resourceChanged,    this, &QnResourcePool::resourceChanged,   Qt::QueuedConnection);
 
         if (!resource->hasFlags(Qn::foreigner))
         {
@@ -199,8 +199,9 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     }
 
     /* Remove resources. */
-    for (const QnResourcePtr &resource: removedResources) {
-        disconnect(resource.data(), NULL, this, NULL);
+    for (const QnResourcePtr &resource: removedResources)
+    {
+        disconnect(resource, NULL, this, NULL);
 
         for(const QnLayoutResourcePtr &layoutResource: getResources<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
             for(const QnLayoutItemData &data: layoutResource->getItems())
@@ -559,11 +560,6 @@ QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUuid &id, bool
         return getResourceById(id);
 
     return QnResourcePtr();
-}
-
-QnResourcePtr QnResourcePool::getIncompatibleResourceByUniqueId(const QString &uid) const {
-    QnMutexLocker locker( &m_resourcesMtx );
-    return m_incompatibleResources.value(uid);
 }
 
 QnResourceList QnResourcePool::getAllIncompatibleResources() const {

@@ -46,6 +46,7 @@ class QnLayoutTabBar;
 class QnGraphicsMessageBoxItem;
 class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
+struct QnPaneSettings;
 
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
@@ -75,7 +76,7 @@ public:
     };
     Q_DECLARE_FLAGS(Panels, Panel)
 
-    QnWorkbenchUi(QObject *parent = NULL);
+    QnWorkbenchUi(QObject *parent = nullptr);
 
     virtual ~QnWorkbenchUi();
 
@@ -87,10 +88,6 @@ public:
     }
 
     void setFlags(Flags flags);
-
-    bool isWindowButtonsUsed() const {
-        return m_windowButtonsUsed;
-    }
 
     bool isTitleUsed() const {
         return m_titleUsed;
@@ -110,34 +107,23 @@ public:
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
 
+    /** Whether notification pane is opened. */
     bool isNotificationsOpened() const;
+
+    /** Whether notification pane is pinned. */
+    bool isNotificationsPinned() const;
 
     /** Whether the calendar is pinned */
     bool isCalendarPinned() const;
 
-    bool isCalendarOpened() const {
-        return m_calendarOpened;
-    }
+    /** Whether the calendar is opened */
+    bool isCalendarOpened() const;
 
-    bool isTreeVisible() const {
-        return m_treeVisible;
-    }
-
-    bool isSliderVisible() const {
-        return m_sliderVisible;
-    }
-
-    bool isTitleVisible() const {
-        return m_titleVisible;
-    }
-
-    bool isNotificationsVisible() const {
-        return m_notificationsVisible;
-    }
-
-    bool isCalendarVisible() const {
-        return m_calendarVisible;
-    }
+    bool isTreeVisible() const          { return m_treeVisible; }
+    bool isSliderVisible() const        { return m_sliderVisible; }
+    bool isTitleVisible() const         { return m_titleVisible; }
+    bool isNotificationsVisible() const { return m_notificationsVisible; }
+    bool isCalendarVisible() const      { return m_calendarVisible; }
 
 public slots:
     void setProxyUpdatesEnabled(bool updatesEnabled);
@@ -145,7 +131,6 @@ public slots:
     void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
 
     void setTitleUsed(bool titleUsed = true);
-    void setWindowButtonsUsed(bool windowButtonsUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
@@ -154,12 +139,13 @@ public slots:
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
 
-    void setTreeOpened(bool opened = true, bool animate = true, bool save = true);
-    void setSliderOpened(bool opened = true, bool animate = true, bool save = true);
-    void setTitleOpened(bool opened = true, bool animate = true, bool save = true);
-    void setNotificationsOpened(bool opened = true, bool animate = true, bool save = true);
+    void setTreeOpened(bool opened = true, bool animate = true);
+    void setSliderOpened(bool opened = true, bool animate = true);
+    void setTitleOpened(bool opened = true, bool animate = true);
+    void setNotificationsOpened(bool opened = true, bool animate = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
     void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
+
 protected:
     virtual bool event(QEvent *event) override;
 
@@ -180,7 +166,7 @@ protected:
     void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry, const QRectF &dayTimeGeometry, qreal *maxHeight);
+    QRectF updatedNotificationsGeometry(const QRectF &notificationsGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
     QRectF updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry);
     void updateActivityInstrumentState();
@@ -200,20 +186,23 @@ protected:
 private:
     void createControlsWidget();
     void createFpsWidget();
-    void createTreeWidget();
-    void createTitleWidget();
-    void createNotificationsWidget();
-    void createCalendarWidget();
-    void createSliderWidget();
+    void createTreeWidget(const QnPaneSettings& settings);
+    void createTitleWidget(const QnPaneSettings& settings);
+    void createNotificationsWidget(const QnPaneSettings& settings);
+    void createCalendarWidget(const QnPaneSettings& settings);
+    void createSliderWidget(const QnPaneSettings& settings);
     void createDebugWidget();
 
     Panels openedPanels() const;
-    void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
+    void setOpenedPanels(Panels panels, bool animate = true);
 
     void initGraphicsMessageBox();
 
     /** Make sure animation is allowed, set animate to false otherwise. */
     void ensureAnimationAllowed(bool &animate);
+
+    void storeSettings();
+
 private slots:
     void updateTreeOpacity(bool animate = true);
     void updateSliderOpacity(bool animate = true);
@@ -223,7 +212,7 @@ private slots:
 
     void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
-    
+
     void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
     void updateSliderOpacityAnimated() { updateSliderOpacity(true); }
     void updateTitleOpacityAnimated() { updateTitleOpacity(true); }
@@ -257,7 +246,6 @@ private slots:
     void at_titleItem_geometryChanged();
     void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
 
-    void at_notificationsPinButton_toggled(bool checked);
     void at_notificationsShowingProcessor_hoverEntered();
     void at_notificationsItem_geometryChanged();
 
@@ -298,19 +286,11 @@ private:
 
     bool m_sliderVisible;
 
-    bool m_notificationsPinned;
-
-    bool m_notificationsOpened;
-
     bool m_notificationsVisible;
-
-    bool m_calendarOpened;
 
     bool m_calendarVisible;
 
     bool m_dayTimeOpened;
-
-    bool m_windowButtonsUsed;
 
     bool m_ignoreClickEvent;
 
@@ -414,11 +394,6 @@ private:
     VariantAnimator *m_titleYAnimator;
 
     HoverFocusProcessor *m_titleOpacityProcessor;
-
-    QGraphicsLinearLayout *m_titleRightButtonsLayout;
-
-    QGraphicsWidget *m_windowButtonsWidget;
-
 
     /* Notifications window-related state. */
 

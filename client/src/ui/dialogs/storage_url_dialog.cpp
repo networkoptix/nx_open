@@ -1,8 +1,6 @@
 #include "storage_url_dialog.h"
 #include "ui_storage_url_dialog.h"
 
-#include <QtWidgets/QMessageBox>
-
 #include <api/media_server_connection.h>
 #include <api/runtime_info_manager.h>
 
@@ -152,7 +150,7 @@ void QnStorageUrlDialog::accept()
 
     m_storage = QnStorageModelInfo(result.reply().value<QnStorageStatusReply>().storage);
     if(result.status() != 0 || !m_storage.isWritable || !m_storage.isExternal) {
-        QMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
+        QnMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
         return;
     }
 
@@ -160,10 +158,10 @@ void QnStorageUrlDialog::accept()
         QString message = tr("System has other server(s) using the same network storage path. "\
                              "Recording data by multiple servers to exactly same place is not recommended.");
 
-        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
-        messageBox.addButton(tr("Add storage"), QnMessageBox::AcceptRole);
+        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QDialogButtonBox::Cancel);
+        messageBox.addButton(tr("Add storage"), QDialogButtonBox::AcceptRole);
 
-        if (messageBox.exec() == QnMessageBox::Cancel)
+        if (messageBox.exec() == QDialogButtonBox::Cancel)
             return;
 
     }

@@ -10,8 +10,9 @@
 #include <QtNetwork/QLocalSocket>
 
 #include <api/ipc_pipe_names.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/process.h>
+#include <utils/common/app_info.h>
 
 #include "process_utils.h"
 
@@ -229,11 +230,11 @@ bool ApplauncherProcess::getVersionToLaunch(
 {
     if( m_settings->contains( MOST_RECENT_VERSION_PARAM_NAME ) )
     {
-        const QnSoftwareVersion& previousMostRecentVersion = 
+        const QnSoftwareVersion& previousMostRecentVersion =
             QnSoftwareVersion(m_settings->value( MOST_RECENT_VERSION_PARAM_NAME ).toString());
         if( previousMostRecentVersion < m_installationManager->latestVersion() )
         {
-            //newer version have been installed since previous client start, 
+            //newer version have been installed since previous client start,
             //ignoring previous launched version and running the new one
             *versionToLaunch = m_installationManager->latestVersion();
             return true;
@@ -263,7 +264,7 @@ static const int MAX_MSG_LEN = 1024;
 
 bool ApplauncherProcess::addTaskToThePipe( const QByteArray& serializedTask )
 {
-    //posting to the pipe 
+    //posting to the pipe
 #ifdef _WIN32
     NamedPipeSocket sock;
     SystemError::ErrorCode result = sock.connectToServerSync( launcherPipeName );
@@ -433,17 +434,17 @@ bool ApplauncherProcess::startInstallation(
     //    return true;
     //}
 
-    //detecting directory to download to 
+    //detecting directory to download to
     const QString& targetDir = m_installationManager->installationDirForVersion(task->version);
     if( !QDir().mkpath(targetDir) )
     {
         response->result = applauncher::api::ResultType::ioError;
         return true;
     }
-    
+
     std::shared_ptr<InstallationProcess> installationProcess( new InstallationProcess(
-        QN_PRODUCT_NAME_SHORT,
-        QN_CUSTOMIZATION_NAME,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName(),
         task->version,
         task->module,
         targetDir,

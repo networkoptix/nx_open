@@ -157,13 +157,28 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
 
     //auto-server resolve by system name is forbidden for now to avoid auto-reconnection to another server
 
-    const auto peerIter = m_peers.find(MediaserverData(ids[1], ids[0]));  //serverID.systemID
+    auto peerIter = m_peers.find(MediaserverData(ids[1], ids[0]));  //serverID.systemID
     if (peerIter == m_peers.end())
         return boost::none;
 
     return ListeningPeerPool::ConstDataLocker(
         std::move(lk),
         std::move(peerIter));
+}
+
+std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
+    const nx::String& systemId) const
+{
+    std::vector<MediaserverData> foundPeers;
+
+    QnMutexLocker lk(&m_mutex);
+    for (auto it = m_peers.lower_bound(MediaserverData(systemId));
+         it != m_peers.end() && it->first.systemId == systemId; ++it)
+    {
+        foundPeers.push_back(it->first);
+    }
+
+    return std::move(foundPeers);
 }
 
 }   //hpm

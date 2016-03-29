@@ -60,13 +60,7 @@ extern "C" {
 /* QT headers. */
 #include <QtWidgets/QAction>
 
-#ifdef Q_OS_WIN
-#   include <QtMultimedia/QAudio>
-#   include <QtMultimedia/QAudioFormat>
-#   include <QtMultimedia/QAudioOutput>
-#endif
-
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QCloseEvent>
@@ -103,7 +97,6 @@ extern "C" {
 #include <QtWidgets/QListView>
 #include <QtCore/QMap>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QMouseEvent>
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QMutexLocker>
@@ -116,7 +109,7 @@ extern "C" {
 #include <QtCore/QPair>
 #include <QtCore/QParallelAnimationGroup>
 #include <QtGui/QPixmap>
-#include <QPixmapCache>
+#include <QtGui/QPixmapCache>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QPropertyAnimation>
@@ -136,7 +129,7 @@ extern "C" {
 #include <QtCore/QStringListModel>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
-#include <QStyleOptionGraphicsItem>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 #include <QtWidgets/QTabWidget>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>
@@ -159,5 +152,6 @@ extern "C" {
 
 #include <nx/utils/thread/wait_condition.h>
 #include <ui/workaround/deprecation.h>
+#include <ui/dialogs/message_box.h>
 
 #endif

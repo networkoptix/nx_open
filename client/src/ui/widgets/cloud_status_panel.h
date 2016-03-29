@@ -12,7 +12,7 @@ class QnCloudStatusPanel : public QPushButton, QnWorkbenchContextAware
     typedef QPushButton base_type;
 
 public:
-    explicit QnCloudStatusPanel(QnWorkbenchContext *context, QWidget *parent = nullptr);
+    explicit QnCloudStatusPanel(QWidget *parent = nullptr);
     ~QnCloudStatusPanel();
 
 private:

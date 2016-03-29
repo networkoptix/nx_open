@@ -3,8 +3,10 @@
 
 #include <QtCore/QThread>
 
-#include <utils/common/qt_private_headers.h>
-#include QT_CORE_PRIVATE_HEADER(qthread_p.h)
+#ifndef Q_OS_ANDROID
+    #include <utils/common/qt_private_headers.h>
+    #include QT_CORE_PRIVATE_HEADER(qthread_p.h)
+#endif
 
 /**
  * \param thread                        Thread to check.

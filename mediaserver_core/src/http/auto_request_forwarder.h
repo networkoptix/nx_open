@@ -7,6 +7,7 @@
 #define NX_AUTO_REQUEST_FORWARDER_H
 
 #include <core/resource/resource_fwd.h>
+#include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/httptypes.h>
 
 
@@ -17,7 +18,11 @@ public:
     //!Analyzes request and adds proxy information if needed
     void processRequest( nx_http::Request* const request );
 
+    void addPathToIgnore(const QString& pathWildcardMask);
+
 private:
+    QnAuthMethodRestrictionList m_restrictionList;
+
     bool findCameraGuid(
         const nx_http::Request& request,
         const QUrlQuery& urlQuery,

@@ -3,6 +3,7 @@
 #include <QtCore/QEvent>
 
 #include <utils/common/warnings.h>
+#include <ui/style/custom_style.h>
 
 QnButtonBoxDialog::QnButtonBoxDialog(QWidget *parent, Qt::WindowFlags windowFlags): 
     base_type(parent, windowFlags), 
@@ -29,6 +30,9 @@ void QnButtonBoxDialog::setButtonBox(QDialogButtonBox *buttonBox) {
         connect(m_buttonBox, SIGNAL(clicked(QAbstractButton *)), this, SLOT(at_buttonBox_clicked(QAbstractButton *)));
         connect(m_buttonBox, SIGNAL(accepted()),                 this, SLOT(accept()));
         connect(m_buttonBox, SIGNAL(rejected()),                 this, SLOT(reject()));
+
+        if (QAbstractButton *okButton = m_buttonBox->button(QDialogButtonBox::Ok))
+            setAccentStyle(okButton);
     }
 }
 
@@ -50,7 +54,7 @@ void QnButtonBoxDialog::initializeButtonBox() {
         return; /* Already initialized with a direct call to setButtonBox in derived class's constructor. */
 
     QList<QDialogButtonBox *> buttonBoxes = findChildren<QDialogButtonBox *>(QString(), Qt::FindDirectChildrenOnly);
-    Q_ASSERT_X(buttonBoxes.size() == 1, Q_FUNC_INFO, "Invalid buttonBox count");
+    NX_ASSERT(buttonBoxes.size() == 1, Q_FUNC_INFO, "Invalid buttonBox count");
 
     if (buttonBoxes.isEmpty())
         buttonBoxes = findChildren<QDialogButtonBox *>(QString(), Qt::FindChildrenRecursively);

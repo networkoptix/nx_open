@@ -20,20 +20,20 @@ namespace {
 } // anonymous namespace
 
 void QnSceneTransformations::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
-    assert(view != NULL);
+    NX_ASSERT(view != NULL);
 
     moveViewportScene(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
 void QnSceneTransformations::moveViewport(QGraphicsView *view, const QPointF &viewportPositionDelta) {
-    assert(view != NULL);
+    NX_ASSERT(view != NULL);
 
     QTransform viewportToScene = view->viewportTransform().inverted();
     moveViewportScene(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
 }
 
 void QnSceneTransformations::moveViewportScene(QGraphicsView *view, const QPointF &scenePositionDelta) {
-    assert(view != NULL);
+    NX_ASSERT(view != NULL);
 
     QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
     bool oldInteractive = view->isInteractive();
@@ -49,7 +49,7 @@ void QnSceneTransformations::moveViewportScene(QGraphicsView *view, const QPoint
 }
 
 void QnSceneTransformations::moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter) {
-    assert(view != NULL);
+    NX_ASSERT(view != NULL);
 
     QTransform viewportToScene = view->viewportTransform().inverted();
     QPointF currentSceneCenter = viewportToScene.map(QRectF(view->viewport()->rect()).center());
@@ -71,7 +71,7 @@ namespace {
 }
 
 void QnSceneTransformations::scaleViewport(QGraphicsView *view, qreal factor, const QPoint &viewportAnchor) {
-    assert(view != NULL);
+    NX_ASSERT(view != NULL);
 
     qreal sceneFactor = 1 / factor;
 
@@ -97,7 +97,7 @@ void QnSceneTransformations::scaleViewport(QGraphicsView *view, qreal factor, QG
 }
 
 void QnSceneTransformations::scaleViewportTo(QGraphicsView *view, const QSizeF &size, Qt::AspectRatioMode mode, QGraphicsView::ViewportAnchor anchor) {
-    assert(view != NULL);
+    NX_ASSERT(view != NULL);
 
     qreal factor = QnGeometry::scaleFactor(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
 

@@ -20,6 +20,7 @@
 #include "common/common_module.h"
 
 
+using nx::network::UDPSocket;
 
 static quint16 DISCOVERY_PORT = 54013;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;

@@ -1,10 +1,12 @@
 #ifndef nx_cc_cloud_server_socket_h
 #define nx_cc_cloud_server_socket_h
 
-#include <nx/utils/async_operation_guard.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
+#include <nx/network/retry_timer.h>
+#include <nx/network/socket_attributes_cache.h>
 
-#include "tunnel/incoming_tunnel.h"
 
 namespace nx {
 namespace network {
@@ -17,31 +19,29 @@ namespace cloud {
 */
 class NX_NETWORK_API CloudServerSocket
 :
-    public AbstractStreamServerSocket
+    public AbstractSocketAttributesCache<
+        AbstractStreamServerSocket, SocketAttributes>
 {
 public:
+    typedef std::function<std::unique_ptr<AbstractTunnelAcceptor>(
+            hpm::api::ConnectionRequestedEvent&)> AcceptorMaker;
+
+    static const std::vector<AcceptorMaker> kDefaultAcceptorMakers;
+
     CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        IncomingTunnelPool* tunnelPool);
+        nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
+            = nx::network::RetryPolicy(),
+        std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
+
+    ~CloudServerSocket();
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
     SocketAddress getLocalAddress() const override;
     void close() override;
     bool isClosed() const override;
-    bool setReuseAddrFlag(bool reuseAddr) override;
-    bool getReuseAddrFlag(bool* val) const override;
-    bool setNonBlockingMode(bool val) override;
-    bool getNonBlockingMode(bool* val) const override;
-    bool getMtu(unsigned int* mtuValue) const override;
-    bool setSendBufferSize(unsigned int buffSize) override;
-    bool getSendBufferSize(unsigned int* buffSize) const override;
-    bool setRecvBufferSize(unsigned int buffSize) override;
-    bool getRecvBufferSize(unsigned int* buffSize) const override;
-    bool setRecvTimeout(unsigned int millis) override;
-    bool getRecvTimeout(unsigned int* millis) const override;
-    bool setSendTimeout(unsigned int ms) override;
-    bool getSendTimeout(unsigned int* millis) const override;
+    void shutdown() override;
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
 
@@ -50,36 +50,62 @@ public:
     AbstractStreamSocket* accept() override;
 
     //!Implementation of QnStoppable::pleaseStop
-    void pleaseStop(std::function<void()> handler) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
-    void post(std::function<void()> handler) override;
-    void dispatch(std::function<void()> handler) override;
+    void post(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
+    aio::AbstractAioThread* getAioThread() override;
+    void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
-    void acceptAsync(
-        std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
+
+    /** Invokes listen on mediator */
+    bool registerOnMediatorSync();
 
 protected:
-    void startAcceptor(
-        std::unique_ptr<AbstractTunnelAcceptor> connector,
-        std::shared_ptr<utils::AsyncOperationGuard::SharedGuard> sharedGuard);
+    enum class State
+    {
+        init,
+        readyToListen,
+        registeringOnMediator,
+        listening
+    };
 
-private:
-    const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
-    IncomingTunnelPool* const m_tunnelPool;
+    void initTunnelPool(int queueLen);
+    void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
+    void onListenRequestCompleted(nx::hpm::api::ResultCode resultCode);
+    void acceptAsyncInternal(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode code,
+            AbstractStreamSocket*)> handler);
+    void issueRegistrationRequest();
+    void onConnectionRequested(
+        hpm::api::ConnectionRequestedEvent event);
 
-    typedef AbstractTunnelAcceptor Acceptor;
-    std::map<Acceptor*, std::unique_ptr<Acceptor>> m_acceptors;
+    std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
+    const std::vector<AcceptorMaker> m_acceptorMakers;
+    int m_acceptQueueLen;
 
-    bool m_isAcceptingTunnelPool;
+    State m_state;
+    QnMutex m_mutex;
+    bool m_terminated;
+    std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
+    std::unique_ptr<IncomingTunnelPool> m_tunnelPool;
     mutable SystemError::ErrorCode m_lastError;
-    std::shared_ptr<StreamSocketOptions> m_socketOptions;
-    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
-    utils::AsyncOperationGuard m_asyncGuard;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode code,
+        AbstractStreamSocket*)> m_savedAcceptHandler;
 };
 
 } // namespace cloud

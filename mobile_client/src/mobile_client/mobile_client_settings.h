@@ -2,7 +2,7 @@
 #define MOBILE_CLIENT_SETTINGS_H
 
 #include <utils/common/property_storage.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <mobile_client/mobile_client_meta_types.h>
 
 class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings> {
@@ -18,6 +18,7 @@ public:
         ShowOfflineCameras,
         LastUsedQuality,
         IsSettingsMigrated,
+        LiteMode,
         VariableCount
     };
 
@@ -45,6 +46,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        showOfflineCameras,         setShowOfflineCameras,      ShowOfflineCameras,         true)
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
         QN_DECLARE_RW_PROPERTY(bool,                        isSettingsMigrated,         setSettingsMigrated,        IsSettingsMigrated,         false)
+        QN_DECLARE_RW_PROPERTY(int,                         liteMode,                   setLiteMode,                LiteMode,                   (int)LiteModeType::LiteModeAuto)
     QN_END_PROPERTY_STORAGE()
 
 private:

@@ -18,7 +18,8 @@ Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
 }
 
 bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
-    const QString paramId = lit("/cgi-bin/ptzctrl.cgi?ptzchannel=0&query=zoom&ptzctrlvalue");
+    const QString query = lit("/cgi-bin/ptzctrl.cgi?ptzchannel=0&query=zoom&ptzctrlvalue=%1");
+
     QString value;
 
     if(qFuzzyIsNull(speed.z())) {
@@ -29,9 +30,7 @@ bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
         value = lit("zoomIn");
     }
 
-    m_resource->setParamPhysical(paramId, value);
-
-    return true;
+    return m_resource->httpClient().doGET(query.arg(value)) == CL_HTTP_SUCCESS;
 }
 
 #endif //ENABLE_ONVIF

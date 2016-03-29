@@ -1,0 +1,33 @@
+$icon-font-path: "../fonts/";
+
+@import 'native-theme/main';
+
+
+@import 'master';
+
+
+
+body.inline-webadmin{
+  padding:0 !important;
+  margin:0 !important;
+  height:100% !important;
+  overflow:hidden;
+  background-color: $window;
+}
+
+.inline-webadmin .panel{
+  height:100%;
+  width:100%;
+  padding-bottom: 58px;
+}
+
+.inline-webadmin .panel-body{
+  position:relative;
+  height:100%;
+}
+
+.inline-webadmin .panel-footer{
+  position:absolute;
+  bottom:0;
+  width:100%;
+}

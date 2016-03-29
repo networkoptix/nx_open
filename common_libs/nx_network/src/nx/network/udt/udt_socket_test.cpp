@@ -15,6 +15,10 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/socket_factory.h>
 
+
+namespace nx {
+namespace network {
+
 namespace {
 // Configuration or client/server
 struct ServerConfig {
@@ -70,7 +74,7 @@ private:
 class Ticker {
 public:
     Ticker() : prev_time_(-1), timeout_(0) , next_timeout_(0) {}
-    void ScheduleNextTick( 
+    void ScheduleNextTick(
         std::function<void()>&& callback , int timeout ) {
             next_timeout_ = timeout;
             callback_ = std::move(callback);
@@ -98,7 +102,7 @@ private:
     std::function<void()> callback_;
 };
 
-}// namespace 
+}// namespace
 
 // ====================================================
 // Profile Server Implementation
@@ -126,7 +130,7 @@ public:
     virtual bool run() {
         if(!server_socket_->bind( SocketAddress(HostAddress(address_),port_)))
             return false;
-        if(!server_socket_->listen()) 
+        if(!server_socket_->listen())
             return false;
         server_socket_->acceptAsync(
             std::bind(
@@ -219,7 +223,7 @@ private:
     // Address
     QString address_;
     int port_;
-    // Statistic 
+    // Statistic
     int current_conn_size_;
     std::size_t total_recv_bytes_;
     std::size_t broken_or_error_conn_;
@@ -233,14 +237,14 @@ public:
     // Call this function to roll a dice. If the probability hits,
     // the function returns true, otherwise it return false.
     bool Roll( float probability ) {
-        Q_ASSERT( probability >= 0.0f && probability <= 1.0f );
+        NX_ASSERT( probability >= 0.0f && probability <= 1.0f );
         std::uniform_real_distribution<> distr(0.0,1.0);
         if( distr(engine_) > probability ) return false;
         return true;
     }
     // Generate Random integer
     int RandomRange( int min , int max ) {
-        Q_ASSERT( min <= max );
+        NX_ASSERT( min <= max );
         std::uniform_int_distribution<int> distr(min,max);
         return distr(engine_);
     }
@@ -248,7 +252,7 @@ public:
     nx::Buffer RandomString( int length ) {
         nx::Buffer ret;
         ret.reserve(length);
-        std::uniform_int_distribution<char> distr(std::numeric_limits<char>::min(),std::numeric_limits<char>::max());
+        std::uniform_int_distribution<short> distr(std::numeric_limits<short>::min(),std::numeric_limits<short>::max());
         for( std::size_t i = 0 ; i < static_cast<std::size_t>(length) ; ++i ) {
             ret.push_back( distr(engine_) );
         }
@@ -322,7 +326,7 @@ private:
             failed_connection_size_++;
             --connected_socket_size_;
         } else {
-            Q_ASSERT( bytes_transferred == conn->buffer.size() );
+            NX_ASSERT( bytes_transferred == conn->buffer.size() );
             sleep_list_.Enqueue( conn.release() );
         }
     }
@@ -376,7 +380,7 @@ private:
             return 1.0f;
         else {
             int left = maximum_allowed_concurrent_connection_ - connected_socket_size_;
-            Q_ASSERT( left>=0 );
+            NX_ASSERT( left>=0 );
             const float lower_bound = 0.7f;
             return lower_bound + (left/half_max)*(1.0f-lower_bound);
         }
@@ -433,7 +437,7 @@ void UdtSocketProfileClient::ScheduleConnection() {
     // Schedule the connection
     std::size_t per_conn_size = static_cast<std::size_t>(random_.RandomRange( conn_size_lower_ , conn_size_upper_ ));
     std::size_t scheduled_size = 0;
-    for( std::size_t i = active_conn_sockets_size_ ; (i < maximum_allowed_concurrent_connection_) && 
+    for( std::size_t i = active_conn_sockets_size_ ; (i < maximum_allowed_concurrent_connection_) &&
                                                (connected_socket_size_ < maximum_allowed_concurrent_connection_) ; ++i ) {
         if( random_.Roll( GetConnectionProbability() ) ) {
             SocketFactory::NatTraversalType type = tcp_ ? SocketFactory::NatTraversalType::nttDisabled : SocketFactory::NatTraversalType::nttEnabled;
@@ -445,9 +449,9 @@ void UdtSocketProfileClient::ScheduleConnection() {
             conn->socket->connectAsync(
                 SocketAddress( HostAddress(address_), port_ ) ,
                 std::bind(
-                &UdtSocketProfileClient::OnConnect,
-                this,
-                std::placeholders::_1, conn.get()));
+                    &UdtSocketProfileClient::OnConnect,
+                    this,
+                    std::placeholders::_1, conn.get()));
             conn.release();
             ++active_conn_sockets_size_;
             ++scheduled_size;
@@ -527,8 +531,8 @@ bool CommandLineParser::ParseCommandLine() {
 }
 
 bool CommandLineParser::ParseServerConfig( ServerConfig* config ) {
-    Q_ASSERT(IsServer());
-    if( !parser_.isSet(QLatin1String("addr")) || 
+    NX_ASSERT(IsServer());
+    if( !parser_.isSet(QLatin1String("addr")) ||
         !parser_.isSet(QLatin1String("port")) ) {
             std::cout<<parser_.helpText().toLatin1().constData()<<std::endl;
             return false;
@@ -553,7 +557,7 @@ float Clamp( float c ) {
         return 1.0f;
     else if( c < 0.0f )
         return 0.0f;
-    else 
+    else
         return c;
 }
 
@@ -590,7 +594,7 @@ bool CommandLineParser::ParseClientConfig( ClientConfig* config ) {
             config->content_min_size = parser_.value(QLatin1String("min_content_len")).toInt();
         else
             config->content_min_size = 1024;
-        if( parser_.isSet(QLatin1String("max_content_len")) ) 
+        if( parser_.isSet(QLatin1String("max_content_len")) )
             config->content_max_size = parser_.value(QLatin1String("max_content_len")).toInt();
         else
             config->content_max_size = 4096;
@@ -622,7 +626,7 @@ std::unique_ptr<UdtSocketProfile> createUdtSocketProfile( const QCoreApplication
         }
     } else {
         ClientConfig client_config;
-        if(!parser.ParseClientConfig(&client_config)) 
+        if(!parser.ParseClientConfig(&client_config))
             return std::unique_ptr<UdtSocketProfile>();
         else {
             return std::unique_ptr<UdtSocketProfile>(new UdtSocketProfileClient(client_config));
@@ -630,3 +634,5 @@ std::unique_ptr<UdtSocketProfile> createUdtSocketProfile( const QCoreApplication
     }
 }
 
+}   //network
+}   //nx

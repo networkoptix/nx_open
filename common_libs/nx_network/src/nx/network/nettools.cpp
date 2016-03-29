@@ -518,11 +518,13 @@ QString getMacByIP(const QHostAddress& ip, bool net)
     return res;
 }
 
+/*
 QHostAddress getGatewayOfIf( const QString& ip )
 {
-    Q_ASSERT( false );
+    NX_ASSERT( false );
     return QHostAddress();
 }
+*/
 
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
@@ -593,10 +595,12 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
 #endif
 
+/*
 QHostAddress getGatewayOfIf(const QString& ip)
 {
     return QHostAddress();
 }
+*/
 
 #else // Linux
 void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
@@ -608,6 +612,7 @@ QString getMacByIP(const QHostAddress& ip, bool net)
     return QString();
 }
 
+/*
 QHostAddress getGatewayOfIf(const QString& netIf)
 {
     std::ostringstream cmd;
@@ -633,6 +638,7 @@ QHostAddress getGatewayOfIf(const QString& netIf)
     pclose(fp);
     return QHostAddress();
 }
+*/
 
 #endif
 

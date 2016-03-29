@@ -53,7 +53,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(messageProcessor,   &QnCommonMessageProcessor::timeServerSelectionRequired,     this,   [this] {
         setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, true);
     });
-    connect( action( Qn::SelectTimeServerAction ), &QAction::triggered,                     this,   [this] {
+    connect( action(QnActions::SelectTimeServerAction), &QAction::triggered,                     this,   [this] {
         setSystemHealthEventVisible( QnSystemHealth::NoPrimaryTimeServer, false );
     } );
 
@@ -153,7 +153,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         break;
     }
 
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Unknown system health message");
+    NX_ASSERT(false, Q_FUNC_INFO, "Unknown system health message");
     return true;
 }
 
@@ -182,7 +182,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
             /* In unit tests there can be users when we are disconnected. */
             QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
             if (guiApp)
-                Q_ASSERT_X(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
+                NX_ASSERT(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
         }
     } else {
         /* Only admins can see some system health events */

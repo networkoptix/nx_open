@@ -25,6 +25,8 @@
 #include <utils/ping_utility.h>
 #include <utils/app_server_file_cache.h>
 
+#include <core/core_meta_types.h>
+
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
 
@@ -40,6 +42,7 @@ void QnClientMetaTypes::initialize() {
         return;
 
     QnCommonMetaTypes::initialize();
+    QnCoreMetaTypes::initialize();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QnUuid> >();
@@ -71,7 +74,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaTypeStreamOperators<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
-    qRegisterMetaType<Qn::ActionId>();
+    qRegisterMetaType<QnActions::IDType>();
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();

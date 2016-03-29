@@ -62,7 +62,7 @@ QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
 QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         QnMutexLocker locker( &factory->m_mutex );
-        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
+        NX_ASSERT(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
         return factory->m_url;
     }
 
@@ -71,7 +71,7 @@ QUrl QnAppServerConnectionFactory::url() {
 
 void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
     if (url.isValid())
-        Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+        NX_ASSERT(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         QnMutexLocker locker( &factory->m_mutex );
@@ -134,7 +134,7 @@ ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2() {
     return currentlyUsedEc2Connection;
 }
 
-bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection) // TODO: #Elric #EC2 pass reference
+bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
     const ec2::ErrorCode errorCode = ec2Connection->getResourceManager()->getResourceTypesSync(&resourceTypeList);

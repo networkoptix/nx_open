@@ -101,8 +101,12 @@ public:
     DataLocker insertAndLockPeerData(
         const ConnectionStrongRef& connection,
         const MediaserverData& peerData);
+
     boost::optional<ConstDataLocker> findAndLockPeerDataByHostName(
         const nx::String& hostName) const;
+
+    std::vector<MediaserverData> findPeersBySystemId(
+        const nx::String& systemId) const;
 
 private:
     mutable QnMutex m_mutex;

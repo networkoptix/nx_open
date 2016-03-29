@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+    <?include BuildVars.wxi ?>
     <Fragment Id='FragmentClient'>
-        <?include BuildVars.wxi ?>
-
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="$(var.customization)ClientDir" Name="Client">
                 <Directory Id="$(var.customization)HelpDir" Name="help"/>                         
@@ -36,6 +35,26 @@
                         </RegistryKey>
                     </Component>    
 
+                    <!-- Demo only!!! -->
+                    <Component Id="ClientUriHandler">
+                        <RegistryKey Root="HKCR" Key="$(var.uriProtocol)">
+                            <RegistryValue Type="string" Value="URL:[ProductName] Protocol"/>
+                            <RegistryValue Type="string" Name="URL Protocol" Value=""/>
+                            <RegistryKey Key="DefaultIcon">
+                                <RegistryValue Type="string" Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" ,0'/>
+                            </RegistryKey>                             
+                            <RegistryKey Key="shell">
+                                <RegistryValue Type="string" Value="open"/>
+                                <RegistryKey Key="open">
+                                    <RegistryKey Key="command">
+                                        <RegistryValue Type="string" Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" -- "%1"' />
+                                    </RegistryKey>  
+                                </RegistryKey>                            
+                            </RegistryKey>                       
+                        </RegistryKey>                 
+                    </Component>                    
+                    <!-- Demo only!!! END -->
+                    
                     <Component Id="clientShortcutDesktop">
                         <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
@@ -46,12 +65,6 @@
                         </Shortcut>
                     </Component>                            
 
-                    <Directory Id="styles" Name="styles">
-                        <Component Id="bespin">
-                            <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="$(var.SourceDir)\styles\bespin$(var.suffix).dll" DiskId="2"/>
-                        </Component>
-                    </Directory>
-
                     <Directory Id="ImageFormats" Name="imageformats">
                     </Directory>    
 
@@ -61,6 +74,7 @@
                     <Directory Id="Platforms" Name="platforms">
                     </Directory>                    
 
+                    <Directory Id="ClientQml" Name="qml"/>
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
@@ -126,7 +140,17 @@
                 <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll" DiskId="4"/>
             </Component>
         </ComponentGroup>
-
+        <ComponentGroup Id="ClientLibs" Directory="$(var.clientDirId)">
+            <Component>
+                <File Id="ClientUtilsLib" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="3" />
+            </Component>
+            <Component>
+                <File Id="ClientNetworkLib" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="3" />
+            </Component>
+            <Component>
+                <File Id="ClientUdtLib" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="3" />
+            </Component>
+        </ComponentGroup>
         <?if $(var.quicksync) = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
@@ -164,7 +188,7 @@
                 <File Id="ClientQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" DiskId="6" />
             </Component>
             <Component>
-                <File Id="ClientQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\..\Qt5XmlPatterns$(var.suffix).dll" DiskId="6" />
+                <File Id="ClientQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\Qt5XmlPatterns$(var.suffix).dll" DiskId="6" />
             </Component>
             <Component>            
                 <File Id="ClientQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll" DiskId="7"  />
@@ -174,19 +198,20 @@
             </Component>             
             <Component>
                 <File Id="ClientQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" DiskId="7"  />                
+            </Component>
+			<Component>
+                <File Id="ClientQt5WebChannel$(var.suffix).dll" Name="Qt5WebChannel$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebChannel$(var.suffix).dll" DiskId="7"  />                
             </Component>            
-
             <Component>
                 <File Id="ClientQt5PrintSupport$(var.suffix).dll" Name="Qt5PrintSupport$(var.suffix).dll" Source="$(var.SourceDir)\Qt5PrintSupport$(var.suffix).dll" DiskId="7"  />                
             </Component>             
-            <?if $(var.webkit) = true ?>
             <Component>
                 <File Id="ClientQt5WebKit$(var.suffix).dll" Name="Qt5WebKit$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKit$(var.suffix).dll" DiskId="7"  />                
             </Component>             
             <Component>
                 <File Id="ClientQt5WebKitWidgets$(var.suffix).dll" Name="Qt5WebKitWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKitWidgets$(var.suffix).dll" DiskId="8"  />                
             </Component>
-            <?endif?>           
+    
             <Component>
                 <File Id="ClientQt5MultimediaWidgets$(var.suffix).dll" Name="Qt5MultimediaWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5MultimediaWidgets$(var.suffix).dll" DiskId="8"  />                
             </Component>             
@@ -196,7 +221,6 @@
             <Component>
                 <File Id="ClientQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Quick$(var.suffix).dll" DiskId="8"  />                
             </Component>             
-            <?if $(var.webkit) = true ?>
             <Component>
                 <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll" DiskId="8"  />                
             </Component>                 
@@ -204,9 +228,9 @@
                 <File Id="Clienticuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll" DiskId="9"  />                
             </Component>                 
             <Component>
-                <File Id="Clienticuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll" DiskId="9"  />                
+                <File Id="Clienticuuc53.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll" DiskId="9"  />                
             </Component>
-            <?endif?>            
+
             <?if $(var.angle) = true ?>         
             <Component>
                 <File Id="ClientlibGLESv2$(var.suffix).dll" Name="libGLESv2$(var.suffix).dll" Source="$(var.SourceDir)\libGLESv2$(var.suffix).dll"  DiskId="9" />                
@@ -218,17 +242,11 @@
             <Component>
                 <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="10" />                
             </Component>
-            <Component>
-                <File Id="Clientzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll" DiskId="10"  />                
-            </Component>                                           
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="10"/>
-            </Component>
-            <Component>
-                <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="$(var.SourceDir)\wrap_oal.dll" DiskId="10"/>
             </Component>
         </ComponentGroup>
 
@@ -275,9 +293,13 @@
             <ComponentRef Id="DefaultLanguage" />                                         
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="clientShortcutDesktop"/>
+            <ComponentRef Id="ClientUriHandler"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
+            <ComponentGroupRef Id="ClientQmlComponent"/>
+            <ComponentGroupRef Id="Vs2015crtComponent"/>
+            <ComponentGroupRef Id="ClientLibs"/>
             <ComponentRef Id="ClientConfiguration" />
             <?if $(var.quicksync) = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
@@ -293,7 +315,6 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>        
             <ComponentRef Id="ClientVsRedistributable"/>
-            <ComponentRef Id="bespin" />         
         </Feature>
     </Fragment>
 </Wix>

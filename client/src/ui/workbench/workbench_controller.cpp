@@ -10,7 +10,6 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QLabel>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
@@ -47,6 +46,7 @@
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
 #include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/message_box.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -76,6 +76,7 @@
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
+#include <ui/graphics/items/resource/button_ids.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -439,25 +440,25 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
     if (QnScreenRecorder::isSupported())
-        window->addAction(action(Qn::ToggleScreenRecordingAction));
-    window->addAction(action(Qn::ToggleSmartSearchAction));
-    window->addAction(action(Qn::ToggleInfoAction));
+        window->addAction(action(QnActions::ToggleScreenRecordingAction));
+    window->addAction(action(QnActions::ToggleSmartSearchAction));
+    window->addAction(action(QnActions::ToggleInfoAction));
 
-    connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
-    connect(action(Qn::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
-    connect(action(Qn::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
-    connect(action(Qn::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
-    connect(action(Qn::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
-    connect(action(Qn::ShowInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_showInfoAction_triggered()));
-    connect(action(Qn::HideInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_hideInfoAction_triggered()));
-    connect(action(Qn::ToggleInfoAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_toggleInfoAction_triggered()));
-    connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
-    connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
-    connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
+    connect(action(QnActions::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
+    connect(action(QnActions::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
+    connect(action(QnActions::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
+    connect(action(QnActions::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
+    connect(action(QnActions::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
+    connect(action(QnActions::ShowInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_showInfoAction_triggered()));
+    connect(action(QnActions::HideInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_hideInfoAction_triggered()));
+    connect(action(QnActions::ToggleInfoAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_toggleInfoAction_triggered()));
+    connect(action(QnActions::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
+    connect(action(QnActions::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
+    connect(action(QnActions::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     if (QnScreenRecorder::isSupported())
-        connect(action(Qn::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                   this,                           SLOT(at_recordingAction_triggered(bool)));
-    connect(action(Qn::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
-    connect(action(Qn::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
+        connect(action(QnActions::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                   this,                           SLOT(at_recordingAction_triggered(bool)));
+    connect(action(QnActions::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
+    connect(action(QnActions::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
 
     /* Init screen recorder. */
     if (QnScreenRecorder::isSupported()){
@@ -489,7 +490,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
             if(!widget->isSelected())
                 display()->scene()->clearSelection();
 
-            menu()->trigger(Qn::RemoveLayoutItemAction, widget);
+            menu()->trigger(QnActions::RemoveLayoutItemAction, widget);
             event->ignore();
             return true;
         }
@@ -596,16 +597,16 @@ void QnWorkbenchController::showContextMenuAtInternal(const QPoint &pos, const W
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::startRecording() {
     if (!m_screenRecorder) {
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
+        action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
 
     if(m_screenRecorder->isRecording() || (m_recordingCountdownLabel != NULL)) {
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
+        action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
         return;
     }
 
-    action(Qn::ToggleScreenRecordingAction)->setChecked(true);
+    action(QnActions::ToggleScreenRecordingAction)->setChecked(true);
 
     m_recordingCountdownLabel = QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), recordingCountdownMs);
     connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished, this, &QnWorkbenchController::at_recordingAnimation_finished);
@@ -618,7 +619,7 @@ void QnWorkbenchController::stopRecording() {
         m_recordingCountdownLabel = NULL;
     }
 
-    action(Qn::ToggleScreenRecordingAction)->setChecked(false);
+    action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
 
     if (m_screenRecorder)
         m_screenRecorder->stopRecording();
@@ -641,9 +642,9 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
     if (QnScreenRecorder::isSupported())
-        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
+        action(QnActions::ToggleScreenRecordingAction)->setChecked(false);
 
-    QMessageBox::warning(display()->view(), tr("Warning"), tr("Unable to start recording due to the following error: %1").arg(errorMessage));
+    QnMessageBox::warning(display()->view(), tr("Warning"), tr("Unable to start recording due to the following error: %1").arg(errorMessage));
 }
 
 void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &recordedFileName) {
@@ -671,7 +672,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QnMessageBox::warning(display()->view(), tr("Warning"), message, QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
                 continue;
             }
 
@@ -689,8 +690,11 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+
+#include <ui/workbench/workbench_welcome_screen.h>
+
 void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event) {
-    if(event->type() != QEvent::KeyPress)
+    if (event->type() != QEvent::KeyPress)
         return;
 
     event->accept(); /* Accept by default. */
@@ -701,9 +705,9 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_Return: {
         QnResourceWidget *widget = display()->widget(Qn::CentralRole);
         if(widget && widget == display()->widget(Qn::ZoomedRole)) {
-            menu()->trigger(Qn::UnmaximizeItemAction, widget);
+            menu()->trigger(QnActions::UnmaximizeItemAction, widget);
         } else {
-            menu()->trigger(Qn::MaximizeItemAction, widget);
+            menu()->trigger(QnActions::MaximizeItemAction, widget);
         }
         break;
     }
@@ -742,14 +746,14 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
     case Qt::Key_Menu: {
-        QGraphicsView *view = display()->view();        
+        QGraphicsView *view = display()->view();
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         QPoint offset = view->mapToGlobal(QPoint(0, 0));
         if (items.count() == 0) {
             showContextMenuAt(offset);
         } else {
             QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
-            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */ 
+            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */
             showContextMenuAt(offset + testRect.bottomRight());
         }
         break;
@@ -777,7 +781,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
         if (objectId.isEmpty())
             break;
 
-        menu()->trigger(Qn::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
+        menu()->trigger(QnActions::PtzActivateObjectAction, QnActionParameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
         break;
     }
     default:
@@ -823,7 +827,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QRectF widgetGeometry = rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
-    
+
     /* Calculate integer size. */
     QSize gridSize = mapper()->mapToGrid(widgetGeometry).size();
     if (gridSize.isEmpty())
@@ -1087,8 +1091,8 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 }
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
-    menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
-    widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
+    menu()->trigger(QnActions::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
+    widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
@@ -1216,7 +1220,7 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem
 
     int rotation = 0;
     if (widget->resource() && widget->resource()->hasProperty(QnMediaResource::rotationKey())) {
-        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();        
+        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();
     }
 
     widget->item()->setRotation(rotation);
@@ -1243,8 +1247,8 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget) {
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if(zoomedItem == workbenchItem) {
-        if (action(Qn::ToggleTourModeAction)->isChecked()){
-            action(Qn::ToggleTourModeAction)->toggle();
+        if (action(QnActions::ToggleTourModeAction)->isChecked()){
+            action(QnActions::ToggleTourModeAction)->toggle();
             return;
         }
 
@@ -1379,7 +1383,7 @@ void QnWorkbenchController::at_startSmartSearchAction_triggered() {
     displayMotionGrid(menu()->currentParameters(sender()).widgets(), true);
 }
 
-void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
+void QnWorkbenchController::at_checkFileSignatureAction_triggered()
 {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if (widgets.isEmpty())

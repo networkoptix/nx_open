@@ -21,6 +21,7 @@
 #include <nx/utils/timermanager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
+#include <utils/common/safe_direct_connection.h>
 
 #include "abstract_nonce_provider.h"
 
@@ -32,7 +33,8 @@
 class CdbNonceFetcher
 :
     public AbstractNonceProvider,
-    public QObject
+    public QObject,
+    public Qn::EnableSafeDirectConnection
 {
 public:
     /*!
@@ -72,7 +74,7 @@ private:
     TimerManager::TimerGuard m_timerID;
     std::random_device m_rd;
     std::default_random_engine m_randomEngine;
-    std::uniform_int_distribution<char> m_nonceTrailerRandomGenerator;
+    std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);

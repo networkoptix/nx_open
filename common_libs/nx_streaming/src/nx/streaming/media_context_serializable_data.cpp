@@ -1,5 +1,7 @@
 #include "media_context_serializable_data.h"
 
+#include <nx/utils/log/assert.h>
+
 #include <utils/common/model_functions.h>
 #include <utils/media/av_codec_helper.h>
 
@@ -39,11 +41,11 @@ static bool checkMatrixSize(
     if (matrix.size() == 0 || matrix.size() == QnAvCodecHelper::kMatrixLength)
         return true;
 
-    const QString warning = QString(QLatin1String(
+    const QString warning11 = QString(QLatin1String(
         "QnMediaContext deserialization error: Invalid %s length: %d")).
         arg(QLatin1String(caption)).arg(matrix.size());
-    Q_ASSERT_X(false, Q_FUNC_INFO, warning.toLatin1());
-    qWarning() << warning;
+    NX_ASSERT(false, Q_FUNC_INFO, warning11);
+    qWarning() << warning11;
     return false;
 }
 
@@ -54,7 +56,7 @@ bool QnMediaContextSerializableData::deserialize(const QByteArray& data)
     {
         static const char* const kWarning =
             "QnMediaContext deserialization error: Fusion has failed.";
-        Q_ASSERT_X(false, Q_FUNC_INFO, kWarning);
+//        NX_ASSERT(false, Q_FUNC_INFO, kWarning);
         qWarning() << kWarning;
         return false;
     }

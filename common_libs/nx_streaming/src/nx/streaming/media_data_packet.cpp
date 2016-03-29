@@ -1,7 +1,5 @@
 #include "media_data_packet.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtGui/QRegion>
 
 #include <utils/media/bitStream.h>
@@ -264,7 +262,7 @@ bool QnMetaDataV1::isEmpty() const
 
 void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )
 {
-    assert( m_data.size() == MD_WIDTH * MD_HEIGHT / CHAR_BIT );
+    NX_ASSERT( m_data.size() == MD_WIDTH * MD_HEIGHT / CHAR_BIT );
 
     memcpy( m_data.data(), data, MD_WIDTH * MD_HEIGHT / CHAR_BIT );
 
@@ -304,8 +302,8 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
 {
-    Q_ASSERT(x<MD_WIDTH);
-    Q_ASSERT(y<MD_HEIGHT);
+    NX_ASSERT(x<MD_WIDTH);
+    NX_ASSERT(y<MD_HEIGHT);
 
     int shift = x*MD_HEIGHT + y;
     unsigned char b = *((unsigned char*)mask + shift/8 );
@@ -314,8 +312,8 @@ bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
 
 bool QnMetaDataV1::isMotionAt(int x, int y) const
 {
-    Q_ASSERT(x<MD_WIDTH);
-    Q_ASSERT(y<MD_HEIGHT);
+    NX_ASSERT(x<MD_WIDTH);
+    NX_ASSERT(y<MD_HEIGHT);
 
     int shift = x*MD_HEIGHT + y;
     unsigned char b = *((unsigned char*)m_data.data() + shift/8 );
@@ -324,8 +322,8 @@ bool QnMetaDataV1::isMotionAt(int x, int y) const
 
 void QnMetaDataV1::setMotionAt(int x, int y) 
 {
-    Q_ASSERT(x<MD_WIDTH);
-    Q_ASSERT(y<MD_HEIGHT);
+    NX_ASSERT(x<MD_WIDTH);
+    NX_ASSERT(y<MD_HEIGHT);
 
     int shift = x*MD_HEIGHT + y;
     quint8* b = (quint8*)m_data.data() + shift/8;
@@ -372,7 +370,7 @@ inline void setBit(quint8* data, int x, int y)
 {
     bool correctData = (x >= 0 && x < MD_WIDTH) && (y >= 0 && y < MD_HEIGHT);
 
-    Q_ASSERT(correctData);
+    NX_ASSERT(correctData);
 
     if (!correctData)
         return;
@@ -410,7 +408,7 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
 
 void QnMetaDataV1::serialize(QIODevice* ioDevice) const
 {
-    Q_ASSERT(channelNumber <= 255);
+    NX_ASSERT(channelNumber <= 255);
     qint64 timeStampMs = htonll(timestamp/1000);
     int durationMs = htonl(m_duration/1000);
     ioDevice->write((const char*) &timeStampMs, sizeof(qint64));
@@ -448,6 +446,3 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
 }
-
-#endif // ENABLE_DATA_PROVIDERS
-

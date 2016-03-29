@@ -6,7 +6,7 @@
 #ifndef CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 #define CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 
-#include <QWebPage>
+#include <QtWebKitWidgets/QWebPage>
 #include "core/resource/resource_fwd.h"
 
 class QnCustomCookieJar;

@@ -36,15 +36,6 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button ScreenshotButton    = static_cast<Button>(0x008);
-    static const Button MotionSearchButton  = static_cast<Button>(0x010);
-    static const Button PtzButton           = static_cast<Button>(0x020);
-    static const Button FishEyeButton       = static_cast<Button>(0x040);
-    static const Button ZoomWindowButton    = static_cast<Button>(0x080);
-    static const Button EnhancementButton   = static_cast<Button>(0x100);
-    static const Button DbgScreenshotButton = static_cast<Button>(0x200);
-    static const Button IoModuleButton      = static_cast<Button>(0x400);
-
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
 
@@ -128,7 +119,7 @@ public:
 
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
-    
+
     QnCompositeTextOverlay *compositeTextOverlay();
 
 signals:
@@ -137,6 +128,7 @@ signals:
     void fisheyeChanged();
     void dewarpingParamsChanged();
     void colorsChanged();
+    void positionChanged(qint64 positionUtcMs);
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -148,7 +140,7 @@ protected:
     virtual QString calculateDetailsText() const override;
     virtual QString calculatePositionText() const override;
     virtual QString calculateTitleText() const override;
-    virtual Buttons calculateButtonsVisibility() const override;
+    virtual int calculateButtonsVisibility() const override;
     virtual QCursor calculateCursor() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
@@ -219,6 +211,8 @@ private:
     qint64 getUtcCurrentTimeUsec() const;
     qint64 getUtcCurrentTimeMs() const;
 
+    void updateCurrentUtcPosMs();
+
 private:
     struct ResourceStates
     {
@@ -281,6 +275,8 @@ private:
 
     typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
     QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+
+    qint64 m_posUtcMs;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

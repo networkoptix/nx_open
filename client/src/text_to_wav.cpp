@@ -1,13 +1,12 @@
-
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
 #include <memory>
 
-#include <festival.h>
+#include <festival/festival.h>
+#include <festival/EST_wave_aux.h>
 
 #include <utils/common/app_info.h>
-#include <EST_wave_aux.h>
 
 #include "text_to_wav.h"
 
@@ -39,7 +38,7 @@ namespace
 
         for (i=0; i<length; i++)
         chars[i] = (data[i]/256);
-        
+
     }
 
     void short_to_uchar(const short *data,unsigned char *chars,int length)
@@ -49,7 +48,7 @@ namespace
 
         for (i=0; i<length; i++)
         chars[i] = (data[i]/256)+128;
-        
+
     }
 
 
@@ -58,12 +57,12 @@ namespace
         /* Returns word size from type */
         int word_size;
 
-        switch (sample_type) 
+        switch (sample_type)
         {
-          case st_unknown:  
+          case st_unknown:
         word_size = 2; break;
-          case st_uchar:  
-          case st_schar:  
+          case st_uchar:
+          case st_schar:
         word_size = 1; break;
           case st_mulaw:
         word_size = 1; break;
@@ -71,14 +70,14 @@ namespace
           case st_adpcm:  /* maybe I mean 0.5 */
         word_size = 1; break;
     #endif
-          case st_short: 
+          case st_short:
         word_size = 2; break;
-          case st_int: 
+          case st_int:
         /* Yes I mean 4 not sizeof(int) these are machine independent defs */
         word_size = 4; break;
-          case st_float: 
+          case st_float:
         word_size = 4; break;
-          case st_double: 
+          case st_double:
         word_size = 8; break;
           default:
         fprintf(stderr,"Unknown encoding format error\n");
@@ -89,8 +88,8 @@ namespace
 
 
     enum EST_write_status save_raw_data(QIODevice *fp, const short *data, int offset,
-                        int num_samples, int num_channels, 
-                        const enum EST_sample_type_t sample_type, 
+                        int num_samples, int num_channels,
+                        const enum EST_sample_type_t sample_type,
                         int bo)
     {
         //int i;
@@ -126,22 +125,22 @@ namespace
 
 
     enum EST_write_status save_wave_riff(QIODevice *fp, const short *data, int offset,
-                         int num_samples, int num_channels, 
+                         int num_samples, int num_channels,
                          int sample_rate,
-                         const enum EST_sample_type_t sample_type, int bo)   
+                         const enum EST_sample_type_t sample_type, int bo)
     {
         (void)bo;
         const char *info;
         int data_size, data_int;
         short data_short;
 
-        Q_ASSERT(sample_type != st_schar);
+        NX_ASSERT(sample_type != st_schar);
      //   if (sample_type == st_schar)
      //     {
         //EST_warning("RIFF format: Signed 8-bit not allowed by this file format");
-        //sample_type=st_uchar; 
+        //sample_type=st_uchar;
      //     }
-        
+
         info = "RIFF";
         //fwrite(info,4,1,fp);
         fp->write( info, 4 );
@@ -202,7 +201,7 @@ namespace
         if (EST_BIG_ENDIAN) data_size = SWAPINT(data_size);
         //fwrite(&data_size,1,4,fp); /* total number of bytes in data */
         fp->write( (const char*)&data_size, 4 );
-        
+
         return save_raw_data(fp,data,offset,num_samples,num_channels,
                  sample_type,bo_little);
     }
@@ -212,8 +211,7 @@ namespace
 static void initFestival()
 {
     //initializing festival engine
-    //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
-#ifndef Q_OS_MAC    
+#ifndef Q_OS_MAC
     sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
 #else
     sprintf( festivalVoxPath, "%s/../Resources/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );

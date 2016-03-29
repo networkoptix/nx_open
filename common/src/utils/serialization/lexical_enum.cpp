@@ -14,12 +14,12 @@
 // QnLexicalEnumSerializerData
 // -------------------------------------------------------------------------- //
 void QnEnumLexicalSerializerData::load(const QMetaObject *metaObject, const char *enumName) {
-    assert(metaObject && enumName);
+    NX_ASSERT(metaObject && enumName);
 
     clear();
 
     int index = metaObject->indexOfEnumerator(enumName);
-    assert(index >= 0); /* Getting an assert here? Do your class actually contain the provided enumeration? Maybe you've forgotten to use Q_ENUMS? */
+    NX_ASSERT(index >= 0); /* Getting an NX_ASSERT here? Do your class actually contain the provided enumeration? Maybe you've forgotten to use Q_ENUMS? */
 
     QMetaEnum enumerator = metaObject->enumerator(index);
     m_flagged = enumerator.isFlag();

@@ -146,7 +146,7 @@ namespace aux
         {
             // Generally, third-party storages aren't supposed to
             // support truncating.
-            assert(false);
+            NX_ASSERT(false);
             return false;
         }
 
@@ -355,7 +355,7 @@ qint64 QnThirdPartyStorageResource::getTotalSpace()
     return totalSpace;
 }
 
-bool QnThirdPartyStorageResource::isAvailable() const
+bool QnThirdPartyStorageResource::initOrUpdate() const
 {
     if (!m_valid)
        return false;

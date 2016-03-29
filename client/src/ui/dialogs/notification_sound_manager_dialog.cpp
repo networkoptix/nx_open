@@ -2,7 +2,6 @@
 #include "ui_notification_sound_manager_dialog.h"
 
 #include <QtCore/QFileInfo>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
 #include <client/client_settings.h>
@@ -85,7 +84,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
         return;
 
     if (!context()->instance<QnAppServerNotificationCache>()->storeSound(fileName, cropSoundSecs*1000, title))
-        QMessageBox::warning(this,
+        QnMessageBox::warning(this,
                              tr("Error"),
                              tr("File cannot be added."));
 }
@@ -110,7 +109,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
         return;
 
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
-        QMessageBox::warning(this,
+        QnMessageBox::warning(this,
                              tr("Error"),
                              tr("New title could not be set."));
 
@@ -127,11 +126,11 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
         return;
 
     QString title = soundModel->titleByFilename(filename);
-    if (QMessageBox::question(this,
+    if (QnMessageBox::question(this,
                               tr("Confirm File Deletion"),
                               tr("Are you sure you want to delete '%1'?").arg(title),
-                              QMessageBox::Ok,
-                              QMessageBox::Cancel) == QMessageBox::Cancel)
+                              QDialogButtonBox::Ok,
+                              QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
     context()->instance<QnAppServerNotificationCache>()->deleteFile(filename);

@@ -4,7 +4,7 @@
 
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 QnWorkbenchSafeModeWatcher::QnWorkbenchSafeModeWatcher(QWidget *parentWidget /*= nullptr*/) : QObject(parentWidget) 
     , m_parentWidget(parentWidget)
@@ -37,13 +37,13 @@ void QnWorkbenchSafeModeWatcher::updateReadOnlyMode() {
 
 void QnWorkbenchSafeModeWatcher::addWarningLabel(QDialogButtonBox *buttonBox, QWidget *beforeWidget) {
     QHBoxLayout* layout = qobject_cast<QHBoxLayout*>(buttonBox->layout());
-    Q_ASSERT_X(layout, Q_FUNC_INFO, "Layout must already exist here.");
+    NX_ASSERT(layout, Q_FUNC_INFO, "Layout must already exist here.");
     if (!layout)
         return;
 
     if (!beforeWidget)
         beforeWidget = buttonBox->button(QDialogButtonBox::Ok);
-    Q_ASSERT_X(beforeWidget, Q_FUNC_INFO, "Select correct widget to place");
+    NX_ASSERT(beforeWidget, Q_FUNC_INFO, "Select correct widget to place");
     int index = beforeWidget
         ? layout->indexOf(beforeWidget)
         : 0;

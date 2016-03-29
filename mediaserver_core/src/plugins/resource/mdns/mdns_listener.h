@@ -13,7 +13,11 @@
 #include <nx/network/socket.h>
 
 
+namespace nx {
+namespace network {
 class UDPSocket;
+}   //network
+}   //nx
 
 class QnMdnsListener
 {

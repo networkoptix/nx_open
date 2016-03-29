@@ -32,6 +32,7 @@
 
 #include <recording/time_period.h>
 
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
@@ -209,7 +210,7 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!(widget->visibleButtons() & QnResourceWidget::InfoButton))
+        if (!(widget->visibleButtons() & Qn::InfoButton))
             continue;
 
         if(m_hasRequiredDisplayInfoValue) {
@@ -316,7 +317,7 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 
 
 Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources) {
+    for(const QnResourcePtr &resource: resources) {
         if(!resource)
             continue; /* OK to remove. */
 
@@ -332,6 +333,9 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
             if(resource->getStatus() == Qn::Offline)
                 continue; /* Can remove only if offline. */
+
+        if (resource->hasFlags(Qn::web_page))
+            continue;
 
         return Qn::InvisibleAction;
     }
@@ -467,7 +471,8 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (Qn::server | Qn::videowall))
+    if((widget->resource()->flags() & (Qn::server | Qn::videowall))
+        || (widget->resource()->flags().testFlag(Qn::web_page)))
         return Qn::InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();
@@ -616,7 +621,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
 }
 
 Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
-    return action(Qn::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
+    return action(QnActions::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
@@ -1060,7 +1065,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     /* Do not check real pointer type to speed up check. */
     QnResourcePtr desktopCamera = qnResPool->getResourceByUniqueId(qnCommon->moduleGUID().toString());
 #ifdef DESKTOP_CAMERA_DEBUG
-    Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()),
+    NX_ASSERT(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()),
         Q_FUNC_INFO,
         "Desktop camera must have correct flags and parent (if exists)");
 #endif
@@ -1134,25 +1139,21 @@ Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &reso
 }
 
 Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources) {
-    bool found = false;
+    if (resources.size() != 1)
+        return Qn::InvisibleAction;
 
-    for (const QnResourcePtr &resource: resources) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            return Qn::InvisibleAction;
+    QnMediaServerResourcePtr server = resources.first().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return Qn::InvisibleAction;
 
-        if (!QnMediaServerResource::isFakeServer(resource))
-            return Qn::InvisibleAction;
+    Qn::ResourceStatus status = server->getStatus();
+    if (status != Qn::Incompatible && status != Qn::Unauthorized)
+        return Qn::InvisibleAction;
 
-        if (server->getModuleInformation().ecDbReadOnly)
-            return Qn::InvisibleAction;
+    if (server->getModuleInformation().ecDbReadOnly)
+        return Qn::InvisibleAction;
 
-        found = true;
-    }
-
-    return found
-        ? Qn::EnabledAction
-        : Qn::InvisibleAction;
+    return Qn::EnabledAction;
 }
 
 

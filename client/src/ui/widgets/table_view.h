@@ -24,6 +24,8 @@ protected:
     virtual void leaveEvent(QEvent * event) override;
     void resetCursor();
 
+    void updateHoveredRow(const QModelIndex &index);
+
 private:
     QModelIndex m_lastMouseModelIndex;
 };

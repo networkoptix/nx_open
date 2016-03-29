@@ -25,20 +25,25 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_state(State::init),
     m_connectionID(std::move(connectionID)),
     m_onFsmFinishedEventHandler(std::move(onFsmFinishedEventHandler)),
-    m_timer(SocketFactory::createStreamSocket()),
     m_serverConnectionWeakRef(serverPeerDataLocker.value().peerConnection)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
     {
-        m_timer->post(std::bind(
+        m_timer.post(std::bind(
             &UDPHolePunchingConnectionInitiationFsm::done,
             this,
             api::ResultCode::serverConnectionBroken));
         return;
     }
 
-    m_timer->bindToAioThread(serverConnectionStrongRef->socket()->getAioThread());
+    m_timer.bindToAioThread(serverConnectionStrongRef->socket()->getAioThread());
+}
+
+void UDPHolePunchingConnectionInitiationFsm::pleaseStop(
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_timer.pleaseStop(std::move(completionHandler));
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
@@ -46,10 +51,10 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
     api::ConnectRequest request,
     std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender)
 {
-    m_timer->dispatch([this, originatingPeerConnection, request, connectResponseSender]()  //TODO #ak msvc2015 move to lambda
+    m_timer.dispatch([this, originatingPeerConnection, request, connectResponseSender]()  //TODO #ak msvc2015 move to lambda
     {
         api::ConnectionRequestedEvent connectionRequestedEvent;
-        connectionRequestedEvent.connectSessionID = std::move(request.connectSessionID);
+        connectionRequestedEvent.connectSessionId = std::move(request.connectSessionId);
         connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerID);
         connectionRequestedEvent.udpEndpointList.emplace_back(
             originatingPeerConnection->getSourceAddress());
@@ -64,14 +69,14 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
         auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
         if (!serverConnectionStrongRef)
         {
-            m_timer->post(std::bind(
+            m_timer.post(std::bind(
                 &UDPHolePunchingConnectionInitiationFsm::done,
                 this,
                 api::ResultCode::serverConnectionBroken));
             return;
         }
         serverConnectionStrongRef->sendMessage(std::move(indication));  //TODO #ak check sendMessage result
-        m_timer->registerTimer(
+        m_timer.start(
             kUdpHolePunchingSessionTimeout,
             std::bind(
                 &UDPHolePunchingConnectionInitiationFsm::done,
@@ -86,9 +91,9 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
     api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_timer->dispatch([this, connection, request, completionHandler]() mutable  //TODO #msvc2015 move to lambda
+    m_timer.dispatch([this, connection, request, completionHandler]() mutable  //TODO #msvc2015 move to lambda
     {
-        assert(m_connectResponseSender);
+        NX_ASSERT(m_connectResponseSender);
 
         if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
             request.udpEndpointList.push_front(connection->getSourceAddress());
@@ -96,7 +101,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
         if (request.udpEndpointList.empty())
         {
             completionHandler(api::ResultCode::noSuitableConnectionMethod);
-            m_timer->post(std::bind(
+            m_timer.post(std::bind(
                 &UDPHolePunchingConnectionInitiationFsm::done,
                 this,
                 api::ResultCode::noSuitableConnectionMethod));
@@ -113,12 +118,12 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             std::move(connectResponse));
         completionHandler(api::ResultCode::ok);
         m_state = State::waitingConnectionResult;
-        m_timer->registerTimer(
+        m_timer.start(
             kConnectionResultWaitTimeout,
             std::bind(
                 &UDPHolePunchingConnectionInitiationFsm::done,
                 this,
-                api::ResultCode::timedout));
+                api::ResultCode::timedOut));
     });
 }
 
@@ -126,11 +131,11 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionResultRequest(
     api::ConnectionResultRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_timer->dispatch([this, request, completionHandler]()
+    m_timer.dispatch([this, request, completionHandler]()
     {
         //TODO #ak saving connection result
         completionHandler(api::ResultCode::ok);
-        m_timer->post(std::bind(
+        m_timer.post(std::bind(
             &UDPHolePunchingConnectionInitiationFsm::done,
             this,
             api::ResultCode::ok));
@@ -141,7 +146,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 {
     if (m_state < State::waitingConnectionResult)
     {
-        Q_ASSERT(result != api::ResultCode::ok);
+        NX_ASSERT(result != api::ResultCode::ok);
         auto connectResponseSender = std::move(m_connectResponseSender);
         connectResponseSender(
             result,

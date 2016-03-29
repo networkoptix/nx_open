@@ -21,6 +21,11 @@ QnZoomableFlickable {
     maxContentWidth: Math.max(content.rotated90 ? sourceContentHeight : sourceContentWidth, width) * maxZoomFactor
     maxContentHeight: Math.max(content.rotated90 ? sourceContentWidth : sourceContentHeight, height) * maxZoomFactor
 
+    readonly property bool zoomed: contentWidth > width * 1.05 || contentHeight > height * 1.05
+
+    allowedHorizontalMargin: zoomed ? width / 3 : 0
+    allowedVerticalMargin: zoomed ? height / 3 : 0
+
     clip: true
 
     onSourceChanged: {

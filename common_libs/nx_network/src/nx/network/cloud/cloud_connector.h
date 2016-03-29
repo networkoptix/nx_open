@@ -28,7 +28,7 @@ public:
     virtual ~CloudConnector();
 
     //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()> completionHandler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     //!Establishes connection to \a targetHost
     /*!
@@ -44,7 +44,7 @@ public:
         Handler&& completionHandler )
     {
         auto tunnel = TunnelPool::instance()->getTunnelToHost( targetHost );
-        assert( tunnel );
+        NX_ASSERT( tunnel );
         return tunnel->connect( std::forward<Handler>(completionHandler) );
     }
 };

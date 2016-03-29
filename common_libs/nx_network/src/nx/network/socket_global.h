@@ -8,8 +8,7 @@
 #include "cloud/address_resolver.h"
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
-#include "cloud/tunnel/incoming_tunnel.h"
-#include "cloud/tunnel/outgoing_tunnel.h"
+#include "cloud/tunnel/outgoing_tunnel_pool.h"
 
 
 namespace nx {
@@ -35,18 +34,12 @@ public:
     { return *s_instance->m_mediatorConnector; }
 
     inline static
-    cloud::IncomingTunnelPool& incomingTunnelPool()
-    { return s_instance->m_incomingTunnelPool; }
-
-    inline static
     cloud::OutgoingTunnelPool& outgoingTunnelPool()
     { return s_instance->m_outgoingTunnelPool; }
 
 	static void init();	/** Should be called before any socket use */
 	static void deinit();  /** Should be called when sockets are not needed any more */
-
-	typedef std::unique_ptr< int, decltype( deinit ) > Guard;
-	static Guard initGuard();
+    static void check(); /** May be called to verify initialization */
 
 	class InitGuard
 	{
@@ -54,17 +47,18 @@ public:
 		InitGuard() { init(); }
 		~InitGuard() { deinit(); }
 
-	private:
-		InitGuard( const InitGuard& );
-		//InitGuard& oprator=( const InitGuard& );
+        InitGuard( const InitGuard& ) = delete;
+        InitGuard( InitGuard&& ) = delete;
+        InitGuard& operator=( const InitGuard& ) = delete;
+        InitGuard& operator=( InitGuard&& ) = delete;
 	};
 
 private:
     SocketGlobals();
     ~SocketGlobals();
 
-	static QnMutex s_mutex;
-	static size_t s_counter;
+    static QnMutex s_mutex;
+    static std::atomic<int> s_counter;
     static SocketGlobals* s_instance;
 
 private:
@@ -74,7 +68,6 @@ private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
-    cloud::IncomingTunnelPool m_incomingTunnelPool;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
 };
 

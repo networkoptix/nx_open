@@ -15,6 +15,7 @@
 
 
 using namespace std;
+using nx::network::UDPSocket;
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int GROUP_PORT = 1900;
@@ -94,7 +95,7 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
 
-    assert(UPNPDeviceSearcherInstance == nullptr);
+    NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
     UPNPDeviceSearcherInstance = this;
 }
 
@@ -184,7 +185,7 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
         }
         else
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             //TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
         }
 

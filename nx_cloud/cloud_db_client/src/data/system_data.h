@@ -42,7 +42,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 class SystemID
 {
 public:
-    QnUuid systemID;
+    std::string systemID;
 
     SystemID();
     SystemID(std::string systemIDStr);

@@ -60,7 +60,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(m_cameraRes);
+    NX_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
@@ -306,9 +306,8 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(videoData);
-    if (isCameraControlRequired && m_totalVideoFrames &&
-            (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
-        saveBitrateIfNeeded(videoData, currentLiveParams);
+    if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
+        saveBitrateIfNeeded(videoData, currentLiveParams, isCameraControlRequired);
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
@@ -353,7 +352,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 {
-    Q_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
+    NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
     // need to adjust fps 
@@ -380,7 +379,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 
 
-    //Q_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and assert is appear
+    //NX_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and NX_ASSERT is appear
 
     setFps(qMax(1,newSecFps));
 }
@@ -549,7 +548,8 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVide
 }
 
 void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
-                                                const QnLiveStreamParams& liveParams )
+                                                const QnLiveStreamParams& liveParams,
+                                                bool isCameraConfigured )
 {
     QSize resoulution;
     std::map<QString, QString> customParams;
@@ -559,18 +559,20 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
     CameraBitrateInfo info(encoderIndex(), std::move(now));
 
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
-                liveParams.quality, resoulution, liveParams.fps) / 1024;
+        liveParams.quality, resoulution, liveParams.fps) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
         liveParams.quality, resoulution, liveParams.fps)) / 1024;
-    info.actualBitrate = getBitrateMbps();
+    info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
     info.bitratePerGop = m_cameraRes->bitratePerGopType();
     info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
+    info.numberOfChannels = getNumberOfChannels();
 
     info.fps = liveParams.fps;
     info.actualFps = getFrameRate();
     info.averageGopSize = getAverageGopSize();
     info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
+    info.isConfigured = isCameraConfigured;
 
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {

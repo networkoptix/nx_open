@@ -55,6 +55,8 @@ private:
 
     QByteArray getDeviceXml(const QUrl& url);
 
+    bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
+
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,

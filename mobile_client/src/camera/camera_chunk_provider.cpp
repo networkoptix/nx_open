@@ -40,7 +40,7 @@ void QnCameraChunkProvider::setResourceId(const QString &id) {
     emit bottomBoundChanged();
     emit bottomBoundDateChanged();
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
     if (!camera)
         return;
 

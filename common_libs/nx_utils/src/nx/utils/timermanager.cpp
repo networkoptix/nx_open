@@ -145,7 +145,7 @@ bool TimerManager::modifyTimerDelay(
     if( taskIter == m_impl->taskToTime.end() )
         return false;   //no timer with requested id
     auto handlerIter = m_impl->timeToTask.find( std::make_pair( taskIter->second, timerID ) );
-    Q_ASSERT( handlerIter != m_impl->timeToTask.end() );
+    NX_ASSERT( handlerIter != m_impl->timeToTask.end() );
     auto taskHandler = std::move(handlerIter->second);
 
     m_impl->taskToTime.erase( taskIter );

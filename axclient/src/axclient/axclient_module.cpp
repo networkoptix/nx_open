@@ -35,8 +35,8 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     qnSettings->setLightMode(Qn::LightModeActiveX);
     qnRuntime->setActiveXMode(true);
 
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin 
-        ? lit(":/skin_light") 
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin
+        ? lit(":/skin_light")
         : lit(":/skin_dark");
     m_skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
@@ -48,11 +48,9 @@ QnAxClientModule::QnAxClientModule(QObject *parent)
     m_customizer.reset(new QnCustomizer(customization));
     m_customizer->customize(qnGlobals);
 
-    auto *style = QnSkin::newStyle();
-    QApplication::setStyle(style);
+    QApplication::setStyle(m_skin->newStyle(m_customizer->genericPalette()));
 
     auto ec2ConnectionFactory = getConnectionFactory(Qn::PT_DesktopClient);
-    ec2ConnectionFactory->setContext(ec2::ResourceContext(QnClientCameraFactory::instance(), qnResPool, qnResTypePool));
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory);
     qnCommon->store<ec2::AbstractECConnectionFactory>(ec2ConnectionFactory);
 

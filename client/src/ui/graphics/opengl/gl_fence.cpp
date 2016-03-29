@@ -7,13 +7,6 @@
 
 #include <ui/graphics/opengl/gl_functions.h>
 
-//#define GL_GLEXT_PROTOTYPES
-//#ifdef Q_OS_MACX
-//#include <glext.h>
-//#else
-//#include <GL/glext.h>
-//#endif
-//#define GL_GLEXT_PROTOTYPES 1
 #include <QtGui/qopengl.h>
 #include <QtGui/QOpenGLFunctions_3_2_Core>
 
@@ -71,7 +64,7 @@ void GLFence::sync()
                 continue;
 
             default:
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 return;
         }
     }*/
@@ -99,7 +92,7 @@ bool GLFence::trySync()
                 return false;
 
             default:
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 return false;
         }
     }*/

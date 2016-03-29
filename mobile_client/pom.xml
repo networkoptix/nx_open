@@ -2,7 +2,7 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
@@ -11,33 +11,27 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Mobile Client</name>
+    <name>Nx Witness Mobile Client</name>
 
     <properties>
         <guid>${mobile_client.guid}</guid>
         <product.title>${mobile_client.name}</product.title>
-        <product.display.title>${client.display.name}</product.display.title>
+        <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lappserver2 -lcommon -lnx_streaming -lclient.core</global.libs>
 
-        <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
-        <android.oslibs>-lssl -lcrypto -lturbojpeg</android.oslibs>
-        <ios.oslibs>-lssl -lcrypto -lturbojpeg</ios.oslibs>
-        <!--Global defines-->
+        <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
+        <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_network -lnx_utils -ludt</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
+        <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
+        <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
+        <ios.oslibs>-lturbojpeg</ios.oslibs>
+
         <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <android.defines/>
-        <ios.defines/>
+
+        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.windows.packages>quazip</rdep.windows.packages>
+        <rdep.linux.packages>quazip</rdep.linux.packages>
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
@@ -121,26 +115,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <!-- Workaround for androiddeployqt bug! It can't handle correctly paths containing "/../". -->
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <version>1.7</version>
-                        <executions>
-                            <execution>
-                                <id>regex-property</id>
-                                <goals>
-                                    <goal>regex-property</goal>
-                                </goals>
-                                <configuration>
-                                    <name>qt.plaindir</name>
-                                    <value>${basedir}</value>
-                                    <regex>(.*)/[^/]+^{0,1}</regex>
-                                    <replacement>$1/build_environment/target</replacement>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <version>1.7</version>
                         <executions>
@@ -221,6 +195,25 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>quazip opengl-es-mali openal</rdep.linux.packages>
+                <linux.oslibs>-lz</linux.oslibs>
+            </properties>
         </profile>
     </profiles>
 </project>

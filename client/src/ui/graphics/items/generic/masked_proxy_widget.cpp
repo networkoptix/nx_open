@@ -5,7 +5,7 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEngine>
-#include <QStyleOptionGraphicsItem>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <utils/math/fuzzy.h>
 

@@ -27,7 +27,7 @@
 #include "camera/get_image_helper.h"
 #include "core/resource_management/resource_properties.h"
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
 #include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
@@ -44,6 +44,7 @@
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include "utils/common/delayed.h"
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -77,6 +78,8 @@ namespace {
     static const QSize SCREENSHOT_SIZE(640, 480);
     static const unsigned int MS_PER_SEC = 1000;
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
+
+    static const int kEmailSendDelay = 1000 * 3;
 };
 
 struct QnEmailAttachmentData {
@@ -144,11 +147,11 @@ struct QnEmailAttachmentData {
             imagePath = lit(":/skin/email_attachments/server.png");
             break;
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All cases must be implemented.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
             break;
         }
 
-        Q_ASSERT_X(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
     }
 
     QString templatePath;
@@ -254,9 +257,9 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action)
 {
-    Q_ASSERT(action);
+    NX_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
-    //Q_ASSERT(camera);
+    //NX_ASSERT(camera);
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
@@ -275,7 +278,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
 {
-    Q_ASSERT(action);
+    NX_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
@@ -360,13 +363,13 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
 {
     const QnResourcePtr& cameraRes = qnResPool->getResourceById(id);
-    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize);
+    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
     return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }
 
 bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
 {
-    Q_ASSERT( action );
+    NX_ASSERT( action );
 
     QStringList log;
     QStringList recipients;
@@ -397,7 +400,9 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     NX_LOG( lit("Processing action SendMail. Sending mail to %1").
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
-    QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
+    executeDelayed([this, action, recipients, aggregatedResCount]() {
+        QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
+    }, kEmailSendDelay);
 
     /*
      * This action instance is not used anymore but storing into the Events Log db.
@@ -430,7 +435,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    contextMap[tpSource] = action->getRuntimeParams().resourceName;
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams());
 
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
@@ -523,7 +528,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
-    contextMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
     if (eventType == QnBusiness::CameraMotionEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
@@ -646,18 +651,18 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {
-        detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
         break;
-                                }
+    }
 
     case CameraInputEvent: {
         detailsMap[tpInputPort] = params.inputPortId;
         break;
-                           }
+    }
 
     case NetworkIssueEvent:
         {
-            detailsMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
+            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }

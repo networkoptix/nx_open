@@ -21,6 +21,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
@@ -43,18 +44,14 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     , QnWorkbenchContextAware(parent)
     , m_hintDisplayed(false)
 {
-    connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
-    connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
-    connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
-    connect(action(Qn::RemoveBookmarksAction),      &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
-    connect(action(Qn::BookmarksModeAction),        &QAction::toggled,      this,   &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
+    connect(action(QnActions::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
+    connect(action(QnActions::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
+    connect(action(QnActions::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
+    connect(action(QnActions::RemoveBookmarksAction),      &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
+    connect(action(QnActions::BookmarksModeAction),        &QAction::toggled,      this,   &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
     /* Reset hint flag for each user. */
     connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
-}
-
-ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
-    return QnAppServerConnectionFactory::getConnection2();
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
@@ -74,7 +71,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (QnAppInfo::beta()) {
         QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online) {
-            QMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Error"),
                 tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
             return;
@@ -94,10 +91,13 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
+    if (!bookmark.isValid())
+        return;
 
     qnCameraBookmarksManager->addCameraBookmark(bookmark);
 
-    action(Qn::BookmarksModeAction)->setChecked(true);
+    action(QnActions::BookmarksModeAction)->setChecked(true);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
@@ -111,7 +111,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmarks can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
         return;
@@ -140,10 +140,10 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
         ? tr("Are you sure you want to delete this bookmark?")
         : tr("Are you sure you want to delete bookmark \"%1\"?").arg(bookmark.name));
 
-    if (QMessageBox::information(mainWindow(),
+    if (QnMessageBox::information(mainWindow(),
             tr("Confirm Deletion"), message,
-            QMessageBox::Ok | QMessageBox::Cancel,
-            QMessageBox::Cancel) != QMessageBox::Ok)
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
@@ -157,12 +157,12 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
-    const auto message = tr("Are you sure you want to delete these %n bookmarks?", nullptr, bookmarks.size());
+    const auto message = tr("Are you sure you want to delete these %n bookmarks?", "", bookmarks.size());
 
-    if (QMessageBox::information(mainWindow(),
+    if (QnMessageBox::information(mainWindow(),
         tr("Confirm Deletion"), message,
-        QMessageBox::Ok | QMessageBox::Cancel,
-        QMessageBox::Cancel) != QMessageBox::Ok)
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
         return;
 
     for (const auto bookmark: bookmarks)
@@ -171,7 +171,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 {
-    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
+    const auto bookmarkModeAction = action(QnActions::BookmarksModeAction);
     const bool checked = bookmarkModeAction->isChecked();
     const bool enabled = bookmarkModeAction->isEnabled();
 
@@ -187,12 +187,12 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
         workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
 
     if (checked)
-        menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
+        menu()->trigger(QnActions::StopSmartSearchAction, QnActionParameters(display()->widgets()));
 
     if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
     {
         QnGraphicsMessageBox::information(
-              tr("Press %1 to search bookmarks").arg(action(Qn::OpenBookmarksSearchAction)->shortcut().toString())
+              tr("Press %1 to search bookmarks").arg(action(QnActions::OpenBookmarksSearchAction)->shortcut().toString())
             , kHintTimeoutMs
             );
         m_hintDisplayed = true;

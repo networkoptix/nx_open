@@ -26,10 +26,12 @@
 #include <ui/dialogs/backup_schedule_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/models/storage_list_model.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
@@ -135,10 +137,13 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
-    ui->storagesWarningLabel->hide();
 
     setWarningStyle(ui->backupStoragesAbsentLabel);
     ui->backupStoragesAbsentLabel->hide();
+
+    setHelpTopic(this, Qn::ServerSettings_Storages_Help);
+    setHelpTopic(ui->backupStoragesGroupBox, Qn::ServerSettings_StoragesBackup_Help);
+    setHelpTopic(ui->backupControls, Qn::ServerSettings_StoragesBackup_Help);
 
     setupGrid(ui->mainStoragesTable, true);
     setupGrid(ui->backupStoragesTable, false);
@@ -246,7 +251,7 @@ void QnStorageConfigWidget::initQualitiesCombo()
         case Qn::CameraBackup_Both:
             return tr("All streams", "Cameras Backup");
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+            NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             break;
         }
 
@@ -378,12 +383,12 @@ void QnStorageConfigWidget::loadDataToUi() {
     updateBackupInfo();
     updateBackupWidgetsVisibility();
 
-    ui->storagesWarningLabel->hide();
+    ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     ui->backupStoragesAbsentLabel->hide();
 }
 
 void QnStorageConfigWidget::loadStoragesFromResources() {
-    Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
+    NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
     QnStorageModelInfoList storages;
     for (const QnStorageResourcePtr &storage: m_server->getStorages())
@@ -447,7 +452,9 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn) {
         if (index.data(Qt::CheckStateRole) == Qt::Unchecked && hasChanges())
-            ui->storagesWarningLabel->show();
+            ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageStoragesWarning);
+        else if (!hasChanges())
+            ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     }
 
     emit hasChangesChanged();
@@ -551,7 +558,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
         }
         else {
             QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(m_server, storageData.url);
-            Q_ASSERT_X(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
+            NX_ASSERT(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
 
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
@@ -614,13 +621,26 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
-    if (m_backupSchedule != m_server->getBackupSchedule()) {
+    /* Make sure scheduled backup will stop in no backup storages left after 'Apply' button. */
+    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo &info)
+    {
+        return info.isBackup;
+    });
+    if (!backupStoragesExist)
+    {
+        m_backupSchedule.backupType = Qn::Backup_Manual;
+        const auto backupTypeIndex = ui->comboBoxBackupType->findData(m_backupSchedule.backupType);
+        ui->comboBoxBackupType->setCurrentIndex(backupTypeIndex);
+    }
+
+    if (m_backupSchedule != m_server->getBackupSchedule())
+    {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
             server->setBackupSchedule(m_backupSchedule);
         });
     }
 
-    ui->storagesWarningLabel->hide();
+    ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     ui->backupStoragesAbsentLabel->hide();
     emit hasChangesChanged();
 }
@@ -629,16 +649,16 @@ void QnStorageConfigWidget::startRebuid(bool isMain) {
     if (!m_server)
         return;
 
-    int warnResult = QMessageBox::warning(
+    int warnResult = QnMessageBox::warning(
         this,
         tr("Warning!"),
         tr("You are about to launch the archive re-synchronization routine.") + L'\n'
         + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n'
         + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.") + L'\n'
         + tr("Are you sure you want to continue?"),
-        QMessageBox::Ok | QMessageBox::Cancel
-        );
-    if(warnResult != QMessageBox::Ok)
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel
+    );
+    if (warnResult != QDialogButtonBox::Ok)
         return;
 
     if (!qnServerStorageManager->rebuildServerStorages(m_server, isMain ? QnServerStoragesPool::Main : QnServerStoragesPool::Backup))
@@ -833,8 +853,8 @@ void QnStorageConfigWidget::updateSelectedCamerasCaption(int selectedCamerasCoun
     const auto getNumberedCaption = [this, selectedCamerasCount]() -> QString
     {
         return QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("%n Camera(s)", nullptr, selectedCamerasCount)
-            , tr("%n Device(s)", nullptr, selectedCamerasCount));
+              tr("%n Camera(s)", "", selectedCamerasCount)
+            , tr("%n Device(s)", "", selectedCamerasCount));
     };
 
     const auto getSimpleCaption = []()
@@ -963,7 +983,7 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServer
     bool isMain = (pool == QnServerStoragesPool::Main);
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     if (!storagePool.rebuildCancelled)
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
             tr("Finished"),
             tr("Rebuilding archive index is completed."));
     storagePool.rebuildCancelled = false;
@@ -977,7 +997,7 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
         return;
 
     if (!m_backupCancelled)
-        QMessageBox::information(this,
+        QnMessageBox::information(this,
             tr("Finished"),
             tr("Backup is finished"));
     m_backupCancelled = false;

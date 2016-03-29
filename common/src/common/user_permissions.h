@@ -1,15 +1,22 @@
 #pragma once
 
+#ifdef __cplusplus  // For safe iOS build
+#include <utils/common/model_functions_fwd.h>
+#endif
+
+// TODO: #ynikitenkov Add serialization using metaobject
+#ifndef QN_NO_NAMESPACES
 namespace Qn {
+#endif
 
     /**
      * Flags describing the actions permitted for the user to do with the
      * selected resource.
      */
     enum Permission {
+        /* Generic permissions. */
         NoPermissions                           = 0x00000000,   /**< No access */
 
-        /* Generic permissions. */
         ReadPermission                          = 0x00010000,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
         WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
         SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to the server. */
@@ -46,10 +53,10 @@ namespace Qn {
         GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
-        GlobalPanicPermission                   = 0x00001000,   /**< Can trigger panic recording. */
         GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
 
         /* Deprecated permissions. */
+        GlobalPanicPermission                   = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
         DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Can view and export archives of available cameras. */
 
@@ -64,8 +71,10 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
 
+#ifdef __cplusplus
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+#endif
 
     /**
      * \param permissions               Permission flags containing some deprecated values.
@@ -77,4 +86,11 @@ namespace Qn {
     Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permission subrahend);
     Qn::Permissions operator-(Qn::Permission minuend, Qn::Permission subrahend);
 
+#ifndef QN_NO_NAMESPACES
 } // namespace Qn
+#endif
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permission)(Qn::Permissions),
+    (lexical)
+    )

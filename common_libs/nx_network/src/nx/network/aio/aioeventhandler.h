@@ -12,8 +12,10 @@
 #include "../socket.h"
 
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
+
     template<class SocketType>
     class AIOEventHandler
     {
@@ -26,6 +28,9 @@ namespace aio
         */
         virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() = 0;
     };
-}
+
+}   //aio
+}   //network
+}   //nx
 
 #endif  //AIOEVENTHANDLER_H

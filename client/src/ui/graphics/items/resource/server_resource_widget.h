@@ -14,7 +14,6 @@
 
 #include "resource_widget.h"
 
-class QnRadialGradientPainter;
 class QnMediaServerStatisticsManager;
 class StatisticsOverlayWidget;
 class QnGlFunctions;
@@ -28,9 +27,6 @@ class QnServerResourceWidget: public QnResourceWidget, public AnimationTimerList
 public:
     typedef QHash<QString, bool> HealthMonitoringButtons;
 
-    static const Button PingButton = static_cast<Button>(0x08);
-    static const Button ShowLogButton = static_cast<Button>(0x10);
-    static const Button CheckIssuesButton = static_cast<Button>(0x20);
 #define PingButton PingButton
 #define ShowLogButton ShowLogButton
 #define CheckIssuesButton CheckIssuesButton
@@ -55,7 +51,7 @@ protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
     virtual QString calculateTitleText() const override;
-    virtual Buttons calculateButtonsVisibility() const override;
+    virtual int calculateButtonsVisibility() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual void tick(int deltaMSecs) override;
@@ -68,7 +64,7 @@ private slots:
     void at_pingButton_clicked();
     void at_showLogButton_clicked();
     void at_checkIssuesButton_clicked();
-    
+
     void updateHoverKey();
     void updateGraphVisibility();
     //void updateInfoOpacity();
@@ -136,9 +132,6 @@ private:
 
     /** Elapsed timer for smooth scroll. */
     QElapsedTimer m_elapsedTimer;
-
-    /** Helper for the background painting. */
-    QSharedPointer<QnRadialGradientPainter> m_backgroundGradientPainter;
 
     /** Button bars with corresponding buttons */
     QnImageButtonBar *m_legendButtonBar[ButtonBarCount];

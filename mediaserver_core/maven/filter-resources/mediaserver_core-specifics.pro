@@ -3,6 +3,10 @@ TEMPLATE = lib
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
 include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
 
+INCLUDEPATH +=  ${qt.dir}/include/QtNetwork/ \
+                ${qt.dir}/include/QtNetwork/$$QT_VERSION/ \
+                ${qt.dir}/include/QtNetwork/$$QT_VERSION/QtNetwork/ \
+
 exists( ${libdir}/libcreateprocess.pri ) {
   include(${libdir}/libcreateprocess.pri)
 }
@@ -22,3 +26,4 @@ INCLUDEPATH += ${root.dir}/common_libs/nx_network/src/
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
+SOURCES += ${project.build.directory}/mediaserver_core_app_info_impl.cpp

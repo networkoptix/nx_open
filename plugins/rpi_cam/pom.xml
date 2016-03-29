@@ -10,12 +10,12 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>2.6.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>2.6.0-SNAPSHOT</version>
     <artifactId>rpi_cam</artifactId>
 	<packaging>pom</packaging>
     <name>HD Witness Raspberry Pi Camera Plugin</name>
@@ -23,17 +23,9 @@
 	<properties>
 		<guid>${rpi_cam.guid}</guid>
         <product.title>${project.name}</product.title>
-		<!--Global libs-->
+
 		<qt.libs>core</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
 		<global.libs>-lcommon -lnx_streaming -lopenmaxil -lvcos -lbcm_host</global.libs>
-		<!--Specific os libs used-->
-        <windows.oslibs/>
-		<!--Global defines-->
-		<global.defines/>
-		<linux.defines/>
-		<mac.defines/>
-        <windows.defines/>
     </properties>
     <dependencies>
         <dependency>

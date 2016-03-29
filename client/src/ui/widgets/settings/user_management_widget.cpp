@@ -16,6 +16,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
+#include <ui/widgets/snapped_scrollbar.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
@@ -23,6 +24,7 @@
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/delegates/switch_item_delegate.h>
 
 #include <utils/common/ldap.h>
 #include <utils/math/color_transformations.h>
@@ -40,7 +42,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     m_sortModel->setSourceModel(m_usersModel);
 
     ui->usersTable->setModel(m_sortModel);  
-    ui->usersTable->setHorizontalHeader(m_header);
+    ui->usersTable->setHeader(m_header);
+    ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn, new QnSwitchItemDelegate(this));
 
     m_header->setVisible(true);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -49,6 +52,9 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
 
     ui->usersTable->sortByColumn(QnUserListModel::NameColumn, Qt::AscendingOrder);
+
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     auto updateFetchButton = [this] {
         ui->fetchButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
@@ -148,19 +154,6 @@ void QnUserManagementWidget::updateSelection() {
         return accessController()->hasPermissions(user, Qn::RemovePermission) 
             && !user->isAdmin();
     }));
-
-    QColor normalColor = this->palette().color(QPalette::Window);
-
-    /* Here all children palette will be overwritten, so restoring it manually. */
-    setPaletteColor(ui->backgroundWidget, QPalette::Window, selectionActive 
-        ? m_colors.selectionBackground 
-        : normalColor);
-
-    for (QPushButton* button: ui->selectionPage->findChildren<QPushButton*>(QString(), Qt::FindDirectChildrenOnly)) {
-        setPaletteColor(button, QPalette::Window, normalColor);       
-        setPaletteColor(button, QPalette::Disabled, QPalette::WindowText, m_colors.disabledButtonsText);
-    }
-    setPaletteColor(m_header, QPalette::Window, normalColor);
     
     update();
 }
@@ -175,7 +168,7 @@ void QnUserManagementWidget::openLdapSettings() {
 }
 
 void QnUserManagementWidget::createUser() {
-    menu()->triggerIfPossible(Qn::NewUserAction); //TODO: #GDM correctly set parent widget
+    menu()->triggerIfPossible(QnActions::NewUserAction); //TODO: #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::fetchUsers() {
@@ -210,7 +203,7 @@ void QnUserManagementWidget::at_usersTable_activated(const QModelIndex &index) {
     if (!user)
         return;
 
-    menu()->trigger(Qn::UserSettingsAction, QnActionParameters(user));
+    menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user));
 }
 
 void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
@@ -218,10 +211,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
     if (!user)
         return;
 
-    if (index.column() == QnUserListModel::EditIconColumn) {
-        at_usersTable_activated(index);
-    }
-    else if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
+    if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
         m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user);
     }
 }
@@ -264,7 +254,7 @@ void QnUserManagementWidget::deleteSelected() {
     if (usersToDelete.isEmpty())
         return;
 
-    menu()->trigger(Qn::RemoveFromServerAction, usersToDelete);
+    menu()->trigger(QnActions::RemoveFromServerAction, usersToDelete);
 }
 
 

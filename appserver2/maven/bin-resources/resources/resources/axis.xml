@@ -31,6 +31,13 @@
                 default_value ="25"/>
             </params>
         </resource>        
+        <resource name = "AXISQ1775" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="60"/>
+            </params>
+        </resource>   
+        <resource name = "AXISP1364" public = "AXISQ1755"/>
         <resource name = "AXISQ3505" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
@@ -160,6 +167,7 @@
                     default_value ="30"/>
             </params>       
         </resource>
+        <resource name = "AXISQ3709" public = "AXIS_COMMON"/>
         <resource name = "AXISP5624" public = "AXISP5635"/>
         <resource name = "AXISP1365" public = "AXIS_COMMON">
             <params>
@@ -184,6 +192,26 @@
                     default_value ="30"/>
             </params>       
         </resource>  
+        <resource name = "AXISP5514" public = "AXIS_COMMON"/>
         <resource name = "AXISM1125" public = "AXISM1124"/>
+        <resource name = "AXISM3037" public = "AXISM3006">
+            <params>
+                <param name = "MaxFPS"
+                    default_value = "12"/>
+            </params>
+        </resource>                
+        <resource name = "AXISM7011" public = "AXIS_ENCODER"/>      
+        <resource name = "AXISP1435" public = "AXISP1365"/>        
+        <resource name = "AXISQ8665" public = "AXISM1124"/>       
+        <resource name = "AXISQ2901" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                    default_value = "8"/>
+            </params>
+        </resource>        
+        <resource name = "AXISQ6128" public = "AXISP1365"/>      
+        <resource name = "AXISP5515" public = "AXISM1124"/>          
+        <resource name = "AXISQ8632" public = "AXISM1124"/>    
+        <resource name = "AXISQ8631" public = "AXISM1124"/>            
     </oem>
 </resources>

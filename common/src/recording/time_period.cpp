@@ -38,6 +38,9 @@ bool operator < (const QnTimePeriod& other, qint64 first)
     return other.startTimeMs < first;
 }
 
+const qint64 QnTimePeriod::kMaxTimeValue = std::numeric_limits<qint64>::max();
+const qint64 QnTimePeriod::kMinTimeValue = 0;
+
 QnTimePeriod::QnTimePeriod() :
     startTimeMs(0),
     durationMs(0)
@@ -51,7 +54,7 @@ QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) :
 QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs
     , qint64 endTimeMs)
 {
-    Q_ASSERT_X(endTimeMs >= startTimeMs, Q_FUNC_INFO
+    NX_ASSERT(endTimeMs >= startTimeMs, Q_FUNC_INFO
         , "Start time could not be greater than end time");
 
     if (endTimeMs >= startTimeMs)
@@ -160,8 +163,11 @@ QnTimePeriod& QnTimePeriod::deserialize(const QByteArray& data)
     return *this;
 }
 
-bool QnTimePeriod::operator==(const QnTimePeriod &other) const {
-    return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
+QnTimePeriod& QnTimePeriod::operator = (const QnTimePeriod &other)
+{
+    startTimeMs = other.startTimeMs;
+    durationMs = other.durationMs;
+    return *this;
 }
 
 bool QnTimePeriod::isNull() const {
@@ -200,6 +206,12 @@ qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
         return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
     else
         return startTimeMs - timeMs;
+}
+
+bool operator==(const QnTimePeriod &first, const QnTimePeriod &other)
+{
+    return ((first.startTimeMs == other.startTimeMs)
+        && (first.durationMs == other.durationMs));
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {

@@ -1,7 +1,7 @@
 #ifndef AGGREGATION_WIDGET_H
 #define AGGREGATION_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class AggregationWidget;

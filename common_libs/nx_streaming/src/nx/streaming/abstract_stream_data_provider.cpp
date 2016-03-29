@@ -1,8 +1,7 @@
 #include "abstract_stream_data_provider.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <core/resource/resource.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
@@ -37,7 +36,7 @@ int QnAbstractStreamDataProvider::processorsCount() const
 
 void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractDataReceptor* dp)
 {
-    Q_ASSERT(dp);
+    NX_ASSERT(dp);
     QnMutexLocker mutex( &m_mutex );
 
     if (!m_dataprocessors.contains(dp))
@@ -99,5 +98,3 @@ void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

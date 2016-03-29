@@ -8,6 +8,8 @@
 #include <udt/udt.h>
 
 
+namespace nx {
+namespace network {
 namespace detail {
 
 SystemError::ErrorCode convertToSystemError(int udtErrorCode)
@@ -89,4 +91,6 @@ SystemError::ErrorCode convertToSystemError(int udtErrorCode)
         return SystemError::ioError;
 }
 
-}
+}   //detail
+}   //network
+}   //nx

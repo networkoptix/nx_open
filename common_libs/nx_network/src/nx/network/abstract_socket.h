@@ -11,19 +11,28 @@
 #include <functional>
 #include <memory>
 
+#include <nx/utils/move_only_func.h>
 #include <utils/common/byte_array.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/stoppable.h>
 
 #include "aio/pollset.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
-#include "utils/common/systemerror.h"
-#include "utils/common/stoppable.h"
 
 //todo: #ak cancel asynchoronous operations
 
 // forward
-namespace aio { class AbstractAioThread; }
+namespace nx {
+namespace network {
+namespace aio {
+
+class AbstractAioThread;
+
+}   //aio
+}   //network
+}   //nx
 
 /** Base interface for sockets. Provides methods to set different socket configuration parameters.
 
@@ -50,14 +59,12 @@ public:
     typedef int SOCKET_HANDLE;
 #endif
 
-    virtual ~AbstractSocket() {}
-
     //!Bind to local address/port
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool bind( const SocketAddress& localAddress ) = 0;
-    bool bind( const QString& localAddress, unsigned short localPort ) { return bind( SocketAddress( localAddress, localPort ) ); };
+    bool bind( const QString& localAddress, unsigned short localPort );
     //!Bind to local network interface by its name
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -161,27 +168,27 @@ public:
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    virtual void post(std::function<void()> handler) = 0;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    virtual void dispatch(std::function<void()> handler) = 0;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) = 0;
 
     //!Returns pointer to AIOThread this socket is bound to
     /*!
         \note if socket is not bound to any thread yet, binds it automatically
     */
-    virtual aio::AbstractAioThread* getAioThread() = 0;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() = 0;
 
     //!Binds current socket to specified AIOThread
     /*!
-        \note internal assert(false) in case if socket can not be bound to
+        \note internal NX_ASSERT(false) in case if socket can not be bound to
               specified tread (e.g. it's already bound to different thread or
               certaind thread type is not the same)
      */
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) = 0;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
 };
 
 //!Interface for writing to/reading from socket
@@ -190,8 +197,6 @@ class NX_NETWORK_API AbstractCommunicatingSocket
     public AbstractSocket
 {
 public:
-    virtual ~AbstractCommunicatingSocket() {}
-
     static const int DEFAULT_TIMEOUT_MILLIS = 3000;
 
     //!Establish connection to specified foreign address
@@ -206,18 +211,10 @@ public:
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
-    {
-        //TODO #ak this method MUST replace the previous one
-        return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
-    }
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS );
     bool connect(
         const SocketAddress& remoteSocketAddress,
-        std::chrono::milliseconds timeoutMillis)
-    {
-        //TODO #ak this method MUST replace the previous one
-        return connect(remoteSocketAddress, timeoutMillis.count());
-    }
+        std::chrono::milliseconds timeoutMillis);
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::recv()
@@ -237,8 +234,8 @@ public:
         \note If socket is in non-blocking mode and non-blocking send is not possible, method will return -1 and set error code to \a SystemError::wouldBlock
     */
     virtual int send( const void* buffer, unsigned int bufferLen ) = 0;
-    int send( const QByteArray& data )  { return send( data.constData(), data.size() ); }
-    int send( const QnByteArray& data ) { return send( data.constData(), data.size() ); }
+    int send( const QByteArray& data );
+    int send( const QnByteArray& data );
     //!Returns host address/port of remote host, socket has been connected to
     /*!
         Get the foreign address.  Call connect() before calling recv()
@@ -257,7 +254,7 @@ public:
     */
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void(SystemError::ErrorCode)> handler) = 0;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     //!Reads bytes from socket asynchronously
     /*!
@@ -279,6 +276,7 @@ public:
 
     //!Asynchnouosly writes all bytes from input buffer
     /*!
+        \param buf Calling party MUST guarantee that this object is not freed until send completion
         \param handler functor with following parameters:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, size_t bytesWritten )
@@ -292,40 +290,34 @@ public:
     //!Register timer on this socket
     /*!
         \param handler functor with no parameters
+        \note \a timeoutMs MUST be greater then zero!
     */
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler) = 0;
-    void registerTimer(
         std::chrono::milliseconds timeout,
-        std::function<void()> handler)
-    {
-        return registerTimer(timeout.count(), std::move(handler));
-    }
+        nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    void registerTimer(
+        unsigned int timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler);
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
         \param eventType event to cancel
     */
-    virtual void cancelIOAsync( aio::EventType eventType,
-                                std::function< void() > handler) = 0;
+    virtual void cancelIOAsync(
+        nx::network::aio::EventType eventType,
+        nx::utils::MoveOnlyFunc< void() > handler) = 0;
 
     //!Cancels async operation and blocks until cancellation is stopped
     /*!
         \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
+        \note If invoked within socket's aio thread, cancels immediately, without blocking
     */
-    void cancelIOSync(aio::EventType eventType)
-    {
-        std::promise< bool > promise;
-        cancelIOAsync( eventType, [ & ](){ promise.set_value( true ); } );
-        promise.get_future().wait();
-    }
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
 
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override
-    {
-        cancelIOAsync( aio::EventType::etNone, std::move( handler ) );
-    }
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of QnStoppable::pleaseStopSync
+    virtual void pleaseStopSync() override;
 };
 
 struct NX_NETWORK_API StreamSocketInfo
@@ -364,8 +356,6 @@ class NX_NETWORK_API AbstractStreamSocket
     public AbstractCommunicatingSocket
 {
 public:
-    virtual ~AbstractStreamSocket() {}
-
     //!Reopenes previously closed socket
     /*!
         TODO #ak this class is not a right place for this method
@@ -440,8 +430,6 @@ class NX_NETWORK_API AbstractStreamServerSocket
     public AbstractSocket
 {
 public:
-    virtual ~AbstractStreamServerSocket() {}
-
     //!Start listening for incoming connections
     /*!
         \note Method returns immediately
@@ -465,11 +453,16 @@ public:
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
-    virtual void acceptAsync(std::function<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> handler) = 0;
-
-protected:
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) = 0;
+    /** Cancel active \a AbstractStreamServerSocket::acceptAsync */
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+    /** Cancel active \a AbstractStreamServerSocket::acceptAsync waiting for completion.
+        \note If called within socket's aio thread, then does not block
+    */
+    virtual void cancelIOSync() = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
@@ -487,18 +480,14 @@ public:
     static const int MAX_IP_HEADER_SIZE = 60;
     static const int MAX_DATAGRAM_SIZE = 64*1024 - 1 - UDP_HEADER_SIZE - MAX_IP_HEADER_SIZE;
 
-    virtual ~AbstractDatagramSocket() {}
-
     //!Set destination address for use by \a AbstractCommunicatingSocket::send() method
     /*!
         Difference from \a AbstractCommunicatingSocket::connect() method is this method does not enable filtering incoming datagrams by (\a foreignAddress, \a foreignPort),
             and \a AbstractCommunicatingSocket::connect() does
     */
     virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) = 0;
-    //TODO #ak drop following method
-    bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) {
-        return setDestAddr( SocketAddress( foreignAddress, foreignPort ) );
-    }
+    //TODO #ak drop following overload
+    bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort );
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         \param buffer buffer to be written
@@ -512,10 +501,7 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const QString& foreignAddress,
-        unsigned short foreignPort )
-    {
-        return sendTo( buffer, bufferLen, SocketAddress( foreignAddress, foreignPort ) );
-    }
+        unsigned short foreignPort );
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         Same as previous method
@@ -526,10 +512,7 @@ public:
         const SocketAddress& foreignAddress ) = 0;
     bool sendTo(
         const nx::Buffer& buf,
-        const SocketAddress& foreignAddress)
-    {
-        return sendTo(buf.constData(), buf.size(), foreignAddress);
-    }
+        const SocketAddress& foreignAddress);
     /*!
         \param completionHandler (errorCode, resolved target address, bytesSent)
     */
@@ -582,55 +565,5 @@ public:
     virtual bool leaveGroup( const QString &multicastGroup ) = 0;
     virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
-
-#ifdef SocketOptions_setOrFalse
-    #error SocketOptions_setOrFalse macro is already defined.
-#endif
-
-#define SocketOptions_setOrFalse(setter, param) \
-    if( param )                                 \
-        if( !socket->setter( *param ) )         \
-            return false;
-
-//!Socket configuration options ready to apply to any \class AbstractSocket
-struct NX_NETWORK_API SocketOptions
-{
-    boost::optional< SocketAddress > boundAddress;
-    boost::optional< bool > reuseAddrFlag, nonBlockingMode;
-    boost::optional< unsigned int > sendBufferSize, recvBufferSize;
-    boost::optional< unsigned int > sendTimeout, recvTimeout;
-
-    inline bool apply( AbstractSocket* socket )
-    {
-        SocketOptions_setOrFalse(bind,              boundAddress);
-        SocketOptions_setOrFalse(setReuseAddrFlag,  reuseAddrFlag);
-        SocketOptions_setOrFalse(setReuseAddrFlag,  nonBlockingMode);
-        SocketOptions_setOrFalse(setSendBufferSize, sendBufferSize);
-        SocketOptions_setOrFalse(setRecvBufferSize, recvBufferSize);
-        SocketOptions_setOrFalse(setSendTimeout,    sendTimeout);
-        SocketOptions_setOrFalse(setRecvTimeout,    recvTimeout);
-        return true;
-    }
-};
-
-//!Socket configuration options ready to apply to any \class AbstractStreamSocket
-struct NX_NETWORK_API StreamSocketOptions : SocketOptions
-{
-    boost::optional< bool > noDelay, statCollect;
-    boost::optional< boost::optional< KeepAliveOptions > > keepAliveOptions;
-
-    inline bool apply( AbstractStreamSocket* socket )
-    {
-        if( !SocketOptions::apply( socket ) )
-            return false;
-
-        SocketOptions_setOrFalse(setNoDelay,                    noDelay);
-        SocketOptions_setOrFalse(toggleStatisticsCollection,    statCollect);
-        SocketOptions_setOrFalse(setKeepAlive,                  keepAliveOptions);
-        return true;
-    }
-};
-
-#undef SocketOptions_setOrFalse
 
 #endif  //ABSTRACT_SOCKET_H

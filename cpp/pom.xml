@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cpp</artifactId>
     <packaging>pom</packaging>
@@ -27,7 +27,7 @@
     <build>
         <directory>${arch}</directory>
         <outputDirectory>${arch}</outputDirectory>
-        <sourceDirectory>${basedir}/src</sourceDirectory> 
+        <sourceDirectory>${basedir}/src</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -63,18 +63,18 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>                                
+                                </resource>
                                 <resource>
                                     <directory>${root.dir}/cpp/maven/bin-resources</directory>
                                     <filtering>false</filtering>
-                                </resource>                                
-                            </resources>              
+                                </resource>
+                            </resources>
                             <encoding>UTF-8</encoding>
-                        </configuration>            
+                        </configuration>
                     </execution>
                     <execution>
                         <id>generate-solution</id>
@@ -84,14 +84,14 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.basedir}</outputDirectory>
-                            <resources>          
+                            <resources>
                                 <resource>
                                     <directory>maven/solution</directory>
                                     <filtering>true</filtering>
-                                </resource>                                                           
-                            </resources>              
+                                </resource>
+                            </resources>
                             <encoding>UTF-8</encoding>
-                        </configuration>            
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -100,6 +100,23 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>get_dependencies.py</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
+                            </environmentVariables>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>gen-qrc</id>
                         <phase>process-sources</phase>
@@ -111,7 +128,7 @@
                             <arguments>
                                 <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                             <environmentVariables>
                                 <ANDROID_SDK_ROOT>${android.sdk}</ANDROID_SDK_ROOT>
                                 <ANDROID_NDK_ROOT>${android.ndk}</ANDROID_NDK_ROOT>
@@ -129,7 +146,7 @@
                             <arguments>
                                 <argument>build-prepare.py</argument>
                             </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -142,13 +159,13 @@
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
                                 <argument>${project.build.directory}/build.py</argument>
-                            </arguments>                                    
-                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
-            </plugin>                   
-        </plugins>      
+            </plugin>
+        </plugins>
     </build>
     <profiles>
         <profile>
@@ -163,75 +180,36 @@
                 <exclude_platform>unix</exclude_platform>
             </properties>
             <build>
-                <plugins>                   
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <!-- Fixing qmake-generated msvc2015 project files. -->
+                                <id>patch-vcproj-file</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${init.python.dir}/${python.executable}</executable>
+                                    <arguments>
+                                        <argument>${root.dir}/build_utils/python/patch_vcproj.py</argument>
+                                        <argument>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</argument>
+                                        <argument>--arch</argument>
+                                        <argument>${arch}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
                         <version>1.5.2</version>
                         <executions>
-                            <execution>
-                                <id>fix-arch-x64-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x64.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>   
-									<escape>true</escape>
-									<regex>false</regex>									
-                                    <replacements>
-                                        <replacement>
-                                            <token>Win32</token>
-                                            <value>${arch}</value>
-                                        </replacement>         
-                                        <replacement>
-                                            <token>Name="VCLibrarianTool"</token>
-                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
-                                        </replacement>  
-                                        <replacement>
-                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x64-msvc2012-opengl\lib\Qt5Core.lib;</token>
-                                            <value>;</value>
-                                        </replacement>  										
-                                    </replacements>
-                                </configuration>                                
-                            </execution>
-                            <execution>
-                                <id>fix-arch-x86-QMAKE-SUCKS!!!!!!!!!!</id>
-								<phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x86.vcxproj</file>
-                                    <!-- <excludes>
-                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
-                                    </excludes> --> 
-                                    <ignoreMissingFile>true</ignoreMissingFile>          
-									<escape>true</escape>
-									<regex>false</regex>	                                    
-                                    <replacements>
-                                        <replacement>
-                                            <token>x64</token>
-                                            <value>Win32</value>
-                                        </replacement>         
-                                        <replacement>
-                                            <token>Name="VCLibrarianTool"</token>
-                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
-                                        </replacement> 
-                                        <replacement>
-                                            <token>;c:\Qt\5.4.2\qt-5.4.2-x86-msvc2012-opengl\lib\Qt5Core.lib;</token>
-                                            <value>;</value>
-                                        </replacement>         
-                                    </replacements>
-                                </configuration>                                
-                            </execution>
-
                             <!-- Fixing qmake-generated msvc2012 project files. Sometimes this step will be unnecessary (when qmake is fixed) -->
                             <execution>
                                 <id>fix-vcxproj-QMAKE-SUCKS!!!!!!!!!!</id>
@@ -245,20 +223,6 @@
                                     <ignoreErrors>true</ignoreErrors>
                                     <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
                                     <replacements>
-                                        <!-- Adding custom build steps since qmake cannot do that for msvc2012 project file -->
-                                        <!--<replacement>
-                                            <token>
-                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace>]]></token>
-                                            <value>
-                                                <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
-                                        </replacement> -->
-
-                                        <!-- Disabling optimization for debug builds -->
-                                        <replacement>
-                                            <xpath>//Project/ItemDefinitionGroup[contains(@Condition,'Debug')]</xpath>
-                                            <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
-                                            <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
-                                        </replacement>
 
                                         <replacement>
                                             <token>
@@ -266,24 +230,7 @@
                                             <value>
                                                 <![CDATA[</RootNamespace>
     <TargetName>${project.artifactId}</TargetName>]]></value>
-                                        </replacement> 
-                                        <replacement>
-                                            <token>
-                                                <![CDATA[<PlatformToolSet>v110</PlatformToolSet>]]></token>
-                                            <value>
-                                                <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
-                                        </replacement>         
-                                        <replacement>
-                                            <token>
-                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">]]></token>
-                                            <value>
-                                                <![CDATA[<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemDefinitionGroup>
-    <Link>
-      <SubSystem Condition="'%(Link.SubSystem)'=='' Or '%(Link.SubSystem)'=='NotSet'">Windows</SubSystem>
-    </Link>
-  </ItemDefinitionGroup>]]></value>
-                                        </replacement> 
+                                        </replacement>
                                         <replacement>
                                             <token>
                                                 <![CDATA[release</ProgramDataBaseFileName>]]></token>
@@ -300,27 +247,6 @@
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
                                         </replacement>
-                                        <replacement>
-                                            <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
-                                            <token>
-                                                <![CDATA[<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>]]></token>
-                                            <value>
-                                                <![CDATA[
-    <CustomBuild Include="$1/$2.$3">
-      <AdditionalInputs>\$(OutputDirectory)../../../bin/protoc.exe;$1/$2.$3</AdditionalInputs>
-      <Command>\$(OutputDirectory)\..\\..\\..\\bin\\protoc.exe --proto_path=./api/pb --cpp_out=../${arch}/build/\$(Configuration)/generated/ ./$1/$2.$3</Command>
-      <Message>Generating code from $1/$2.$3 to $2.pb.cc</Message>
-      <Outputs>../${arch}/build/\$(Configuration)/generated/$2.pb.cc</Outputs>
-    </CustomBuild>
-]]></value>
-                                        </replacement>
-
-                                        <!-- Fixing compiling of *.pb.cc files -->
-                                        <replacement>
-                                            <xpath>//Project/ItemGroup/CustomBuild[contains(@Include,'.pb.cc')]</xpath>
-                                            <token>CustomBuild</token>
-                                            <value>ClCompile</value>
-                                        </replacement>
 
                                         <!-- Disabling compile of .res file (otherwise we come into duplicate resource error during linkage) -->
                                         <replacement>
@@ -328,48 +254,25 @@
                                             <token>CustomBuild</token>
                                             <value>None</value>
                                         </replacement>
-                                        
+
                                         <!-- Replacing GUIDs to predefined ones -->
                                         <replacement>
                                             <xpath>//Project/PropertyGroup</xpath>
                                             <token><![CDATA[<ProjectGuid>\{(.*)}]]></token>
-                                            <value><![CDATA[<ProjectGuid>${guid}]]></value>
+                                            <value><![CDATA[<ProjectGuid>\${guid}]]></value>
                                         </replacement>
 
-                                        <!-- Disabling moc preprocessor steps, since we do it with jom -->
+                                        <!-- Adding target machine for x86 -->
                                         <replacement>
-                                            <xpath>//Project/PropertyGroup/CustomBuild[contains(@Include,'.h')]</xpath>
-                                            <token><![CDATA[</CustomBuild>]]></token>
+                                            <xpath>//Project/ItemDefinitionGroup</xpath>
+                                            <token><![CDATA[</Lib>]]></token>
                                             <value><![CDATA[
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </CustomBuild>
-                                            ]]></value>
-                                        </replacement>
+      <TargetMachine>Machine${machine.type}</TargetMachine>
+    </Lib>]]></value>
+                                        </replacement>                                        
 
-                                        <!-- Adding moc preprocessor steps with jom -->
-                                        <replacement>
-                                            <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath>
-                                            <token><![CDATA[</Link>]]></token>
-                                            <value><![CDATA[
-    </Link>
-    <PreBuildEvent>
-      <Command>\$\(ProjectDir\)../${arch}/build_moc.bat \$\(ProjectDir\)../${arch} \$\(Configuration\)</Command>
-    </PreBuildEvent>
-                                            ]]></value>
-                                        </replacement>
+                                        
 
-                                        <!-- Cleaning moc files -->
-                                        <replacement>
-                                            <!-- <xpath>//Project/ItemDefinitionGroup[not(@*)]</xpath> -->
-                                            <token><![CDATA[<ItemDefinitionGroup>]]></token>
-                                            <value><![CDATA[
-  <Target Name="BeforeClean">
-    <Message Text="Cleaning moc generated files"/>
-    <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
-  </Target>
-  <ItemDefinitionGroup>
-                                            ]]></value>
-                                        </replacement>
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
@@ -379,68 +282,10 @@
                                                 <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
                                         </replacement>
 
-                                        <!-- Adding "Create precompiled header option" to StdAfx.cpp compile options -->
-                                        <!-- <replacement>
-                                            <xpath>//Project/ItemGroup/ClCompile[contains(@Include,'StdAfx.cpp')]</xpath>
-                                            <token>CustomBuild</token>
-                                            <value>None</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
-                                            <value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
-                                        </replacement> -->
                                     </replacements>
                                     <skip>${replace.skip}</skip>
-                                </configuration>                                
+                                </configuration>
                             </execution>
-                            <execution>
-                                <id>fix-vcxproj-finalname-QMAKE-SUCKS!!!!!!!!!!</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <unescape>no</unescape>
-                                    <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
-                                    <replacements>
-                                        <replacement>
-                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
-                                            <value>${project.artifactId}</value>
-                                        </replacement>
-                                    </replacements>
-                                    <skip>${replace.skip}</skip>
-                                </configuration>                                
-                            </execution>
-                            <execution>
-                                <id>fix-makefile-QMAKE-SUCKS!!!!!!!!!!</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>replace</goal>
-                                </goals>
-                                <configuration>
-                                    <encoding>utf-8</encoding>
-                                    <unescape>no</unescape>
-                                    <ignoreErrors>true</ignoreErrors>
-                                    <file>${project.build.directory}/Makefile.${build.configuration}</file>
-                                    <replacements>
-                                        <replacement>
-                                            <token><![CDATA[@echo compiling \$< && cl]]></token>
-                                            <value>cl</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token><![CDATA[@echo linking \$@ && link]]></token>
-                                            <value>link</value>
-                                        </replacement>
-                                        <replacement>
-                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
-                                            <value>${project.artifactId}</value>
-                                        </replacement>                                      
-                                    </replacements>
-                                    <skip>${replace.skip}</skip>
-                                </configuration>                                
-                            </execution>                            
                         </executions>
                     </plugin>
                 </plugins>
@@ -452,12 +297,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <rename-skip>false</rename-skip>
             </properties>
-            <build> 
+            <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
@@ -472,15 +317,15 @@
                                 </goals>
                                 <configuration>
                                     <executable>${project.build.directory}/build.sh</executable>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>     
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>  
-            </build>            
-        </profile>  
-        
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>linux-arm</id>
             <activation>
@@ -488,7 +333,7 @@
                 <os>
                     <family>unix</family>
                     <name>linux</name>
-                </os> 
+                </os>
                 <property>
                     <name>arch</name>
                     <value>arm</value>
@@ -530,7 +375,7 @@
                 </property>
             </activation>
             <build>
-                <plugins>                   
+                <plugins>
                     <plugin>
                         <groupId>com.google.code.maven-replacer-plugin</groupId>
                         <artifactId>replacer</artifactId>
@@ -547,19 +392,19 @@
                                     <regex>false</regex>
                                     <encoding>utf-8</encoding>
                                     <file>${project.build.directory}/Makefile.release</file>
-                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <ignoreMissingFile>true</ignoreMissingFile>
                                     <replacements>
                                         <replacement>
                                             <token> /usr/include/c++/4.8</token>
                                             <value> </value>
-                                        </replacement>         
+                                        </replacement>
                                     </replacements>
-                                </configuration>                                   
-                            </execution>                          
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-        </profile>         
-    </profiles> 
+        </profile>
+    </profiles>
 </project>

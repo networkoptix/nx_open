@@ -23,7 +23,8 @@ protected:
     Singleton() {
         /* Init global instance. */
         if(s_instance) {
-            assert(false);
+            // TODO: #dklychov Refactor camera motion tab and enable this NX_ASSERT
+            // NX_ASSERT(false);
         } else {
             s_instance = static_cast<Derived *>(this);
         }

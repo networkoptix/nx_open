@@ -38,7 +38,7 @@ public:
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
             startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
         {
-            //Q_ASSERT_X(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
+            //NX_ASSERT(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
         }
 
         qint64 distanceToTime(qint64 timeMs) const;
@@ -171,6 +171,9 @@ public:
     void setLastSyncTime(int64_t);
     int64_t getLastSyncTime() const;
 
+    // This should be called without m_mutex locked
+    int64_t getLastSyncTimeFromDBNoLock() const;
+
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
@@ -204,7 +207,6 @@ public:
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
-    void setStoragePool(QnServer::StoragePool value);
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -247,7 +249,7 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
-    QnServer::StoragePool m_storagePool;
+    const QnServer::StoragePool m_storagePool;
     mutable int64_t m_lastSyncTime;
 };
 

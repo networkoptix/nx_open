@@ -4,6 +4,8 @@
 #include <nx/utils/timermanager.h>
 
 #include "mediator_connections.h"
+#include "nx/network/aio/timer.h"
+
 
 namespace nx {
 namespace network {
@@ -22,7 +24,7 @@ public:
     void setUpdateInterval( TimerDuration updateInterval );
     void updateAddresses( std::list< SocketAddress > addresses );
 
-    void pleaseStop( std::function<void()> handler ) override;
+    void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
     void setupUpdateTimer( QnMutexLockerBase* lk );
@@ -38,7 +40,7 @@ private:
     std::list< SocketAddress > m_pingedAddresses;
     std::list< SocketAddress > m_publishedAddresses;
 
-    std::unique_ptr< AbstractStreamSocket > m_timerSocket;
+    nx::network::aio::Timer m_timer;
     std::shared_ptr< hpm::api::MediatorServerTcpConnection > m_mediatorConnection;
 };
 

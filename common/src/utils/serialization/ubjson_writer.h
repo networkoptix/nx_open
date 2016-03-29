@@ -130,7 +130,7 @@ private:
         State &state = m_stateStack.back();
 
         if(type != QnUbjson::InvalidMarker) {
-            assert(QnUbjson::isValidContainerType(type) && size >= 0);
+            NX_ASSERT(QnUbjson::isValidContainerType(type) && size >= 0);
 
             m_stream.writeMarker(QnUbjson::ContainerTypeMarker);
             m_stream.writeMarker(type);
@@ -152,8 +152,8 @@ private:
     }
 
     void writeContainerEndInternal(QnUbjson::Marker marker) {
-        assert(m_stateStack.size() > 1);
-        assert(m_stateStack.back().count <= 0);
+        NX_ASSERT(m_stateStack.size() > 1);
+        NX_ASSERT(m_stateStack.back().count <= 0);
 
         writeMarkerInternal(marker);
 
@@ -179,14 +179,14 @@ private:
             break;
 
         case AtTypedSizedArrayElement:
-            assert(marker == state.type);
+            NX_ASSERT(marker == state.type);
             state.count--;
             if(state.count == 0)
                 state.status = AtArrayEnd;
             break;
 
         case AtArrayEnd:
-            assert(marker == QnUbjson::ArrayEndMarker);
+            NX_ASSERT(marker == QnUbjson::ArrayEndMarker);
             break;
 
         case AtObjectStart:
@@ -194,7 +194,7 @@ private:
             break;
 
         case AtObjectKey:
-            assert(marker == QnUbjson::Utf8StringMarker);
+            NX_ASSERT(marker == QnUbjson::Utf8StringMarker);
             state.status = AtObjectValue;
             break;
 
@@ -204,7 +204,7 @@ private:
             break;
 
         case AtSizedObjectKey:
-            assert(marker == QnUbjson::Utf8StringMarker);
+            NX_ASSERT(marker == QnUbjson::Utf8StringMarker);
             state.status = AtSizedObjectValue;
             break;
 
@@ -219,12 +219,12 @@ private:
             break;
 
         case AtTypedSizedObjectKey:
-            assert(marker == QnUbjson::Utf8StringMarker);
+            NX_ASSERT(marker == QnUbjson::Utf8StringMarker);
             state.status = AtTypedSizedObjectValue;
             break;
 
         case AtTypedSizedObjectValue:
-            assert(marker == state.type);
+            NX_ASSERT(marker == state.type);
             state.count--;
             if(state.count == 0) {
                 state.status = AtObjectEnd;
@@ -234,7 +234,7 @@ private:
             break;
 
         case AtObjectEnd:
-            assert(marker == QnUbjson::ObjectEndMarker);
+            NX_ASSERT(marker == QnUbjson::ObjectEndMarker);
             break;
 
         default:

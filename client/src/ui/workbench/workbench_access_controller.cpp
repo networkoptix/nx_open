@@ -55,7 +55,7 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &re
             return Qn::GlobalViewerPermissions;
 
     if (!m_dataByResource.contains(resource)) {
-        Q_ASSERT(resource);
+        NX_ASSERT(resource);
         if (resource && !resource->resourcePool())         /* Calculated permissions should always exist for all resources in the pool. */
             qDebug() << "Requesting permissions for the non-pool resource" << resource->getName();
         return calculatePermissions(resource);
@@ -81,7 +81,10 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
     if(!user)
         return result;
 
-    result = static_cast<Qn::Permissions>(user->getPermissions());
+    // QFlags uses int internally and don't have a constructor from quint64.
+    // Also we don't place values bigger than uint max to the user permissions
+    // so we can just cast permissions to int.
+    result = static_cast<Qn::Permissions>(static_cast<int>(user->getPermissions()));
 
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;
@@ -96,7 +99,7 @@ bool QnWorkbenchAccessController::hasGlobalPermissions(Qn::Permissions requiredP
 }
 
 QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const {
-    Q_ASSERT(m_dataByResource.contains(resource));
+    NX_ASSERT(m_dataByResource.contains(resource));
 
     if(!m_dataByResource.contains(resource))
         return NULL;
@@ -108,7 +111,7 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) const {
-    Q_ASSERT(resource);
+    NX_ASSERT(resource);
 
     if(QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         return calculatePermissionsInternal(user);
@@ -134,12 +137,12 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
         return calculatePermissionsInternal(webPage);
 
-    Q_ASSERT("invalid resource type");
+    NX_ASSERT("invalid resource type");
     return Qn::NoPermissions;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnUserResourcePtr &user) const {
-    Q_ASSERT(user);
+    NX_ASSERT(user);
 
     Qn::Permissions result = Qn::NoPermissions;
     if (user == m_user) {
@@ -176,7 +179,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnLayoutResourcePtr &layout) const {
-    Q_ASSERT(layout);
+    NX_ASSERT(layout);
 
     auto checkReadOnly = [this, layout](Qn::Permissions permissions) {
         if (!m_readOnlyMode)
@@ -242,7 +245,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnVirtualCameraResourcePtr &camera) const {
-    Q_ASSERT(camera);
+    NX_ASSERT(camera);
 
     Qn::Permissions result = Qn::ReadPermission;
     if(m_userPermissions & Qn::GlobalExportPermission)
@@ -262,13 +265,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnAbstractArchiveResourcePtr &media) const {
-    Q_ASSERT(media);
+    NX_ASSERT(media);
 
     return Qn::ReadPermission | Qn::ExportPermission;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnMediaServerResourcePtr &server) const {
-    Q_ASSERT(server);
+    NX_ASSERT(server);
 
     if (m_readOnlyMode)
         return Qn::ReadPermission;
@@ -279,7 +282,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnVideoWallResourcePtr &videoWall) const {
-    Q_ASSERT(videoWall);
+    NX_ASSERT(videoWall);
 
     if (m_readOnlyMode)
         return Qn::ReadPermission;
@@ -291,7 +294,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnWebPageResourcePtr &webPage) const {
-    Q_ASSERT(webPage);
+    NX_ASSERT(webPage);
 
     if (m_readOnlyMode)
         return Qn::ReadPermission;

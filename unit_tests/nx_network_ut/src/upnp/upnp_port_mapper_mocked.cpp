@@ -3,7 +3,7 @@
 
 #include <common/common_globals.h>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 
 namespace nx_upnp {

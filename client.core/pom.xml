@@ -2,12 +2,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client.core</artifactId>
     <packaging>pom</packaging>
@@ -16,12 +16,30 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+    
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>  
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -37,26 +55,14 @@
         <guid>${client.core.guid}</guid>
         <product.title>${client.name} Core</product.title>
         <product.display.title>${client.display.name} Core</product.display.title>
-        <!--Global libs-->
         <template>lib</template>
         <qt.libs>core gui network multimedia concurrent sql</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs>-lssl -lcrypto</linux.oslibs>
+        <global.libs>-lcommon -lnx_streaming -lappserver2</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <android.defines/>
-        <ios.defines/>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
     
     <profiles>
@@ -106,6 +112,23 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
     </profiles>	

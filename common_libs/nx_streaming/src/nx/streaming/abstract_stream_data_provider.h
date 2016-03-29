@@ -1,8 +1,6 @@
 #ifndef ABSTRACT_STREAM_DATA_PROVIDER
 #define ABSTRACT_STREAM_DATA_PROVIDER
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <utils/common/long_runnable.h>
 #include <core/resource/resource_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
@@ -60,7 +58,5 @@ protected:
     QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // ABSTRACT_STREAM_DATA_PROVIDER

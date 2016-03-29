@@ -5,6 +5,7 @@
 
 #include <utils/common/string.h>
 
+//TODO: #GDM include and use <ui/workaround/cancel_drag.h>
 QnCustomFileDialog::QnCustomFileDialog(QWidget *parent, const QString &caption, const QString &directory, const QString &filter):
     base_type(parent, caption, directory, filter),
     m_currentColumn(0)
@@ -68,7 +69,7 @@ void QnCustomFileDialog::addLineEdit(const QString &label, QString *value) {
 
 void QnCustomFileDialog::addWidget(const QString &label, QWidget *widget, QnAbstractWidgetControlDelegate *delegate) {
     QGridLayout *layout = customizedLayout();
-    assert(layout);
+    NX_ASSERT(layout);
 
     int row = layout->rowCount();
     if(label.isEmpty()) {

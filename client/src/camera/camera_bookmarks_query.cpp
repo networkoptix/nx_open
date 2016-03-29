@@ -58,6 +58,11 @@ void QnCameraBookmarksQuery::executeRemoteAsync(BookmarksCallbackType callback) 
     qnCameraBookmarksManager->executeQueryRemoteAsync(toSharedPointer(), callback);
 }
 
+void QnCameraBookmarksQuery::refresh()
+{
+    emit queryChanged();
+}
+
 QnCameraBookmarksQueryPtr QnCameraBookmarksQuery::toSharedPointer() const {
     return QnFromThisToShared<QnCameraBookmarksQuery>::toSharedPointer();
 }

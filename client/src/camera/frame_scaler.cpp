@@ -16,7 +16,7 @@ const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x00
 void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                       const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
-    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(fillter, fillter, fillter, fillter, fillter, fillter, fillter, fillter); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -69,7 +69,7 @@ void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int ds
 void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -116,7 +116,7 @@ void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const
 void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -267,7 +267,7 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     }
     else 
     {
-        assert(false);
+        NX_ASSERT(false);
     }
 }
 

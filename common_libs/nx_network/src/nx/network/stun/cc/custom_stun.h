@@ -35,8 +35,11 @@ namespace methods
         /** server uses this request to confirm its willingness to proceed with cloud connection */
         connectionAck,
 
+        /** Returns host name list included in domain */
+        resolveDomain,
+
         /** Returns host's public address list and suitable connections methods */
-        resolve,
+        resolvePeer,
 
         /** Initiate connection to some mediaserver
          *  Request: \class PeerId, \class HostName, \class ConnectionId
@@ -46,6 +49,9 @@ namespace methods
         connect,
 
         connectionResult,
+
+        udpHolePunchingSyn,
+        udpHolePunchingSynAck,
     };
 
     NX_NETWORK_API nx::String toString(Value val);
@@ -92,12 +98,14 @@ namespace attrs
         connectionId,
 
         hostName = stun::attrs::userDefined + 0x200,
+        hostNameList,
         publicEndpointList,
         tcpHpEndpointList,
         udtHpEndpointList,
         connectionMethods,
 
-        connectionSucceeded,
+        udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
+        systemErrorCode,
     };
 
     NX_NETWORK_API const char* toString(AttributeType val);
@@ -159,10 +167,18 @@ namespace attrs
         ConnectionMethods(const String& value): StringAttribute(TYPE, value) {}
     };
 
-    struct NX_NETWORK_API ConnectionSucceeded: StringAttribute
+    struct NX_NETWORK_API UdpHolePunchingResultCodeAttr: stun::attrs::IntAttribute
     {
-        static const AttributeType TYPE = connectionSucceeded;
-        ConnectionSucceeded(const String& value): StringAttribute(TYPE, value) {}
+        static const AttributeType TYPE = udpHolePunchingResultCode;
+        UdpHolePunchingResultCodeAttr(int value)
+            : stun::attrs::IntAttribute(TYPE, value) {}
+    };
+
+    struct NX_NETWORK_API SystemErrorCodeAttr: stun::attrs::IntAttribute
+    {
+        static const AttributeType TYPE = systemErrorCode;
+        SystemErrorCodeAttr(int value)
+            : stun::attrs::IntAttribute(TYPE, value) {}
     };
 
 
@@ -193,6 +209,21 @@ namespace attrs
         static const AttributeType TYPE = udtHpEndpointList;
         UdtHpEndpointList( const std::list< SocketAddress >& endpoints )
             : EndpointList( TYPE, endpoints ) {}
+    };
+
+
+    /** Base class for string list based attributes */
+    struct NX_NETWORK_API StringList : StringAttribute
+    {
+        StringList( int type, const std::vector< String >& strings );
+        std::vector< String > get() const;
+    };
+
+    struct NX_NETWORK_API HostNameList : StringList
+    {
+        static const AttributeType TYPE = hostNameList;
+        HostNameList( const std::vector< String >& hostNames )
+            : StringList( TYPE, hostNames ) {}
     };
 }
 

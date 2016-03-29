@@ -66,7 +66,7 @@ namespace
             for (auto it = mergeDataIt + 1; it != mergeData.end(); ++it)
             {
                 const QnCameraBookmark *currentBookmark= it->first;
-                if (!pred(*minBookmark, *currentBookmark))
+                if (!pred(*currentBookmark, *minBookmark))
                     continue;
 
                 mergeDataIt = it;
@@ -121,7 +121,7 @@ namespace
             return makePredByGetter(cameraNameGetter, isAscending);
         }
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid bookmark sorting field!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid bookmark sorting field!");
             return BinaryPredicate();
         };
     };
@@ -148,7 +148,7 @@ namespace
     QnCameraBookmarkList getSparseByIters(ItersLinkedList &bookmarkIters
         , int limit)
     {
-        Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
+        NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
         if (limit <= 0)
             return QnCameraBookmarkList();
 
@@ -183,7 +183,7 @@ namespace
         , int limit
         , const BinaryPredicate &pred)
     {
-        Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
+        NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
         if (limit <= 0)
             return QnCameraBookmarkList();
 
@@ -246,9 +246,16 @@ bool QnCameraBookmark::isNull() const
     return guid.isNull();
 }
 
-QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &bokmarkTags, const QString &delimiter)
+QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter)
 {
-    return QStringList(bokmarkTags.toList()).join(delimiter);
+    QStringList validTags;
+    for (const QString &tag: tags)
+    {
+        QString trimmed = tag.trimmed();
+        if (!trimmed.isEmpty())
+            validTags << trimmed;
+    }
+    return validTags.join(delimiter);
 }
 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
@@ -264,7 +271,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
     , const QnBookmarkSparsingOptions &sparsing
     , int limit)
 {
-    Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
+    NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit should be greater than 0!");
     if (limit <= 0)
         return QnCameraBookmarkList();
 
@@ -286,7 +293,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
 }
 
 QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {
-    Q_ASSERT_X(limit > 0, Q_FUNC_INFO, "Limit must be correct");
+    NX_ASSERT(limit > 0, Q_FUNC_INFO, "Limit must be correct");
     if (limit <= 0)
         return QnCameraBookmarkTagList();
 
@@ -335,7 +342,10 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
 
 
 bool QnCameraBookmark::isValid() const {
-    return !isNull() && !cameraId.isEmpty();
+    return !isNull()
+        && !name.isEmpty()
+        && !cameraId.isEmpty()
+        && durationMs > 0;
 }
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {

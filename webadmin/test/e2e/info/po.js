@@ -7,7 +7,7 @@ var Page = function () {
     this.platformNode = element(by.id("software-platform"));
     this.osNode = element(by.id("software-operatingsystem"));
     this.storagesNodes = element.all(by.repeater("storage in storages"));
-    this.hmLegentNodes = element.all(by.repeater("dataset in datasets"));
+    this.hmLegendNodes = element.all(by.repeater("dataset in datasets"));
     this.logIframe = element(by.css("iframe.log-frame"));
     this.refreshLogButton = element(by.id("refresh-log"));
 
@@ -18,5 +18,5 @@ var Page = function () {
         browser.get('/#/info');
     };
 };
-
+ 
 module.exports = Page;

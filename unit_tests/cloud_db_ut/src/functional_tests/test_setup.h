@@ -31,11 +31,11 @@ public:
     ~CdbFunctionalTest();
 
     void start();
-    void startAndWaitUntilStarted();
-    void waitUntilStarted();
+    bool startAndWaitUntilStarted();
+    bool waitUntilStarted();
     void stop();
     //!restarts process
-    void restart();
+    bool restart();
 
     void addArg(const char* arg);
 
@@ -90,13 +90,13 @@ protected:
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,
-        const QnUuid& systemID,
+        const std::string& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole accessRole);
     api::ResultCode updateSystemSharing(
         const std::string& email,
         const std::string& password,
-        const QnUuid& systemID,
+        const std::string& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole newAccessRole);
     api::ResultCode getSystemSharings(
@@ -130,11 +130,11 @@ protected:
     const api::SystemSharingEx& findSharing(
         const std::vector<api::SystemSharingEx>& sharings,
         const std::string& accountEmail,
-        const QnUuid& systemID) const;
+        const std::string& systemID) const;
     api::SystemAccessRole accountAccessRoleForSystem(
         const std::vector<api::SystemSharingEx>& sharings,
         const std::string& accountEmail,
-        const QnUuid& systemID) const;
+        const std::string& systemID) const;
 
 private:
     QString m_tmpDir;
@@ -147,6 +147,7 @@ private:
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
+    std::unique_ptr<std::promise<bool /*result*/>> m_cdbStartedPromise;
 };
 
 namespace api {

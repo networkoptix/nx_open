@@ -144,7 +144,8 @@ private:
         std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
     void saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
-                              const QnLiveStreamParams& liveParams );
+                              const QnLiveStreamParams& liveParams,
+                              bool isCameraConfigured );
 
 private:
     QnAbstractVideoCamera* m_owner;

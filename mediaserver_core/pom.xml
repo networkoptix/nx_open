@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core</artifactId>
     <packaging>pom</packaging>
@@ -25,24 +25,16 @@
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lcommon -lappserver2 -lonvif -lquazip -ludt -lnx_email -lnx_streaming</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lssl</linux.oslibs>
-        <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
 
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <global.libs>-lcommon -lappserver2 -lonvif -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
+        <linux.oslibs>-ldl</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+
+        <rdep.packages>server-external openssl ffmpeg quazip sigar</rdep.packages>
     </properties>
 
     <dependencies>
@@ -54,7 +46,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_sdk/nx_sdk/vms-archive.zip</systemPath>            
         </dependency>
-		
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_storage_sdk</artifactId>
@@ -72,7 +64,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-		
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_network</artifactId>
@@ -140,32 +132,36 @@
                             <stripVersion>true</stripVersion>
                         </configuration>
                     </execution>
-                </executions>
+                </executions>               
             </plugin>
-            <!-- <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.6</version>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
                 <executions>
                     <execution>
-                        <id>copy-mediaserver-resources</id>
-                        <phase>${resources.phase}</phase>
+                        <id>gen-api-xml</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>copy-resources</goal>
+                            <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>${root.dir}/webadmin</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-jar</argument>
+                                <argument>${environment.dir}/bin/apidoctool.jar</argument>
+                                <argument>code-to-xml</argument>
+                                <argument>-vms-path</argument>
+                                <argument>${root.dir}</argument>
+                                <argument>-template-xml</argument>
+                                <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
+                                <argument>-output-xml</argument>
+                                <argument>${project.build.directory}/resources/static/api.xml</argument>
+                            </arguments>
                         </configuration>
-                    </execution>
+                    </execution>                   
                 </executions>
-            </plugin> -->
+            </plugin>
         </plugins>
     </build>
 

@@ -5,8 +5,6 @@
 #ifndef ABSTRACT_DATA_RECEPTOR_H
 #define ABSTRACT_DATA_RECEPTOR_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "nx/streaming/media_data_packet.h"
 
 
@@ -33,7 +31,5 @@ public:
     */
     virtual bool needConfigureProvider() const { return true; }
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //ABSTRACT_DATA_RECEPTOR_H

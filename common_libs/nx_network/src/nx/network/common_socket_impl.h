@@ -14,26 +14,33 @@
 
 static std::atomic<SocketSequenceType> socketSequenceCounter(1);
 
-namespace aio
-{
-    template<class SocketType> class AIOThread;
-}
+namespace nx {
+namespace network {
 
-template<class SocketType>
+class Pollable;
+
+namespace aio {
+    class AIOThread;
+}   //aio
+}   //network
+}   //nx
+
 class CommonSocketImpl
 {
 public:
-    std::atomic<aio::AIOThread<SocketType>*> aioThread;
-    std::array<void*, aio::etMax> eventTypeToUserData;
+    std::atomic<nx::network::aio::AIOThread*> aioThread;
+    std::array<void*, nx::network::aio::etMax> eventTypeToUserData;
     std::atomic<int> terminated;
     //!This socket sequence is unique even after socket destruction (socket pointer is not unique after delete call)
     SocketSequenceType socketSequence;
+    bool isUdtSocket;
 
     CommonSocketImpl()
     :
         aioThread( nullptr ),
         terminated( 0 ),
-        socketSequence( ++socketSequenceCounter )
+        socketSequence( ++socketSequenceCounter ),
+        isUdtSocket(false)
     {
         eventTypeToUserData.fill( nullptr );
     }

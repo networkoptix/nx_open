@@ -1,5 +1,7 @@
-INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
+INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/ \
+                ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
+                ${qt.dir}/include/QtGui/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
                 ${root.dir}/appserver2/src/ \
@@ -28,3 +30,5 @@ unix:!mac {
 }
 
 OTHER_FILES += ${root.dir}/client/src/ui/help/help_topics.i
+
+SOURCES += ${project.build.directory}/client_app_info_impl.cpp

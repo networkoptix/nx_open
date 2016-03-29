@@ -7,6 +7,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <utils/common/conversion_wrapper.h>
+#include <nx/utils/log/assert.h>
 
 #include "sql_fwd.h"
 #include "sql_index_mapping.h"
@@ -48,7 +49,7 @@ namespace QnSqlDetail {
 namespace QnSql {
     template<class T>
     void bind(const T &value, QSqlQuery *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::bind_internal(value, target);
     }
@@ -60,7 +61,7 @@ namespace QnSql {
 
     template<class T>
     void fetch(const QnSqlIndexMapping &mapping, const QSqlRecord &value, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::fetch_internal(mapping, value, target);
     }
@@ -71,7 +72,7 @@ namespace QnSql {
 
         QSqlRecord record = query.record();
         QnSqlIndexMapping mapping = QnSql::mapping<value_type>(query);
-        
+
         while(query.next()) {
             target->push_back(value_type());
             QnSql::fetch(mapping, query.record(), &target->back());
@@ -87,7 +88,7 @@ namespace QnSql {
 
     template<class T>
     void serialize_field(const T &value, QVariant *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::serialize_field_internal(value, target);
     }
@@ -101,7 +102,7 @@ namespace QnSql {
 
     template<class T>
     void deserialize_field(const QVariant &value, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QnSqlDetail::deserialize_field_internal(value, target);
     }
@@ -114,5 +115,24 @@ namespace QnSql {
     }
 
 } // namespace QnSql
+
+  /* Some fields are not meant to be bound or fetched. */
+template<class T, class Allocator>
+inline void serialize_field(const std::vector<T, Allocator> &, QVariant *) { return; }
+template<class Key, class T, class Predicate, class Allocator>
+inline void serialize_field(const std::map<Key, T, Predicate, Allocator> &, QVariant *) { return; }
+template<class Key, class T>
+inline void serialize_field(const QMap<Key, T> &, QVariant *) { return; }
+template<class T>
+inline void serialize_field(const QList<T> &, QVariant *) { return; }
+
+template<class T, class Allocator>
+inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
+template<class Key, class T, class Predicate, class Allocator>
+inline void deserialize_field(const QVariant &, std::map<Key, T, Predicate, Allocator> *) { return; }
+template<class Key, class T>
+inline void deserialize_field(const QVariant &, QMap<Key, T> *) { return; }
+template<class T>
+inline void deserialize_field(const QVariant &, QList<T> *) { return; }
 
 #endif // QN_SERIALIZATION_SQL_H

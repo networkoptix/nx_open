@@ -9,7 +9,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnGraphicsMessageBox;
-class QnLoginDialog;
 struct QnConnectionInfo;
 
 class QnWorkbenchConnectHandler : public QObject, public QnWorkbenchContextAware {
@@ -21,16 +20,17 @@ public:
     ~QnWorkbenchConnectHandler();
 
 protected:
-    ec2::AbstractECConnectionPtr connection2() const;
-    QnLoginDialog *loginDialog() const;
-
-    bool connected() const;
-
     ec2::ErrorCode connectToServer(const QUrl &appServerUrl, bool silent = false);
+
     bool disconnectFromServer(bool force);
+
+    ec2::AbstractECConnectionPtr connection2() const;
+    
+    bool connected() const;
 
     void hideMessageBox();
     void showLoginDialog();
+    void showWelcomeScreen();
 
     bool tryToRestoreConnection();
 
@@ -47,7 +47,6 @@ private:
     void at_beforeExitAction_triggered();
 private:
     QnGraphicsMessageBox* m_connectingMessageBox;
-    QPointer<QnLoginDialog> m_loginDialog;
     int m_connectingHandle;
 
     /** Flag that we should handle new connection. */

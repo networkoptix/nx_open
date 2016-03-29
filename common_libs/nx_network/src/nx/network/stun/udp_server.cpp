@@ -32,7 +32,7 @@ UDPServer::~UDPServer()
     pleaseStopSync();
 }
 
-void UDPServer::pleaseStop(std::function<void()> handler)
+void UDPServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(std::move(handler));
 }
@@ -63,21 +63,19 @@ SocketAddress UDPServer::address() const
 void UDPServer::sendMessage(
     SocketAddress destinationEndpoint,
     const Message& message,
-    std::function<void(SystemError::ErrorCode)> completionHandler)
+    utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
 {
     m_messagePipeline.sendMessage(
-        std::move(destinationEndpoint),
-        message,
-        [completionHandler](    //TODO #ak #msvc2015 move to lambda
-            SystemError::ErrorCode errorCode,
-            SocketAddress resolvedTargetAddress)
+        std::move(destinationEndpoint), message,
+        [completionHandler = std::move(completionHandler)](
+            SystemError::ErrorCode errorCode, SocketAddress) mutable
         {
             if (completionHandler)
                 completionHandler(errorCode);
         });
 }
 
-const std::unique_ptr<AbstractDatagramSocket>& UDPServer::socket()
+const std::unique_ptr<network::UDPSocket>& UDPServer::socket()
 {
     return m_messagePipeline.socket();
 }

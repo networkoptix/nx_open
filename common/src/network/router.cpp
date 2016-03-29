@@ -41,18 +41,23 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 			
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
-        Q_ASSERT_X(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
+        NX_ASSERT(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
 		// todo: add distance for camera route
         return result;
     }
 
     result.distance = INT_MAX;
     QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
-    if (routeVia == id || routeVia.isNull())
+    if (routeVia.isNull())
         return result; // can't route
 
+    if (routeVia == id) {
         // peer accesible directly, but no address avaliable (bc of NAT),
         // so we need backwards connection
+        result.reverseConnect = true;
+        return result;
+    }
+
     // route gateway is found
     result.gatewayId = routeVia;
     result.addr = m_moduleFinder->primaryAddress(routeVia);

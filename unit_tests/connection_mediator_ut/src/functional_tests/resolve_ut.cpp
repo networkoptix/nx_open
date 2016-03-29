@@ -9,8 +9,9 @@
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 
-#include "mediaserver_emulator.h"
-#include "mediator_functional_test.h"
+#include <test_support/mediaserver_emulator.h>
+
+#include "functional_tests/mediator_functional_test.h"
 
 
 namespace nx {
@@ -31,16 +32,40 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
 
-    //resolving 
-    for (int i = 0; i < system1Servers.size(); ++i)
+    // resolve system
     {
-        api::ResolveResponse resolveResponse;
+        api::ResolveDomainResponse resolveResponse;
         api::ResultCode resultCode = api::ResultCode::ok;
-        std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-            std::bind(
-                &nx::hpm::api::MediatorClientTcpConnection::resolve,
+        std::tie(resultCode, resolveResponse) =
+            makeSyncCall<api::ResultCode, api::ResolveDomainResponse>(std::bind(
+                &nx::hpm::api::MediatorClientTcpConnection::resolveDomain,
                 client.get(),
-                api::ResolveRequest(system1Servers[i]->serverId() + "." + system1.id),
+                api::ResolveDomainRequest(system1.id),
+                std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
+
+        ASSERT_EQ(system1Servers.size(), resolveResponse.hostNames.size());
+        for (size_t i = 0; i < system1Servers.size(); ++i)
+        {
+            const auto it = std::find(
+                resolveResponse.hostNames.begin(),
+                resolveResponse.hostNames.end(),
+                system1Servers[i]->serverId() + "." + system1.id);
+            ASSERT_NE(it, resolveResponse.hostNames.end());
+        }
+    }
+
+    // resolving servers
+    for (size_t i = 0; i < system1Servers.size(); ++i)
+    {
+        api::ResolvePeerResponse resolveResponse;
+        api::ResultCode resultCode = api::ResultCode::ok;
+        std::tie(resultCode, resolveResponse) =
+            makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
+                &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
+                client.get(),
+                api::ResolvePeerRequest(
+                    system1Servers[i]->serverId() + "." + system1.id),
                 std::placeholders::_1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
         ASSERT_TRUE(std::find(
@@ -66,13 +91,13 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
     auto server2 = addServer(system1, server1->serverId());
 
     //resolving, last added server is chosen
-    api::ResolveResponse resolveResponse;
+    api::ResolvePeerResponse resolveResponse;
     api::ResultCode resultCode = api::ResultCode::ok;
-    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-        std::bind(
-            &nx::hpm::api::MediatorClientTcpConnection::resolve,
+    std::tie(resultCode, resolveResponse) =
+        makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
+            &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
             client.get(),
-            api::ResolveRequest(server1->serverId() + "." + system1.id),
+            api::ResolvePeerRequest(server1->serverId() + "." + system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, resultCode);
     ASSERT_TRUE(std::find(
@@ -83,6 +108,30 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
         resolveResponse.endpoints.begin(),
         resolveResponse.endpoints.end(),
         server1->endpoint()) == resolveResponse.endpoints.end());
+
+    client->pleaseStopSync();
+}
+
+TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
+{
+    using namespace nx::hpm;
+
+    startAndWaitUntilStarted();
+
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
+        client = clientConnection();
+
+    //resolving unknown system
+    api::ResolveDomainResponse resolveResponse;
+    api::ResultCode resultCode = api::ResultCode::ok;
+    std::tie(resultCode, resolveResponse) =
+        makeSyncCall<api::ResultCode, api::ResolveDomainResponse>(std::bind(
+            &nx::hpm::api::MediatorClientTcpConnection::resolveDomain,
+            client.get(),
+            api::ResolveDomainRequest(generateRandomName(16)),
+            std::placeholders::_1));
+
+    ASSERT_EQ(api::ResultCode::notFound, resultCode);
 
     client->pleaseStopSync();
 }
@@ -99,13 +148,13 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     const auto system1 = addRandomSystem();
 
     //resolving unknown system
-    api::ResolveResponse resolveResponse;
+    api::ResolvePeerResponse resolveResponse;
     api::ResultCode resultCode = api::ResultCode::ok;
-    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-        std::bind(
-            &nx::hpm::api::MediatorClientTcpConnection::resolve,
+    std::tie(resultCode, resolveResponse) =
+        makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
+            &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
             client.get(),
-            api::ResolveRequest(system1.id),
+            api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
@@ -130,13 +179,13 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
     ASSERT_EQ(api::ResultCode::ok, mserverEmulator.registerOnMediator());
 
     //resolving 
-    api::ResolveResponse resolveResponse;
+    api::ResolvePeerResponse resolveResponse;
     api::ResultCode resultCode = api::ResultCode::ok;
-    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-        std::bind(
-            &nx::hpm::api::MediatorClientTcpConnection::resolve,
+    std::tie(resultCode, resolveResponse) =
+        makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
+            &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
             client.get(),
-            api::ResolveRequest(mserverEmulator.serverId() + "." + system1.id),
+            api::ResolvePeerRequest(mserverEmulator.serverId() + "." + system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, resultCode);
     ASSERT_TRUE(std::find(
@@ -145,11 +194,11 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
         mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
 
     //resolve by system name is forbidden
-    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-        std::bind(
-            &nx::hpm::api::MediatorClientTcpConnection::resolve,
+    std::tie(resultCode, resolveResponse) =
+        makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
+            &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
             client.get(),
-            api::ResolveRequest(system1.id),
+            api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
 

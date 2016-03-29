@@ -8,16 +8,20 @@
 
 #include <recording/stream_recorder.h>
 
+#include <utils/common/connective.h>
+
 class QnlTimeSource;
 class QnMediaStreamStatistics;
 class QnResource;
 class QnAbstractArchiveStreamReader;
 class QnTimePeriod;
 
-class QnClientVideoCamera : public QObject {
+class QnClientVideoCamera : public Connective<QObject> {
     Q_OBJECT
 
     Q_ENUMS(ClientVideoCameraError)
+
+    typedef Connective<QObject> base_type;
 public:
     enum ClientVideoCameraError {
         NoError = 0,
@@ -84,12 +88,12 @@ public slots:
 private:
     mutable QnMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
-    QnCamDisplay m_camdispay;
-    QnAbstractMediaStreamDataProvider* m_reader;
+    QnCamDisplay m_camdispay;   //TODO: #GDM refactor to scoped pointer
+    QPointer<QnAbstractMediaStreamDataProvider> m_reader;   //TODO: #GDM refactor to unique pointer or 'owner' template
 
-    QnlTimeSource* m_extTimeSrc;
-    QnStreamRecorder* m_exportRecorder;
-    QnAbstractArchiveStreamReader* m_exportReader;
+    QnlTimeSource* m_extTimeSrc;    //TODO: #GDM refactor to weak pointer
+    QPointer<QnStreamRecorder> m_exportRecorder;
+    QPointer<QnAbstractArchiveStreamReader>  m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };

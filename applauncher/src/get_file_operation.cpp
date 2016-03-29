@@ -11,7 +11,7 @@
 
 #include <functional>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/fs/async_file_processor.h>
 #include <utils/media/custom_output_stream.h>
@@ -220,7 +220,7 @@ namespace detail
                 return;
 
             default:
-                assert( false );
+                NX_ASSERT( false );
                 break;
         }
     }
@@ -296,7 +296,7 @@ namespace detail
             }
 
             default:
-                assert( false );
+                NX_ASSERT( false );
                 break;
         }
     }
@@ -304,7 +304,7 @@ namespace detail
     void GetFileOperation::onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
-        assert( m_httpClient == httpClient );
+        NX_ASSERT( m_httpClient == httpClient );
         onSomeMessageBodyAvailableNonSafe();
     }
 
@@ -338,7 +338,7 @@ namespace detail
 
         std::unique_lock<std::mutex> lk( m_mutex );
 
-        assert( m_httpClient == httpClient );
+        NX_ASSERT( m_httpClient == httpClient );
 
         //check message body download result
         if( httpClient->failed() )
@@ -411,11 +411,7 @@ namespace detail
             this, &GetFileOperation::onHttpDone,
             Qt::DirectConnection );
         m_httpClient->setUseCompression( false );   //not using compression for server to report Content-Length
-        if( !m_httpClient->doGet( downloadUrl ) )
-        {
-            //TODO/IMPL we must return false here and cancel async stat. But for the moment cancellation is not implemented, so assert is here...
-            assert( false );
-        }
+        m_httpClient->doGet( downloadUrl );
 
         return true;
     }
@@ -424,8 +420,8 @@ namespace detail
     {
         NX_LOG( QString::fromLatin1("GetFileOperation::checkIfFileDownloadRequired. file %1").arg(entryPath), cl_logDEBUG2 );
 
-        assert( m_localFileSize && m_remoteFileSize );
-        assert( m_state == State::sCheckingLocalFile );
+        NX_ASSERT( m_localFileSize && m_remoteFileSize );
+        NX_ASSERT( m_state == State::sCheckingLocalFile );
 
         if( m_localFileSize.get() >= 0 && m_localFileSize.get() == m_remoteFileSize.get() )
         {
@@ -475,17 +471,7 @@ namespace detail
             m_httpClient.get(), &nx_http::AsyncHttpClient::done,
             this, &GetFileOperation::onHttpDone,
             Qt::DirectConnection );
-        if( !m_httpClient->doGet( downloadUrl ) )
-        {
-            setResult( ResultCode::downloadFailure );
-            setErrorText( SystemError::getLastOSErrorText() );
-            {
-                std::unique_lock<std::mutex> lk( m_mutex );
-                m_state = State::sFinished;
-            }
-            m_handler->operationDone( shared_from_this() );
-            return false;
-        }
+        m_httpClient->doGet( downloadUrl );
 
         return true;
     }

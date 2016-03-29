@@ -7,13 +7,32 @@
 namespace nx {
 namespace stun {
 
-const AsyncClient::Timeouts AsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000, 60000 };
+const AbstractAsyncClient::Timeouts AbstractAsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000, 60000 };
 
-AsyncClient::AsyncClient( Timeouts timeouts )
-    : m_timeouts( timeouts )
-    , m_useSsl( false )
-    , m_state( State::disconnected )
-    , m_timerSocket( SocketFactory::createStreamSocket() )
+boost::optional< QString >
+    AbstractAsyncClient::hasError(SystemError::ErrorCode code, const Message& message)
+{
+    if( code != SystemError::noError )
+        return lit( "System error %1: %2" )
+            .arg( code ).arg( SystemError::toString( code ) );
+
+    if( message.header.messageClass != MessageClass::successResponse )
+    {
+        if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
+            return lit( "STUN error %1: %2" )
+                .arg( err->getCode() ).arg( QString::fromUtf8( err->getString() ) );
+        else
+            return lit( "STUN error without ErrorDescription" );
+    }
+
+    return boost::none;
+}
+
+AsyncClient::AsyncClient(Timeouts timeouts):
+    m_timeouts(timeouts),
+    m_useSsl(false),
+    m_state(State::disconnected),
+    m_timer(new nx::network::aio::Timer())
 {
 }
 
@@ -21,25 +40,25 @@ AsyncClient::~AsyncClient()
 {
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
     std::unique_ptr< BaseConnectionType > baseConnection;
-    std::unique_ptr< AbstractCommunicatingSocket > timerSocket;
+    std::unique_ptr< nx::network::aio::Timer > timer;
     {
         QnMutexLocker lock( &m_mutex );
         connectingSocket = std::move( m_connectingSocket );
 		baseConnection = std::move( m_baseConnection );
-        timerSocket = std::move( m_timerSocket );
+        timer = std::move( m_timer );
         m_state = State::terminated;
     }
 
     if (baseConnection)
-        baseConnection->pleaseStop();
+        baseConnection->pleaseStopSync();
 
     if( connectingSocket )
         connectingSocket->pleaseStopSync();
 
-    timerSocket->pleaseStopSync();
+    timer->pleaseStopSync();
 }
 
-void AsyncClient::connect( SocketAddress endpoint, bool useSsl )
+void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
 {
     QnMutexLocker lock( &m_mutex );
     m_endpoint = std::move( endpoint );
@@ -47,19 +66,19 @@ void AsyncClient::connect( SocketAddress endpoint, bool useSsl )
     openConnectionImpl( &lock );
 }
 
-bool AsyncClient::setIndicationHandler( int method, IndicationHandler handler )
+bool AsyncClient::setIndicationHandler(int method, IndicationHandler handler)
 {
-    QnMutexLocker lock( &m_mutex );
-    return m_indicationHandlers.emplace( method, std::move(handler) ).second;
+    QnMutexLocker lock(&m_mutex);
+    return m_indicationHandlers.emplace(method, std::move(handler)).second;
 }
 
-bool AsyncClient::ignoreIndications( int method )
+bool AsyncClient::ignoreIndications(int method)
 {
-    QnMutexLocker lock( &m_mutex );
-    return m_indicationHandlers.erase( method );
+    QnMutexLocker lock(&m_mutex);
+    return m_indicationHandlers.erase(method);
 }
 
-void AsyncClient::sendRequest( Message request, RequestHandler handler )
+void AsyncClient::sendRequest(Message request, RequestHandler handler)
 {
     QnMutexLocker lock( &m_mutex );
     m_requestQueue.push_back( std::make_pair(
@@ -79,7 +98,7 @@ void AsyncClient::sendRequest( Message request, RequestHandler handler )
             return;
 
         default:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
+            NX_ASSERT( false, Q_FUNC_INFO, "m_state is invalid" );
             NX_LOGX( lit( "m_state has invalid value: %1" )
                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return;
@@ -94,9 +113,23 @@ SocketAddress AsyncClient::localAddress() const
         : SocketAddress();
 }
 
+SocketAddress AsyncClient::remoteAddress() const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_endpoint)
+        return *m_endpoint;
+
+    return SocketAddress();
+}
+
+void AsyncClient::closeConnection(SystemError::ErrorCode errorCode)
+{
+    closeConnection(errorCode, nullptr);
+}
+
 void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
-    BaseConnectionType* connection )
+    BaseConnectionType* connection)
 {
 	std::unique_ptr< BaseConnectionType > baseConnection;
     {
@@ -105,34 +138,15 @@ void AsyncClient::closeConnection(
 		baseConnection = std::move( m_baseConnection );
     }
 
-    Q_ASSERT_X( !baseConnection || !connection ||
+    if (baseConnection)
+        baseConnection->pleaseStopSync();
+
+    NX_ASSERT( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
-
-    if (baseConnection)
-        baseConnection->pleaseStop();
 }
 
-boost::optional< QString >
-    AsyncClient::hasError( SystemError::ErrorCode code, const Message& message )
-{
-    if( code != SystemError::noError )
-        return lit( "System error %1: %2" )
-            .arg( code ).arg( SystemError::toString( code ) );
-
-    if( message.header.messageClass != MessageClass::successResponse )
-    {
-        if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
-            return lit( "STUN error %1: %2" )
-                .arg( err->getCode() ).arg( QString::fromUtf8( err->getString() ) );
-        else
-            return lit( "STUN error without ErrorDescription" );
-    }
-
-    return boost::none;
-}
-
-void AsyncClient::openConnectionImpl( QnMutexLockerBase* lock )
+void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 {
     if( !m_endpoint )
     {
@@ -172,15 +186,15 @@ void AsyncClient::openConnectionImpl( QnMutexLockerBase* lock )
             return;
 
         default:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
+            NX_ASSERT( false, Q_FUNC_INFO, "m_state is invalid" );
             NX_LOGX( lit( "m_state has invalid value: %1" )
                      .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return;
     }
 }
 
-void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
-                                       SystemError::ErrorCode code )
+void AsyncClient::closeConnectionImpl(
+        QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
     auto connectingSocket = std::move( m_connectingSocket );
     auto requestQueue = std::move( m_requestQueue );
@@ -200,14 +214,16 @@ void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
     lock->relock();
 
     if( m_state != State::terminated )
-        m_timerSocket->registerTimer( m_timeouts.reconnect, [this]()
-        {
-            QnMutexLocker lock( &m_mutex );
-            openConnectionImpl( &lock );
-        });
+        m_timer->start(
+            std::chrono::milliseconds(m_timeouts.reconnect),
+            [this]
+            {
+                QnMutexLocker lock( &m_mutex );
+                openConnectionImpl( &lock );
+            });
 }
 
-void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
+void AsyncClient::dispatchRequestsInQueue(QnMutexLockerBase* lock)
 {
     static_cast< void >( lock );
     while( !m_requestQueue.empty() )
@@ -220,7 +236,7 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
         if ( !m_requestsInProgress.emplace(
                  tid, std::move( handler ) ).second )
         {
-            Q_ASSERT_X( false, Q_FUNC_INFO,
+            NX_ASSERT( false, Q_FUNC_INFO,
                         "transactionId is not unique" );
 
             NX_LOGX( lit( "transactionId is not unique: %1" )
@@ -241,7 +257,7 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
     }
 }
 
-void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
+void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )
@@ -250,7 +266,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
-    assert(!m_baseConnection);
+    NX_ASSERT(!m_baseConnection);
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
     m_baseConnection->setMessageHandler( 
@@ -262,7 +278,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     dispatchRequestsInQueue( &lock );
 }
 
-void AsyncClient::processMessage( Message message )
+void AsyncClient::processMessage(Message message)
 {
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )
@@ -271,7 +287,7 @@ void AsyncClient::processMessage( Message message )
     switch( message.header.messageClass )
     {
         case MessageClass::request:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "client does not support requests" );
+            NX_ASSERT( false, Q_FUNC_INFO, "client does not support requests" );
             NX_LOGX( lit( "Client does not support requests" ), cl_logERROR );
             return;
 
@@ -282,7 +298,7 @@ void AsyncClient::processMessage( Message message )
             const auto it = m_requestsInProgress.find( message.header.transactionId );
             if( it == m_requestsInProgress.end() )
             {
-                Q_ASSERT_X( false, Q_FUNC_INFO, "unexpected transactionId" );
+                NX_ASSERT( false, Q_FUNC_INFO, "unexpected transactionId" );
                 NX_LOGX( lit( "Unexpected transactionId: %2" )
                          .arg( QString::fromUtf8( message.header.transactionId.toHex() ) ),
                          cl_logERROR );
@@ -317,7 +333,7 @@ void AsyncClient::processMessage( Message message )
         }
 
         default:
-            Q_ASSERT_X( false, Q_FUNC_INFO, "messageClass is invalid" );
+            NX_ASSERT( false, Q_FUNC_INFO, "messageClass is invalid" );
             NX_LOGX( lit( "messageClass has invalid value: %1" )
                      .arg( static_cast< int >( message.header.messageClass ) ),
                      cl_logERROR );

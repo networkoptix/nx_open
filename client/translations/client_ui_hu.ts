@@ -95,7 +95,7 @@
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
         <source>From</source>
-        <translation>Tól</translation>
+        <translation>tól</translation>
     </message>
     <message>
         <location/>
@@ -105,7 +105,7 @@
     <message>
         <location/>
         <source>User actions</source>
-        <translation>Felhasnálói műveletek</translation>
+        <translation>Felhasználói műveletek</translation>
     </message>
     <message>
         <location/>
@@ -165,17 +165,17 @@
     <message>
         <location/>
         <source>Audit Trail</source>
-        <translation>Audit nyomvonal</translation>
+        <translation>Audit napló</translation>
     </message>
     <message>
         <location/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>ig</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Minden szerver offline. Az audit adat nem érhető el.</translation>
     </message>
 </context>
 <context>
@@ -183,32 +183,32 @@
     <message>
         <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
         <source>Backup Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonságimentés ütemezése...</translation>
     </message>
     <message>
         <location/>
         <source>Execute backup on the following days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonságimentés a következő napokon:</translation>
     </message>
     <message>
         <location/>
         <source>Finish:</source>
-        <translation type="unfinished"></translation>
+        <translation>Befejezés:</translation>
     </message>
     <message>
         <location/>
         <source>Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kezdés:</translation>
     </message>
     <message>
         <location/>
         <source>Limit Bandwidth to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sávszél. korlát:</translation>
     </message>
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -216,27 +216,27 @@
     <message>
         <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fix időtartam:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>másodperc</translation>
     </message>
     <message>
         <location/>
         <source>Tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>Címke:</translation>
     </message>
     <message>
         <location/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Előrögzítés:</translation>
     </message>
     <message>
         <location/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Utórögzítés:</translation>
     </message>
 </context>
 <context>
@@ -244,32 +244,32 @@
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
         <source>&amp;Name</source>
-        <translation type="unfinished">&amp;Név</translation>
+        <translation>&amp;Név</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished">&amp;Időtúllépés</translation>
+        <translation>&amp;Időtúllépés</translation>
     </message>
     <message>
         <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished">&amp;Címke</translation>
+        <translation>&amp;Címke</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished">&amp;Leírás</translation>
+        <translation>&amp;Leírás</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Pontosvesszővel vagy szóközzel elválasztott címkelista</translation>
     </message>
     <message>
         <location/>
         <source>Popular tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Népszerű címkék</translation>
     </message>
 </context>
 <context>
@@ -277,27 +277,27 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">Frissítés</translation>
+        <translation>Frissítés</translation>
     </message>
     <message>
         <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; Bármely kamera &gt;</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">Minden szerver offline.Nincs elérhető eseménylista.</translation>
+        <translation>Minden szerver offline.Nincs elérhető eseménylista.</translation>
     </message>
     <message>
         <location/>
         <source>Bookmark Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvjelző logok</translation>
     </message>
 </context>
 <context>
@@ -484,12 +484,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
         <source>Category</source>
-        <translation type="unfinished">Kategória</translation>
+        <translation>Kategória</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">Frissítés</translation>
+        <translation>Frissítés</translation>
     </message>
 </context>
 <context>
@@ -502,7 +502,7 @@
     <message>
         <location/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ennél a kameránál nincs lehetőség haladó beállítások elérésére</translation>
     </message>
 </context>
 <context>
@@ -525,7 +525,7 @@
     <message>
         <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;Kamera beállítások optimalizálásának engedélyezése a rendszernek&quot; ki van kapcsolva a Rendszer Kezelésben.</translation>
+        <translation>&quot;Kamera beállítások optimalizálásak engedélyezése a rendszernek&quot; ki van kapcsolva a Rendszer Kezelésben.</translation>
     </message>
     <message>
         <location/>
@@ -886,7 +886,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;PTZ presetek:</translation>
     </message>
 </context>
 <context>
@@ -937,7 +937,7 @@
     <message>
         <location/>
         <source>&amp;Add...</source>
-        <translation>Hozzá &amp;adás...</translation>
+        <translation>Hozzá&amp;adás...</translation>
     </message>
     <message>
         <location/>
@@ -1004,21 +1004,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Rendszerbeállítások</translation>
     </message>
@@ -1034,43 +1019,33 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>&amp;Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Riasztás/esemény...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Esemény log...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Health Monitoring...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Állapotfigyelés...</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>Audit napló...</translation>
     </message>
     <message>
         <location/>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Audit napló log megnyitása</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Könyvjelzők...</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1068,7 @@
     <message>
         <location/>
         <source>Default Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alapértelmezett elforgatás:</translation>
     </message>
 </context>
 <context>
@@ -1303,7 +1278,7 @@
     <message>
         <location/>
         <source>This license type requires a higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ehhez a licenchsz újabb szoftververzió szükséges.</translation>
     </message>
 </context>
 <context>
@@ -1547,7 +1522,7 @@
     <message>
         <location/>
         <source>Enable Background Image</source>
-        <translation>Háttéérkép engedélyezése</translation>
+        <translation>Háttérkép engedélyezése</translation>
     </message>
     <message>
         <location/>
@@ -1572,7 +1547,7 @@
     <message>
         <location/>
         <source>Time Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Idő mód:</translation>
     </message>
 </context>
 <context>
@@ -1809,7 +1784,7 @@
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.ui"/>
         <source>Auto Calibration</source>
-        <translation>Autókalibrálás</translation>
+        <translation>Autokalibrálás</translation>
     </message>
 </context>
 <context>
@@ -1848,7 +1823,7 @@
     <message>
         <location/>
         <source>Server URL:</source>
-        <translation>Szerver ZRL:</translation>
+        <translation>Szerver URL:</translation>
     </message>
     <message>
         <location/>
@@ -1868,7 +1843,7 @@
     <message>
         <location/>
         <source>You will be reconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Újracsatlakoztatás.</translation>
     </message>
 </context>
 <context>
@@ -2000,7 +1975,7 @@
     <message>
         <location/>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Frissítések keresése az Interneten nem lehetséges.</translation>
     </message>
 </context>
 <context>
@@ -2123,7 +2098,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kérjük várjon amíg a kapcsolat helyreáll...</translation>
     </message>
 </context>
 <context>
@@ -2224,7 +2199,7 @@
     <message>
         <location/>
         <source>Quarter Native</source>
-        <translation></translation>
+        <translation>A jelenlegi negyede</translation>
     </message>
     <message>
         <location/>
@@ -2465,17 +2440,17 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation type="unfinished"></translation>
+        <translation>Érintett:</translation>
     </message>
     <message>
         <location/>
         <source>Force Alarm Layout opening</source>
-        <translation type="unfinished"></translation>
+        <translation>Riasztás elrendezés megnyitásának kényszerítése</translation>
     </message>
     <message>
         <location/>
         <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrás kamera megjelenítésével együtt</translation>
     </message>
 </context>
 <context>
@@ -2483,27 +2458,27 @@
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>másodperc</translation>
     </message>
     <message>
         <location/>
         <source>Display text for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Szöveg megjelenítése:</translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation type="unfinished"></translation>
+        <translation>Egyedi szöveg használata:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for prolonged events</source>
-        <translation type="unfinished"></translation>
+        <translation>A szabály csak hosszantartó eseményekkel működik</translation>
     </message>
     <message>
         <location/>
         <source>Also show on source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrás kamera megjelenítésével együtt</translation>
     </message>
 </context>
 <context>
@@ -2679,7 +2654,7 @@
     <message>
         <location/>
         <source>I/O ports</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O portok</translation>
     </message>
 </context>
 <context>
@@ -2687,62 +2662,62 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished">SMTP &amp;Szerver:</translation>
+        <translation>SMTP &amp;Szerver:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished">&amp;Felhasználó:</translation>
+        <translation>&amp;Felhasználó:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Jelszó:</translation>
+        <translation>&amp;Jelszó:</translation>
     </message>
     <message>
         <location/>
         <source>Email:</source>
-        <translation type="unfinished">Email:</translation>
+        <translation>Email:</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished">P&amp;ort:</translation>
+        <translation>P&amp;ort:</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">Nem biztonságos kapcsolat</translation>
+        <translation>Nem biztonságos kapcsolat</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished">(ajánlott)</translation>
+        <translation>(ajánlott)</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">Biztonságos kapcsolat TLS használatával.</translation>
+        <translation>Biztonságos kapcsolat TLS használatával.</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">Biztonságos kapcsolat SSl használatával.</translation>
+        <translation>Biztonságos kapcsolat SSL használatával.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;Rendszer aláírás:</translation>
+        <translation>&amp;Rendszer aláírás:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">Adjon meg rövid rendszerleírást ide.</translation>
+        <translation>Adjon meg rövid rendszerleírást ide.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">Támogató aláírás:</translation>
+        <translation>Támogató aláírás:</translation>
     </message>
 </context>
 <context>
@@ -2750,7 +2725,7 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
-        <translation>Kimenp email beállítások</translation>
+        <translation>Kimenő email beállítások</translation>
     </message>
     <message>
         <location/>
@@ -2768,27 +2743,27 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;Email:</translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Jelszó:</translation>
+        <translation>&amp;Jelszó:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;Rendszer aláírás:</translation>
+        <translation>&amp;Rendszer aláírás:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">Adjon meg rövid rendszerleírást ide.</translation>
+        <translation>Adjon meg rövid rendszerleírást ide.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">Támogató aláírás:</translation>
+        <translation>Támogató aláírás:</translation>
     </message>
 </context>
 <context>
@@ -2796,42 +2771,42 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
-        <translation type="unfinished">Szerver:</translation>
+        <translation>Szerver:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">Port:</translation>
+        <translation>Port:</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished">Felhasználó:</translation>
+        <translation>Felhasználó:</translation>
     </message>
     <message>
         <location/>
         <source>Security:</source>
-        <translation type="unfinished">Biztonság:</translation>
+        <translation>Biztonság:</translation>
     </message>
     <message>
         <location/>
         <source>Progress:</source>
-        <translation type="unfinished">Folyyamat:</translation>
+        <translation>Folyamat:</translation>
     </message>
     <message>
         <location/>
         <source>Result:</source>
-        <translation type="unfinished">Eredmény:</translation>
+        <translation>Eredmény:</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégsem</translation>
+        <translation>Mégsem</translation>
     </message>
 </context>
 <context>
@@ -2839,94 +2814,94 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív index újraépítése</translation>
     </message>
     <message>
         <location/>
         <source>Backup progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági mentés állapota</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégsem</translation>
+        <translation>Mégsem</translation>
     </message>
     <message>
         <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági mentés indítása most</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">Az adattároló lekapcsolása nem okoz semmit, csak az írás leállását.
+        <translation>Az adattároló lekapcsolása nem okoz semmit, csak az írás leállását.
 Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     </message>
     <message>
         <location/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">Külső tárhely hozzáadása...</translation>
+        <translation>Külső tárhely hozzáadása...</translation>
     </message>
     <message>
         <location/>
         <source>Main Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Fő tároló helye</translation>
     </message>
     <message>
         <location/>
         <source>Backup Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági tároló helye</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági mentés végrehajtása</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ütemezés beállítása...</translation>
     </message>
     <message>
         <location/>
         <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem állított be tárolót a biztonsági mentéshez. A biztonsági mentés nem fog elindulni.</translation>
     </message>
     <message>
         <location/>
         <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági tároló elérhető ha van legalább 2 vagy több érvényes tároló meghajtó a rendszerben.</translation>
     </message>
     <message>
         <location/>
         <source>Global Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Globális biztonsági mentés beállításai</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From:</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív adatok biztonsági mentése innen:</translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági mentés minősége:</translation>
     </message>
     <message>
         <location/>
         <source>&lt;Select at least one camera&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Válasszon ki legalább egy kamerát&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Server Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Szerver biztonsági mentésének beállításai</translation>
     </message>
     <message>
         <location/>
         <source>Backup Time Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Biztonsági mentés időcímke</translation>
     </message>
 </context>
 <context>
@@ -2934,7 +2909,7 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     <message>
         <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
         <source>Cancel</source>
-        <translation type="unfinished">Mégsem</translation>
+        <translation>Mégsem</translation>
     </message>
 </context>
 <context>
@@ -2975,7 +2950,7 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     <message>
         <location/>
         <source>Enable audit trail</source>
-        <translation>Audit nyomvonal engedélyezése</translation>
+        <translation>Audit napló engedélyezése</translation>
     </message>
     <message>
         <location/>
@@ -2985,7 +2960,7 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished">Figyelem! Ez a Minőség és Képfrissítés (FPS) beállításokat jelentéktelenné teszi a Felvétel Ütemzésben.</translation>
+        <translation>Figyelem! Ez a Minőség és Képfrissítés (FPS) beállításokatérvénytelenné teszi a Felvétel Ütemzésben.</translation>
     </message>
 </context>
 <context>
@@ -2998,7 +2973,7 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     <message>
         <location/>
         <source>Current System Time:</source>
-        <translation>Jelenlegi rendszer idp:</translation>
+        <translation>Jelenlegi rendszer idő:</translation>
     </message>
     <message>
         <location/>

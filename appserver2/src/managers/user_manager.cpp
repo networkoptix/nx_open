@@ -1,38 +1,45 @@
 #include "user_manager.h"
 
-#include <functional>
-
-#include <QtConcurrent/QtConcurrent>
-
 #include "fixed_url_client_query_processor.h"
-#include "database/db_manager.h"
-#include "transaction/transaction_log.h"
 #include "server_query_processor.h"
-#include "nx_ec/data/api_conversion_functions.h"
-
 
 namespace ec2
 {
+    QnUserNotificationManager::QnUserNotificationManager()
+    {}
+
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserData>& tran)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveUser);
+        emit addedOrUpdated(tran.params);
+    }
+
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
+    {
+        NX_ASSERT(tran.command == ApiCommand::removeUser);
+        emit removed(tran.params.id);
+    }
+
+
     template<class QueryProcessorType>
-    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor)
     :
-        QnUserNotificationManager(resCtx),
+        QnUserNotificationManager(),
         m_queryProcessor( queryProcessor )
     {
     }
 
-    template<class T>
-    int QnUserManager<T>::getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::getUsers(impl::GetUsersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
-            QnUserResourceList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(users, outData);
-            handler->done( reqID, errorCode, outData );
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users)
+        {
+            handler->done( reqID, errorCode, users);
         };
-        m_queryProcessor->template processQueryAsync<QnUuid, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, userId, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getUsers, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -40,78 +47,63 @@ namespace ec2
     void callSaveUserAsync(
         QueryProcessorType* const queryProcessor,
         QnTransaction<ApiUserData>& tran,
-        impl::AddUserHandlerPtr handler,
+        impl::SimpleHandlerPtr handler,
         const int reqID,
-        QnUserResourceList users )
+        const ec2::ApiUserData& user,
+        const QString& newPassword)
     {
-        using namespace std::placeholders;
-        queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddUserHandler::done, handler, reqID, _1, users ) );
+        QN_UNUSED(user, newPassword); /* Actual only for FixedUrlClientQueryProcessor implementation */
+        queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
     }
 
     template<>
     void callSaveUserAsync<FixedUrlClientQueryProcessor>(
         FixedUrlClientQueryProcessor* const queryProcessor,
         QnTransaction<ApiUserData>& tran,
-        impl::AddUserHandlerPtr handler,
+        impl::SimpleHandlerPtr handler,
         const int reqID,
-        QnUserResourceList users )
+        const ec2::ApiUserData& user,
+        const QString& newPassword)
     {
         //after successfull call completion users.front()->getPassword() is empty, so saving it here
-        QString newPassword = users.front()->getPassword();
-        queryProcessor->processUpdateAsync( tran, 
-            [queryProcessor, handler, reqID, users, newPassword]( ec2::ErrorCode errorCode ){
-                if( errorCode == ec2::ErrorCode::ok 
-                    && queryProcessor->userName() == users.front()->getName()
+        queryProcessor->processUpdateAsync( tran,
+            [queryProcessor, handler, reqID, user, newPassword]( ec2::ErrorCode errorCode )
+        {
+                if( errorCode == ec2::ErrorCode::ok
+                    && queryProcessor->userName() == user.name
                     && !newPassword.isEmpty()
                     )
                     queryProcessor->setPassword( newPassword );
-                handler->done( reqID, errorCode, users );
-            });
+                handler->done( reqID, errorCode );
+        });
     }
 
-    template<class T>
-    int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler )
     {
-        //preparing output data
-        QnUserResourceList users;
-        if (resource->getId().isNull()) {
-            resource->setId(QnUuid::createUuid());
-        }
-        users.push_back( resource );
+        NX_ASSERT(!user.id.isNull(), Q_FUNC_INFO, "User id must be set before saving");
 
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::saveUser, resource );
-        callSaveUserAsync( m_queryProcessor, tran, handler, reqID, users );
+        QnTransaction<ApiUserData> tran(ApiCommand::saveUser, user);
+        callSaveUserAsync( m_queryProcessor, tran, handler, reqID, user, newPassword);
         return reqID;
     }
 
-    template<class T>
-    int QnUserManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeUser, id );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        QnTransaction<ApiIdData> tran(ApiCommand::removeUser, id);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
         return reqID;
-    }
-
-    template<class T>
-    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
-    {
-        QnTransaction<ApiUserData> tran(command);
-        fromResourceToApi(resource, tran.params);
-        return tran;
-    }
-
-    template<class T>
-    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
-    {
-        QnTransaction<ApiIdData> tran(command);
-        tran.params.id = id;
-        return tran;
     }
 
     template class QnUserManager<ServerQueryProcessor>;
     template class QnUserManager<FixedUrlClientQueryProcessor>;
-
 }

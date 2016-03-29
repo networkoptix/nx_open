@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 
 #include <ui/common/read_only.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/math/fuzzy.h>

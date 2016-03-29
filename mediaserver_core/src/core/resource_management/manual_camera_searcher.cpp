@@ -18,8 +18,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/webpage_resource.h>
-
 
 
 static const int MAX_PERCENT = 100;
@@ -85,25 +83,10 @@ namespace {
             );
     }
 
-    QnManualResourceSearchEntry entryFromWebPage(const QnWebPageResourcePtr &webPage)
-    {
-        return QnManualResourceSearchEntry(
-              QUrl(webPage->getUrl()).host()
-            , webPage->getUrl()
-            , qnResTypePool->getResourceType(webPage->getTypeId())->getName()
-            , QnResourceTypePool::kWebPageTypeId
-            , webPage->getUniqueId()
-            , resourceExistsInPool(webPage)
-            );
-    }
-
     QnManualResourceSearchEntry entryFromResource(const QnResourcePtr &resource)
     {
         if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
             return entryFromCamera(camera);
-
-        if (const QnWebPageResourcePtr &webPage = resource.dynamicCast<QnWebPageResource>())
-            return entryFromWebPage(webPage);
 
         return QnManualResourceSearchEntry();
     }
@@ -154,7 +137,7 @@ struct PluginsEnumerator {
         QList<SinglePluginChecker> result;
         for(QnAbstractResourceSearcher* as: QnResourceDiscoveryManager::instance()->plugins()) {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            Q_ASSERT( ns );
+            NX_ASSERT( ns );
             result << SinglePluginChecker(ns, url, auth);
         }
         return result;
@@ -320,7 +303,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
             NX_LOG( lit(" -----------------3 %1 : %2").arg(result.status.current).arg(result.status.total), cl_logDEBUG1 );
         } else {
             const size_t maxProgress = m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum();
-            Q_ASSERT( m_scanProgress->progressMaximum() >= m_scanProgress->progressMinimum() );
+            NX_ASSERT( m_scanProgress->progressMaximum() >= m_scanProgress->progressMinimum() );
             const size_t currentProgress = m_scanProgress->progressValue();
             //considering it to be second half of entire job
             result.status = QnManualResourceSearchStatus(

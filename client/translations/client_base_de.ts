@@ -5,27 +5,27 @@
     <name>BackupCamerasDialogDelegate</name>
     <message>
         <source>Backup newly added devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu hinzugefügte Geräte sichern</translation>
     </message>
     <message>
         <source>Backup newly added cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu hinzugefügte Kameras sichern</translation>
     </message>
     <message>
         <source>Cannot add new devices while backup process is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Geräte können während des Sicherungsprozess nicht hinzugefügt werden.</translation>
     </message>
     <message>
         <source>Cannot add new cameras while backup process is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Kameras können während des Sicherungsprozess nicht hinzugefügt werden.</translation>
     </message>
     <message>
         <source>Cannot add new devices because they store archive on external storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Geräte können während des Speichervorgangs nicht hinzugefügt werden.</translation>
     </message>
     <message>
         <source>Cannot add new cameras because they store archive on external storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Kameras können während des Speichervorgangs nicht hinzugefügt werden.</translation>
     </message>
 </context>
 <context>
@@ -35,7 +35,8 @@
 to view more bookmarks</source>
         <comment>Use &apos;
 &apos; to split message in two lines (required)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Zeitachse heranzoomen
+um mehr Lesezeichen zu sehen</translation>
     </message>
 </context>
 <context>
@@ -92,11 +93,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Dateien</translation>
     </message>
     <message>
         <source>Bitrate for the Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate für das zuletzt Aufgenommene</translation>
     </message>
 </context>
 <context>
@@ -303,7 +304,7 @@ to view more bookmarks</source>
     <name>QnAbstractCameraAdvancedParamWidget</name>
     <message>
         <source>Read-Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Lesen</translation>
     </message>
 </context>
 <context>
@@ -328,14 +329,6 @@ to view more bookmarks</source>
         <translation>FPS ausblenden</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Strg+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Strg+Alt+D</translation>
-    </message>
-    <message>
         <source>Drop Resources</source>
         <translation>Ressourcen ablegen</translation>
     </message>
@@ -356,24 +349,12 @@ to view more bookmarks</source>
         <translation>Nächstes Layout</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Strg+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>Vorheriges Layout</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Strg+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>Alle auswählen</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Strg+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -390,10 +371,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>In Freespace Modus schalten</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -436,16 +413,8 @@ to view more bookmarks</source>
         <translation>Hauptmenü</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Leertaste</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Mit Server verbinden...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Strg+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -458,10 +427,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>Panik-Aufnahme anhalten</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Strg+P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -484,20 +449,12 @@ to view more bookmarks</source>
         <translation>Neuer Tab</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Strg+T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>Fenster</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>Neues Fenster</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Strg+N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -528,10 +485,6 @@ to view more bookmarks</source>
         <translation>Datei(en)...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Strg+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>Layout(s)...</translation>
     </message>
@@ -544,16 +497,8 @@ to view more bookmarks</source>
         <translation>Aktuelles Layout speichern</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Strg+S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>Aktuelles Layout speichern als...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Strg+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -566,14 +511,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Screen Recording</source>
         <translation>Bildschirmaufnahme beenden</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -600,18 +537,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Ctrl+F</source>
-        <translation>Strg+F</translation>
-    </message>
-    <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>Nachricht anzeigen</translation>
     </message>
@@ -632,10 +557,6 @@ to view more bookmarks</source>
         <translation>System Administration...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Strg+Alt+A</translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>Web Client öffnen...</translation>
     </message>
@@ -646,18 +567,6 @@ to view more bookmarks</source>
     <message>
         <source>Local Settings...</source>
         <translation>Lokale Einstellungen...</translation>
-    </message>
-    <message>
-        <source>Ctrl+E</source>
-        <translation>Strg+E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Strg+L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Strg+M</translation>
     </message>
     <message>
         <source>Merge Systems...</source>
@@ -672,16 +581,8 @@ to view more bookmarks</source>
         <translation>Über...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Beenden</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -724,14 +625,6 @@ to view more bookmarks</source>
         <translation>Enthaltene Ordner öffnen</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Strg+Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Strg+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>Identifiziere</translation>
     </message>
@@ -754,10 +647,6 @@ to view more bookmarks</source>
     <message>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>Del</source>
-        <translation>Del</translation>
     </message>
     <message>
         <source>Update Layout</source>
@@ -784,24 +673,12 @@ to view more bookmarks</source>
         <translation>Objekt maximieren</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>Enter</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>Objekt wiederherstellen</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>Info anzeigen</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -856,10 +733,6 @@ to view more bookmarks</source>
         <translation>Motion anzeigen</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Motion-Erkennbereich ausblenden</translation>
     </message>
@@ -880,24 +753,12 @@ to view more bookmarks</source>
         <translation>Datei-Wasserzeichen prüfen</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>Screenshot erstellen</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>Bildverbesserung...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -930,10 +791,6 @@ to view more bookmarks</source>
     <message>
         <source>Rename</source>
         <translation>Umbenennen</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1004,16 +861,8 @@ to view more bookmarks</source>
         <translation>Kamerafahrt stoppen</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Schliessen</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Strg+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1024,16 +873,8 @@ to view more bookmarks</source>
         <translation>Auswahl als Start markieren</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>Auswahl als Ende markieren</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1064,50 +905,6 @@ to view more bookmarks</source>
         <translation>Vorschau-Suche...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Strg+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>Debug-Zähler erhöhen</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Strg+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>Debug-Zähler verringern</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Strg+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>Zeige Ressourcenpool</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>PTZ kalibrieren</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>PTZ Position abfragen</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Strg+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>Debug Control Panel</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>Leerzeichen</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Abspielen</translation>
     </message>
@@ -1116,72 +913,36 @@ to view more bookmarks</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>Strg+Links</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>Vorheriges Bild</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>Strg+Rechts</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>Nächstes Bild</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>An den Anfang</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>An den Schluß</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>Strg+Oben</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>Lautstärke reduzieren</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>Strg+Unten</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>Lautstärke anheben</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>Stummschaltung</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>Auf Live schalten</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1248,20 +1009,12 @@ to view more bookmarks</source>
         <translation>Nachrichten abkoppeln</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Strg+Alt+T</translation>
-    </message>
-    <message>
         <source>Disable Background Animation</source>
         <translation>Hintergrundanimation deaktivieren</translation>
     </message>
     <message>
         <source>Enable Background Animation</source>
         <translation>Hintergrundanimation aktivieren</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>STRG+Shift+S</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -1385,95 +1138,91 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
+        <translation>Kameras sichern...</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Lesezeichen</translation>
     </message>
     <message>
         <source>Hide Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Verstecke Lesezeichen</translation>
     </message>
     <message>
         <source>Pin Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalendar anpinnen</translation>
     </message>
     <message>
         <source>Unpin Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalendar abdocken</translation>
     </message>
     <message>
         <source>I/O Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Diagnose...</translation>
     </message>
     <message>
         <source>Web Client...</source>
-        <translation type="unfinished"></translation>
+        <translation>Web Client...</translation>
     </message>
     <message>
         <source>Bookmark Search...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen Suche...</translation>
     </message>
     <message>
         <source>Open in Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Alarm Layout öffnen</translation>
     </message>
     <message>
         <source>Check I/O Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Prüfe I/O Modul Probleme...</translation>
     </message>
     <message>
         <source>Check I/O Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>Prüfe I/O Modul Probleme...</translation>
     </message>
     <message>
         <source>I/O Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Regeln...</translation>
     </message>
     <message>
         <source>I/O Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Regeln...</translation>
     </message>
     <message>
         <source>I/O Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Einstellungen...</translation>
     </message>
     <message>
         <source>I/O Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Einstellungen...</translation>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
-        <translation type="unfinished"></translation>
+        <translation>Entferne Lesezeichen...</translation>
     </message>
     <message>
         <source>Monitor in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>In neuem Tab anzeigen</translation>
     </message>
     <message>
         <source>Monitor in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>In neuem Fenster anzeigen</translation>
     </message>
     <message>
         <source>Open Layout in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout in neuem Tab öffnen</translation>
     </message>
     <message>
         <source>Open Layout(s) in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout(s) in neuem Fenster öffnen</translation>
     </message>
     <message>
         <source>Open Current Layout in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelles Layout in neuem Fenster öffnen</translation>
     </message>
     <message>
         <source>Add Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lesezeichen hinzufügen...</translation>
     </message>
 </context>
 <context>
@@ -1510,7 +1259,7 @@ to view more bookmarks</source>
     <name>QnAlarmLayoutResource</name>
     <message>
         <source>Alarms</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarme</translation>
     </message>
 </context>
 <context>
@@ -1569,7 +1318,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Ressourcen sind bereits vom System entfernt worden</translation>
     </message>
 </context>
 <context>
@@ -1755,25 +1504,25 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Red mark means that the archive is still available</source>
-        <translation type="unfinished"></translation>
+        <translation>Die rote Markierung bedeutet, dass das Archive noch verfügbar ist</translation>
     </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
     <message>
         <source>Select Devices to Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle Geräte für Sicherung...</translation>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle Kameras für Sicherung...</translation>
     </message>
 </context>
 <context>
     <name>QnBackupScheduleDialog</name>
     <message>
         <source>Until finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Bis zum Abschluss</translation>
     </message>
 </context>
 <context>
@@ -1794,23 +1543,23 @@ to view more bookmarks</source>
     <name>QnBookmarkWidget</name>
     <message>
         <source>Do not lock archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Archiv nicht sperren</translation>
     </message>
     <message>
         <source>1 month</source>
-        <translation type="unfinished">1 Monat</translation>
+        <translation>1 Monat</translation>
     </message>
     <message>
         <source>3 month</source>
-        <translation type="unfinished">3 Monate</translation>
+        <translation>3 Monate</translation>
     </message>
     <message>
         <source>6 month</source>
-        <translation type="unfinished">6 Monate</translation>
+        <translation>6 Monate</translation>
     </message>
     <message>
         <source>year</source>
-        <translation type="unfinished">Jahr</translation>
+        <translation>Jahr</translation>
     </message>
 </context>
 <context>
@@ -1828,16 +1577,16 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 von %n Geräten</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 von %n Geräten</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%1 von %n Kameras</numerusform>
-            <numerusform></numerusform>
+            <numerusform>%1 von %n Kameras</numerusform>
         </translation>
     </message>
     <message>
@@ -1850,17 +1599,17 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished">Wählen Sie mindestens ein Gerät</translation>
+        <translation>Wählen Sie mindestens ein Gerät</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished">Wählen Sie mindestens eine Kamera</translation>
+        <translation>Wählen Sie mindestens eine Kamera</translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 von %n I/O Module</numerusform>
+            <numerusform>%1 von %n I/O Module</numerusform>
         </translation>
     </message>
 </context>
@@ -1974,15 +1723,18 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Quell-Kamera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+            <numerusform>Quell-Kamera und %n weitere Kameras</numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
 </context>
 <context>
@@ -2008,19 +1760,19 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished">Wählen Sie mindestens ein Gerät</translation>
+        <translation>Wählen Sie mindestens ein Gerät</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished">Wählen Sie mindestens eine Kamera</translation>
+        <translation>Wählen Sie mindestens eine Kamera</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished">Geräte</translation>
+        <translation>Geräte</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished">Kameras</translation>
+        <translation>Kameras</translation>
     </message>
 </context>
 <context>
@@ -2267,18 +2019,18 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Finishing searching...</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche wird beendet...</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
     <message>
         <source>Loading values...</source>
-        <translation type="unfinished"></translation>
+        <translation>Werte werden geladen...</translation>
     </message>
     <message>
         <source>Applying changes...</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungen werden übernommen...</translation>
     </message>
 </context>
 <context>
@@ -2341,19 +2093,19 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Diagnostics for I/O module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnose für I/O Modul %1</translation>
     </message>
     <message>
         <source>I/O Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Diagnose</translation>
     </message>
     <message>
         <source>Confirming I/O module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul ist erreichbar.</translation>
     </message>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul liefert Medienstream.</translation>
     </message>
 </context>
 <context>
@@ -2407,16 +2159,16 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n Gerät gefunden</numerusform>
             <numerusform>%n Geräte gefunden</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n cameras found</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n Kamera gefunden</numerusform>
             <numerusform>%n Kameras gefunden</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2429,9 +2181,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Module gefunden</numerusform>
+            <numerusform>%n I/O Module gefunden</numerusform>
         </translation>
     </message>
 </context>
@@ -2554,15 +2306,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Bewegungserkennungsaufnahme ist deaktiviert oder wird von einigen ausgewählten Kameras nicht unterstützt. Prüfen Sie dies bitte in den Bewegungserkennungseinstellungen.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported on this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-Stream wird von dieser Kamera nicht unterstützt.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual-Stream und Bewegungserkennung sind auf dieser Kamera nicht verfügbar.</translation>
     </message>
 </context>
 <context>
@@ -2641,16 +2393,16 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Änderungen für dieses %n Gerät bestätigen?</numerusform>
             <numerusform>Änderungen für diese %n Geräte bestätigen?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Änderungen für diese %n Kamera bestätigen?</numerusform>
             <numerusform>Änderungen für diese %n Kameras bestätigen?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2659,33 +2411,33 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Einstellungen</translation>
     </message>
     <message>
         <source>I/O Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Einstellungen</translation>
     </message>
     <message>
         <source>I/O Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Diagnose</translation>
     </message>
     <message>
         <source>I/O Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Diagnose</translation>
     </message>
     <message>
         <source>I/O Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Regeln</translation>
     </message>
     <message>
         <source>I/O Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Regeln</translation>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Änderungen für %n I/O Modul übernehmen?</numerusform>
+            <numerusform>Änderungen für %n I/O Module übernehmen?</numerusform>
         </translation>
     </message>
 </context>
@@ -2871,22 +2623,22 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbinden</translation>
     </message>
 </context>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
         <source>Server API</source>
-        <translation type="unfinished"></translation>
+        <translation>Server API</translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Um ein Event zu generien, befolgen Sie bitte %1.</translation>
     </message>
     <message>
         <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Ereignis wird nur dann ausgelöst, wenn alle oben gennanten Bedingungen erfüllt sind. Wenn das Passwortfeld leer ist, ist die Bedingung immer erfüllt. Wenn das nicht der Fall ist, dann ist die Bedingung erst erfüllt, wenn das entsprechende Feld des Ereignisses ein Passwort enthält.</translation>
     </message>
 </context>
 <context>
@@ -2965,7 +2717,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>You need to connect to a server prior to backup start.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie müssen sich vorher mit einem Server verbinden, um die Sicherung zu starten.</translation>
     </message>
 </context>
 <context>
@@ -3143,38 +2895,38 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>&lt;User removed&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; Benutzer entfernt&gt;</translation>
     </message>
     <message>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Benutzer</translation>
     </message>
     <message>
         <source>%1 users</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Benutzer</translation>
     </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 (%n mal)</numerusform>
+            <numerusform>%1 (%n mal)</numerusform>
         </translation>
     </message>
     <message>
         <source>and %1 user(s) more...</source>
-        <translation type="unfinished"></translation>
+        <translation>und %1 Benutzer mehr...</translation>
     </message>
 </context>
 <context>
     <name>QnExecPtzPresetPolicy</name>
     <message>
         <source>Select exactly one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie genau eine Kamera</translation>
     </message>
     <message>
         <source>%1 has no ptz presets</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 hat keine PTZ Presets</translation>
     </message>
 </context>
 <context>
@@ -3231,11 +2983,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select devices to setup failover priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie Geräte, um die Ausfallsicherungspriorität festzulegen</translation>
     </message>
     <message>
         <source>Select cameras to setup failover priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie Kameras, um die Ausfallsicherungspriorität festzulegen</translation>
     </message>
 </context>
 <context>
@@ -3288,31 +3040,31 @@ to view more bookmarks</source>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Geräteliste...</translation>
     </message>
     <message>
         <source>Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kameraliste...</translation>
     </message>
     <message>
         <source>Open Alarm/Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Alarm/Ereignis-Regeln-Einstellungen</translation>
     </message>
     <message>
         <source>Open Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Ereignislog</translation>
     </message>
     <message>
         <source>Open Bookmarks List</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Lesezeichenliste</translation>
     </message>
     <message>
         <source>Open Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Geräteliste</translation>
     </message>
     <message>
         <source>Open Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Kameraliste</translation>
     </message>
 </context>
 <context>
@@ -3331,7 +3083,8 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This may result in client software issues (including unexpected crash).</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Dies kann dazu führen, dass Client-Software-Probleme auftreten (z.B. unerwartete Abstürze).</translation>
     </message>
 </context>
 <context>
@@ -3512,15 +3265,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unknown error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannter Fehler aufgetreten.</translation>
     </message>
     <message>
         <source>Could not export I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte I/O Modul %1 nicht exportieren.</translation>
     </message>
     <message>
         <source>Could not create output file %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgabedatei %1 konnte nicht erstellt werden...</translation>
     </message>
 </context>
 <context>
@@ -3589,11 +3342,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">Zeitüberschreitung</translation>
+        <translation>Zeitüberschreitung</translation>
     </message>
 </context>
 <context>
@@ -3643,11 +3396,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">Zeitüberschreitung</translation>
+        <translation>Zeitüberschreitung</translation>
     </message>
 </context>
 <context>
@@ -3914,23 +3667,23 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Verwende Lizenzen für %n Gerät</numerusform>
             <numerusform>Verwende Lizenzen für %n Geräte</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Verwende Lizenzen für %n Kamera</numerusform>
             <numerusform>Verwende Lizenzen für %n Kameras</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Verwende Lizenzen für %n I/O Modul</numerusform>
+            <numerusform>Verwende Lizenzen für %n I/O Module</numerusform>
         </translation>
     </message>
 </context>
@@ -4006,7 +3759,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Invalid Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Parameter</translation>
     </message>
 </context>
 <context>
@@ -4120,7 +3873,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul</translation>
     </message>
 </context>
 <context>
@@ -4449,23 +4202,23 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Alarm: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm: %1</translation>
     </message>
     <message>
         <source>Open in Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne im Alarm Layout</translation>
     </message>
     <message>
         <source>Open I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne I/O Modul</translation>
     </message>
     <message>
         <source>I/O Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Einstellungen...</translation>
     </message>
     <message>
         <source>Open I/O Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne I/O Modul Web Seite...</translation>
     </message>
 </context>
 <context>
@@ -4480,7 +4233,7 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">Warnung!</translation>
+        <translation>Warnung!</translation>
     </message>
 </context>
 <context>
@@ -4569,15 +4322,15 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Fehler ist aufgetreten, beim Versuch die aktuelle Position für Kamera %1 festzulegen.</translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwalte PTZ für %1...</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get the current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Fehler ist aufgetreten, beim Versuch die aktuelle Position für Kamera %1 aufzurufen.</translation>
     </message>
 </context>
 <context>
@@ -4862,16 +4615,16 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>Total %n devices</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Gesamt %n Gerät</numerusform>
             <numerusform>Gesamt %n Geräte</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Gesamt %n Kamera</numerusform>
             <numerusform>Gesamt %n Kameras</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4900,18 +4653,18 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Kameras von anderen Servern und gelöschte Kameras&gt;</translation>
     </message>
     <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Gesamt %n I/O Modul</numerusform>
+            <numerusform>Gesamt %n I/O Module</numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivierte Dauer in Kalendertagen seit der ersten Aufzeichnung</translation>
     </message>
 </context>
 <context>
@@ -5063,70 +4816,79 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
         <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportiere Lesezeichen...</translation>
     </message>
     <message>
         <source>Search bookmarks by name, tag or description</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche Lesezeichen nach Namen, Tag oder Beschreibung</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished">&lt;Jedes Gerät&gt;</translation>
+        <translation>&lt;Jedes Gerät&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;Jede Kamera&gt;</translation>
+        <translation>&lt;Jede Kamera&gt;</translation>
     </message>
     <message>
         <source>&lt;Any I/O Module&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Jedes I/O Modul&gt;</translation>
     </message>
     <message>
         <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Alle meine Geräte&gt;</translation>
     </message>
     <message>
         <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Alle meine Kameras&gt;</translation>
     </message>
     <message>
         <source>&lt;All My I/O Modules&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Alle meine I/O Module&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+            <numerusform>&lt;%n Gerät(e)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+            <numerusform>&lt;%n Kamera(s)&gt;</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+            <numerusform>&lt;%n I/O Modul(e)&gt;</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>Start time</source>
-        <translation type="unfinished"></translation>
+        <translation>Startzeit</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Länge</translation>
     </message>
     <message>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Tags</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished">Kamera</translation>
+        <translation>Kamera</translation>
     </message>
 </context>
 <context>
@@ -5159,7 +4921,7 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>%1 (up %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (auf %2)</translation>
     </message>
 </context>
 <context>
@@ -5194,11 +4956,11 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Storage Management</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicherverwaltung</translation>
     </message>
     <message>
         <source>Apply changes to server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Änderungen für Server %1 übernehmen?</translation>
     </message>
 </context>
 <context>
@@ -5233,11 +4995,11 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>To avoid issues adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Um Probleme zu vermeiden, passen Sie die maximale Anzahl der Geräte an</translation>
     </message>
     <message>
         <source>To avoid issues adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Um Probleme zu vermeiden, passen Sie die maximale Anzahl der Kameras an</translation>
     </message>
 </context>
 <context>
@@ -5475,57 +5237,57 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Authentifizierung fehlgeschlagen bei %n Server:</numerusform>
+            <numerusform>Authentifizierung fehlgeschlagen bei %n Servern:</numerusform>
         </translation>
     </message>
     <message>
         <source>Update Succeeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Update war erfolgreich</translation>
     </message>
     <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Update nicht starten. Ein Downgrade auf eine frühere Version ist verboten.</translation>
     </message>
     <message>
         <source>Launcher process was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Startprozess wurde nicht gefunden.</translation>
     </message>
     <message>
         <source>No such build is available on update server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Build ist auf dem Updateserver nicht verfügbar.</translation>
     </message>
     <message>
         <source>Unable to begin update. Updates for one or more servers were not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Update nicht starten. Updates für einen oder mehrere Server wurden nicht gefunden.</translation>
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Update nicht starten. Client-Update wurde nicht gefunden.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Update abgebrochen</translation>
     </message>
     <message>
         <source>Update is not needed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Update ist nicht erforderlich.</translation>
     </message>
     <message>
         <source>All servers are already updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Server sind bereits geupdatet.</translation>
     </message>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
     <message>
         <source>&lt;All Users&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Alle Benutzer&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n User(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Benutzer</numerusform>
             <numerusform>%n Benutzer</numerusform>
         </translation>
@@ -5538,7 +5300,8 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
         <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-        <translation type="unfinished"></translation>
+        <translation>HTML-Tags können innerhalb von benutzerdefinierten Texten verwendet werden:
+&lt;h4&gt;Header (h1-h6)&lt;/h4&gt;Auch verschiedene &lt;font color=&quot;red&quot;&gt;Farben&lt;/font&gt; und &lt;font size=&quot;18&quot;&gt;Größen&lt;/font&gt; können angewandt werden. Der Text kann &lt;s&gt;durchgestrichen&lt;/s&gt;, &lt;u&gt;unterstrichen&lt;/u&gt;, &lt;b&gt;fett&lt;/b&gt; oder &lt;i&gt;kursiv&lt;/i&gt; sein</translation>
     </message>
 </context>
 <context>
@@ -5604,84 +5367,85 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Modul Einstellungen</translation>
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished">Ungültiger Aufnahmeplan</translation>
+        <translation>Ungültiger Aufnahmeplan</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der zweite Stream ist für diese Kamera deaktiviert. Motion und LQ Option haben keine Effekt. Drücken Sie &quot;Ja&quot;, um den Aufnahmetyp auf &quot;Immer&quot; zu ändern. Drücken Sie&quot;Nein&quot;, um den zweiten Stream zu reaktivieren.</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">Email ist nicht gültig</translation>
+        <translation>Email ist nicht gültig</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">Email ist nicht gültig</translation>
+        <translation>Email ist nicht gültig</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished">Keine Voreinstellung gefunden. Bitte verwenden Sie die &quot;Erweiterten&quot; Optionen.</translation>
+        <translation>Kein Preset gefunden. Bitte verwenden Sie die &quot;Erweiterten&quot; Optionen.</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">Zeitüberschreitung</translation>
+        <translation>Zeitüberschreitung</translation>
     </message>
     <message>
         <source>Invalid data</source>
-        <translation type="unfinished">Ungültige Daten</translation>
+        <translation>Ungültige Daten</translation>
     </message>
     <message>
         <source>Network Error</source>
-        <translation type="unfinished">Netzwerkfehler</translation>
+        <translation>Netzwerkfehler</translation>
     </message>
     <message>
         <source>TLS</source>
-        <translation type="unfinished">TLS</translation>
+        <translation>TLS</translation>
     </message>
     <message>
         <source>SSL</source>
-        <translation type="unfinished">SSL</translation>
+        <translation>SSL</translation>
     </message>
     <message>
         <source>Unsecured</source>
-        <translation type="unfinished">Ungeschützt</translation>
+        <translation>Ungeschützt</translation>
     </message>
     <message>
         <source>In Progress...</source>
-        <translation type="unfinished">Am laufen...</translation>
+        <translation>In Bearbeitung...</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation type="unfinished">Fehlschlag</translation>
+        <translation>Fehlschlag</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished">Aktion erfolgreich</translation>
+        <translation>Aktion erfolgreich</translation>
     </message>
     <message>
         <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte den Test nicht ausführen. Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
     </message>
     <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+Die bereitgestellten Parameter sind nicht gültig. Ein Test konnte nicht ausgeführt werden.</translation>
     </message>
 </context>
 <context>
@@ -5755,176 +5519,182 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Please check authentication information in I/O module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Prüfen Sie die Authentifizierungsinformationen in den I/O Modul Einstellungen</translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished">Sie sind dabei die Archiv Resynchronisationsroutine zu starten.</translation>
+        <translation>Sie sind dabei die Archiv Resynchronisationsroutine zu starten.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished">WICHTIG! Während die Resynchronisationsroutine läuft, wird ihre Festplatte eine erhöhte Aktivität aufweisen. Abhängig von der Größe ihres Archives kann der Vorgang mehrere Stunden benötigen.</translation>
+        <translation>WICHTIG! Während die Resynchronisationsroutine läuft, wird Ihre Festplatte eine erhöhte Aktivität aufweisen. Abhängig von der Größe Ihres Archives kann der Vorgang mehrere Stunden benötigen.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Möchten Sie fortfahren?</translation>
+        <translation>Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>Backup is already in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sicherung ist bereits in Bearbeitung.</translation>
     </message>
     <message>
         <source>Select at least one backup storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie mindestens ein Sicherungs-Laufwerk.</translation>
     </message>
     <message>
         <source>Apply changes before starting backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Übernehmen Sie die Änderungen bevor Sie die Sicherung starten.</translation>
     </message>
     <message>
         <source>(%1 before now)</source>
-        <translation type="unfinished"></translation>
+        <translation>(%1 vor jetzt)</translation>
     </message>
     <message>
         <source>Backup was never started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sicherung wurde nie gestartet.</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">Beendet</translation>
+        <translation>Beendet</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished">Archivindex wurde neu aufgebaut.</translation>
+        <translation>Archivindex wurde neu aufgebaut.</translation>
     </message>
     <message>
         <source>By Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Zeitplan</translation>
     </message>
     <message>
         <source>On Demand</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf Nachfrage</translation>
     </message>
     <message>
         <source>Backup Schedule is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sicherungszeitplan ist ungültig.</translation>
     </message>
     <message>
         <source>No devices selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Geräte ausgewählt</translation>
     </message>
     <message>
         <source>No cameras selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Kameras ausgewählt</translation>
     </message>
     <message>
         <source>Real-Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Echtzeit</translation>
     </message>
     <message>
         <source>Low-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>Low-Res Streams</translation>
     </message>
     <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>Hi-Res Streams</translation>
     </message>
     <message>
         <source>All streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>Alle Streams</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">Warnung!</translation>
+        <translation>Warnung!</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Prozess ist nur notwendig, wenn Ihr Archivordner entfernt, umbenannt oder verschoben wurde. Sie können jederzeit und ohne Datenverlust den Neuerstellungsvorgang abbrechen.</translation>
     </message>
     <message>
         <source>Select at least one device to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie mindestens ein Gerät, um die Sicherung zu starten.</translation>
     </message>
     <message>
         <source>Select at least one camera to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie mindestens eine Kamera, um die Sicherung zu starten.</translation>
     </message>
     <message>
         <source>Cannot start backup while archive index rebuild is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann die Sicherung während des Neuerstellungsvorgangs nicht starten.</translation>
     </message>
     <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinweis: Nur neuere Aufnahmen werden gesichert. Der Sicherungsprozess wird vorhandene Aufnahmen ignorieren.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>%n Kamera(s)</numerusform>
+            <numerusform>%n Kamera(s)</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>%n Gerät(e)</numerusform>
+            <numerusform>%n Gerät(e)</numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Sicherung ist fertig</translation>
     </message>
     <message>
         <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Echtzeitmodus werden alle Daten kontinuierlich gesichert.</translation>
     </message>
     <message>
         <source>Archive backup is completed up to: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivsicherung  ist abgeschlossen bis zu: %1.</translation>
     </message>
 </context>
 <context>
     <name>QnStorageListModel</name>
     <message>
         <source>Invalid storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger Speicher</translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation type="unfinished">%1 GB</translation>
+        <translation>%1 GB</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <source>Use as backup storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwende als Sicherungslaufwerk</translation>
     </message>
     <message>
         <source>Inaccessible</source>
-        <translation type="unfinished"></translation>
+        <translation>Unzugänglich</translation>
     </message>
     <message>
         <source>Use as main storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwende als Hauptspeicher</translation>
     </message>
     <message>
         <source>%1 (Checking...)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Prüfung...)</translation>
     </message>
     <message>
         <source>%1 (Scanning... %2%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Scannen... %2%)</translation>
     </message>
     <message>
         <source>%1 (Rebuilding... %2%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (Wiederherstellung... %2%)</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Lade...</translation>
+        <translation>Lade...</translation>
     </message>
 </context>
 <context>
@@ -5932,12 +5702,12 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <message>
         <source>Fast Archive Scan - %p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Schnell Archiv-Scan - %p%</translation>
     </message>
     <message>
         <source>Rebuilding Archive Index - %p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung des Archivindex - %p%</translation>
     </message>
 </context>
 <context>
@@ -5975,7 +5745,7 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">Warnung!</translation>
+        <translation>Warnung!</translation>
     </message>
 </context>
 <context>
@@ -6013,111 +5783,111 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailadresse ist nicht festgelegt</translation>
     </message>
     <message>
         <source>No licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Lizenzen</translation>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailserver ist nicht festgelegt</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige Benutzer haben keine Emailadressen festgelegt</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbindung zum Server verloren</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie einen Server, um die Zeit für andere zu synchronisieren</translation>
     </message>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished">System ist im abgesicherten Modus</translation>
+        <translation>System ist im abgesicherten Modus</translation>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Senden einer Email</translation>
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicher ist voll</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicher ist nicht konfiguriert</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung des Archivindex ist abgeschlossen</translation>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung des Archivindex wurde vom Benutzer abgebrochen</translation>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailadresse bei Benutzer %1 nicht gesetzt</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailadresse nicht gesetzt.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie können keine Systembenachrichtigungen per Email erhalten.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Emailserver ist nicht festgelegt.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige Benutzer haben keine Emailadressen festgelegt.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie können keine Systembenachrichtigungen per Email erhalten.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serverzeiten sind nicht synchronisiert und der Zeitpunkt konnte nicht automatisch ermittelt werden.</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das System wird im abgesicherten Modus ausgeführt.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurationsänderungen außer Lizenzaktivierung sind ausgeschlossen.</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben keine Lizenzen.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie können keine Videos von den Kameras aufnehmen.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung des Archivindex ist auf folgendem Server abgeschlossen:</translation>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung des Archivindex wurde vom Benutzer auf folgendem Server abgebrochen:</translation>
     </message>
     <message>
         <source>Storage is full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicher ist auf folgendem Server voll:</translation>
     </message>
     <message>
         <source>Storage is not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicher ist auf folgendem Server nicht konfiguriert:</translation>
     </message>
 </context>
 <context>
@@ -6810,44 +6580,44 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n Gerät wird automatisch erkannt. Es kann nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie es entfernen möchten?</numerusform>
             <numerusform>Diese %n Geräte werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Diese %n Kamera wird automatisch erkannt. Sie kann nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
             <numerusform>Diese %n Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n Gerät wird automatisch erkannt. Es kann nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie es entfernen möchten?</numerusform>
             <numerusform>%n von diesen Geräten werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n Kamera wird automatisch erkannt. Sie kann nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
             <numerusform>%n von diesen Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Wollen Sie %n Gerät wirklich löschen?</numerusform>
             <numerusform>Wollen Sie %n Geräte wirklich löschen?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>Wollen Sie %n Kamera wirklich löschen?</numerusform>
             <numerusform>Wollen Sie %n Kameras wirklich löschen?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6859,42 +6629,42 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message numerus="yes">
         <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kann %n I/O Modul nicht auf Server %1 verschieben. Der Server ist nicht erreichbar.</numerusform>
+            <numerusform>Kann %n I/O Module nicht auf Server %1 verschieben. Der Server ist nicht erreichbar.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Server %1 ist nicht imstande %n I/O Modul zu finden und zu erreichen. Sind Sie sicher, dass Sie es verschieben wollen?</numerusform>
+            <numerusform>Server %1 ist nicht imstande %n I/O Module zu finden und zu erreichen. Sind Sie sicher, dass Sie sie verschieben wollen?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Modul wird automatisch erkannt. Es kann nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie es entfernen möchten?</numerusform>
+            <numerusform>Diese %n I/O Module werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Modul wird automatisch erkannt. Es kann nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie es entfernen möchten?</numerusform>
+            <numerusform>%n von diesen I/O Modulen werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Wollen Sie %n I/O Modul wirklich löschen?</numerusform>
+            <numerusform>Wollen Sie %n I/O Module wirklich löschen?</numerusform>
         </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Hinzufügen des Geräts ist bereits im Gange. Sind Sie sicher, dass Sie den aktuellen Vorgang abbrechen möchten?</translation>
     </message>
 </context>
 <context>
@@ -6921,19 +6691,22 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>Are you sure you want to delete this bookmark?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, dass Sie dieses Lesezeichen löschen wollen?</translation>
     </message>
     <message>
         <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, dass Sie dieses Lesezeichen &quot;%1&quot; löschen wollen?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Drücken Sie %1, um nach Lesezeichen zu suchen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+            <numerusform>Sind Sie sicher, dass Sie die %n Lesezeichen löschen wollen?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7169,19 +6942,19 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>Selected format is not recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>Das ausgewählte Format wird nicht empfohlen</translation>
     </message>
     <message>
         <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>Das ausgewählte Format wird für diese Kamera nicht empfohlen aufgrund von Herunterskalierung des Videos. Wir empfehlen Ihnen die ausgewählten Videos in das &apos;.nov&apos; oder &apos;.exe&apos; Format zu exportieren. Möchten Sie fortfahren?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie sind dabei ein Video zu exportieren, welches länger als 30 Minuten ist.</translation>
     </message>
     <message>
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie sind dabei mehrere Videos zu exportieren, welche eine Gesamtlänge von größer als 30 Minuten haben.</translation>
     </message>
 </context>
 <context>
@@ -7249,11 +7022,11 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie können erneut versuchen die Server über die &quot;Systemverwaltung&quot; zu aktualisieren.</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">Warnung!</translation>
+        <translation>Warnung!</translation>
     </message>
 </context>
 <context>
@@ -7367,7 +7140,7 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>All I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle I/O Module</translation>
     </message>
 </context>
 <context>
@@ -7386,15 +7159,15 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Unable to set position on camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht in der Lage die Position vor der Kamera festlegen.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Versuch, die aktuelle Position für Kamera %1 festzulegen.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get the current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Versuch, die aktuelle Position für Kamera %1 abzurufen.</translation>
     </message>
 </context>
 <context>
@@ -7409,9 +7182,9 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished">
-            <numerusform>Die folgenden %n Objekte wurden nicht gespeichert.</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Objekt wurde nicht gespeichert.</numerusform>
+            <numerusform>%n Objekte wurden nicht gespeichert.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7427,9 +7200,9 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished">
-            <numerusform>Die folgenden %n Objekte wurden nicht gelöscht.</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Objekt wurde nicht gelöscht.</numerusform>
+            <numerusform>%n Objekte wurden nicht gelöscht.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7515,30 +7288,30 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Speichern des Screenshots &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Fehler</translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <source>Error while taking screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler während der Aufnahme eines Screenshots</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchStateDependentTabbedDialog</name>
     <message>
         <source>* %1</source>
-        <translation type="unfinished">* %1</translation>
+        <translation>* %1</translation>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation type="unfinished">Ungesicherte Änderungen gehen verloren. Sollen die folgenden Seiten gesichert werden?</translation>
+        <translation>Ungesicherte Änderungen gehen verloren. Sollen die folgenden Seiten gesichert werden?</translation>
     </message>
     <message>
         <source>Confirm exit</source>
-        <translation type="unfinished">Beenden bestätigen</translation>
+        <translation>Beenden bestätigen</translation>
     </message>
 </context>
 <context>
@@ -7699,22 +7472,22 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message numerus="yes">
         <source>%n items</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n Element</numerusform>
             <numerusform>%n Elemente</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, dass Sie die Videowand stoppen wollen?</translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie werden Sie manuell starten müssen.</translation>
     </message>
     <message>
         <source>The changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Änderungen können nicht übernommen werden. Unerwarteter Fehler aufgetreten.</translation>
     </message>
 </context>
 <context>

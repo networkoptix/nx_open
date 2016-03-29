@@ -1,10 +1,13 @@
 #include "client_installation.h"
 
+#include <QtCore/QDataStream>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
+
 #include "version.h"
+
 
 namespace {
     const QString installationDataFile("install.dat");

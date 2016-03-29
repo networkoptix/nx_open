@@ -44,12 +44,13 @@ namespace nx_api
         \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
             In other case, it is caller's responsibility to syunchronize access to the connection object.
         \note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
+        \note This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
     */
     template<
         class CustomConnectionType
     > class BaseServerConnection
     :
-        public QnStoppable
+        public QnStoppableAsync
     {
     public:
         typedef BaseServerConnection<CustomConnectionType> SelfType;
@@ -70,16 +71,17 @@ namespace nx_api
 
         ~BaseServerConnection()
         {
+            stopWhileInAioThread();
         }
 
-        virtual void pleaseStop() override
+        virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
         {
-            for (auto& handler : m_connectionCloseHandlers)
-                handler();
-            m_connectionCloseHandlers.clear();
-
-            m_streamSocket->pleaseStopSync();
-            m_streamSocket->close();
+            m_streamSocket->pleaseStop(
+                [this, handler = std::move(handler)]
+                {
+                    stopWhileInAioThread();
+                    handler();
+                });
         }
 
         //!Start receiving data from connection
@@ -156,7 +158,7 @@ namespace nx_api
                     SystemError::connectionReset,
                     static_cast<CustomConnectionType*>(this) );
 
-            assert( m_readBuffer.size() == bytesRead );
+            NX_ASSERT( m_readBuffer.size() == bytesRead );
             static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(
@@ -169,7 +171,7 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
 
-            assert( count == m_bytesToSend );
+            NX_ASSERT( count == m_bytesToSend );
 
             static_cast<CustomConnectionType*>(this)->readyToSendData();
         }
@@ -179,7 +181,7 @@ namespace nx_api
             switch( errorCode )
             {
                 case SystemError::noError:
-                    assert( false );
+                    NX_ASSERT( false );
                     break;
 
                 case SystemError::connectionReset:
@@ -193,6 +195,13 @@ namespace nx_api
                         errorCode,
 						static_cast<CustomConnectionType*>(this) );
             }
+        }
+
+        void stopWhileInAioThread()
+        {
+            for (auto& connectionCloseHandler : m_connectionCloseHandlers)
+                connectionCloseHandler();
+            m_connectionCloseHandlers.clear();
         }
     };
 }

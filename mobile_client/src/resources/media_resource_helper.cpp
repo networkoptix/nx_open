@@ -94,14 +94,26 @@ namespace
         return !(flags & (Qn::SF_ArmServer | Qn::SF_Edge));
     }
 
+    QnMediaServerResourcePtr serverAtPosition(
+            const QnVirtualCameraResourcePtr &camera,
+            qint64 position,
+            QnTimePeriod *foundPeriod = nullptr)
+    {
+        if (position < 0 || position == DATETIME_NOW)
+            return camera->getParentServer();
+
+        return qnCameraHistoryPool->getMediaServerOnTime(
+                camera, position, foundPeriod);
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
     : base_type(parent)
     , m_position(-1)
     , m_finalTimestamp(-1)
+    , m_resolution(0)
     , m_nativeStreamIndex(1)
-    , m_transcodingSupported(true)
     , m_useTranscoding(true)
     , m_transcodingProtocol(transcodingProtocol)
     , m_nativeProtocol(nativeStreamProtocol)
@@ -164,7 +176,7 @@ void QnMediaResourceHelper::setResourceId(const QString &id)
     connect(m_camera, &QnResource::propertyChanged, this,
             [this](const QnResourcePtr &resource, const QString &key)
             {
-                Q_ASSERT(m_camera == resource);
+                NX_ASSERT(m_camera == resource);
                 if (m_camera != resource)
                     return;
 
@@ -483,7 +495,7 @@ void QnMediaResourceHelper::updateFinalTimestamp()
     }
 
     QnTimePeriod period;
-    qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    serverAtPosition(m_camera, m_position, &period);
 
     setFinalTimestamp(period.isValid() && !period.isInfinite() ? period.endTimeMs() : -1);
 }
@@ -503,7 +515,7 @@ QnMediaServerResourcePtr QnMediaResourceHelper::serverAtCurrentPosition() const
     if (position != -1)
         position = m_chunkProvider->closestChunkStartMs(position, true);
 
-    return qnCameraHistoryPool->getMediaServerOnTime(m_camera, position);
+    return serverAtPosition(m_camera, position);
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const
@@ -640,12 +652,24 @@ void QnMediaResourceHelper::updateMediaStreams()
         }
     }
 
-    if (mjpegSupported && !nativeSupported)
-        m_nativeProtocol = Mjpeg;
-    else
-        m_nativeProtocol = nativeStreamProtocol;
+    Protocol nativeProtocol = m_nativeProtocol;
 
-    updateCurrentStream();
+    if (mjpegSupported && !nativeSupported)
+        nativeProtocol = Mjpeg;
+    else
+        nativeProtocol = nativeStreamProtocol;
+
+    bool needUpdateUrl = m_url.isEmpty();
+
+    if (m_nativeProtocol != nativeProtocol)
+    {
+        m_nativeProtocol = nativeProtocol;
+        if (!m_useTranscoding)
+            needUpdateUrl = true;
+    }
+
+    if (needUpdateUrl)
+        updateCurrentStream();
 }
 
 void QnMediaResourceHelper::updateCurrentStream()
@@ -654,11 +678,12 @@ void QnMediaResourceHelper::updateCurrentStream()
         return;
 
     QnTimePeriod period;
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    QnMediaServerResourcePtr server = serverAtPosition(
+            m_camera, m_position, &period);
     if (!server)
         return;
 
-    bool useTranscoding = m_transcodingSupported && transcodingSupportedForServer(server);
+    bool useTranscoding = transcodingSupportedForServer(server);
 
     if (m_useTranscoding != useTranscoding)
     {
@@ -672,6 +697,11 @@ void QnMediaResourceHelper::updateCurrentStream()
         emit protocolChanged();
         emit aspectRatioChanged();
     }
+    else if (m_useTranscoding && m_url.isEmpty())
+    {
+        updateStardardResolutions();
+        emit resolutionsChanged();
+    }
 
     updateUrl();
 }
@@ -681,7 +711,7 @@ void QnMediaResourceHelper::at_resource_parentIdChanged(const QnResourcePtr &res
     if (m_camera != resource)
         return;
 
-    updateUrl();
+    updateCurrentStream();
 }
 
 void QnMediaResourceHelper::updateStardardResolutions()
@@ -696,8 +726,8 @@ void QnMediaResourceHelper::updateStardardResolutions()
             m_standardResolutions.append(resolution);
     }
 
-    if (!m_transcodingSupported)
-        return;
+    if (m_standardResolutions.isEmpty())
+        m_standardResolutions.append(maxResolution);
 
     maxResolution = m_standardResolutions.last();
 

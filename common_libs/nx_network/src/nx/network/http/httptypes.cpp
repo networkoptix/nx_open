@@ -9,7 +9,9 @@
 #include <cstring>
 #include <memory>
 
-#include "version.h"
+#include <QtCore/QString>
+
+#include <utils/common/app_info.h>
 
 #ifdef _WIN32
 static int strcasecmp(const char * str1, const char * str2) { return strcmpi(str1, str2); }
@@ -38,7 +40,7 @@ namespace nx_http
         HttpHeaders::const_iterator it = headers.find( headerName );
         return it == headers.end() ? StringType() : it->second;
     }
-    
+
     HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
     {
         HttpHeaders::iterator existingHeaderIter = headers->lower_bound( newHeader.first );
@@ -231,8 +233,10 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case moved:
                     return StringType("Moved");
-                case moved_permanently:
+                case movedPermanently:
                     return StringType("Moved Permanently");
+                case notModified:
+                    return StringType("Not Modified");
                 case badRequest:
                     return StringType("Bad Request");
                 case unauthorized:
@@ -548,7 +552,7 @@ namespace nx_http
 
         return BufferType();
     }
-        
+
 
     ////////////////////////////////////////////////////////////
     //// class Response
@@ -730,6 +734,10 @@ namespace nx_http
 
     namespace header
     {
+        const StringType kContentType = "Content-Type";
+        const StringType kUserAgent = "User-Agent";
+
+
         namespace AuthScheme
         {
             const char* toString( Value val )
@@ -764,7 +772,7 @@ namespace nx_http
             }
         }
 
-        namespace 
+        namespace
         {
             std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
             {
@@ -838,7 +846,7 @@ namespace nx_http
                 return false;
             userid = decodedBuf.mid( 0, sepIndex );
             password = decodedBuf.mid( sepIndex+1 );
-            
+
             return true;
         }
 
@@ -888,7 +896,7 @@ namespace nx_http
                 case AuthScheme::basic:
                     basic = new BasicCredentials();
                     break;
-                
+
                 case AuthScheme::digest:
                     digest = new DigestCredentials();
                     break;
@@ -924,7 +932,7 @@ namespace nx_http
                     break;
             }
         }
-        
+
         Authorization::~Authorization()
         {
             clear();
@@ -991,7 +999,7 @@ namespace nx_http
                     delete basic;
                     basic = nullptr;
                     break;
-                
+
                 case AuthScheme::digest:
                     delete digest;
                     digest = nullptr;
@@ -1270,7 +1278,7 @@ namespace nx_http
 
         quint64 ContentRange::rangeLength() const
         {
-            Q_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+            NX_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
 
             if( rangeSpec.end )
                 return rangeSpec.end.get() - rangeSpec.start + 1;   //both boundaries are inclusive
@@ -1282,7 +1290,7 @@ namespace nx_http
 
         StringType ContentRange::toString() const
         {
-            Q_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+            NX_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
 
             StringType str = unitName;
             str += " ";
@@ -1629,17 +1637,21 @@ namespace nx_http
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #   define PRODUCT_NAME_SUFFIX " Mobile"
 #else
-#   define PRODUCT_NAME_SUFFIX
+#   define PRODUCT_NAME_SUFFIX ""
 #endif
 
-    static const StringType defaultUserAgentString = QN_PRODUCT_NAME_LONG PRODUCT_NAME_SUFFIX "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_USER_AGENT;
+    static const StringType defaultUserAgentString = lit("%1%2/%3 (%4) %5").arg(
+        QnAppInfo::productNameLong(), PRODUCT_NAME_SUFFIX, QnAppInfo::applicationVersion(), QnAppInfo::organizationName(), COMMON_USER_AGENT
+        ).toUtf8();
 
     StringType userAgentString()
     {
         return defaultUserAgentString;
     }
 
-    static const StringType defaultServerString = QN_PRODUCT_NAME "/" QN_APPLICATION_VERSION " (" QN_ORGANIZATION_NAME ") " COMMON_SERVER;
+    static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
+        QnAppInfo::productNameLong(), QnAppInfo::applicationVersion(), QnAppInfo::organizationName(), COMMON_SERVER
+        ).toUtf8();
 
     StringType serverString()
     {

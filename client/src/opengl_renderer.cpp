@@ -8,7 +8,7 @@
 #include <ui/graphics/shaders/per_vertex_colored_shader_program.h>
 #include <ui/graphics/shaders/texture_transition_shader_program.h>
 
-#include <QOpenGLFunctions>
+#include <QtGui/QOpenGLFunctions>
 
 QnOpenGLRenderer::QnOpenGLRenderer(QObject *parent):
     m_colorProgram(new QnColorGLShaderProgram(parent)),

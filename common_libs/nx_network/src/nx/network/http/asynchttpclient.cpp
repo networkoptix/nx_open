@@ -20,7 +20,6 @@
 #include <utils/common/systemerror.h>
 
 #include "auth_tools.h"
-#include "version.h"
 
 //TODO: #ak persistent connection support
 //TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
@@ -66,7 +65,7 @@ namespace nx_http
     {
         return m_socket.data();
     }
-    
+
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;
@@ -120,7 +119,7 @@ namespace nx_http
     */
     void AsyncHttpClient::doGet( const QUrl& url )
     {
-        Q_ASSERT( url.isValid() );
+        NX_ASSERT( url.isValid() );
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -133,7 +132,7 @@ namespace nx_http
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody)
     {
-        Q_ASSERT(url.isValid());
+        NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -151,7 +150,7 @@ namespace nx_http
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody )
     {
-        Q_ASSERT(url.isValid());
+        NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -271,11 +270,11 @@ namespace nx_http
         if( m_terminated )
             return;
 
-        Q_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.data() );
 
         if( m_state != sWaitingConnectToHost )
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             return;
         }
 
@@ -315,11 +314,11 @@ namespace nx_http
         if( m_terminated )
             return;
 
-        Q_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.data() );
 
         if( m_state != sSendingRequest )
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             return;
         }
 
@@ -375,14 +374,14 @@ namespace nx_http
         if( m_terminated )
             return;
 
-        Q_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.data() );
 
         if( errorCode != SystemError::noError )
         {
             if( reconnectIfAppropriate() )
                 return;
             NX_LOGX(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state = 
+            m_state =
                 ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
                 ? sDone
@@ -530,7 +529,7 @@ namespace nx_http
                 }
 
                 //message body has been received with request
-                assert( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
+                NX_ASSERT( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
 
                 m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
                 lk.unlock();
@@ -569,7 +568,7 @@ namespace nx_http
 
             default:
             {
-                Q_ASSERT( false );
+                NX_ASSERT( false );
                 break;
             }
         }
@@ -692,7 +691,7 @@ namespace nx_http
             return bytesRead;
         }
 
-        Q_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
+        NX_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
         if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber )
             return bytesRead;   //reading some old message, not changing state in this case
 
@@ -796,7 +795,7 @@ namespace nx_http
     bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
+        NX_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
 
         HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find( "WWW-Authenticate" );
         if( wwwAuthenticateIter == response.headers.end() )
@@ -954,7 +953,7 @@ namespace nx_http
             SystemError::ErrorCode osErrorCode,
             int statusCode,
             nx_http::StringType,
-            nx_http::BufferType msgBody ) 
+            nx_http::BufferType msgBody )
         {
             completionHandler(osErrorCode, statusCode, msgBody);
         };
@@ -1005,7 +1004,7 @@ namespace nx_http
                 return;
             }
 
-            completionHandler( 
+            completionHandler(
                 SystemError::noError,
                 httpClient->response()->statusLine.statusCode,
                 httpClient->contentType(),
@@ -1046,4 +1045,89 @@ namespace nx_http
 
         return resultingErrorCode;
     }
+
+    void uploadDataAsync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const nx_http::HttpHeaders &extraHeaders
+        , const UploadCompletionHandler &callback
+        , const AsyncHttpClient::AuthType authType
+        , const QString &user
+        , const QString &password)
+    {
+        nx_http::AsyncHttpClientPtr httpClientHolder = nx_http::AsyncHttpClient::create();
+        httpClientHolder->setAdditionalHeaders(extraHeaders);
+        if (!user.isEmpty())
+            httpClientHolder->setUserName(user);
+        if (!password.isEmpty())
+            httpClientHolder->setUserPassword(password);
+
+        httpClientHolder->setAuthType(authType);
+
+        auto completionFunc = [callback, httpClientHolder]
+            (nx_http::AsyncHttpClientPtr httpClient) mutable
+        {
+            httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
+            httpClientHolder.reset();
+
+            if( httpClient->failed() )
+                return callback(SystemError::connectionReset, nx_http::StatusCode::ok);
+
+            const auto response = httpClient->response();
+            const auto statusLine = response->statusLine;
+            if((statusLine.statusCode != nx_http::StatusCode::ok)
+                && (statusLine.statusCode != nx_http::StatusCode::partialContent))
+            {
+                return callback(SystemError::noError, statusLine.statusCode);
+            }
+
+            callback(SystemError::noError, statusLine.statusCode);
+        };
+
+        QObject::connect(httpClientHolder.get(), &nx_http::AsyncHttpClient::done,
+            httpClientHolder.get(), completionFunc, Qt::DirectConnection);
+
+        httpClientHolder->doPost(url, contentType, data);
+    }
+
+    SystemError::ErrorCode uploadDataSync(const QUrl &url
+        , const QByteArray &data
+        , const QByteArray &contentType
+        , const QString &user
+        , const QString &password
+        , const AsyncHttpClient::AuthType authType
+        , nx_http::StatusCode::Value *httpCode)
+    {
+        bool done = false;
+        SystemError::ErrorCode result = SystemError::noError;
+        std::mutex mutex;
+        std::condition_variable waiter;
+
+
+        const auto callback = [&result, &mutex, &waiter, &done, httpCode]
+            (SystemError::ErrorCode errorCode, int statusCode)
+        {
+            result = errorCode;
+            if (httpCode)
+            {
+                *httpCode = (errorCode == SystemError::noError
+                    ? static_cast<nx_http::StatusCode::Value>(statusCode)
+                    : nx_http::StatusCode::internalServerError);
+            }
+
+            std::unique_lock<std::mutex> lk(mutex);
+            done = true;
+            waiter.notify_all();
+        };
+
+        uploadDataAsync(url, data, contentType
+            , nx_http::HttpHeaders(), callback, authType, user, password);
+
+        std::unique_lock<std::mutex> guard(mutex);
+        while(!done)
+            waiter.wait(guard);
+
+        return result;
+    }
+
 }

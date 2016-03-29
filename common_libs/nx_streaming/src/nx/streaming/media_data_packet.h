@@ -1,20 +1,12 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <memory>
 
 #include <QtCore/QVector>
 #include <QtCore/QRect>
 
-// TODO: #Elric implement this ifdef on utils/media/audioformat.h level.
-#ifndef Q_OS_WIN
-#   include <utils/media/audioformat.h> 
-#else
-#   include <QtMultimedia/QAudioFormat>
-#   define QnAudioFormat QAudioFormat
-#endif
+#include <utils/media/audioformat.h> 
 
 #include <utils/common/byte_array.h>
 #include <utils/media/sse_helper.h>
@@ -248,7 +240,5 @@ protected:
 private:
     qint64 m_firstTimestamp;
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif //abstract_media_data_h_112

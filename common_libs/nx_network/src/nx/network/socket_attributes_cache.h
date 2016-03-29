@@ -15,6 +15,7 @@
 namespace nx {
 namespace network {
 
+/** Socket configuration attributes ready to apply to any \class AbstractSocket */
 class SocketAttributes
 {
 public:
@@ -26,42 +27,45 @@ public:
     boost::optional<unsigned int> sendTimeout;
     boost::optional<aio::AbstractAioThread*> aioThread;
 
-    void applyTo(AbstractSocket* const targetSocket)
+    bool applyTo(AbstractSocket* const socket) const
     {
         if (aioThread)
-            targetSocket->bindToAioThread(*aioThread);
-        if (reuseAddrFlag)
-            targetSocket->setReuseAddrFlag(*reuseAddrFlag);
-        if (nonBlockingMode)
-            targetSocket->setNonBlockingMode(*nonBlockingMode);
-        if (sendBufferSize)
-            targetSocket->setSendBufferSize(*sendBufferSize);
-        if (recvBufferSize)
-            targetSocket->setRecvBufferSize(*recvBufferSize);
-        if (recvTimeout)
-            targetSocket->setRecvTimeout(*recvTimeout);
-        if (sendTimeout)
-            targetSocket->setSendTimeout(*sendTimeout);
+            socket->bindToAioThread(*aioThread); //< success or assert
+
+        return
+            apply(socket, &AbstractSocket::setReuseAddrFlag, reuseAddrFlag) &&
+            apply(socket, &AbstractSocket::setNonBlockingMode, nonBlockingMode) &&
+            apply(socket, &AbstractSocket::setSendBufferSize, sendBufferSize) &&
+            apply(socket, &AbstractSocket::setRecvBufferSize, recvBufferSize) &&
+            apply(socket, &AbstractSocket::setRecvTimeout, recvTimeout) &&
+            apply(socket, &AbstractSocket::setSendTimeout, sendTimeout);
+    }
+
+protected:
+    template<typename Socket, typename Attribute>
+    bool apply(
+        Socket* const socket,
+        bool (Socket::*function)(Attribute value),
+        const boost::optional<Attribute>& value) const
+    {
+        return value ? (socket->*function)(*value) : true;
     }
 };
 
-/** saves socket attributes and applies them to a given socket */
+/** Saves socket attributes and applies them to a given socket */
 template<class ParentType, class SocketAttributesHolderType>
 class AbstractSocketAttributesCache
 :
     public ParentType
 {
 public:
-    AbstractSocketAttributesCache()
-    :
-        m_delegate(nullptr)
+    AbstractSocketAttributesCache(ParentType* delegate = nullptr):
+        m_delegate(delegate)
     {
     }
-
     virtual ~AbstractSocketAttributesCache()
     {
     }
-
     virtual bool setReuseAddrFlag(bool val) override
     {
         return setAttributeValue(
@@ -170,6 +174,40 @@ public:
         }
         return m_delegate->getLastError(errorCode);
     }
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override
+    {
+        if (!m_delegate)
+        {
+            NX_ASSERT(false, Q_FUNC_INFO, "Not supported");
+            return -1;
+        }
+
+        return m_delegate->handle();
+    }
+    virtual aio::AbstractAioThread* getAioThread() override
+    {
+        if (!m_delegate)
+        {
+            if (m_socketAttributes.aioThread)
+                return *m_socketAttributes.aioThread;
+
+            NX_ASSERT(false, Q_FUNC_INFO,
+                       "Notfully supported while delegate is not set");
+        }
+
+        return m_delegate->getAioThread();
+    }
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        if (!m_delegate)
+            m_socketAttributes.aioThread = aioThread;
+        else
+            m_delegate->bindToAioThread(aioThread);
+    }
+
+protected:
+    ParentType* m_delegate;
+    SocketAttributesHolderType m_socketAttributes;
 
     void setDelegate(ParentType* _delegate)
     {
@@ -181,11 +219,6 @@ public:
     {
         return m_socketAttributes;
     }
-
-protected:
-    ParentType* m_delegate;
-
-    SocketAttributesHolderType m_socketAttributes;
 
     template<typename AttributeType, typename SocketClassType>
     bool setAttributeValue(
@@ -232,33 +265,35 @@ protected:
     }
 };
 
-
+/** Socket configuration attributes ready to apply to any \class AbstractStreamSocket */
 class StreamSocketAttributes
 :
     public SocketAttributes
 {
 public:
     boost::optional<bool> noDelay;
-    boost::optional<boost::optional< KeepAliveOptions >> keepAlive;
+    boost::optional<boost::optional<KeepAliveOptions>> keepAlive;
 
-    void applyTo(AbstractStreamSocket* const streamSocket)
+    bool applyTo(AbstractStreamSocket* const socket) const
     {
-        SocketAttributes::applyTo(streamSocket);
-
-        if (noDelay)
-            streamSocket->setNoDelay(*noDelay);
-        if (keepAlive)
-            streamSocket->setKeepAlive(*keepAlive);
+        return
+            SocketAttributes::applyTo(socket) &&
+            apply(socket, &AbstractStreamSocket::setNoDelay, noDelay) &&
+            apply(socket, &AbstractStreamSocket::setKeepAlive, keepAlive);
     }
 };
 
-/** saves socket attributes and applies them to a given socket */
+/** Saves socket attributes and applies them to a given socket */
 template<class ParentType>
 class AbstractStreamSocketAttributesCache
 :
     public AbstractSocketAttributesCache<ParentType, StreamSocketAttributes>
 {
 public:
+    AbstractStreamSocketAttributesCache(ParentType* delegate = nullptr):
+        AbstractSocketAttributesCache<ParentType, StreamSocketAttributes>(delegate)
+    {
+    }
     virtual bool setNoDelay(bool val) override
     {
         return this->setAttributeValue(

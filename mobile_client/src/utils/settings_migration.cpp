@@ -23,26 +23,29 @@ void migrateSettings()
     bool success = false;
     auto importedSessions = getMigratedSessions(&success);
 
-    if (!importedSessions.isEmpty())
+    if (importedSessions.isEmpty())
     {
-        QVariantList sessions = qnSettings->savedSessions();
-
-        for (const auto &importedSession : importedSessions)
-        {
-            QnLoginSession session;
-            session.systemName = importedSession.title;
-            session.address = importedSession.host;
-            session.port = importedSession.port;
-            session.user = importedSession.login;
-            session.password = importedSession.password;
-
-            sessions.append(session.toVariant());
-        }
-
-        qnSettings->setSavedSessions(sessions);
-
-        qDebug() << "Imported" << importedSessions.size() << "sessions.";
+        qDebug() << "Settings migration is skipped.";
+        return;
     }
+
+    QVariantList sessions = qnSettings->savedSessions();
+
+    for (const auto &importedSession : importedSessions)
+    {
+        QnLoginSession session;
+        session.systemName = importedSession.title;
+        session.address = importedSession.host;
+        session.port = importedSession.port;
+        session.user = importedSession.login;
+        session.password = importedSession.password;
+
+        sessions.append(session.toVariant());
+    }
+
+    qnSettings->setSavedSessions(sessions);
+
+    qDebug() << "Imported" << importedSessions.size() << "sessions.";
 
     if (success)
         qnSettings->setSettingsMigrated(true);

@@ -1,7 +1,10 @@
+#ifndef DISABLE_FFMPEG
+
 #include "av_codec_media_context.h"
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
+#include <nx/utils/log/assert.h>
 #include <nx/streaming/media_context_serializable_data.h>
 
 QnAvCodecMediaContext::~QnAvCodecMediaContext()
@@ -13,13 +16,13 @@ QnAvCodecMediaContext::~QnAvCodecMediaContext()
 QnAvCodecMediaContext::QnAvCodecMediaContext(CodecID codecId):
     m_context(QnFfmpegHelper::createAvCodecContext(codecId))
 {
-    assert(m_context);
+    NX_ASSERT(m_context);
 }
 
 QnAvCodecMediaContext::QnAvCodecMediaContext(const AVCodecContext* context):
     m_context(QnFfmpegHelper::createAvCodecContext(context))
 {
-    assert(m_context);
+    NX_ASSERT(m_context);
 }
 
 QnAvCodecMediaContext* QnAvCodecMediaContext::cloneWithoutExtradata() const
@@ -78,7 +81,7 @@ QByteArray QnAvCodecMediaContext::serialize() const
 void QnAvCodecMediaContext::setExtradata(
     const quint8* extradata, int extradata_size)
 {
-    Q_ASSERT_X(!m_context->extradata, Q_FUNC_INFO,
+    NX_ASSERT(!m_context->extradata, Q_FUNC_INFO,
         "Attempt to reassign AVCodecContext extradata.");
 
     QnFfmpegHelper::copyAvCodecContextField(
@@ -187,3 +190,5 @@ int QnAvCodecMediaContext::getBlockAlign() const
 {
     return m_context->block_align;
 }
+
+#endif // DISABLE_FFMPEG

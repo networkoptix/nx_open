@@ -50,7 +50,7 @@ QnWorkbench::~QnWorkbench() {
 
 void QnWorkbench::clear() {
     setCurrentLayout(NULL);
-    
+
     while(!m_layouts.empty())
         removeLayout(m_layouts.back());
 }
@@ -85,6 +85,7 @@ void QnWorkbench::insertLayout(QnWorkbenchLayout *layout, int index) {
     m_layouts.insert(index, layout);
     connect(layout, SIGNAL(aboutToBeDestroyed()), this, SLOT(at_layout_aboutToBeDestroyed()));
 
+    emit layoutAdded(layout);
     emit layoutsChanged();
 }
 
@@ -104,7 +105,7 @@ void QnWorkbench::removeLayout(QnWorkbenchLayout *layout) {
     /* Update current layout if it's being removed. */
     if(layout == m_currentLayout) {
         QnWorkbenchLayout *newCurrentLayout = NULL;
-        
+
         int newCurrentIndex = m_layouts.indexOf(m_currentLayout);
         newCurrentIndex++;
         if(newCurrentIndex >= m_layouts.size())
@@ -114,6 +115,8 @@ void QnWorkbench::removeLayout(QnWorkbenchLayout *layout) {
 
         setCurrentLayout(newCurrentLayout);
     }
+
+    emit layoutRemoved(layout);
 
     m_layouts.removeOne(layout);
     disconnect(layout, NULL, this, NULL);
@@ -194,9 +197,9 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         m_dummyLayout->clear();
         m_currentLayout = m_dummyLayout;
     }
-    
-    /* Set up new layout. 
-     * 
+
+    /* Set up new layout.
+     *
      * The fact that new layout is NULL means that we're in destructor, so no
      * signals should be emitted. */
     if(m_currentLayout == NULL)
@@ -225,13 +228,13 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
 }
 
 QnWorkbenchItem *QnWorkbench::item(Qn::ItemRole role) {
-    Q_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
+    NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
 
     return m_itemByRole[role];
 }
 
 void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
-    Q_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
+    NX_ASSERT(role >= 0 && role < Qn::ItemRoleCount);
 
     if(m_itemByRole[role] == item)
         return;
@@ -287,7 +290,7 @@ void QnWorkbench::update(const QnWorkbenchState &state) {
 
         QnWorkbenchLayout *layout = new QnWorkbenchLayout(resource, this);
         addLayout(layout);
-        if(i == state.currentLayoutIndex)            
+        if(i == state.currentLayoutIndex)
             setCurrentLayout(layout);
     }
 

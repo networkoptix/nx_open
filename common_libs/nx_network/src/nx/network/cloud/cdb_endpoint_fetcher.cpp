@@ -8,11 +8,14 @@
 #include <QtCore/QBuffer>
 
 #include <common/common_globals.h>
+
+#include <nx/network/app_info.h>
+
 #include <nx/utils/log/log.h>
 #include <utils/common/guard.h>
 
 #include "cloud_modules_xml_sax_handler.h"
-#include "version.h"
+
 
 namespace nx {
 namespace network {
@@ -66,7 +69,7 @@ void CloudModuleEndPointFetcher::get(
             onHttpClientDone(std::move(client));
         },
         Qt::DirectConnection);
-    m_httpClient->doGet(QUrl(lit(QN_CLOUD_MODULES_XML)));
+    m_httpClient->doGet(QUrl(nx::network::AppInfo::cloudModulesXmlUrl()));
 
     //if async resolve is already started, should wait for its completion
     m_resolveHandlers.emplace_back(std::move(handler));
@@ -122,7 +125,7 @@ bool CloudModuleEndPointFetcher::parseCloudXml(
     if (!reader.parse(&input))
     {
         NX_LOG(lit("Failed to parse cloud_modules.xml from %1. %2")
-               .arg(lit(QN_CLOUD_MODULES_XML)).arg(xmlHandler.errorString()),
+               .arg(nx::network::AppInfo::cloudModulesXmlUrl()).arg(xmlHandler.errorString()),
                cl_logERROR);
         return false;
     }
@@ -150,7 +153,7 @@ void CloudModuleEndPointFetcher::endpointSelected(
         return signalWaitingHandlers(result, std::move(selectedEndpoint));
 
     QnMutexLocker lk(&m_mutex);
-    Q_ASSERT(!m_endpoint);
+    NX_ASSERT(!m_endpoint);
     m_endpoint = selectedEndpoint;
     lk.unlock();
     signalWaitingHandlers(result, selectedEndpoint);

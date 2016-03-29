@@ -15,7 +15,7 @@ class QnLayoutResource: public QnResource {
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource(const QnResourceTypePool* resTypePool);
+    QnLayoutResource();
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;

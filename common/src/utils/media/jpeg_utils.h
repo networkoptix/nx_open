@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include <functional>
+
 #include <QtCore/QString>
 
 

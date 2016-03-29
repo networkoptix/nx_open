@@ -17,12 +17,27 @@
 class NX_NETWORK_API SocketFactory
 {
 public:
+    enum class SocketType
+    {
+        cloud,    ///< production mode
+        tcp,        ///< \class TcpSocket and \class TcpServerSocket
+        udt,        ///< \class UdtSocket and \class UdtServerSocket
+    };
+
     enum class NatTraversalType
     {
         nttAuto,
         nttEnabled,
         nttDisabled
     };
+
+    typedef std::function<std::unique_ptr< AbstractStreamSocket >(
+        bool /*sslRequired*/,
+        NatTraversalType /*natTraversalRequired*/)> CreateStreamSocketFuncType;
+    typedef std::function<std::unique_ptr< AbstractStreamServerSocket >(
+        bool /*sslRequired*/,
+        NatTraversalType /*natTraversalRequired*/)> CreateStreamServerSocketFuncType;
+
 
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
 
@@ -37,17 +52,20 @@ public:
         bool sslRequired = false,
         NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
 
-    enum class SocketType
-    {
-        Default,    ///< production mode
-        Tcp,        ///< \class TcpSocket and \class TcpServerSocket
-        Udt,        ///< \class UdtSocket and \class UdtServerSocket
-    };
+    static QString toString( SocketType type );
+    static SocketType stringToSocketType( QString type );
 
     /*! Enforces factory to produce certain sockets
      *  \note DEBUG use ONLY! */
     static void enforceStreamSocketType( SocketType type );
+    static void enforceStreamSocketType( QString type );
     static bool isStreamSocketTypeEnforced();
+
+    /** Sets new factory. Returns old one */
+    static CreateStreamSocketFuncType 
+        setCreateStreamSocketFunc(CreateStreamSocketFuncType newFactoryFunc);
+    static CreateStreamServerSocketFuncType
+        setCreateStreamServerSocketFunc(CreateStreamServerSocketFuncType newFactoryFunc);
 
 private:
     SocketFactory();

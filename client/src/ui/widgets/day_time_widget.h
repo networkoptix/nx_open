@@ -1,7 +1,7 @@
 #ifndef QN_DAY_TIME_WIDGET_H
 #define QN_DAY_TIME_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <recording/time_period_storage.h>
 

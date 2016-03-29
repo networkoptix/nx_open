@@ -80,7 +80,7 @@ namespace ec2
                 return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeResource);
             }
             else {
-                Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
+                NX_ASSERT(0, "Not implemented", Q_FUNC_INFO);
             }
         }
 
@@ -147,7 +147,7 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::addLicenses);
+            NX_ASSERT(tran.command == ApiCommand::addLicenses);
             return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
         }
 
@@ -159,7 +159,7 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::saveLayouts);
+            NX_ASSERT(tran.command == ApiCommand::saveLayouts);
             return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
         }
 
@@ -171,7 +171,7 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::saveCameras);
+            NX_ASSERT(tran.command == ApiCommand::saveCameras);
             return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
@@ -183,7 +183,7 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::saveStorages);
+            NX_ASSERT(tran.command == ApiCommand::saveStorages);
             return processMultiUpdateAsync<ApiStorageDataList, ApiStorageData>(tran, handler, ApiCommand::saveStorage);
         }
 
@@ -195,7 +195,7 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiCameraAttributesDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
+            NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
             return processMultiUpdateAsync<ApiCameraAttributesDataList, ApiCameraAttributesData>(tran, handler, ApiCommand::saveCameraUserAttributes);
         }
 
@@ -207,7 +207,7 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+            NX_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
             return processMultiUpdateAsync<ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(tran, handler, ApiCommand::saveServerUserAttributes);
         }
 
@@ -224,7 +224,7 @@ namespace ec2
             else if(tran.command == ApiCommand::removeResourceParams)
                 return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::removeResourceParam);
             else
-                Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
+                NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
         }
 
         //!Asynchronously fetches data from DB
@@ -363,12 +363,12 @@ namespace ec2
             std::list<std::function<void()>>* const transactionsToSend,
             int /*dummy*/ = 0 )
         {
-            Q_ASSERT( ApiCommand::isPersistent(tran.command) );
+            NX_ASSERT( ApiCommand::isPersistent(tran.command) );
 
             transactionLog->fillPersistentInfo(tran);
             QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
             ErrorCode errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
-            assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
+            NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
 

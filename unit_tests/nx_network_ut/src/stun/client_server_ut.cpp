@@ -33,7 +33,7 @@ protected:
     };
 };
 
-const AsyncClient::Timeouts CLIENT_TIMEOUTS = { 100, 100, 500 };
+const AbstractAsyncClient::Timeouts CLIENT_TIMEOUTS = { 1000, 1000, 5000 };
 
 class StunClientServerTest
         : public ::testing::Test
@@ -54,7 +54,7 @@ protected:
     SystemError::ErrorCode sendTestRequestSync()
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         client->sendRequest( std::move( request ), waiter.pusher() );
         return waiter.pop().first;
     }
@@ -62,13 +62,15 @@ protected:
     void startServer()
     {
         server = std::make_unique< TestServer >(dispatcher);
-        EXPECT_TRUE( server->bind( address ) );
-        EXPECT_TRUE( server->listen() );
+        EXPECT_TRUE( server->bind( address ) ) 
+            << SystemError::getLastOSErrorText().toStdString();
+        EXPECT_TRUE( server->listen() ) 
+            << SystemError::getLastOSErrorText().toStdString();
     }
 
     SystemError::ErrorCode sendIndicationSync( int method )
     {
-        SyncQueue< SystemError::ErrorCode > sendWaiter;
+        TestSyncQueue< SystemError::ErrorCode > sendWaiter;
         const auto connection = server->connections.front();
         connection->sendMessage(
             Message( Header( MessageClass::indication, method ) ),
@@ -79,7 +81,7 @@ protected:
 
     const SocketAddress address;
     nx::stun::MessageDispatcher dispatcher;
-    std::shared_ptr< AsyncClient > client;
+    std::shared_ptr< AbstractAsyncClient > client;
     std::unique_ptr< TestServer > server;
 };
 
@@ -110,16 +112,22 @@ TEST_F( StunClientServerTest, Connectivity )
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
-    client->connect( address );
+    const auto t1 = std::chrono::steady_clock::now();
+
     startServer();
+    client->connect(address);
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
+        const auto timePassed = 
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - t1);
         ASSERT_EQ( result.first, SystemError::noError );
+
 
         const auto& response = result.second;
         ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
@@ -133,7 +141,7 @@ TEST_F( StunClientServerTest, RequestResponse )
     {
         Message request( Header( MessageClass::request, 0xFFF /* unknown */ ) );
 
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -154,7 +162,7 @@ TEST_F( StunClientServerTest, Indications )
 {
     startServer();
 
-    SyncQueue< Message > recvWaiter;
+    TestSyncQueue< Message > recvWaiter;
     client->connect( address );
     client->setIndicationHandler( 0xAB, recvWaiter.pusher() );
     client->setIndicationHandler( 0xCD, recvWaiter.pusher() );
@@ -174,7 +182,7 @@ TEST_F( StunClientServerTest, Indications )
 struct TestUser
     : public AsyncClientUser
 {
-    TestUser( std::shared_ptr<AsyncClient> client )
+    TestUser( std::shared_ptr<AbstractAsyncClient> client )
         : AsyncClientUser(std::move(client)) {}
 
     void request()
@@ -183,7 +191,7 @@ struct TestUser
         sendRequest( std::move( request ), responses.pusher() );
     }
 
-    SyncMultiQueue< SystemError::ErrorCode, Message > responses;
+    TestSyncMultiQueue< SystemError::ErrorCode, Message > responses;
 };
 
 static const size_t USER_COUNT = 3;

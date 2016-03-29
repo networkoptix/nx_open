@@ -1,5 +1,7 @@
 #include "user_permissions.h"
 
+#include <utils/common/model_functions.h>
+
 Qn::Permissions Qn::undeprecate(Permissions permissions)
 {
     Qn::Permissions result = permissions;

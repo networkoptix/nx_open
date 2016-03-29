@@ -1,17 +1,19 @@
 #include "unlink_from_cloud_dialog.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/param.h>
+#include <api/global_settings.h>
+#include <api/server_rest_connection.h>
+
 #include <cdb/connection.h>
 
-#include <utils/common/delayed.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 
 #include <client/client_settings.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+#include <utils/common/delayed.h>
 
 using namespace nx::cdb;
 
@@ -42,8 +44,8 @@ QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent)
 {
     setWindowTitle(tr("Unlink from cloud"));
     setText(tr("You are going to disconnect this system from the cloud account."));
-    setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    setDefaultButton(QMessageBox::Ok);
+    setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    setDefaultButton(QDialogButtonBox::Ok);
     //TODO: #dklychkov set help topic
 }
 
@@ -51,20 +53,17 @@ QnUnlinkFromCloudDialog::~QnUnlinkFromCloudDialog()
 {
 }
 
-void QnUnlinkFromCloudDialog::done(int result)
+void QnUnlinkFromCloudDialog::accept()
 {
-    if (result == QMessageBox::Ok)
-    {
-        Q_D(QnUnlinkFromCloudDialog);
+    Q_D(QnUnlinkFromCloudDialog);
 
-        if (!d->unlinkedSuccessfully)
-        {
-            d->unbindSystem();
-            return;
-        }
+    if (!d->unlinkedSuccessfully)
+    {
+        d->unbindSystem();
+        return;
     }
 
-    base_type::done(result);
+    base_type::accept();
 }
 
 QnUnlinkFromCloudDialogPrivate::QnUnlinkFromCloudDialogPrivate(QnUnlinkFromCloudDialog *parent)
@@ -92,23 +91,21 @@ void QnUnlinkFromCloudDialogPrivate::lockUi(bool lock)
 
     const bool enabled = !lock;
 
-    q->button(QMessageBox::Ok)->setEnabled(enabled);
+    q->button(QDialogButtonBox::Ok)->setEnabled(enabled);
 }
 
 void QnUnlinkFromCloudDialogPrivate::unbindSystem()
 {
     lockUi(true);
 
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-
-    std::string systemId = adminUser->getProperty(Qn::CLOUD_SYSTEM_ID).toStdString();
+    std::string systemId = qnGlobalSettings->cloudSystemID().toStdString();
 
     cloudConnection = connectionFactory->createConnection(
             systemId,
-            adminUser->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY).toStdString());
+            qnGlobalSettings->cloudAuthKey().toStdString());
 
     cloudConnection->systemManager()->unbindSystem(
-            qnResPool->getAdministrator()->getProperty(Qn::CLOUD_SYSTEM_ID).toStdString(),
+            systemId,
             [this](api::ResultCode result)
     {
         Q_Q(QnUnlinkFromCloudDialog);
@@ -126,11 +123,11 @@ void QnUnlinkFromCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnUnlinkFromCloudDialog);
 
-    QnMessageBox messageBox(QMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             tr("Error"),
                             tr("Can not unlink the system from the cloud"),
-                            QMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q);
 
     if (!message.isEmpty())
@@ -149,37 +146,27 @@ void QnUnlinkFromCloudDialogPrivate::at_unbindFinished(api::ResultCode result)
         return;
     }
 
-    //TODO #dklychkov removing properties from settings
-
     Q_Q(QnUnlinkFromCloudDialog);
-
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
+    auto handleReply = [this, q](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
-        q->reject();
+        Q_UNUSED(handleId);
+        if (success && reply.error == QnRestResult::NoError)
+        {
+            unlinkedSuccessfully = true;
+            q->accept();
+        }
+        else
+        {
+            showFailure(reply.errorString);
+        }
+    };
+
+    if (!qnCommon->currentServer())
         return;
-    }
 
-    admin->setProperty(Qn::CLOUD_SYSTEM_ID, QVariant());
-    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, QVariant());
+    auto serverConnection = qnCommon->currentServer()->restConnection();
+    if (!serverConnection)
+        return;
 
-    int requestId = propertyDictionary->saveParamsAsync(admin->getId());
-    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this,
-            [this, requestId](int reqId, ec2::ErrorCode errorCode)
-            {
-                if (reqId != requestId)
-                    return;
-
-                disconnect(propertyDictionary, nullptr, this, nullptr);
-
-                if (errorCode != ec2::ErrorCode::ok)
-                {
-                    showFailure(tr("Can not remove settings from the database."));
-                    return;
-                }
-
-                unlinkedSuccessfully = true;
-                Q_Q(QnUnlinkFromCloudDialog);
-                q->accept();
-            });
+    serverConnection->resetCloudSystemCredentials(handleReply, q->thread());
 }

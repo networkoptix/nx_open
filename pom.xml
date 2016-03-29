@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -29,9 +29,17 @@
     <properties>
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
+        <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
+        <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
+        <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
+        <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
+        <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
+        <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
+        <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
@@ -55,6 +63,14 @@
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
+        <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
+        <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
+        <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
+        <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
+        <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>
+        <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
+        <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
+        <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -62,8 +78,9 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>        
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+        <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${product.name} Launcher</applauncher.name>
         <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
@@ -87,7 +104,7 @@
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
-        <build.configuration>release</build.configuration>
+        <build.configuration>debug</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <box>none</box>
@@ -99,14 +116,11 @@
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile></newmobile>
-        <ffmpeg.libs></ffmpeg.libs>
-        <!-- compile.option1. See profile no-webkit -->
-        <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1>-webkit</compile.option1>
+        <compile.option1></compile.option1>
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
@@ -114,25 +128,42 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
-        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
+        <rdep.target>${platform}-${arch}</rdep.target>
+        <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
+         <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
+        <qt.debug></qt.debug>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
+        <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
-        <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.2.1</qt.version>
-        <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
+        <qt.version>5.6.0</qt.version>
+        <ffmpeg.version>0.11.4</ffmpeg.version>
+        <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
-        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
-        <sigar.version>1.7-SNAPSHOT</sigar.version>
-        <festival.version>2.1-SNAPSHOT</festival.version>
+        <sigar.version>1.7</sigar.version>
+        <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
-        <bespin.version>1.2-SNAPSHOT</bespin.version>
-        <quazip.version>0.6.2-SNAPSHOT</quazip.version>
+        <quazip.version>0.7.1</quazip.version>
+
+        <qt.libs/>
+        <global.libs/>
+        <windows.oslibs/>
+        <linux.oslibs/>
+        <mac.oslibs/>
+        <android.oslibs/>
+        <ios.oslibs/>
+
+        <global.defines/>
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>
+        <android.defines/>
+        <ios.defines/>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
@@ -144,32 +175,28 @@
         <customization.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
-        <qtlib1>Core</qtlib1>
-        <qtlib2>Network</qtlib2>
-        <qtlib3>Xml</qtlib3>
-        <qtlib4>Concurrent</qtlib4>
-        <qtlib5>Sql</qtlib5>
-        <qtlib6>Multimedia</qtlib6>
-        <qtlib7>OpenGL</qtlib7>
-        <qtlib8>Widgets</qtlib8>
-        <qtlib9>Gui</qtlib9>
-        <qtlib10>X11Extras</qtlib10>
-        <qtlib11>PrintSupport</qtlib11>
-        <qtlib12>WebKit</qtlib12>
-        <qtlib13>WebKitWidgets</qtlib13>
-        <qtlib14>MultimediaWidgets</qtlib14>
-        <qtlib15>Quick</qtlib15>
-        <qtlib16>Qml</qtlib16>
-        <qtlib17>Positioning</qtlib17>
-        <qtlib18>Sensors</qtlib18>
-        <!-- qtlib19 is replaced with DBus in the client profile -->
-        <qtlib19></qtlib19>
-        <qtlib20>XmlPatterns</qtlib20>
+        <qtlibs>
+            Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
+            PrintSupport, MultimediaWidgets, Quick, MultimediaQuick_p, Qml,
+            XmlPatterns, XcbQpa
+        </qtlibs>
+        <additional.qtlibs/>
 
         <!--QT plugins used-->
-        <qtplugin1>imageformats</qtplugin1>
-        <qtplugin2>platforms</qtplugin2>
-        <qtplugin3/>
+        <qtplugins>
+            imageformats, platforms, xcbglintegrations
+        </qtplugins>
+        <additional.qtplugins/>
+
+        <!-- List of commonly used RDep packages -->
+        <rdep.packages/>
+        <rdep.windows.packages/>
+        <rdep.linux.packages/>
+        <rdep.mac.packages/>
+        <rdep.android.packages/>
+        <rdep.ios.packages/>
+        
+        
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -341,7 +368,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
-                <module>common_libs/nx_email</module>
+                <!--<module>common_libs/nx_email</module>-->
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
                 <module>common_libs/udt</module>
@@ -361,14 +388,15 @@
             </activation>
             <modules>
                 <module>unit_tests/common_ut</module>
+                <module>unit_tests/cloud_connectivity_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
-                <module>unit_tests/image_library_plugin_ut</module>
+                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <module>unit_tests/mediaserver_core_ut</module>
                 <module>unit_tests/nx_network_ut</module>
-                <module>unit_tests/traytool_ut</module>
+                <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
-       <profile>
+        <profile>
             <id>nomac-nomobile</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -407,15 +435,17 @@
                 </property>
             </activation>
             <properties>
-                <qtlib19>DBus</qtlib19>
+                <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
+                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
-                <!--<module>applauncher</module>-->
-                <module>client</module>
                 <module>client.core</module>
+                <module>client</module>
                 <module>client.bin</module>
+                <module>common_libs/nx_audio</module>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
             </modules>
@@ -427,36 +457,22 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <modules>
-                <module>traytool</module>
-                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
-                <module>client.core</module>
-                <module>nxtool</module>
-                <module>client.bin</module>
-                <module>wixsetup</module>
-            </modules>
             <properties>
-                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}</qt.path>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
+                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
-                <buildenv.script>get_buildenv.bat</buildenv.script>
+                <buildenv.script>get_buildenv_2.6.bat</buildenv.script>
                 <platform>windows</platform>
-                <box>windows</box>
-                <compiler>msvc2012u3</compiler>
+                <box>none</box>
+                <compiler>msvc2015u1</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
-                <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
-                <!-- <qt.spec>win32-msvc2012</qt.spec>
-                <PlatformToolSet>v110</PlatformToolSet>
-                <modification>win78</modification> -->
-                <qt.spec>win32-msvc2012xp</qt.spec>
-                <PlatformToolSet>v110_xp</PlatformToolSet>
+                <qt.spec>win32-msvc2015</qt.spec>
+                <PlatformToolSet>v140_xp</PlatformToolSet>
+                <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
 
                 <profile.classifier>${platform}</profile.classifier>
@@ -464,8 +480,25 @@
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <machine.type>X64</machine.type>
             </properties>
         </profile>
+        <profile>
+            <id>windows-x86</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+            </activation>
+            <properties>
+                <machine.type>X86</machine.type>
+            </properties>
+        </profile>        
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -478,13 +511,11 @@
                 </property>
             </activation>
             <modules>
+                <module>applauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
-                <module>client.core</module>
-                <module>nxtool</module>
-                <module>client.bin</module>
+                <!--<module>nxtool</module>-->
                 <module>wixsetup</module>
             </modules>
         </profile>
@@ -551,6 +582,7 @@
                 <unix>true</unix>
                 <windows>false</windows>
                 <script.extension>sh</script.extension>
+                <festival.version>2.1</festival.version>
             </properties>
         </profile>
         <profile>
@@ -564,7 +596,7 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
+                <additional.qtplugins>audio, platforminputcontexts</additional.qtplugins>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -580,7 +612,6 @@
             </activation>
             <properties>
                 <additional.compiler>clang</additional.compiler>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -649,7 +680,6 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
@@ -672,13 +702,14 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.0j</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
+                <rdep.target>isd</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -700,12 +731,13 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1f</openssl.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
+                <rdep.target>isd_s2</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -729,9 +761,10 @@
             <properties>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>rpi</modification>
+                <rdep.target>rpi</rdep.target>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -754,12 +787,14 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bpi</modification>
+                <rdep.target>bpi</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -780,13 +815,13 @@
                 </property>
             </activation>
             <properties>
-                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
-                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+                <rdep.target>bpi</rdep.target>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -866,18 +901,6 @@
             </properties>
         </profile>
         <profile>
-            <id>no-webkit</id>
-            <activation>
-                <property>
-                    <name>webkit</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <properties>
-                <compile.option1/>
-            </properties>
-        </profile>
-        <profile>
             <id>angle</id>
             <activation>
                 <os>
@@ -904,11 +927,13 @@
                 </property>
             </activation>
             <properties>
-                <qt.version>5.5.1-SNAPSHOT</qt.version>
                 <compile.options/>
+                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>client.core</module>
+                <module>common_libs/nx_media</module>
+                <module>common_libs/nx_audio</module>
                 <module>mobile_client</module>
             </modules>
         </profile>
@@ -931,7 +956,6 @@
                 <platform>android</platform>
                 <toolchain.version>android</toolchain.version>
                 <qt.spec>android-g++</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>gcc</compiler>
                 <additional.compiler>gcc</additional.compiler>
@@ -940,8 +964,10 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
-                <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.2d</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
+                <rdep.target>android-${arch}</rdep.target>
             </properties>
         </profile>
         <profile>
@@ -957,7 +983,6 @@
                 </file>
             </activation>
             <properties>
-                <qt.classifier>${platform}-${arch}-release</qt.classifier>
                 <additional.compiler>${compiler}</additional.compiler>
             </properties>
         </profile>
@@ -983,14 +1008,30 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec>macx-ios-clang</qt.spec>
-                <qt.classifier>${platform}-${arch}</qt.classifier>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <openssl.version>1.0.1i-SNAPSHOT</openssl.version>
+                <openssl.version>1.0.1i</openssl.version>
                 <compile.option1/>
+                <rdep.target>ios</rdep.target>
             </properties>
         </profile>
+        <profile>
+            <id>webadmin</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>webadmin</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <modules>
+                <module>webadmin</module>
+            </modules>            
+        </profile>        
     </profiles>
 </project>

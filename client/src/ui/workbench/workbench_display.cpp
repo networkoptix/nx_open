@@ -54,6 +54,7 @@
 #include <ui/graphics/instruments/tool_tip_instrument.h>
 #include <ui/graphics/instruments/widget_layout_instrument.h>
 
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -69,8 +70,6 @@
 #include <ui/graphics/items/grid/grid_raised_cone_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
-
-#include <ui/graphics/view/gradient_background_painter.h>
 
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/gl_widget_workaround.h>
@@ -269,8 +268,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
-
-    connect(action(Qn::ToggleBackgroundAnimationAction),   &QAction::toggled,  this,   &QnWorkbenchDisplay::toggleBackgroundAnimation);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
@@ -321,7 +318,7 @@ void QnWorkbenchDisplay::setView(QnGraphicsView *view) {
 }
 
 void QnWorkbenchDisplay::deinitSceneView() {
-    assert(m_scene && m_view);
+    NX_ASSERT(m_scene && m_view);
 
     /* Deinit view. */
     m_instrumentManager->unregisterView(m_view);
@@ -333,8 +330,8 @@ void QnWorkbenchDisplay::deinitSceneView() {
     m_instrumentManager->unregisterScene(m_scene);
 
     disconnect(m_scene, NULL, this, NULL);
-    disconnect(m_scene, NULL, context()->action(Qn::SelectionChangeAction), NULL);
-    disconnect(action(Qn::SelectionChangeAction), NULL, this, NULL);
+    disconnect(m_scene, NULL, context()->action(QnActions::SelectionChangeAction), NULL);
+    disconnect(action(QnActions::SelectionChangeAction), NULL, this, NULL);
 
     /* Clear curtain. */
     if(!m_curtainItem.isNull()) {
@@ -346,13 +343,6 @@ void QnWorkbenchDisplay::deinitSceneView() {
     /* Clear grid. */
     if(!m_gridItem.isNull())
         delete m_gridItem.data();
-
-    /* Clear background painter. */
-    if (!m_backgroundPainter.isNull()) {
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
-        delete m_backgroundPainter.data();
-    }
-
 
     /* Deinit workbench. */
     disconnect(workbench(), NULL, this, NULL);
@@ -372,18 +362,18 @@ QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags wind
 }
 
 void QnWorkbenchDisplay::initSceneView() {
-    assert(m_scene && m_view);
+    NX_ASSERT(m_scene && m_view);
 
     /* Init scene. */
     m_instrumentManager->registerScene(m_scene);
 
     /* Note that selection often changes there and back, and we don't want such changes to
      * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
-    connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
+    connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(QnActions::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged()));
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
 
-    connect(action(Qn::SelectionChangeAction), &QAction::triggered,                 this,                   &QnWorkbenchDisplay::updateSelectionFromTree);
+    connect(action(QnActions::SelectionChangeAction), &QAction::triggered,                 this,                   &QnWorkbenchDisplay::updateSelectionFromTree);
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -444,7 +434,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(Qt::black);
+    m_curtainItem.data()->setColor(Qt::green);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -456,20 +446,14 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-	if (canShowLayoutBackground()) {
+	if (canShowLayoutBackground())
+    {
 		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
 		m_scene->addItem(gridBackgroundItem());
 		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
 		gridBackgroundItem()->setOpacity(0.0);
 		gridBackgroundItem()->setMapper(workbench()->mapper());
 	}
-
-    /* Set up background */
-    if (!(m_lightMode & Qn::LightModeNoSceneBackground)) {
-        /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
-        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->background().animationPeriodSec, NULL, context());
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    }
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -488,7 +472,7 @@ void QnWorkbenchDisplay::initSceneView() {
 }
 
 void QnWorkbenchDisplay::initBoundingInstrument() {
-    assert(m_view != NULL);
+    NX_ASSERT(m_view != NULL);
 
     m_boundingInstrument->setSizeEnforced(m_view, true);
     m_boundingInstrument->setPositionEnforced(m_view, true);
@@ -511,15 +495,6 @@ QnCurtainAnimator* QnWorkbenchDisplay::curtainAnimator() const {
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
 }
-
-
-void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
-    if (!m_scene || !m_view || !m_backgroundPainter)
-        return;
-
-    m_backgroundPainter->setEnabled(enabled);
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: item properties
@@ -592,7 +567,7 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
 }
 
 void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
-    Q_ASSERT_X(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
+    NX_ASSERT(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
     QnGridRaisedConeItem* item = raisedConeItem(widget);
     if (item->scene() == m_scene)
         return;
@@ -1028,7 +1003,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     QnResourceWidget *widget = this->widget(item);
     if(widget == NULL) {
-        assert(!destroyItem);
+        NX_ASSERT(!destroyItem);
         return false; /* The widget wasn't created. */
     }
 
@@ -1220,7 +1195,7 @@ Qn::ItemLayer QnWorkbenchDisplay::shadowLayer(Qn::ItemLayer itemLayer) const {
 }
 
 Qn::ItemLayer QnWorkbenchDisplay::synchronizedLayer(QnResourceWidget *widget) const {
-    assert(widget != NULL);
+    NX_ASSERT(widget != NULL);
 
     if(widget == m_widgetByRole[Qn::ZoomedRole]) {
         return Qn::ZoomedLayer;
@@ -1734,7 +1709,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
     }
 
-    action(Qn::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
+    action(QnActions::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
@@ -1767,7 +1742,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
         int checkedButtons = resourceWidget->item()->data<int>(Qn::ItemCheckedButtonsRole, -1);
         if(checkedButtons != -1)
-            resourceWidget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
+            resourceWidget->setCheckedButtons(checkedButtons);
 
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
@@ -1810,7 +1785,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(thumbnailed)
-            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(QnMediaResourceWidget::PtzButton));
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(Qn::PtzButton));
     }
 
     QVector<QnUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid> >();

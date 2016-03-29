@@ -4,19 +4,21 @@
 
 #include <nx/utils/log/log.h>
 
+#include <api/common_message_processor.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/webpage_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 
-#include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
-#include "nx_ec/data/api_camera_attributes_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
+
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+
 #include "media_server/serverutil.h"
 #include "utils/common/util.h"
 #include "core/resource/camera_user_attribute_pool.h"
@@ -56,15 +58,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QString uniqueId = camera->getUniqueId();
         camera->setId(camera->uniqueIdToId(uniqueId));
         addNewCamera(camera);
-    }
-
-    for (const QnWebPageResourcePtr& webPage: resources.filtered<QnWebPageResource>()) {
-        /* Check if this page already exists in the pool. */
-        if (qnResPool->getResourceByUrl(webPage->getUrl()).dynamicCast<QnWebPageResource>())
-            continue;
-
-        webPage->setParentId(m_serverId);
-        addNewWebPageInternal(webPage);
     }
 
 }
@@ -114,7 +107,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     if (mutex->checkUserData())
     {
         // add camera if and only if it absent on the other server
-        Q_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || qnResPool->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
+        NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || qnResPool->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
         addNewCameraInternal(data.cameraResource);
     }
 
@@ -138,31 +131,20 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
-
-void QnAppserverResourceProcessor::addNewWebPageInternal(const QnWebPageResourcePtr &webPage)
-{
-    Q_ASSERT(!webPage->getId().isNull());
-    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-
-    connect->getWebPageManager()->save(webPage, this, [] (int handle, ec2::ErrorCode errorCode, const QnWebPageResourceList &webPages) {
-        QN_UNUSED(handle, webPages);
-        if (errorCode != ec2::ErrorCode::ok)
-            NX_LOG( QString::fromLatin1("Can't add web page to ec2 (save query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-    });
-}
-
-
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
         return;   //ignoring newly discovered camera
 
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
-    Q_ASSERT(!cameraResource->getId().isNull());
-    QnVirtualCameraResourceList cameras;
-    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+    NX_ASSERT(!cameraResource->getId().isNull());
 
-    ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+
+    ec2::ApiCameraData apiCamera;
+    fromResourceToApi(cameraResource, apiCamera);
+
+    ec2::ErrorCode errorCode = connection->getCameraManager()->addCameraSync(apiCamera);
     if( errorCode != ec2::ErrorCode::ok ) {
         NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
         return;
@@ -185,7 +167,10 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         userAttrCopy->cameraID = cameraResource->getId();
 
-        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributesList() << userAttrCopy);
+        ec2::ApiCameraAttributesDataList attrsList;
+        fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
+
+        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );

@@ -64,12 +64,12 @@ namespace {
 // -------------------------------------------------------------------------- //
 // PtzInstrument
 // -------------------------------------------------------------------------- //
-PtzInstrument::PtzInstrument(QObject *parent): 
+PtzInstrument::PtzInstrument(QObject *parent):
     base_type(
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease),
         parent
     ),
     QnWorkbenchContextAware(parent),
@@ -144,7 +144,8 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->focusAutoButton(), &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_focusAutoButton_clicked);
     connect(overlay->modeButton(),      &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_modeButton_clicked);
 
-    widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, QnResourceWidget::TopControlsLayer);
+    widget->addOverlayWidget(overlay, detail::OverlayParams(
+        QnResourceWidget::Invisible, true, false, QnResourceWidget::TopControlsLayer));
 
     return overlay;
 }
@@ -176,7 +177,7 @@ void PtzInstrument::ensureElementsWidget() {
 
     m_elementsWidget = new PtzElementsWidget();
     display()->setLayer(elementsWidget(), Qn::EffectsLayer);
-    
+
     if(scene())
         scene()->addItem(elementsWidget());
 }
@@ -207,7 +208,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
         overlayWidget->focusInButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
         overlayWidget->focusOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
         overlayWidget->focusAutoButton()->setVisible(data.traits.contains(Qn::ManualAutoFocusPtzTrait));
-        
+
         if (isFisheye) {
             int panoAngle = widget->item()
                     ? 90 * widget->item()->dewarpingParams().panoFactor
@@ -221,7 +222,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
 
 void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     PtzData &data = m_dataByWidget[widget];
-    
+
     Qn::PtzCapabilities capabilities = widget->ptzController()->getCapabilities();
     if(data.capabilities == capabilities)
         return;
@@ -268,7 +269,7 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
         return;
 
     instant = instant ||
-        (qFuzzyIsNull(data.currentSpeed) ^ qFuzzyIsNull(data.requestedSpeed)) || 
+        (qFuzzyIsNull(data.currentSpeed) ^ qFuzzyIsNull(data.requestedSpeed)) ||
         (data.currentSpeed - data.requestedSpeed).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
 
     if(instant) {
@@ -344,8 +345,8 @@ void PtzInstrument::processPtzDoubleClick() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void PtzInstrument::installedNotify() {
-    assert(selectionItem() == NULL);
-    assert(elementsWidget() == NULL);
+    NX_ASSERT(selectionItem() == NULL);
+    NX_ASSERT(elementsWidget() == NULL);
 
     base_type::installedNotify();
 }
@@ -376,10 +377,10 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             connect(widget, &QnMediaResourceWidget::fisheyeChanged, this, &PtzInstrument::updateOverlayWidget);
 
             PtzData &data = m_dataByWidget[widget];
-            data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this, 
-                [=](Qn::PtzDataFields fields) { 
+            data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this,
+                [=](Qn::PtzDataFields fields) {
                     if(fields & Qn::CapabilitiesPtzField)
-                        updateCapabilities(widget); 
+                        updateCapabilities(widget);
                     if(fields & Qn::AuxilaryTraitsPtzField)
                         updateTraits(widget);
                 }
@@ -405,7 +406,7 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
 
     PtzData &data = m_dataByWidget[object];
     disconnect(data.capabilitiesConnection);
-    
+
     m_dataByWidget.remove(object);
 }
 
@@ -414,7 +415,7 @@ void PtzInstrument::timerEvent(QTimerEvent *event) {
         m_clickTimer.stop();
 
         processPtzClick(m_clickPos);
-    } else if(event->timerId() == m_movementTimer.timerId()) { 
+    } else if(event->timerId() == m_movementTimer.timerId()) {
         if(!target())
             return;
 
@@ -427,7 +428,7 @@ void PtzInstrument::timerEvent(QTimerEvent *event) {
 
 bool PtzInstrument::animationEvent(AnimationEvent *event) {
     qreal dt = event->deltaTime() / 1000.0;
-    
+
     for(int i = m_activeAnimations.size() - 1; i >= 0; i--) {
         SplashItemAnimation &animation = m_activeAnimations[i];
 
@@ -452,7 +453,7 @@ bool PtzInstrument::animationEvent(AnimationEvent *event) {
         animation.item->setOpacity(opacity);
         animation.item->setRect(rect);
     }
-    
+
     return false;
 }
 
@@ -468,7 +469,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
 
     if(event->button() != Qt::LeftButton) {
         m_skipNextAction = true; /* Interrupted by RMB? Do nothing. */
-        reset(); 
+        reset();
         return false;
     }
 
@@ -511,7 +512,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
 
     dragProcessor()->mousePressEvent(target, event);
-    
+
     event->accept();
     return false;
 }
@@ -593,7 +594,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
         ptzMove(target(), QVector3D(speed));
         break;
     }
-    case ViewportMovement: 
+    case ViewportMovement:
         ensureSelectionItem();
         selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()), target()->rect());
         break;
@@ -613,13 +614,13 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
         QVector3D position;
         target()->ptzController()->getPosition(Qn::LogicalPtzCoordinateSpace, &position);
-            
+
         qreal speed = 0.5 * position.z();
         QVector3D positionDelta(shift.x() * speed, shift.y() * speed, 0.0);
         target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace, position + positionDelta, 2.0); /* 2.0 means instant movement. */
 
         /* Calling setPos on each move event causes serious lags which I so far
-         * was unable to explain. This is worked around by invoking it not that frequently. 
+         * was unable to explain. This is worked around by invoking it not that frequently.
          * Note that we don't account for screen-relative position. */
         if(!m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128) {
             m_pendingMouseReturn = true;
@@ -736,7 +737,7 @@ void PtzInstrument::at_zoomOutButton_released() {
 
 void PtzInstrument::at_zoomButton_activated(qreal speed) {
     PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
-    
+
     if(QnMediaResourceWidget *widget = button->target())
         ptzMove(widget, QVector3D(0.0, 0.0, speed), true);
 }

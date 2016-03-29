@@ -5,7 +5,6 @@
 #include <QtCore/QScopedPointer>
 
 #include <QtWidgets/QStyledItemDelegate>
-#include <QtWidgets/QMessageBox>
 
 #include <common/common_globals.h>
 #include <client/client_settings.h>
@@ -25,7 +24,6 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/widgets/ptz_tour_widget.h>
-#include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
@@ -374,7 +372,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         return;
 
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             this,
             tr("Could not get position from camera."),
             tr("An error has occurred while trying to get the current position from camera %1.").arg(m_resource->getName()) + L'\n'
@@ -396,7 +394,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
         return;
 
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             this,
             tr("Could not set position for camera."),
             tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
@@ -437,7 +435,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
         return;
 
     if(m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
             this,
             tr("Could not set position for camera."),
             tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
@@ -490,22 +488,24 @@ void QnPtzManageDialog::at_deleteButton_clicked() {
         }
 
         if (presetIsInUse) {
-            bool ignorePresetIsInUse = qnSettings->isPtzPresetInUseWarningDisabled();
-            if (!ignorePresetIsInUse) {
-                QDialogButtonBox::StandardButton button = QnCheckableMessageBox::warning(
-                    this,
-                    tr("Remove Preset"),
-                    tr("This preset is used in some tours.") + L'\n'
-                  + tr("These tours will become invalid if you remove it."),
-                    tr("Do not show again."),
-                    &ignorePresetIsInUse,
-                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                    QDialogButtonBox::Cancel
+            if (!qnSettings->isPtzPresetInUseWarningDisabled()) {
+                QnMessageBox messageBox(
+                        QnMessageBox::Warning,
+                        -1,
+                        tr("Remove Preset"),
+                        tr("This preset is used in some tours.") + L'\n'
+                      + tr("These tours will become invalid if you remove it."),
+                        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                        this
                 );
+                messageBox.setDefaultButton(QDialogButtonBox::Cancel);
+                messageBox.setCheckBoxText(tr("Do not show again."));
 
-                qnSettings->setPtzPresetInUseWarningDisabled(ignorePresetIsInUse);
+                int result = messageBox.exec();
 
-                if (button == QDialogButtonBox::Cancel)
+                qnSettings->setPtzPresetInUseWarningDisabled(messageBox.isChecked());
+
+                if (result == QDialogButtonBox::Cancel)
                     break;
             }
         }
@@ -679,23 +679,23 @@ bool QnPtzManageDialog::tryClose(bool force) {
 
 bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/) {
 
-    QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
+    QDialogButtonBox::StandardButtons allowedButtons = QDialogButtonBox::Yes | QDialogButtonBox::No;
     if (cancelIsAllowed)
-        allowedButtons |= QnMessageBox::Cancel;
+        allowedButtons |= QDialogButtonBox::Cancel;
 
-    QnMessageBox::StandardButton button = QnMessageBox::question(
+    QDialogButtonBox::StandardButton button = QnMessageBox::question(
         this,
         0,
         tr("PTZ configuration has not been saved."),
         tr("Changes have not been saved. Would you like to save them?"),
         allowedButtons,
-        QnMessageBox::Yes);
+        QDialogButtonBox::Yes);
 
     switch (button) {
-    case QnMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         saveChanges();
         return true;
-    case QnMessageBox::Cancel:
+    case QDialogButtonBox::Cancel:
         if (cancelIsAllowed)
             return false;
         return true;

@@ -22,7 +22,6 @@ public:
         PermissionsColumn,
         LdapColumn,
         EnabledColumn,
-        EditIconColumn,
 
         ColumnCount
     };

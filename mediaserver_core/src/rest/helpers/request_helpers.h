@@ -5,13 +5,15 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <utils/common/systemerror.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-template<typename Context, typename CompletionFunc>
-void runMultiserverDownloadRequest(QUrl &url
+template<typename Context, typename RequestFunc>
+void runMultiserverRequest(QUrl url
+    , const RequestFunc &request
     , const QnMediaServerResourcePtr &server
-    , const CompletionFunc &requestCompletionFunc
     , Context *context)
 {
     nx_http::HttpHeaders headers;
@@ -36,10 +38,51 @@ void runMultiserverDownloadRequest(QUrl &url
         url.setPassword(QString::fromUtf8(admin->getDigest()));
     }
 
-    context->executeGuarded([url, requestCompletionFunc, headers, context]()
+    request(url, headers, context);
+}
+
+template<typename Context, typename CompletionFunc>
+void runMultiserverDownloadRequest(QUrl url
+    , const QnMediaServerResourcePtr &server
+    , const CompletionFunc &requestCompletionFunc
+    , Context *context)
+{
+    const auto downloadRequest = [requestCompletionFunc]
+        (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
     {
-        nx_http::downloadFileAsync(
-                    url, requestCompletionFunc, headers, nx_http::AsyncHttpClient::authDigestWithPasswordHash);
-        context->incRequestsCount();
-    });
+        context->executeGuarded([url, requestCompletionFunc, headers, context]()
+        {
+            nx_http::downloadFileAsync(url, requestCompletionFunc, headers,
+                                       nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+            context->incRequestsCount();
+        });
+    };
+
+    runMultiserverRequest(url, downloadRequest, server, context);
+}
+
+template<typename Context, typename CompletionFunc>
+void runMultiserverUploadRequest(QUrl url
+    , const QByteArray &data
+    , const QByteArray &contentType
+    , const QString &user
+    , const QString &password
+    , const QnMediaServerResourcePtr &server
+    , const CompletionFunc &completionFunc
+    , Context *context)
+{
+    const auto downloadRequest = [completionFunc, data, contentType, user, password]
+        (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
+    {
+        context->executeGuarded([url, data, completionFunc, headers
+            , contentType, context, user, password]()
+        {
+            nx_http::uploadDataAsync(url, data, contentType, headers
+                , completionFunc, nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+
+            context->incRequestsCount();
+        });
+    };
+
+    runMultiserverRequest(url, downloadRequest, server, context);
 }

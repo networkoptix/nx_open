@@ -5,12 +5,12 @@
     <name>QnCameraFlow</name>
     <message>
         <source>Hidden cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>隠しカメラ</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are hidden</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 隠しカメラ</numerusform>
         </translation>
     </message>
 </context>
@@ -19,109 +19,110 @@
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>認証
+必要</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished"></translation>
+        <translation>オフライン</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMenu</name>
     <message>
         <source>Quality</source>
-        <translation type="unfinished">画質</translation>
+        <translation>画質</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
 </context>
 <context>
     <name>QnDiscoveredSessionItem</name>
     <message>
         <source>incompatible server version</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないサーバーバージョン</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明</translation>
     </message>
 </context>
 <context>
     <name>QnHiddenCameraItem</name>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>表示</translation>
     </message>
 </context>
 <context>
     <name>QnHorizontalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>閉じる</translation>
     </message>
 </context>
 <context>
     <name>QnLiveVideoNavigation</name>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブ</translation>
     </message>
 </context>
 <context>
     <name>QnLoginPage</name>
     <message>
         <source>New Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>新規接続</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>ホスト</translation>
     </message>
     <message>
         <source>Port (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>ポート（オプション）</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>接続</translation>
     </message>
     <message>
         <source>Auto-discovered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>自動検索システム</translation>
     </message>
     <message>
         <source>Incorrect login or password</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なログインまたはパスワード</translation>
     </message>
     <message>
         <source>Server or network is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーまたはネットワーク無効</translation>
     </message>
     <message>
         <source>Incompatible server</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないサーバー</translation>
     </message>
     <message>
         <source>Incompatible server version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないサーバーバージョン %1</translation>
     </message>
 </context>
 <context>
@@ -129,126 +130,127 @@ required</source>
     <message>
         <source>To connect to old servers please download the legacy application from Google Play.</source>
         <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>古いサーバーに接続するにはGoogle Playよりレガシーアプリケーションをダウンロードしてください.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>古いサーバーに接続するにはApp Storeよりレガシーアプリケーションをダウンロードしてください.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>古いサーバーに接続するにはインターネットよりレガシーアプリケーションをダウンロードしてください.</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>ダウンロード</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
     <name>QnQualityDialog</name>
     <message>
         <source>Video quality</source>
-        <translation type="unfinished"></translation>
+        <translation>画質</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
 </context>
 <context>
     <name>QnResourcesPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーオフライン</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">ロード中...</translation>
+        <translation>ロード中...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>接続中...</translation>
     </message>
 </context>
 <context>
     <name>QnSearchItem</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished">検索</translation>
+        <translation>検索</translation>
     </message>
 </context>
 <context>
     <name>QnSettingsPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>設定</translation>
     </message>
     <message>
         <source>Show offline cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>オフラインカメラ表示</translation>
     </message>
 </context>
 <context>
     <name>QnSideNavigation</name>
     <message>
         <source>Saved connections</source>
-        <translation type="unfinished"></translation>
+        <translation>保存した接続設定</translation>
     </message>
     <message>
         <source>New connection</source>
-        <translation type="unfinished"></translation>
+        <translation>新規接続</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>設定</translation>
     </message>
 </context>
 <context>
     <name>QnVerticalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>閉じる</translation>
     </message>
 </context>
 <context>
     <name>QnVideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブなし</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>ライブ</translation>
     </message>
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation type="unfinished"></translation>
+        <translation>d MMMM yyyy</translation>
     </message>
 </context>
 <context>
     <name>QnVideoPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーオフライン</translation>
     </message>
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>認証
+必要</translation>
     </message>
     <message>
         <source>Camera offline</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラオフライン</translation>
     </message>
     <message>
         <source>Can&apos;t load video</source>
-        <translation type="unfinished"></translation>
+        <translation>画像が読み込めません</translation>
     </message>
 </context>
 </TS>

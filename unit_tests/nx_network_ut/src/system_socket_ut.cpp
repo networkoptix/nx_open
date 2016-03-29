@@ -6,8 +6,12 @@
 #include <utils/common/cpp14.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/test_support/simple_socket_test_helper.h>
 
-#include "simple_socket_test_helper.h"
+
+namespace nx {
+namespace network {
+namespace test {
 
 TEST( TcpSocket, KeepAliveOptions )
 {
@@ -51,6 +55,11 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-NX_SIMPLE_SOCKET_TESTS(TcpSocket,
-                       &std::make_unique<TCPServerSocket>,
-                       &std::make_unique<TCPSocket>)
+NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+    TEST, TcpSocket,
+    &std::make_unique<TCPServerSocket>,
+    &std::make_unique<TCPSocket>)
+
+}   //test
+}   //network
+}   //nx

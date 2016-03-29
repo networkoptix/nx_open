@@ -1,8 +1,3 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
 #ifdef USE_OWN_MUTEX
 
 #include "mutex.h"
@@ -25,6 +20,12 @@ QnMutex::QnMutex( QnMutex::RecursionMode mode )
 
 QnMutex::~QnMutex()
 {
+    if (!m_impl->currentLockStack.empty())
+    {
+        int* x = nullptr;
+        *x = 1;
+    }
+
     delete m_impl;
     m_impl = nullptr;
 }
@@ -102,6 +103,9 @@ QnMutexLockerBase& QnMutexLockerBase::operator=(QnMutexLockerBase&& rhs)
     if (this == &rhs)
         return *this;
 
+    if (m_locked)
+        unlock();
+
     m_mtx = rhs.m_mtx;
     m_sourceFile = rhs.m_sourceFile;
     m_sourceLine = rhs.m_sourceLine;
@@ -121,15 +125,15 @@ QnMutex* QnMutexLockerBase::mutex()
 
 void QnMutexLockerBase::relock()
 {
-    Q_ASSERT( !m_locked );
+    NX_ASSERT( !m_locked );
     m_mtx->lock( m_sourceFile, m_sourceLine, ++m_relockCount );
     m_locked = true;
 }
 
 void QnMutexLockerBase::unlock()
 {
-    //assert here to verify that developer knows what he is doing when he tries to unlock already unlocked mutex
-    Q_ASSERT( m_locked );
+    //NX_ASSERT here to verify that developer knows what he is doing when he tries to unlock already unlocked mutex
+    NX_ASSERT( m_locked );
     m_mtx->unlock();
     m_locked = false;
 }

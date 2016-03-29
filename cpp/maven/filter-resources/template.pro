@@ -9,13 +9,13 @@ VERSION = ${release.version}
 unix {
     VERSION = ${linux.release.version}
 }
-QT += ${qt.libs}
+QT = ${qt.libs}
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
-
 
 ## GLOBAL CONFIGURATIONS
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
+CONFIG += no_private_qt_headers_warning
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
@@ -42,21 +42,18 @@ CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
     CONFIG += console
   }
-  win* {
-    LIBS = ${windows.oslibs.debug}
-  } else {
+  !win* {
     DEFINES += _DEBUG
   }
-  DEFINES += USE_OWN_MUTEX
-  #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
-  #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+  !linux-clang {
+    # Temporary fix for linux clang 3.6-3.7 that crashes with our mutex.
+    DEFINES += USE_OWN_MUTEX
+    #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
+    #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+  }
 }
 else {
-  CONFIG += silent
   CONFIGURATION=release
-  win* {
-    LIBS = ${windows.oslibs.release}
-  }
 
   !win32 {
       contains( DEFINES, debug_in_release ) {
@@ -103,9 +100,19 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/$$CONFIGURATION
+
+#temporary hardcode
+CONFIG(debug, debug|release) {
+    LIBS += -L${qt.dir}-debug/lib
+}
+else {
+    LIBS += -L${qt.dir}/lib
+}
+
+LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
+    LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
 
@@ -119,10 +126,16 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${root.dir}/common_libs/nx_network/src \
                 ${root.dir}/common_libs/nx_utils/src \
                 ${root.dir}/common_libs/nx_streaming/src \
+                ${root.dir}/common_libs/nx_media/src \
+                ${root.dir}/common_libs/nx_audio/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/ \
+                ${qt.dir}/include/QtCore/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
+                ${qt.dir}/include/QtQuick/$$QT_VERSION/ \
+                ${qt.dir}/include/QtQuick/$$QT_VERSION/QtQuick/ \
+
+
 
 win* {
     DEFINES += \
@@ -190,12 +203,12 @@ CONFIG += ${arch}
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${customization.dir}/icons/hdw_logo.ico
-  LIBS += ${windows.oslibs} ${ffmpeg.libs}
+  LIBS += ${windows.oslibs}
   DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
   win32-msvc* {
     # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
-    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj /wd4290 /wd4661 /wd4100 /we4717
     # /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
     QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
     QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF
@@ -215,7 +228,12 @@ win* {
 ## BOTH LINUX AND MAC
 unix: {
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+  clang {
+    QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
+  } else {
+    QMAKE_CXXFLAGS += -std=c++11
+  }
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
 ## LINUX
@@ -240,7 +258,6 @@ unix:!android:!mac {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
-  LIBS += ${ffmpeg.libs}
 }
 
 ## MAC OS
@@ -254,17 +271,12 @@ macx {
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 
-  !ios {
-    LIBS += ${ffmpeg.libs}
-  }
-
   contains(TEMPLATE, "lib") {
-    QMAKE_LFLAGS += -undefined dynamic_lookup 
+    QMAKE_LFLAGS += -undefined dynamic_lookup
   }
 }
 
 INCLUDEPATH += ${environment.dir}/boost_1_56_0
-INCLUDEPATH += ${environment.dir}/include/ffmpeg-misc-headers-win32
 INCLUDEPATH += ${environment.dir}/include/glext
 
 ## ANDROID
@@ -275,6 +287,7 @@ android {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${android.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+  CONFIG += no_smart_library_merge
 }
 
 ## iOS
@@ -288,7 +301,11 @@ ios {
 
 
 
-
+CONFIG(debug, debug|release) {
+  include(dependencies-debug.pri)
+} else {
+  include(dependencies.pri)
+}
 
 
 

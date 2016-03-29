@@ -13,6 +13,7 @@
 
 class QStyle;
 class QnNoptixIconLoader;
+class QnGenericPalette;
 
 class QnSkin: public QObject, public Singleton<QnSkin> {
     Q_OBJECT
@@ -40,7 +41,7 @@ public:
     QMovie *newMovie(const QString &name, QObject* parent = NULL);
     QMovie *newMovie(const char *name, QObject* parent = NULL);
 
-    static QStyle *newStyle();
+    static QStyle *newStyle(const QnGenericPalette &genericPalette);
 
 private:
     void init(const QStringList &paths);

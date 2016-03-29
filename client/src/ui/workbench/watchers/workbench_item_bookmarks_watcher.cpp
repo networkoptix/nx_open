@@ -4,30 +4,49 @@
 #include <utils/common/string.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <camera/camera_bookmark_aggregation.h>
+#include <camera/camera_bookmarks_query.h>
+#include <camera/camera_bookmarks_manager.h>
 #include <ui/utils/workbench_item_helper.h>
-#include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_bookmarks_cache.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/graphics/items/overlays/text_overlay_widget.h>
-#include <ui/graphics/items/controls/time_slider.h> // TODO: #ynikitenkov remove this dependency
+#include <ui/graphics/items/overlays/composite_text_overlay.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+
+#include <utils/common/scoped_timer.h>
+#include <utils/common/synctime.h>
 
 namespace
 {
-    enum { kMaxBookmarksNearThePosition = 256 };
-
     enum
     {
         kWindowWidthMs =  5 * 60 * 1000      // 3 minute before and after current position
         , kLeftOffset = kWindowWidthMs / 2
         , kRightOffset = kLeftOffset
-
-        , kMinWindowChange = 10000
     };
+
+    const QnCameraBookmarkSearchFilter kInitialFilter = []()
+    {
+        enum { kMaxBookmarksNearThePosition = 256 };
+
+        QnCameraBookmarkSearchFilter filter;
+        filter.sparsing.used = true;
+        filter.limit = kMaxBookmarksNearThePosition;
+        filter.startTimeMs = DATETIME_INVALID;
+        filter.endTimeMs = DATETIME_INVALID;
+        return filter;
+    }();
+
+    /* Maximum number of bookmarks, allowed on the single widget. */
+    const int kBookmarksDisplayLimit = 10;
+
+    /* Ignore position changes less than given time period. */
+    const qint64 kMinPositionChangeMs = 100;
+
+    /* Periods to update bookmarks query. */
+    const qint64 kMinWindowChangeNearLiveMs = 10000;
+    const qint64 kMinWindowChangeInArchiveMs = 2 * 60 * 1000;
 
     QnOverlayTextItemData makeBookmarkItem(const QnCameraBookmark &bookmark
         , const QnBookmarkColors &colors)
@@ -66,39 +85,184 @@ namespace
 
 //
 
-class QnWorkbenchItemBookmarksWatcher::ListenerHolderPrivate
+class QnWorkbenchItemBookmarksWatcher::WidgetData : public Connective<QObject>
 {
+    typedef Connective<QObject> base_type;
+
+    typedef QPointer<QnTimelineBookmarksWatcher> QnTimelineBookmarksWatcherPtr;
 public:
-    ListenerHolderPrivate(const Listeners::iterator it
-        , QnWorkbenchItemBookmarksWatcher *watcher)
-        : m_it(it)
-        , m_watcher(watcher)
-    {}
+    static WidgetDataPtr create(QnMediaResourceWidget *widget
+        , QnWorkbenchContext *context
+        , QnWorkbenchItemBookmarksWatcher *watcher);
 
+    WidgetData(const QnVirtualCameraResourcePtr &camera
+        , QnMediaResourceWidget *resourceWidget
+        , QnTimelineBookmarksWatcher *timelineWatcher
+        , QnWorkbenchItemBookmarksWatcher *watcher);
 
-    ~ListenerHolderPrivate()
-    {
-        if (m_watcher)
-            m_watcher->removeListener(m_it);
-    }
+    ~WidgetData();
 
 private:
-    const Listeners::iterator m_it;
-    const QPointer<QnWorkbenchItemBookmarksWatcher> m_watcher;
+    void updatePos(qint64 posMs);
+
+    void updateQueryFilter();
+
+    void updateBookmarksAtPosition();
+
+    void updateBookmarks(const QnCameraBookmarkList &newBookmarks);
+
+    void sendBookmarksToCompositeOverlay();
+
+private:
+    const QnTimelineBookmarksWatcherPtr m_timelineWatcher;
+    const QnVirtualCameraResourcePtr m_camera;
+    QnWorkbenchItemBookmarksWatcher * const m_parent;
+    QnMediaResourceWidget * const m_mediaWidget;
+
+    qint64 m_posMs;
+    QnCameraBookmarkList m_bookmarks;
+    QnCameraBookmarkAggregation m_bookmarksAtPos;
+    QnCameraBookmarkList m_displayedBookmarks;
+    QnCameraBookmarksQueryPtr m_query;
 };
 
-//
-
-struct QnWorkbenchItemBookmarksWatcher::ListenerDataPrivate
+QnWorkbenchItemBookmarksWatcher::WidgetDataPtr QnWorkbenchItemBookmarksWatcher::WidgetData::create(
+    QnMediaResourceWidget *widget
+    , QnWorkbenchContext *context
+    , QnWorkbenchItemBookmarksWatcher *parent)
 {
-    Listener listenerCallback;
+    if (!widget|| !context || !parent)
+        return WidgetDataPtr();
+
+    const auto camera = helpers::extractCameraResource(widget->item());
+    if (!camera)
+        return WidgetDataPtr();
+
+    const auto timelineWatcher = context->instance<QnTimelineBookmarksWatcher>();
+
+    return WidgetDataPtr(new WidgetData(camera, widget, timelineWatcher, parent));
+}
+
+QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(const QnVirtualCameraResourcePtr &camera
+    , QnMediaResourceWidget *resourceWidget
+    , QnTimelineBookmarksWatcher *timelineWatcher
+    , QnWorkbenchItemBookmarksWatcher *parent)
+    : base_type(parent)
+    , m_timelineWatcher(timelineWatcher)
+    , m_camera(camera)
+    , m_parent(parent)
+    , m_mediaWidget(resourceWidget)
+    , m_posMs(DATETIME_INVALID)
+    , m_bookmarks()
+    , m_bookmarksAtPos()
+    , m_query(qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << camera))
+{
+    m_query->setFilter(kInitialFilter);
+    connect(m_query, &QnCameraBookmarksQuery::bookmarksChanged
+        , this, &WidgetData::updateBookmarks);
+
+    connect(m_mediaWidget, &QnMediaResourceWidget::positionChanged
+        , this, &WidgetData::updatePos);
+}
+
+QnWorkbenchItemBookmarksWatcher::WidgetData::~WidgetData()
+{
+    disconnect(m_query, nullptr, this, nullptr);
+}
+
+void QnWorkbenchItemBookmarksWatcher::WidgetData::updatePos(qint64 posMs)
+{
+    if (m_posMs == posMs)
+        return; /* Really should never get here. */
+
+    bool updateRequired = (m_posMs == DATETIME_INVALID) || (qAbs(m_posMs - posMs) >= kMinPositionChangeMs);
+    m_posMs = posMs;
+    if (!updateRequired)
+        return;
+
+    updateBookmarksAtPosition();
+    updateQueryFilter();
+}
+
+void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
+{
+    QN_LOG_TIME(Q_FUNC_INFO);
+
+    const auto newWindow = (m_posMs == DATETIME_INVALID
+        ? QnTimePeriod::fromInterval(DATETIME_INVALID, DATETIME_INVALID)
+        : helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset));
+
+    bool nearLive = m_posMs + kRightOffset >= qnSyncTime->currentMSecsSinceEpoch();
+    const qint64 minWindowChange = nearLive
+        ? kMinWindowChangeNearLiveMs
+        : kMinWindowChangeInArchiveMs;
+
+    auto filter = m_query->filter();
+    const bool changed = helpers::isTimeWindowChanged(newWindow.startTimeMs, newWindow.endTimeMs()
+        , filter.startTimeMs, filter.endTimeMs, minWindowChange);
+    if (!changed)
+        return;
+
+    filter.startTimeMs = newWindow.startTimeMs;
+    filter.endTimeMs = newWindow.endTimeMs();
+    m_query->setFilter(filter);
+}
+
+void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarksAtPosition()
+{
+    QN_LOG_TIME(Q_FUNC_INFO);
+
     QnCameraBookmarkList bookmarks;
 
-    explicit ListenerDataPrivate(const Listener &listenerCallback)
-        : listenerCallback(listenerCallback)
-        , bookmarks()
-    {}
-};
+    const auto endTimeGreaterThanPos = [this](const QnCameraBookmark &bookmark)
+    { return (bookmark.endTimeMs() > m_posMs); };
+
+    const auto itEnd = std::upper_bound(m_bookmarks.begin(), m_bookmarks.end(), m_posMs);
+    std::copy_if(m_bookmarks.begin(), itEnd, std::back_inserter(bookmarks), endTimeGreaterThanPos);
+
+    m_bookmarksAtPos.setBookmarkList(bookmarks);
+    if (m_timelineWatcher)
+        m_bookmarksAtPos.mergeBookmarkList(m_timelineWatcher->rawBookmarksAtPosition(m_camera, m_posMs));
+
+    sendBookmarksToCompositeOverlay();
+}
+
+void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarks(const QnCameraBookmarkList &newBookmarks)
+{
+    if (m_bookmarks == newBookmarks)
+        return;
+
+    m_bookmarks = newBookmarks;
+    updateBookmarksAtPosition();
+}
+
+void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToCompositeOverlay()
+{
+    QN_LOG_TIME(Q_FUNC_INFO);
+
+    const auto compositeTextOverlay = m_mediaWidget->compositeTextOverlay();
+    if (!compositeTextOverlay)
+        return;
+
+    QnCameraBookmarkList bookmarksToDisplay;
+    for (const auto &bookmark: m_bookmarksAtPos.bookmarkList())
+    {
+        if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
+            continue;
+        bookmarksToDisplay << bookmark;
+        if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
+            break;
+    }
+
+    if (m_displayedBookmarks == bookmarksToDisplay)
+        return;
+    m_displayedBookmarks = bookmarksToDisplay;
+
+    compositeTextOverlay->resetModeData(QnCompositeTextOverlay::kBookmarksMode);
+    const QnBookmarkColors colors = m_parent->bookmarkColors();
+    for (const auto &bookmark: bookmarksToDisplay)
+        compositeTextOverlay->addModeData(QnCompositeTextOverlay::kBookmarksMode, makeBookmarkItem(bookmark, colors));
+}
 
 //
 
@@ -106,34 +270,37 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_aggregationHelper(new QnCameraBookmarkAggregation())
-    , m_timelineWatcher(context()->instance<QnTimelineBookmarksWatcher>())
-    , m_bookmarksCache(new QnWorkbenchBookmarksCache(kMaxBookmarksNearThePosition
-        , QnBookmarkSortOrder::defaultOrder, QnBookmarkSparsingOptions::kNosparsing
-        , kMinWindowChange, parent))
-    , m_itemListinersMap()
-    , m_listeners()
-    , m_posMs(DATETIME_INVALID)
-
     , m_colors()
+    , m_widgetDataHash()
 {
-    // TODO: #ynikitenkov remove these dependencies.
-    connect(navigator()->timeSlider(), &QnTimeSlider::valueChanged
-        , this, &QnWorkbenchItemBookmarksWatcher::updatePosition);
+    connect(context()->display(), &QnWorkbenchDisplay::widgetAdded, this
+        , [this](QnResourceWidget *resourceWidget)
+    {
+        if (!resourceWidget)
+            return;
 
-    // TODO: add correct handling of QnCameraBookmarksManager::
-    // bookmarkAdded / bookmarkUpdated / bookmarkRemoved
-    // For now, there is no practical need - bookmarks are updated every
-    // ~5 seconds (by query), but if we decide to extend this period (for
-    // 1 minute, for example), we will have to support it
-    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::bookmarksChanged
-        , this, &QnWorkbenchItemBookmarksWatcher::onBookmarksChanged);
-    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemAdded
-        , this, &QnWorkbenchItemBookmarksWatcher::onItemAdded);
-    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemRemoved
-        , this, &QnWorkbenchItemBookmarksWatcher::onItemRemoved);
-    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemAboutToBeRemoved
-        , this, &QnWorkbenchItemBookmarksWatcher::onItemRemoved);
+        auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(resourceWidget);
+        if (!mediaWidget)
+            return;
+
+        if (m_widgetDataHash.contains(mediaWidget))
+            return;
+
+        m_widgetDataHash.insert(mediaWidget, WidgetData::create(mediaWidget, context(), this));
+    });
+
+    connect(context()->display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this
+        , [this](QnResourceWidget *resourceWidget)
+    {
+        if (!resourceWidget)
+            return;
+
+        auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(resourceWidget);
+        if (!mediaWidget)
+            return;
+
+        m_widgetDataHash.remove(mediaWidget);
+    });
 }
 
 QnWorkbenchItemBookmarksWatcher::~QnWorkbenchItemBookmarksWatcher()
@@ -148,117 +315,3 @@ void QnWorkbenchItemBookmarksWatcher::setBookmarkColors(const QnBookmarkColors &
 {
     m_colors = colors;
 }
-
-void QnWorkbenchItemBookmarksWatcher::onItemAdded(QnWorkbenchItem *item)
-{
-    if (!display())
-        return;
-
-    const auto camera = helpers::extractCameraResource(item);
-    if (!camera)
-        return;
-
-    auto resourceWidget = display()->widget(item->uuid());
-    QPointer<QnMediaResourceWidget> widget = dynamic_cast<QnMediaResourceWidget*>(resourceWidget);
-    if (!widget)
-        return;
-
-    const auto bookmarksAtPosUpdatedCallback = [this, widget](const QnCameraBookmarkList &bookmarks)
-    {
-        if (!widget)
-            return;
-
-        auto compositeTextOverlay = widget->compositeTextOverlay();
-        if (!compositeTextOverlay)
-            return;
-
-        compositeTextOverlay->resetModeData(QnCompositeTextOverlay::kBookmarksMode);
-        for (auto bookmark: bookmarks)
-        {
-            if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
-                continue;
-
-            compositeTextOverlay->addModeData(QnCompositeTextOverlay::kBookmarksMode
-                , makeBookmarkItem(bookmark, m_colors));
-        }
-    };
-
-    const auto listenerHolder = addListener(camera, bookmarksAtPosUpdatedCallback);
-    m_itemListinersMap.insert(item, listenerHolder);
-}
-
-void QnWorkbenchItemBookmarksWatcher::onItemRemoved(QnWorkbenchItem *item)
-{
-    m_itemListinersMap.remove(item);
-}
-
-void QnWorkbenchItemBookmarksWatcher::updatePosition(qint64 posMs)
-{
-    m_posMs = posMs;
-    const auto leftPos = posMs - kLeftOffset;
-    const auto rightPos = posMs + kRightOffset;
-    const bool invalidInterval = ((leftPos < 0) || (rightPos < 0) || (leftPos > rightPos));
-    Q_ASSERT_X(!invalidInterval, Q_FUNC_INFO, "Invalid window period!");
-    if (invalidInterval)
-        return;
-
-    const QnTimePeriod newWindow = QnTimePeriod::fromInterval(leftPos, rightPos);
-
-    m_bookmarksCache->setWindow(newWindow);
-
-    for (auto it = m_listeners.begin(); it != m_listeners.end(); ++it)
-    {
-        const auto camera = it.key();
-        updateListenerData(it, m_bookmarksCache->bookmarks(camera));
-    }
-}
-
-void QnWorkbenchItemBookmarksWatcher::onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
-    , const QnCameraBookmarkList &bookmarks)
-{
-    const auto range = m_listeners.equal_range(camera);
-    for (auto it = range.first; it != range.second; ++it)
-        updateListenerData(it, bookmarks);
-}
-
-QnWorkbenchItemBookmarksWatcher::ListenerLifeHolder QnWorkbenchItemBookmarksWatcher::addListener(
-    const QnVirtualCameraResourcePtr &camera
-    , const Listener &listenerCallback)
-{
-    const auto iterator = m_listeners.insertMulti(camera
-        , ListenerDataPrivatePtr(new ListenerDataPrivate(listenerCallback)));
-    return ListenerLifeHolder(new ListenerHolderPrivate(iterator, this));
-}
-
-void QnWorkbenchItemBookmarksWatcher::removeListener(const Listeners::iterator &it)
-{
-    m_listeners.erase(it);
-}
-
-void QnWorkbenchItemBookmarksWatcher::updateListenerData(const Listeners::iterator &it
-    , const QnCameraBookmarkList &bookmarks)
-{
-    const auto camera = it.key();
-    auto &listenerData = it.value();
-
-    // We have to source for bookmarks:
-    //  *   Current watcher bookmarks for item - constrained by small period near the current position.
-    //      If bookmarks query has completed we have all bookmarks for current position
-    //  *   Bookmarks at timeline watcher - there could be not all bookmarks for position,
-    //      but they could exist before current watcher load bookmarks for current position.
-    // Thus, we could merge them and get best result by load speed (from one side) and bookmarks presence
-    // for specified position
-
-    m_aggregationHelper->setBookmarkList(helpers::bookmarksAtPosition(bookmarks, m_posMs));
-    if (m_timelineWatcher)
-        m_aggregationHelper->mergeBookmarkList(m_timelineWatcher->rawBookmarksAtPosition(camera, m_posMs));
-
-    const auto currentBookmarksList = m_aggregationHelper->bookmarkList();
-
-    if (listenerData->bookmarks == currentBookmarksList)
-        return;
-
-    listenerData->bookmarks = currentBookmarksList;
-    listenerData->listenerCallback(currentBookmarksList);
-}
-

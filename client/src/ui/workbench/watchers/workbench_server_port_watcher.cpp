@@ -35,8 +35,8 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
         , this, [this]()
     {
         const auto currentServer = qnCommon->currentServer();
-        
-        Q_ASSERT_X(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
+
+        NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
         if (!currentServer)
             return;
 
@@ -54,7 +54,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
             url.setPort(currentServer->getPort());
             QnAppServerConnectionFactory::setUrl(url);
 
-            context()->menu()->trigger(Qn::ReconnectAction);
+            context()->menu()->trigger(QnActions::ReconnectAction);
         });
     });
 }

@@ -1,7 +1,7 @@
 #ifndef QN_COMBO_BOX_H
 #define QN_COMBO_BOX_H
 
-#include <QComboBox>
+#include <QtWidgets/QComboBox>
 
 /**
  * A combo box with additional slots that are not available in <tt>QComboBox</tt>.

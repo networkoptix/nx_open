@@ -39,6 +39,17 @@ Item {
         readonly property var locale: Qt.locale()
     }
 
+    QnCameraChunkProvider {
+        id: chunkProvider
+        resourceId: player.resourceId
+    }
+
+    Timer {
+        interval: 30000
+        triggeredOnStart: true
+        running: true
+        onTriggered: chunkProvider.update()
+    }
 
     Item {
         id: navigator
@@ -108,21 +119,18 @@ Item {
                 width: parent.width
                 height: dp(104)
 
-                stickToEnd: mediaPlayer.atLive && !playbackController.paused
+                stickToEnd: mediaPlayer.liveMode && !playbackController.paused
 
                 chunkBarHeight: dp(32)
                 textY: height - chunkBarHeight - dp(16) - dp(24)
 
-                chunkProvider: mediaPlayer.chunkProvider
-                startBound: mediaPlayer.chunkProvider.bottomBound
-
-                autoPlay: mediaPlayer.playing && !mediaPlayer.hasTimestamp
+                chunkProvider: chunkProvider
+                startBound: chunkProvider.bottomBound
 
                 onMoveFinished: {
-                    if (playbackController.paused)
-                        mediaPlayer.seek(position)
-                    else
-                        mediaPlayer.play(position)
+                    mediaPlayer.seek(position)
+                    if (!playbackController.paused)
+                        mediaPlayer.play()
                 }
 
                 onPositionTapped: mediaPlayer.seek(position)
@@ -131,27 +139,19 @@ Item {
                     if (!dragging)
                         return
 
-                    var live = position + 1000 >= (new Date()).getTime()
-                    if (!live)
-                        mediaPlayer.pause()
+                    mediaPlayer.seek(position)
                 }
 
                 Connections {
                     target: mediaPlayer
-                    onTimelineCorrectionRequest: {
+                    onPositionChanged: {
                         if (timeline.moving)
                             return
 
-                        if (mediaPlayer.hasTimestamp)
-                            timeline.position = position
-                        else
-                            timeline.correctPosition(position)
-                    }
-                    onTimelinePositionRequest: {
-                        if (timeline.moving)
+                        if (mediaPlayer.liveMode)
                             return
 
-                        timeline.position = position
+                        timeline.position = mediaPlayer.position
                     }
                     onPlayingChanged: {
                         if (timeline.moving)
@@ -389,7 +389,7 @@ Item {
 
         sourceComponent: QnCalendarPanel
         {
-            chunkProvider: mediaPlayer.chunkProvider
+        chunkProvider: chunkProvider
             onDatePicked:
             {
                 hide()

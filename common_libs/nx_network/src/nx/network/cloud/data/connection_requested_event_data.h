@@ -18,7 +18,7 @@ class NX_NETWORK_API ConnectionRequestedEvent
     public StunMessageData
 {
 public:
-    nx::String connectSessionID;
+    nx::String connectSessionId;
     nx::String originatingPeerID;
     std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
     ConnectionMethods connectionMethods;        ///< All requestd connection types

@@ -16,7 +16,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/string.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -29,11 +29,8 @@ namespace
 
     rest::QnConnectionPtr getPublicServerConnection()
     {
-        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
         {
-            if (server->getStatus() != Qn::Online)
-                continue;
-
             if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
                 continue;
 
@@ -196,11 +193,11 @@ void QnLinkToCloudDialogPrivate::bindSystem()
 void QnLinkToCloudDialogPrivate::showSuccess()
 {
     Q_Q(QnLinkToCloudDialog);
-    QnMessageBox messageBox(QMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             q->windowTitle(),
                             tr("The system is successfully linked to %1").arg(q->ui->accountLineEdit->text()),
-                            QMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q->parentWidget());
 
     messageBox.exec();
@@ -212,11 +209,11 @@ void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnLinkToCloudDialog);
 
-    QnMessageBox messageBox(QMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::NoIcon,
                             helpTopic(q),
                             tr("Error"),
                             tr("Could not link the system to the cloud"),
-                            QMessageBox::Ok,
+                            QDialogButtonBox::Ok,
                             q);
 
     if (!message.isEmpty())
@@ -266,19 +263,20 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, q->ui->accountLineEdit->text());
-    propertyDictionary->saveParamsAsync(admin->getId());
-
-    auto handleReply = [this](bool success, rest::Handle handleId, rest::ServerConnection::EmptyResponseType)
+    auto handleReply = [this](bool success, rest::Handle handleId, const QnRestResult& reply)
     {
         Q_UNUSED(handleId)
 
-        if (success)
+        if (success && reply.error == QnRestResult::NoError)
             showSuccess();
         else
-            showFailure(tr("Cannot save information to database"));
+            showFailure(reply.errorString);
     };
 
-    connection->saveCloudSystemCredentials(systemData.id.toString(), QString::fromStdString(systemData.authKey),
-                                           handleReply, q->thread());
+    connection->saveCloudSystemCredentials(
+        QString::fromStdString(systemData.id),
+        QString::fromStdString(systemData.authKey),
+        q->ui->accountLineEdit->text(),
+        handleReply,
+        q->thread());
 }

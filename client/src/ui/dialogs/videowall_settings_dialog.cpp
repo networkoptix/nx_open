@@ -4,12 +4,11 @@
 #include <api/app_server_connection.h>
 
 #include <client/client_settings.h>
+#include <client/client_app_info.h>
 
 #include <core/resource/videowall_resource.h>
 
 #include <platform/platform_abstraction.h>
-
-#include "version.h"
 
 QnVideowallSettingsDialog::QnVideowallSettingsDialog(QWidget *parent) :
     base_type(parent),
@@ -41,7 +40,7 @@ void QnVideowallSettingsDialog::submitToResource(const QnVideoWallResourcePtr &v
     if (!qnPlatform->shortcuts()->supported())
         return;
 
-    if (!ui->shortcutCheckbox->isChecked()) 
+    if (!ui->shortcutCheckbox->isChecked())
         deleteShortcut(videowall);
     else if (canStartVideowall(videowall))
         createShortcut(videowall);
@@ -78,7 +77,7 @@ bool QnVideowallSettingsDialog::createShortcut(const QnVideoWallResourcePtr &vid
     arguments << lit("--auth");
     arguments << QString::fromUtf8(url.toEncoded());
 
-    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments, IDI_ICON_VIDEOWALL);
+    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments, QnClientAppInfo::videoWallIconId());
 }
 
 bool QnVideowallSettingsDialog::deleteShortcut(const QnVideoWallResourcePtr &videowall) {

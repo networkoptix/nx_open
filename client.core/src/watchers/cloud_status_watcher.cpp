@@ -13,17 +13,17 @@ namespace
 {
     const int kRetryInterval = 10 * 1000;
 
-    QnCloudSystemList getCloudSystemList(const api::SystemDataList &systemsList)
+    QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
     {
         QnCloudSystemList result;
 
-        for (const api::SystemData &systemData : systemsList.systems)
+        for (const api::SystemDataEx &systemData : systemsList.systems)
         {
             if (systemData.status != api::ssActivated)
                 continue;
 
             QnCloudSystem system;
-            system.id = systemData.id;
+            system.id = QString::fromStdString(systemData.id);
             system.name = QString::fromStdString(systemData.name);
             system.authKey = systemData.authKey;
             result.append(system);
@@ -88,8 +88,13 @@ QString QnCloudStatusWatcher::cloudLogin() const
 void QnCloudStatusWatcher::setCloudLogin(const QString &login)
 {
     Q_D(QnCloudStatusWatcher);
+
+    if (d->cloudLogin == login)
+        return;
+
     d->cloudLogin = login;
     d->updateConnection();
+    emit loginChanged();
 }
 
 QString QnCloudStatusWatcher::cloudPassword() const
@@ -160,7 +165,7 @@ void QnCloudStatusWatcher::updateSystems()
         return;
 
     d->cloudConnection->systemManager()->getSystems(
-            [this](api::ResultCode result, const api::SystemDataList &systemsList)
+            [this](api::ResultCode result, const api::SystemDataExList &systemsList)
             {
                 QnCloudSystemList cloudSystems;
 
@@ -223,7 +228,10 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     cloudConnection.reset();
 
     if (cloudLogin.isEmpty() || cloudPassword.isEmpty())
+    {
+        setCloudSystems(QnCloudSystemList());
         return;
+    }
 
     cloudConnection = connectionFactory->createConnection(cloudLogin.toStdString(), cloudPassword.toStdString());
 

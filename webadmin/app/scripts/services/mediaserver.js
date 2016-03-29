@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, ipCookie,$log) {
+    .factory('mediaserver', function ($http, $modal, $q, ipCookie, $log) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
@@ -14,7 +14,7 @@ angular.module('webadminApp')
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
                     proxy = '/proxy/' + pair[1];
-                    if(pair[1] == 'demo'){
+                    if(pair[1] === 'demo'){
                         proxy = Config.demo;
                     }
                     break;
@@ -32,9 +32,14 @@ angular.module('webadminApp')
         var loginDialog = null;
         function offlineHandler(error){
             // Check 401 against offline
+            var inlineMode = typeof(setupDialog)!='undefined'; // Qt registered object
+            var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
+
+            if(isInFrame || inlineMode){
+                return; // inline mode - do not do anything
+            }
             if(error.status === 401) {
-                var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
-                if (!isInFrame && loginDialog === null) { //Dialog is not displayed
+                if (loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: 'views/login.html',
                         keyboard:false,
@@ -49,18 +54,17 @@ angular.module('webadminApp')
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
             }
-            console.log(error);
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
-                getSettings(true).catch(function (error) {
+                getSettings(true).catch(function (/*error*/) {
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',
                         keyboard:false,
                         backdrop:'static'
                     });
-                    offlineDialog.result.then(function (info) {//Dialog closed - means server is online
+                    offlineDialog.result.then(function (/*info*/) {//Dialog closed - means server is online
                         offlineDialog = null;
                     });
                 });
@@ -89,12 +93,85 @@ angular.module('webadminApp')
             };
             return obj;
         }
+
+        function getNonce(){
+            var deferred = $q.defer();
+            function resolver(){
+                var realm = ipCookie('realm');
+                var nonce = ipCookie('nonce');
+                $log.log("Authorization - reading nonce:" + nonce + " realm:" + realm);
+                if(!realm || !nonce){
+                    return false;
+                }
+                deferred.resolve({
+                    realm: realm,
+                    nonce: nonce
+                });
+                return true;
+            }
+            if(!resolver()){
+                $http.get(proxy + '/api/getCurrentUser').then(resolver,resolver);
+            }
+            return deferred.promise;
+        }
         return {
+            login:function(login,password){
+                // Calculate digest
+                var deferred = $q.defer();
+                getNonce().then(function(data){
+                    var realm = data.realm;
+                    var nonce = data.nonce;
+
+                    $log.log("Authorization - got nonce:" + nonce + " realm:" + realm);
+
+                    var digest = md5(login + ':' + realm + ':' + password);
+                    var method = md5('GET:');
+                    var authDigest = md5(digest + ':' + nonce + ':' + method);
+                    var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+
+                    /*
+                     console.log('debug auth - realm:',realm);
+                     console.log('debug auth - nonce:',nonce);
+                     console.log('debug auth - login:',login);
+                     console.log('debug auth - password:',$scope.user.password);
+                     console.log('debug auth - digest = md5(login:realm:password):',digest);
+                     console.log('debug auth - method:','GET:');
+                     console.log('debug auth - md5(method):',method);
+                     console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
+                     console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
+                     */
+
+
+
+                    /*
+                    var rtspmethod = md5('PLAY:');
+                    var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                    var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
+                    ipCookie('auth_rtsp',authRtsp, { path: '/' });
+                    */
+
+                    //Old cookies:  // TODO: REMOVE THIS SECTION
+                    //ipCookie('response',auth_digest, { path: '/' });
+                    //ipCookie('username',login, { path: '/' });
+
+                    ipCookie('auth', auth, { path: '/' });
+
+                    $log.log("Authorization - cookie set auth:" + ipCookie('auth'));
+
+                    // Check auth again - without catching errors
+                    return $http.get(proxy + '/api/getCurrentUser').then(function(data){
+                        deferred.resolve(data);
+                    },function(error){
+                        deferred.reject(error);
+                    });
+                });
+                return deferred.promise;
+            },
             url:function(){
                 return proxy;
             },
             mediaDemo:function(){
-                if(proxy == Config.demo){
+                if(proxy === Config.demo){
                     return Config.demoMedia;
                 }
                 return false;
@@ -126,13 +203,16 @@ angular.module('webadminApp')
             hasProxy:function(){
                 return proxy !=='';
             },
-            getUser:function(){
+            getUser:function(reload){
                 var deferred = $q.defer();
                 if(this.hasProxy()){ // Proxy means read-only
                     deferred.resolve(false);
                 }
-                this.getCurrentUser().then(function(result){
-                    var isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
+                this.getCurrentUser(reload).then(function(result){
+                    /*jshint bitwise: false*/
+                    var hasEditServerPermission = result.data.reply.permissions & Config.globalEditServersPermissions;
+                    /*jshint bitwise: true*/
+                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
                     var isOwner = result.data.reply.isAdmin ;
 
@@ -141,6 +221,8 @@ angular.module('webadminApp')
                         isOwner:isOwner,
                         name:result.data.reply.name
                     });
+                },function(error){
+                    deferred.reject(error);
                 });
                 return deferred.promise;
             },
@@ -168,11 +250,67 @@ angular.module('webadminApp')
                     timeout: 3*1000
                 });
             },
+            systemCloudInfo:function(){
+                var deferred = $q.defer();
+                this.getSystemSettings().then(function(data){
 
-            changeSystem:function(systemName,pasword){
+                    var allSettings = data.data;
+                    var cloudId = _.find(allSettings, function (setting) {
+                        return setting.name === 'cloudSystemID';
+                    });
+                    var cloudSystemID = cloudId ? cloudId.value : '';
+
+                    if (cloudSystemID.trim() === '' || cloudSystemID === '{00000000-0000-0000-0000-000000000000}') {
+                        deferred.reject(null);
+                        return;
+                    }
+
+                    var cloudAccount = _.find(allSettings, function (setting) {
+                        return setting.name === 'cloudAccountName';
+                    });
+                    cloudAccount = cloudAccount ? cloudAccount.value : '';
+
+                    deferred.resolve({
+                        cloudSystemID:cloudSystemID,
+                        cloudAccountName: cloudAccount
+                    });
+                });
+                return deferred.promise;
+            },
+
+            detachFromSystem:function(oldPassword){
+                return wrapPost(proxy + '/api/detachFromSystem',{
+                    oldPassword:oldPassword
+                });
+            },
+            setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName){
+                return wrapPost(proxy + '/api/setupCloudSystem',{
+                    systemName: systemName,
+                    cloudSystemID: systemId,
+                    cloudAuthKey: authKey,
+                    cloudAccountName: cloudAccountName
+                });
+            },
+
+            setupLocalSystem:function(systemName, adminAccount, adminPassword){
+                return wrapPost(proxy + '/api/setupLocalSystem',{
+                    systemName: systemName,
+                    adminAccount: adminAccount,
+                    password: adminPassword
+                });
+            },
+
+
+            changeSystemName:function(systemName){
                 return wrapPost(proxy + '/api/configure?' + $.param({
-                    systemName:systemName,
-                    password:password
+                    systemName:systemName
+                }));
+            },
+            changeSystem:function(systemName,login,password){
+                return wrapPost(proxy + '/api/configure?' + $.param({
+                    systemName: systemName,
+                    login: login,
+                    password: password
                 }));
             },
 
@@ -183,9 +321,10 @@ angular.module('webadminApp')
             },
 
 
-            mergeSystems: function(url,password,currentPassword,keepMySystem){
+            mergeSystems: function(url, remoteLogin, remotePassword, currentPassword, keepMySystem){
                 return wrapPost(proxy + '/api/mergeSystems?' + $.param({
-                    password: password,
+                    login: remoteLogin,
+                    password: remotePassword,
                     currentPassword: currentPassword,
                     url: url,
                     takeRemoteSettings: !keepMySystem
@@ -230,6 +369,8 @@ angular.module('webadminApp')
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
+
+
             systemSettings:function(setParams){
                 //return;
                 if(!setParams) {
@@ -246,10 +387,13 @@ angular.module('webadminApp')
             getSystemSettings:function(){
                 return wrapGet(proxy + '/ec2/getSettings');
             },
-            saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey){
+
+
+            saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey, cloudAccountName){
                 return wrapPost(proxy + '/api/saveCloudSystemCredentials',{
                     cloudSystemID:cloudSystemId,
-                    cloudAuthKey:cloudAuthKey
+                    cloudAuthKey:cloudAuthKey,
+                    cloudAccountName: cloudAccountName
                 });
             },
             clearCloudSystemCredentials: function(){
@@ -278,9 +422,10 @@ angular.module('webadminApp')
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
-                if( proxy == Config.demo){
+                if( proxy === Config.demo){
                     serverUrl = proxy + '/';
                 }
+
                 //RecordedTimePeriods
                 return  wrapGet(serverUrl + 'ec2/recordedTimePeriods' +
                     '?' + (label||'') +
@@ -294,13 +439,13 @@ angular.module('webadminApp')
             },
             debugFunctionUrl:function(url,getParams){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
-                return proxy + url + delimeter + $.param(getParams)
+                return proxy + url + delimeter + $.param(getParams);
             },
             debugFunction:function(method,url,getParams,postParams){
                 switch(method){
-                    case "GET":
+                    case 'GET':
                         return $http.get(this.debugFunctionUrl(url,getParams));
-                    case "POST":
+                    case 'POST':
                         return $http.post(this.debugFunctionUrl(url,getParams), postParams);
 
                 }

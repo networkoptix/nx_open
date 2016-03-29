@@ -191,8 +191,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    m_renameActions.insert(Qn::RenameResourceAction, new QAction(this));
-    m_renameActions.insert(Qn::RenameVideowallEntityAction, new QAction(this));
+    m_renameActions.insert(QnActions::RenameResourceAction, new QAction(this));
+    m_renameActions.insert(QnActions::RenameVideowallEntityAction, new QAction(this));
 
     setHelpTopic(this,                              Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab,                     Qn::MainWindow_Tree_Search_Help);
@@ -213,6 +213,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
     ui->searchTreeWidget->setWorkbench(workbench());
+
+    ui->tabWidget->tabBar()->setMaximumHeight(32);
 
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
@@ -321,10 +323,10 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
-        for (Qn::ActionId key: m_renameActions.keys())
+        for (QnActions::IDType key: m_renameActions.keys())
             manager->redirectAction(menu.data(), key, NULL);
     } else {
-        for (Qn::ActionId key: m_renameActions.keys())
+        for (QnActions::IDType key: m_renameActions.keys())
             manager->redirectAction(menu.data(), key, m_renameActions[key]);
     }
 
@@ -668,7 +670,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             QnWorkbenchLayout *layout = workbench()->currentLayout();
             if(!isLayoutSearchable(layout)) {
                 QString filter = ui->filterLineEdit->text();
-                menu()->trigger(Qn::OpenNewTabAction);
+                menu()->trigger(QnActions::OpenNewTabAction);
                 setLayoutFilter(layout, QString()); /* Clear old layout's filter. */
 
                 layout = workbench()->currentLayout();
@@ -792,7 +794,7 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
     QnResourcePtr resource = qnResPool->getResourceById(m_tooltipWidget->resourceId());
     if (!resource)
         return;
-    menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resource));
+    menu()->trigger(QnActions::OpenInCurrentLayoutAction, QnActionParameters(resource));
 }
 
 void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel *model) const {
@@ -807,5 +809,3 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
         model->addCriterion(QnResourceCriterion(Qn::layout));
     }
 }
-
-

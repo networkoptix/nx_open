@@ -1,18 +1,25 @@
 'use strict';
+/*exported Config */
 
 var Config = {
+
+    defaultLogin: 'admin',
+    defaultPassword: 'admin',
+    newServerFlag: 'SF_NewSystem',
+
     globalEditServersPermissions:0x00000020 ,
     globalViewArchivePermission:0x00000100,
     globalViewLivePermission:0x00000080,
 
     cloud:{
+        apiUrl: 'http://cloud-demo.hdw.mx/api',
         portalWhiteList:'http://cloud-demo.hdw.mx/**',
         portalUrl: 'http://cloud-demo.hdw.mx',
         portalRegisterUrl: 'http://cloud-demo.hdw.mx/static/index.html#/register',
 
-        portalSystemUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}?inline',
-        portalConnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/connect/{systemName}?inline',
-        portalDisconnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}/disconnect?inline'
+        portalSystemUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}',
+        portalConnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/connect/{systemName}',
+        portalDisconnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}/disconnect'
     },
 
     cloudLocalhost:{
@@ -28,22 +35,22 @@ var Config = {
 
 
 
-    demo:"/~ebalashov/webclient/api",
-    demoMedia:"//10.0.2.186:7001",
+    demo:'/~ebalashov/webclient/api',
+    demoMedia:'//10.0.2.186:7001',
 
     webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//"flashls", // videowindow.js - force video player
+        videoFormat: false,//'flashls', // videowindow.js - force video player
         chunksOnTimeline: false // timeline.js - draw debug events
     },
     helpLinks:[
         // Additional Links to show in help
         /*{
-            url: "#/support/",
-            title: "Support",
-            target: "" // new|frame
+            url: '#/support/',
+            title: 'Support',
+            target: '' // new|frame
         }*/
     ]
 };

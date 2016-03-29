@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>794</width>
-    <height>551</height>
+    <height>549</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0,0">
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
@@ -361,21 +361,13 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="backupPreparePage">
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <widget class="QLabel" name="storagesWarningLabel">
-            <property name="text">
-             <string>Unchecking the storage will cause nothing but writing stop.
-It won't deny oldest footage removing from the drive.</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="backupTimeLabel">
             <property name="text">
@@ -420,6 +412,38 @@ It won't deny oldest footage removing from the drive.</string>
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="storagesWarningStackedWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="pageStoragesWarning">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="storagesWarningLabel">
+         <property name="text">
+          <string>Unchecking the storage will cause nothing but writing stop.
+It won't deny oldest footage removing from the drive.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageSpacer"/>
     </widget>
    </item>
   </layout>

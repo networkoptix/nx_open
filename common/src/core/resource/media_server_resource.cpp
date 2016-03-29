@@ -41,22 +41,13 @@ namespace {
     }
 }
 
-
-class QnMediaServerResourceGuard: public QObject {
-public:
-    QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
-
-private:
-    QnMediaServerResourcePtr m_resource;
-};
-
-QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
+QnMediaServerResource::QnMediaServerResource():
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
         &m_mutex )
 {
-    setTypeId(resTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
@@ -114,7 +105,7 @@ void QnMediaServerResource::atResourceChanged()
 
 QString QnMediaServerResource::getUniqueId() const
 {
-    assert(!getId().isNull());
+    NX_ASSERT(!getId().isNull());
     return QLatin1String("Server ") + getId().toString();
 }
 
@@ -189,33 +180,33 @@ QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(id);
+    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->additionalUrls(id);
     if (oldUrls == urls)
         return;
 
-    QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(id, urls);
+    qnServerAdditionalAddressesDictionary->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 {
-    return QnServerAdditionalAddressesDictionary::instance()->additionalUrls(getId());
+    return qnServerAdditionalAddressesDictionary->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
     QnUuid id = getId();
-    QList<QUrl> oldUrls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(id);
+    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->ignoredUrls(id);
     if (oldUrls == urls)
         return;
 
-    QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(id, urls);
+    qnServerAdditionalAddressesDictionary->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
-    return QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(getId());
+    return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
 }
 
 quint16 QnMediaServerResource::getPort() const {
@@ -229,7 +220,12 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread,
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_apiConnection && !m_apiUrl.isEmpty())
-        m_apiConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
+    {
+        QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
+        m_apiConnection = QnMediaServerConnectionPtr(
+            new QnMediaServerConnection(thisPtr, QnAppServerConnectionFactory::videowallGuid()),
+            &qnDeleteLater);
+    }
 
     return m_apiConnection;
 }
@@ -242,16 +238,6 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
         m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
 
     return m_restConnection;
-}
-
-QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)
-{
-    Q_UNUSED(resourceTypeId)
-
-    QnResourcePtr result(new QnMediaServerResource(qnResTypePool));
-    //result->deserialize(parameters);
-
-    return result;
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
@@ -485,7 +471,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
 }
 
 void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
-    Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
+    NX_ASSERT(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
 
     QList<SocketAddress> addressList;
     for (const QString &address: moduleInformation.remoteAddresses)
@@ -548,7 +534,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
-            Q_ASSERT_X(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
+            NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
                        Q_FUNC_INFO,
                        "Incompatible servers should not take any status but incompatible or unauthorized");
         }

@@ -7,6 +7,7 @@
 
 #include <nx/network/stun/cc/custom_stun.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/move_only_func.h>
 
 #include "data/result_code.h"
 
@@ -51,7 +52,7 @@ protected:
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
         nx::stun::Message request,
-        std::function<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
 
@@ -60,7 +61,7 @@ protected:
 
         this->sendRequest(
             std::move(request),
-            [this, method, /*std::move*/ completionHandler](    //TODO #ak #msvc2015 move to lambda
+            [this, method, completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode code,
                 stun::Message message)
         {
@@ -109,7 +110,7 @@ protected:
 
     void sendRequestAndReceiveResponse(
         nx::stun::Message request,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
     {
         using namespace nx::hpm::api;
 
@@ -118,9 +119,9 @@ protected:
 
         this->sendRequest(
             std::move(request),
-            [this, method, /*std::move*/ completionHandler](
+            [this, method, completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode code,
-                nx::stun::Message message)
+                nx::stun::Message message) mutable
         {
             if (code != SystemError::noError)
             {

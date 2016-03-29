@@ -71,6 +71,22 @@ protected:
         return true;
     }
 
+    template<typename AttributeType, typename EnumType>
+    bool readEnumAttributeValue(
+        const nx::stun::Message& message,
+        EnumType* const value)
+    {
+        const auto attribute = message.getAttribute< AttributeType >();
+        if (!attribute)
+        {
+            setErrorText(nx::String("Missing required attribute ") +
+                stun::cc::attrs::toString(AttributeType::TYPE));
+            return false;
+        }
+        *value = static_cast<EnumType>(attribute->value());
+        return true;
+    }
+
     template<typename AttributeType>
     bool readUuidAttributeValue(
         const nx::stun::Message& message,

@@ -422,7 +422,7 @@ bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
 
 void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
     Q_UNUSED(value);
-    Q_ASSERT("Should never get here");
+    NX_ASSERT("Should never get here");
 }
 
 void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
@@ -627,7 +627,7 @@ void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps &snaps, bool va
         for (int idx: screenIdxs) {
             if (idx >= m_screens.size())
                 continue;   // we can lose one screen after snaps have been set
-            Q_ASSERT(m_screens[idx].free() != value);
+            NX_ASSERT(m_screens[idx].free() != value);
             m_screens[idx].setFree(value);
         }
     } else if (!screenIdxs.isEmpty()) { //otherwise looking at the screen parts
@@ -639,8 +639,8 @@ void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps &snaps, bool va
         for (int i = snaps.left().snapIndex; i < QnScreenSnap::snapsPerScreen() - snaps.right().snapIndex; ++i) {
             for (int j = snaps.top().snapIndex; j < QnScreenSnap::snapsPerScreen() - snaps.bottom().snapIndex; ++j) {
                 int idx = i* QnScreenSnap::snapsPerScreen() + j;
-                Q_ASSERT(idx < screen.parts.size());
-                Q_ASSERT(screen.parts[idx].free() != value);
+                NX_ASSERT(idx < screen.parts.size());
+                NX_ASSERT(screen.parts[idx].free() != value);
                 screen.parts[idx].setFree(value);
             }
         }
@@ -732,10 +732,11 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
             continue;;
         
         if (item->itemType == ItemType::Existing) {
-            if (QMessageBox::question(q_ptr, 
+            if (QnMessageBox::question(
+                q_ptr,
                 tr("Delete Screen"),
                 tr("Are you sure you want to delete %1?").arg(item->name),
-                QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+                QDialogButtonBox::Ok | QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
                 return;
         }
         
@@ -748,7 +749,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
 }
 
 void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
-    Q_ASSERT(!m_process.isRunning());
+    NX_ASSERT(!m_process.isRunning());
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
         if (!item.editable || !item.geometry.contains(pos))
             return;

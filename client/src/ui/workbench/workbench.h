@@ -77,19 +77,19 @@ public:
 
     /**
      * \param index                     Index of the layout to get.
-     * \returns                         Layout for the given index. 
+     * \returns                         Layout for the given index.
      */
     QnWorkbenchLayout *layout(int index) const;
 
     /**
-     * \returns                         All layouts of this workbench. May be empty. 
+     * \returns                         All layouts of this workbench. May be empty.
      */
     const QList<QnWorkbenchLayout *> &layouts() const {
         return m_layouts;
     }
 
     /**
-     * \param layout                    Layout to add to this workbench. 
+     * \param layout                    Layout to add to this workbench.
      */
     void addLayout(QnWorkbenchLayout *layout);
 
@@ -123,7 +123,7 @@ public:
 
     /**
      * Note that workbench does not take ownership of the supplied layout.
-     * If supplied layout is not in this workbench's layout list, 
+     * If supplied layout is not in this workbench's layout list,
      * it will be added to it.
      *
      * \param layout                    New layout for this workbench. If NULL
@@ -136,7 +136,7 @@ public:
      * Sets the index of the current layout. Note that index does not need
      * to be valid as it will be bounded to the closest valid value.
      *
-     * \param index                     New current layout index. 
+     * \param index                     New current layout index.
      */
     void setCurrentLayoutIndex(int index);
 
@@ -185,10 +185,11 @@ signals:
      */
     void currentLayoutChanged();
 
-    /**
-     * This signal is emitted whenever this workbench's layouts list changes. 
-     */
     void layoutsChanged();
+
+    void layoutAdded(QnWorkbenchLayout *layout);
+
+    void layoutRemoved(QnWorkbenchLayout *layout);
 
     /**
      * This signal is emitted whenever a new item is assigned to the role.

@@ -1,7 +1,7 @@
 #ifndef FRAMED_LABEL_H
 #define FRAMED_LABEL_H
 
-#include <QLabel>
+#include <QtWidgets/QLabel>
 
 /**
  * The QnFramedLabel class implements the label control that can draw frame around

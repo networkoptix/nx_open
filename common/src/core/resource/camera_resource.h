@@ -12,11 +12,6 @@
 
 #include "security_cam_resource.h"
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#define CodecID int
-#define CODEC_ID_NONE 0
-#endif
-
 class QnAbstractDTSFactory;
 
 class CameraMediaStreams;
@@ -192,6 +187,8 @@ public:
     float actualFps;
     float averageGopSize;
     QString resolution;
+    int numberOfChannels;
+    bool isConfigured;
 
     CameraBitrateInfo(int index = -1, QString time = QString())
         : encoderIndex(index)
@@ -200,16 +197,18 @@ public:
         , suggestedBitrate(-1)
         , actualBitrate(-1)
         , bitratePerGop(Qn::BPG_None)
-        , bitrateFactor(1)
+        , bitrateFactor(-1)
         , fps(-1)
         , actualFps(-1)
+        , numberOfChannels(-1)
+        , isConfigured(false)
     {
     }
 };
 #define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
     (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
     (bitratePerGop)(bitrateFactor) \
-    (fps)(actualFps)(averageGopSize)(resolution)
+    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)(isConfigured)
 
 class CameraBitrates
 {

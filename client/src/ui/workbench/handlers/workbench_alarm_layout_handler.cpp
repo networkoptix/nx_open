@@ -33,20 +33,22 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/streaming/archive_stream_reader.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <utils/aspect_ratio.h>
+#include <utils/common/delayed.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
         Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
     public:
         QnAlarmLayoutResource():
-            QnLayoutResource(qnResTypePool)
+            QnLayoutResource()
         {
-            Q_ASSERT_X(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
+            NX_ASSERT(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
 
             setId(QnUuid::createUuid());
             addFlags(Qn::local);
@@ -59,13 +61,16 @@ namespace {
 
     typedef QnSharedResourcePointer<QnAlarmLayoutResource> QnAlarmLayoutResourcePtr;
     typedef QnSharedResourcePointerList<QnAlarmLayoutResource> QnAlarmLayoutResourceList;
+
+    /* Processing actions are cleaned by this timeout. */
+    const qint64 kProcessingActionTimeoutMs = 5000;
 }
 
 QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 {
-    connect( action(Qn::OpenInAlarmLayoutAction), &QAction::triggered, this,   [this] {
+    connect( action(QnActions::OpenInAlarmLayoutAction), &QAction::triggered, this,   [this] {
         QnActionParameters parameters = menu()->currentParameters(sender());
         openCamerasInAlarmLayout(parameters.resources().filtered<QnVirtualCameraResource>(), true);
     } );
@@ -79,22 +84,30 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
         if (!context()->user())
             return;
 
-        QnUserResourceList users = qnResPool->getResources<QnUserResource>(businessAction->getParams().additionalResources);
+        const auto params = businessAction->getParams();
+
+        QnUserResourceList users = qnResPool->getResources<QnUserResource>(params.additionalResources);
         if (!users.isEmpty() && !users.contains(context()->user()))
             return;
 
-        //TODO: #GDM code duplication
-        QnBusinessEventParameters params = businessAction->getRuntimeParams();
-
         QnVirtualCameraResourceList targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
-        if (businessAction->getParams().useSource) {
-            if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(params.eventResourceId))
-                targetCameras << sourceCamera;
-            targetCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-        }
+        if (businessAction->getParams().useSource)
+            targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+
+        if (targetCameras.isEmpty())
+            return;
+
+        ActionKey key(businessAction->getBusinessRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
+        if (m_processingActions.contains(key))
+            return; /* See m_processingActions comment. */
+
+        m_processingActions.append(key);
+        executeDelayedParented([this, key] {
+            m_processingActions.removeOne(key);
+        }, kProcessingActionTimeoutMs, this);
 
         /* If forced, open layout instantly */
-        if (businessAction->getParams().forced)
+        if (params.forced)
         {
             if (currentInstanceIsMain())
                 openCamerasInAlarmLayout(targetCameras, true);
@@ -119,7 +132,13 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     const bool wasEmptyLayout = layout->items().isEmpty();
 
     /* Disable Sync on layout before adding cameras */
-    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    const auto syncDisabled = QnStreamSynchronizationState();
+    if (workbench()->currentLayout() == layout)
+    {
+        QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+        streamSynchronizer->setState(syncDisabled);
+    }
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(syncDisabled));
 
     // Sort items to guarantee the same item placement for the same set of cameras.
     QnVirtualCameraResourceList sortedCameras = cameras;
@@ -176,7 +195,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     QnAlarmLayoutResourcePtr alarmLayout;
 
     QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
-    Q_ASSERT_X(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
+    NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
     if (!layouts.empty()) {
         alarmLayout = layouts.first();
     } else {
@@ -200,7 +219,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
         return false;
 
     QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
-    Q_ASSERT_X(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
+    NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
     if (layouts.empty())
         return false;
 
@@ -208,7 +227,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
 }
 
 void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item ) {
-    Q_ASSERT_X(layout && item, Q_FUNC_INFO, "Objects must exist here");
+    NX_ASSERT(layout && item, Q_FUNC_INFO, "Objects must exist here");
     if (!item)
         return;
 
@@ -219,21 +238,31 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     if (!layout || workbench()->currentLayout() != layout)
         return;
 
-    if (auto resourceDisplay = display()->display(item)) {
-        if (resourceDisplay->archiveReader()) {
+    /* Navigator will not update values if we are changing current item's state. */
+    auto currentWidget = navigator()->currentWidget();
+    if (currentWidget && currentWidget->item() == item)
+    {
+        navigator()->setSpeed(1.0);
+        navigator()->setPosition(DATETIME_NOW);
+    }
+
+    if (auto resourceDisplay = display()->display(item))
+    {
+        if (resourceDisplay->archiveReader())
+        {
+            //resourceDisplay->archiveReader()->pauseMedia(); //TODO: #GDM make sure this magic is required
             resourceDisplay->archiveReader()->setSpeed(1.0);
             resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
             resourceDisplay->archiveReader()->resumeMedia();
         }
         resourceDisplay->start();
     }
-
 }
 
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
     auto clientInstanceManager = qnCommon->instance<QnClientInstanceManager>();
-    Q_ASSERT_X(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
+    NX_ASSERT(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
     if (!clientInstanceManager)
         return true;
 
@@ -243,33 +272,28 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
     if (runningInstances.isEmpty())
         return true;
 
-    return runningInstances.first() == clientInstanceManager->instanceIndex();
+    QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
 
-    // Currently client only knows about instances that were connected to server only after than itself.
-    // This leads to undefined behavior and alarm layout duplicating.
+    QSet<QnUuid> connectedInstances;
+    for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
+    {
+        if (info.data.userId != localUserId)
+            continue;
+        connectedInstances.insert(info.uuid);
+    }
 
-//     QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
-//
-//     QSet<QnUuid> connectedInstances;
-//     for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
-//     {
-//         if (info.data.userId != localUserId)
-//             continue;
-//         connectedInstances.insert(info.uuid);
-//     }
-//
-//     /* Main instance is the one that has the smallest index between all instances
-//        connected to current server with the same credentials. */
-//     for (int index: runningInstances)
-//     {
-//         if (index == clientInstanceManager->instanceIndex())
-//             return true;
-//
-//         /* Check if other instance connected to the same server. */
-//         QnUuid otherInstanceUuid = clientInstanceManager->instanceGuidForIndex(index);
-//         if (connectedInstances.contains(otherInstanceUuid))
-//             return false;
-//     }
-//
-//     return true;
+    /* Main instance is the one that has the smallest index between all instances
+    connected to current server with the same credentials. */
+    for (int index: runningInstances)
+    {
+        if (index == clientInstanceManager->instanceIndex())
+            return true;
+
+        /* Check if other instance connected to the same server. */
+        QnUuid otherInstanceUuid = clientInstanceManager->instanceGuidForIndex(index);
+        if (connectedInstances.contains(otherInstanceUuid))
+            return false;
+    }
+
+    return true;
 }

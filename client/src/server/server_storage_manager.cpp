@@ -6,6 +6,9 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 
+#include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -146,6 +149,11 @@ QnServerStorageManager::~QnServerStorageManager()
 
 }
 
+void QnServerStorageManager::invalidateRequests()
+{
+    m_requests.clear();
+}
+
 bool QnServerStorageManager::isServerValid( const QnMediaServerResourcePtr &server ) const
 {
     /* Server is invalid. */
@@ -221,7 +229,10 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     if (!conn)
         return;
 
-    conn->getMediaServerManager()->saveStorages(storages, this, [storages](int reqID, ec2::ErrorCode error)
+    ec2::ApiStorageDataList apiStorages;
+    ec2::fromResourceListToApi(storages, apiStorages);
+
+    conn->getMediaServerManager()->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
     {
         Q_UNUSED(reqID);
         if (error != ec2::ErrorCode::ok)
@@ -231,6 +242,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
             if (const QnClientStorageResourcePtr& clientStorage = storage.dynamicCast<QnClientStorageResource>())
                 clientStorage->setActive(true);
     });
+    invalidateRequests();
 }
 
 //TODO: #GDM SafeMode
@@ -241,6 +253,7 @@ void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
         return;
 
     conn->getMediaServerManager()->removeStorages(ids, this, [] {});
+    invalidateRequests();
 }
 
 bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action )
@@ -255,6 +268,9 @@ bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResou
         SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
     if (handle <= 0)
         return false;
+
+    if (action != Qn::RebuildAction_ShowProgress)
+        invalidateRequests();
 
     m_requests.insert(handle, RequestKey(server, pool));
     return true;
@@ -307,6 +323,9 @@ bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &
         SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
     if (handle <= 0)
         return false;
+
+    if (action != Qn::BackupAction_ShowProgress)
+        invalidateRequests();
 
     m_requests.insert(handle, RequestKey(server, QnServerStoragesPool::Main));
     return true;
@@ -410,7 +429,7 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         if (existingStorages.contains(spaceInfo.url))
             continue;
 
-        Q_ASSERT_X(spaceInfo.storageId.isNull(), Q_FUNC_INFO, "We should process only non-pool storages here");
+        /* If we have just deleted a storage, we can receive it's space info from the previous request. Just skip it. */
         if (!spaceInfo.storageId.isNull())
             continue;
 
@@ -430,8 +449,20 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
     QnResourceList storagesToDelete;
     for (const QnStorageResourcePtr &storage: requestKey.server->getStorages())
     {
+        /*
+         * Skipping storages that are really present in the server resource pool.
+         * They will be deleted on storageRemoved transaction.
+         */
+        QnClientStorageResourcePtr clientStorage = storage.dynamicCast<QnClientStorageResource>();
+        NX_ASSERT(clientStorage, Q_FUNC_INFO, "Only client storage intances must exist on the client side.");
+        if (clientStorage && clientStorage->isActive())
+            continue;
+
+        /* Skipping storages that are confirmed by server. */
         if (receivedStorages.contains(storage->getUrl()))
             continue;
+
+        /* Removing other storages (e.g. external drives that were switched off. */
         storagesToDelete << storage;
     }
 

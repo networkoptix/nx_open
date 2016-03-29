@@ -8,7 +8,6 @@
 
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QTreeWidgetItem>
-#include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -22,10 +21,11 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/dialogs/message_box.h>
+#include <ui/widgets/snapped_scrollbar.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
@@ -38,6 +38,9 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     m_httpClient(NULL)
 {
     ui->setupUi(this);
+
+    QnSnappedScrollBar *tableScrollBar = new QnSnappedScrollBar(this);
+    ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
     QList<QnLicenseListModel::Column> columns;
     columns 
@@ -184,16 +187,16 @@ void QnLicenseManagerWidget::updateLicenses() {
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox>> messageBox(new QnWorkbenchStateDependentDialog<QnMessageBox>(this));
-    messageBox->setIcon(warning ? QMessageBox::Warning : QMessageBox::Information);
+    messageBox->setIcon(warning ? QnMessageBox::Warning : QnMessageBox::Information);
     messageBox->setWindowTitle(title);
     messageBox->setText(message);
-    QPushButton* copyButton = messageBox->addCustomButton(tr("Copy to Clipboard"), QMessageBox::HelpRole);
+    QPushButton* copyButton = messageBox->addButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
     connect(copyButton, &QPushButton::clicked, this, [this, message]{
         qApp->clipboard()->setText(message);
     });
-    messageBox->setStandardButtons(QMessageBox::Ok);
-    messageBox->setEscapeButton(QMessageBox::Ok);
-    messageBox->setDefaultButton(QMessageBox::Ok);
+    messageBox->setStandardButtons(QDialogButtonBox::Ok);
+    messageBox->setEscapeButton(QDialogButtonBox::Ok);
+    messageBox->setDefaultButton(QDialogButtonBox::Ok);
     messageBox->exec();
 }
 
@@ -363,7 +366,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
     }
 
     if (!message.isEmpty())
-        QMessageBox::information(this, tr("License Activation"), message);
+        QnMessageBox::information(this, tr("License Activation"), message);
 
     ui->licenseWidget->setSerialKey(QString());
 

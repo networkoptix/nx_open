@@ -1,7 +1,6 @@
 #include "build_number_dialog.h"
 #include "ui_build_number_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 
 #include "utils/update/update_utils.h"
@@ -44,6 +43,6 @@ void QnBuildNumberDialog::accept() {
     if (checkPassword(buildNumber(), password())) {
         base_type::accept();
     } else {
-        QMessageBox::critical(this, tr("Error"), tr("The password you have entered is not valid."));
+        QnMessageBox::critical(this, tr("Error"), tr("The password you have entered is not valid."));
     }
 }

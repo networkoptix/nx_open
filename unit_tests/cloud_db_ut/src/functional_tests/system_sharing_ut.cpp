@@ -14,7 +14,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -176,7 +176,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
     {
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
-            getSystemSharings(account2.email, account2Password, system1.id.toStdString(), &sharings),
+            getSystemSharings(account2.email, account2Password, system1.id, &sharings),
             api::ResultCode::forbidden);
     }
 
@@ -185,7 +185,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings));
+            getSystemSharings(account2.email, account2Password, system2.id, &sharings));
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
@@ -199,7 +199,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -261,7 +261,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 
     restart();
 
-    //account1: trying to modify (change access rights) sharing to account2 
+    //account1: trying to modify (change access rights) sharing to account2
     //(failure: maintenance sharing cannot be updated)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -272,7 +272,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2.email,
             api::SystemAccessRole::viewer));
 
-    //account1: trying to remove sharing to account2 
+    //account1: trying to remove sharing to account2
     //(failure: maintenance sharing cannot be removed)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -283,7 +283,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2.email,
             api::SystemAccessRole::none));
 
-    //account2: trying to modify sharing to account2 
+    //account2: trying to modify sharing to account2
     //(failure: integrator cannot modify its sharing, only remove)
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -322,7 +322,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account1.email,
             api::SystemAccessRole::none));
 
-    //account2: trying to remove sharing to account2 
+    //account2: trying to remove sharing to account2
     //(success: itegrator removed sharing to itself)
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -516,7 +516,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -583,7 +583,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
 TEST_F(CdbFunctionalTest, system_sharing_owner)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating account
     api::AccountData account1;
@@ -669,7 +669,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
 TEST_F(CdbFunctionalTest, system_sharing_remove_system)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -684,7 +684,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
         api::ResultCode::ok,
         bindRandomSystem(account1.email, account1Password, &system1));
 
-    //sharing system 
+    //sharing system
     api::AccountData account2;
     std::string account2Password;
     ASSERT_EQ(
@@ -726,7 +726,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
     //removing system
     ASSERT_EQ(
         api::ResultCode::ok,
-        unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+        unbindSystem(account1.email, account1Password, system1.id));
 
     for (int i = 0; i < 2; ++i)
     {
@@ -756,7 +756,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
 TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -770,7 +770,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
         api::ResultCode::ok,
         bindRandomSystem(account1.email, account1Password, &system1));
 
-    //sharing system 
+    //sharing system
     api::AccountData account2;
     std::string account2Password;
     ASSERT_EQ(
@@ -848,7 +848,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccessRoleList(account1.email, account1Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account1.email, account1Password, system1.id, &accessRoles));
             ASSERT_EQ(6, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
@@ -869,7 +869,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccessRoleList(account2.email, account2Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account2.email, account2Password, system1.id, &accessRoles));
             ASSERT_EQ(5, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
@@ -882,7 +882,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccessRoleList(account3.email, account3Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account3.email, account3Password, system1.id, &accessRoles));
             ASSERT_EQ(1, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::maintenance) != accessRoles.end());
         }
@@ -891,21 +891,21 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::forbidden,
-                getAccessRoleList(account4.email, account4Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account4.email, account4Password, system1.id, &accessRoles));
         }
 
         {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::forbidden,
-                getAccessRoleList(account5.email, account5Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account5.email, account5Password, system1.id, &accessRoles));
         }
 
         {
             std::set<api::SystemAccessRole> accessRoles;
             ASSERT_EQ(
                 api::ResultCode::forbidden,
-                getAccessRoleList(account6.email, account6Password, system1.id.toStdString(), &accessRoles));
+                getAccessRoleList(account6.email, account6Password, system1.id, &accessRoles));
         }
     }
 }
@@ -913,7 +913,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
 TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -942,7 +942,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
 TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     //creating two accounts
     api::AccountData account1;
@@ -963,7 +963,7 @@ TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
         updateSystemSharing(
             account1.email,
             account1Password,
-            "unknown_system_id",
+            QnUuid::createUuid().toString().toStdString(),   /* Let assume we can never have system with random id. */
             "unknown_account_name",
             api::SystemAccessRole::none));
 

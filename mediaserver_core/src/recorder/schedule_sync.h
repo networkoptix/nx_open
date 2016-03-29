@@ -1,7 +1,6 @@
 #ifndef __SHEDULE_SYNC_H__
 #define __SHEDULE_SYNC_H__
 
-#include <QtConcurrent>
 #include <atomic>
 #include <vector>
 #include <map>
@@ -150,7 +149,7 @@ private:
 
     QnServerBackupSchedule  m_schedule;
     qint64                  m_syncTimePoint;
-    std::atomic<qint64>     m_syncEndTimePoint;
+    qint64                  m_syncEndTimePoint;
     QnMutex                 m_syncPointMutex;
 
     SyncDataMap           m_syncData;

@@ -5,27 +5,27 @@
     <name>BackupCamerasDialogDelegate</name>
     <message>
         <source>Backup newly added devices</source>
-        <translation type="unfinished"></translation>
+        <translation>גבה התקנים שהתווספו לאחרונה</translation>
     </message>
     <message>
         <source>Backup newly added cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>גבה מצלמות שהתווספו לאחרונה</translation>
     </message>
     <message>
         <source>Cannot add new devices while backup process is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להוסיף התקנים חדשים כאשר הגיבוי מתבצע.</translation>
     </message>
     <message>
         <source>Cannot add new cameras while backup process is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להוסיף מצלמות חדשות כאשר הגיבוי מתבצע.</translation>
     </message>
     <message>
         <source>Cannot add new devices because they store archive on external storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להוסיף התקנים חדשים מאחר והם שומרים ארכיון על התקן חיצוני.</translation>
     </message>
     <message>
         <source>Cannot add new cameras because they store archive on external storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להוסיף מצלמות חדשות מאחר והן שומרות ארכיון על התקן חיצוני.</translation>
     </message>
 </context>
 <context>
@@ -35,7 +35,8 @@
 to view more bookmarks</source>
         <comment>Use &apos;
 &apos; to split message in two lines (required)</comment>
-        <translation type="unfinished"></translation>
+        <translation>בצע זום על ציר הזמן
+לצפיה בסימניות נוספות</translation>
     </message>
 </context>
 <context>
@@ -92,11 +93,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>All Data</source>
-        <translation type="unfinished"></translation>
+        <translation>כל המידע</translation>
     </message>
     <message>
         <source>Bitrate for the Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>קצב תקשורת עבור ההקלטה האחרונה</translation>
     </message>
 </context>
 <context>
@@ -302,7 +303,7 @@ to view more bookmarks</source>
     <name>QnAbstractCameraAdvancedParamWidget</name>
     <message>
         <source>Read-Only</source>
-        <translation type="unfinished"></translation>
+        <translation>לקריאה בלבד</translation>
     </message>
 </context>
 <context>
@@ -325,14 +326,6 @@ to view more bookmarks</source>
     <message>
         <source>Hide FPS</source>
         <translation>הסתר פריימים לשניה</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+F</source>
-        <translation>Ctrl+Alt+F</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+D</source>
-        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <source>Drop Resources</source>
@@ -359,24 +352,12 @@ to view more bookmarks</source>
         <translation>הפריסה הבאה</translation>
     </message>
     <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
         <source>Previous Layout</source>
         <translation>הפריסה הקודמת</translation>
     </message>
     <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Select All</source>
         <translation>בחר הכל</translation>
-    </message>
-    <message>
-        <source>Ctrl+A</source>
-        <translation>Ctrl+A</translation>
     </message>
     <message>
         <source>Selection Changed</source>
@@ -393,10 +374,6 @@ to view more bookmarks</source>
     <message>
         <source>Go to Freespace Mode</source>
         <translation>עבור למצב &quot;שטח פנוי&quot;</translation>
-    </message>
-    <message>
-        <source>F11</source>
-        <translation>F11</translation>
     </message>
     <message>
         <source>Help</source>
@@ -447,16 +424,8 @@ to view more bookmarks</source>
         <translation>תפריט ראשי</translation>
     </message>
     <message>
-        <source>Alt+Space</source>
-        <translation>Alt+Space</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>התחבר לשרת...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+C</source>
-        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <source>Logout</source>
@@ -469,10 +438,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Panic Recording</source>
         <translation>הפסק הקלטת מצוקה</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation>Ctrl +P</translation>
     </message>
     <message>
         <source>New...</source>
@@ -495,20 +460,12 @@ to view more bookmarks</source>
         <translation>כרטיסיה חדשה</translation>
     </message>
     <message>
-        <source>Ctrl+T</source>
-        <translation>Ctrl +T</translation>
-    </message>
-    <message>
         <source>Window</source>
         <translation>חלון</translation>
     </message>
     <message>
         <source>New Window</source>
         <translation>חלון חדש</translation>
-    </message>
-    <message>
-        <source>Ctrl+N</source>
-        <translation>Ctrl +N</translation>
     </message>
     <message>
         <source>User...</source>
@@ -539,10 +496,6 @@ to view more bookmarks</source>
         <translation>קובץ/קבצים...</translation>
     </message>
     <message>
-        <source>Ctrl+O</source>
-        <translation>Ctrl+O</translation>
-    </message>
-    <message>
         <source>Layout(s)...</source>
         <translation>פריסה/פריסות...</translation>
     </message>
@@ -555,20 +508,8 @@ to view more bookmarks</source>
         <translation>שמור פריסה נוכחית</translation>
     </message>
     <message>
-        <source>Ctrl+S</source>
-        <translation>Ctrl +S</translation>
-    </message>
-    <message>
         <source>Save Current Layout As...</source>
         <translation>שמור פריסה נוכחית כ...</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+S</source>
-        <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
         <source>Save Video Wall View</source>
@@ -581,14 +522,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Screen Recording</source>
         <translation>הפסק הקלטת מסך</translation>
-    </message>
-    <message>
-        <source>Alt+R</source>
-        <translation>Alt+R</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <translation>יציאה</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -615,18 +548,6 @@ to view more bookmarks</source>
         <translation>שחזר</translation>
     </message>
     <message>
-        <source>Alt+Enter</source>
-        <translation>Alt+Enter</translation>
-    </message>
-    <message>
-        <source>Alt+Return</source>
-        <translation>Alt+Return</translation>
-    </message>
-    <message>
-        <source>Ctrl+F</source>
-        <translation>Ctrl+F</translation>
-    </message>
-    <message>
         <source>Show Message</source>
         <translation>הצג הודעה</translation>
     </message>
@@ -651,10 +572,6 @@ to view more bookmarks</source>
         <translation>ניהול המערכת...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+A</source>
-        <translation>Ctrl+Alt+A</translation>
-    </message>
-    <message>
         <source>Open Web Client...</source>
         <translation>פתח קליינט אינטרנט...</translation>
     </message>
@@ -675,18 +592,6 @@ to view more bookmarks</source>
         <translation>נתיב ביקורת...</translation>
     </message>
     <message>
-        <source>Ctrl+E</source>
-        <translation>Ctrl +E</translation>
-    </message>
-    <message>
-        <source>Ctrl+L</source>
-        <translation>Ctrl +L</translation>
-    </message>
-    <message>
-        <source>Ctrl+M</source>
-        <translation>Ctrl +M</translation>
-    </message>
-    <message>
         <source>Merge Systems...</source>
         <translation>מזג מערכות...</translation>
     </message>
@@ -699,16 +604,8 @@ to view more bookmarks</source>
         <translation>אודות...</translation>
     </message>
     <message>
-        <source>F1</source>
-        <translation>F1</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>יציאה</translation>
-    </message>
-    <message>
-        <source>Alt+F4</source>
-        <translation>Alt+F4</translation>
     </message>
     <message>
         <source>Server...</source>
@@ -751,14 +648,6 @@ to view more bookmarks</source>
         <translation>פתח את התיקיה המכילה</translation>
     </message>
     <message>
-        <source>Ctrl+Enter</source>
-        <translation>Ctrl +Enter</translation>
-    </message>
-    <message>
-        <source>Ctrl+Return</source>
-        <translation>Ctrl+Return</translation>
-    </message>
-    <message>
         <source>Identify</source>
         <translation>זהה</translation>
     </message>
@@ -780,10 +669,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Delete</source>
-        <translation>מחק</translation>
-    </message>
-    <message>
-        <source>Del</source>
         <translation>מחק</translation>
     </message>
     <message>
@@ -811,24 +696,12 @@ to view more bookmarks</source>
         <translation>הגדל פריט</translation>
     </message>
     <message>
-        <source>Enter</source>
-        <translation>הכנס</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation>חזור</translation>
-    </message>
-    <message>
         <source>Restore Item</source>
         <translation>שחזר פריט</translation>
     </message>
     <message>
         <source>Show Info</source>
         <translation>הצג מידע</translation>
-    </message>
-    <message>
-        <source>Alt+I</source>
-        <translation>Alt+I</translation>
     </message>
     <message>
         <source>Hide Info</source>
@@ -883,10 +756,6 @@ to view more bookmarks</source>
         <translation>הצג תנועה</translation>
     </message>
     <message>
-        <source>Alt+G</source>
-        <translation>Alt+G</translation>
-    </message>
-    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>הסתר חיפוש חכם/תנועה</translation>
     </message>
@@ -907,24 +776,12 @@ to view more bookmarks</source>
         <translation>בדוק סימן מים בקובץ</translation>
     </message>
     <message>
-        <source>Alt+C</source>
-        <translation>Alt+C</translation>
-    </message>
-    <message>
         <source>Take Screenshot</source>
         <translation>צילום מסך</translation>
     </message>
     <message>
-        <source>Alt+S</source>
-        <translation>Alt+S</translation>
-    </message>
-    <message>
         <source>Image Enhancement...</source>
         <translation>שיפורי תמונה...</translation>
-    </message>
-    <message>
-        <source>Alt+J</source>
-        <translation>Alt+J</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -957,10 +814,6 @@ to view more bookmarks</source>
     <message>
         <source>Rename</source>
         <translation>שנה שם</translation>
-    </message>
-    <message>
-        <source>F2</source>
-        <translation>F2</translation>
     </message>
     <message>
         <source>Delete from Disk</source>
@@ -1039,16 +892,8 @@ to view more bookmarks</source>
         <translation>עצור סיור</translation>
     </message>
     <message>
-        <source>Alt+T</source>
-        <translation>Alt+T</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>סגור</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <translation>Ctrl+W</translation>
     </message>
     <message>
         <source>Close All But This</source>
@@ -1060,16 +905,8 @@ to view more bookmarks</source>
         <translation>סמן את תחילת הבחירה</translation>
     </message>
     <message>
-        <source>[</source>
-        <translation>[</translation>
-    </message>
-    <message>
         <source>Mark Selection End</source>
         <translation>סמן את סיום הבחירה</translation>
-    </message>
-    <message>
-        <source>]</source>
-        <translation>]</translation>
     </message>
     <message>
         <source>Clear Selection</source>
@@ -1100,50 +937,6 @@ to view more bookmarks</source>
         <translation>חיפוש ויזואלי...</translation>
     </message>
     <message>
-        <source>Ctrl+Alt+Shift++</source>
-        <translation>Ctrl+Alt+Shift++</translation>
-    </message>
-    <message>
-        <source>Increment Debug Counter</source>
-        <translation>הגדל מונה איתור באגים</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+-</source>
-        <translation>Ctrl+Alt+Shift+-</translation>
-    </message>
-    <message>
-        <source>Decrement Debug Counter</source>
-        <translation>הקטן מונה איתור באגים</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+R</source>
-        <translation>Ctrl+Alt+Shift+R</translation>
-    </message>
-    <message>
-        <source>Show Resource Pool</source>
-        <translation>הצג מאגר משאבים</translation>
-    </message>
-    <message>
-        <source>Calibrate PTZ</source>
-        <translation>כייל את המצלמה הממונעת</translation>
-    </message>
-    <message>
-        <source>Get PTZ Position</source>
-        <translation>קבל את מיקום המצלמה הממונעת</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+Shift+D</source>
-        <translation>Ctrl+Alt+Shift+D</translation>
-    </message>
-    <message>
-        <source>Debug Control Panel</source>
-        <translation>לוח הבקרה של איתור הבאגים</translation>
-    </message>
-    <message>
-        <source>Space</source>
-        <translation>רווח</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>הפעל</translation>
     </message>
@@ -1152,72 +945,36 @@ to view more bookmarks</source>
         <translation>השהה</translation>
     </message>
     <message>
-        <source>Ctrl+Left</source>
-        <translation>חץ שמאלי +Ctrl</translation>
-    </message>
-    <message>
         <source>Previous Frame</source>
         <translation>פריים קודם</translation>
-    </message>
-    <message>
-        <source>Ctrl+Right</source>
-        <translation>חץ ימני+Ctrl</translation>
     </message>
     <message>
         <source>Next Frame</source>
         <translation>פריים הבא</translation>
     </message>
     <message>
-        <source>Z</source>
-        <translation>Z</translation>
-    </message>
-    <message>
         <source>To Start</source>
         <translation>להתחלה</translation>
-    </message>
-    <message>
-        <source>X</source>
-        <translation>X</translation>
     </message>
     <message>
         <source>To End</source>
         <translation>לסוף</translation>
     </message>
     <message>
-        <source>Ctrl+Up</source>
-        <translation>חץ עליון+Ctrl</translation>
-    </message>
-    <message>
         <source>Volume Down</source>
         <translation>הנמך עוצמת שמע</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <translation>חץ תחתון+Ctrl</translation>
     </message>
     <message>
         <source>Volume Up</source>
         <translation>הגבהה עוצמת שמע</translation>
     </message>
     <message>
-        <source>M</source>
-        <translation>M</translation>
-    </message>
-    <message>
         <source>Toggle Mute</source>
         <translation>הפעל/כבה השתקה</translation>
     </message>
     <message>
-        <source>L</source>
-        <translation>L</translation>
-    </message>
-    <message>
         <source>Jump to Live</source>
         <translation>עבור לשידור חי</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation>S</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
@@ -1282,10 +1039,6 @@ to view more bookmarks</source>
     <message>
         <source>Unpin Notifications</source>
         <translation>הפרד התראות</translation>
-    </message>
-    <message>
-        <source>Ctrl+Alt+T</source>
-        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <source>Disable Background Animation</source>
@@ -1386,95 +1139,91 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמה לגיבוי...</translation>
     </message>
     <message>
         <source>Show Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>הצג סימניות</translation>
     </message>
     <message>
         <source>Hide Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>הסתר סימניות</translation>
     </message>
     <message>
         <source>Pin Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>הצמד לוח שנה</translation>
     </message>
     <message>
         <source>Unpin Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>בטל הצמדה של לוח השנה</translation>
     </message>
     <message>
         <source>I/O Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מודול קלט/פלט...</translation>
     </message>
     <message>
         <source>Web Client...</source>
-        <translation type="unfinished"></translation>
+        <translation>קליינט רשת...</translation>
     </message>
     <message>
         <source>Bookmark Search...</source>
-        <translation type="unfinished"></translation>
+        <translation>חיפוש סימניות...</translation>
     </message>
     <message>
         <source>Open in Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח בפריסת אזעקה</translation>
     </message>
     <message>
         <source>Check I/O Module Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות במודול קלט/פלט...</translation>
     </message>
     <message>
         <source>Check I/O Modules Issues...</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק בעיות במודולי קלט/פלט...</translation>
     </message>
     <message>
         <source>I/O Module Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מודול קלט/פלט...</translation>
     </message>
     <message>
         <source>I/O Modules Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מודולי קלט/פלט...</translation>
     </message>
     <message>
         <source>I/O Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מודול קלט/פלט...</translation>
     </message>
     <message>
         <source>I/O Modules Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מודולי קלט/פלט...</translation>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
-        <translation type="unfinished"></translation>
+        <translation>הסר סימניות...</translation>
     </message>
     <message>
         <source>Monitor in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>צפה בכרטיסיה חדשה</translation>
     </message>
     <message>
         <source>Monitor in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>צפה בחלון חדש</translation>
     </message>
     <message>
         <source>Open Layout in New Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח פריסה בכרטיסיה חדשה</translation>
     </message>
     <message>
         <source>Open Layout(s) in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח פריסות בחלון חדש</translation>
     </message>
     <message>
         <source>Open Current Layout in New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח פריסה נוכחית בחלון חדש</translation>
     </message>
     <message>
         <source>Add Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>הוסף סימניה...</translation>
     </message>
 </context>
 <context>
@@ -1511,7 +1260,7 @@ to view more bookmarks</source>
     <name>QnAlarmLayoutResource</name>
     <message>
         <source>Alarms</source>
-        <translation type="unfinished"></translation>
+        <translation>אזעקות</translation>
     </message>
 </context>
 <context>
@@ -1570,7 +1319,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This resources are already removed from the system</source>
-        <translation type="unfinished"></translation>
+        <translation>משאבים אלו הוסרו כבר מהמערכת</translation>
     </message>
 </context>
 <context>
@@ -1756,25 +1505,25 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Red mark means that the archive is still available</source>
-        <translation type="unfinished"></translation>
+        <translation>משמעות הסימון האדום היא שהארכיון עדיין זמין</translation>
     </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
     <message>
         <source>Select Devices to Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר התקנים לגיבוי...</translation>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר מצלמות לגיבוי...</translation>
     </message>
 </context>
 <context>
     <name>QnBackupScheduleDialog</name>
     <message>
         <source>Until finished</source>
-        <translation type="unfinished"></translation>
+        <translation>עד הסיום</translation>
     </message>
 </context>
 <context>
@@ -1795,23 +1544,23 @@ to view more bookmarks</source>
     <name>QnBookmarkWidget</name>
     <message>
         <source>Do not lock archive</source>
-        <translation type="unfinished"></translation>
+        <translation>אל תנעל ארכיון</translation>
     </message>
     <message>
         <source>1 month</source>
-        <translation type="unfinished">חודש 1</translation>
+        <translation>חודש 1</translation>
     </message>
     <message>
         <source>3 month</source>
-        <translation type="unfinished">3 חודשים</translation>
+        <translation>3 חודשים</translation>
     </message>
     <message>
         <source>6 month</source>
-        <translation type="unfinished">6 חודשים</translation>
+        <translation>6 חודשים</translation>
     </message>
     <message>
         <source>year</source>
-        <translation type="unfinished">שנה</translation>
+        <translation>שנה</translation>
     </message>
 </context>
 <context>
@@ -1829,16 +1578,16 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>התקן %1 מ %n</numerusform>
             <numerusform>התקנים %1 מ %n</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>מצלמה %1 מ %n</numerusform>
             <numerusform>מצלמות %1 מ %n</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -1851,17 +1600,17 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished">בחר לפחות התקן אחד</translation>
+        <translation>בחר לפחות התקן אחד</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished">בחר לפחות מצלמה אחת</translation>
+        <translation>בחר לפחות מצלמה אחת</translation>
     </message>
     <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>מודול קלט/פלט %1 מ %n</numerusform>
+            <numerusform>מודולי קלט/פלט %1 מ %n</numerusform>
         </translation>
     </message>
 </context>
@@ -1975,15 +1724,18 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>מצלמת מקור</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Source and %n more cameras</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>מקור ו %n מצלמות נוספות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>לא זמין</translation>
     </message>
 </context>
 <context>
@@ -2008,19 +1760,19 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select at least one device</source>
-        <translation type="unfinished">בחר לפחות התקן אחד</translation>
+        <translation>בחר לפחות התקן אחד</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation type="unfinished">בחר לפחות מצלמה אחת</translation>
+        <translation>בחר לפחות מצלמה אחת</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished">התקנים</translation>
+        <translation>התקנים</translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished">מצלמות</translation>
+        <translation>מצלמות</translation>
     </message>
 </context>
 <context>
@@ -2267,18 +2019,18 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Finishing searching...</source>
-        <translation type="unfinished"></translation>
+        <translation>מסיים חיפושים...</translation>
     </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
     <message>
         <source>Loading values...</source>
-        <translation type="unfinished"></translation>
+        <translation>טוען ערכים...</translation>
     </message>
     <message>
         <source>Applying changes...</source>
-        <translation type="unfinished"></translation>
+        <translation>מחיל שינויים...</translation>
     </message>
 </context>
 <context>
@@ -2341,19 +2093,19 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Diagnostics for I/O module %1</source>
-        <translation type="unfinished"></translation>
+        <translation>איבחון עבור מודול קלט/פלט %1</translation>
     </message>
     <message>
         <source>I/O Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>איבחון מודול קלט/פלט</translation>
     </message>
     <message>
         <source>Confirming I/O module is accessible.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שמודול הקלט/פלט נגיש.</translation>
     </message>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>מוודא שמודול הקלט/פלט ביעד מספק תזרים מדיה.</translation>
     </message>
 </context>
 <context>
@@ -2407,16 +2159,16 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>%n devices found</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>נמצא התקן %n</numerusform>
             <numerusform>נמצאו %n התקנים</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n cameras found</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>נמצאה מצלמה %n</numerusform>
             <numerusform>נמצאו %n מצלמות</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2429,9 +2181,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>נמצא התקן קלט/פלט %n</numerusform>
+            <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
         </translation>
     </message>
 </context>
@@ -2511,7 +2263,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>ל%1 אין יציאות ממסר</numerusform>
+            <numerusform>ל%1 אין יציאת ממסר</numerusform>
             <numerusform>ל%1 אין יציאות ממסר</numerusform>
         </translation>
     </message>
@@ -2522,7 +2274,7 @@ to view more bookmarks</source>
         <source>Recording is disabled for %1</source>
         <translation>
             <numerusform>ההקלטה כבויה עבור %1</numerusform>
-            <numerusform>ההקלטה כבויה עבור %1</numerusform>
+            <numerusform>ההקלטות כבויות עבור %1</numerusform>
         </translation>
     </message>
 </context>
@@ -2554,15 +2306,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>זיהוי תנועה אינו מאופשר או לא נתמך בחלק מהמצלמות שנבחרו. עבור לדף הגדרת זיהוי התנועה ווודא שזיהוי תנועה נתמך ומוגדר.</translation>
     </message>
     <message>
         <source>Dual-Streaming is not supported on this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>הזרמה כפולה אינה נתמכת במצלמה זו.</translation>
     </message>
     <message>
         <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>הזרמה כפולה וזיהוי תנועה אינם נתמכים במצלמה זו.</translation>
     </message>
 </context>
 <context>
@@ -2641,16 +2393,16 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation type="unfinished">
-            <numerusform>להחיל שינויים על על %n ההתקנים הבאים?</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>להחיל שינויים על ההתקן הבא?</numerusform>
+            <numerusform>להחיל שינויים על %n ההתקנים הבאים?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation type="unfinished">
-            <numerusform>להחיל שינויים על על %n המצלמות הבאות?</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>להחיל שינויים על המצלמה הבאה?</numerusform>
+            <numerusform>להחיל שינויים על %n המצלמות הבאות?</numerusform>
         </translation>
     </message>
     <message>
@@ -2659,33 +2411,33 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מודול קלט/פלט</translation>
     </message>
     <message>
         <source>I/O Modules Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מודולי קלט/פלט</translation>
     </message>
     <message>
         <source>I/O Module Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מודול קלט/פלט</translation>
     </message>
     <message>
         <source>I/O Modules Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>אבחון מודולי קלט/פלט</translation>
     </message>
     <message>
         <source>I/O Module Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מודול קלט/פלט</translation>
     </message>
     <message>
         <source>I/O Modules Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>חוקי מודולי קלט/פלט</translation>
     </message>
     <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>להחיל שינויים על מודול הקלט/פלט הבא?</numerusform>
+            <numerusform>להחיל שינויים על %n מודולי הקלט/פלט הבאים?</numerusform>
         </translation>
     </message>
 </context>
@@ -2871,22 +2623,22 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>התחבר</translation>
     </message>
 </context>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
         <source>Server API</source>
-        <translation type="unfinished"></translation>
+        <translation>ממשק תכנות לשרת (API)</translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ליצירת אירוע כללי, פנה ל %1.</translation>
     </message>
     <message>
         <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-        <translation type="unfinished"></translation>
+        <translation>האירוע יפעל אך ורק אם האירוע הכללי יענה על כל התנאים הנ&quot;ל. אם שדה מילת מפתח ריק התנאי תמיד יתקיים. במידה ולא, התנאי יתקיים אם השדה של האירוע הכללי מכיל מילת מפתח כלשהי.</translation>
     </message>
 </context>
 <context>
@@ -2965,7 +2717,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>You need to connect to a server prior to backup start.</source>
-        <translation type="unfinished"></translation>
+        <translation>יש להתחבר לשרת לפני תחילת הגיבוי.</translation>
     </message>
 </context>
 <context>
@@ -3143,38 +2895,38 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>&lt;User removed&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;המשתמש הוסר&gt;</translation>
     </message>
     <message>
         <source>All users</source>
-        <translation type="unfinished"></translation>
+        <translation>כל המשתמשים</translation>
     </message>
     <message>
         <source>%1 users</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 משתמשים</translation>
     </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 (פעם אחת)</numerusform>
+            <numerusform>%1 (%n פעמים)</numerusform>
         </translation>
     </message>
     <message>
         <source>and %1 user(s) more...</source>
-        <translation type="unfinished"></translation>
+        <translation>ו %1 משתמשים נוספים...</translation>
     </message>
 </context>
 <context>
     <name>QnExecPtzPresetPolicy</name>
     <message>
         <source>Select exactly one camera</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר מצלמה אחת בדיוק</translation>
     </message>
     <message>
         <source>%1 has no ptz presets</source>
-        <translation type="unfinished"></translation>
+        <translation>ל %1 אין פריסטים</translation>
     </message>
 </context>
 <context>
@@ -3231,11 +2983,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select devices to setup failover priority</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר התקנים להגדרת קדימות לגיבוי</translation>
     </message>
     <message>
         <source>Select cameras to setup failover priority</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר מצלמות להגדרת קדימות לגיבוי</translation>
     </message>
 </context>
 <context>
@@ -3288,31 +3040,31 @@ to view more bookmarks</source>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
         <source>Devices List...</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת התקנים...</translation>
     </message>
     <message>
         <source>Cameras List...</source>
-        <translation type="unfinished"></translation>
+        <translation>רשימת מצלמות...</translation>
     </message>
     <message>
         <source>Open Alarm/Event Rules Management</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח ממשק ניהול אזעקות/אירועים</translation>
     </message>
     <message>
         <source>Open Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח יומן אירועים</translation>
     </message>
     <message>
         <source>Open Bookmarks List</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח רשימת סימניות</translation>
     </message>
     <message>
         <source>Open Devices List</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח רשימת התקנים</translation>
     </message>
     <message>
         <source>Open Cameras List</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח רשימת מצלמות</translation>
     </message>
 </context>
 <context>
@@ -3331,7 +3083,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This may result in client software issues (including unexpected crash).</source>
-        <translation type="unfinished"></translation>
+        <translation>דבר זה עלול לגרום לתקלות בצד הקליינט (כולל סגירה לא צפויה של התוכנה).</translation>
     </message>
 </context>
 <context>
@@ -3512,15 +3264,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unknown error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה לא ידועה התרחשה.</translation>
     </message>
     <message>
         <source>Could not export I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>ייצוא מודול קלט/פלט %1 נכשל.</translation>
     </message>
     <message>
         <source>Could not create output file %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן ליצור קובץ פלט %1...</translation>
     </message>
 </context>
 <context>
@@ -3588,11 +3340,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>אף אחד מהשרתים שלך אינו מחובר לאינטרנט.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">הזמן הקצוב עבר</translation>
+        <translation>הזמן הקצוב עבר</translation>
     </message>
 </context>
 <context>
@@ -3642,11 +3394,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>אף אחד מהשרתים שלך אינו מחובר לאינטרנט.</translation>
     </message>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">הזמן הקצוב עבר</translation>
+        <translation>הזמן הקצוב עבר</translation>
     </message>
 </context>
 <context>
@@ -3912,23 +3664,23 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>השתמש ברישיון עבור ההתקן שנבחר</numerusform>
             <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>השתמש ברישיון עבור המצלמה שנבחרה</numerusform>
             <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
+            <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
         </translation>
     </message>
 </context>
@@ -4004,7 +3756,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Invalid Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>ערכים לא תקינים</translation>
     </message>
 </context>
 <context>
@@ -4118,7 +3870,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>מודול קלט/פלט</translation>
     </message>
 </context>
 <context>
@@ -4449,23 +4201,23 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Alarm: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>אזעקה: %1</translation>
     </message>
     <message>
         <source>Open in Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח בפריסת אזעקה</translation>
     </message>
     <message>
         <source>Open I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח מודול קלט/פלט</translation>
     </message>
     <message>
         <source>I/O Module Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מודול קלט/פלט...</translation>
     </message>
     <message>
         <source>Open I/O Module Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>פתח דף אינטרנט של מודול קלט/פלט...</translation>
     </message>
 </context>
 <context>
@@ -4480,7 +4232,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">אזהרה!</translation>
+        <translation>אזהרה!</translation>
     </message>
 </context>
 <context>
@@ -4569,15 +4321,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה תקלה בעת נסיון להגדיר את המיקום הנוכחי של מצלמה %1.</translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>נהל ממונעת עבור %1...</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get the current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה תקלה בעת נסיון לקרוא את המיקום הנוכחי של מצלמה %1.</translation>
     </message>
 </context>
 <context>
@@ -4858,16 +4610,16 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>Total %n devices</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>סה&quot;כ התקן אחד</numerusform>
             <numerusform>סה&quot;כ %n התקנים</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>סה&quot;כ מצלמה אחת</numerusform>
             <numerusform>סה&quot;כ %n מצלמות</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4900,18 +4652,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;מצלמות משרתים אחרים ומצלמות שהוסרו&gt;</translation>
     </message>
     <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>סה&quot;כ מודול קלט/פלט אחד</numerusform>
+            <numerusform>סה&quot;כ %n מודולי קלט/פלט</numerusform>
         </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
-        <translation type="unfinished"></translation>
+        <translation>משך ארכיון בימים מאז ההקלטה הראשונה</translation>
     </message>
 </context>
 <context>
@@ -5063,70 +4815,79 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
         <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>ייצוא סימנייה...</translation>
     </message>
     <message>
         <source>Search bookmarks by name, tag or description</source>
-        <translation type="unfinished"></translation>
+        <translation>חפש סימנייה לפי שם, תגית או תיאור</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished">&lt;כל התקן&gt;</translation>
+        <translation>&lt;כל התקן&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;כל מצלמה&gt;</translation>
+        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <source>&lt;Any I/O Module&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מודול קלט/פלט&gt;</translation>
     </message>
     <message>
         <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל ההתקנים שלי&gt;</translation>
     </message>
     <message>
         <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל המצלמות שלי&gt;</translation>
     </message>
     <message>
         <source>&lt;All My I/O Modules&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל מודולי הקלט/פלט שלי&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n התקנים&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n מצלמות&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>&lt;%n מודולי קלט/פלט&gt;</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
-        <translation type="unfinished">שם</translation>
+        <translation>שם</translation>
     </message>
     <message>
         <source>Start time</source>
-        <translation type="unfinished"></translation>
+        <translation>זמן התחלה</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>משך</translation>
     </message>
     <message>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>תגיות</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished">מצלמה</translation>
+        <translation>מצלמה</translation>
     </message>
 </context>
 <context>
@@ -5159,7 +4920,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>%1 (up %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (עד %2)</translation>
     </message>
 </context>
 <context>
@@ -5194,11 +4955,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Storage Management</source>
-        <translation type="unfinished"></translation>
+        <translation>ניהול איחסון</translation>
     </message>
     <message>
         <source>Apply changes to server %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>החל שינויים לשרת %1?</translation>
     </message>
 </context>
 <context>
@@ -5233,11 +4994,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>To avoid issues adjust max number of devices</source>
-        <translation type="unfinished"></translation>
+        <translation>בכדי להימנע מתקלות עדכן את הערך המקסימלי של התקנים</translation>
     </message>
     <message>
         <source>To avoid issues adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>בכדי להימנע מתקלות עדכן את הערך המקסימלי של מצלמות</translation>
     </message>
 </context>
 <context>
@@ -5475,57 +5236,57 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>אימות נכשל עבור שרת:</numerusform>
+            <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
         </translation>
     </message>
     <message>
         <source>Update Succeeded</source>
-        <translation type="unfinished"></translation>
+        <translation>העדכון הצליח</translation>
     </message>
     <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להתחיל עדכון. שנמוך לגרסה ישנה יותר אינו מורשה.</translation>
     </message>
     <message>
         <source>Launcher process was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>תהליך מפעיל היישומים לא נמצא.</translation>
     </message>
     <message>
         <source>No such build is available on update server.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נמצאה גרסה כזו בשרת העדכון.</translation>
     </message>
     <message>
         <source>Unable to begin update. Updates for one or more servers were not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להתחיל את העדכון. עדכון עבור אחד השרתים או יותר לא נמצא.</translation>
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להתחיל את העדכון. עדכון עבור הקליינט לא נמצא.</translation>
     </message>
     <message>
         <source>Update cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>העדכון בוטל</translation>
     </message>
     <message>
         <source>Update is not needed.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נדרש עדכון.</translation>
     </message>
     <message>
         <source>All servers are already updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>כל השרתים כבר מעודכנים.</translation>
     </message>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
     <message>
         <source>&lt;All Users&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;כל המשתמשים&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n User(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>משתמש %n</numerusform>
             <numerusform>%n משתמשים</numerusform>
         </translation>
@@ -5538,7 +5299,8 @@ If you understand this and would like to proceed please click Merge to continue.
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
         <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-        <translation type="unfinished"></translation>
+        <translation>ניתן להתשמש בתגי HTML עבור טקסט מותאם באופן אישי:
+&lt;h4&gt;כותרות (h1-h6)&lt;/h4&gt;וגם צבעים &lt;font color=&quot;red&quot;&gt;שונים&lt;/font&gt; ו &lt;font size=&quot;18&quot;&gt;גדלים&lt;/font&gt; יכולים להיות מוחלים. ניתן גם להשתמש ב &lt;s&gt;מחיקה&lt;/s&gt;, &lt;u&gt;קו תחתון&lt;/u&gt;, &lt;b&gt;הדגשה&lt;/b&gt; או &lt;i&gt;הטייה&lt;/i&gt;</translation>
     </message>
 </context>
 <context>
@@ -5604,84 +5366,84 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>I/O Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>הגדרות מודול קלט/פלט</translation>
     </message>
     <message>
         <source>Invalid Schedule</source>
-        <translation type="unfinished">לוח הזמנים איננו תקין</translation>
+        <translation>לוח הזמנים איננו תקין</translation>
     </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>תזרים הוידאו המשני אינו מאופשר במצלמה. לפונקציית Motion + LQ אין שום השפעה. לחץ על &quot;כן&quot; לשינוי אופן ההקלטה ל&quot;קבועה&quot; או &quot;לא&quot; להפעלה מחדש של תזרים הוידאו המשני.</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">אוטומטית</translation>
+        <translation>אוטו</translation>
     </message>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">כתובת המייל איננה תקינה</translation>
+        <translation>כתובת הדואר אינה תקינה</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
         <source>E-Mail is not valid</source>
-        <translation type="unfinished">כתובת המייל איננה תקינה</translation>
+        <translation>כתובת הדואר אינה תקינה</translation>
     </message>
     <message>
         <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation type="unfinished">לא נמצא פריסט. השתמש באפשרות &apos;מתקדם&apos;.</translation>
+        <translation>לא נמצא פריסט. השתמש באפשרות &apos;מתקדם&apos;.</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
         <source>Timed Out</source>
-        <translation type="unfinished">הזמן הקצוב עבר</translation>
+        <translation>הזמן הקצוב עבר</translation>
     </message>
     <message>
         <source>Invalid data</source>
-        <translation type="unfinished">נתונים שגויים</translation>
+        <translation>נתונים שגויים</translation>
     </message>
     <message>
         <source>Network Error</source>
-        <translation type="unfinished">שגיאת רשת</translation>
+        <translation>שגיאת רשת</translation>
     </message>
     <message>
         <source>TLS</source>
-        <translation type="unfinished">TLS</translation>
+        <translation>TLS</translation>
     </message>
     <message>
         <source>SSL</source>
-        <translation type="unfinished">SSL</translation>
+        <translation>SSL</translation>
     </message>
     <message>
         <source>Unsecured</source>
-        <translation type="unfinished">לא מאובטח</translation>
+        <translation>לא מאובטח</translation>
     </message>
     <message>
         <source>In Progress...</source>
-        <translation type="unfinished">מתבצע...</translation>
+        <translation>מתבצע...</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation type="unfinished">נכשל</translation>
+        <translation>כשלון</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished">הצלחה</translation>
+        <translation>הצלחה</translation>
     </message>
     <message>
         <source>Could not perform a test. None of your servers are connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן לבצע בדיקה. אף שרת אינו מחובר לרשת האינטרנט.</translation>
     </message>
     <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
-        <translation type="unfinished"></translation>
+        <translation>הנתונים שסופקו אינם תקינים. לא ניתן לבצע בדיקה.</translation>
     </message>
 </context>
 <context>
@@ -5755,176 +5517,182 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Please check authentication information in I/O module settings</source>
-        <translation type="unfinished"></translation>
+        <translation>בדוק הגדרות אימות בהגדרות מודול הקלט/פלט</translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
-        <translation type="unfinished">אתה עומד להפעיל את רוטינת הסינכרון מחדש של הארכיון.</translation>
+        <translation>אתה עומד להפעיל את רוטינת הסינכרון מחדש של הארכיון.</translation>
     </message>
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
-        <translation type="unfinished">שים לב! השימוש בדיסק הקשיח יוגבר במהלך תהליך הסנכרון מחדש! בהתאמה לגודל הכללי של הארכיון, התהליך עשוי לקחת מספר שעות.</translation>
+        <translation>שים לב! השימוש בדיסק הקשיח יוגבר במהלך תהליך הסנכרון מחדש! בהתאמה לגודל הכללי של הארכיון, התהליך עשוי לקחת מספר שעות.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">האם אתה בטוח שברצונך להמשיך?</translation>
+        <translation>האם אתה בטוח שברצונך להמשיך?</translation>
     </message>
     <message>
         <source>Backup is already in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>הגיבוי כבר מתבצע.</translation>
     </message>
     <message>
         <source>Select at least one backup storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>יש לבחור לפחות כונן גיבוי אחד.</translation>
     </message>
     <message>
         <source>Apply changes before starting backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>החל שינויים לפני התחלת הגיבוי.</translation>
     </message>
     <message>
         <source>(%1 before now)</source>
-        <translation type="unfinished"></translation>
+        <translation>(%1 לפני עכשיו)</translation>
     </message>
     <message>
         <source>Backup was never started.</source>
-        <translation type="unfinished"></translation>
+        <translation>הגיבוי לא התחיל מעולם.</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished">הסתיים</translation>
+        <translation>הסתיים</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed.</source>
-        <translation type="unfinished">בנייה מחדש של אינדקס הארכיון בוצעה בהצלחה.</translation>
+        <translation>בנייה מחדש של אינדקס הארכיון בוצעה בהצלחה.</translation>
     </message>
     <message>
         <source>By Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>לפי לוח זמנים</translation>
     </message>
     <message>
         <source>On Demand</source>
-        <translation type="unfinished"></translation>
+        <translation>לפי דרישה</translation>
     </message>
     <message>
         <source>Backup Schedule is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>לוח זמני הגיבוי אינו תקין.</translation>
     </message>
     <message>
         <source>No devices selected</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נבחרו התקנים</translation>
     </message>
     <message>
         <source>No cameras selected</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נבחרו מצלמות</translation>
     </message>
     <message>
         <source>Real-Time</source>
-        <translation type="unfinished"></translation>
+        <translation>זמן אמת</translation>
     </message>
     <message>
         <source>Low-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>תזרימים ברזולוציה נמוכה</translation>
     </message>
     <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>תזרימים ברזולוציה גבוהה</translation>
     </message>
     <message>
         <source>All streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>כל התזרימים</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">אזהרה!</translation>
+        <translation>אזהרה!</translation>
     </message>
     <message>
         <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
-        <translation type="unfinished"></translation>
+        <translation>תהליך זה נדרש רק במקרה בו תקיות הארכיון הוסרו, שינו שם או הוחלפו. ניתן לבטל את תהליך הבניה מחדש בכל רגע ללא חשש מאיבוד נתונים.</translation>
     </message>
     <message>
         <source>Select at least one device to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר לפחות התקן אחד להתחלת הגיבוי.</translation>
     </message>
     <message>
         <source>Select at least one camera to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר לפחות מצלמה אחת להתחלת הגיבוי.</translation>
     </message>
     <message>
         <source>Cannot start backup while archive index rebuild is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להתחיל גיבוי בזמן שתהליך בניית אינדקס הארכיון מתבצע.</translation>
     </message>
     <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
+        <translation>שים לב: רק הקלטות עתידיות יגובו. תהליך הגיבוי יתעלם מהקלטות נוכחיות.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>%n מצלמות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>%n התקנים</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Backup is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>הגיבוי הסתיים</translation>
     </message>
     <message>
         <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
+        <translation>במצב זמן אמת כל המידע מגובה כל הזמן.</translation>
     </message>
     <message>
         <source>Archive backup is completed up to: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>גיבוי ארכיון הסתיים עד ל: %1.</translation>
     </message>
 </context>
 <context>
     <name>QnStorageListModel</name>
     <message>
         <source>Invalid storage</source>
-        <translation type="unfinished"></translation>
+        <translation>איחסון לא תקין</translation>
     </message>
     <message>
         <source>%1 Gb</source>
-        <translation type="unfinished">%1 Gb</translation>
+        <translation>%1 Gb</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>הסרה</translation>
     </message>
     <message>
         <source>Use as backup storage</source>
-        <translation type="unfinished"></translation>
+        <translation>השתמש כאיחסון לגיבוי</translation>
     </message>
     <message>
         <source>Inaccessible</source>
-        <translation type="unfinished"></translation>
+        <translation>לא נגיש</translation>
     </message>
     <message>
         <source>Use as main storage</source>
-        <translation type="unfinished"></translation>
+        <translation>השתמש כאיחסון ראשי</translation>
     </message>
     <message>
         <source>%1 (Checking...)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (בודק...)</translation>
     </message>
     <message>
         <source>%1 (Scanning... %2%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (סורק... %2%)</translation>
     </message>
     <message>
         <source>%1 (Rebuilding... %2%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (בונה מחדש... %2%)</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">טוען...</translation>
+        <translation>טוען...</translation>
     </message>
 </context>
 <context>
@@ -5932,12 +5700,12 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Fast Archive Scan - %p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <translation>חיפוש מהיר בארכיון - %p%</translation>
     </message>
     <message>
         <source>Rebuilding Archive Index - %p%</source>
         <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <translation>בניה מחדש של אינדקס הארכיון - %p%</translation>
     </message>
 </context>
 <context>
@@ -5975,7 +5743,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">אזהרה!</translation>
+        <translation>אזהרה!</translation>
     </message>
 </context>
 <context>
@@ -6013,111 +5781,111 @@ If you understand this and would like to proceed please click Merge to continue.
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>כתובת דואר לא הוגדרה</translation>
     </message>
     <message>
         <source>No licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>אין רישיונות</translation>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>שרת דואר לא מוגדר</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>מספר משתמשים לא הגדירו את כתובת הדואר שלהם</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
-        <translation type="unfinished"></translation>
+        <translation>החיבור לשרת אבד</translation>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation>בחר שרת איתו יסנכרנו שאר השרתים את השעה</translation>
     </message>
     <message>
         <source>System is in safe mode</source>
-        <translation type="unfinished">המערכת במצב בטוח</translation>
+        <translation>המערכת במצב בטוח</translation>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation type="unfinished"></translation>
+        <translation>שגיאה בעת שליחת דואר</translation>
     </message>
     <message>
         <source>Storage is full</source>
-        <translation type="unfinished"></translation>
+        <translation>האיחסון מלא</translation>
     </message>
     <message>
         <source>Storage is not configured</source>
-        <translation type="unfinished"></translation>
+        <translation>האיחסון אינו מוגדר</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed</source>
-        <translation type="unfinished"></translation>
+        <translation>בניית אינדקס הארכיון הושלמה</translation>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user</source>
-        <translation type="unfinished"></translation>
+        <translation>בניית אינדקס הארכיון בוטלה על ידי משתמש</translation>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>כתובת הדואר אינה מוגדרת למשתמש %1</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>כתובת דואר אינה מוגדרת.</translation>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>אתה לא יכול לקבל הודעות מערכת בדואר.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation type="unfinished"></translation>
+        <translation>שרת דואר אינו מוגדר.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>מספר משתמשים לא הגדירו את כתובת הדואר שלהם.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>הם לא יכולים לקבל הודעות מערכת בדואר.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>שעת השרת אינה מסונכרנת וזמן משותף לא זוהה באופן אוטומטי.</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>המערכת פועלת במצב בטוח.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
-        <translation type="unfinished"></translation>
+        <translation>כל שינוי הגדרות אינו מורשה למעט הפעלת רישיון.</translation>
     </message>
     <message>
         <source>You have no licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>אין לך רישיונות.</translation>
     </message>
     <message>
         <source>You cannot record video from cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>אתה לא יכול להקליט וידאו מהמצלמות.</translation>
     </message>
     <message>
         <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>בניית אינדקס הארכיון הושלם בשרתים הבאים:</translation>
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>בניית אינדקס הארכיון בוטלה על ידי משתמש בשרתים הבאים:</translation>
     </message>
     <message>
         <source>Storage is full on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>האיחסון מלא בשרת הבא:</translation>
     </message>
     <message>
         <source>Storage is not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>האיחסון אינו מוגדר בשרת הבא:</translation>
     </message>
 </context>
 <context>
@@ -6561,8 +6329,8 @@ If you understand this and would like to proceed please click Merge to continue.
     <message numerus="yes">
         <source>Pc %1 - Screens %2</source>
         <translation>
-            <numerusform>מחשב %1 מסכים %2</numerusform>
-            <numerusform>מחשב %1 מסכים %2</numerusform>
+            <numerusform>מחשב %1 - מסך %2</numerusform>
+            <numerusform>מחשב %1 - מסכים %2</numerusform>
         </translation>
     </message>
 </context>
@@ -6809,44 +6577,44 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform>%n התקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>התקן זה התגלה באופן אוטומטי. יתכן והוא יתגלה שוב לאחר הסרתו. האם למחוק אותו?</numerusform>
+            <numerusform>%n התקנים אלו התגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>מצלמה זו התגלתה באופן אוטומטי. יתכן והיא תתגלה שוב לאחר הסרתה. האם למחוק אותה?</numerusform>
             <numerusform>%n מצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>התקן זה התגלה באופן אוטומטי. יתכן והוא יתגלה שוב לאחר הסרתו. האם למחוק אותו?</numerusform>
             <numerusform>%n מהתקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>מצלמה זו התגלתה באופן אוטומטי. יתכן והיא תתגלה שוב לאחר הסרתה. האם למחוק אותה?</numerusform>
             <numerusform>%n ממצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>האם אתה רוצה למחוק את התקן זה?</numerusform>
             <numerusform>האם אתה רוצה למחוק את %n ההתקנים הבאים?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>האם אתה רוצה למחוק את מצלמה זו?</numerusform>
             <numerusform>האם אתה רוצה למחוק את %n המצלמות הבאות?</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6858,42 +6626,42 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>לא ניתן להזיז את מודול הקלט/פלט לשרת %1. השרת אינו מגיב.</numerusform>
+            <numerusform>לא ניתן להזיז את %n מודולי הקלט/פלט לשרת %1. השרת אינו מגיב.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>השרת %1 אינו יכול למצוא ולהגיע אל מודול הקלט/פלט הזה. האם אתה בטוח שאתה רוצה להזיז אותו?</numerusform>
+            <numerusform>השרת %1 אינו יכול למצוא ולהגיע אל %n מודולי הקלט/פלט האלו. האם אתה בטוח שאתה רוצה להזיז אותם?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>מודול %n זה התגלה באופן אוטומטי. יתכן והוא יתגלה שוב לאחר הסרתו. האם למחוק אותו?</numerusform>
+            <numerusform>%n מודולי הקלט/פלט האלו התגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>מודול קלט/פלט זה התגלה באופן אוטומטי. יתכן והוא יתגלה שוב לאחר הסרתו. האם למחוק אותו?</numerusform>
+            <numerusform>%n ממודולי הקלט/פלט האלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>האם אתה רוצה למחוק את מודול הקלט/פלט הבא?</numerusform>
+            <numerusform>האם אתה רוצה למחוק את %n מודולי הקלט/פלט הבאים?</numerusform>
         </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
+        <translation>הוספת ההתקן כבר מתבצעת.האם אתה בטוח שאתה רוצה לבטל את התהליך הנוכחי?</translation>
     </message>
 </context>
 <context>
@@ -6920,19 +6688,22 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Are you sure you want to delete this bookmark?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם למחוק את הסימנייה הזו?</translation>
     </message>
     <message>
         <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם למחוק את סימנייה &quot;%1&quot;?</translation>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>לחץ על %1 לחיפוש סימניות</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform>האם למחוק את %n הסימניות?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7168,19 +6939,19 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected format is not recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>הפורמט שנבחר אינו מומלץ</translation>
     </message>
     <message>
         <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>הפורמט שנבחר אינו מומלץ למצלמה זו בגלל הקטנת הודיאו. אנו ממליצים לייצא את הוידאו לפורמט &apos;.NOV&apos; או &apos;.EXE&apos;. האם אתה רוצה להמשיך?</translation>
     </message>
     <message>
         <source>You are about to export a video that is longer than 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>אתה עומד לייצא וידאו שארוך מ 30 דקות.</translation>
     </message>
     <message>
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>אתה עומד לייצא מספר קטעי וידאו שאורכם הכולל ארוך מ 30 דקות.</translation>
     </message>
 </context>
 <context>
@@ -7249,11 +7020,11 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>You can try to update the servers again in the System Administration dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>ניתן לנסות לעדכן מחדש את השרתים בחלון ניהול המערכת.</translation>
     </message>
     <message>
         <source>Warning!</source>
-        <translation type="unfinished">אזהרה!</translation>
+        <translation>אזהרה!</translation>
     </message>
 </context>
 <context>
@@ -7367,7 +7138,7 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>All I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>כל מודולי הקלט/פלט</translation>
     </message>
 </context>
 <context>
@@ -7386,15 +7157,15 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להגדיר מיקום במצלמה.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה שגיאה בעת הנסיון להגדרת המיקום הנוכחי למצלמה %1.</translation>
     </message>
     <message>
         <source>An error has occurred while trying to get the current position from camera %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה שגיאה בעת הנסיון לקריאת המיקום הנוכחי ממצלמה %1.</translation>
     </message>
 </context>
 <context>
@@ -7409,9 +7180,9 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>הפריט הבא לא נשמר.</numerusform>
             <numerusform>%n הפריטים הבאים לא נשמרו.</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7427,9 +7198,9 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>הפריט הבא לא נמחק.</numerusform>
             <numerusform>%n הפריטים הבאים לא נמחקו.</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7515,30 +7286,30 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה שגיאה בעת שמירת התמונה &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">שגיאה</translation>
+        <translation>שגיאה</translation>
     </message>
     <message>
         <source>Error while taking screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>התרחשה שגיאה בעת לכידת תמונה</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchStateDependentTabbedDialog</name>
     <message>
         <source>* %1</source>
-        <translation type="unfinished">* %1</translation>
+        <translation>* %1</translation>
     </message>
     <message>
         <source>Unsaved changes will be lost. Save the following pages?</source>
-        <translation type="unfinished">שינויים שלא נשמרו יאבדו. האם לשמור את הדפים הבאים?</translation>
+        <translation>שינויים שלא נשמרו יאבדו. האם לשמור את הדפים הבאים?</translation>
     </message>
     <message>
         <source>Confirm exit</source>
-        <translation type="unfinished">אשר יציאה</translation>
+        <translation>אשר יציאה</translation>
     </message>
 </context>
 <context>
@@ -7699,22 +7470,22 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message numerus="yes">
         <source>%n items</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>פריט אחד</numerusform>
             <numerusform>%n פריטים</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>
-        <translation type="unfinished"></translation>
+        <translation>האם לעצור את קיר הוידאו?</translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>יהיה צורך להפעילו באופן ידני.</translation>
     </message>
     <message>
         <source>The changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>לא ניתן להחיל את השינויים. התרחשה שגיאה בלתי צפויה.</translation>
     </message>
 </context>
 <context>

@@ -21,7 +21,7 @@ using std::string;
 NotificationConsumerBindingService* OnvifNotificationConsumer::copy()
 {
     //TODO/IMPL
-    Q_ASSERT( false );
+    NX_ASSERT( false );
     return NULL;
 }
 
@@ -133,7 +133,7 @@ void OnvifNotificationConsumer::removeResourceRegistration( const QnPlOnvifResou
 
 SOAP_SOCKET OnvifNotificationConsumer::accept()
 {
-    return TCPServerSocket::accept(soap->master);
+    return nx::network::TCPServerSocket::accept(soap->master);
 }
 
 #endif  //ENABLE_ONVIF

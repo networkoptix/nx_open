@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <utils/common/model_functions.h>
 
@@ -20,14 +21,24 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     : base_type(parent)
     , m_request()
 {
-    Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
-    Q_ASSERT_X(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
+    NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
+    NX_ASSERT(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
 
     m_request.camera = camera;
     m_request.msecSinceEpoch = msecSinceEpoch;
     m_request.rotation = rotation;
     m_request.size = size;
     m_request.imageFormat = format;
+
+    if (!camera || !camera->hasVideo(nullptr))
+    {
+        if (statusPixmapManager)
+        {
+            QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
+            m_image = statusPixmap.toImage();
+        }
+        return;
+    }
 
     if (statusPixmapManager)
     {

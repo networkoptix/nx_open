@@ -24,6 +24,9 @@ public:
 
     virtual void pleaseStop() override;
 
+    void setOnStartedEventHandler(
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+
     int exec();
 
 private:

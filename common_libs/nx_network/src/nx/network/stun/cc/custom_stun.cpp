@@ -18,12 +18,18 @@ namespace methods {
                 return "listen";
             case connectionAck:
                 return "connectionAck";
-            case resolve:
-                return "resolve";
+            case resolvePeer:
+                return "resolvePeer";
+            case resolveDomain:
+                return "resolveDomain";
             case connect:
                 return "connect";
             case connectionResult:
                 return "connectionResult";
+            case udpHolePunchingSyn:
+                return "udpHolePunchingSyn";
+            case udpHolePunchingSynAck:
+                return "udpHolePunchingSynAck";
             default:
                 return "unknown";
         };
@@ -89,6 +95,33 @@ std::list< SocketAddress > EndpointList::get() const
     std::list< SocketAddress > list;
     for( const auto ep : QString::fromUtf8( value ).split( lit(",") ) )
         list.push_back( SocketAddress( ep ) );
+
+    return list;
+}
+
+static String vectorToString( const std::vector< String >& vector )
+{
+    QStringList list;
+    for( const auto& it : vector )
+        list << QString::fromUtf8( it );
+
+    return list.join( lit(",") ).toUtf8();
+}
+
+StringList::StringList( int type, const std::vector< String >& strings )
+    : StringAttribute( type, vectorToString( strings ) )
+{
+}
+
+std::vector< String > StringList::get() const
+{
+    const auto value = getString();
+    if( value.isEmpty() )
+        return std::vector< String >();
+
+    std::vector< String > list;
+    for( const auto it : QString::fromUtf8( value ).split( lit(",") ) )
+        list.push_back( it.toUtf8() );
 
     return list;
 }

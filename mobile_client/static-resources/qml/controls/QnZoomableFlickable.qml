@@ -1,6 +1,7 @@
 import QtQuick 2.4
 
-Item {
+Item
+{
     id: rootItem
 
     property string message
@@ -15,13 +16,17 @@ Item {
     property real maxContentWidth: Infinity
     property real maxContentHeight: Infinity
 
+    property real allowedHorizontalMargin: 0
+    property real allowedVerticalMargin: 0
+
     readonly property alias contentX: flick.contentX
     readonly property alias contentY: flick.contentY
 
     signal clicked()
     signal doubleClicked()
 
-    function resizeContent(width, height, animate, forceSize) {
+    function resizeContent(width, height, animate, forceSize)
+    {
         flick.animateToSize(width, height, animate, forceSize)
     }
 
@@ -32,11 +37,14 @@ Item {
 
         topMargin: 0
         leftMargin: 0
-        bottomMargin: topMargin * 2
-        rightMargin: leftMargin
+        bottomMargin: 0
+        rightMargin: 0
+
+        readonly property bool allowOvershoot: allowedHorizontalMargin > 0 || allowedVerticalMargin > 0
+        property bool animating: false
 
         flickableDirection: Flickable.HorizontalAndVerticalFlick
-        boundsBehavior: Flickable.StopAtBounds
+        boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
 
         Item {
             id: contentItem
@@ -45,30 +53,69 @@ Item {
         }
 
         /* Workaround for qt bug: top and left margins are ignored. */
-        onContentXChanged: {
-            if (leftMargin > 0 && contentX > -leftMargin)
-                contentX = -leftMargin
-        }
-        onContentYChanged: {
-            if (topMargin > 0 && contentY > -topMargin)
-                contentY = -topMargin
-        }
-        onLeftMarginChanged: {
-            if (leftMargin > 0)
-                contentX = -leftMargin
-        }
-        onTopMarginChanged: {
-            if (topMargin > 0)
-                contentY = -topMargin
+        onContentXChanged: fixContentX()
+        onContentYChanged: fixContentY()
+        onLeftMarginChanged: fixContentX()
+        onTopMarginChanged: fixContentY()
+
+        function fixContentX()
+        {
+            if (pinchArea.pinch.active || allowOvershoot || animating)
+                return
+
+            var newContentX = contentX
+
+            if (leftMargin > 0 && -newContentX > leftMargin)
+                newContentX = -leftMargin
+
+            if (rightMargin > 0 && -newContentX + contentWidth < width - rightMargin)
+                newContentX = Math.min(newContentX, contentWidth - width + rightMargin)
+
+            contentX = newContentX
         }
 
-        function updateMargins() {
-            leftMargin = Qt.binding(function() { return Math.max(0, (width - contentWidth) / 2) })
-            topMargin = Qt.binding(function() { return Math.max(0, (height - contentHeight) / 3) })
+        function fixContentY()
+        {
+            if (pinchArea.pinch.active || allowOvershoot || animating)
+                return
+
+            var newContentY = contentY
+
+            if (topMargin > 0 && -newContentY > topMargin)
+                newContentY = -topMargin
+
+            if (bottomMargin > 0 && -newContentY + contentHeight < height - bottomMargin)
+                newContentY = Math.min(newContentY, contentHeight - height + bottomMargin)
+
+            contentY = newContentY
         }
 
-        function animateToBounds() {
-            if (contentWidth < minContentWidth && contentHeight < minContentHeight) {
+        function bindMargins()
+        {
+            var x = contentX
+            var y = contentY
+
+            leftMargin = Qt.binding(function() { return Math.max(allowedHorizontalMargin, (width - contentWidth) / 2) })
+            topMargin = Qt.binding(function() { return Math.max(allowedVerticalMargin, (height - contentHeight) / 3) })
+            rightMargin = Qt.binding(function() { return leftMargin })
+            bottomMargin = Qt.binding(function() { return Math.max(allowedVerticalMargin, (height - contentHeight) / 3 * 2) })
+
+            contentX = x
+            contentY = y
+        }
+
+        function fixMargins()
+        {
+            leftMargin = leftMargin
+            topMargin = topMargin
+            rightMargin = rightMargin
+            bottomMargin = bottomMargin
+        }
+
+        function animateToBounds()
+        {
+            if (contentWidth < minContentWidth && contentHeight < minContentHeight)
+            {
                 animateToSize(minContentWidth, minContentHeight, true)
                 return
             }
@@ -90,7 +137,8 @@ Item {
             */
         }
 
-        function animateToSize(cw, ch, animate, forceSize) {
+        function animateToSize(cw, ch, animate, forceSize)
+        {
             boundsAnimation.stop()
 
             var w = contentWidth
@@ -98,80 +146,110 @@ Item {
             var x = contentX
             var y = contentY
 
-            if (w > 0 && h > 0 && forceSize != true) {
+            if (w > 0 && h > 0 && forceSize != true)
+            {
                 var scale = Math.min(cw / w, ch / h)
                 w *= scale
                 h *= scale
-            } else {
+            }
+            else
+            {
                 w = cw
                 h = ch
             }
 
-            var xMargin = Math.max(0, (width - w) / 2)
-            var yMargin = Math.max(0, (height - h) / 3)
-
+            var xMargin = Math.max(allowedHorizontalMargin, (width - w) / 2)
             if (-x + w < width - xMargin)
                 x = w - width + xMargin
-            if (x < xMargin)
+            if (-x > xMargin)
                 x = -xMargin
-            if (-y + h < height - yMargin * 2)
-                y = h - height + yMargin * 2
-            if (y < yMargin)
-                y = -yMargin
 
-            if (animate) {
+            var topMargin = Math.max(allowedVerticalMargin, (height - h) / 3)
+            var bottomMargin = Math.max(allowedVerticalMargin, (height - h) / 3 * 2)
+            if (-y + h < height - bottomMargin)
+                y = h - height + bottomMargin
+            if (-y > topMargin)
+                y = -topMargin
+
+            if (animate)
+            {
                 widthAnimation.to = w
                 heightAnimation.to = h
                 xAnimation.to = x
                 yAnimation.to = y
 
+                fixMargins()
+
                 boundsAnimation.start()
-            } else {
+            }
+            else
+            {
                 contentWidth = w
                 contentHeight = h
                 contentX = x
                 contentY = y
 
-                updateMargins()
+                flick.animating = false
+
+                bindMargins()
             }
         }
 
-        Component.onCompleted: {
-            updateMargins()
+        Component.onCompleted:
+        {
+            bindMargins()
         }
 
-        ParallelAnimation {
+        ParallelAnimation
+        {
             id: boundsAnimation
-            NumberAnimation {
+
+            property int duration: 250
+
+            NumberAnimation
+            {
                 id: widthAnimation
                 target: flick
                 property: "contentWidth"
+                duration: boundsAnimation.duration
             }
-            NumberAnimation {
+            NumberAnimation
+            {
                 id: heightAnimation
                 target: flick
                 property: "contentHeight"
+                duration: boundsAnimation.duration
             }
-            NumberAnimation {
+            NumberAnimation
+            {
                 id: xAnimation
                 target: flick
                 property: "contentX"
+                duration: boundsAnimation.duration
             }
-            NumberAnimation {
+            NumberAnimation
+            {
                 id: yAnimation
                 target: flick
                 property: "contentY"
+                duration: boundsAnimation.duration
             }
-            onStopped: flick.updateMargins()
+            onStopped:
+            {
+                flick.animating = false
+                flick.bindMargins()
+            }
         }
 
-        onMovingChanged: {
+        onMovingChanged:
+        {
             if (moving)
                 boundsAnimation.stop()
         }
     }
 
-    PinchArea {
+    PinchArea
+    {
         id: pinchArea
 
         parent: flick
@@ -183,7 +261,8 @@ Item {
         property real initialContentX
         property real initialContentY
 
-        onPinchStarted: {
+        onPinchStarted:
+        {
             boundsAnimation.stop()
             initialWidth = flick.contentWidth
             initialHeight = flick.contentHeight
@@ -193,14 +272,16 @@ Item {
             flick.topMargin = 0
             flick.contentX = initialContentX
             flick.contentY = initialContentY
+            flick.fixMargins()
         }
 
-        onPinchUpdated: {
+        onPinchUpdated:
+        {
             flick.contentX += pinch.previousCenter.x - pinch.center.x
             flick.contentY += pinch.previousCenter.y - pinch.center.y
 
-            var cx = pinch.center.x + flick.contentX - flick.leftMargin
-            var cy = pinch.center.y + flick.contentY - flick.topMargin
+            var cx = pinch.center.x + flick.contentX
+            var cy = pinch.center.y + flick.contentY
 
             var scale = pinch.scale
 
@@ -215,11 +296,17 @@ Item {
             flick.resizeContent(initialWidth * scale, initialHeight * scale, Qt.point(cx, cy))
         }
 
-        onPinchFinished: {
+        onPinchFinished:
+        {
+            flick.animating = true
+            flick.fixMargins()
             flick.animateToBounds()
         }
 
-        MouseArea {
+        MouseArea
+        {
+            id: mouseArea
+
             readonly property real zoomFactor: 1.1
             readonly property real wheelStep: 120
 
@@ -228,9 +315,10 @@ Item {
             onClicked: rootItem.clicked()
             onDoubleClicked: rootItem.doubleClicked()
 
-            onWheel: {
-                var cx = wheel.x + flick.contentX - flick.leftMargin
-                var cy = wheel.y + flick.contentY - flick.topMargin
+            onWheel:
+            {
+                var cx = wheel.x + flick.contentX
+                var cy = wheel.y + flick.contentY
 
                 var scale = wheel.angleDelta.y / wheelStep * zoomFactor
                 if (scale < 0)
@@ -244,6 +332,8 @@ Item {
                 if (h > maxContentHeight)
                     scale = Math.max(scale, maxContentHeight / flick.contentHeight)
 
+                flick.animating = true
+                flick.fixMargins()
                 flick.resizeContent(flick.contentWidth * scale, flick.contentHeight * scale, Qt.point(cx, cy))
                 flick.animateToBounds()
             }

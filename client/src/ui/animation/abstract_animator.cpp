@@ -22,7 +22,7 @@ AbstractAnimator::AbstractAnimator(QObject *parent):
 {}
 
 AbstractAnimator::~AbstractAnimator() {
-    assert(isStopped()); /* Derived class must be sure to stop the animation in its destructor. */
+    NX_ASSERT(isStopped()); /* Derived class must be sure to stop the animation in its destructor. */
 }
 
 void AbstractAnimator::setTimeLimit(int timeLimitMSec) {
@@ -51,7 +51,7 @@ void AbstractAnimator::ensureDuration() const {
 }
 
 void AbstractAnimator::invalidateDuration() {
-    assert(!isRunning()); /* Cannot invalidate duration of a running animation. */
+    NX_ASSERT(!isRunning()); /* Cannot invalidate duration of a running animation. */
 
     m_durationValid = false;
 }
@@ -91,7 +91,7 @@ void AbstractAnimator::setDurationOverride(int durationOverride) {
 }
 
 void AbstractAnimator::setState(State newState) {
-    assert(newState == Stopped || newState == Paused || newState == Running);
+    NX_ASSERT(newState == Stopped || newState == Paused || newState == Running);
 
     int d = newState > m_state ? 1 : -1;
     for(int i = m_state; i != newState;) {

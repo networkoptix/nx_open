@@ -170,12 +170,12 @@
     <message>
         <location/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos los servidores están fuera de línea. Datos de auditoría no está disponible.</translation>
     </message>
 </context>
 <context>
@@ -183,32 +183,32 @@
     <message>
         <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
         <source>Backup Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Horario de reserva...</translation>
     </message>
     <message>
         <location/>
         <source>Execute backup on the following days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecute la reserva durante los días siguientes:</translation>
     </message>
     <message>
         <location/>
         <source>Finish:</source>
-        <translation type="unfinished"></translation>
+        <translation>Final:</translation>
     </message>
     <message>
         <location/>
         <source>Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>Comienzo:</translation>
     </message>
     <message>
         <location/>
         <source>Limit Bandwidth to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Limitar ancho de banda a:</translation>
     </message>
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Mbit/s</translation>
     </message>
 </context>
 <context>
@@ -216,27 +216,27 @@
     <message>
         <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Duración fija:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>segundos</translation>
     </message>
     <message>
         <location/>
         <source>Tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiquetas:</translation>
     </message>
     <message>
         <location/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pre-grabar:</translation>
     </message>
     <message>
         <location/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Post grabación:</translation>
     </message>
 </context>
 <context>
@@ -244,32 +244,32 @@
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
         <source>&amp;Name</source>
-        <translation type="unfinished">&amp;Nombre</translation>
+        <translation>&amp;Nombre</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished">&amp;Tiempo Cumplido</translation>
+        <translation>&amp;Tiempo Cumplido</translation>
     </message>
     <message>
         <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished">E&amp;tiquetas</translation>
+        <translation>E&amp;tiquetas</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished">&amp;Descripción</translation>
+        <translation>&amp;Descripción</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista de etiquetas separadas por comas o espacios</translation>
     </message>
     <message>
         <location/>
         <source>Popular tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiquetas populares</translation>
     </message>
 </context>
 <context>
@@ -277,27 +277,27 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">Refrescar</translation>
+        <translation>Refrescar</translation>
     </message>
     <message>
         <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Cualquiera cámara &gt;</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished">Todos los servidores están desconectados. Los registros no están disponibles.</translation>
+        <translation>Todos los servidores están desconectados. Los registros no están disponibles.</translation>
     </message>
     <message>
         <location/>
         <source>Bookmark Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Registro de Marcador</translation>
     </message>
 </context>
 <context>
@@ -484,12 +484,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
         <source>Category</source>
-        <translation type="unfinished">Categoría </translation>
+        <translation>Categoría</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished">Refrescar</translation>
+        <translation>Refrescar</translation>
     </message>
 </context>
 <context>
@@ -502,7 +502,7 @@
     <message>
         <location/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta cámara no tiene ninguna configuración avanzada</translation>
     </message>
 </context>
 <context>
@@ -886,7 +886,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>Programación &amp;PTZ:</translation>
     </message>
 </context>
 <context>
@@ -1004,21 +1004,6 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Ajustes del sistema</translation>
     </message>
@@ -1034,43 +1019,33 @@
     </message>
     <message>
         <location/>
-        <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>&amp;Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Alarma/Reglas de Eventos...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Registro de Eventos...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Health Monitoring...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Vigilancia de Salud...</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>Registro de auditoría...</translation>
     </message>
     <message>
         <location/>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir el registro de auditoría</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Marcadores...</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1068,7 @@
     <message>
         <location/>
         <source>Default Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotación Predeterminada:</translation>
     </message>
 </context>
 <context>
@@ -1303,7 +1278,7 @@
     <message>
         <location/>
         <source>This license type requires a higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este tipo de la licencia requiere una versión del software más alta.</translation>
     </message>
 </context>
 <context>
@@ -1572,7 +1547,7 @@
     <message>
         <location/>
         <source>Time Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo de tiempo:</translation>
     </message>
 </context>
 <context>
@@ -1867,7 +1842,7 @@
     <message>
         <location/>
         <source>You will be reconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Usted será reconectado.</translation>
     </message>
 </context>
 <context>
@@ -1999,7 +1974,7 @@
     <message>
         <location/>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se ha podido comprobar las actualizaciones en Internet.</translation>
     </message>
 </context>
 <context>
@@ -2122,7 +2097,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor, espere mientras se restablece la conexión...</translation>
     </message>
 </context>
 <context>
@@ -2464,17 +2439,17 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation type="unfinished"></translation>
+        <translation>para</translation>
     </message>
     <message>
         <location/>
         <source>Force Alarm Layout opening</source>
-        <translation type="unfinished"></translation>
+        <translation>Forzar apertura de la Disposición de Alarma</translation>
     </message>
     <message>
         <location/>
         <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>También mostrar cámara de origen</translation>
     </message>
 </context>
 <context>
@@ -2482,27 +2457,27 @@
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>segundos</translation>
     </message>
     <message>
         <location/>
         <source>Display text for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar texto para:</translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilice texto personalizado:</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for prolonged events</source>
-        <translation type="unfinished"></translation>
+        <translation>Regla funciona solo para eventos prolongados</translation>
     </message>
     <message>
         <location/>
         <source>Also show on source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>También mostrar en cámara de origen</translation>
     </message>
 </context>
 <context>
@@ -2678,7 +2653,7 @@
     <message>
         <location/>
         <source>I/O ports</source>
-        <translation type="unfinished"></translation>
+        <translation>Puertos de E/S</translation>
     </message>
 </context>
 <context>
@@ -2686,62 +2661,62 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished">&amp;Servidor SMTP:</translation>
+        <translation>&amp;Servidor SMTP:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished">&amp;Usuario:</translation>
+        <translation>&amp;Usuario:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Contraseña:</translation>
+        <translation>&amp;Contraseña:</translation>
     </message>
     <message>
         <location/>
         <source>Email:</source>
-        <translation type="unfinished">Correo electrónico:</translation>
+        <translation>Correo electrónico:</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished">P&amp;uerto:</translation>
+        <translation>P&amp;uerto:</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished">Conexión insegura</translation>
+        <translation>Conexión insegura</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished">(recomendado)</translation>
+        <translation>(recomendado)</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished">Conexión segura mediante TLS.</translation>
+        <translation>Conexión segura mediante TLS.</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished">Conexión segura mediante SSL.</translation>
+        <translation>Conexión segura mediante SSL.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;Firma de Sistema:</translation>
+        <translation>&amp;Firma de Sistema:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">Escriba aquí la descripción corta del sistema.</translation>
+        <translation>Escriba aquí la descripción corta del sistema.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">Firma de apoyo:</translation>
+        <translation>Firma de apoyo:</translation>
     </message>
 </context>
 <context>
@@ -2767,27 +2742,27 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;Correo electrónico:</translation>
+        <translation>&amp;Correo electrónico:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished">&amp;Contraseña:</translation>
+        <translation>&amp;Contraseña:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished">&amp;Firma de Sistema:</translation>
+        <translation>&amp;Firma de Sistema:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished">Escriba aquí la descripción corta del sistema.</translation>
+        <translation>Escriba aquí la descripción corta del sistema.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished">Firma de apoyo:</translation>
+        <translation>Firma de apoyo:</translation>
     </message>
 </context>
 <context>
@@ -2795,42 +2770,42 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
-        <translation type="unfinished">Servidor:</translation>
+        <translation>Servidor:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">Puerto:</translation>
+        <translation>Puerto:</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished">Usuario:</translation>
+        <translation>Usuario:</translation>
     </message>
     <message>
         <location/>
         <source>Security:</source>
-        <translation type="unfinished">Seguridad:</translation>
+        <translation>Seguridad:</translation>
     </message>
     <message>
         <location/>
         <source>Progress:</source>
-        <translation type="unfinished">Progreso:</translation>
+        <translation>Progreso:</translation>
     </message>
     <message>
         <location/>
         <source>Result:</source>
-        <translation type="unfinished">Resultado:</translation>
+        <translation>Resultado:</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
@@ -2838,94 +2813,94 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstruir índices de Archivo</translation>
     </message>
     <message>
         <location/>
         <source>Backup progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Progreso de reserva</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Comience reserva ahora</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">Desactivar el almacenamiento parara de escribir.
+        <translation>Desactivar el almacenamiento parara de escribir.
 No negará de retirar las más antiguas grabaciones de la unidad.</translation>
     </message>
     <message>
         <location/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">Añadir Almacenamiento externo ...</translation>
+        <translation>Añadir Almacenamiento externo ...</translation>
     </message>
     <message>
         <location/>
         <source>Main Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Ubicaciones de Almacenamiento Principal</translation>
     </message>
     <message>
         <location/>
         <source>Backup Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Copia las ubicaciones de almacenamiento</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecute reserva</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Horario establecido...</translation>
     </message>
     <message>
         <location/>
         <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation type="unfinished"></translation>
+        <translation>No ha configurado ningún almacenamiento de respaldo. La reserva no será realizada.</translation>
     </message>
     <message>
         <location/>
         <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>La reserva de almacenaje está disponible si hay 2 o más paseos de almacenaje válidos en el sistema.</translation>
     </message>
     <message>
         <location/>
         <source>Global Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes de reserva globales</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From:</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo de reserva de:</translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Calidad de reserva:</translation>
     </message>
     <message>
         <location/>
         <source>&lt;Select at least one camera&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; Seleccione al menos una cámara&gt; </translation>
     </message>
     <message>
         <location/>
         <source>Server Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes de la reserva del servidor</translation>
     </message>
     <message>
         <location/>
         <source>Backup Time Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Reserva de la Etiqueta de Tiempo</translation>
     </message>
 </context>
 <context>
@@ -2933,7 +2908,7 @@ No negará de retirar las más antiguas grabaciones de la unidad.</translation>
     <message>
         <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
@@ -2984,7 +2959,7 @@ No negará de retirar las más antiguas grabaciones de la unidad.</translation>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished">¡ ADVERTENCIA! Esto hará que los ajustes de calidad y marco de velocidad (FPS) en el horario de grabación irrelevante.</translation>
+        <translation>¡ ADVERTENCIA! Esto hará que los ajustes de calidad y marco de velocidad (FPS) en el horario de grabación irrelevante.</translation>
     </message>
 </context>
 <context>

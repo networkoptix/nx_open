@@ -10,6 +10,7 @@
 #include "core/resource/media_resource.h"
 #include "utils/common/sleep.h"
 #include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
 #include <utils/media/frame_type_extractor.h>
 
 // used in reverse mode.
@@ -245,8 +246,6 @@ bool QnArchiveStreamReader::init()
             if (m_requiredJumpTime == requiredJumpTime) {
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     m_requiredJumpTime = AV_NOPTS_VALUE;
-                m_oldQuality = quality;
-                m_oldQualityFastSwitch = true;
                 m_jumpMtx.unlock();
                 if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
                     emit jumpOccured(requiredJumpTime);
@@ -258,6 +257,7 @@ bool QnArchiveStreamReader::init()
         }
     }
 
+    m_delegate->setQuality(quality, true);
     if (!m_delegate->open(m_resource)) {
         if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
             emit jumpOccured(requiredJumpTime);
@@ -269,6 +269,11 @@ bool QnArchiveStreamReader::init()
         return false;
     }
     m_delegate->setAudioChannel(m_selectedAudioChannel);
+
+    m_jumpMtx.lock();
+    m_oldQuality = quality;
+    m_oldQualityFastSwitch = true;
+    m_jumpMtx.unlock();
 
     // Alloc common resources
 
@@ -356,6 +361,21 @@ void QnArchiveStreamReader::startPaused(qint64 startTime)
     m_singleQuantProcessed = true;
     m_requiredJumpTime = m_tmpSkipFramesToTime = startTime;
     start();
+}
+
+bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const
+{
+    if (hasVideo())
+    {
+        if (mediaData->dataType != QnAbstractMediaData::VIDEO)
+            return false;
+    }
+    else 
+    {
+        if (mediaData->dataType != QnAbstractMediaData::AUDIO)
+            return false;
+    }
+    return !(mediaData->flags & QnAbstractMediaData::MediaFlags_LIVE);
 }
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
@@ -613,7 +633,7 @@ begin_label:
             if (m_eof || (m_currentTime == 0 && m_bottomIFrameTime > 0 && m_topIFrameTime >= m_bottomIFrameTime))
             {
                 // seek from EOF to BOF occured
-                //Q_ASSERT(m_topIFrameTime != DATETIME_NOW);
+                //NX_ASSERT(m_topIFrameTime != DATETIME_NOW);
                 setCurrentTime(m_topIFrameTime);
                 m_eof = false;
             }
@@ -696,7 +716,7 @@ begin_label:
                         internalJumpTo(seekTime);
                         m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
-                        //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
+                        //NX_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
                         //return getNextData();
                         goto begin_label;
@@ -789,7 +809,7 @@ begin_label:
     // Do not display archive in a future
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_UnsyncTime)) 
     {
-        if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+        if (isCompatiblePacketForMask(m_currentData) && m_currentData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
         {
             m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
@@ -797,7 +817,7 @@ begin_label:
     }
 
     // ensure Pos At playback mask
-    if (!needToStop() && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (!needToStop() && isCompatiblePacketForMask(m_currentData) && !(m_currentData->flags & QnAbstractMediaData::MediaFlags_Ignore)
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();
@@ -1227,7 +1247,7 @@ QnConstMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 
 qint64 QnArchiveStreamReader::startTime() const
 {
-    Q_ASSERT(m_delegate);
+    NX_ASSERT(m_delegate);
     QnTimePeriod p;
     {
         QnMutexLocker lock( &m_playbackMaskSync );
@@ -1241,7 +1261,7 @@ qint64 QnArchiveStreamReader::startTime() const
 
 qint64 QnArchiveStreamReader::endTime() const
 {
-    Q_ASSERT(m_delegate);
+    NX_ASSERT(m_delegate);
     QnTimePeriod p;
     {
         QnMutexLocker lock( &m_playbackMaskSync );

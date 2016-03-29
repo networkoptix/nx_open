@@ -5,6 +5,8 @@
 #include "onvif/soapImagingBindingProxy.h"
 #include "onvif/soapStub.h"
 
+#include <nx/utils/log/assert.h>
+
 //
 // class QnOnvifImagingProxy
 //
@@ -51,7 +53,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
         if (!range)
             return;
         QnCameraAdvancedParameter param = parameters.getParameterById(id);
-        Q_ASSERT(param.isValid());
+        NX_ASSERT(param.isValid());
         if (!param.isValid())
             return;
         param.setRange(range->Min, range->Max);
@@ -62,7 +64,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
     auto registerEnumParameter = [this, &parameters](const QString &id, QnEnumOnvifImagingOperation::pathFunction path) {
         QnCameraAdvancedParameter param = parameters.getParameterById(id);
-        Q_ASSERT(param.isValid());
+        NX_ASSERT(param.isValid());
         if (!param.isValid())
             return;
         m_supportedOperations.insert(id, QnAbstractOnvifImagingOperationPtr(new QnEnumOnvifImagingOperation(m_values, param.getRange(), path)));

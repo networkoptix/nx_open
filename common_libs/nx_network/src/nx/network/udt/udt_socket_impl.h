@@ -9,9 +9,12 @@
 #include "../common_socket_impl.h"
 
 
+namespace nx {
+namespace network {
+
 class UDTSocketImpl
 :
-    public CommonSocketImpl<UdtSocket>
+    public CommonSocketImpl
 {
 public:
     UDTSOCKET udtHandle;
@@ -20,7 +23,11 @@ public:
     :
         udtHandle(_udtHandle)
     {
+        isUdtSocket = true;
     }
 };
+
+}   //network
+}   //nx
 
 #endif  //NX_NETWORK_UDT_SOCKET_IMPL_H

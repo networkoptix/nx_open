@@ -12,10 +12,16 @@
 #include "message_parser.h"
 #include "message_serializer.h"
 #include "unreliable_message_pipeline.h"
+#include "nx/network/aio/timer.h"
 
 
 namespace nx {
 namespace stun {
+
+typedef nx::network::UnreliableMessagePipeline<
+    Message,
+    MessageParser,
+    MessageSerializer> UnreliableMessagePipeline;
 
 /** STUN protocol UDP client.
     Conforms to [rfc5389, 7.2.1]
@@ -23,6 +29,7 @@ namespace stun {
     \note \a UDPClient object can be safely deleted within request completion handler 
         (more generally, within internal socket's aio thread).
         To delete it in another thread, cancel I/O with \a UDPClient::pleaseStop call
+    \note Notifies all who waiting for response before destruction by reporting \a SystemError::interrupted
  */
 class NX_NETWORK_API UDPClient
 :
@@ -30,7 +37,7 @@ class NX_NETWORK_API UDPClient
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
 public:
-    typedef std::function<void(
+    typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
         Message response)> RequestCompletionHandler;
 
@@ -39,8 +46,9 @@ public:
 
     UDPClient();
     UDPClient(SocketAddress serverAddress);
+    virtual ~UDPClient();
 
-    virtual void pleaseStop(std::function<void()> handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     /**
         \param request MUST contain unique transactionId
@@ -56,7 +64,13 @@ public:
         Message request,
         RequestCompletionHandler completionHandler);
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket();
+    const std::unique_ptr<network::UDPSocket>& socket();
+    /** Move ownership of socket to the caller.
+        \a UDPClient is in undefined state after this call and MUST be freed
+        \note Can be called within send/recv completion handler 
+            (more specifically, within socket's aio thread) only!
+    */
+    std::unique_ptr<network::UDPSocket> takeSocket();
     /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress);
     SocketAddress localAddress() const;
@@ -68,10 +82,7 @@ public:
     void setMaxRetransmissions(int maxRetransmissions);
 
 private:
-    typedef nx::network::UnreliableMessagePipeline<
-        Message,
-        MessageParser,
-        MessageSerializer> PipelineType;
+    typedef UnreliableMessagePipeline PipelineType;
 
     class RequestContext
     {
@@ -80,7 +91,7 @@ private:
         std::chrono::milliseconds currentRetransmitTimeout;
         int retryNumber;
         //TODO #ak use some aio thread timer when it is available
-        std::unique_ptr<AbstractStreamSocket> timer;
+        std::unique_ptr<nx::network::aio::Timer> timer;
         SocketAddress originalServerAddress;
         /** this address reported by socket on send completion */
         SocketAddress resolvedServerAddress;
@@ -104,9 +115,7 @@ private:
     void sendRequestInternal(
         SocketAddress serverAddress,
         Message request,
-        std::function<void(
-            SystemError::ErrorCode errorCode,
-            Message response)> completionHandler);
+        RequestCompletionHandler completionHandler);
     void sendRequestAndStartTimer(
         SocketAddress serverAddress,
         const Message& request,
@@ -115,7 +124,8 @@ private:
         SystemError::ErrorCode errorCode,
         nx::Buffer transactionId,
         SocketAddress resolvedServerAddress);
-    void timedout(nx::Buffer transactionId);
+    void timedOut(nx::Buffer transactionId);
+    void cleanupWhileInAioThread();
 };
 
 }   //stun

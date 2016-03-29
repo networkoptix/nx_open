@@ -11,7 +11,7 @@
 #include <QtXml/QXmlInputSource>
 #include <QtXml/QXmlSimpleReader>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 namespace detail
@@ -201,12 +201,7 @@ namespace detail
         //starting download
         m_downloadUrl = baseUrl;
         m_downloadUrl.setPath( baseUrl.path() + (baseUrl.path().endsWith('/') ? "" : "/") + entryPath + "/" + CONTENTS_FILE_NAME );
-        if( !m_httpClient->doGet( m_downloadUrl ) )
-        {
-            m_httpClient->terminate();
-            m_httpClient.reset();
-            return false;
-        }
+        m_httpClient->doGet( m_downloadUrl );
         return true;
     }
 

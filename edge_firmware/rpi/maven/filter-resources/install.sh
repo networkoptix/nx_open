@@ -27,6 +27,7 @@ then
 else
   update 2>&1
 fi
+if [[ "${box}" == "bpi" ]]; then reboot; fi
 /etc/init.d/$COMPANY_NAME-mediaserver start
 /etc/init.d/cron start
 

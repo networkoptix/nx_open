@@ -1,8 +1,6 @@
 #ifndef NX_RTP_PARSER_H
 #define NX_RTP_PARSER_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QByteArray>
 #include <QMap>
 
@@ -28,7 +26,5 @@ private:
     qint64 m_position;
 };
 typedef QSharedPointer<QnNxRtpParser> QnNxRtpParserPtr;
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // NX_RTP_PARSER_H

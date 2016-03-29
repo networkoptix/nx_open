@@ -4,22 +4,23 @@
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/test_support/simple_socket_test_helper.h>
+#include <nx/network/test_support/socket_test_helper.h>
 
-#include "simple_socket_test_helper.h"
 
 namespace nx {
 namespace network {
 namespace test {
 
+template<quint16 kShift>
 class MultipleServerSocketTester
     : public MultipleServerSocket
 {
 public:
     MultipleServerSocketTester()
     {
-        addSocket(std::make_unique<TCPServerSocket>());
-        addSocket(std::make_unique<TCPServerSocket>());
-        addSocket(std::make_unique<TCPServerSocket>());
+        for (int i = 0; i < kShift; ++i)
+            addSocket(std::make_unique<TCPServerSocket>());
     }
 
     bool bind(const SocketAddress& localAddress) override
@@ -38,44 +39,10 @@ public:
     }
 };
 
-class MultipleClientSocketTester
-    : public TCPSocket
-{
-public:
-    MultipleClientSocketTester()
-        : TCPSocket() {}
-
-    bool connect(const SocketAddress& address, unsigned int timeout ) override
-    {
-        return TCPSocket::connect(modifyAddress(address), timeout);
-    }
-
-    void connectAsync(const SocketAddress& address,
-                      std::function<void(SystemError::ErrorCode)> handler) override
-    {
-        TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
-    }
-
-private:
-    SocketAddress modifyAddress(const SocketAddress& address)
-    {
-        static quint16 modifier = 0;
-        if (m_address == SocketAddress())
-        {
-            m_address = SocketAddress(address.address,
-                                    address.port + (modifier++ % 3));
-            NX_LOGX(lm("connect ") + m_address.toString(), cl_logDEBUG1);
-        }
-
-        return m_address;
-    }
-
-    SocketAddress m_address;
-};
-
-NX_SIMPLE_SOCKET_TESTS(MultipleServerSocket,
-                       &std::make_unique<MultipleServerSocketTester>,
-                       &std::make_unique<MultipleClientSocketTester>)
+NX_NETWORK_SERVER_SOCKET_TEST_CASE(
+    TEST, MultipleServerSocket,
+    &std::make_unique<MultipleServerSocketTester<4>>,
+    &std::make_unique<MultipleClientSocketTester<3>>)
 
 } // namespace test
 } // namespace network

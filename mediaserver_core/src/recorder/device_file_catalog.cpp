@@ -376,6 +376,9 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
         return chunk;
     }
 
+    if (!storage->isFileExists(fileName))
+        return chunk;
+
     auto    nameParts   = QnFile::baseName(fileName).split(lit("_"));
     int64_t startTimeMs = nameParts[0].toLongLong();
     int64_t durationMs  = nameParts[1].toInt();
@@ -397,26 +400,37 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
 void DeviceFileCatalog::setLastSyncTime(int64_t time)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_lastSyncTime = time;
     qnServerDb->setLastBackupTime(
         m_storagePool,
-        qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
+        guidFromArbitraryData(m_cameraUniqueId),
         m_catalog,
-        m_lastSyncTime
+        time 
     );
+
+    QnMutexLocker lk(&m_mutex);
+    m_lastSyncTime = time;
+}
+
+int64_t DeviceFileCatalog::getLastSyncTimeFromDBNoLock() const
+{
+    int64_t ret = qnServerDb->getLastBackupTime(
+        m_storagePool,
+        guidFromArbitraryData(m_cameraUniqueId),
+        m_catalog
+    );
+    return ret;
 }
 
 int64_t DeviceFileCatalog::getLastSyncTime() const
 {
     QnMutexLocker lk(&m_mutex);
     if (m_lastSyncTime == 0)
-    {
-        m_lastSyncTime = qnServerDb->getLastBackupTime(
-            m_storagePool,
-            qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
-            m_catalog
-        );
+    {   // need to unlock here to fetch data from DB.
+        lk.unlock();
+        int64_t dbLastSyncTime = getLastSyncTimeFromDBNoLock();
+        // locking again
+        lk.relock();
+        m_lastSyncTime = dbLastSyncTime;
         if (m_lastSyncTime == 0)
             m_lastSyncTime = 1;
     }
@@ -430,7 +444,7 @@ QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
     else if (m_storagePool == QnServer::StoragePool::Backup)
         return qnBackupStorageMan;
     else {
-        Q_ASSERT(0);
+        NX_ASSERT(0);
         return nullptr;
     }
 }
@@ -441,13 +455,10 @@ QnServer::StoragePool DeviceFileCatalog::getStoragePool() const
     return m_storagePool;
 }
 
-void DeviceFileCatalog::setStoragePool(QnServer::StoragePool kind)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_storagePool = kind;
-}
-
-QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName)
+QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
+    const QnStorageResourcePtr  &storage,
+    const QString               &dirName
+)
 {
     QnTimePeriod timePeriod;
     const QString path = toLocalStoragePath(storage, dirName);
@@ -638,14 +649,14 @@ QnServer::ChunksCatalog DeviceFileCatalog::getRole() const
 
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
-    Q_ASSERT(chunk.durationMs < 1000 * 1000);
+    NX_ASSERT(chunk.durationMs < 1000 * 1000);
 
     QnMutexLocker lock( &m_mutex );
 
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if( itr != m_chunks.end() )
     {
-        itr = m_chunks.insert(itr, chunk);  //triggers assert if itr == end()
+        itr = m_chunks.insert(itr, chunk);  //triggers NX_ASSERT if itr == end()
     }
     else
     {
@@ -690,7 +701,7 @@ qint64 DeviceFileCatalog::lastChunkStartTime() const
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)
 {
-    Q_ASSERT(durationMs < 1000 * 1000);
+    NX_ASSERT(durationMs < 1000 * 1000);
     QnMutexLocker lock( &m_mutex );
     //m_chunks.last().durationMs = durationMs;
     auto itr = qLowerBound(m_chunks.begin(), m_chunks.end(), m_recordingChunkTime);
@@ -775,16 +786,16 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
 {
     QnStorageResourcePtr storage;
     QString delFileName;
+    int storageIndex;
     Chunk deletedChunk;
     {
         QnMutexLocker lock( &m_mutex );
 
         if (m_chunks.empty())
             return deletedChunk;
-
-        if (!m_chunks.empty())
+        else
         {
-            storage = getMyStorageMan()->storageRoot(m_chunks[0].storageIndex);
+            storageIndex = m_chunks[0].storageIndex;
             delFileName = fullFileName(m_chunks[0]);
             deletedChunk = m_chunks[0];
 
@@ -792,6 +803,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
         }
     }
 
+    storage = getMyStorageMan()->storageRoot(storageIndex);
     if (storage) {
         if (!delFileName.isEmpty())
         {
@@ -1137,7 +1149,7 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalizePerio
     bitrateStats.recordedSecs /= 1000; // msec to sec
     if (bitrateStats.recordedBytes > 0 && bitrateStats.recordedSecs > 0)
         result.averageBitrate = bitrateStats.recordedBytes / (qreal) bitrateStats.recordedSecs;
-    Q_ASSERT(result.averageBitrate >= 0);
+    NX_ASSERT(result.averageBitrate >= 0);
     return result;
 }
 

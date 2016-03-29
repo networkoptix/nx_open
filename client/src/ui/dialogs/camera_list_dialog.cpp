@@ -96,7 +96,7 @@ void QnCameraListDialog::updateWindowTitle() {
         if (QnVirtualCameraResourcePtr camera = index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnVirtualCameraResource>())
             cameras << camera;
     }
-    Q_ASSERT_X(cameras.size() == m_resourceSearch->rowCount(), Q_FUNC_INFO, "Make sure all found resources are cameras");
+    NX_ASSERT(cameras.size() == m_resourceSearch->rowCount(), Q_FUNC_INFO, "Make sure all found resources are cameras");
 
     const QString titleServerPart = m_model->server()
         ? QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -142,7 +142,7 @@ void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) 
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
-        context()->menu()->trigger(Qn::CameraSettingsAction, QnActionParameters(resource));
+        context()->menu()->trigger(QnActions::CameraSettingsAction, QnActionParameters(resource));
 }
 
 void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint &) {

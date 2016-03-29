@@ -2,7 +2,6 @@
 
 #include <QtCore/QTimer>
 #include <QtWidgets/QAction>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 #include <QtGui/QDesktopServices>
 
@@ -14,7 +13,7 @@
 #include <common/common_module.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/dialogs/checkable_message_box.h>
+#include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
@@ -74,7 +73,7 @@ void QnWorkbenchUpdateWatcher::stop()
 
 void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &info)
 {
-    Q_ASSERT_X(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
+    NX_ASSERT(!info.currentRelease.isNull(), Q_FUNC_INFO, "Notification must be valid");
 
     if (info.currentRelease.isNull())
         return;
@@ -84,7 +83,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* We have no access rights. */
-    if (!menu()->canTrigger(Qn::SystemUpdateAction))
+    if (!menu()->canTrigger(QnActions::SystemUpdateAction))
         return;
 
     /* User was already notified about this release. */
@@ -104,11 +103,13 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* Do not show notifications near the end of the week or on our holidays. */
-    if (QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek)
-        return;
+     if (QDateTime::currentDateTime().date().dayOfWeek() >= kTooLateDayOfWeek)
+         return;
 
     QnUpdateInfo oldUpdateInfo = qnSettings->latestUpdateInfo();
     if (oldUpdateInfo.currentRelease != info.currentRelease
+        ||
+        oldUpdateInfo.releaseDateMs != info.releaseDateMs
         ||
         oldUpdateInfo.releaseDeliveryDays != info.releaseDeliveryDays)
     {
@@ -131,6 +132,8 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
 
 void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
+    m_notifiedVersion = info.currentRelease;
+
     QnSoftwareVersion current = qnCommon->engineVersion();
     bool majorVersionChange = info.currentRelease.major() > current.major() || info.currentRelease.minor() > current.minor();
 
@@ -156,10 +159,10 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         message += lit("</span><br/>");
     }
 
-    QnCheckableMessageBox messageBox(0);
+    QnMessageBox messageBox(mainWindow());
 
     messageBox.setStandardButtons(buttons);
-    messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+    messageBox.setIcon(QnMessageBox::Question);
 
 #ifdef Q_OS_MAC
     bool hasOutdatedServer = false;
@@ -175,14 +178,15 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     {
         actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
         messageBox.setStandardButtons(QDialogButtonBox::Ok);
-        messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Information));
+        messageBox.setIcon(QnMessageBox::Information);
     }
 #endif
 
     message += actionMessage;
 
     messageBox.setWindowTitle(title);
-    messageBox.setRichText(message);
+    messageBox.setTextFormat(Qt::RichText);
+    messageBox.setText(message);
     messageBox.setCheckBoxText(tr("Do not notify me again about this update."));
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
 
@@ -199,13 +203,11 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
     messageBox.adjustSize();
     messageBox.setGeometry(QnGeometry::aligned(messageBox.size(), mainWindow()->geometry(), Qt::AlignCenter));
 
-    messageBox.exec();
+    int result = messageBox.exec();
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
-    if (messageBox.clickedStandardButton() == QDialogButtonBox::Yes)
-        action(Qn::SystemUpdateAction)->trigger();
+    if (result == QDialogButtonBox::Yes)
+        action(QnActions::SystemUpdateAction)->trigger();
     else
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
-
-    m_notifiedVersion = info.currentRelease;
 }

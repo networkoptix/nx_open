@@ -100,7 +100,7 @@ public:
             const TimePeriod &second = tp1 == first ? tp2 : tp1;
 
             // merge only overlapping periods
-            assert(first.startTimeMs + first.durationMs > second.startTimeMs);
+            NX_ASSERT(first.startTimeMs + first.durationMs > second.startTimeMs);
             TimePeriod ret;
             ret.startTimeMs = first.startTimeMs;
             ret.durationMs =
@@ -459,7 +459,7 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 static void ffmpegInit()
 {
-    av_register_all();
+    avcodec_register_all();
 
     if(av_lockmgr_register(lockmgr) != 0)
     {
@@ -476,7 +476,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
-    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     std::unique_ptr<QnStorageManager> normalStorageManager;
     if (!qnNormalStorageMan) {

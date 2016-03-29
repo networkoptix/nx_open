@@ -3,24 +3,17 @@
 
 #include <limits.h>
 
+#include <QtCore/QEvent>
 
+#include <QtGui/QCursor>
+#include <QtGui/QPainter>
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QStyleOption>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
-
-#include "qapplication.h"
-#include "qcursor.h"
-#include "qevent.h"
-#include "qpainter.h"
-#include "qscrollbar.h"
-#include "qstyle.h"
-#include "qstyleoption.h"
-#include "qmenu.h"
-
-#ifndef QT_NO_ACCESSIBILITY
-#include "qaccessible.h"
-#endif
-
 
 namespace {
     QPointF cwiseDiv(const QPointF &l, const QSizeF &r) {

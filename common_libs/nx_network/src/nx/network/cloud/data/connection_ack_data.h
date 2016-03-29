@@ -19,7 +19,7 @@ class NX_NETWORK_API ConnectionAckRequest
     public StunMessageData
 {
 public:
-    nx::String connectSessionID;
+    nx::String connectSessionId;
     ConnectionMethods connectionMethods;
     std::list<SocketAddress> udpEndpointList;
 

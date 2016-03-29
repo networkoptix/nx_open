@@ -545,7 +545,7 @@ void ZoomWindowInstrument::updateWidgetFromWindow(ZoomWindowWidget *windowWidget
 // Handlers
 // -------------------------------------------------------------------------- //
 void ZoomWindowInstrument::installedNotify() {
-    assert(selectionItem() == NULL);
+    NX_ASSERT(selectionItem() == NULL);
 
     m_resizingInstrument = manager()->instrument<ResizingInstrument>();
     if(m_resizingInstrument) {
@@ -754,7 +754,7 @@ void ZoomWindowInstrument::at_resizing(QGraphicsView *view, QGraphicsWidget *, R
     if(!newTargetWidget || newTargetWidget == windowTarget()->overlay()->target()) 
         return;
     
-    QnAction *action = menu()->action(Qn::CreateZoomWindowAction);
+    QnAction *action = menu()->action(QnActions::CreateZoomWindowAction);
     if(!action || action->checkCondition(action->scope(), QnActionParameters(newTargetWidget)) != Qn::EnabledAction)
         return;
 

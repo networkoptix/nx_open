@@ -3,6 +3,8 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <ui/style/custom_style.h>
+
 namespace {
     const int defaultTimeoutIdx = 0;
 }
@@ -29,6 +31,17 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
             m_selectedTags.insert(tag.trimmed());
 
         updateTagsList();
+    });
+
+    connect(ui->nameLineEdit, &QLineEdit::textEdited, this, [this](const QString& text)
+    {
+        Q_UNUSED(text);
+
+        QPalette palette = this->palette();
+        if (!isValid())
+            setWarningStyle(&palette);
+        ui->nameLabel->setPalette(palette);
+        emit validChanged();
     });
 
     // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
@@ -70,10 +83,15 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
 }
 
 void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const {
-    bookmark.name = ui->nameLineEdit->text();
-    bookmark.description = ui->descriptionTextEdit->toPlainText();
+    bookmark.name = ui->nameLineEdit->text().trimmed();
+    bookmark.description = ui->descriptionTextEdit->toPlainText().trimmed();
     bookmark.timeout = ui->timeoutComboBox->currentData().toLongLong();
     bookmark.tags = m_selectedTags;
+}
+
+bool QnBookmarkWidget::isValid() const
+{
+    return !ui->nameLineEdit->text().trimmed().isEmpty();
 }
 
 void QnBookmarkWidget::updateTagsList() {

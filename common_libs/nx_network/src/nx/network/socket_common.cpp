@@ -1,5 +1,8 @@
+
 #include "socket_common.h"
+
 #include "socket_global.h"
+
 
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
 const HostAddress HostAddress::anyHost( (uint32_t)INADDR_ANY );
@@ -62,7 +65,8 @@ HostAddress::HostAddress( const QByteArray& _ipv6 )
 {
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
 
-    if( _ipv6.size() != IP_V6_MAP_PREFIX.size() + sizeof(m_sinAddr.s_addr) ) return;
+    if( _ipv6.size() != IP_V6_MAP_PREFIX.size() +
+        static_cast<int>(sizeof(m_sinAddr.s_addr)) ) return;
     if( !_ipv6.startsWith(IP_V6_MAP_PREFIX) ) return;
 
     uint32_t _ipv4;
@@ -106,7 +110,7 @@ QString HostAddress::toString() const
 {
     if( !m_addrStr )
     {
-        Q_ASSERT( m_addressResolved );
+        NX_ASSERT( m_addressResolved );
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     }
     return m_addrStr.get();
@@ -115,6 +119,23 @@ QString HostAddress::toString() const
 bool HostAddress::isResolved() const
 {
     return m_addressResolved;
+}
+
+bool HostAddress::isLocalIp() const
+{
+    // TODO: #mux virify with standart
+    static const std::vector<QString> kLocalPrefixes
+    {
+        QLatin1String("192.168"),
+        QLatin1String("127.0.0"),
+    };
+
+    const auto string = toString();
+    for (const auto& prefix: kLocalPrefixes)
+        if (string.startsWith("192.168"))
+            return true;
+
+    return false;
 }
 
 HostAddress& HostAddress::operator=( const HostAddress& rhs )
@@ -169,7 +190,7 @@ struct in_addr HostAddress::inAddr(bool* ok) const
 {
     if( !m_addressResolved )
     {
-        Q_ASSERT( m_addrStr );
+        NX_ASSERT( m_addrStr );
         const auto addrs = nx::network::SocketGlobals::addressResolver().resolveSync(
                     m_addrStr.get(), false );
 
@@ -235,6 +256,12 @@ SocketAddress::SocketAddress( const QString& str )
     port( 0 )
 {
     initializeFromString(str);
+}
+
+SocketAddress::SocketAddress(const QByteArray& utf8Str)
+:
+    SocketAddress(QString::fromUtf8(utf8Str))
+{
 }
 
 SocketAddress::SocketAddress( const char* str )

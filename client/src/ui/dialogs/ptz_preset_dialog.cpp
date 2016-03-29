@@ -2,7 +2,6 @@
 #include "ui_ptz_preset_dialog.h"
 
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QMessageBox>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>

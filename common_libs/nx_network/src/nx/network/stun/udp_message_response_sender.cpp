@@ -47,7 +47,7 @@ SocketAddress UDPMessageResponseSender::getSourceAddress() const
 void UDPMessageResponseSender::addOnConnectionCloseHandler(std::function<void()> /*handler*/)
 {
     //TODO #ak
-    assert(false);
+    NX_ASSERT(false);
 }
 
 AbstractCommunicatingSocket* UDPMessageResponseSender::socket()

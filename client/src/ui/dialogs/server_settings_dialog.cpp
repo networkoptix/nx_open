@@ -26,7 +26,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     , m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
 {
     ui->setupUi(this);
-  
+
     addPage(SettingsPage, m_generalPage, tr("General"));
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
@@ -35,7 +35,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     connect(this, &QnGenericTabbedDialog::dialogClosed, m_statisticsPage, &QnRecordingStatisticsWidget::resetForecast);
 
     connect(m_webPageButton, &QPushButton::clicked, this, [this] {
-        menu()->trigger(Qn::WebClientAction, m_server);
+        menu()->trigger(QnActions::WebClientAction, m_server);
     });
 
 
@@ -114,15 +114,16 @@ void QnServerSettingsDialog::retranslateUi() {
     }
 }
 
-QMessageBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
-    Q_ASSERT_X(m_server, Q_FUNC_INFO, "Server must exist here");
+QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
+    NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
-    return QMessageBox::question(this,
+    return QnMessageBox::question(
+        this,
         tr("Server not saved"),
         tr("Apply changes to server %1?")
         .arg(m_server
             ? m_server->getName()
             : QString()),
-        QMessageBox::Yes | QMessageBox::No,
-        QMessageBox::Yes);
+        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QDialogButtonBox::Yes);
 }

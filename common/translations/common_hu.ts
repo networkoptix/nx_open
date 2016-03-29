@@ -6,7 +6,7 @@
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>Nyelv</translation>
+        <translation>Magyar</translation>
     </message>
     <message>
         <source>Locale Code</source>
@@ -344,75 +344,75 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ preset indítás</translation>
     </message>
     <message>
         <source>Show text overlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Felirat fólia megjelenítése</translation>
     </message>
     <message>
         <source>Show on Alarm Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Megjelenítés a riasztás elrendezésen</translation>
     </message>
     <message>
         <source>Archive backup finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés kész</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív boztonsági mentés &apos;%1&apos; szerveren kész</translation>
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - általános esemény</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bemeneti port: %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés sikeresen elkészült</translation>
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 I/O modul szétkapcsolt</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Címütközés: %1</translation>
     </message>
     <message>
         <source>Archive backup failed: No available backup storages with sufficient free space</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés sikertelen: nincs elég hely a megadott tárolón</translation>
     </message>
     <message>
         <source>Archive backup failed: Target storage failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés sikertelen: céltároló hiba</translation>
     </message>
     <message>
         <source>Archive backup failed: Source file open/read error</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés sikertelen: hiba a forrás fájl megnyitásakor</translation>
     </message>
     <message>
         <source>Archive backup failed: Target file create/write error</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés sikertelen: Írási hiba a célfájlban</translation>
     </message>
     <message>
         <source>Archive backup failed: File catalog error</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés sikertelen: fáljegyzék hiba</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentés kész, de nem teljes mert a biztosnági mentésre szánt idő lejárt. Az adat lementve %1-ig</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Archív biztonsági mentést a felhasználó megszakította. Az adat lementve %1-ig</translation>
     </message>
     <message>
         <source>Recording on I/O modules is disabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rögzítés az I/O modulon kikapcsolva:</translation>
     </message>
 </context>
 <context>
@@ -575,55 +575,55 @@
     </message>
     <message>
         <source>Camera plugin error. %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera plugin hiba. %1</translation>
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Indítsa újra az I/O modult, majd  állítsa vissza az I/O modul weboldalán gyári alapértelmezett beállításokat.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ellenőrizze, hogy az I/O modul csatlakoztatva van a rendszerre. Próbálja újraindítani az I/O modult.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Az I/O modul  nem válaszol. URL: %1, név: %2.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Először kapcsolja be a rögzítést (ha még nincs), majd csökkentse a frame rátát az I/O modul beállításokban.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha ez nem segített, állítsa vissza az I/O modul weboldalán gyári alapértelmezett beállításokra.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O modul kérés &quot;%1&quot; hiba, &quot;%2&quot; hibával.</translation>
     </message>
     <message>
         <source>Unknown I/O module issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen I/O modul probléma.</translation>
     </message>
     <message>
         <source>Invalid data was received from the I/O module %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen adat a(z) %1 I/O modultól.</translation>
     </message>
     <message>
         <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-        <translation type="unfinished"></translation>
+        <translation>Túl sok média hiba. Nyissa meg az I/O modul beállításokat további információkért.</translation>
     </message>
     <message>
         <source>Device initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eszközinicializálás folyamatban.</translation>
     </message>
     <message>
         <source>Camera initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamerainicializálás folyamatban.</translation>
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O modul inicializálás folyamatban.</translation>
     </message>
 </context>
 <context>
@@ -645,7 +645,7 @@
     </message>
     <message>
         <source>File explorer failed to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fájlböngésző nem nyílt meg.</translation>
     </message>
 </context>
 <context>
@@ -660,11 +660,11 @@
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audió enkóder nem inicializálható.</translation>
     </message>
     <message>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audió dekóder nem inicializálható.</translation>
     </message>
 </context>
 <context>
@@ -702,7 +702,7 @@
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Videó  enkóder nem inicializálható.</translation>
     </message>
 </context>
 <context>
@@ -860,11 +860,11 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a licenckulcs aktiválása során. Adatbázishiba történt.</translation>
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiba a licenckulcs aktiválása során. Érvénytelen adat. Lépjen kapcsolatba a forgalmazóval.</translation>
     </message>
 </context>
 <context>
@@ -941,31 +941,31 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O modul</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O modul</numerusform>
         </translation>
     </message>
     <message>
         <source>I/O Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O modulok</translation>
     </message>
     <message>
         <source>I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O modulok</translation>
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished">I/O modul</translation>
+        <translation>I/O modul</translation>
     </message>
     <message>
         <source>I/O module</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O modul</translation>
     </message>
 </context>
 <context>
@@ -1093,7 +1093,7 @@
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Íráshiba. Nincs elég tárhely.</translation>
     </message>
 </context>
 <context>
@@ -1157,7 +1157,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
         <source>Removed camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Eltávolított kamera</translation>
     </message>
 </context>
 </TS>

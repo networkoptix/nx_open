@@ -1,7 +1,5 @@
 #include "connect_to_current_system_tool.h"
 
-#include <QtWidgets/QMessageBox>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>

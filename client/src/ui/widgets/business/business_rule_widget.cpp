@@ -8,7 +8,6 @@
 
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
 

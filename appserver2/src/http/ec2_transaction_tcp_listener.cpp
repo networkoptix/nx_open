@@ -26,7 +26,7 @@ class QnTransactionTcpProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
 
-    QnTransactionTcpProcessorPrivate(): 
+    QnTransactionTcpProcessorPrivate():
         QnTCPConnectionProcessorPrivate()
     {
     }
@@ -85,7 +85,7 @@ void QnTransactionTcpProcessor::run()
     }
 
     d->response.headers.emplace(
-        "Keep-Alive",
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
             QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
 
@@ -141,7 +141,7 @@ void QnTransactionTcpProcessor::run()
 
     auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_NAME_HEADER_NAME);
     if( (systemNameHeaderIter != d->request.headers.end()) &&
-        (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) != 
+        (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
             QnCommonModule::instance()->localSystemName()) )
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
@@ -180,7 +180,7 @@ void QnTransactionTcpProcessor::run()
 
         auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_NAME_HEADER_NAME);
         if( (systemNameHeaderIter != d->request.headers.end()) &&
-            (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) != 
+            (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
                 QnCommonModule::instance()->localSystemName()) )
         {
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
@@ -188,7 +188,7 @@ void QnTransactionTcpProcessor::run()
         }
 
         d->response.headers.emplace(
-            "Keep-Alive",
+            Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
             nx_http::header::KeepAlive(
                 QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
     }
@@ -198,7 +198,7 @@ void QnTransactionTcpProcessor::run()
     if( connectionGuidIter == d->request.headers.end() )
         connectionGuid = QnUuid::createUuid();  //generating random connection guid
     else
-        connectionGuid = connectionGuidIter->second;
+        connectionGuid = QnUuid::fromStringSafe(connectionGuidIter->second);
 
     ConnectionType::Type requestedConnectionType = ConnectionType::none;
     auto connectionDirectionIter = d->request.headers.find( Qn::EC2_CONNECTION_DIRECTION_HEADER_NAME );
@@ -206,7 +206,7 @@ void QnTransactionTcpProcessor::run()
         requestedConnectionType = ConnectionType::incoming;
     else
         requestedConnectionType = ConnectionType::fromString(connectionDirectionIter->second);
-    
+
     //checking content encoding requested by remote peer
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;
@@ -228,7 +228,7 @@ void QnTransactionTcpProcessor::run()
         fail = true; // accept only allowed peers
 
     d->chunkedMode = false;
-    d->response.headers.emplace( "Connection", "close" );
+    //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
@@ -250,7 +250,7 @@ void QnTransactionTcpProcessor::run()
 
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
-            std::move(d->socket),
+            d->socket,
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
@@ -260,7 +260,8 @@ void QnTransactionTcpProcessor::run()
             );
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
-        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid );
+        if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
+            QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
 
         d->socket.clear();
     }

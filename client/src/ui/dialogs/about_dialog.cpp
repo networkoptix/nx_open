@@ -15,6 +15,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <core/resource/resource_name.h>
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
@@ -25,7 +26,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
 #include <utils/common/string.h>
@@ -50,10 +51,10 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    if(menu()->canTrigger(Qn::ShowcaseAction)) {
+    if(menu()->canTrigger(QnActions::ShowcaseAction)) {
         QPushButton* showcaseButton = new QPushButton(this);
-        showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-        connect(showcaseButton, &QPushButton::clicked, action(Qn::ShowcaseAction), &QAction::trigger);
+        showcaseButton->setText(action(QnActions::ShowcaseAction)->text());
+        connect(showcaseButton, &QPushButton::clicked, action(QnActions::ShowcaseAction), &QAction::trigger);
         ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
     }
 
@@ -80,7 +81,8 @@ void QnAboutDialog::changeEvent(QEvent *event)
         retranslateUi();
 }
 
-QString QnAboutDialog::connectedServers() const {
+QString QnAboutDialog::connectedServers() const
+{
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
 
     QnSoftwareVersion latestVersion = watcher->latestVersion();
@@ -91,15 +93,16 @@ QString QnAboutDialog::connectedServers() const {
         latestMsVersion = latestVersion;
 
     QString servers;
-    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData()) {
+    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData())
+    {
         if (data.component != Qn::ServerComponent)
             continue;
 
         QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-        if(!resource)
+        if (!resource)
             continue;
 
-        QString server = tr("Server at %2: v%1").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host()) + lit("<br/>");
+        QString server = lit("%1: v%2<br/>").arg(getFullResourceName(resource, true)).arg(data.version.toString());
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
@@ -149,7 +152,6 @@ void QnAboutDialog::retranslateUi()
     credits << lit("<b>OpenAL %1</b> - Copyright (c) 2000-2006 %2.").arg(QtvAudioDevice::instance()->versionString()).arg(QtvAudioDevice::instance()->company());
     credits << lit("<b>SIGAR %1</b> - Copyright (c) 2004-2011 VMware Inc.").arg(versionString(QnAppInfo::sigarVersion()));
     credits << lit("<b>Boost %1</b> - Copyright (c) 2000-2012 Boost developers.").arg(versionString(QnAppInfo::boostVersion()));
-    credits << lit("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.");
 
     int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
 

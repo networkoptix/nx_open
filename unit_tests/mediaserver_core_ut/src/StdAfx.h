@@ -6,3 +6,9 @@
 #       define noexcept
 #   endif
 #endif
+
+extern "C"
+{
+    #include <libavformat/avformat.h>
+}
+

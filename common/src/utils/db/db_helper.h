@@ -2,7 +2,8 @@
 #define __QN_DB_HELPER_H__
 
 #include <QtSql/QSqlDatabase>
-#include <QtCore/QReadWriteLock>
+
+#include <nx/utils/thread/mutex.h>
 
 class QSqlDatabase;
 
@@ -12,7 +13,7 @@ public:
     class QnDbTransaction
     {
     public:
-        QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex);
+        QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex);
         virtual ~QnDbTransaction();
     protected:
         virtual bool beginTran();
@@ -23,7 +24,7 @@ public:
         friend class QnDbHelper;
 
         QSqlDatabase& m_database;
-        QReadWriteLock& m_mutex;
+        QnReadWriteLock& m_mutex;
     };
 
     class QnDbTransactionLocker
@@ -54,7 +55,9 @@ public:
     static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
     //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
     static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
+
     static bool execSQLQuery(QSqlQuery *query, const char* details);
+    static bool prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details);
 
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
@@ -62,7 +65,7 @@ protected:
     void removeDatabase();
 protected:
     QSqlDatabase m_sdb;
-    mutable QReadWriteLock m_mutex;
+    mutable QnReadWriteLock m_mutex;
     QString m_connectionName;
 };
 

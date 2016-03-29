@@ -38,7 +38,7 @@ protected:
 
 private:
     void updateFailoverLabel();
-    
+    void updateUrl();
     void updateReadOnly();
 
 private slots:

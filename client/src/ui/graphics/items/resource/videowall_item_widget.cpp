@@ -94,7 +94,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(m_videowall, this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+    addOverlayWidget(m_statusOverlayWidget, detail::OverlayParams(UserVisible, true));
 
     initInfoOverlay();
 
@@ -115,7 +115,7 @@ void QnVideowallItemWidget::initInfoOverlay() {
     m_headerLabel->setAcceptedMouseButtons(0);
     m_headerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
-    m_infoButton = new QnImageButtonWidget();
+    m_infoButton = new QnImageButtonWidget(lit("videowall_info"));
     m_infoButton->setIcon(qnSkin->icon("item/info.png"));
     m_infoButton->setCheckable(true);
     m_infoButton->setToolTip(tr("Information"));
@@ -356,7 +356,7 @@ void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
     parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
 
-    menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
+    menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
 
     event->acceptProposedAction();
 }
@@ -425,7 +425,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
         return;
 
     menu()->triggerIfPossible(
-        Qn::StartVideoWallControlAction,
+        QnActions::StartVideoWallControlAction,
         QnActionParameters(m_indices)
     );
 }

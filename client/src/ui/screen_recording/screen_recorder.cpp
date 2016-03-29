@@ -10,7 +10,6 @@
 #include "ui/style/skin.h"
 #include "video_recorder_settings.h"
 #include <nx/utils/log/log.h>
-#include "plugins/resource/desktop_win/desktop_file_encoder.h"
 #include "plugins/resource/desktop_win/desktop_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include <utils/common/string.h>
@@ -53,7 +52,7 @@ void QnScreenRecorder::startRecording() {
     QnVideoRecorderSettings recorderSettings;
 
     QDateTime dt = QDateTime::currentDateTime();
-    QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) + 
+    QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) +
                        replaceNonFileNameCharacters(QString(lit("video_recording_%1.avi")).arg(datetimeSaveDialogSuggestion(dt)), QLatin1Char('_'));
     QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QnAudioDeviceInfo secondAudioDevice;
@@ -128,7 +127,7 @@ void QnScreenRecorder::stopRecording() {
         return; /* Stopping when nothing is being recorded is OK. */
 
     QString recordedFileName = m_recorder->fixedFileName();
-    
+
     m_dataProvider->removeDataProcessor(m_recorder);
 
     delete m_dataProvider;

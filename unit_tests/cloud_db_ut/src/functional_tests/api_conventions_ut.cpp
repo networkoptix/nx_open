@@ -13,7 +13,7 @@
 #include <cloud_db_client/src/data/types.h>
 
 #include "test_setup.h"
-#include "version.h"
+#include <utils/common/app_info.h>
 
 
 namespace nx {
@@ -22,7 +22,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, api_conventions_general)
 {
     //waiting for cloud_db initialization
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -33,13 +33,13 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
     {
         //missing required parameter
         nx_http::HttpClient httpClient;
-        QUrl url(lit("http://%1:%2/system/bind?name=esadfwer").arg(endpoint().address.toString()).arg(endpoint().port));
+        QUrl url(lit("http://%1:%2/cdb/system/bind?name=esadfwer").arg(endpoint().address.toString()).arg(endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(httpClient.doGet(url));
 
         auto msgBody = httpClient.fetchMessageBodyBuffer();
-        nx_http::FusionRequestResult requestResult = 
+        nx_http::FusionRequestResult requestResult =
             QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
 
         ASSERT_TRUE(httpClient.response() != nullptr);
@@ -56,8 +56,8 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
     {
         //operation forbidden for account in this state
         nx_http::HttpClient httpClient;
-        QUrl url(lit("http://%1:%2/system/bind?name=esadfwer&customization=%3").
-            arg(endpoint().address.toString()).arg(endpoint().port).arg(QN_CUSTOMIZATION_NAME));
+        QUrl url(lit("http://%1:%2/cdb/system/bind?name=esadfwer&customization=%3").
+            arg(endpoint().address.toString()).arg(endpoint().port).arg(QnAppInfo::customizationName()));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(httpClient.doGet(url));
@@ -89,14 +89,14 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
         testData, api::AccountData(), &success);
     ASSERT_TRUE(success);
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     auto client = nx_http::AsyncHttpClient::create();
     QUrl url;
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");
-    url.setPath("/account/register");
+    url.setPath("/cdb/account/register");
     std::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(
@@ -114,7 +114,7 @@ TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
 
 TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     for (int i = 0; i < 2; ++i)
     {
@@ -123,7 +123,7 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
         url.setHost(endpoint().address.toString());
         url.setPort(endpoint().port);
         url.setScheme("http");
-        url.setPath("/account/get");
+        url.setPath("/cdb/account/get");
         if (i == 1)
         {
             url.setUserName("invalid");
@@ -154,7 +154,7 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
 
 TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     api::AccountData account1;
     std::string account1Password;
@@ -179,7 +179,7 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
     url.setHost(endpoint().address.toString());
     url.setPort(endpoint().port);
     url.setScheme("http");
-    url.setPath("/account/update");
+    url.setPath("/cdb/account/update");
     url.setUserName(QString::fromStdString(account1.email));
     url.setPassword(QString::fromStdString(account1Password));
     url.setQuery(std::move(urlQuery));

@@ -42,7 +42,7 @@ QnConstMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compress
         m_generatedContexts.insert(compressionType, result);
     }
 
-    assert(result);
+    NX_ASSERT(result);
     return result;
 }
 
@@ -60,7 +60,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
         QnConstMediaContextPtr currentContext = m_media->context;
         if (!currentContext)
             currentContext = getGeneratedContext(m_media->compressionType);
-        assert(currentContext);
+        NX_ASSERT(currentContext);
         //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
         if (!m_contextSent || !m_contextSent->isSimilarTo(currentContext))
         {
@@ -77,7 +77,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 
     if (!m_codecCtxData.isEmpty())
     {
-        Q_ASSERT(!m_codecCtxData.isEmpty());
+        NX_ASSERT(!m_codecCtxData.isEmpty());
         sendBuffer.write(m_codecCtxData);
         m_codecCtxData.clear();
         m_isLastDataContext = true;
@@ -174,13 +174,7 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
-    if (!m_codecCtxData.isEmpty()) {
-        QString result(lit("a=fmtp:%1 config=%2\r\n"));
-        return result.arg((int)getPayloadtype()).arg(QLatin1String(m_codecCtxData.toBase64())).toLatin1();
-    }
-    else {
-        return QByteArray();
-    }
+    return QByteArray();
 }
 
 QString QnRtspFfmpegEncoder::getName()
@@ -196,12 +190,6 @@ void QnRtspFfmpegEncoder::setLiveMarker(int value)
 void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
 {
     m_additionFlags = value;
-}
-
-void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& context)
-{
-    if (context)
-        m_codecCtxData = context->serialize();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

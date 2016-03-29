@@ -8,6 +8,7 @@ angular.module('webadminApp', [
     //'ngTouch',
     'ui.bootstrap',
     'tc.chartjs',
+    'ui.select',
     'ngStorage'
 ]).config(function($sceDelegateProvider) {
     $sceDelegateProvider.resourceUrlWhitelist([
@@ -75,9 +76,9 @@ angular.module('webadminApp', [
             templateUrl: 'views/log.html',
             controller: 'LogCtrl'
         })
-        .when('/log', {
-            templateUrl: 'views/log.html',
-            controller: 'LogCtrl'
+        .when('/setup', {
+            templateUrl: 'views/dialogs/setup.html',
+            controller: 'SetupCtrl'
         })
         .otherwise({
             redirectTo: '/view'

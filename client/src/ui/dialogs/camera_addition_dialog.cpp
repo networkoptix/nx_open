@@ -1,7 +1,6 @@
 #include "camera_addition_dialog.h"
 #include "ui_camera_addition_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QDesktopServices>
 
@@ -11,7 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/ui_resource_name.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
@@ -45,8 +44,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
         <p><b>192.168.1.15</b></p>\
         <p><b>www.example.com:8080</b></p>\
         <p><b>rtsp://example.com:554/video</b></p>\
-        <p><b>http://example.com/custom_page</b></p>\
-        <p><b>https://example.com/secure_page</b></p>\
         </body></html>")
         .arg(tr("Examples:"));
 
@@ -321,7 +318,7 @@ bool QnCameraAdditionDialog::ensureServerOnline() {
     if (serverOnline())
         return true;
 
-    QMessageBox::critical(this,
+    QnMessageBox::critical(this,
                           tr("Error"),
                           tr("Server is offline.") + L'\n'
                           + tr("Device addition is possible for online servers only."));
@@ -428,15 +425,11 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
         return;
 
     QnManualResourceSearchEntry info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualResourceSearchEntry>();
-    QString urlText = info.url;
-    if (!urlText.contains(QLatin1String("://")))
-        urlText = QLatin1String("http://") + urlText;
 
-    QUrl url(urlText);
-    if (url.isEmpty())
+    QUrl url = QUrl::fromUserInput(info.url);
+    if (!url.isValid())
         return;
 
-    //TODO: #GDM handle for web pages
     url.setPath(QString());
     QDesktopServices::openUrl(url);
 }
@@ -542,7 +535,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         camerasToAdd << info;
     }
     if (camerasToAdd.empty()){
-        QMessageBox::information(this, tr("No devices selected."), tr("Please select at least one device"));
+        QnMessageBox::information(this, tr("No devices selected."), tr("Please select at least one device"));
         return;
     }
 
@@ -562,20 +555,20 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     if(result.isFinished()) {
         if(result.status() == 0) {
             removeAddedCameras();
-            QMessageBox::information(
+            QnMessageBox::information(
                 this,
                 tr("Success"),
                 tr("%n devices added successfully.", "", camerasToAdd.size())
                     + L'\n'
                     + tr("It might take a few moments to populate them in the tree."),
-                QMessageBox::Ok
+                QDialogButtonBox::Ok
             );
         } else {
             if (!ensureServerOnline()) {
                 setState(CamerasOffline);
                 return;
             }
-            QMessageBox::critical(this, tr("Error"), tr("Error while adding %n devices.", "", camerasToAdd.size()));
+            QnMessageBox::critical(this, tr("Error"), tr("Error while adding %n devices.", "", camerasToAdd.size()));
         }
     }
     setState(CamerasFound);
@@ -666,7 +659,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0) {
         setState(Initial);
-        QMessageBox::warning(this, tr("Error"), tr("Error while searching for device(s)."));
+        QnMessageBox::warning(this, tr("Error"), tr("Error while searching for device(s)."));
         return;
     }
 
@@ -702,10 +695,10 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         if (result.cameras.size() > 0) {
             setState(CamerasFound);
             if (newCameras == 0)
-                QMessageBox::information(this, tr("Finished"), tr("All devices are already in the resource tree."));
+                QnMessageBox::information(this, tr("Finished"), tr("All devices are already in the resource tree."));
         } else {
             setState(Initial);
-            QMessageBox::information(this, tr("Finished"), tr("No devices found."));
+            QnMessageBox::information(this, tr("Finished"), tr("No devices found."));
         }
         m_processUuid = QnUuid();
     }

@@ -1,7 +1,7 @@
 #ifndef PTZ_TOUR_WIDGET_H
 #define PTZ_TOUR_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include <core/ptz/ptz_fwd.h>
 

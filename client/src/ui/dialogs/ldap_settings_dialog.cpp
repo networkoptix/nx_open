@@ -1,7 +1,6 @@
 #include "ldap_settings_dialog.h"
 #include "ui_ldap_settings_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
@@ -10,7 +9,7 @@
 #include <api/global_settings.h>
 #include <utils/common/ldap.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

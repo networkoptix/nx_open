@@ -1,7 +1,5 @@
 #include "rtp_stream_parser.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 QnRtpVideoStreamParser::QnRtpVideoStreamParser()
 {
     m_chunks.reserve(1024);
@@ -77,5 +75,3 @@ QnAbstractMediaDataPtr QnRtpAudioStreamParser::nextData()
         return result;
     }
 }
-
-#endif // ENABLE_DATA_PROVIDERS

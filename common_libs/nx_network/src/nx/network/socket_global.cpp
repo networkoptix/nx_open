@@ -22,7 +22,6 @@ SocketGlobals::~SocketGlobals()
         m_addressResolver.pleaseStop( barrier.fork() );
         m_addressPublisher.pleaseStop( barrier.fork() );
         m_mediatorConnector->pleaseStop( barrier.fork() );
-        m_incomingTunnelPool.pleaseStop(barrier.fork());
         m_outgoingTunnelPool.pleaseStop( barrier.fork() );
     }
 
@@ -32,21 +31,28 @@ SocketGlobals::~SocketGlobals()
 
 void SocketGlobals::init()
 {
-	QnMutexLocker lk( &s_mutex );
-	if( ++s_counter == 1 )
+    QnMutexLocker lock(&s_mutex);
+    if (++s_counter == 1) // first in
         s_instance = new SocketGlobals;
 }
 
 void SocketGlobals::deinit()
 {
-	QnMutexLocker lk( &s_mutex );
-    if( --s_counter == 0 )
+    QnMutexLocker lock(&s_mutex);
+    if (--s_counter == 0) // last out
         delete s_instance;
 }
 
+void SocketGlobals::check()
+{
+    NX_CRITICAL(
+        s_counter.load() != 0,
+        "SocketGlobals::InitGuard must be initialized before using Sockets");
+}
+
 QnMutex SocketGlobals::s_mutex;
-size_t SocketGlobals::s_counter( 0 );
-SocketGlobals* SocketGlobals::s_instance;
+std::atomic<int> SocketGlobals::s_counter(0);
+SocketGlobals* SocketGlobals::s_instance(nullptr);
 
 } // namespace network
 } // namespace nx

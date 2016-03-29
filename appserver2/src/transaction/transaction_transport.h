@@ -57,6 +57,29 @@ class QnTransactionTransport
     Q_OBJECT
 
 public:
+    class Locker
+    {
+    public:
+        Locker(QnTransactionTransport* objectToLock)
+        :
+            m_objectToLock(objectToLock)
+        {
+            m_objectToLock->lock();
+        }
+        ~Locker()
+        {
+            m_objectToLock->unlock();
+        }
+
+        void waitForNewTransactionsReady()
+        {
+            m_objectToLock->waitForNewTransactionsReady();
+        }
+
+    private:
+        QnTransactionTransport* m_objectToLock;
+    };
+
     static const char* TUNNEL_MULTIPART_BOUNDARY;
     static const char* TUNNEL_CONTENT_TYPE;
 
@@ -105,16 +128,16 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
     {
         QnTransactionTransportHeader header(_header);
-        assert(header.processedPeers.contains(m_localPeer.id));
+        NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
         header.fillSequence();
 #ifdef _DEBUG
 
         for (const QnUuid& peer: header.dstPeers) {
-            Q_ASSERT(!peer.isNull());
-            //Q_ASSERT(peer != qnCommon->moduleGUID());
+            NX_ASSERT(!peer.isNull());
+            //NX_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
-        Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
+        NX_ASSERT(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
         if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))
@@ -214,13 +237,6 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         const nx_http::Request& request,
         const QByteArray& requestBuf );
-    //!Blocks till connection is ready to accept new transactions
-    /*!
-        \param invokeBeforeWait This handler is invoked if wait is required. Invoked with internal mutex locked
-        \note After \a invokeBeforeWait has been called this object cannot be destroyed (will block in destructor)
-            until \a QnTransactionTransport::waitForNewTransactionsReady has returned
-    */
-    void waitForNewTransactionsReady( std::function<void()> invokeBeforeWait );
     //!Transport level logic should use this method to report connection problem
     void connectionFailure();
 
@@ -336,6 +352,12 @@ private:
     void monitorConnectionForClosure( SystemError::ErrorCode errorCode, size_t bytesRead );
     QUrl generatePostTranUrl();
     void aggregateOutgoingTransactionsNonSafe();
+
+    /** Destructor will block until unlock is called */
+    void lock();
+    void unlock();
+    //!Blocks till connection is ready to accept new transactions
+    void waitForNewTransactionsReady();
 
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );

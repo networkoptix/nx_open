@@ -28,8 +28,8 @@
 #include "action_factories.h"
 #include "action_parameter_types.h"
 
-QnAction::QnAction(Qn::ActionId id, QObject *parent): 
-    QAction(parent), 
+QnAction::QnAction(QnActions::IDType id, QObject *parent):
+    QAction(parent),
     QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0),
@@ -151,11 +151,11 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return (m_mode & mode) == mode;
     };
 
-    if (qnRuntime->isVideoWallMode() && 
+    if (qnRuntime->isVideoWallMode() &&
         !hasMode(QnActionTypes::VideoWallMode) )
         return Qn::InvisibleAction;
 
-    if (qnRuntime->isActiveXMode() && 
+    if (qnRuntime->isActiveXMode() &&
         !hasMode(QnActionTypes::ActiveXMode) )
         return Qn::InvisibleAction;
 
@@ -223,6 +223,7 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
 
 bool QnAction::event(QEvent *event) {
     if (event->type() == QEvent::Shortcut) {
+        // Shortcuts
         QShortcutEvent *e = static_cast<QShortcutEvent *>(event);
         if (e->isAmbiguous()) {
             if(m_flags & Qn::IntentionallyAmbiguous) {
@@ -248,7 +249,7 @@ bool QnAction::event(QEvent *event) {
                 qnWarning("Ambiguous shortcut overload: %1.", e->key().toString());
                 return true;
             }
-        } 
+        }
 
         Qn::ActionScope scope = Qn::InvalidScope;
         QnActionParameters parameters;
@@ -271,7 +272,7 @@ bool QnAction::event(QEvent *event) {
             QnWorkbenchContextAware::menu()->trigger(id(), parameters);
         return true;
     }
-    
+
     return QObject::event(event);
 }
 
@@ -316,7 +317,7 @@ void QnAction::updateToolTipSilent() {
 }
 
 void QnAction::addConditionalText(QnActionCondition *condition, const QString &text) {
-    m_conditionalTexts << ConditionalText(condition, text);    
+    m_conditionalTexts << ConditionalText(condition, text);
 }
 
 bool QnAction::hasConditionalTexts() {

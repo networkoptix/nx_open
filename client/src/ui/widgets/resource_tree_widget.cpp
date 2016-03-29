@@ -20,7 +20,6 @@
 #include <ui/models/resource_search_proxy_model.h>
 
 #include <ui/style/noptix_style.h>
-#include <ui/style/proxy_style.h>
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
@@ -39,8 +38,8 @@ public:
         m_filterEnabled(false)
     {}
 
-    bool isFilterEnabled() { 
-        return m_filterEnabled; 
+    bool isFilterEnabled() {
+        return m_filterEnabled;
     }
 
     void setFilterEnabled(bool enabled) {
@@ -72,41 +71,62 @@ protected:
         Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
         Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        /* "Other Systems" must be the last element */
-        bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
-        bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
-        if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
-            return rightOtherSystems;
+        {
+            /* "Other Systems" must be the last element */
+            bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
+            bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
+            if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
+                return rightOtherSystems;
+        }
 
-        /* Local node must be just before "other systems". */
-        bool leftLocal = leftNode == Qn::LocalNode;
-        bool rightLocal = rightNode == Qn::LocalNode;
-        if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
-            return rightLocal;
+        {
+            /* Local node must be just before "other systems". */
+            bool leftLocal = leftNode == Qn::LocalNode;
+            bool rightLocal = rightNode == Qn::LocalNode;
+            if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
+                return rightLocal;
+        }
+
+        {
+            /* WebPages node must be just before "Local". */
+            bool leftWebPages = leftNode == Qn::WebPagesNode;
+            bool rightWebPages = rightNode == Qn::WebPagesNode;
+            if(leftWebPages ^ rightWebPages) /* One of the nodes is a local node, but not both. */
+                return rightWebPages;
+        }
 
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
-        bool leftVideoWall = leftResource.dynamicCast<QnVideoWallResource>();
-        bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
-        if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
-            return rightVideoWall;
 
-        bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
-        bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
-        if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
-            return rightIncompatible;
+        {
+            bool leftVideoWall = leftResource.dynamicCast<QnVideoWallResource>();
+            bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
+            if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
+                return rightVideoWall;
+        }
 
-        // checking pairs of VideoWallItemNode + VideoWallMatrixNode
-        if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
-            && leftNode != rightNode)
-            return rightNode == Qn::VideoWallItemNode;   
+        {
+            bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
+            bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
+            if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+                return rightIncompatible;
+        }
 
-        /* Sort by name. */
-        QString leftDisplay = left.data(Qt::DisplayRole).toString();
-        QString rightDisplay = right.data(Qt::DisplayRole).toString();
-        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
-        if(result != 0)
-            return result < 0;
+        {
+            // checking pairs of VideoWallItemNode + VideoWallMatrixNode
+            if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
+                && leftNode != rightNode)
+                return rightNode == Qn::VideoWallItemNode;
+        }
+
+        {
+            /* Sort by name. */
+            QString leftDisplay = left.data(Qt::DisplayRole).toString();
+            QString rightDisplay = right.data(Qt::DisplayRole).toString();
+            int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+            if(result != 0)
+                return result < 0;
+        }
 
         /* We want the order to be defined even for items with the same name. */
         if(leftResource && rightResource) {
@@ -194,8 +214,8 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
 }
 
 QAbstractItemModel *QnResourceTreeWidget::model() const {
-    return m_resourceProxyModel 
-        ? m_resourceProxyModel->sourceModel() 
+    return m_resourceProxyModel
+        ? m_resourceProxyModel->sourceModel()
         : nullptr;
 }
 
@@ -240,7 +260,7 @@ const QnResourceCriterion &QnResourceTreeWidget::criterion() const {
 
 void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion) {
     m_criterion = criterion;
-    
+
     updateFilter();
 }
 
@@ -292,9 +312,9 @@ QnResourcePoolModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDeleg
     while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
         sourceModel = proxy->sourceModel();
 
-    if (QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel)) 
+    if (QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel))
         return resourceModel->customColumnDelegate();
-   
+
 
     return nullptr;
 }
@@ -305,7 +325,7 @@ void QnResourceTreeWidget::setCustomColumnDelegate(QnResourcePoolModelCustomColu
         sourceModel = proxy->sourceModel();
 
     QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel);
-    Q_ASSERT_X(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
+    NX_ASSERT(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
 
     if (!resourceModel)
         return;

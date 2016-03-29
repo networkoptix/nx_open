@@ -18,7 +18,7 @@
 #include <ui/common/read_only.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <client/client_globals.h>
@@ -55,7 +55,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     
     setHelpTopic(ui->accessRightsLabel, ui->accessRightsComboBox,   Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->accessRightsGroupbox,                          Qn::UserSettings_UserRoles_Help);
-    setHelpTopic(ui->enabledLabel, ui->enabledCheckBox,             Qn::UserSettings_DisableUser_Help);
+    setHelpTopic(ui->enabledCheckBox,                               Qn::UserSettings_DisableUser_Help);
 
     ui->accessRightsGroupbox->hide();
 
@@ -161,7 +161,6 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         break;
     case Enabled:
         ui->enabledCheckBox->setVisible(visible);
-        ui->enabledLabel->setVisible(visible);
         setReadOnly(ui->enabledCheckBox, !editable);
         break;
     default:

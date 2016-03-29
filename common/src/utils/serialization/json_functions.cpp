@@ -5,6 +5,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
+#include <QtGui/QBrush>
+
 #include <utils/serialization/lexical_functions.h>
 #include <utils/fusion/fusion_adaptors.h>
 
@@ -109,7 +111,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnUuid *target) {
 }
 
 void serialize(QnJsonContext *, const QFont &, QJsonValue *) {
-    assert(false); /* Won't need for now. */ // TODO: #Elric
+    NX_ASSERT(false); /* Won't need for now. */ // TODO: #Elric
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
@@ -118,7 +120,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QFont *target) {
         return true;
     } else if(value.type() == QJsonValue::Object) {
         QJsonObject map = value.toObject();
-        
+
         QString family;
         int pointSize = -1;
         if(
@@ -142,7 +144,7 @@ void testValue(const TYPE &value) {                                 \
     QString result = QString::fromUtf8(json);                       \
     TYPE newValue;                                                  \
     QJson::deserialize(result.toUtf8(), &newValue);                 \
-    Q_ASSERT(value == newValue);                                    \
+    NX_ASSERT(value == newValue);                                    \
 }
 
 TEST_VALUE(QSize)
@@ -168,7 +170,7 @@ void testRegion(int len) {
     QJson::serialize(region, &json);
     QRegion newValue;
     QJson::deserialize(json, &newValue);
-    Q_ASSERT(region == newValue);
+    NX_ASSERT(region == newValue);
 }
 
 void qnJsonFunctionsUnitTest() {

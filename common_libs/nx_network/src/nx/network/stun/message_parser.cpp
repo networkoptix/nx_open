@@ -157,7 +157,7 @@ Attribute* MessageParser::parseXORMappedAddress() {
     // Parsing the family 
     std::unique_ptr<XorMappedAddress> attribute( new XorMappedAddress() );
     std::uint16_t family = buffer.NextUint16(&ok);
-    Q_ASSERT(ok);
+    NX_ASSERT(ok);
     // We only need the lower part of the word.
     family = family & 0x000000ff;
     if( family != XorMappedAddress::IPV4 && family != XorMappedAddress::IPV6 ) {
@@ -166,13 +166,13 @@ Attribute* MessageParser::parseXORMappedAddress() {
     attribute->family = family;
     // Parsing the port 
     std::uint16_t xor_port = buffer.NextUint16(&ok);
-    Q_ASSERT(ok);
+    NX_ASSERT(ok);
     attribute->port = xor_port ^ MAGIC_COOKIE_HIGH;
 
     // Parsing the address 
     if( attribute->family == XorMappedAddress::IPV4 ) {
         std::uint32_t xor_addr = buffer.NextUint32(&ok);
-        Q_ASSERT(ok);
+        NX_ASSERT(ok);
         attribute->address.ipv4 = xor_addr ^ MAGIC_COOKIE;
     } else {
         // ensure the buffer
@@ -182,16 +182,16 @@ Attribute* MessageParser::parseXORMappedAddress() {
         std::uint16_t xor_comp;
         // XOR with high part of MAGIC_COOKIE
         xor_comp = buffer.NextUint16(&ok);
-        Q_ASSERT(ok);
+        NX_ASSERT(ok);
         attribute->address.ipv6.array[0] = xor_comp ^ MAGIC_COOKIE_LOW;
         // XOR with low part of MAGIC_COOKIE
         xor_comp = buffer.NextUint16(&ok);
-        Q_ASSERT(ok);
+        NX_ASSERT(ok);
         attribute->address.ipv6.array[1] = xor_comp ^ MAGIC_COOKIE_HIGH;
         // XOR with rest of the transaction id
         for( std::size_t i = 0 ; i < 6 ; ++i ) {
             xor_comp = buffer.NextUint16(&ok);
-            Q_ASSERT(ok);
+            NX_ASSERT(ok);
             attribute->address.ipv6.array[i+2] = 
                 xor_comp ^ *reinterpret_cast< const std::uint16_t* >(
                         m_header.transactionId.data() + i * 2 );
@@ -207,7 +207,7 @@ Attribute* MessageParser::parseErrorCode() {
     MessageParserBuffer buffer(m_attribute.value);
     bool ok;
     std::uint32_t val = buffer.NextUint32(&ok);
-    Q_ASSERT(ok);
+    NX_ASSERT(ok);
     // The first 21 bits is for reservation, but the RFC says it SHOULD be zero, so ignore it.
     std::bitset<16> value(val & 0x0000ffff);
 
@@ -248,7 +248,7 @@ Attribute* MessageParser::parseFingerprint() {
     MessageParserBuffer buffer(m_attribute.value);
     bool ok;
     std::uint32_t xor_crc_32 = buffer.NextUint32(&ok);
-    Q_ASSERT(ok);
+    NX_ASSERT(ok);
 
     // XOR back the value that we get from our CRC32 value
     uint32_t crc32 =
@@ -284,7 +284,7 @@ Attribute* MessageParser::parseValue() {
 }
 
 int MessageParser::parseHeaderInitialAndType( MessageParserBuffer& buffer ) {
-    Q_ASSERT(m_state == HEADER_INITIAL_AND_TYPE);
+    NX_ASSERT(m_state == HEADER_INITIAL_AND_TYPE);
     bool ok;
     std::bitset<16> value = buffer.NextUint16(&ok);
     if(!ok) {
@@ -326,7 +326,7 @@ int MessageParser::parseHeaderInitialAndType( MessageParserBuffer& buffer ) {
 }
 
 int MessageParser::parseHeaderLength( MessageParserBuffer& buffer ) {
-    Q_ASSERT(m_state == HEADER_LENGTH);
+    NX_ASSERT(m_state == HEADER_LENGTH);
     bool ok;
     std::uint16_t val = buffer.NextUint16(&ok);
     if(!ok) {
@@ -347,7 +347,7 @@ int MessageParser::parseHeaderLength( MessageParserBuffer& buffer ) {
 }
 
 int MessageParser::parseHeaderMagicCookie( MessageParserBuffer& buffer ) {
-    Q_ASSERT(m_state == HEADER_MAGIC_ID);
+    NX_ASSERT(m_state == HEADER_MAGIC_ID);
     bool ok;
     std::uint32_t magic_id;
     magic_id = buffer.NextUint32(&ok);
@@ -363,7 +363,7 @@ int MessageParser::parseHeaderMagicCookie( MessageParserBuffer& buffer ) {
 }
 
 int MessageParser::parseHeaderTransactionID( MessageParserBuffer& buffer ) {
-    Q_ASSERT(m_state == HEADER_TRANSACTION_ID );
+    NX_ASSERT(m_state == HEADER_TRANSACTION_ID );
     bool ok;
     buffer.readNextBytesToBuffer( m_header.transactionId.data(), m_header.transactionId.size(), &ok );
     if(!ok) {
@@ -386,7 +386,7 @@ int MessageParser::parseMoreValue( MessageParserBuffer& buffer ) {
     // If after we finished transaction id, we find out that the length
     // of our body is zero, simply means we are done here since no attributes
     // are associated with our body. 
-    Q_ASSERT(m_state == MORE_VALUE);
+    NX_ASSERT(m_state == MORE_VALUE);
     if( m_leftMessageLength == 0 ) {
         buffer.clear();
         m_attribute.clear();
@@ -400,7 +400,7 @@ int MessageParser::parseMoreValue( MessageParserBuffer& buffer ) {
 }
 
 int MessageParser::parseAttributeType( MessageParserBuffer& buffer ) {
-    Q_ASSERT(m_state == ATTRIBUTE_TYPE);
+    NX_ASSERT(m_state == ATTRIBUTE_TYPE);
     bool ok;
     m_attribute.type = buffer.NextUint16(&ok);
     if(!ok) {
@@ -411,7 +411,7 @@ int MessageParser::parseAttributeType( MessageParserBuffer& buffer ) {
 }
 
 int MessageParser::parseAttributeLength( MessageParserBuffer& buffer ) {
-    Q_ASSERT(m_state == ATTRIBUTE_LENGTH);
+    NX_ASSERT(m_state == ATTRIBUTE_LENGTH);
     bool ok;
     m_attribute.length = buffer.NextUint16(&ok);
     if(!ok) {
@@ -446,7 +446,7 @@ int MessageParser::parseAttributeValueNotAdd( MessageParserBuffer& buffer )
 
 int MessageParser::parseAttributeValue(MessageParserBuffer& buffer)
 {
-    Q_ASSERT(m_state == ATTRIBUTE_VALUE);
+    NX_ASSERT(m_state == ATTRIBUTE_VALUE);
     int ret = parseAttributeValueNotAdd(buffer);
     if (ret != SECTION_FINISH)
         return ret;
@@ -492,7 +492,7 @@ int MessageParser::parseEndMessageIntegrity( MessageParserBuffer& buffer ) {
 }
 
 nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred ) {
-    Q_ASSERT( !user_buffer.isEmpty() );
+    NX_ASSERT( !user_buffer.isEmpty() );
     // Setting up the buffer environment variables
     MessageParserBuffer buffer(&m_tempBuffer,user_buffer);
     // Tick the parsing state machine
@@ -540,7 +540,7 @@ nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , 
                 ret = parseEndMessageIntegrity(buffer);
                 break;
             default:
-                Q_ASSERT(0);
+                NX_ASSERT(0);
                 return nx_api::ParserState::failed;
         }
 
@@ -557,7 +557,7 @@ nx_api::ParserState::Type MessageParser::parse( const nx::Buffer& user_buffer , 
                 *bytes_transferred = buffer.position();
                 return nx_api::ParserState::done;           
             default :                                       
-                Q_ASSERT(0);                                
+                NX_ASSERT(0);                                
                 return nx_api::ParserState::failed;                                      
         }                                                       
     } while( true );

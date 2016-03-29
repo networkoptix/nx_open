@@ -48,7 +48,10 @@ signals:
     void storageAdded(const QnStorageResourcePtr &storage);
     void storageChanged(const QnStorageResourcePtr &storage);
     void storageRemoved(const QnStorageResourcePtr &storage);
+
 private:
+    void invalidateRequests();
+
     bool isServerValid(const QnMediaServerResourcePtr &server) const;
 
     bool sendArchiveRebuildRequest(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action = Qn::RebuildAction_ShowProgress);

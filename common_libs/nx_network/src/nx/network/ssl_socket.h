@@ -15,6 +15,9 @@
 struct bio_st;
 typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to include in this header. */
 
+namespace nx {
+namespace network {
+
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
 
@@ -67,8 +70,9 @@ public:
     bool doClientHandshake();
 
     virtual void cancelIOAsync(
-        aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::network::aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
 protected:
     enum IOMode
@@ -90,7 +94,7 @@ protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::readSomeAsync
     virtual void readSomeAsync(
         nx::Buffer* const buf,
@@ -101,8 +105,8 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     // Async version
@@ -126,14 +130,14 @@ public:
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
     virtual void cancelIOAsync(
-        aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) override;
+        nx::network::aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )> handler ) override;
+        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::readSomeAsync
     virtual void readSomeAsync(
         nx::Buffer* const buf,
@@ -144,8 +148,8 @@ protected:
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
-        unsigned int timeoutMs,
-        std::function<void()> handler ) override;
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
@@ -168,28 +172,35 @@ public:
     ///////// Implementation of AbstractStreamServerSocket methods
     //////////////////////////////////////////////////////////////////////
 
-    //!Implementation of SSLServerSocket::listen
+    //!Implementation of AbstractStreamServerSocket::listen
     virtual bool listen( int queueLen ) override;
-    //!Implementation of SSLServerSocket::accept
+    //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
 
-protected:
-    //!Implementation of SSLServerSocket::acceptAsync
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
-        std::function<void(
+        nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractStreamServerSocket::cancelIOSync
+    virtual void cancelIOSync() override;
 
 private:
     const bool m_allowNonSecureConnect;
     std::unique_ptr<AbstractStreamServerSocket> m_delegateSocket;
-    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    nx::utils::MoveOnlyFunc<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> m_acceptHandler;
 
     void connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket);
 };
 
+}   //network
+}   //nx
 
 #endif // ENABLE_SSL
 

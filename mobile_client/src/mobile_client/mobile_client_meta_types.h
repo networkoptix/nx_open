@@ -1,5 +1,4 @@
-#ifndef MOBILE_CLIENT_META_TYPES_H
-#define MOBILE_CLIENT_META_TYPES_H
+#pragma once
 
 #include <common/common_meta_types.h>
 
@@ -9,6 +8,13 @@ Q_DECLARE_METATYPE(QnAspectRatioHash)
 typedef QSet<QString> QnStringSet;
 Q_DECLARE_METATYPE(QnStringSet)
 
+enum class LiteModeType
+{
+    LiteModeAuto = -1,
+    LiteModeDisabled,
+    LiteModeEnabled
+};
+
 class QnMobileClientMetaTypes {
 public:
     static void initialize();
@@ -17,5 +23,3 @@ private:
     static void registerMetaTypes();
     static void registerQmlTypes();
 };
-
-#endif // MOBILE_CLIENT_META_TYPES_H

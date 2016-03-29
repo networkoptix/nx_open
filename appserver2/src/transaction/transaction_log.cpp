@@ -19,7 +19,7 @@ static QnTransactionLog* globalInstance = nullptr;
 
 QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 {
-    Q_ASSERT(!globalInstance);
+    NX_ASSERT(!globalInstance);
     globalInstance = this;
     m_lastTimestamp = 0;
     m_baseTime = 0;
@@ -27,7 +27,7 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 
 QnTransactionLog::~QnTransactionLog()
 {
-    Q_ASSERT(globalInstance == this);
+    NX_ASSERT(globalInstance == this);
     globalInstance = nullptr;
 }
 
@@ -225,11 +225,11 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
 
     NX_LOG( QnLog::EC2_TRAN_LOG, lit("add transaction to log: %1 hash=%2").arg(tran.toString()).arg(hash.toString()), cl_logDEBUG1);
 
-    Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    Q_ASSERT_X(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
+    NX_ASSERT(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
+    NX_ASSERT(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
+    NX_ASSERT(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
     if (tran.peerID == qnCommon->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->instance()->getID())
-        Q_ASSERT(tran.persistentInfo.timestamp > 0);
+        NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
     //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
@@ -258,7 +258,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (updateHistoryItr == m_updateHistory.end())
         updateHistoryItr = m_updateHistory.insert(hash, UpdateHistoryData());
 
-    assert ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
+    NX_ASSERT ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
             (tran.persistentInfo.timestamp == updateHistoryItr.value().timestamp && !(key < updateHistoryItr.value().updatedBy)));
 
     updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;
@@ -294,13 +294,13 @@ void QnTransactionLog::rollback()
 
 QnTranState QnTransactionLog::getTransactionsState()
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     return m_state;
 }
 
 int QnTransactionLog::getLatestSequence(const QnTranStateKey& key) const
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     return m_state.values.value(key);
 }
 
@@ -308,7 +308,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
 {
 
     QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
-    Q_ASSERT(tran.persistentInfo.sequence != 0);
+    NX_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
         NX_LOG( QnLog::EC2_TRAN_LOG,
             lit("Transaction log contains transaction %1 because of precessed seq: %2 >= %3").
@@ -336,7 +336,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
 
 bool QnTransactionLog::contains(const QnTranState& state) const
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
     {
         if (itr.value() > m_state.values.value(itr.key()))
@@ -347,7 +347,7 @@ bool QnTransactionLog::contains(const QnTranState& state) const
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
 {
-    QReadLocker lock(&m_dbManager->getMutex());
+    QnReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
     for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
     {

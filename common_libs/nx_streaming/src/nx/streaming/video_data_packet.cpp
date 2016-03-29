@@ -5,8 +5,6 @@
 
 #include "video_data_packet.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <utils/memory/cyclic_allocator.h>
 #include <network/h264_rtp_parser.h>
 
@@ -42,7 +40,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(/*&videoPacketCyclicAllocator,*/ alignment, capacity)
 {
-    Q_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
+    NX_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
@@ -54,7 +52,7 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_data(allocator, alignment, capacity)
 {
-    Q_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
+    NX_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
 }
 
 //!Implementation of QnAbstractMediaData::clone
@@ -85,5 +83,3 @@ void QnWritableCompressedVideoData::assign( const QnWritableCompressedVideoData*
     QnCompressedVideoData::assign( other );
     m_data = other->m_data;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

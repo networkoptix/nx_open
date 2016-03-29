@@ -51,6 +51,9 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     void executeRemoteAsync(BookmarksCallbackType callback);
 
+    /// @brief                  Refreshes bookmark data using current parameters
+    void refresh();
+
 signals:
     void queryChanged();
     void bookmarksChanged(const QnCameraBookmarkList &bookmarks);

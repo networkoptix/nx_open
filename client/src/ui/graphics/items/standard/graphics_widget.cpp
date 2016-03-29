@@ -31,13 +31,13 @@ namespace {
 // -------------------------------------------------------------------------- //
 // GraphicsWidgetPrivate
 // -------------------------------------------------------------------------- //
-GraphicsWidgetPrivate::GraphicsWidgetPrivate(): 
-    q_ptr(NULL), 
-    handlingFlags(0), 
-    transformOrigin(GraphicsWidget::Legacy), 
-    resizeEffectRadius(qn_graphicsWidget_defaultResizeEffectRadius), 
+GraphicsWidgetPrivate::GraphicsWidgetPrivate():
+    q_ptr(NULL),
+    handlingFlags(0),
+    transformOrigin(GraphicsWidget::Legacy),
+    resizeEffectRadius(qn_graphicsWidget_defaultResizeEffectRadius),
     inSetGeometry(false),
-    windowData(NULL) 
+    windowData(NULL)
 {};
 
 GraphicsWidgetPrivate::~GraphicsWidgetPrivate() {
@@ -82,7 +82,7 @@ void GraphicsWidgetPrivate::ensureWindowData() {
 void GraphicsWidgetPrivate::initStyleOptionTitleBar(QStyleOptionTitleBar *option) {
     Q_Q(GraphicsWidget);
 
-    assert(option != NULL);
+    NX_ASSERT(option != NULL);
 
     ensureWindowData();
 
@@ -120,7 +120,7 @@ QRectF GraphicsWidgetPrivate::mapFromFrame(const QRectF &rect) {
 void GraphicsWidgetPrivate::mapToFrame(QStyleOptionTitleBar *option) {
     Q_Q(GraphicsWidget);
 
-    assert(option != NULL);
+    NX_ASSERT(option != NULL);
 
     option->rect = q->windowFrameRect().toRect();
     option->rect.moveTo(0, 0);
@@ -177,16 +177,8 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
     d_ptr->q_ptr = this;
 }
 
-GraphicsWidget::~GraphicsWidget() {
-    // TODO: #Elric #Qt5.0.1 workaround for QTBUG-29684 that is fixed in Qt5.0.1
-    while(!childItems().empty()) // #QT5PORT
-        delete childItems().back();
-
-    /* This must be the last line of destructor so that this widget is not 
-     * added to the list again. */
-    if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData())
-        sd->pendingLayoutWidgets.remove(this);
-}
+GraphicsWidget::~GraphicsWidget()
+{}
 
 void GraphicsWidget::initStyleOption(QStyleOption *option) const {
     base_type::initStyleOption(option);
@@ -220,10 +212,10 @@ GraphicsWidget::TransformOrigin GraphicsWidget::transformOrigin() const {
 
 void GraphicsWidget::setTransformOrigin(TransformOrigin transformOrigin) {
     Q_D(GraphicsWidget);
-    
-    if (transformOrigin == d->transformOrigin) 
+
+    if (transformOrigin == d->transformOrigin)
         return;
-    
+
     d->transformOrigin = transformOrigin;
     setTransformOriginPoint(d->calculateTransformOrigin());
     emit transformOriginChanged();
@@ -291,7 +283,7 @@ void GraphicsWidget::setGeometry(const QRectF &rect) {
 
     if(d->inSetGeometry && rect == geometry())
         return; // TODO: #Elric #2395 patch QGraphicsWidget::setGeometry
-    
+
     d->inSetGeometry = true;
     base_type::setGeometry(rect);
     d->inSetGeometry = false;
@@ -309,13 +301,13 @@ void GraphicsWidget::updateGeometry() {
     if((d->handlingFlags & ItemHandlesLayoutRequests) || !QGraphicsLayout::instantInvalidatePropagation()) {
         base_type::updateGeometry();
         return;
-    } 
-    
+    }
+
     if(!parentLayoutItem()) {
         if(GraphicsWidgetSceneData *sd = d->ensureSceneData()) {
-            /* Skip QGraphicsWidget's implementation as it will post a relayout request 
+            /* Skip QGraphicsWidget's implementation as it will post a relayout request
              * (actually a metacall to _q_relayout). */
-            QGraphicsLayoutItem::updateGeometry(); 
+            QGraphicsLayoutItem::updateGeometry();
 
             if(sd->pendingLayoutWidgets.empty())
                 QApplication::postEvent(sd, new QEvent(GraphicsWidgetSceneData::HandlePendingLayoutRequests));
@@ -357,7 +349,7 @@ bool GraphicsWidget::event(QEvent *event) {
         return base_type::event(event);
     }
 
-    /* Note that the following code is copied from QGraphicsWidget implementation, 
+    /* Note that the following code is copied from QGraphicsWidget implementation,
      * so we don't need to call into the base class. */
     Q_D(GraphicsWidget);
 
@@ -390,7 +382,7 @@ bool GraphicsWidget::event(QEvent *event) {
     default:
         break;
     }
-    
+
     return QObject::event(event);
 }
 
@@ -405,24 +397,35 @@ void GraphicsWidget::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
+void GraphicsWidget::selectThisWidget(bool clearOtherSelection)
+{
+    if (!isSelected() && (flags() & ItemIsSelectable))
+    {
+        if (clearOtherSelection)
+        {
+            QGraphicsScene *scene = this->scene();
+            if (scene)
+            {
+                /* Don't emit multiple notifications. */
+                bool signalsBlocked = scene->blockSignals(true);
+                scene->clearSelection();
+                scene->blockSignals(signalsBlocked);
+            }
+        }
+
+        setSelected(true);
+    }
+}
+
 void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    /* The code is copied from QGraphicsItem implementation, 
+    /* The code is copied from QGraphicsItem implementation,
      * so we don't need to call into the base class. */
 
     if(event->button() == Qt::LeftButton && (flags() & ItemIsSelectable)) {
         bool multiSelect = (event->modifiers() & Qt::ControlModifier) != 0;
-        if (!multiSelect) {
-            if (!isSelected() && (flags() & ItemIsSelectable)) {
-                if (QGraphicsScene *scene = this->scene()) {
-                    /* Don't emit multiple notifications. */
-                    bool signalsBlocked = scene->blockSignals(true);
-                    scene->clearSelection();
-                    scene->blockSignals(signalsBlocked);
-                } 
-                    
-                setSelected(true);
-            }
-        }
+        if (!multiSelect)
+            selectThisWidget();
+
     } else if(!(flags() & ItemIsMovable) || !(d_func()->handlingFlags & ItemHandlesMovement)) {
         event->ignore();
     }
@@ -436,9 +439,9 @@ void GraphicsWidget::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-    /* The code is copied from QGraphicsItem implementation, 
-     * so we don't need to call into the base class. 
-     * 
+    /* The code is copied from QGraphicsItem implementation,
+     * so we don't need to call into the base class.
+     *
      * Note that this code does not handle items that ignore transformations as
      * they are seriously broken anyway. */
     Q_D(GraphicsWidget);
@@ -495,7 +498,7 @@ void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
                 if (item->flags() & ItemIsSelectable)
                     item->setSelected(true);
             }
-            
+
             ++i;
         }
     } else {
@@ -504,7 +507,7 @@ void GraphicsWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-    /* The code is copied from QGraphicsItem implementation, 
+    /* The code is copied from QGraphicsItem implementation,
      * so we don't need to call into the base class. */
     Q_D(GraphicsWidget);
 
@@ -525,7 +528,7 @@ void GraphicsWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
             }
         }
     }
-    
+
     if(!event->buttons() && (d->handlingFlags & ItemHandlesMovement))
         if(GraphicsWidgetSceneData *sd = d->ensureSceneData())
             sd->movingItemsInitialPositions.clear();
@@ -549,7 +552,7 @@ QCursor GraphicsWidget::windowCursorAt(Qn::WindowFrameSection section) const {
     if(section & Qn::ResizeSections) {
         QTransform sceneTransform = this->sceneTransform();
 
-        /* Note that rotation is estimated using a very simple method here. 
+        /* Note that rotation is estimated using a very simple method here.
          * A better way would be to calculate local rotation at cursor position,
          * but currently there is not need for such precision. */
         QRectF rect = this->rect();
@@ -578,7 +581,7 @@ Qt::WindowFrameSection GraphicsWidgetPrivate::resizingFrameSectionAt(const QPoin
 }
 
 bool GraphicsWidget::windowFrameEvent(QEvent *event) {
-    /* The code is copied from QGraphicsWidget implementation, 
+    /* The code is copied from QGraphicsWidget implementation,
      * so we don't need to call into the base class. */
     Q_D(GraphicsWidget);
 
@@ -607,7 +610,7 @@ bool GraphicsWidgetPrivate::windowFrameHoverMoveEvent(QGraphicsSceneHoverEvent *
     ensureWindowData();
     bool oldCloseButtonHovered = windowData->closeButtonHovered;
     windowData->closeButtonHovered = false;
-    
+
     Qt::WindowFrameSection section = resizingFrameSectionAt(event->pos(), event->widget());
     if(section == Qt::TitleBarArea) {
         /* Make sure that the coordinates (rect and pos) we send to the style are positive. */
@@ -658,7 +661,7 @@ bool GraphicsWidgetPrivate::windowFrameHoverLeaveEvent(QGraphicsSceneHoverEvent 
 
 bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent *event) {
     Q_Q(GraphicsWidget);
-    
+
     if (event->button() != Qt::LeftButton)
         return false;
 
@@ -678,7 +681,7 @@ bool GraphicsWidgetPrivate::windowFrameMousePressEvent(QGraphicsSceneMouseEvent 
         if(handlingFlags & GraphicsWidget::ItemHandlesMovement) {
             QSizeF size = q->size();
             windowData->startPinPoint = QnGeometry::cwiseDiv(event->pos(), size);
-            
+
             /* Make sure we don't get NaNs in startPinPoint. */
             if(qFuzzyIsNull(size.width()))
                 windowData->startPinPoint.setX(0.0);
@@ -734,7 +737,7 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
             newSize = q->size();
         } else {
             newSize = windowData->startSize + Qn::calculateSizeDelta(
-                event->pos() - q->mapFromScene(event->buttonDownScenePos(Qt::LeftButton)), 
+                event->pos() - q->mapFromScene(event->buttonDownScenePos(Qt::LeftButton)),
                 windowData->grabbedSection
             );
             QSizeF minSize = q->effectiveSizeHint(Qt::MinimumSize);
@@ -762,7 +765,7 @@ bool GraphicsWidgetPrivate::windowFrameMouseMoveEvent(QGraphicsSceneMouseEvent *
         /* Change size & position. */
         q->resize(newSize);
         q->setPos(newPos);
-        
+
         return true;
     } else {
         return false;

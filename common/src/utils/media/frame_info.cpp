@@ -12,6 +12,7 @@ extern "C" {
 #   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
 #ifdef WIN32
 #   undef AVPixFmtDescriptor
 #endif
@@ -203,7 +204,7 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
 
 bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff)
 {
-    if (img1->width!=img2->width || img1->height!=img2->height || img1->format != img2->format) 
+    if (img1->width!=img2->width || img1->height!=img2->height || img1->format != img2->format)
         return false;
 
     if (!equalPlanes(img1->data[0], img2->data[0], img1->width, img1->linesize[0], img2->linesize[0], img1->height, max_diff))
@@ -220,7 +221,7 @@ bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, cons
     return true;
 }
 
-bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, 
+bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width,
                                        int stride1, int stride2, int height, int max_diff)
 {
     const unsigned char* p1 = plane1;
@@ -306,9 +307,9 @@ bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
 
 void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 {
-    Q_ASSERT(width == frame->width);
-    Q_ASSERT(height == frame->height);
-    Q_ASSERT(format == frame->format);
+    NX_ASSERT(width == frame->width);
+    NX_ASSERT(height == frame->height);
+    NX_ASSERT(format == frame->format);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
@@ -324,7 +325,7 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 }
 
 
-CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image) 
+CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
     memset( this, 0, sizeof(*this) );
 
@@ -335,8 +336,8 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
-    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_BGRA, 
-                                              width, height, PIX_FMT_YUV420P, 
+    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_BGRA,
+                                              width, height, PIX_FMT_YUV420P,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
     sws_freeContext(scaleContext);
@@ -347,7 +348,7 @@ QImage CLVideoDecoderOutput::toImage() const
     CLVideoDecoderOutput dst;
     dst.reallocate(width, height, PIX_FMT_BGRA);
 
-    SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format, 
+    SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format,
                                               width, height, PIX_FMT_BGRA,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
@@ -356,7 +357,7 @@ QImage CLVideoDecoderOutput::toImage() const
     QImage img(width, height, QImage::Format_ARGB32);
     for (int y = 0; y < height; ++y)
         memcpy(img.scanLine(y), dst.data[0] + dst.linesize[0]*y, width * 4);
-    
+
     return img;
 }
 
@@ -380,10 +381,10 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, PixelFo
     dst->sample_aspect_ratio = 1.0;
 
     SwsContext* scaleContext = sws_getContext(
-        width, height, (PixelFormat) format, 
-        newSize.width(), newSize.height(), newFormat, 
+        width, height, (PixelFormat) format,
+        newSize.width(), newSize.height(), newFormat,
         SWS_BICUBIC, NULL, NULL, NULL);
-    
+
     sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
     sws_freeContext(scaleContext);
     return dst;
@@ -414,7 +415,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
     dstPict->assignMiscData(this);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
-    for (int i = 0; i < descr->nb_components && data[i]; ++i) 
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int filler = (i == 0 ? 0x0 : 0x80);
         int numButes = dstPict->linesize[i] * dstHeight;
@@ -424,7 +425,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
         int w = width;
         int h = height;
-        
+
         if (i > 0 && !transposeChroma) {
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
@@ -436,7 +437,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
             if (transposeChroma && i > 0)
             {
-                for (int y = 0; y < h; y += 2) 
+                for (int y = 0; y < h; y += 2)
                 {
                     quint8* src = data[i] + linesize[i] * y;
                     quint8* dst = dstPict->data[i] + (h - y)/2 - 1;
@@ -451,7 +452,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
                 }
             }
             else {
-                for (int y = 0; y < h; ++y) 
+                for (int y = 0; y < h; ++y)
                 {
                     quint8* src = data[i] + linesize[i] * y;
                     quint8* dst = dstPict->data[i] + h - y -1;
@@ -470,7 +471,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
             if (transposeChroma && i > 0)
             {
-                for (int y = 0; y < h; y += 2) 
+                for (int y = 0; y < h; y += 2)
                 {
                     quint8* src = data[i] + linesize[i] * y;
                     quint8* dst = dstPict->data[i] + (w-1) * dstPict->linesize[i] + y/2;
@@ -485,7 +486,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
                 }
             }
             else {
-                for (int y = 0; y < h; ++y) 
+                for (int y = 0; y < h; ++y)
                 {
                     quint8* src = data[i] + linesize[i] * y;
                     quint8* dst = dstPict->data[i] + (w-1) * dstPict->linesize[i] + y;
@@ -496,7 +497,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
                 }
             }
         }
-        else 
+        else
         {  // 180
             for (int y = 0; y < h; ++y) {
                 quint8* src = data[i] + linesize[i] * y;

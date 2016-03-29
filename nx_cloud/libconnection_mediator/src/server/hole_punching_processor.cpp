@@ -7,6 +7,7 @@
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include "listening_peer_pool.h"
 
@@ -56,6 +57,29 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 }
 
+HolePunchingProcessor::~HolePunchingProcessor()
+{
+    ConnectSessionsDictionary localSessions;
+    {
+        QnMutexLocker lk(&m_mutex);
+        std::swap(localSessions, m_activeConnectSessions);
+    }
+
+    if (localSessions.empty())
+        return;
+
+    std::promise<void> allSessionsStoppedPromise;
+    {
+        nx::BarrierHandler barrier(
+            [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });
+        for (const auto& connectSession: localSessions)
+            connectSession.second->pleaseStop(barrier.fork());
+    }
+
+    //waiting for all sessions to stop...
+    allSessionsStoppedPromise.get_future().wait();
+}
+
 void HolePunchingProcessor::connect(
     const ConnectionStrongRef& connection,
     api::ConnectRequest request,
@@ -64,7 +88,7 @@ void HolePunchingProcessor::connect(
 {
     NX_LOGX(lm("connect request. from %1 to host %2, connection id %3").
         arg(connection->getSourceAddress().toString()).
-        arg(request.destinationHostName).arg(request.connectSessionID),
+        arg(request.destinationHostName).arg(request.connectSessionId),
         cl_logDEBUG2);
 
     api::ResultCode validationResult = api::ResultCode::ok;
@@ -74,18 +98,18 @@ void HolePunchingProcessor::connect(
         request);
     if (validationResult != api::ResultCode::ok)
         return completionHandler(validationResult, api::ConnectResponse());
-    assert(static_cast<bool>(targetPeerDataLocker));
+    NX_ASSERT(static_cast<bool>(targetPeerDataLocker));
 
     //preparing and saving connection context
     QnMutexLocker lk(&m_mutex);
     const auto connectionFsmIterAndFlag = m_activeConnectSessions.emplace(
-        request.connectSessionID,
+        request.connectSessionId,
         nullptr);
     if (!connectionFsmIterAndFlag.second)
     {
         NX_LOGX(lm("connect request retransmit: from %1, to %2, connection id %3").
             arg(connection->getSourceAddress().toString()).
-            arg(request.destinationHostName).arg(request.connectSessionID),
+            arg(request.destinationHostName).arg(request.connectSessionId),
             cl_logDEBUG1);
         //ignoring request, response will be sent by fsm
         return;
@@ -93,7 +117,7 @@ void HolePunchingProcessor::connect(
 
     connectionFsmIterAndFlag.first->second = 
         std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
-            request.connectSessionID,
+            request.connectSessionId,
             targetPeerDataLocker.get(),
             std::bind(
                 &HolePunchingProcessor::connectSessionFinished,
@@ -115,7 +139,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
         completionHandler(api::ResultCode::notFound);
@@ -134,7 +158,7 @@ void HolePunchingProcessor::connectionResult(
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
-    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
         completionHandler(api::ResultCode::notFound);
@@ -205,6 +229,9 @@ void HolePunchingProcessor::connectSessionFinished(
     api::ResultCode connectionResult)
 {
     QnMutexLocker lk(&m_mutex);
+
+    if (m_activeConnectSessions.empty())
+        return; //HolePunchingProcessor is being stopped currently?
 
     NX_LOGX(lm("connect session %1 finished with result %2").
         arg(sessionIter->first).arg(QnLexical::serialized(connectionResult)),

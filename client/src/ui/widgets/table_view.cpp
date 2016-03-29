@@ -9,11 +9,15 @@
 #include <client/client_globals.h>
 #include <utils/common/event_processors.h>
 
+#include <ui/style/helper.h>
+
 QnTableView::QnTableView(QWidget *parent):
     base_type(parent)
 {
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
     signalizer->setEventType(QEvent::Enter);
+
+    setMouseTracking(true);
 
     horizontalHeader()->installEventFilter(signalizer);
     verticalHeader()->installEventFilter(signalizer);
@@ -21,6 +25,8 @@ QnTableView::QnTableView(QWidget *parent):
     verticalScrollBar()->installEventFilter(signalizer);
 
     connect(signalizer, &QnSingleEventSignalizer::activated, this, &QnTableView::resetCursor);
+    connect(signalizer, &QnSingleEventSignalizer::activated, this, [this]() { updateHoveredRow(QModelIndex()); });
+    connect(this, &QnTableView::entered, this, &QnTableView::updateHoveredRow);
 }
 
 QnTableView::~QnTableView() {
@@ -54,6 +60,7 @@ void QnTableView::mouseMoveEvent(QMouseEvent *event) {
                 setCursor(shape);
             }
         } else {
+            updateHoveredRow(QModelIndex());
             resetCursor();
         }
     }
@@ -68,8 +75,19 @@ void QnTableView::resetCursor() {
     m_lastMouseModelIndex = QModelIndex();
 }
 
+void QnTableView::updateHoveredRow(const QModelIndex &index)
+{
+    int row = -1;
+
+    if (selectionBehavior() == SelectRows)
+        row = index.isValid() ? index.row() : -1;
+
+    setProperty(::style::Properties::kHoveredRowProperty, row);
+}
+
 void QnTableView::leaveEvent(QEvent *) {
     resetCursor();
+    updateHoveredRow(QModelIndex());
 }
 
 // ------------------------------------------------QnCheckableTableView ---------------------

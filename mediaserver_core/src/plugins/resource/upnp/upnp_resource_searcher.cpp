@@ -11,12 +11,14 @@
 
 #include <utils/common/app_info.h>
 
-static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
+static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
+
+using nx::network::UDPSocket;
 
 // TODO: #mu try to replace with UpnpDeviceDescriptionHandler when upnp camera is avaliable
 //!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)

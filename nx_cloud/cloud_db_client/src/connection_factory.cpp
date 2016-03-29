@@ -9,8 +9,6 @@
 #include <nx/network/cloud/random_online_endpoint_selector.h>
 
 #include "cdb_connection.h"
-#include "version.h"
-
 
 namespace nx {
 namespace cdb {

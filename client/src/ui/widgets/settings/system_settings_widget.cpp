@@ -5,19 +5,15 @@
 
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
-//#include <core/resource_management/resource_pool.h>
-//#include <core/resource_management/resource_properties.h>
-// #include <core/resource/general_attribute_pool.h>
-// #include <core/resource/media_server_resource.h>
 
 #include <ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
-    QnAbstractPreferencesWidget(parent),
+    base_type(parent),
     ui(new Ui::SystemSettingsWidget)
 {
     ui->setupUi(this);
@@ -29,7 +25,8 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     setWarningStyle(ui->settingsWarningLabel);
 
     QnCheckbox::autoCleanTristate(ui->autoDiscoveryCheckBox);
-    connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]{
+    connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]
+    {
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
     });
 
@@ -41,18 +38,18 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
-    connect(qnGlobalSettings, &QnGlobalSettings::disabledVendorsChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);   
-    connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged,        this,   &QnSystemSettingsWidget::loadDataToUi);   
-    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);   
+    connect(qnGlobalSettings, &QnGlobalSettings::disabledVendorsChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged,        this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
 }
 
-QnSystemSettingsWidget::~QnSystemSettingsWidget() {
-}
+QnSystemSettingsWidget::~QnSystemSettingsWidget()
+{}
 
-void QnSystemSettingsWidget::retranslateUi() {
-    
+void QnSystemSettingsWidget::retranslateUi()
+{
     ui->autoDiscoveryCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Enable devices and servers auto discovery"),
         tr("Enable cameras and servers auto discovery")
@@ -64,7 +61,8 @@ void QnSystemSettingsWidget::retranslateUi() {
 }
 
 
-void QnSystemSettingsWidget::loadDataToUi() {
+void QnSystemSettingsWidget::loadDataToUi()
+{
     QSet<QString> disabledVendors = qnGlobalSettings->disabledVendorsSet();
     bool discoveryEnabled = (!disabledVendors.contains(lit("all")) && !disabledVendors.contains(lit("all=partial"))) || qnGlobalSettings->isServerAutoDiscoveryEnabled();
     bool discoveryFullEnabled = disabledVendors.isEmpty() && qnGlobalSettings->isServerAutoDiscoveryEnabled();
@@ -78,14 +76,18 @@ void QnSystemSettingsWidget::loadDataToUi() {
     ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
 }
 
-void QnSystemSettingsWidget::applyChanges() {
+void QnSystemSettingsWidget::applyChanges()
+{
     if (!hasChanges())
         return;
-   
-    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked) {
+
+    if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked)
+    {
         qnGlobalSettings->setDisabledVendors(QString());
         qnGlobalSettings->setServerAutoDiscoveryEnabled(true);
-    } else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked) {
+    }
+    else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked)
+    {
         qnGlobalSettings->setDisabledVendors(lit("all=partial"));
         qnGlobalSettings->setServerAutoDiscoveryEnabled(false);
     }
@@ -97,14 +99,15 @@ void QnSystemSettingsWidget::applyChanges() {
     ui->settingsWarningLabel->setVisible(false);
 }
 
-bool QnSystemSettingsWidget::hasChanges() const  {
+bool QnSystemSettingsWidget::hasChanges() const
+{
     if (isReadOnly())
         return false;
 
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
         && !qnGlobalSettings->disabledVendors().isEmpty())
         return true;
-    
+
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked
         && !qnGlobalSettings->disabledVendors().contains(lit("all")) )  //MUST not overwrite "all" with "all=partial"
         return true;
@@ -125,7 +128,8 @@ bool QnSystemSettingsWidget::hasChanges() const  {
     return false;
 }
 
-void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly) {
+void QnSystemSettingsWidget::setReadOnlyInternal(bool readOnly)
+{
     using ::setReadOnly;
 
     setReadOnly(ui->autoDiscoveryCheckBox, readOnly);

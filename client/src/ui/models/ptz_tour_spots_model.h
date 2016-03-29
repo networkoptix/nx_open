@@ -1,7 +1,7 @@
 #ifndef PTZ_TOUR_MODEL_H
 #define PTZ_TOUR_MODEL_H
 
-#include <QStandardItemModel>
+#include <QtGui/QStandardItemModel>
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_tour.h>

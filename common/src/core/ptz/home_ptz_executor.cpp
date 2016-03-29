@@ -1,5 +1,7 @@
 #include "home_ptz_executor.h"
 
+#include <QtCore/QTimerEvent>
+
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_ptz_controller.h"
@@ -41,7 +43,7 @@ void QnHomePtzExecutorPrivate::stop() {
 }
 
 bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
-    if(timerId != timer.timerId()) 
+    if(timerId != timer.timerId())
         return false;
     timer.stop();
 
@@ -51,7 +53,7 @@ bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
         homePosition = this->homePosition;
     }
 
-    /* Note that we don't use threaded PTZ controller here as 
+    /* Note that we don't use threaded PTZ controller here as
      * the activation commands are pretty rare. */
 
     if(homePosition.type == Qn::PresetPtzObject) {
@@ -79,7 +81,7 @@ QnHomePtzExecutor::QnHomePtzExecutor(const QnPtzControllerPtr &controller):
 
 QnHomePtzExecutor::~QnHomePtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
-    assert(QThread::currentThread() == thread()); 
+    NX_ASSERT(QThread::currentThread() == thread());
 }
 
 void QnHomePtzExecutor::restart() {

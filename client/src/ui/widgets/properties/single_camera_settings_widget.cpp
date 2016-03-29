@@ -5,7 +5,6 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
-#include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
 
 #include <camera/single_thumbnail_loader.h>
@@ -30,7 +29,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
@@ -118,7 +117,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton,   &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
-    connect(ui->pingButton,                 &QPushButton::clicked,              this,   [this]{menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));});
+    connect(ui->pingButton,                 &QPushButton::clicked,              this,   [this]{menu()->trigger(QnActions::PingAction, QnActionParameters(m_camera));});
 
     connect(ui->licensingWidget,         &QnLicensesProposeWidget::changed,      this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
     connect(ui->licensingWidget,         &QnLicensesProposeWidget::changed,      this,   [this] {
@@ -558,13 +557,13 @@ void QnSingleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
 }
 
 void QnSingleCameraSettingsWidget::disconnectFromMotionWidget() {
-    assert(m_motionWidget);
+    NX_ASSERT(m_motionWidget);
 
     disconnect(m_motionWidget, NULL, this, NULL);
 }
 
 void QnSingleCameraSettingsWidget::connectToMotionWidget() {
-    assert(m_motionWidget);
+    NX_ASSERT(m_motionWidget);
 
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_dbDataChanged()), Qt::UniqueConnection);
     connect(m_motionWidget, SIGNAL(motionRegionListChanged()), this, SLOT(at_motionRegionListChanged()), Qt::UniqueConnection);
@@ -603,13 +602,13 @@ void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded() {
     d->calculateMaxFps(&maxValidFps, &maxDualStreamingValidFps);
 
     if (maxValidFps < maxFps) {
-        QMessageBox::warning(this, tr("FPS value is too high"),
+        QnMessageBox::warning(this, tr("FPS value is too high"),
             tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(maxFps).arg(maxValidFps));
         hasChanges = true;
     }
 
     if (maxDualStreamingValidFps < maxDualStreamFps) {
-        QMessageBox::warning(this, tr("FPS value is too high"),
+        QnMessageBox::warning(this, tr("FPS value is too high"),
             tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
             .arg(maxDualStreamFps).arg(maxDualStreamingValidFps));
         hasChanges = true;
@@ -689,17 +688,17 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
     if (ui->expertSettingsWidget->isSecondStreamEnabled())
         return true;
 
-    auto button = QMessageBox::warning(this,
+    auto button = QnMessageBox::warning(this,
         tr("Invalid Schedule"),
         tr("Second stream is disabled on this camera. Motion + LQ option has no effect. "
         "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-        QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
-        QMessageBox::Yes);
+        QDialogButtonBox::StandardButtons(QDialogButtonBox::Yes|QDialogButtonBox::No | QDialogButtonBox::Cancel),
+        QDialogButtonBox::Yes);
     switch (button) {
-    case QMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
         return true;
-    case QMessageBox::No:
+    case QDialogButtonBox::No:
         ui->expertSettingsWidget->setSecondStreamEnabled();
         return true;
     default:
@@ -730,7 +729,7 @@ int QnSingleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
     case Qn::ExpertCameraSettingsTab:
         return ui->tabWidget->indexOf(ui->expertTab);
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return -1;
@@ -841,11 +840,11 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
 }
 
 void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked() {
-    if (QMessageBox::warning(this,
+    if (QnMessageBox::warning(this,
         tr("Confirm motion regions reset"),
         tr("Are you sure you want to reset motion regions to the defaults?") + L'\n' + tr("This action CANNOT be undone!"),
-        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
-        QMessageBox::Cancel) == QMessageBox::Cancel)
+        QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
+        QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
         return;
 
     if (m_motionWidget)

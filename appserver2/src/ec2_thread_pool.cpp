@@ -5,8 +5,7 @@
 
 #include "ec2_thread_pool.h"
 
-#include <cassert>
-
+#include <nx/utils/log/assert.h>
 
 namespace ec2
 {
@@ -14,7 +13,7 @@ namespace ec2
 
     Ec2ThreadPool::Ec2ThreadPool()
     {
-        assert( Ec2ThreadPool_instance == nullptr );
+        NX_ASSERT( Ec2ThreadPool_instance == nullptr );
         Ec2ThreadPool_instance = this;
         setMaxThreadCount( QThread::idealThreadCount() );
         setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3

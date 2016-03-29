@@ -6,19 +6,55 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>417</width>
-    <height>360</height>
+    <width>456</width>
+    <height>426</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>14</number>
+   </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>16</number>
+   </property>
    <item>
     <widget class="QGroupBox" name="commonGroupBox">
      <property name="title">
       <string>Administration</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QFormLayout" name="formLayout_2">
       <property name="fieldGrowthPolicy">
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <property name="horizontalSpacing">
+       <number>8</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>8</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
       <item row="0" column="0">
        <widget class="QPushButton" name="businessRulesButton">
@@ -30,9 +66,6 @@
         </property>
         <property name="text">
          <string>&amp;Alarm/Event Rules...</string>
-        </property>
-        <property name="shortcut">
-         <string>Ctrl+E</string>
         </property>
        </widget>
       </item>
@@ -54,9 +87,6 @@
         <property name="text">
          <string>&amp;Event Log...</string>
         </property>
-        <property name="shortcut">
-         <string>Ctrl+L</string>
-        </property>
        </widget>
       </item>
       <item row="1" column="1">
@@ -70,9 +100,6 @@
        <widget class="QPushButton" name="cameraListButton">
         <property name="text">
          <string notr="true">Camera/Devices List...</string>
-        </property>
-        <property name="shortcut">
-         <string>Ctrl+M</string>
         </property>
        </widget>
       </item>
@@ -122,15 +149,12 @@
         <property name="text">
          <string>&amp;Bookmarks...</string>
         </property>
-        <property name="shortcut">
-         <string>Ctrl+B</string>
-        </property>
        </widget>
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="bookmarksLabel">
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string notr="true" extracomment="Test set in source file">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -142,7 +166,25 @@
      <property name="title">
       <string>System Settings</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>8</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QnSystemSettingsWidget" name="systemSettingsWidget" native="true"/>
       </item>
@@ -154,7 +196,25 @@
      <property name="title">
       <string>System Backup and Restore</string>
      </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>8</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QnDatabaseManagementWidget" name="backupWidget" native="true"/>
       </item>

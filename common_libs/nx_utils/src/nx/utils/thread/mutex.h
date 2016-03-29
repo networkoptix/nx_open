@@ -1,10 +1,7 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
 #ifndef NX_MUTEX_H
 #define NX_MUTEX_H
+
+#include <nx/utils/log/assert.h>
 
 #ifdef USE_OWN_MUTEX
 
@@ -77,14 +74,90 @@ private:
 #define CCAT(s1, s2) CONCATENATE_DIRECT(s1, s2)
 #define QnMutexLocker struct CCAT(QnMutexLocker, __LINE__) : public QnMutexLockerBase { CCAT(QnMutexLocker, __LINE__)(QnMutex* mtx) : QnMutexLockerBase( mtx, __FILE__, __LINE__) {} }
 
+class QnReadWriteLock
+    : public QnMutex
+{
+public:
+    void lockForWrite() { lock(); }
+    void lockForRead() { lock(); }
+};
+
+#define QnReadLocker QnMutexLocker
+#define QnWriteLocker QnMutexLocker
+
 #else   //USE_OWN_MUTEX
 
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QReadWriteLock>
 
 typedef QMutex QnMutex;
-typedef QMutexLocker QnMutexLocker;
-typedef QMutexLocker QnMutexLockerBase;
+
+/** Adding this class since \a QMutexLocker does not have move operations */
+class QnMutexLocker
+{
+public:
+    QnMutexLocker(QMutex* const mtx)
+    :
+        m_mutex(mtx),
+        m_locked(false)
+    {
+        relock();
+    }
+    ~QnMutexLocker()
+    {
+        if (m_locked)
+            unlock();
+    }
+
+    QnMutexLocker(QnMutexLocker&& rhs)
+    {
+        m_mutex = rhs.m_mutex;
+        rhs.m_mutex = nullptr;
+        m_locked = rhs.m_locked;
+        rhs.m_locked = false;
+    }
+    QnMutexLocker& operator=(QnMutexLocker&& rhs)
+    {
+        if (this == &rhs)
+            return *this;
+        if (m_locked)
+            unlock();
+        m_mutex = rhs.m_mutex;
+        rhs.m_mutex = nullptr;
+        m_locked = rhs.m_locked;
+        rhs.m_locked = false;
+        return *this;
+    }
+
+    QMutex* mutex()
+    {
+        return m_mutex;
+    }
+
+    void relock()
+    {
+        NX_ASSERT(!m_locked);
+        m_mutex->lock();
+        m_locked = true;
+    }
+    void unlock()
+    {
+        NX_ASSERT(m_locked);
+        m_mutex->unlock();
+        m_locked = false;
+    }
+
+private:
+    QnMutex* m_mutex;
+    bool m_locked;
+};
+
+typedef QnMutexLocker QnMutexLockerBase;
+
+typedef QReadWriteLock QnReadWriteLock;
+typedef QReadLocker QnReadLocker;
+typedef QWriteLocker QnWriteLocker;
 
 #endif  //USE_OWN_MUTEX
 

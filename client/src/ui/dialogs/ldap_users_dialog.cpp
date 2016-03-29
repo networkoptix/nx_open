@@ -1,7 +1,6 @@
 #include "ldap_users_dialog.h"
 #include "ui_ldap_users_dialog.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
@@ -12,7 +11,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>
@@ -232,7 +231,6 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     for (const QnLdapUser &ldapUser: filteredUsers) {
         QnUserResourcePtr user(new QnUserResource());
         user->setId(QnUuid::createUuid());
-        user->setTypeByName(lit("User"));
         user->setPermissions(Qn::GlobalLiveViewerPermissions);
         user->setLdap(true);
         user->setEnabled(false);
