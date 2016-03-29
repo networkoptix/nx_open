@@ -99,7 +99,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
-    m_role(Role_ServerRecording)
+    m_role(Role_ServerRecording),
+    m_gen(m_rd())
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -454,6 +455,10 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
+#if 0 // for storage balancing algorithm test
+        if (md && m_recordingContextVector[i].storage)
+            m_recordingContextVector[i].storage->addWrited(md->dataSize());
+#endif
         AVStream* stream = m_recordingContextVector[i].formatCtx->streams[streamIndex];
         NX_ASSERT(stream->time_base.num && stream->time_base.den);
 
@@ -859,9 +864,12 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             m_recordingContextVector[i].fileName, 
             m_mediaProvider
         );
+        
+        std::uniform_int_distribution<qint64> dis(1, m_truncateInterval / 4);
 
         if (m_truncateInterval > 4000000ll)
-            m_truncateIntervalEps = (qrand() % (m_truncateInterval/4000000ll)) * 1000000ll;
+            m_truncateIntervalEps = dis(m_gen);
+
     } // for each storage
 
     return true;

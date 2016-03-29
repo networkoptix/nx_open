@@ -74,6 +74,7 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
+    base_type(),
     m_ready( false ),
     m_state( InitialSearch ),
     m_discoveryUpdateIdx(0),
@@ -96,6 +97,7 @@ void QnResourceDiscoveryManager::setReady(bool ready)
 
 void QnResourceDiscoveryManager::start( Priority priority )
 {
+    updateSearchersUsage();
     QnLongRunnable::start( priority );
     //moveToThread( this );
 }
@@ -103,7 +105,6 @@ void QnResourceDiscoveryManager::start( Priority priority )
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QnMutexLocker locker( &m_searchersListMutex );
-    updateSearcherUsage(serv, isRedundancyUsing());
     m_searchersList.push_back(serv);
 }
 
@@ -466,7 +467,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( camRes->getPhysicalId() );
         if( existingRes )
         {
-            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>( existingRes.data() );
+            const QnSecurityCamResourcePtr existingCamRes = existingRes.dynamicCast<QnSecurityCamResource>();
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
 #ifdef EDGE_SERVER
@@ -521,7 +522,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
             return false;
 
         const QnResourcePtr& rpResource = qnResPool->getResourceByUniqueId((*it)->getUniqueId());
-        QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(rpResource.data());
+        QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
         if (rpNetRes) {
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
             if (newNetRes)
@@ -572,7 +573,10 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
 {
     const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
+    {
+        disconnect(server, nullptr, this, nullptr);
         updateSearchersUsage();
+    }
 
     QnMutexLocker lock( &m_searchersListMutex );
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
@@ -584,8 +588,9 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
 void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
     const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server) {
-        connect(server.data(), &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+    if (server)
+    {
+        connect(server, &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
         updateSearchersUsage();
     }
 
@@ -660,15 +665,9 @@ bool QnResourceDiscoveryManager::isRedundancyUsing() const
     return false;
 }
 
-void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable) {
+void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable)
+{
     // TODO: #Elric strictly speaking, we must do this under lock.
-
-    QSet<QString> disabledVendorsForAutoSearch;
-    //TODO #ak edge server MUST always discover edge camera despite disabledVendors setting,
-        //but MUST check disabledVendors for all other vendors (if they enabled on edge server)
-#ifndef EDGE_SERVER
-    disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
-#endif
 
     DiscoveryMode discoveryMode = DiscoveryMode::fullyEnabled;
     if( searcher->isLocal() ||                  // local resources should always be found
@@ -678,6 +677,13 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
     }
     else
     {
+        QSet<QString> disabledVendorsForAutoSearch;
+        //TODO #ak edge server MUST always discover edge camera despite disabledVendors setting,
+        //but MUST check disabledVendors for all other vendors (if they enabled on edge server)
+#ifndef EDGE_SERVER
+        disabledVendorsForAutoSearch = qnGlobalSettings->disabledVendorsSet();
+#endif
+
         //no lower_bound, since QSet is built on top of hash
         if( disabledVendorsForAutoSearch.contains(searcher->manufacture()+lit("=partial")) )
             discoveryMode = DiscoveryMode::partiallyEnabled;

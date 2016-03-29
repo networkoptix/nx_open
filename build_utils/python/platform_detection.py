@@ -12,7 +12,8 @@ supported_targets = [
     "isd",
     "isd_s2",
     "android-arm",
-    "ios"
+    "ios",
+    "any"
 ]
 
 def detect_platform():
