@@ -9,11 +9,13 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#if defined(__linux__) && !defined(Q_OS_ANDROID)
+#if defined(__linux__)
 #   include <sys/types.h>
 #   include <sys/syscall.h>
 #   include <unistd.h>
+#ifndef Q_OS_ANDROID
 static pid_t gettid(void) { return syscall(__NR_gettid); }
+#endif
 #elif __APPLE__
 #include <pthread.h>
 #endif
@@ -21,7 +23,7 @@ static pid_t gettid(void) { return syscall(__NR_gettid); }
 
 uintptr_t currentThreadSystemId()
 {
-#if __linux__ && !defined(Q_OS_ANDROID)
+#if __linux__ //&& !defined(Q_OS_ANDROID)
     /* This one is purely for debugging purposes.
     * QThread::currentThreadId is implemented via pthread_self,
     * which is not an identifier you see in GDB. */

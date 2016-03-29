@@ -12,7 +12,8 @@ supported_targets = [
     "isd",
     "isd_s2",
     "android-arm",
-    "ios"
+    "ios",
+    "any"
 ]
 
 def detect_platform():
@@ -22,7 +23,7 @@ def detect_platform():
     elif platform.startswith("linux"):
         return "linux"
     elif platform.startswith("darwin"):
-        return "macos"
+        return "macosx"
     else:
         return "unknown"
 
@@ -41,8 +42,8 @@ def get_platform_for_target(target):
         return "windows"
     elif target.startswith("linux"):
         return "linux"
-    elif target.startswith("macos"):
-        return "macos"
+    elif target.startswith("macosx"):
+        return "macosx"
     elif target in [ "rpi", "bpi", "isd", "isd_s2" ]:
         return "linux"
     elif target.startswith("android"):

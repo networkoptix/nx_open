@@ -59,6 +59,21 @@ h4{
   margin-bottom:16px;
 }
 
+
+button, select{
+  &,
+  &:focus,
+  &:hover,
+  &:active,
+  &.active,
+  &.disabled,
+  &[disabled] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+}
+
 .btn-default{
 
   border-bottom: 1px solid $button_d2;
