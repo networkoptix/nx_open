@@ -36,14 +36,14 @@ android {
         $$OUTPUT_PATH/lib/libopenal.so
 
     ANDROID_EXTRA_LIBS += \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavcodec.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavdevice.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavfilter.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavformat.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavutil.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavcodec.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavformat.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavdevice.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libpostproc.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libswscale.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libswresample.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libswscale.so
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavfilter.so
 
     ANDROID_PACKAGE_SOURCE_DIR = ${basedir}/${arch}/android
 
