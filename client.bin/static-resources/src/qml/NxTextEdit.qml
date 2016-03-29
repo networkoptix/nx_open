@@ -75,9 +75,8 @@ TextField
                 }
             }
 
-            font: Qt.font({ pixelSize: 14
-                , weight: (control.readOnly ? Font.Medium : Font.Normal) });
-            textColor: Style.colors.text;
+            font: (control.readOnly ? Style.textEdit.fontReadOnly : Style.textEdit.font);
+            textColor: Style.textEdit.color;
 
             placeholderTextColor: Style.colors.midlight;
             renderType: Text.QtRendering;

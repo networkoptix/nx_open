@@ -76,6 +76,15 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>nx_email</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_email/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>nx_streaming</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 

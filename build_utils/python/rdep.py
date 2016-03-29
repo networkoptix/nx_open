@@ -182,6 +182,7 @@ def posix_path(path):
 
 def fetch_package_config(url, file_name):
     command = list(RSYNC)
+    command += RSYNC_DOWNLOAD_ARGS
     command.append(url)
     command.append(posix_path(file_name))
 
@@ -249,9 +250,6 @@ def sync_package(root, url, target, package, debug, force):
         ret = try_sync(root, url, target, package, force)
         if ret == SYNC_NOT_FOUND:
             path = os.path.join(root, target, package)
-            if os.path.isdir(path):
-                to_remove.append(path)
-
             print "Could not find {0}".format(package)
             return False
 
@@ -321,6 +319,7 @@ def upload_package(root, url, target, package):
         return False
 
     command = list(RSYNC)
+    command += RSYNC_UPLOAD_ARGS
     command.append(posix_path(os.path.join(local, PACKAGE_CONFIG_NAME)))
     command.append(remote)
 

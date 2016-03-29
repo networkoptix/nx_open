@@ -65,6 +65,7 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
 
     , m_visibleControls(true)
     , m_visible(false)
+    , m_connectingNow(false)
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
@@ -160,10 +161,28 @@ void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
     emit visibleControlsChanged();
 }
 
+bool QnWorkbenchWelcomeScreen::connectingNow() const
+{
+    return m_connectingNow;
+}
+
+void QnWorkbenchWelcomeScreen::setConnectingNow(bool value)
+{
+    if (m_connectingNow == value)
+        return;
+
+    m_connectingNow = value;
+    emit connectingNowChanged();
+}
+
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
+    setConnectingNow(true);
+    const auto controlsGuard = QnRaiiGuard::createDestructable(
+        [this]() { setConnectingNow(false); });
+
     QUrl url = QUrl::fromUserInput(serverUrl);
     url.setScheme(lit("http"));
     if (!password.isEmpty())
@@ -201,8 +220,13 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
     {
         /* We are receiving string with port but without protocol, so we must parse it. */
-        const QScopedPointer<QnSetupWizardDialog> dialog(
-            new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
+        const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
+        dialog->setUrl(QUrl::fromUserInput(serverUrl));
+        if (isLoggedInToCloud())
+        {
+            dialog->setCloudLogin(m_cloudWatcher->cloudLogin());
+            dialog->setCloudPassword(m_cloudWatcher->cloudPassword());
+        }
         dialog->exec();
     };
 

@@ -47,9 +47,10 @@ MaskedComboBox
 
                 Binding
                 {
-                    property: "text";
                     target: textItem;
-                    value: thisComponent.value;
+                    property: "text";
+                    value: (thisComponent.value.length
+                        ? thisComponent.value : qsTr("No host specified")); // TODO: cancel all values if we are not connected
                 }
             }
         }

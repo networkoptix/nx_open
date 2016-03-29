@@ -1,14 +1,8 @@
 #include "setup_wizard_dialog.h"
-#include "private/setup_wizard_dialog_private.h"
 
-#include <QtWebKitWidgets/QWebFrame>
+#include <ui/dialogs/private/setup_wizard_dialog_p.h>
+
 #include <QtWidgets/QBoxLayout>
-#include <QtGui/QDesktopServices>
-
-#include <common/common_module.h>
-#include <core/resource/media_server_resource.h>
-
-#include <ui/widgets/web_page.h>
 
 #include <nx/utils/log/log.h>
 
@@ -24,21 +18,21 @@ namespace
         url.setFragment(lit("/setup"));
         return url;
     }
+
 }
 
-QnSetupWizardDialog::QnSetupWizardDialog(const QUrl& serverUrl, QWidget *parent)
+QnSetupWizardDialog::QnSetupWizardDialog(QWidget *parent)
     : base_type(parent)
     , d_ptr(new QnSetupWizardDialogPrivate(this))
 {
     Q_D(QnSetupWizardDialog);
-    d->url = serverUrl;
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
 #ifdef _DEBUG
     QLineEdit* urlLineEdit = new QLineEdit(this);
     layout->addWidget(urlLineEdit);
-    urlLineEdit->setText(constructUrl(serverUrl).toString());
+    //urlLineEdit->setText(constructUrl(serverUrl).toString());
     connect(urlLineEdit, &QLineEdit::returnPressed, this, [this, urlLineEdit]()
     {
         Q_D(QnSetupWizardDialog);
@@ -67,43 +61,38 @@ int QnSetupWizardDialog::exec()
     return base_type::exec();
 }
 
-QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
-        QnSetupWizardDialog *parent)
-    : QObject(parent)
-    , q_ptr(parent)
-    , webView(new QWebView(parent))
+QUrl QnSetupWizardDialog::url() const
 {
-    Q_Q(QnSetupWizardDialog);
-
-    QnWebPage* page = new QnWebPage(webView);
-    webView->setPage(page);
-
-    QWebFrame *frame = page->mainFrame();
-
-    connect(frame, &QWebFrame::javaScriptWindowObjectCleared,
-            this, [this, frame]()
-        {
-            frame->addToJavaScriptWindowObject(lit("setupDialog"), this);
-        }
-    );
-
-    connect(page, &QWebPage::windowCloseRequested,
-            q, &QnSetupWizardDialog::accept);
+    Q_D(const QnSetupWizardDialog);
+    return d->url;
 }
 
-void QnSetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
+void QnSetupWizardDialog::setUrl(const QUrl& url)
 {
-    QUrl url(urlString);
+    Q_D(QnSetupWizardDialog);
+    d->url = url;
+}
 
-    NX_LOG(lit("QnSetupWizardDialog: External URL requested: %1")
-           .arg(urlString), cl_logINFO);
+QString QnSetupWizardDialog::cloudLogin() const
+{
+    Q_D(const QnSetupWizardDialog);
+    return d->loginInfo.cloudEmail;
+}
 
-    if (!url.isValid())
-    {
-        NX_LOG(lit("QnSetupWizardDialog: External URL is invalid: %1")
-               .arg(urlString), cl_logWARNING);
-        return;
-    }
+void QnSetupWizardDialog::setCloudLogin(const QString& login)
+{
+    Q_D(QnSetupWizardDialog);
+    d->loginInfo.cloudEmail = login;
+}
 
-    QDesktopServices::openUrl(url);
+QString QnSetupWizardDialog::cloudPassword() const
+{
+    Q_D(const QnSetupWizardDialog);
+    return d->loginInfo.cloudPassword;
+}
+
+void QnSetupWizardDialog::setCloudPassword(const QString& password)
+{
+    Q_D(QnSetupWizardDialog);
+    d->loginInfo.cloudPassword = password;
 }

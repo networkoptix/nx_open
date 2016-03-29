@@ -144,6 +144,8 @@ Rectangle
                                     , selectedUser, ":", selectedPassword);
                                 context.connectToLocalSystem(selectedHost, selectedUser, selectedPassword);
                             }
+
+                            enabled: (!isExpanded || !context.connectingNow);
                         }
                     }
 

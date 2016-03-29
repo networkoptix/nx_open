@@ -117,6 +117,9 @@ void QnConnectionManager::disconnectFromServer(bool force) {
         return;
     }
 
+    if (d->connectionState == Disconnected || d->connectionState == Connecting)
+        return;
+
     d->doDisconnect(force);
 
     d->url = QUrl();

@@ -2,6 +2,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <nx/network/http/httptypes.h>
 #include <media_server/serverutil.h>
 
@@ -57,9 +59,7 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     if (data.oldPassword.isEmpty())
         data.oldPassword = kDefaultAdminPassword;
 
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-    if (!systemName.isDefault())
+    if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
         return nx_http::StatusCode::ok;
@@ -78,13 +78,15 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     }
 
     qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setNewSystem(false);
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            lit("Failed to save cloud credentials to local DB"));
+            lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
+    qnCommon->updateModuleInformation();
 
     if (data.systemName.isEmpty())
     {

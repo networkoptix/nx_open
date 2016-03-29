@@ -1,11 +1,17 @@
 #define QT_NO_CAST_FROM_ASCII
 
 #include <common/config.h>
-#ifdef __cplusplus
-#   include <common/common_globals.h>
+
+#ifdef _WIN32
+#   define FD_SETSIZE 2048
+#   include <winsock2.h>
+#   include <windows.h> /* You HAVE to include winsock2.h BEFORE windows.h */
+#else
+#   include <arpa/inet.h>
 #endif
 
 #ifdef __cplusplus
+#include <common/common_globals.h>
 
 /* STL headers. */
 #include <algorithm>

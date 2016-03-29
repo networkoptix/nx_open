@@ -28,7 +28,7 @@
         <template>lib</template>
 
         <qt.libs>core gui network concurrent sql xml</qt.libs>
-        <global.libs>-lnx_network -lcommon -lnx_network -lnx_utils -ludt</global.libs>
+        <global.libs>-lcommon -lnx_network -lcommon -lnx_utils -ludt</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -95,6 +95,33 @@
             </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
             </properties>
         </profile>
     </profiles>
