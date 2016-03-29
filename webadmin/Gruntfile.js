@@ -9,6 +9,7 @@
 
 module.exports = function (grunt) {
 
+    var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
 
@@ -334,7 +335,7 @@ module.exports = function (grunt) {
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.app %>/../../../buildenv/packages/any/server-external-3.0.0/bin/external.data'
+                        src: '<%= yeoman.app %>/../../../' + package_dir + '/external.dat'
                     }
                 ],
                 options: {
@@ -566,7 +567,7 @@ module.exports = function (grunt) {
                 expand: true,
                 nonull:true,
                 cwd: '<%= yeoman.app %>/../',
-                dest: '<%= yeoman.app %>/../../../buildenv/packages/any/server-external-3.0.0/bin',
+                dest: '<%= yeoman.app %>/../../../' + package_dir + '/bin',
                 src: 'external.dat'
             }
         },
@@ -577,8 +578,13 @@ module.exports = function (grunt) {
                     mode: 'zip'
                 },
                 files: [
-                    { src: '<%= yeoman.app %>/../static/**' }
+                    { src: '<%= yeoman.app %>/../dist/**' }
                 ]
+            }
+        },
+        shell: {
+            deploy: {
+                command: 'cd ~/develop/' + package_dir + '; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             }
         },
 
@@ -705,13 +711,20 @@ module.exports = function (grunt) {
         'build',
         'clean:zip',
         'clean:publish',
-        'compress:external',
-        'copy:publish'
+        'compress:external'
     ]);
 
 
     grunt.registerTask('pub', [
         'publish'
+    ]);
+
+
+    grunt.registerTask('deploy', [
+        'publish',
+        'copy:publish',
+        'clean:zip',
+        'shell:deploy'
     ]);
 
     grunt.registerTask('demo', [
