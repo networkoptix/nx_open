@@ -86,9 +86,15 @@ constexpr const int kDefaultRecvWindowSize = 25600;
 // Mimimum recv buffer size is 32 packets
 constexpr const int kMinRecvBufferSize = 32;
 //Rcv buffer MUST NOT be bigger than Flight Flag size
-constexpr const int kDefaultRecvBufferSize = std::min<int>(kDefaultRecvWindowSize, 8192);
+constexpr const int kDefaultRecvBufferSize = 
+    kDefaultRecvWindowSize < 8192
+    ? kDefaultRecvWindowSize
+    : 8192;
 
-constexpr const int kDefaultSendBufferSize = std::min<int>(kDefaultRecvWindowSize, 8192);
+constexpr const int kDefaultSendBufferSize =
+    kDefaultRecvWindowSize < 8192
+    ? kDefaultRecvWindowSize
+    : 8192;
 
 
 CUDT::CUDT()
