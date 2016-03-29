@@ -24,6 +24,8 @@ ComboBox
 
     height: 28;
 
+    opacity: (enabled ? 1.0 : 0.3);
+
     Binding
     {
         target: thisComponent;
@@ -61,7 +63,9 @@ ComboBox
 
         anchors.fill: parent;
 
-        color: Style.colors.shadow;
+        color: (thisComponent.activeFocus
+            ? Style.darkerColor(Style.colors.shadow, 1)
+            : Style.colors.shadow);
         border.color: Style.darkerColor(Style.colors.shadow, 1);
         radius: 1;
     }

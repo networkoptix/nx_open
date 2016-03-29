@@ -49,7 +49,8 @@ MaskedComboBox
                 {
                     target: textItem;
                     property: "text";
-                    value: thisComponent.value;
+                    value: (thisComponent.value.length
+                        ? thisComponent.value : qsTr("No host specified")); // TODO: cancel all values if we are not connected
                 }
             }
         }

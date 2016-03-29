@@ -205,7 +205,7 @@ Item
             onClicked:
             {
                 if (thisComponent.enabled)
-                    toggle();
+                    thisComponent.toggle();
             }
         }
 
@@ -246,6 +246,7 @@ Item
             {
                 id: systemNameText;
 
+                disableable: false;
                 anchors.left: parent.left;
                 anchors.right: parent.left;
                 anchors.top: parent.top;
@@ -277,7 +278,7 @@ Item
                 bkgColor: tileArea.color;
                 hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
 
-                onClicked: { toggle(); }
+                onClicked: { thisComponent.toggle(); }
             }
 
             Column

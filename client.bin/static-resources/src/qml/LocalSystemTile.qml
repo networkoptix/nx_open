@@ -72,7 +72,6 @@ BaseTile
         {
             id: userChooseItem;
 
-            visible: thisComponent.isRecentlyConnected;
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
 
             disabledLabelColor: Style.colors.midlight;

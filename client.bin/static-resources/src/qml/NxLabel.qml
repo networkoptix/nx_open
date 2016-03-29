@@ -9,6 +9,7 @@ Text
     property bool acceptClicks: false;
     property bool autoHoverable: false;
     property bool isHovered: false;
+    property bool disableable: true;
 
     property color standardColor: Style.label.color;
     property color hoveredColor: Style.lighterColor(Style.label.color);
@@ -16,6 +17,8 @@ Text
     property var hoveredCursorShape: Qt.ArrowCursor;
 
     signal clicked();
+
+    opacity: (disableable && !enabled ? 0.3 : 1.0);
 
     color:
     {
