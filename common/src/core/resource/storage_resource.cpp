@@ -218,6 +218,12 @@ void QnStorageResource::setWritedCoeff(double value)
     m_writedCoeff = value;
 }
 
+double QnStorageResource::getWritedCoeff() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_writedCoeff;
+}
+
 double QnStorageResource::calcUsageCoeff() const
 {
     QnMutexLocker lk(&m_mutex);
