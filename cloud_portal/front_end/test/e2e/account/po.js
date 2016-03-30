@@ -47,8 +47,10 @@ var AccountPage = function () {
         this.currentPasswordInput.sendKeys(this.userPassword);
     };
 
-    this.passwordGroup = element(by.css('password-input'));
-    this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
+    this.passCheck = {
+        input: this.passwordInput,
+        submit: this.submitButton
+    };
 };
 
 module.exports = AccountPage;
