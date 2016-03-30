@@ -6,14 +6,6 @@ angular.module('webadminApp')
             isAdmin: true
         };
 
-        mediaserver.getUser().then(function(user){
-            $scope.user = {
-                isAdmin: user.isAdmin,
-                name: user.name
-            };
-        });
-
-
         mediaserver.getSettings().then(function (r) {
             $scope.settings = r.data.reply;
             $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
@@ -21,7 +13,15 @@ angular.module('webadminApp')
             // check for safe mode and new server and redirect.
             if(r.data.reply.serverFlags.includes(Config.newServerFlag) && !r.data.reply.ecDbReadOnly){
                 $location.path("/setup");
+                return;
             }
+            mediaserver.getUser().then(function(user){
+                $scope.user = {
+                    isAdmin: user.isAdmin,
+                    name: user.name
+                };
+            });
+
         });
         $scope.isActive = function (path) {
             var currentPath = $location.path().split('/')[1];
