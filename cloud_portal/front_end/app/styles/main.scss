@@ -194,25 +194,32 @@ footer {
   display: block;
   margin-bottom:12px;
 }
-.system-button{
+
+.system-button {
   user-select: none;
   cursor: pointer;
-}
-.system-button h2{
-  line-height: 24px;
-  margin-bottom: 2px;
-}
-.system-button .label {
-  display: inline-block;
-  vertical-align: bottom;
 
-  height: 20px;
-  margin-top: 12px;
-  line-height: 14px;
-  border-radius: $border-radius-small;
+  h2 {
+    line-height: 24px;
+    margin-bottom: 2px;
 
-  font-weight: normal;
-  font-size: $font-size-h6;
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .label {
+    display: inline-block;
+    vertical-align: bottom;
+
+    height: 20px;
+    margin-top: 12px;
+    line-height: 14px;
+    border-radius: $border-radius-small;
+
+    font-weight: normal;
+    font-size: $font-size-h6;
+  }
 }
 
 .btn-wrapper {
@@ -308,4 +315,38 @@ a .product-name.add-version:after {
 .image-link,
 .image-link:hover{
   text-decoration: none !important;
+}
+
+.jumbotron .promo-block{
+  color: $jumbotron-color;
+}
+.promo-block {
+  padding: 32px;
+  text-align: center;
+  color: $light15;
+
+  h2 {
+    font-weight: bold;
+  }
+
+  .promo-block {
+    padding-bottom: 0;
+  }
+
+}
+.jumbotron .promo-block{
+
+}
+
+.cloud-icon img{
+  height: 60px;
+}
+
+.jumbotron .cloud-icon img{
+  height: 100px;
+}
+
+.welcome-caption{
+  font-size: 36px;
+  color: $brand_core !important;
 }

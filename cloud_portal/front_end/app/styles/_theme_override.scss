@@ -94,13 +94,6 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
 h1{
   margin-bottom: $line-height-computed;
 }
-
-h2, h3{
-  max-width: 100%;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
 h2{
   margin:0;
 }
