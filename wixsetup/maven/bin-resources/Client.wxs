@@ -75,6 +75,7 @@
                     </Directory>                    
 
                     <Directory Id="ClientQml" Name="qml"/>
+                    <Directory Id="ClientFontsDir" Name="fonts"/>
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
@@ -301,6 +302,7 @@
             <ComponentRef Id="ClientUriHandler"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
+            <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="Vs2015crtComponent"/>
