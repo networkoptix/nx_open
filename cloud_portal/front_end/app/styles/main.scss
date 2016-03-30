@@ -303,3 +303,8 @@ a .product-name:after {
     top: -74px;
   }
 }
+
+.image-link,
+.image-link:hover{
+  text-decoration: none !important;
+}
