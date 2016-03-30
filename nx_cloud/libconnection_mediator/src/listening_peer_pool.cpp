@@ -152,18 +152,31 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
     // TODO: hostName alias resolution in cloud_db
 
     const auto ids = hostName.split('.');
-    if (ids.size() != 2)
-        return boost::none;
+    if (ids.size() == 2)
+    {
+        //hostName is serverID.systemID
+        const auto& systemId = ids[1];
+        const auto& serverId = ids[0];
 
-    //auto-server resolve by system name is forbidden for now to avoid auto-reconnection to another server
+        //searching for exact server match
+        auto peerIter = m_peers.find(MediaserverData(systemId, serverId));
+        if (peerIter != m_peers.end())  //found exact match
+            return ListeningPeerPool::ConstDataLocker(
+                std::move(lk),
+                std::move(peerIter));
+    }
+    else if (ids.size() == 1)
+    {
+        const auto& systemId = ids[0];
+        //resolving to any server of a system
+        auto peerIter = m_peers.lower_bound(MediaserverData(systemId, nx::String()));
+        if (peerIter != m_peers.end() && peerIter->first.systemId == systemId)
+            return ListeningPeerPool::ConstDataLocker(
+                std::move(lk),
+                std::move(peerIter));
+    }
 
-    auto peerIter = m_peers.find(MediaserverData(ids[1], ids[0]));  //serverID.systemID
-    if (peerIter == m_peers.end())
-        return boost::none;
-
-    return ListeningPeerPool::ConstDataLocker(
-        std::move(lk),
-        std::move(peerIter));
+    return boost::none;
 }
 
 std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
