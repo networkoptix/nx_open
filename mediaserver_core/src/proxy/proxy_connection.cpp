@@ -22,14 +22,12 @@
 #include <utils/common/systemerror.h>
 #include "utils/network/compat_poll.h"
 #include "utils/network/socket.h"
-#include "utils/network/router.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
 #include "core/resource/network_resource.h"
 #include "transaction/transaction_message_bus.h"
 
-#include "proxy_connectionv_processor_p.h"
 #include "http/custom_headers.h"
 #include "api/global_settings.h"
 
