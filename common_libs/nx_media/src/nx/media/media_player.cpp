@@ -559,7 +559,8 @@ void Player::setPosition(qint64 value)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
         d->positionMs = value;
-
+    d->setLiveMode(value == kLivePosition);
+    
     d->at_hurryUp(); //< renew receiving frames
 }
 

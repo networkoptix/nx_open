@@ -18,6 +18,9 @@ public:
     QUrl url() const;
     void setUrl(const QUrl& url);
 
+    QString localLogin() const;
+    QString localPassword() const;
+
     QString cloudLogin() const;
     void setCloudLogin(const QString& login);
 

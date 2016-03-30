@@ -165,6 +165,20 @@ void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &sy
     checkOutdatedServersInternal(system);
 }
 
+void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serverInfo
+    , const QString &supposedSystemId)
+{
+    const auto serverId = serverInfo.id;
+    for (const auto system : m_systems)
+    {
+        if ((system->id() != serverInfo.cloudSystemId)
+            && system->containsServer(serverId))
+        {
+            system->removeServer(serverId);
+        }
+    }
+}
+
 void QnCloudSystemsFinder::pingServerInternal(const QString &host
     , int serverPriority
     , const QString &systemId)
@@ -197,13 +211,20 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
         if (it == m_systems.end())
             return;
 
+        // To prevent hanging on of fake online cloud servers
+        // It is almost not hack.
+        tryRemoveAlienServer(moduleInformation, systemId);
+        if (systemId != moduleInformation.cloudSystemId)
+            return;
+
+        const auto serverId = moduleInformation.id;
         const auto systemDescription = it.value();
-        if (systemDescription->containsServer(moduleInformation.id))
+        if (systemDescription->containsServer(serverId))
             systemDescription->updateServer(moduleInformation);
         else
             systemDescription->addServer(moduleInformation, serverPriority);
 
-        systemDescription->setServerHost(moduleInformation.id, host);
+        systemDescription->setServerHost(serverId, host);
     };
 
     nx_http::downloadFileAsync(apiUrl, onModuleInformationCompleted);

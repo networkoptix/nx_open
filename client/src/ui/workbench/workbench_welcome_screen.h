@@ -13,7 +13,7 @@ class QnWorkbenchWelcomeScreen : public Connective<QObject>
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
-    
+
     Q_PROPERTY(bool isVisible READ isVisible WRITE setVisible NOTIFY visibleChanged)
 
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged);
@@ -27,7 +27,7 @@ public:
     QnWorkbenchWelcomeScreen(QObject *parent);
 
     virtual ~QnWorkbenchWelcomeScreen();
-    
+
     QWidget *widget();
 
 public: // Properties
@@ -103,7 +103,7 @@ private:
     void showScreen();
 
     void enableScreen();
-    
+
 private: // overrides
     bool eventFilter(QObject *obj
         , QEvent *event) override;
@@ -111,7 +111,7 @@ private: // overrides
 private:
     typedef QPointer<QWidget> WidgetPtr;
     typedef QPointer<QnCloudStatusWatcher> CloudStatusWatcherPtr;
-    
+
     bool m_visibleControls;
     bool m_visible;
     bool m_connectingNow;

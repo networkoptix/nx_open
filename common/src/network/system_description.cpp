@@ -110,7 +110,7 @@ QnModuleInformation QnSystemDescription::getServer(const QnUuid &serverId) const
     return m_servers.value(serverId);
 }
 
-void QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
+QnServerFields QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
 {
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
@@ -120,15 +120,18 @@ void QnSystemDescription::updateServer(const QnModuleInformation &serverInfo)
     if (!containsServer)
     {
         addServer(serverInfo);
-        return;
+        return QnServerField::NoField;
     }
 
     auto &current = it.value();
     const auto changes = getChanges(current, serverInfo);
     m_serverTimestamps[serverInfo.id].restart();
     current = serverInfo;
-    if (changes)
-        emit serverChanged(serverInfo.id, changes);
+    if (!changes)
+        return QnServerField::NoField;
+
+    emit serverChanged(serverInfo.id, changes);
+    return changes;
 }
 
 void QnSystemDescription::removeServer(const QnUuid &serverId)

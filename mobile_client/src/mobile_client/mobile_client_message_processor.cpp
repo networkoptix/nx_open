@@ -28,7 +28,7 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
     base_type::updateResource(resource);
 
     if (resource->getId() == qnCommon->remoteGUID())
-        updateMainServerApiUrl();
+        updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());
 }
 
 QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory() const
@@ -36,8 +36,8 @@ QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory() const
     return QnMobileClientCameraFactory::instance();
 }
 
-void QnMobileClientMessageProcessor::updateMainServerApiUrl() {
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+void QnMobileClientMessageProcessor::updateMainServerApiUrl(const QnMediaServerResourcePtr& server)
+{
     if (!server)
         return;
 

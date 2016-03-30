@@ -25,6 +25,7 @@ BaseTile
 
             anchors.leftMargin: 4;
 
+            disableable: false;
             enabled: thisComponent.isAvailable;
             text: thisComponent.userName;
             font: Style.fonts.systemTile.info;
