@@ -31,19 +31,13 @@ describe('Restore password suite', function () {
         p.alert.catchAlert(p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger);
     });
 
-    //p.passwordField.check(p, p.callPage()); // url with token from email
-    //it("generates url token for the next case", function () {
-    //    var userEmail = p.helper.userEmail;
-    //    p.sendLinkToEmail(userEmail);
-    //
-    //    browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
-    //        var regCode = p.getTokenFromEmail(email, userEmail);
-    //
-    //        describe('Password checks for step2', function () {
-    //            p.passwordField.check(p, p.url + regCode); // url with token from email
-    //        });
-    //    }));
-    //});
+    p.passwordField.check(function(){
+        var deferred = protractor.promise.defer();
+        p.getRestorePassPage(p.helper.userEmail).then(function(){
+            deferred.fulfill();
+        });
+        return deferred.promise;
+    }, p);
 
     it("should be able to set new password (which is same as old)", function () {
         var userEmail = p.helper.userEmail;
