@@ -76,6 +76,17 @@ TEST_F(CloudStreamSocketTest, simple)
         ASSERT_EQ(bytesToSendThroughConnection, bytesRead);
     }
 
+    // also try to connect just by system name
+    {
+        CloudStreamSocket cloudSocket;
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
+        QByteArray data;
+        data.resize(bytesToSendThroughConnection);
+        const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
+        ASSERT_EQ(bytesToSendThroughConnection, bytesRead);
+    }
+
+    server.pleaseStopSync();
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
         serverAddress);
@@ -160,6 +171,18 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
         createClientSocketFunc,
         serverAddress,
         SocketAddress(tempHostName));
+
+    test::socketSimpleSync(
+        createServerSocketFunc,
+        createClientSocketFunc,
+        serverAddress,
+        SocketAddress("bla"));
+
+    test::socketSimpleAsync(
+        createServerSocketFunc,
+        createClientSocketFunc,
+        serverAddress,
+        SocketAddress("bla"));
 
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
