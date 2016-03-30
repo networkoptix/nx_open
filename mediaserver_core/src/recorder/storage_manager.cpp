@@ -524,7 +524,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         return;
     }
     int storageIndex = qnStorageDbPool->getStorageIndex(storage);
-    QVector<DeviceFileCatalogPtr> result;
+    QVector<DeviceFileCatalogPtr> oldCatalogs;
 
     QSqlQuery query(sqlDb);
     query.setForwardOnly(true);
@@ -558,7 +558,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
             if (fileCatalog)
             {
                 fileCatalog->addChunks(chunks);
-                result << fileCatalog;
+                oldCatalogs << fileCatalog;
                 chunks.clear();
             }
 
@@ -576,11 +576,39 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (fileCatalog)
     {
         fileCatalog->addChunks(chunks);
-        result << fileCatalog;
+        oldCatalogs << fileCatalog;
     }
 
     auto sdb = qnStorageDbPool->getSDB(storage);
-    
+    auto newCatalogs = sdb->loadFullFileCatalog();
+    QVector<DeviceFileCatalogPtr> catalogsToWrite;
+
+    for (auto const &c : oldCatalogs)
+    {
+        auto newCatalogIt = std::find_if(newCatalogs.begin(), newCatalogs.end(),
+                                         [&c](const DeviceFileCatalogPtr &catalog)
+                                         {
+                                             return c->cameraUniqueId() == catalog->cameraUniqueId() && 
+                                                    c->getCatalog() == catalog->getCatalog();
+                                         });
+        if (newCatalogIt == newCatalogs.end())
+            catalogsToWrite.push_back(c);
+        else
+        {
+            DeviceFileCatalogPtr newCatalog = *newCatalogIt;
+            DeviceFileCatalogPtr catalogToWrite = DeviceFileCatalogPtr(new DeviceFileCatalog(c->cameraUniqueId(), c->getCatalog(), QnServer::StoragePool::None));
+            assert(std::is_sorted(c->getChunks().cbegin(), c->getChunks().cend()));
+            assert(std::is_sorted(newCatalog->getChunks().cbegin(), newCatalog->getChunks().cend()));
+            std::set_difference(c->getChunks().begin(), c->getChunks().end(), newCatalog->getChunks().begin(), newCatalog->getChunks().end(), std::back_inserter(catalogToWrite->getChunks()));
+            catalogsToWrite.push_back(catalogToWrite);
+        }
+    }
+
+    for (auto const &c : catalogsToWrite)
+    {
+        for (auto const &chunk : c->getChunks())
+            sdb->addRecord(c->cameraUniqueId(), c->getCatalog(), chunk);
+    }
 }
 
 void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
@@ -1739,6 +1767,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
+        migrateSqliteDatabase(fileStorage);
         addDataFromDatabase(fileStorage);
         m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
     }

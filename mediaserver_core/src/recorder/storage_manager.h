@@ -134,6 +134,7 @@ public:
     void initDone();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
 
+    static void migrateSqliteDatabase(const QnStorageResourcePtr & storage);
     /*
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
@@ -184,7 +185,6 @@ private:
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
-    void migrateSqliteDatabase(const QnStorageResourcePtr & storage);
     bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
     void backupFolderRecursive(const QString& src, const QString& dst);
     void getCamerasWithArchiveInternal(std::set<QString>& result,  const FileCatalogMap& catalog) const;

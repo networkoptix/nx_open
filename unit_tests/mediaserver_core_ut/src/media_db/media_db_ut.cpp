@@ -9,6 +9,9 @@
 #include <vector>
 #include <algorithm>
 
+#include <QtCore>
+#include <QtSql>
+
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <recorder/storage_manager.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
@@ -16,7 +19,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/util.h>
-#include <QtCore>
+#include <utils/db/db_helper.h>
 
 bool recursiveClean(const QString &path);
 
@@ -816,6 +819,126 @@ TEST(MediaDb_test, StorageDB)
                                        return !tc.isDeleted && !tc.isVisited; 
                                    });
     ASSERT_EQ(allVisited, true);
+    recursiveClean(workDirPath);
+}
+
+TEST(MediaDb_test, Migration_from_sqlite)
+{
+    std::unique_ptr<QnCommonModule> commonModule;
+    if (!qnCommon) {
+        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
+    }
+    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+
+    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
+    if (!qnStatusDictionary) {
+        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
+                new QnResourceStatusDictionary);
+    }
+
+    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
+    if (!propertyDictionary) {
+        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
+            new QnResourcePropertyDictionary);
+    }
+
+    std::unique_ptr<QnStorageDbPool> dbPool;
+    if (!qnStorageDbPool) {
+        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
+    }
+    auto dbPoolPtr = dbPool->create();
+
+    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    recursiveClean(workDirPath);
+    QDir().mkpath(workDirPath);
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
+    QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+    //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
+    QSqlDatabase sqlDb = QSqlDatabase::addDatabase(lit("QSQLITE"), QString("QnStorageManager_%1").arg(fileName));
+
+    sqlDb.setDatabaseName(fileName);
+    ASSERT_TRUE(sqlDb.open());
+    ASSERT_TRUE(QnDbHelper::execSQLFile(lit(":/01_create_storage_db.sql"), sqlDb));
+
+    const size_t kMaxCatalogs = 4;
+    const size_t kMaxChunks = 200;
+    const size_t k23MaxChunks = kMaxChunks * 2 / 3;
+    const size_t k13MaxChunks = kMaxChunks / 3;
+    std::vector<DeviceFileCatalogPtr> referenceCatalogs;
+
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
+    {
+        auto catalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::number(i),
+                                                                  i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
+                                                                  QnServer::StoragePool::Normal));
+        std::deque<DeviceFileCatalog::Chunk> chunks;
+        for (size_t j = 0; j < kMaxChunks; ++j)
+            chunks.push_back(DeviceFileCatalog::Chunk((j + 10) * j + 10, 0, DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 1, 0, 1, 1));
+        catalog->addChunks(chunks);
+
+        referenceCatalogs.push_back(catalog);
+    }
+
+    /*  Two thirds of reference chunks (from the beginning) we will write to sqlite db and two thirds (from the end) - to the new media db.
+    *   After migration routine executed, result should be equal to the reference catalogs.
+    */
+
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
+    {
+        for (size_t j = 0; j < k23MaxChunks; ++j)
+        {
+            QSqlQuery query(sqlDb);
+            query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)");
+            DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunks().at(j);
+
+            query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
+            query.addBindValue(referenceCatalogs[i]->getCatalog()); // role
+            query.addBindValue(chunk.startTimeMs); // start_time
+            query.addBindValue(chunk.timeZone); // timezone
+            query.addBindValue(chunk.fileIndex); // file_index
+            query.addBindValue(chunk.durationMs); // duration
+            query.addBindValue(chunk.getFileSize()); // filesize
+
+            ASSERT_TRUE(query.exec());
+        }
+    }
+
+    bool result;
+    QnFileStorageResourcePtr storage(new QnFileStorageResource);
+    storage->setUrl(workDirPath);
+    result = storage->initOrUpdate();
+    ASSERT_TRUE(result);
+
+    auto sdb = qnStorageDbPool->getSDB(storage);
+    result = sdb->open(workDirPath + lit("/test.nxdb"));
+    ASSERT_TRUE(result);
+    sdb->loadFullFileCatalog();
+
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
+    {
+        for (size_t j = k13MaxChunks; j < kMaxChunks; ++j)
+        {
+            sdb->addRecord(referenceCatalogs[i]->cameraUniqueId(),
+                           referenceCatalogs[i]->getCatalog(),
+                           referenceCatalogs[i]->getChunks().at(j));
+        }
+    }
+
+    sqlDb.close();
+    QSqlDatabase::removeDatabase(sqlDb.connectionName());
+    QnStorageManager::migrateSqliteDatabase(storage);
+    auto mergedCatalogs = sdb->loadFullFileCatalog();
+
+    for (size_t i = 0; i < kMaxCatalogs; ++i)
+    {
+        auto mergedIt = std::find_if(mergedCatalogs.cbegin(), mergedCatalogs.cend(),
+                                     [&referenceCatalogs, i](const DeviceFileCatalogPtr &c) 
+                                     { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() && 
+                                              c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
+        ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
+        ASSERT_TRUE((*mergedIt)->getChunks() == referenceCatalogs[i]->getChunks());
+    }
+    recursiveClean(workDirPath);
 }
 
 TEST(MediaDb_test, Cleanup)
