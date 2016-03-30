@@ -20,6 +20,7 @@ public slots:
 
     void updateCredentials(const QString& login, const QString& password, bool isCloud);
 
+    void cancel();
 public:
     struct LoginInfo
     {

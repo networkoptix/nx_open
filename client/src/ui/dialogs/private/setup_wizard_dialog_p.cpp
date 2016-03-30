@@ -50,6 +50,19 @@ void QnSetupWizardDialogPrivate::updateCredentials(const QString& login, const Q
     loginInfo.cloudPassword = isCloud ? password    : QString();
 }
 
+void QnSetupWizardDialogPrivate::cancel()
+{
+    Q_Q(QnSetupWizardDialog);
+
+    /* Remove 'accept' connection. */
+    disconnect(webView->page(), nullptr, q, nullptr);
+
+    /* Security fix to make sure we will never try to login further. */
+    loginInfo = LoginInfo();
+
+    q->reject();
+}
+
 void QnSetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
 {
     QUrl url(urlString);
