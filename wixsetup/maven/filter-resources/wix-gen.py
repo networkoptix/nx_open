@@ -14,7 +14,7 @@ if '${nxtool}' == 'true':
     generated_items += ['qtquickcontrols']
 
 for wxs in generated_items:
-    p = subprocess.Popen('${init.python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE)
+    p = subprocess.Popen('${init.python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE, stderr=subprocess.STDOUT)
     out, err = p.communicate()
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
     print out
