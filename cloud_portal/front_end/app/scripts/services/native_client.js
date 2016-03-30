@@ -7,7 +7,7 @@ angular.module('cloudApp')
 
                 var protocol = Config.clientProtocol;
 
-                var system   = (systemId + '/') || '';
+                var system   = (systemId + '/') || 'open/';
 
                 var params = {};
 
