@@ -13,8 +13,11 @@ describe('Account suite', function () {
     });
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
         p.get(p.accountUrl);
         p.alert.submitButton.click();
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success, true);
 
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
@@ -125,7 +128,14 @@ describe('Account suite', function () {
         expect(browser.getCurrentUrl()).toContain('#/account/password');
         expect(p.htmlBody.getText()).toContain('Current password');
     });
-    p.passwordField.check(p, p.passwordUrl);
+
+    p.passwordField.check(function(){
+        var deferred = protractor.promise.defer();
+        p.get(p.passwordUrl);
+        p.prepareToPasswordCheck();
+        deferred.fulfill();
+        return deferred.promise;
+    }, p);
 
     it("should allow to change password (and change it back)", function () {
         p.get(p.passwordUrl);
@@ -134,7 +144,7 @@ describe('Account suite', function () {
         p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.submitButton.click();
 
-p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
+        p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         browser.refresh();
 
@@ -142,7 +152,7 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
 
-p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
+        p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
     it("should save new password correctly (and change it back)", function () {
@@ -150,7 +160,7 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
         p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.submitButton.click();
-p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
+        p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         p.helper.logout();
         p.helper.login(p.helper.userEmail, p.helper.userPasswordNew);
@@ -159,19 +169,25 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
         p.currentPasswordInput.sendKeys(p.helper.userPasswordNew);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
-p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
+        p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
-
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.get(p.passwordUrl);
+
         p.currentPasswordInput.sendKeys(p.helper.userPasswordWrong);
         p.passwordInput.sendKeys(p.helper.userPasswordNew);
-
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger, true);
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.get(p.passwordUrl);
 
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
@@ -183,6 +199,9 @@ p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.
         p.passwordInput.clear();
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success, true);
 
     it("should not allow to change password if old password is wrong", function () {

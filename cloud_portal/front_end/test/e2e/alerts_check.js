@@ -56,7 +56,6 @@ var AlertSuite = function () {
     this.catchAlert = function (message, type) {
         waitAlert();
         checkAlertContent(message, type);
-        //closeAlert();
         finishAlertCheck();
     };
 
@@ -64,7 +63,6 @@ var AlertSuite = function () {
 
         it("should show error alert and close it by button",function(){
             callAlert().then(function(){
-                console.log("call1");
                 waitAlert();
                 checkAlertContent(message, type);
                 closeAlert();
@@ -75,7 +73,6 @@ var AlertSuite = function () {
         if(shouldCloseOnTimeout){
             it("should close on timeout",function(){
                 callAlert().then(function(){
-                    console.log("call3");
                     waitAlert();
                     checkAlertTimeout(true);
                     finishAlertCheck();
@@ -85,7 +82,6 @@ var AlertSuite = function () {
         else{
             it("should not close on timeout",function(){
                 callAlert().then(function(){
-                    console.log("call4");
                     waitAlert();
                     checkAlertTimeout(false);
                     closeAlert();

@@ -4,9 +4,14 @@ describe('Registration suite', function () {
     var p = new RegisterPage();
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.getByUrl();
         p.prepareToAlertCheck();
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
 
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
@@ -177,7 +182,13 @@ describe('Registration suite', function () {
         //TODO: Write checks for different wrong email patterns, see testrail for cases
     });
 
-     p.passwordField.check(p, p.url);
+    p.passwordField.check(function(){
+        var deferred = protractor.promise.defer();
+        p.getByUrl();
+        p.prepareToPasswordCheck();
+        deferred.fulfill();
+        return deferred.promise;
+    }, p);
 
     it("should open Terms and conditions in a new page", function () {
         p.getByUrl();

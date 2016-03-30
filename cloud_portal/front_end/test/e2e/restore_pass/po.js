@@ -36,10 +36,13 @@ RestorePasswordPage = function () {
     this.emailInput = element(by.model('data.email'));
     this.emailInputWrap = this.emailInput.element(by.xpath('../..'));
     this.passwordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
-    this.passwordGroup = element(by.css('password-input'));
-    this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
     this.submitButton = element(by.buttonText('Restore password'));
     this.savePasswordButton = element(by.buttonText('Save password'));
+
+    this.passCheck = {
+        input: this.passwordInput,
+        submit: this.savePasswordButton
+    };
 
     this.sendLinkToEmail = function(email) {
         this.emailInput.clear();
