@@ -66,9 +66,9 @@ namespace
         return result;
     }();
 
-    QString getIncompatibleCustomization(const QnSystemDescriptionPtr &sysemDescription)
+    QString getIncompatibleCustomization(const QnSystemDescriptionPtr &systemDescription)
     {
-        const auto servers = sysemDescription->servers();
+        const auto servers = systemDescription->servers();
         if (servers.isEmpty())
             return QString();
 
@@ -85,14 +85,14 @@ namespace
             : incompatibleIt->customization);
     }
 
-    bool isCorrectCustomization(const QnSystemDescriptionPtr &sysemDescription)
+    bool isCorrectCustomization(const QnSystemDescriptionPtr &systemDescription)
     {
-        return getIncompatibleCustomization(sysemDescription).isEmpty();
+        return getIncompatibleCustomization(systemDescription).isEmpty();
     }
 
-    QString getIncompatibleVersion(const QnSystemDescriptionPtr &sysemDescription)
+    QString getIncompatibleVersion(const QnSystemDescriptionPtr &systemDescription)
     {
-        const auto servers = sysemDescription->servers();
+        const auto servers = systemDescription->servers();
         if (servers.isEmpty())
             return QString();
 
@@ -109,9 +109,9 @@ namespace
             : incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
     }
 
-    bool isCompatibleVersion(const QnSystemDescriptionPtr &sysemDescription)
+    bool isCompatibleVersion(const QnSystemDescriptionPtr &systemDescription)
     {
-        return getIncompatibleVersion(sysemDescription).isEmpty();
+        return getIncompatibleVersion(systemDescription).isEmpty();
     }
 
     bool isCompatibleSystem(const QnSystemDescriptionPtr &sysemDescription)
@@ -122,9 +122,12 @@ namespace
             );
     }
 
-    bool isFactorySystem(const QnSystemDescriptionPtr &sysemDescription)
+    bool isFactorySystem(const QnSystemDescriptionPtr &systemDescription)
     {
-        const auto servers = sysemDescription->servers();
+        if (systemDescription->isCloudSystem())
+            return false;
+
+        const auto servers = systemDescription->servers();
         if (servers.isEmpty())
             return false;
 
