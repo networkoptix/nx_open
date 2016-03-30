@@ -5,10 +5,15 @@ describe('Login suite', function () {
     var p = new LoginPage();
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.get();
         p.emailInput.sendKeys(p.helper.userEmailWrong);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
 
     it("should open login dialog in anonymous state", function () {
