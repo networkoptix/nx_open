@@ -179,19 +179,30 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
-    setConnectingNow(true);
-    const auto controlsGuard = QnRaiiGuard::createDestructable(
-        [this]() { setConnectingNow(false); });
+    // TODO: #ynikitenkov add look after connection process
+    // and don't allow to connect to two or more servers simultaneously
+    const auto connectFunction = [this
+        , serverUrl, userName, password]()
+    {
+        setConnectingNow(true);
+        const auto controlsGuard = QnRaiiGuard::createDestructable(
+            [this]() { setConnectingNow(false); });
 
-    QUrl url = QUrl::fromUserInput(serverUrl);
-    url.setScheme(lit("http"));
-    if (!password.isEmpty())
-        url.setPassword(password);
-    if (!userName.isEmpty())
-        url.setUserName(userName);
+        QUrl url = QUrl::fromUserInput(serverUrl);
+        url.setScheme(lit("http"));
+        if (!password.isEmpty())
+            url.setPassword(password);
+        if (!userName.isEmpty())
+            url.setUserName(userName);
 
-    menu()->trigger(QnActions::ConnectAction
-        , QnActionParameters().withArgument(Qn::UrlRole, url));
+        menu()->trigger(QnActions::ConnectAction
+            , QnActionParameters().withArgument(Qn::UrlRole, url));
+    };
+
+    enum { kMinimalDelay = 1};
+    // We have to use delayed execution to prevent client crash 
+    // when closing server that we are connecting to.
+    executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
 void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
