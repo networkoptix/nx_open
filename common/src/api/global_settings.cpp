@@ -63,6 +63,8 @@ namespace {
     const int kEc2AliveUpdateIntervalDefault = 60;
     const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
     const int kServerDiscoveryPingTimeoutDefault = 60;
+    const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
+    const int kProxyConnectTimeoutDefault = 5;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -122,6 +124,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         true,
         this);
     ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
+    m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kProxyConnectTimeout,
+        kProxyConnectTimeoutDefault,
+        this);
+    ec2Adaptors << m_proxyConnectTimeoutAdaptor;
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -369,8 +376,14 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
 }
 
-bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const
+{
     return m_timeSynchronizationEnabledAdaptor->value();
+}
+
+std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
+{
+    return std::chrono::seconds(m_proxyConnectTimeoutAdaptor->value());
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

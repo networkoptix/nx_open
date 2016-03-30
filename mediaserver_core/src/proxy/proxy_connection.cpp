@@ -16,35 +16,42 @@
 #include "utils/network/router.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
+#include "api/global_settings.h"
 #include "media_server/server_message_processor.h"
 #include "core/resource/network_resource.h"
 #include "transaction/transaction_message_bus.h"
+//#include "media_server/settings.h"
 
 #include "proxy_connection_processor_p.h"
 #include "http/custom_headers.h"
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
-static const int CONNECT_TIMEOUT = 1000 * 5;
 static const int MAX_PROXY_TTL = 8;
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner):
-    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, socket)
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalTcpListener* owner)
+:
+    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket))
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = owner;
+    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
 }
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
-        QnUniversalTcpListener* owner):
-    QnTCPConnectionProcessor(priv, socket)
+    QnProxyConnectionProcessorPrivate* priv,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalTcpListener* owner)
+:
+    QnTCPConnectionProcessor(priv, std::move(socket))
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = owner;
+    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
 }
 
 
@@ -114,14 +121,16 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
 
     if (route.reverseConnect) {
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        d->dstSocket = d->owner->getProxySocket(target.toString(), CONNECT_TIMEOUT,
-                                                [&](int socketCount)
-        {
-            ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
-            tran.params.targetServer = qnCommon->moduleGUID();
-            tran.params.socketCount = socketCount;
-            qnTransactionBus->sendTransaction(tran, target);
-        });
+        d->dstSocket = d->owner->getProxySocket(
+            target.toString(),
+            d->connectTimeout.count(),
+            [&](int socketCount)
+            {
+                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
+                tran.params.targetServer = qnCommon->moduleGUID();
+                tran.params.socketCount = socketCount;
+                qnTransactionBus->sendTransaction(tran, target);
+            });
     } else {
         d->dstSocket.clear();
     }
@@ -135,8 +144,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
 #endif
 
         d->dstSocket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket(url.scheme() == lit("https")));
-        d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
-        d->dstSocket->setSendTimeout(CONNECT_TIMEOUT);
+        d->dstSocket->setRecvTimeout(d->connectTimeout.count());
+        d->dstSocket->setSendTimeout(d->connectTimeout.count());
         if (!d->dstSocket->connect(url.host().toLatin1().data(), url.port())) {
             d->socket->close();
             return QString(); // now answer from destination address
@@ -144,8 +153,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
         return url.toString();
     }
     else {
-        d->dstSocket->setRecvTimeout(CONNECT_TIMEOUT);
-        d->dstSocket->setSendTimeout(CONNECT_TIMEOUT);
+        d->dstSocket->setRecvTimeout(d->connectTimeout.count());
+        d->dstSocket->setSendTimeout(d->connectTimeout.count());
         return route.id.toString();
     }
 
