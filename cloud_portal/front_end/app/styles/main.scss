@@ -243,14 +243,15 @@ footer {
 }
 
 /* add beta-symbol after product name everywhere */
-.product-name:after{
-  content: "(\03B2)";
+
+.product-name.add-version:after{
+  content: "\03B2";
   font-style: italic;
   color: $gray-light;
   font-size: 90%;
 }
 
-a .product-name:after {
+a .product-name.add-version:after {
   color: $link-color;
 }
 
