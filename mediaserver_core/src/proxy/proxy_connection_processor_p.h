@@ -6,7 +6,6 @@
 #include "utils/network/socket.h"
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
-#include "media_server/settings.h"
 
 
 class QnProxyConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
