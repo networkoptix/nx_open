@@ -73,9 +73,10 @@ angular.module('webadminApp')
             }
         };
 
+        var retry = true; // This is hack for auth problems on server: we try to apply credentials twice each time
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
-
+            retry = true;
             if( nativeClientObject && nativeClientObject.updateCredentials &&
                 ($scope.activeLogin != Config.defaultLogin ||
                 $scope.activePassword != Config.defaultPassword)){
@@ -113,15 +114,21 @@ angular.module('webadminApp')
             });
 
         }
-
         function updateCredentials(login, password, isCloud){
-            $log.log("Apply credentials " + login);
+            $log.log("Apply credentials: " + login);
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
             return mediaserver.login(login, password).then(checkMySystem,function(error){
                 $log.error("Authorization on server with login " + login + " failed:");
                 logMediaserverError(error);
+                if(retry){
+                    retry = false;
+                    $log.log("Try again: " + login);
+                    updateCredentials(login, password, isCloud);
+                }else{
+                    $log.log("Do not try again. Consider credentials wrong: " + login);
+                }
             });
         }
 
