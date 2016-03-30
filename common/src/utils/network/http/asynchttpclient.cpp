@@ -50,6 +50,7 @@ namespace nx_http
         m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest),
         m_awaitedMessageNumber( 0 ),
+        m_lastSysErrorCode(SystemError::noError),
         m_requestSequence( 0 )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
@@ -104,6 +105,11 @@ namespace nx_http
     bool AsyncHttpClient::failed() const
     {
         return m_state == sFailed;
+    }
+
+    SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
+    {
+        return m_lastSysErrorCode;
     }
 
     //!Start request to \a url
@@ -294,6 +300,7 @@ namespace nx_http
         {
             NX_LOG( lit( "AsyncHttpClient. Failed to establish tcp connection to %1. %2" ).
                 arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            m_lastSysErrorCode = errorCode;
             if( reconnectIfAppropriate() )
                 return;
         }
@@ -326,6 +333,7 @@ namespace nx_http
                 return;
             NX_LOG( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
             m_state = sFailed;
+            m_lastSysErrorCode = errorCode;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
@@ -386,6 +394,7 @@ namespace nx_http
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
                 ? sDone
                 : sFailed;
+            m_lastSysErrorCode = errorCode;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
