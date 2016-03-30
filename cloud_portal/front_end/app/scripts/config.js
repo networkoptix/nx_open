@@ -2,7 +2,7 @@
 
 var Config = {
     apiBase: '/api',
-    clientProtocol: 'vms://',
+    clientProtocol: 'nx-vms://',
     cacheTimeout: 30*1000, // Cache lives for 30 seconds
     alertTimeout: 3*1000,  // Alerts are shown for 3 seconds
     //alertTimeout: 3*1000*1000,  // Debug - Alerts are shown for 3000 seconds
