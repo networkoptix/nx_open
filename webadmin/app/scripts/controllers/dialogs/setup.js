@@ -73,16 +73,18 @@ angular.module('webadminApp')
             }
         };
 
-        /* Common helpers: error handling, check current system, error handler */
-        function checkMySystem(user){
-
-            if( nativeClientObject && nativeClientObject.updateCredentials &&
-                ($scope.activeLogin != Config.defaultLogin ||
-                $scope.activePassword != Config.defaultPassword)){
-
-                $log.log("Send credentials to client app");
+        function tryToUpdateCredentials(){
+            if(nativeClientObject && nativeClientObject.updateCredentials){
+                $log.log("Send credentials to client app: " + $scope.activeLogin);
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
             }
+        }
+        var retry = true; // This is hack for auth problems on server: we try to apply credentials twice each time
+        /* Common helpers: error handling, check current system, error handler */
+
+        function checkMySystem(user){
+            retry = true;
+
 
             $log.log("check system configuration");
 
@@ -95,7 +97,7 @@ angular.module('webadminApp')
             mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
                 $scope.settings.cloudEmail = data.cloudAccountName;
-
+                tryToUpdateCredentials();
                 $log.log("System is in cloud! go to CloudSuccess");
                 $scope.next('cloudSuccess');
             },function(){
@@ -106,6 +108,7 @@ angular.module('webadminApp')
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                     }else{
+                        tryToUpdateCredentials();
                         $log.log("System is local - go to local success");
                         $scope.next('localSuccess');
                     }
@@ -113,15 +116,21 @@ angular.module('webadminApp')
             });
 
         }
-
         function updateCredentials(login, password, isCloud){
-            $log.log("Apply credentials " + login);
+            $log.log("Apply credentials: " + login);
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
             return mediaserver.login(login, password).then(checkMySystem,function(error){
                 $log.error("Authorization on server with login " + login + " failed:");
                 logMediaserverError(error);
+                if(retry){
+                    retry = false;
+                    $log.log("Try again: " + login);
+                    updateCredentials(login, password, isCloud);
+                }else{
+                    $log.log("Do not try again. Consider credentials wrong: " + login);
+                }
             });
         }
 
@@ -417,8 +426,11 @@ angular.module('webadminApp')
         /* Wizard workflow */
 
         $scope.wizardFlow = {
-            0:{
-                next:'start'
+            initFailure:{
+                cancel: !!nativeClientObject || debugMode,
+                next:function(){
+                    initWizard();
+                }
             },
             start:{
                 cancel: !!nativeClientObject || debugMode,
@@ -489,5 +501,13 @@ angular.module('webadminApp')
 
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
-        updateCredentials(Config.defaultLogin, Config.defaultPassword, false);
+
+        function initWizard(){
+            updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
+                $log.error("Couldn't run setup wizard: auth failed");
+                $scope.next("initFailure");
+            });
+        }
+
+        initWizard();
     });
