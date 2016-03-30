@@ -34,7 +34,6 @@ angular.module('cloudApp')
 
 
         $scope.openClient = function(system,$event){
-            console.log("call client: ", system);
             nativeClient.open(system?system.id:null);
             $event.stopPropagation();
         };

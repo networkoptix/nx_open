@@ -7,7 +7,8 @@ angular.module('cloudApp', [
     'ngAnimate',
     'ngRoute',
     'ui.bootstrap',
-    'ngStorage'
+    'ngStorage',
+    'base64'
 ]).config(function ($routeProvider) {
     $routeProvider
         .when('/register/:email', {
