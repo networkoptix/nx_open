@@ -116,6 +116,7 @@
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile></newmobile>
+        <liteMode>false</liteMode>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -795,6 +796,7 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
+                <liteMode>true</liteMode>
                 <qt.spec/>
             </properties>
             <modules>
