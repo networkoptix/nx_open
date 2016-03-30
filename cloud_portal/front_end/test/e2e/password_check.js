@@ -1,11 +1,10 @@
 'use strict';
 
 var PasswordFieldSuite = function () {
+    var Helper = require('./helper.js');
+    this.helper = new Helper();
+
     var self = this;
-    
-    self.userPasswordCyrillic = 'йцуфывячс';
-    self.userPasswordSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
-    self.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
 
     self.passwordWeak = { class:'label-danger', text:'too short', title: 'Password must contain at least 6 characters' };
     self.passwordIncorrect = { class:'label-danger', text:'incorrect', title: 'Use only latin letters, numbers and keyboard symbols' };
@@ -17,104 +16,105 @@ var PasswordFieldSuite = function () {
     // self.invalidClassRequired = 'ng-invalid-required';
     // self.invalidClassExists = 'ng-invalid-already-exists';
 
-
-
-    this.check = function(pageObj, url){
+    this.check = function(getToPassword, pageObj){
 
         var checkPasswordInvalid = function (invalidClass) {
             expect(pageObj.passwordInput.getAttribute('class')).toContain(invalidClass);
             expect(pageObj.passwordGroup.$('.form-group').getAttribute('class')).toContain('has-error');
-        }
+        };
 
         var checkPasswordWarning = function (strength) {
             expect(pageObj.passwordControlContainer.element(by.css('.label')).getAttribute('class')).toContain(strength.class);
             expect(pageObj.passwordControlContainer.element(by.css('.label')).getText()).toContain(strength.text);
-        }
+        };
 
         // Check that particular message does NOT appear
         var checkNoPasswordWarning = function (strength) {
             expect(pageObj.passwordControlContainer.element(by.css('.label')).getAttribute('class')).not.toContain(strength.class);
             expect(pageObj.passwordControlContainer.element(by.css('.label')).getText()).not.toContain(strength.text);
-        }
+        };
 
         var notAllowPasswordWith = function (password) {
-            browser.get(url);
-
-            pageObj.prepareToPasswordCheck();
             pageObj.passwordInput.sendKeys(password);
-
-            pageObj.submitButton.click();
+            pageObj.savePasswordButton.click();
             checkPasswordInvalid(self.invalidClass);
-        }
+        };
 
         it("should not allow password with cyrillic symbols", function () {
-            notAllowPasswordWith(self.userPasswordCyrillic);
+            getToPassword().then(function(){
+                notAllowPasswordWith(self.helper.userPasswordCyrillic);
+            });
         });
 
         it("should not allow password with smile symbols", function () {
-            notAllowPasswordWith(self.userPasswordSmile);
+            getToPassword().then(function(){
+                notAllowPasswordWith(self.helper.userPasswordSmile);
+            });
         });
 
         it("should not allow password with hieroglyph symbols", function () {
-            notAllowPasswordWith(self.userPasswordHierog);
+            getToPassword().then(function(){
+                notAllowPasswordWith(self.helper.userPasswordHierog);
+            });
         });
 
         xit("should not allow password with tm symbols", function () {
-            notAllowPasswordWith(self.userPasswordTm);
+            getToPassword().then(function(){
+                notAllowPasswordWith(self.helper.userPasswordTm);
+            });
         });
 
         it("should show warnings about password strength", function () {
-            browser.get(url);
+            getToPassword().then(function(){
+                pageObj.passwordInput.sendKeys('qwe');
+                checkPasswordWarning(self.passwordWeak);
 
-            pageObj.passwordInput.sendKeys('qwe');
-            checkPasswordWarning(self.passwordWeak);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('asdo iu2Q#');
+                checkPasswordWarning(self.passwordIncorrect);
 
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('asdo iu2Q#');
-            checkPasswordWarning(self.passwordIncorrect);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('qwerty');
+                checkPasswordWarning(self.passwordCommon);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('password');
+                checkPasswordWarning(self.passwordCommon);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('12345678');
+                checkPasswordWarning(self.passwordCommon);
 
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('qwerty');
-            checkPasswordWarning(self.passwordCommon);
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('password');
-            checkPasswordWarning(self.passwordCommon);
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('12345678');
-            checkPasswordWarning(self.passwordCommon);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('asdoiu');
+                checkPasswordWarning(self.passwordFair);
 
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('asdoiu');
-            checkPasswordWarning(self.passwordFair);
-
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('asdoiu2Q#');
-            checkPasswordWarning(self.passwordGood);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('asdoiu2Q#');
+                checkPasswordWarning(self.passwordGood);
+            });
         });
 
         it("should show only 1 warning about strength at a time", function () {
-            browser.get(url);
+            getToPassword().then(function(){
+                pageObj.passwordInput.sendKeys('123qwe');
+                checkPasswordWarning(self.passwordCommon);
 
-            pageObj.passwordInput.sendKeys('123qwe');
-            checkPasswordWarning(self.passwordCommon);
-
-            pageObj.passwordInput.sendKeys(protractor.Key.BACK_SPACE);
-            checkNoPasswordWarning(self.passwordCommon);
-            checkPasswordWarning(self.passwordWeak);
+                pageObj.passwordInput.sendKeys(protractor.Key.BACK_SPACE);
+                checkNoPasswordWarning(self.passwordCommon);
+                checkPasswordWarning(self.passwordWeak);
+            });
         });
 
         it("should not allow pasword with leading or trailing spaces", function () {
-            browser.get(url);
+            getToPassword().then(function(){
+                pageObj.passwordInput.sendKeys(' 123qwe');
+                checkPasswordWarning(self.passwordIncorrect);
 
-            pageObj.passwordInput.sendKeys(' 123qwe');
-            checkPasswordWarning(self.passwordIncorrect);
-
-            pageObj.passwordInput.clear();
-            pageObj.passwordInput.sendKeys('123qwe ');
-            checkPasswordWarning(self.passwordIncorrect);
+                pageObj.passwordInput.clear();
+                pageObj.passwordInput.sendKeys('123qwe ');
+                checkPasswordWarning(self.passwordIncorrect);
+            });
         });
     }
 };
-
 
 module.exports = PasswordFieldSuite;
