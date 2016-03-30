@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', function ($scope, cloudApi, process, $sessionStorage, $routeParams, account) {
+    .controller('AccountCtrl', function ($scope, cloudApi, process, $localStorage, $routeParams, account) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -10,7 +10,7 @@ angular.module('cloudApp')
         $scope.accountMode = $routeParams.accountMode;
         $scope.passwordMode =  $routeParams.passwordMode;
 
-        $scope.session = $sessionStorage;
+        $scope.session = $localStorage;
 
         $scope.pass = {
             password: '',

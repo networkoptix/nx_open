@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', function ($scope, cloudApi, $sessionStorage, $location, nativeClient, process, account) {
+    .controller('SystemsCtrl', function ($scope, cloudApi, $location, nativeClient, process, account) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -33,8 +33,10 @@ angular.module('cloudApp')
         $scope.gettingSystems.run();
 
 
-        $scope.openClient = function(system){
+        $scope.openClient = function(system,$event){
+            console.log("call client: ", system);
             nativeClient.open(system?system.id:null);
+            $event.stopPropagation();
         };
 
         $scope.openSystem = function(system){

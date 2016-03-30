@@ -1,12 +1,12 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams, account, dialogs) {
+    .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, dialogs) {
 
         account.logoutAuthorised();
 
         $scope.Config = Config;
-        $scope.session = $sessionStorage;
+        $scope.session = $localStorage;
 
         var registerEmail = $routeParams.email || '';
         $scope.lockEmail = !!$routeParams.email;

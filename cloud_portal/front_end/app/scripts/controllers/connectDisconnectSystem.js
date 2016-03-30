@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ConnectDisconnectCtrl', function ($scope, cloudApi, $routeParams, process, $sessionStorage, account, $location) {
+    .controller('ConnectDisconnectCtrl', function ($scope, cloudApi, $routeParams, process, account, $location) {
 
 
         $scope.connect = $routeParams.connect;

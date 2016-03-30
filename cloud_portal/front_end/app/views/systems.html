@@ -20,7 +20,7 @@
                           ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">
                         {{Config.systemStatuses[system.status].label||system.status}}</span>
                     <button ng-if="system.status==Config.systemStatuses.onlineStatus" class="btn btn-default"
-                            ng-click="open(system);$event.stopPropagation();">Open in Nx Witness</button>
+                            ng-click="openClient(system,$event);">Open in Nx Witness</button>
                 </div>
             </div>
         </div>

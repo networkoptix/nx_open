@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams, account, dialogs) {
+    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, dialogs) {
 
         $scope.Config = Config;
-        $scope.session = $sessionStorage;
+        $scope.session = $localStorage;
         var dialogSettings = dialogs.getSettings($scope);
 
         $scope.auth = {

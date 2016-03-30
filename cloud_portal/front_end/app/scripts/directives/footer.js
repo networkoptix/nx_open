@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('footer', function (dialogs, cloudApi, $sessionStorage, account, $location) {
+    .directive('footer', function () {
         return {
             restrict: 'E',
             templateUrl: 'views/components/footer.html',

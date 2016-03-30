@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemCtrl', function ($scope, cloudApi, $sessionStorage, $routeParams, $location, nativeClient, dialogs, process, account) {
+    .controller('SystemCtrl', function ($scope, cloudApi, $routeParams, $location, nativeClient, dialogs, process, account) {
 
 
         $scope.Config = Config;

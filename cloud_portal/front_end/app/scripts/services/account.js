@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('account', function (cloudApi, dialogs, $q, $location, $sessionStorage) {
+    .factory('account', function (cloudApi, dialogs, $q, $location, $localStorage) {
         return {
             get:function(){
                 var defer = $q.defer();
@@ -28,7 +28,7 @@ angular.module('cloudApp')
             },
             logout:function(){
                 cloudApi.logout().then(function(){
-                    $sessionStorage.$reset(); // Clear session
+                    $localStorage.$reset(); // Clear session
                     $location.path(Config.redirectUnauthorised);
                     setTimeout(function(){
                         document.location.reload();

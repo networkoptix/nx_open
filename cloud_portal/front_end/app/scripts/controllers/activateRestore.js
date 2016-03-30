@@ -1,15 +1,15 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $sessionStorage, account) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account) {
 
-        $scope.session = $sessionStorage;
+        $scope.session = $localStorage;
 
         $scope.Config = Config;
 
         $scope.data = {
             newPassword: '',
-            email: $sessionStorage.email,
+            email: $scope.session.email,
             restoreCode: $routeParams.restoreCode,
             activateCode: $routeParams.activateCode
         };
