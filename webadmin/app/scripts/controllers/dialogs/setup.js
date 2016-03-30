@@ -73,17 +73,18 @@ angular.module('webadminApp')
             }
         };
 
-        var retry = true; // This is hack for auth problems on server: we try to apply credentials twice each time
-        /* Common helpers: error handling, check current system, error handler */
-        function checkMySystem(user){
-            retry = true;
-            if( nativeClientObject && nativeClientObject.updateCredentials &&
-                ($scope.activeLogin != Config.defaultLogin ||
-                $scope.activePassword != Config.defaultPassword)){
-
+        function tryToUpdateCredentials(){
+            if(nativeClientObject && nativeClientObject.updateCredentials){
                 $log.log("Send credentials to client app");
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
             }
+        }
+        var retry = true; // This is hack for auth problems on server: we try to apply credentials twice each time
+        /* Common helpers: error handling, check current system, error handler */
+
+        function checkMySystem(user){
+            retry = true;
+
 
             $log.log("check system configuration");
 
@@ -96,7 +97,7 @@ angular.module('webadminApp')
             mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
                 $scope.settings.cloudEmail = data.cloudAccountName;
-
+                tryToUpdateCredentials();
                 $log.log("System is in cloud! go to CloudSuccess");
                 $scope.next('cloudSuccess');
             },function(){
@@ -107,6 +108,7 @@ angular.module('webadminApp')
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                     }else{
+                        tryToUpdateCredentials();
                         $log.log("System is local - go to local success");
                         $scope.next('localSuccess');
                     }
