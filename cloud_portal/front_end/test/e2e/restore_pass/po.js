@@ -35,7 +35,9 @@ RestorePasswordPage = function () {
 
     this.emailInput = element(by.model('data.email'));
     this.emailInputWrap = this.emailInput.element(by.xpath('../..'));
-    this.newPasswordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
+    this.passwordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
+    this.passwordGroup = element(by.css('password-input'));
+    this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
     this.submitButton = element(by.buttonText('Restore password'));
     this.savePasswordButton = element(by.buttonText('Save password'));
 
@@ -58,15 +60,15 @@ RestorePasswordPage = function () {
     };
 
     this.setNewPassword = function(newPassword) {
-        expect(this.newPasswordInput.isPresent()).toBe(true);
-        this.newPasswordInput.sendKeys(newPassword);
+        expect(this.passwordInput.isPresent()).toBe(true);
+        this.passwordInput.sendKeys(newPassword);
         this.savePasswordButton.click();
         this.alert.catchAlert( this.alert.alertMessages.restorePassSuccess, this.alert.alertTypes.success);
     };
 
     this.verifySecondAttemptFails = function(newPassword) {
         browser.refresh();
-        this.newPasswordInput.sendKeys(newPassword);
+        this.passwordInput.sendKeys(newPassword);
         this.savePasswordButton.click();
         this.alert.catchAlert( this.alert.alertMessages.restorePassWrongCode, this.alert.alertTypes.danger);
     };
