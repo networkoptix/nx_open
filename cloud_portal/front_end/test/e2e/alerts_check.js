@@ -56,36 +56,41 @@ var AlertSuite = function () {
     this.catchAlert = function (message, type) {
         waitAlert();
         checkAlertContent(message, type);
-        closeAlert();
+        //closeAlert();
         finishAlertCheck();
     };
 
     this.checkAlert = function (callAlert, message, type, shouldCloseOnTimeout){
 
         it("should show error alert and close it by button",function(){
-            callAlert();
-            waitAlert();
-            checkAlertContent(message, type);
-            closeAlert();
-            finishAlertCheck();
+            callAlert().then(function(){
+                console.log("call1");
+                waitAlert();
+                checkAlertContent(message, type);
+                closeAlert();
+                finishAlertCheck();
+            });
         });
 
-        
         if(shouldCloseOnTimeout){
             it("should close on timeout",function(){
-                callAlert();
-                waitAlert();
-                checkAlertTimeout(true);
-                finishAlertCheck();
+                callAlert().then(function(){
+                    console.log("call3");
+                    waitAlert();
+                    checkAlertTimeout(true);
+                    finishAlertCheck();
+                });
             });
         } 
         else{
             it("should not close on timeout",function(){
-                callAlert();
-                waitAlert();
-                checkAlertTimeout(false);
-                closeAlert();
-                finishAlertCheck();
+                callAlert().then(function(){
+                    console.log("call4");
+                    waitAlert();
+                    checkAlertTimeout(false);
+                    closeAlert();
+                    finishAlertCheck();
+                });
             });
         }
     }

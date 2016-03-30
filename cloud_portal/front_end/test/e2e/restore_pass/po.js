@@ -12,6 +12,8 @@ RestorePasswordPage = function () {
     var PasswordSuite = require('../password_check.js');
     this.passwordField = new PasswordSuite();
 
+    var self = this;
+
     this.url = '/#/restore_password/';
 
     this.emailSubject = this.helper.emailSubjects.restorePass;
@@ -41,7 +43,7 @@ RestorePasswordPage = function () {
         this.emailInput.clear();
         this.emailInput.sendKeys(email);
         this.submitButton.click();
-        //this.alert.catchAlert(this.alert.alertMessages.restorePassConfirmSent, this.alert.alertTypes.success);
+        this.alert.catchAlert(this.alert.alertMessages.restorePassConfirmSent, this.alert.alertTypes.success);
     };
 
     this.getTokenFromEmail = function(email, userEmail) {
@@ -69,8 +71,17 @@ RestorePasswordPage = function () {
         this.alert.catchAlert( this.alert.alertMessages.restorePassWrongCode, this.alert.alertTypes.danger);
     };
 
-    this.urlWithCode = "";
-    this.prepareToPasswordCheck = function(){
+    this.getRestorePassPage = function(userEmail) {
+        var deferred = protractor.promise.defer();
+        this.sendLinkToEmail(userEmail);
+
+        browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.emailSubject).then(function (email) {
+            var regCode = self.getTokenFromEmail(email, userEmail);
+            self.get(self.url + regCode);
+            deferred.fulfill();
+        }), 60000);
+
+        return deferred.promise;
     };
 };
 
