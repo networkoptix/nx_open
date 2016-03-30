@@ -16,9 +16,6 @@ var SystemsListPage = function () {
 
     this.htmlBody = element(by.css('body'));
 
-    this.userEmail = 'ekorneeva+1@networkoptix.com';
-    this.userPassword = 'qweasd123';
-
     this.systemsList = element.all(by.repeater('system in systems'));
 };
 

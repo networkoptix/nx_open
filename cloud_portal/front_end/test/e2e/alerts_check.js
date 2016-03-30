@@ -5,13 +5,16 @@ var AlertSuite = function () {
     
     this.alertTypes = {danger: 'danger', success: 'success'};
     this.alertMessages = {
-        loginDanger: 'Login or password are incorrect',
+        loginIncorrect: 'Login or password are incorrect',
+        loginNotActive: 'Your account was not confirmed',
         registerSuccess: 'Your account was successfully registered. Please, check your email to confirm it',
+        registerConfirmSuccess: 'Your account was successfully activated.',
+        registerConfirmError: 'Couldn\'t activate your account: Wrong confirmation code',
         accountSuccess: 'Your account was successfully saved.',
-        restorePassWrongEmail: '',
-        restorePassConfirmSent: '',
-        restorePassWrongCode: '',
-        restorePassSuccess: '',
+        restorePassWrongEmail: 'Couldn\'t send confirmation email: Email isn\'t registered in portal',
+        restorePassConfirmSent: 'Confirmation link was sent to your email. Check it for creating a new password',
+        restorePassWrongCode: 'Couldn\'t save new password: Wrong confirmation code',
+        restorePassSuccess: 'Password successfully saved',
         changePassWrongCurrent: 'Couldn\'t change your password: Current password doesn\'t match',
         changePassSuccess: 'Your password was successfully changed.'
     };
@@ -21,7 +24,7 @@ var AlertSuite = function () {
     this.alertCloseButton = this.alert.element(by.css('button.close'));
 
     function waitAlert(){
-        browser.sleep(1000);
+        browser.sleep(1500);
         browser.ignoreSynchronization = true;
         expect(self.alert.isDisplayed()).toBe(true);
     }
@@ -33,7 +36,7 @@ var AlertSuite = function () {
 
     function closeAlert(){
         self.alertCloseButton.click();
-        browser.sleep(1000);
+        browser.sleep(500);
 
         expect(self.alert.isPresent()).toBe(false);
     }
@@ -50,32 +53,44 @@ var AlertSuite = function () {
         expect(self.alert.isPresent()).toBe(!shouldCloseOnTimeout);
     }
 
+    this.catchAlert = function (message, type) {
+        waitAlert();
+        checkAlertContent(message, type);
+        //closeAlert();
+        finishAlertCheck();
+    };
+
     this.checkAlert = function (callAlert, message, type, shouldCloseOnTimeout){
 
         it("should show error alert and close it by button",function(){
-            callAlert();
-            waitAlert();
-            checkAlertContent(message, type);
-            closeAlert();
-            finishAlertCheck();
+            callAlert().then(function(){
+                console.log("call1");
+                waitAlert();
+                checkAlertContent(message, type);
+                closeAlert();
+                finishAlertCheck();
+            });
         });
 
-        
         if(shouldCloseOnTimeout){
             it("should close on timeout",function(){
-                callAlert();
-                waitAlert();
-                checkAlertTimeout(true);
-                finishAlertCheck();
+                callAlert().then(function(){
+                    console.log("call3");
+                    waitAlert();
+                    checkAlertTimeout(true);
+                    finishAlertCheck();
+                });
             });
         } 
         else{
             it("should not close on timeout",function(){
-                callAlert();
-                waitAlert();
-                checkAlertTimeout(false);
-                closeAlert();
-                finishAlertCheck();
+                callAlert().then(function(){
+                    console.log("call4");
+                    waitAlert();
+                    checkAlertTimeout(false);
+                    closeAlert();
+                    finishAlertCheck();
+                });
             });
         }
     }
