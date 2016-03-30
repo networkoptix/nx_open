@@ -177,7 +177,13 @@ describe('Registration suite', function () {
         //TODO: Write checks for different wrong email patterns, see testrail for cases
     });
 
-     p.passwordField.check(p, p.url);
+    p.passwordField.check(function(){
+        var deferred = protractor.promise.defer();
+        p.getByUrl();
+        p.prepareToPasswordCheck();
+        deferred.fulfill();
+        return deferred.promise;
+    }, p);
 
     it("should open Terms and conditions in a new page", function () {
         p.getByUrl();

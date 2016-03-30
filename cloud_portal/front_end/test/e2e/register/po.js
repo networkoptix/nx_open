@@ -18,13 +18,6 @@ var RegisterPage = function () {
         browser.waitForAngular();
     };
 
-    this.getByTopButton = function () {
-        browser.get('/');
-        browser.waitForAngular();
-
-        this.openRegisterButton.click();
-    };
-
     this.getByUrl = function () {
         browser.get(this.url);
         browser.waitForAngular();
@@ -76,8 +69,10 @@ var RegisterPage = function () {
         expect(this.fieldWrap(this.emailInput).$('.help-block').getText()).toContain('Email is already registered in portal');
     };
 
-    this.passwordControlContainer = this.passwordGroup.element(by.css('.help-block'));
-
+    this.passCheck = {
+        input: this.passwordInput,
+        submit: this.submitButton
+    };
 
     this.prepareToPasswordCheck = function () {
         this.firstNameInput.sendKeys(this.helper.userFirstName);
