@@ -13,8 +13,11 @@ describe('Account suite', function () {
     });
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
         p.get(p.accountUrl);
         p.alert.submitButton.click();
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success, true);
 
     it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
@@ -169,16 +172,22 @@ describe('Account suite', function () {
         p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
-
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.get(p.passwordUrl);
+
         p.currentPasswordInput.sendKeys(p.helper.userPasswordWrong);
         p.passwordInput.sendKeys(p.helper.userPasswordNew);
-
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger, true);
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.get(p.passwordUrl);
 
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
@@ -190,6 +199,9 @@ describe('Account suite', function () {
         p.passwordInput.clear();
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success, true);
 
     it("should not allow to change password if old password is wrong", function () {
