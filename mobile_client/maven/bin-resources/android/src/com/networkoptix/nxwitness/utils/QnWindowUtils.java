@@ -6,6 +6,7 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.content.res.Resources;
 import android.content.res.Configuration;
 import android.util.DisplayMetrics;
@@ -16,6 +17,8 @@ import android.annotation.TargetApi;
 import org.qtproject.qt5.android.QtNative;
 
 public class QnWindowUtils {
+
+    static int statusBarHeight = -1;
 
     private static class VisibilityChanger implements Runnable {
         public enum Operation {
@@ -129,12 +132,13 @@ public class QnWindowUtils {
     }
 
     public static int getStatusBarHeight() {
-        Resources resources = QtNative.activity().getResources();
-        int result = 0;
-        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0)
-            result = resources.getDimensionPixelSize(resourceId);
-        return result;
+        if (statusBarHeight < 0) {
+            Rect rectangle = new Rect();
+            Window window = QtNative.activity().getWindow();
+            window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+            statusBarHeight = rectangle.top;
+        }
+        return statusBarHeight;
     }
 
     public static boolean isPhone() {

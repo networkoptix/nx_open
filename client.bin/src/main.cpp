@@ -48,6 +48,7 @@ extern "C"
 #include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
+#include <client/system_uri_resolver.h>
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
@@ -584,10 +585,27 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
 
-    if (!startupParams.customUri.isEmpty()) {
-        /* Set authentication parameters from uri. */
-        QUrl appServerUrl = QUrl::fromUserInput(startupParams.customUri);
-        context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+    if (!startupParams.customUri.isEmpty())
+    {
+        QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
+        if (resolver.isValid())
+        {
+            for (QnSystemUriResolver::Action action : resolver.result().actions)
+            {
+                switch (action)
+                {
+                case QnSystemUriResolver::Action::LoginToCloud:
+                    //TODO: #GDM implement me
+                    break;
+                case QnSystemUriResolver::Action::ConnectToServer:
+                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, resolver.result().serverUrl));
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:

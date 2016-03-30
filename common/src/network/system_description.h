@@ -53,7 +53,7 @@ public:
 
     QnModuleInformation getServer(const QnUuid &serverId) const;
 
-    void updateServer(const QnModuleInformation &serverInfo);
+    QnServerFields updateServer(const QnModuleInformation &serverInfo);
 
     void removeServer(const QnUuid &serverId);
 

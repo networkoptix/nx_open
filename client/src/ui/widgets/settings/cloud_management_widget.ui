@@ -51,6 +51,21 @@
        <item>
         <widget class="QnPanel" name="introWidget" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <property name="leftMargin">
+           <number>16</number>
+          </property>
+          <property name="topMargin">
+           <number>16</number>
+          </property>
+          <property name="rightMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>16</number>
+          </property>
           <item alignment="Qt::AlignHCenter">
            <widget class="QLabel" name="learnMoreLabel">
             <property name="text">

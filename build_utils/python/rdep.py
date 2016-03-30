@@ -18,13 +18,11 @@ PACKAGE_CONFIG_NAME = ".rdpack"
 ANY_KEYWORD = "any"
 DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
-RSYNC_DOWNLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
-RSYNC_UPLOAD_ARGS = [ "--archive", "--delete", "--progress" ]
+RSYNC_CHMOD_ARG = None
 if detect_platform() == "windows":
-    RSYNC_DOWNLOAD_ARGS.append("--chmod=ugo=rwx")
+    RSYNC_CHMOD_ARG = "--chmod=ugo=rwx"
     if not distutils.spawn.find_executable("rsync"):
         RSYNC = [os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")]
-SSH_ARGS = None
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
@@ -172,6 +170,28 @@ SYNC_NOT_FOUND = 0
 SYNC_FAILED = 1
 SYNC_SUCCESS = 2
 
+def get_rsync_command(source,
+                      destination,
+                      rdpack_file = False,
+                      show_progress = True,
+                      additional_args = []):
+
+    command = list(RSYNC)
+    if not rdpack_file:
+        command.append("--archive")
+        command.append("--delete")
+
+    if show_progress:
+        command.append("--progress")
+
+    if RSYNC_CHMOD_ARG:
+        command.append(RSYNC_CHMOD_ARG)
+
+    command.append(source)
+    command.append(destination)
+
+    return command
+
 # Workaround against rsync bug: all paths with semicolon are counted as remote, so 'rsync rsync://server/path c:\test\path' won't work on windows
 def posix_path(path):
     if len(path) > 1 and path[1] == ':':
@@ -181,10 +201,11 @@ def posix_path(path):
     return path
 
 def fetch_package_config(url, file_name):
-    command = list(RSYNC)
-    command += RSYNC_DOWNLOAD_ARGS
-    command.append(url)
-    command.append(posix_path(file_name))
+    command = get_rsync_command(
+            url,
+            posix_path(file_name),
+            show_progress = False,
+            rdpack_file = True)
 
     verbose_rsync(command)
 
@@ -216,12 +237,11 @@ def try_sync(root, url, target, package, force):
     if not os.path.isdir(dst):
         os.makedirs(dst)
 
-    command = list(RSYNC)
-    command += RSYNC_DOWNLOAD_ARGS
-    command.append("--exclude")
-    command.append(PACKAGE_CONFIG_NAME)
-    command.append(src + "/")
-    command.append(posix_path(dst))
+    command = get_rsync_command(
+            src + "/",
+            posix_path(dst),
+            additional_args = [ "--exclude", PACKAGE_CONFIG_NAME]
+    )
 
     verbose_rsync(command)
 
@@ -287,7 +307,6 @@ def sync_packages(root, url, target, packages, debug, force):
         ssh = get_ssh_args(root)
         if ssh:
             RSYNC += [ "-e", ssh ]
-            print RSYNC
 
     success = True
 
@@ -305,12 +324,11 @@ def upload_package(root, url, target, package):
 
     update_package_timestamp(local)
 
-    command = list(RSYNC)
-    command += RSYNC_UPLOAD_ARGS
-    command.append("--exclude")
-    command.append(PACKAGE_CONFIG_NAME)
-    command.append(posix_path(local) + "/")
-    command.append(remote)
+    command = get_rsync_command(
+            posix_path(local) + "/",
+            remote,
+            additional_args = [ "--exclude", PACKAGE_CONFIG_NAME]
+    )
 
     verbose_rsync(command)
 
@@ -318,10 +336,12 @@ def upload_package(root, url, target, package):
         print "Could not upload {0}".format(package)
         return False
 
-    command = list(RSYNC)
-    command += RSYNC_UPLOAD_ARGS
-    command.append(posix_path(os.path.join(local, PACKAGE_CONFIG_NAME)))
-    command.append(remote)
+    command = get_rsync_command(
+            posix_path(os.path.join(local, PACKAGE_CONFIG_NAME)),
+            remote,
+            rdpack_file = True,
+            show_progress = False
+    )
 
     verbose_rsync(command)
 

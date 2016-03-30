@@ -49,7 +49,7 @@ void QnClientRecentConnectionsManager::removeModel(QnLastSystemUsersModel* model
     const bool isFound = (it != m_bound.end());
 
     qDebug() << "Removing model for " << systemName;
-    NX_ASSERT(isFound, Q_FUNC_INFO, "Model has not been found");
+//    NX_ASSERT(isFound, Q_FUNC_INFO, "Model has not been found"); //TODO: #ynikitenkov Investigate
     if (!isFound)
         return;
 
@@ -76,13 +76,13 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnLastSystemUsersModel
         const auto it = std::find(m_bound.cbegin(), m_bound.cend(), model);
 
         const bool isBoundAlready = (it != m_bound.cend());
-        NX_ASSERT(!isBoundAlready, Q_FUNC_INFO, "Model is bound");
+//        NX_ASSERT(!isBoundAlready, Q_FUNC_INFO, "Model is bound"); //TODO: #ynikitenkov Investigate
         if (isBoundAlready)
             return;
 
         const bool modelWithSameSystem = m_bound.contains(systemName);
-        NX_ASSERT(!modelWithSameSystem, Q_FUNC_INFO
-            , "Model with the same system name exists");
+//        NX_ASSERT(!modelWithSameSystem, Q_FUNC_INFO
+//            , "Model with the same system name exists"); //TODO: #ynikitenkov Investigate
 
         if (modelWithSameSystem)
             return;

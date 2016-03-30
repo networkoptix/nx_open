@@ -73,6 +73,7 @@ BaseTile
             id: userChooseItem;
 
             isAvailable: thisComponent.allowExpanding && thisComponent.isExpanded;
+            visible: thisComponent.isRecentlyConnected;
 
             disabledLabelColor: Style.colors.midlight;
             enabled: thisComponent.allowExpanding;

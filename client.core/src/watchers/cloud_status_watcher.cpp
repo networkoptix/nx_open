@@ -11,7 +11,7 @@ using namespace nx::cdb;
 
 namespace
 {
-    const int kRetryInterval = 10 * 1000;
+    const int kUpdateInterval = 5 * 1000;
 
     QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
     {
@@ -48,7 +48,7 @@ public:
     QString cloudLogin;
     QString cloudPassword;
 
-    QTimer *retryTimer;
+    QTimer *updateTimer;
 
     std::unique_ptr<
         api::ConnectionFactory,
@@ -159,8 +159,6 @@ void QnCloudStatusWatcher::updateSystems()
 {
     Q_D(QnCloudStatusWatcher);
 
-    d->retryTimer->stop();
-
     if (!d->cloudConnection)
         return;
 
@@ -190,7 +188,6 @@ void QnCloudStatusWatcher::updateSystems()
                             default:
                                 d->checkAndSetStatus(QnCloudStatusWatcher::Offline);
                                 emit error(QnCloudStatusWatcher::UnknownError);
-                                d->retryTimer->start();
                                 break;
                             }
                         },
@@ -210,15 +207,15 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
     : QObject(parent)
     , q_ptr(parent)
     , cloudPort(-1)
-    , retryTimer(new QTimer(this))
+    , updateTimer(new QTimer(this))
     , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
     , status(QnCloudStatusWatcher::LoggedOut)
 {
     Q_Q(QnCloudStatusWatcher);
 
-    retryTimer->setInterval(kRetryInterval);
-    retryTimer->setSingleShot(true);
-    connect(retryTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
+    updateTimer->setInterval(kUpdateInterval);
+    updateTimer->start();
+    connect(updateTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
 }
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)

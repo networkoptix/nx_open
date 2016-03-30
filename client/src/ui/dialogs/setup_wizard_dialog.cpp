@@ -73,6 +73,19 @@ void QnSetupWizardDialog::setUrl(const QUrl& url)
     d->url = url;
 }
 
+QString QnSetupWizardDialog::localLogin() const
+{
+    Q_D(const QnSetupWizardDialog);
+    return d->loginInfo.localLogin;
+
+}
+
+QString QnSetupWizardDialog::localPassword() const
+{
+    Q_D(const QnSetupWizardDialog);
+    return d->loginInfo.localPassword;
+}
+
 QString QnSetupWizardDialog::cloudLogin() const
 {
     Q_D(const QnSetupWizardDialog);

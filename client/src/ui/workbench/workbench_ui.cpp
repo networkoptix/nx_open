@@ -1566,6 +1566,13 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
     QGraphicsProxyWidget* titleControlsWidget = new QGraphicsProxyWidget(m_controlsWidget);
     titleControlsWidget->setWidget(new QnMainWindowTitleControlsWidget(nullptr, context()));
 
+    /* Workaround against qt bug. Before destroying, QWidget sends QHideEvent to notify other widgets.
+     * QGraphicsProxyWidget as its parent catches the event and tries to pass focus to the next child.
+     * As this occurs in the QGraphicsProxyWidget dtor, it is already in the invalid state, what leads to crash.
+     * --gdm, Qt 5.6.0 beta.
+     */
+    titleControlsWidget->setFocusPolicy(Qt::NoFocus);
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->setSpacing(2);

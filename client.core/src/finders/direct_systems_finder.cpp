@@ -108,7 +108,16 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
         return;
 
     auto systemDescription = systemIt.value();
-    systemDescription->updateServer(moduleInformation);
+    const auto changes = systemDescription->updateServer(moduleInformation);
+    if (!changes.testFlag(QnServerField::SystemNameField))
+        return;
+
+    // System name has changed. We have to remove server from current 
+    // system and add to new
+    const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
+    removeServer(moduleInformation);
+    addServer(moduleInformation);
+    updatePrimaryAddress(moduleInformation, SocketAddress(serverHost));
 }
 
 void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &moduleInformation
