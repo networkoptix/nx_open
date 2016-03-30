@@ -16,10 +16,11 @@
 #include "utils/network/router.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
+#include "api/global_settings.h"
 #include "media_server/server_message_processor.h"
 #include "core/resource/network_resource.h"
 #include "transaction/transaction_message_bus.h"
-#include "media_server/settings.h"
+//#include "media_server/settings.h"
 
 #include "proxy_connection_processor_p.h"
 #include "http/custom_headers.h"
@@ -31,30 +32,26 @@ static const int MAX_PROXY_TTL = 8;
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket, QnUniversalTcpListener* owner)
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalTcpListener* owner)
 :
-    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket))
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = owner;
-    d->connectTimeoutMs =
-        MSSettings::roSettings()->value(
-            nx_ms_conf::PROXY_CONNECT_TIMEOUT_MS,
-            nx_ms_conf::DEFAULT_PROXY_CONNECT_TIMEOUT_MS).toInt();
+    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
 }
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
-        QnProxyConnectionProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
-        QnUniversalTcpListener* owner)
+    QnProxyConnectionProcessorPrivate* priv,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalTcpListener* owner)
 :
-    QnTCPConnectionProcessor(priv, socket)
+    QnTCPConnectionProcessor(priv, std::move(socket))
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = owner;
-    d->connectTimeoutMs =
-        MSSettings::roSettings()->value(
-            nx_ms_conf::PROXY_CONNECT_TIMEOUT_MS,
-            nx_ms_conf::DEFAULT_PROXY_CONNECT_TIMEOUT_MS).toInt();
+    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
 }
 
 
@@ -126,7 +123,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
         d->dstSocket = d->owner->getProxySocket(
             target.toString(),
-            d->connectTimeoutMs,
+            d->connectTimeout.count(),
             [&](int socketCount)
             {
                 ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
@@ -147,8 +144,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
 #endif
 
         d->dstSocket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket(url.scheme() == lit("https")));
-        d->dstSocket->setRecvTimeout(d->connectTimeoutMs);
-        d->dstSocket->setSendTimeout(d->connectTimeoutMs);
+        d->dstSocket->setRecvTimeout(d->connectTimeout.count());
+        d->dstSocket->setSendTimeout(d->connectTimeout.count());
         if (!d->dstSocket->connect(url.host().toLatin1().data(), url.port())) {
             d->socket->close();
             return QString(); // now answer from destination address
@@ -156,8 +153,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
         return url.toString();
     }
     else {
-        d->dstSocket->setRecvTimeout(d->connectTimeoutMs);
-        d->dstSocket->setSendTimeout(d->connectTimeoutMs);
+        d->dstSocket->setRecvTimeout(d->connectTimeout.count());
+        d->dstSocket->setSendTimeout(d->connectTimeout.count());
         return route.id.toString();
     }
 
