@@ -4,9 +4,14 @@ describe('Registration suite', function () {
     var p = new RegisterPage();
 
     p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
         p.getByUrl();
         p.prepareToAlertCheck();
         p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
     }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
 
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
