@@ -30,8 +30,20 @@ angular.module('webadminApp')
         var debugMode = $location.search().debug;
 
         var cloudAuthorized = debugMode;
+
+        $log.log("check getCredentials from client");
         if(nativeClientObject && nativeClientObject.getCredentials){
+            $log.log("request get credentials from client");
             var authObject = nativeClientObject.getCredentials();
+            if (typeof authObject === 'string' || authObject instanceof String){
+                $log.log("got string from client, try to decode JSON: " + authObject);
+                try {
+                    authObject = JSON.parse(authObject);
+                }catch(a){
+                    $log("could not decode JSON from string: " + authObject);
+                }
+            }
+            $log.log("got credentials from client: " + JSON.stringify(authObject, null, 4));
             cloudAuthorized = authObject.cloudEmail && authObject.cloudPassword;
             if(cloudAuthorized){
                 $scope.settings.presetCloudEmail = authObject.cloudEmail;
@@ -108,7 +120,7 @@ angular.module('webadminApp')
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
             return mediaserver.login(login, password).then(checkMySystem,function(error){
-                $log.error("Authorization failed:");
+                $log.error("Authorization on server with login " + login + " failed:");
                 logMediaserverError(error);
             });
         }
@@ -198,7 +210,7 @@ angular.module('webadminApp')
             logMediaserverError(error);
 
             var errorMessage = 'Connection error (' + error.status + ')';
-            if(error.data.errorString){
+            if(error.data.errorString && error.data.errorString!=''){
                 errorMessage = formatError(error.data.errorString);
             }
             $scope.settings.remoteError = errorMessage;
@@ -220,7 +232,7 @@ angular.module('webadminApp')
                 Config.defaultPassword,
                 false
             ).then(function(r){
-                if(r.data.error!=='0') {
+                if(r.data.error !== 0 && r.data.error !=='0') {
                     remoteErrorHandler(r);
                     return;
                 }
@@ -297,9 +309,9 @@ angular.module('webadminApp')
                     mediaserver.setupCloudSystem($scope.settings.systemName,
                         message.data.id,
                         message.data.authKey,
-                        $scope.settings.cloudEmail).then(function(data){
-                            if(data.error !== '0'){
-                                errorHandler(data);
+                        $scope.settings.cloudEmail).then(function(r){
+                            if(r.data.error !== 0 && r.data.error !=='0') {
+                                errorHandler(r.data);
                                 return;
                             }
 
@@ -339,7 +351,7 @@ angular.module('webadminApp')
 
             $log.log("Request /api/setupLocalSystem on cloud portal ...");
             mediaserver.setupLocalSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
-                if(r.data.error!=='0') {
+                if(r.data.error !== 0 && r.data.error !=='0') {
                     offlineErrorHandler(r);
                     return;
                 }
