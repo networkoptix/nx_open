@@ -42,6 +42,14 @@ QString QnSetupWizardDialogPrivate::getCredentials() const
     return QString::fromUtf8(QJson::serialized(loginInfo));
 }
 
+void QnSetupWizardDialogPrivate::updateCredentials(const QString& login, const QString& password, bool isCloud)
+{
+    loginInfo.localLogin    = isCloud ? QString()   : login;
+    loginInfo.localPassword = isCloud ? QString()   : password;
+    loginInfo.cloudEmail    = isCloud ? login       : QString();
+    loginInfo.cloudPassword = isCloud ? password    : QString();
+}
+
 void QnSetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
 {
     QUrl url(urlString);

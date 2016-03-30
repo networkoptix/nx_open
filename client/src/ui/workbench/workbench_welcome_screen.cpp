@@ -227,7 +227,14 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
             dialog->setCloudLogin(m_cloudWatcher->cloudLogin());
             dialog->setCloudPassword(m_cloudWatcher->cloudPassword());
         }
-        dialog->exec();
+
+        if (dialog->exec() != QDialog::Accepted)
+            return;
+
+        if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
+            connectToLocalSystem(serverUrl, dialog->localLogin(), dialog->localPassword());
+        else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
+            connectToLocalSystem(serverUrl, dialog->cloudLogin(), dialog->cloudPassword());
     };
 
     // Use delayed handling for proper animation
