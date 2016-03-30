@@ -49,7 +49,6 @@ void QnClientRecentConnectionsManager::removeModel(QnLastSystemUsersModel* model
     const bool isFound = (it != m_bound.end());
 
     qDebug() << "Removing model for " << systemName;
-    NX_ASSERT(isFound, Q_FUNC_INFO, "Model has not been found");
     if (!isFound)
         return;
 
