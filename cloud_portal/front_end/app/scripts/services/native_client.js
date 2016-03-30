@@ -5,14 +5,22 @@ angular.module('cloudApp')
         return {
             open:function(systemId){
 
-                var storage = $localStorage;
-                var username = encodeURIComponent(storage.email);
-                var password = encodeURIComponent(storage.password);
-                var system   = systemId?systemId:'localhost:7001';
                 var protocol = Config.clientProtocol;
-                system = system.replace('{','').replace('}','');
-                var url = protocol + system + '/?auth=' + $base64.encode(username + ':' + password);
-                window.open(url);
+
+                var system   = (systemId + '/') || '';
+
+                var params = {};
+
+                var storage = $localStorage;
+                var username = storage.email;
+                var password = storage.password;
+                if (username && password){
+                    params.auth = $base64.encode(username + ':' + password);
+                }
+
+                var url = protocol + system + '?' + $.param(params);
+                window.location.href = url;
+                //window.open(url);
             }
         }
     }]);
