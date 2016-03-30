@@ -357,12 +357,6 @@ QnSystemsModel::InternalList::iterator QnSystemsModel::getInternalDataIt(
     if (it == m_internalData.end())
         return m_internalData.end();
 
-    const auto testIt = std::find_if(m_internalData.begin()
-        , m_internalData.end(), [systemDescription](const InternalSystemDataPtr &data)
-    {
-        return (data->system->id() == systemDescription->id());
-    });
-    const bool found = (testIt != m_internalData.end());
     const auto foundId = (*it)->system->id();
     return (foundId == systemDescription->id() ? it : m_internalData.end());
 }
@@ -375,9 +369,8 @@ void QnSystemsModel::serverChanged(const QnSystemDescriptionPtr &systemDescripti
     {
         // If NEW_SYSTEM state flag is changed we have to resort systems.
         // TODO: #ynikitenkov check is exactly NEW_SYSTEM flag is changed
-        std::sort(m_internalData.begin(), m_internalData.end(), m_lessPred);
-        if (!m_internalData.empty())
-            dataChanged(index(0), index(rowCount() - 1));
+        removeSystem(systemDescription->id());
+        addSystem(systemDescription);
     }
     
     const auto dataIt = getInternalDataIt(systemDescription);
