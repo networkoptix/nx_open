@@ -75,7 +75,7 @@ angular.module('webadminApp')
 
         function tryToUpdateCredentials(){
             if(nativeClientObject && nativeClientObject.updateCredentials){
-                $log.log("Send credentials to client app");
+                $log.log("Send credentials to client app: " + $scope.activeLogin);
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
             }
         }
@@ -426,8 +426,11 @@ angular.module('webadminApp')
         /* Wizard workflow */
 
         $scope.wizardFlow = {
-            0:{
-                next:'start'
+            initFailure:{
+                cancel: !!nativeClientObject || debugMode,
+                next:function(){
+                    initWizard();
+                }
             },
             start:{
                 cancel: !!nativeClientObject || debugMode,
@@ -498,5 +501,13 @@ angular.module('webadminApp')
 
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
-        updateCredentials(Config.defaultLogin, Config.defaultPassword, false);
+
+        function initWizard(){
+            updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
+                $log.error("Couldn't run setup wizard: auth failed");
+                $scope.next("initFailure");
+            });
+        }
+
+        initWizard();
     });
