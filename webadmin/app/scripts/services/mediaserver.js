@@ -101,70 +101,72 @@ angular.module('webadminApp')
                 var nonce = ipCookie('nonce');
                 $log.log("Authorization - reading nonce:" + nonce + " realm:" + realm);
                 if(!realm || !nonce){
-                    return false;
+                    deferred.reject(null);
                 }
                 deferred.resolve({
                     realm: realm,
                     nonce: nonce
                 });
-                return true;
             }
-            if(!resolver()){
-                $http.get(proxy + '/api/getCurrentUser').then(resolver,resolver);
-            }
+            $http.get(proxy + '/api/getCurrentUser').then(resolver,resolver);
             return deferred.promise;
         }
         return {
             login:function(login,password){
-                // Calculate digest
                 var deferred = $q.defer();
-                getNonce().then(function(data){
-                    var realm = data.realm;
-                    var nonce = data.nonce;
+                this.logout().then(function(){
+                    // Calculate digest
+                    getNonce().then(function(data){
+                        var realm = data.realm;
+                        var nonce = data.nonce;
 
-                    $log.log("Authorization - got nonce:" + nonce + " realm:" + realm);
+                        $log.log("Authorization - got nonce:" + nonce + " realm:" + realm);
 
-                    var digest = md5(login + ':' + realm + ':' + password);
-                    var method = md5('GET:');
-                    var authDigest = md5(digest + ':' + nonce + ':' + method);
-                    var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
+                        var digest = md5(login + ':' + realm + ':' + password);
+                        var method = md5('GET:');
+                        var authDigest = md5(digest + ':' + nonce + ':' + method);
+                        var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
-                    /*
-                     console.log('debug auth - realm:',realm);
-                     console.log('debug auth - nonce:',nonce);
-                     console.log('debug auth - login:',login);
-                     console.log('debug auth - password:',$scope.user.password);
-                     console.log('debug auth - digest = md5(login:realm:password):',digest);
-                     console.log('debug auth - method:','GET:');
-                     console.log('debug auth - md5(method):',method);
-                     console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
-                     console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
-                     */
+                        /*
+                         console.log('debug auth - realm:',realm);
+                         console.log('debug auth - nonce:',nonce);
+                         console.log('debug auth - login:',login);
+                         console.log('debug auth - password:',$scope.user.password);
+                         console.log('debug auth - digest = md5(login:realm:password):',digest);
+                         console.log('debug auth - method:','GET:');
+                         console.log('debug auth - md5(method):',method);
+                         console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
+                         console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
+                         */
 
+                        /*
+                         var rtspmethod = md5('PLAY:');
+                         var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
+                         var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
+                         ipCookie('auth_rtsp',authRtsp, { path: '/' });
+                         */
 
+                        ipCookie('auth', auth, { path: '/' });
 
-                    /*
-                    var rtspmethod = md5('PLAY:');
-                    var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
-                    var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
-                    ipCookie('auth_rtsp',authRtsp, { path: '/' });
-                    */
+                        $log.log("Authorization - cookie set auth:" + ipCookie('auth'));
 
-                    //Old cookies:  // TODO: REMOVE THIS SECTION
-                    //ipCookie('response',auth_digest, { path: '/' });
-                    //ipCookie('username',login, { path: '/' });
-
-                    ipCookie('auth', auth, { path: '/' });
-
-                    $log.log("Authorization - cookie set auth:" + ipCookie('auth'));
-
-                    // Check auth again - without catching errors
-                    return $http.get(proxy + '/api/getCurrentUser').then(function(data){
-                        deferred.resolve(data);
-                    },function(error){
-                        deferred.reject(error);
+                        // Check auth again - without catching errors
+                        return $http.get(proxy + '/api/getCurrentUser').then(function(data){
+                            deferred.resolve(data);
+                        },function(error){
+                            deferred.reject(error);
+                        });
                     });
                 });
+                return deferred.promise;
+            },
+            logout:function(){
+                ipCookie.remove('auth', { path: '/' });
+                ipCookie.remove('nonce',{ path: '/' });
+                ipCookie.remove('realm',{ path: '/' });
+
+                var deferred = $q.defer();
+                deferred.resolve();
                 return deferred.promise;
             },
             url:function(){
