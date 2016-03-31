@@ -34,6 +34,7 @@ describe('Restore password suite', function () {
     p.passwordField.check(function(){
         var deferred = protractor.promise.defer();
         p.getRestorePassPage(p.helper.userEmail).then(function(){
+            browser.sleep(500);
             deferred.fulfill();
         });
         return deferred.promise;
@@ -72,8 +73,7 @@ describe('Restore password suite', function () {
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
         p.getRestorePassPage(p.helper.userEmail).then(function(){
-            p.setNewPassword(p.helper.userPasswordNew);
-            p.helper.swapPasswords();
+            p.setNewPassword(p.helper.userPassword);
             deferred.fulfill();
         });
         return deferred.promise;
@@ -82,9 +82,8 @@ describe('Restore password suite', function () {
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
         p.getRestorePassPage(p.helper.userEmail).then(function(){
-            p.setNewPassword(p.helper.userPasswordNew);
-            p.helper.swapPasswords();
-            p.verifySecondAttemptFails(p.helper.userPasswordNew);
+            p.setNewPassword(p.helper.userPassword);
+            p.verifySecondAttemptFails(p.helper.userPassword);
             deferred.fulfill();
         });
         return deferred.promise;
@@ -93,9 +92,14 @@ describe('Restore password suite', function () {
     it("should set new password, login with new password", function () {
         p.getRestorePassPage(p.helper.userEmail).then(function() {
             p.setNewPassword(p.helper.userPasswordNew);
-            p.helper.swapPasswords();
-            p.helper.login(p.helper.userEmail, p.helper.userPassword);
+            p.helper.login(p.helper.userEmail, p.helper.userPasswordNew);
             p.helper.logout();
+        });
+    });
+
+    it("restores password to userPassword", function () {
+        p.getRestorePassPage(p.helper.userEmail).then(function() {
+            p.setNewPassword(p.helper.userPassword);
         });
     });
 
@@ -130,12 +134,6 @@ describe('Restore password suite', function () {
             p.setNewPassword(p.helper.basePassword); // due to current bug in portal, this fails
             p.get("/");
             expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
-        });
-    });
-
-    it("restores password to qweasd123", function () {
-        p.getRestorePassPage(p.helper.userEmail).then(function() {
-            p.setNewPassword(p.helper.basePassword);
         });
     });
 });

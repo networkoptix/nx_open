@@ -32,12 +32,6 @@ var Helper = function () {
     this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordWrong = 'qweqwe123';
 
-    this.swapPasswords = function() {
-        var temp = this.userPassword;
-        this.userPassword = this.userPasswordNew;
-        this.userPasswordNew = temp;
-    };
-
     this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
 
     this.login = function(email, password) {

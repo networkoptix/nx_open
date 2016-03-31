@@ -84,7 +84,7 @@ RestorePasswordPage = function () {
             var regCode = self.getTokenFromEmail(email, userEmail);
             self.get(self.url + regCode);
             deferred.fulfill();
-        }), 60000);
+        }));
 
         return deferred.promise;
     };
