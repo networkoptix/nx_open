@@ -8,6 +8,7 @@ angular.module('webadminApp')
             This is kind of universal wizard controller.
         */
 
+        $scope.lockNextButton = false;
         // Common model
         $scope.settings = {
             systemName: '',
@@ -79,13 +80,8 @@ angular.module('webadminApp')
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
             }
         }
-        var retry = true; // This is hack for auth problems on server: we try to apply credentials twice each time
         /* Common helpers: error handling, check current system, error handler */
-
         function checkMySystem(user){
-            retry = true;
-
-
             $log.log("check system configuration");
 
             $scope.settings.localLogin = user.name || Config.defaultLogin;
@@ -124,13 +120,6 @@ angular.module('webadminApp')
             return mediaserver.login(login, password).then(checkMySystem,function(error){
                 $log.error("Authorization on server with login " + login + " failed:");
                 logMediaserverError(error);
-                if(retry){
-                    retry = false;
-                    $log.log("Try again: " + login);
-                    updateCredentials(login, password, isCloud);
-                }else{
-                    $log.log("Do not try again. Consider credentials wrong: " + login);
-                }
             });
         }
 
@@ -398,6 +387,7 @@ angular.module('webadminApp')
             $scope.next($scope.activeStep.back);
         };
         $scope.next = function(target){
+            $scope.lockNextButton = true;
             if(!target) {
                 var activeStep = $scope.activeStep || $scope.wizardFlow[0];
                 target = activeStep.next || activeStep.finish;
@@ -410,6 +400,7 @@ angular.module('webadminApp')
             if($scope.activeStep.onShow){
                 $scope.activeStep.onShow();
             }
+            $scope.lockNextButton = false;
         };
         $scope.cantGoNext = function(){
             if($scope.activeStep.valid){
@@ -505,7 +496,14 @@ angular.module('webadminApp')
         function initWizard(){
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
                 $log.error("Couldn't run setup wizard: auth failed");
-                $scope.next("initFailure");
+                if( $location.search().retry) {
+                    $log.log("Second try: show error to user");
+                    $scope.next("initFailure");
+                }else {
+                    $log.log("Reload page to try again");
+                    $location.search("retry","true");
+                    window.location.reload();
+                }
             });
         }
 
