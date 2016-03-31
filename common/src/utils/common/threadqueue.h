@@ -138,13 +138,13 @@ public:
         m_bufferLen -= count;
     }
 
-    void remoteAt(int index)
+    void removeAt(int index)
     {
         QnMutexLocker mutex( &m_cs );
-        remoteAtUnsafe(index);
+        removeAtUnsafe(index);
     }
 
-    void remoteAtUnsafe(int index)
+    void removeAtUnsafe(int index)
     {
         int bufferIndex = (m_headIndex + index) % m_buffer.size();
         int toMove = m_bufferLen - index - 1;
