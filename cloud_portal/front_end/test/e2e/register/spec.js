@@ -55,39 +55,6 @@ describe('Registration suite', function () {
         expect(p.firstNameInput.isPresent()).toBe(false);
     });
 
-    it("should activate registration with a registration code sent to an email", function () {
-
-        p.getByUrl();
-        var userEmail = p.helper.getRandomEmail();
-        var userPassword = p.helper.userPassword;
-        p.firstNameInput.sendKeys(p.helper.userFirstName);
-        p.lastNameInput.sendKeys(p.helper.userLastName);
-        p.emailInput.sendKeys(userEmail);
-        p.passwordInput.sendKeys(userPassword);
-
-        p.submitButton.click();
-
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
-
-        browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.helper.emailSubjects.register).then(function (email) {
-            expect(email.subject).toContain(p.helper.emailSubjects.register);
-            expect(email.headers.to).toEqual(userEmail);
-
-            // extract registration token from the link in the email message
-            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
-            var regCode = pattern.exec(email.html)[1];
-            console.log(regCode);
-            browser.get('/#/activate/' + regCode);
-
-            p.alert.catchAlert( p.alert.alertMessages.registerConfirmSuccess, p.alert.alertTypes.success);
-            browser.refresh();
-            p.alert.catchAlert( p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger);
-
-            p.helper.login(userEmail, userPassword);
-            p.helper.logout();
-        }));
-    });
-
     it("should register user with cyrillic First and Last names and correct credentials", function () {
         p.getByUrl();
 
