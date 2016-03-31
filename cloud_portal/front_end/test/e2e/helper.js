@@ -4,6 +4,8 @@ var Helper = function () {
     var AlertSuite = require('./alerts_check.js');
     this.alert = new AlertSuite();
 
+    var self = this;
+
     this.baseEmail = 'noptixqa@gmail.com';
     this.basePassword = 'qweasd123';
 
@@ -126,6 +128,16 @@ var Helper = function () {
 
         return deferred.promise;
     };
+
+    var RestorePassObject = require('./restore_pass/po.js');
+    this.restorePassword = function(userEmail, newPassword) {
+        this.restorePassObj = new RestorePassObject();
+        browser.get('/#/restore_password/');
+        browser.waitForAngular();
+        this.restorePassObj.getRestorePassPage(userEmail).then(function() {
+            self.restorePassObj.setNewPassword(newPassword);
+        });
+    }
 };
 
 module.exports = Helper;

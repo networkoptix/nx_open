@@ -94,12 +94,7 @@ describe('Restore password suite', function () {
             p.setNewPassword(p.helper.userPasswordNew);
             p.helper.login(p.helper.userEmail, p.helper.userPasswordNew);
             p.helper.logout();
-        });
-    });
-
-    it("restores password to userPassword", function () {
-        p.getRestorePassPage(p.helper.userEmail).then(function() {
-            p.setNewPassword(p.helper.userPassword);
+            p.helper.restorePassword(p.helper.userEmail, p.helper.userPassword);
         });
     });
 
