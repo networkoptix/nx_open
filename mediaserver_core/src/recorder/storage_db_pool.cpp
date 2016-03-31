@@ -25,9 +25,14 @@ QString QnStorageDbPool::getLocalGuid()
     return simplifiedGUID;
 }
 
-bool QnStorageDbPool::getDBPath( const QnStorageResourcePtr& storage, QString* const dbDirectory )
+bool QnStorageDbPool::getDBPath(const QnStorageResourcePtr& storage, QString* const dbDirectory, bool isSqliteDb)
 {
     QString storageUrl = storage->getUrl();
+    if (!isSqliteDb)
+    {
+        *dbDirectory = storageUrl;
+        return true;
+    }
     QString dbRefFilePath;
 
     //if (storagePath.indexOf(lit("://")) != -1)

@@ -510,7 +510,7 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
 void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storage)
 {
     QString dbPath;
-    if (!QnStorageDbPool::getDBPath(storage, &dbPath))
+    if (!QnStorageDbPool::getDBPath(storage, &dbPath, true))
         return;
 
     QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
@@ -579,6 +579,10 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         oldCatalogs << fileCatalog;
     }
 
+    sqlDb.close();
+    QSqlDatabase::removeDatabase(sqlDb.connectionName());
+    storage->renameFile(fileName, fileName + lit("_deprecated"));
+
     auto sdb = qnStorageDbPool->getSDB(storage);
     auto newCatalogs = sdb->loadFullFileCatalog();
     QVector<DeviceFileCatalogPtr> catalogsToWrite;
@@ -597,8 +601,8 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         {
             DeviceFileCatalogPtr newCatalog = *newCatalogIt;
             DeviceFileCatalogPtr catalogToWrite = DeviceFileCatalogPtr(new DeviceFileCatalog(c->cameraUniqueId(), c->getCatalog(), QnServer::StoragePool::None));
-            assert(std::is_sorted(c->getChunks().cbegin(), c->getChunks().cend()));
-            assert(std::is_sorted(newCatalog->getChunks().cbegin(), newCatalog->getChunks().cend()));
+            NX_ASSERT(std::is_sorted(c->getChunks().cbegin(), c->getChunks().cend()));
+            NX_ASSERT(std::is_sorted(newCatalog->getChunks().cbegin(), newCatalog->getChunks().cend()));
             std::set_difference(c->getChunks().begin(), c->getChunks().end(), newCatalog->getChunks().begin(), newCatalog->getChunks().end(), std::back_inserter(catalogToWrite->getChunks()));
             catalogsToWrite.push_back(catalogToWrite);
         }

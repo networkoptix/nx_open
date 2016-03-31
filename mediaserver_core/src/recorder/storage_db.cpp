@@ -430,7 +430,7 @@ bool QnStorageDb::vacuumInternal()
             {
                 nx::media_db::MediaFileOperation mediaFileOp;
                 auto cameraIdIt = m_uuidToHash.left.find(it->first);
-                assert(cameraIdIt != m_uuidToHash.left.end());
+                NX_ASSERT(cameraIdIt != m_uuidToHash.left.end());
 
                 mediaFileOp.setCameraId(cameraIdIt->second);
                 mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
@@ -451,29 +451,29 @@ bool QnStorageDb::vacuumInternal()
 
     m_ioDevice.reset();
     bool res = m_storage->removeFile(m_dbFileName);
-    assert(res);
+    NX_ASSERT(res);
     if (!res)
         NX_LOG(lit("%1 temporary DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
 
     tmpFile.reset();
     res = m_storage->renameFile(tmpDbFileName, m_dbFileName);
-    assert(res);
+    NX_ASSERT(res);
     if (!res)
         NX_LOG(lit("%1 temporary DB rename file error").arg(Q_FUNC_INFO), cl_logWARNING);
 
     res = resetIoDevice();
-    assert(res);
+    NX_ASSERT(res);
 
     auto readDataCopy = m_readData;
     uint8_t dbVersion;
 
     m_readData.clear();
     m_dbHelper.setMode(nx::media_db::Mode::Read);
-    assert(m_dbHelper.getDevice());
+    NX_ASSERT(m_dbHelper.getDevice());
 
     error = m_dbHelper.readFileHeader(&dbVersion);
-    assert(error == nx::media_db::Error::NoError);
-    assert(dbVersion == m_dbVersion);
+    NX_ASSERT(error == nx::media_db::Error::NoError);
+    NX_ASSERT(dbVersion == m_dbVersion);
     if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
     {
         NX_LOG(lit("%1 DB file read header error after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
@@ -487,7 +487,7 @@ bool QnStorageDb::vacuumInternal()
     }
 
     bool isDataConsistent = checkDataConsistency(readDataCopy);
-    assert(isDataConsistent);
+    NX_ASSERT(isDataConsistent);
     if (!isDataConsistent)
     {
         NX_LOG(lit("%1 DB is not consistent after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);

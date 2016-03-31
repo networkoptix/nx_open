@@ -910,7 +910,6 @@ TEST(MediaDb_test, Migration_from_sqlite)
     ASSERT_TRUE(result);
 
     auto sdb = qnStorageDbPool->getSDB(storage);
-    result = sdb->open(workDirPath + lit("/test.nxdb"));
     ASSERT_TRUE(result);
     sdb->loadFullFileCatalog();
 
@@ -938,7 +937,6 @@ TEST(MediaDb_test, Migration_from_sqlite)
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
         ASSERT_TRUE((*mergedIt)->getChunks() == referenceCatalogs[i]->getChunks());
     }
-    recursiveClean(workDirPath);
 }
 
 TEST(MediaDb_test, Cleanup)
