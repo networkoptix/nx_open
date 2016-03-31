@@ -162,7 +162,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     client->pleaseStopSync();
 }
 
-TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
+TEST_F(MediatorFunctionalTest, resolve_by_system_name)
 {
     using namespace nx::hpm;
 
@@ -193,14 +193,18 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
         resolveResponse.endpoints.end(),
         mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
 
-    //resolve by system name is forbidden
+    //resolve by system name is supported!
     std::tie(resultCode, resolveResponse) =
         makeSyncCall<api::ResultCode, api::ResolvePeerResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolvePeer,
             client.get(),
             api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::notFound, resultCode);
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
+    ASSERT_TRUE(std::find(
+        resolveResponse.endpoints.begin(),
+        resolveResponse.endpoints.end(),
+        mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
 
     client->pleaseStopSync();
 }

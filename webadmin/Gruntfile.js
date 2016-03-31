@@ -142,7 +142,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
 
                 // Gdm
-                {context: '/api/',      host: '10.0.2.240', port: 7001},
+                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.240', port: 7001},
                 {context: '/hls/',      host: '10.0.2.240', port: 7001},
                 {context: '/media/',    host: '10.0.2.240', port: 7001},
@@ -212,6 +212,14 @@ module.exports = function (grunt) {
                 {context: '/hls/',      host: '10.0.2.232', port: 7002},
                 {context: '/media/',    host: '10.0.2.232', port: 7002},
                 {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
+
+
+                //Surface
+                {context: '/api/',      host: '10.0.3.203', port: 7011},
+                 {context: '/ec2/',      host: '10.0.3.203', port: 7011},
+                 {context: '/hls/',      host: '10.0.3.203', port: 7011},
+                 {context: '/media/',    host: '10.0.3.203', port: 7011},
+                 {context: '/proxy/',    host: '10.0.3.203', port: 7011}/**/
 
             ],
             livereload: {
