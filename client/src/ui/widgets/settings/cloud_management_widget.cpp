@@ -32,12 +32,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
     ui->accountLabel->setFont(accountFont);
     for (auto label: { ui->accountLabel, ui->promo1TextLabel, ui->promo2TextLabel, ui->promo3TextLabel })
         setPaletteColor(label, QPalette::WindowText, nxColor);
-    /*
-    setPaletteColor(ui->accountLabel,    QPalette::WindowText, nxColor);
-    setPaletteColor(ui->promo1TextLabel, QPalette::WindowText, nxColor);
-    setPaletteColor(ui->promo2TextLabel, QPalette::WindowText, nxColor);
-    setPaletteColor(ui->promo3TextLabel, QPalette::WindowText, nxColor);
-    */
+
     ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png"));
     ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png"));
     ui->promo3Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_3.png"));
