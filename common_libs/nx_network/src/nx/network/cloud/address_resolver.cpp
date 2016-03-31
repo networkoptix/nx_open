@@ -189,6 +189,7 @@ void AddressResolver::resolveAsync(
     QnMutexLocker lk( &m_mutex );
     auto info = m_info.emplace( hostName, HostAddressInfo() ).first;
     info->second.checkExpirations();
+    tryFastDomainResolve(info);
     if( info->second.isResolved( natTraversal ) )
     {
         auto entries = info->second.getAll();
@@ -362,6 +363,27 @@ AddressResolver::RequestInfo::RequestInfo(RequestInfo&& right)
     handler(std::move(right.handler)),
     guard(std::move(right.guard))
 {
+}
+
+void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
+{
+    const auto domain = info->first.toString();
+    if (domain.indexOf(lit(".")) != -1)
+        return; // only top level domains might be fast resolved
+
+    // TODO: #mux Think about better representation to increase performance
+    const auto suffix = lit(".") + domain;
+    for (const auto& other : m_info)
+    {
+        if (other.first.toString().endsWith(suffix) &&
+            !other.second.fixedEntries.empty())
+        {
+            info->second.fixedEntries = other.second.fixedEntries;
+            return; // just resolve to first avaliable
+        }
+    }
+
+    info->second.fixedEntries.clear();
 }
 
 void AddressResolver::dnsResolve(HaInfoIterator info)

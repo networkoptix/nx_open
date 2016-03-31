@@ -70,8 +70,8 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRes
         return nx_http::StatusCode::ok;
     }
 
-    QnSaveCloudSystemCredentialsHandler subHundler;
-    int httpResult = subHundler.execute(data, result);
+    QnSaveCloudSystemCredentialsHandler subHandler;
+    int httpResult = subHandler.execute(data, result);
     if (result.error == QnJsonRestResult::NoError)
     {
         changeSystemName(newSystemName, 0, 0);
