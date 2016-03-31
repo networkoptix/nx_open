@@ -496,7 +496,7 @@ angular.module('webadminApp')
         /* initiate wizard */
 
         function initWizard(){
-            updateCredentials(Config.defaultLogin, Config.defaultPassword + "fail", false).catch(function(){
+            updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
                 $log.error("Couldn't run setup wizard: auth failed");
                 if( $location.search().retry) {
                     $log.log("Second try: show error to user");
