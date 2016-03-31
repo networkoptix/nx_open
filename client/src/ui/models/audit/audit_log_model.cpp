@@ -595,20 +595,14 @@ int QnAuditLogModel::minWidthForColumn(const Column &column) const
 
 QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (section >= m_columns.size())
-        return QVariant();
-
-    const Column &column = m_columns[section];
-    if (orientation != Qt::Horizontal)
-        return base_type::headerData(section, orientation, role);
-
-    if (role == Qt::SizeHintRole)
+    if (role == Qt::DisplayRole)
     {
-        return QSize(minWidthForColumn(column), m_headerHeight);
-    }
-    else if (role == Qt::DisplayRole)
-    {
-        switch (column) {
+        if (section >= m_columns.size())
+            return QVariant();
+
+        const Column &column = m_columns[section];
+        switch (column)
+        {
         case SelectRowColumn:
             return QVariant();
         case TimestampColumn:
@@ -626,10 +620,7 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
         case EventTypeColumn:
             return tr("Activity");
         case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("Device name"),
-                tr("Camera name")
-                );
+            return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device name"), tr("Camera name"));
         case CameraIpColumn:
             return tr("IP");
         case DateColumn:
