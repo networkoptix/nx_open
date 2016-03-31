@@ -155,7 +155,8 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         isNotOwerflowed = m_queuedSize <= m_maxRecordQueueSizeBytes &&
             (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
 
-        (void)(pauseRebuildIfHighData(&lock) || resumeRebuildIfLowData(&lock));
+        pauseRebuildIfHighData(&lock);
+        resumeRebuildIfLowData(&lock);
     }
 
     if (!isNotOwerflowed)
