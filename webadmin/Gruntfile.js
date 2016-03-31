@@ -215,11 +215,11 @@ module.exports = function (grunt) {
 
 
                 //Surface
-                {context: '/api/',      host: '10.0.3.203', port: 7011},
-                 {context: '/ec2/',      host: '10.0.3.203', port: 7011},
-                 {context: '/hls/',      host: '10.0.3.203', port: 7011},
-                 {context: '/media/',    host: '10.0.3.203', port: 7011},
-                 {context: '/proxy/',    host: '10.0.3.203', port: 7011}/**/
+                {context: '/api/',      host: '10.0.3.203', port: 7001},
+                 {context: '/ec2/',      host: '10.0.3.203', port: 7001},
+                 {context: '/hls/',      host: '10.0.3.203', port: 7001},
+                 {context: '/media/',    host: '10.0.3.203', port: 7001},
+                 {context: '/proxy/',    host: '10.0.3.203', port: 7001}/**/
 
             ],
             livereload: {
