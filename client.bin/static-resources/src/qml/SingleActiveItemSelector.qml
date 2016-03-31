@@ -6,8 +6,7 @@ QtObject
 
     property bool isSomeoneActive: (currentItem !== null);
     property string variableName;
-    property string writeVariableName: variableName;
-    property string signalName: variableToSignalName(variableName);
+    property var deactivateFunc;
 
     // Impl properties
     property QtObject currentItem;
@@ -19,6 +18,7 @@ QtObject
             setCurrentItem(item);
         }
 
+        var signalName = variableToSignalName(variableName);
         item[signalName].connect(handler);
     }
 
@@ -26,8 +26,8 @@ QtObject
     {
         if (!item || item[variableName])
         {
-            if (currentItem)
-                currentItem[writeVariableName] = false;
+            if (currentItem && deactivateFunc)
+                deactivateFunc(currentItem);
 
             currentItem = item;
         }

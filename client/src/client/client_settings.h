@@ -12,6 +12,8 @@
 #include <client/client_connection_data.h>
 #include <client/client_model_types.h>
 
+#include <ui/workbench/workbench_pane_settings.h>
+
 #include <update/update_info.h>
 
 #include <utils/common/property_storage.h>
@@ -87,14 +89,8 @@ public:
         TIME_MODE,
 
         CREATE_FULL_CRASH_DUMP,
-        TREE_PINNED,
-        TREE_OPENED,
-        TREE_WIDTH,
-        CALENDAR_PINNED,
-        SLIDER_OPENED,
-        TITLE_OPENED,
-        NOTIFICATIONS_PINNED,
-        NOTIFICATIONS_OPENED,
+
+        WORKBENCH_PANES,
 
         CLOCK_24HOUR,
         CLOCK_WEEKDAY,
@@ -227,14 +223,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isTreePinned,           setTreePinned,              TREE_PINNED,                true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isCalendarPinned,       setCalendarPinned,          CALENDAR_PINNED,            false)
-        QN_DECLARE_RW_PROPERTY(bool,                        isTreeOpened,           setTreeOpened,              TREE_OPENED,                true)
-        QN_DECLARE_RW_PROPERTY(int,                         treeWidth,              setTreeWidth,               TREE_WIDTH,                 250)
-        QN_DECLARE_RW_PROPERTY(bool,                        isSliderOpened,         setSliderOpened,            SLIDER_OPENED,              true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isTitleOpened,          setTitleOpened,             TITLE_OPENED,               true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isNotificationsPinned,  setNotificationsPinned,     NOTIFICATIONS_PINNED,       true)
-        QN_DECLARE_RW_PROPERTY(bool,                        isNotificationsOpened,  setNotificationsOpened,     NOTIFICATIONS_OPENED,       true)
+        QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneSettings,           setPaneSettings,            WORKBENCH_PANES,            Qn::defaultPaneSettings())
         QN_DECLARE_RW_PROPERTY(bool,                        isClock24Hour,          setClock24Hour,             CLOCK_24HOUR,               true)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockWeekdayOn,       setClockWeekdayOn,          CLOCK_WEEKDAY,              false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClockDateOn,          setClockDateOn,             CLOCK_DATE,                 false)

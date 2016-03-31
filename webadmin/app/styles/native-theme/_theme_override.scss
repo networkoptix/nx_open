@@ -58,3 +58,82 @@ h4{
   margin-top:8px;
   margin-bottom:16px;
 }
+
+
+button, select{
+  &,
+  &:focus,
+  &:hover,
+  &:active,
+  &.active,
+  &.disabled,
+  &[disabled] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+}
+
+.btn-default{
+
+  border-bottom: 1px solid $button_d2;
+
+  &:focus{
+    background-color: $button;
+    border-color: $brand_d4;
+  }
+
+  &:hover{
+    background-color: $button_l1;
+    border-bottom: 1px solid $button_d1;
+  }
+
+  &:active,
+  &.active {
+    border-top: 1px solid $button_d2;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      opacity: 0.3;
+    }
+  }
+}
+.btn-primary{ /* $color, $background, $border */
+
+  border-bottom: 1px solid $brand_d3;
+
+  &:focus{
+    background-color: $brand_core;
+    border-color: $brand_l4;
+  }
+
+  &:hover{
+    background-color: $brand_l1;
+    border-bottom: 1px solid $brand_d2;
+  }
+
+  &:active,
+  &.active {
+    background-color: $brand_d1;
+    border-top: 1px solid $brand_d3;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      opacity: 0.2;
+    }
+  }
+}

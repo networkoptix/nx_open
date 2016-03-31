@@ -9,6 +9,7 @@
 
 module.exports = function (grunt) {
 
+    var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
 
@@ -19,6 +20,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
     grunt.loadNpmTasks('grunt-wiredep');
+    grunt.loadNpmTasks('grunt-zip-directories');
+
 
 
     // Define the configuration for all the tasks
@@ -28,7 +31,7 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'dist'
+            dist: 'static'
         },
 
         // Automatically inject Bower components into the app
@@ -66,7 +69,7 @@ module.exports = function (grunt) {
                     livereload: '<%= connect.options.livereload %>'
                 },
                 files: [
-                    '<%= yeoman.app %>/{,*/}*.html',
+                    '<%= yeoman.app %>/**/*.html',
                     '<%= yeoman.app %>/views/**',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
@@ -139,7 +142,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
 
                 // Gdm
-                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
+                {context: '/api/',      host: '10.0.2.240', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.240', port: 7001},
                 {context: '/hls/',      host: '10.0.2.240', port: 7001},
                 {context: '/media/',    host: '10.0.2.240', port: 7001},
@@ -152,6 +155,21 @@ module.exports = function (grunt) {
                 {context: '/hls/',      host: '10.1.5.126', port: 7001},
                 {context: '/media/',    host: '10.1.5.126', port: 7001},
                 {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
+
+
+                // kds
+                /* {context: '/api/',      host: '10.0.2.137', port: 7000},
+                 {context: '/ec2/',      host: '10.0.2.137', port: 7000},
+                 {context: '/hls/',      host: '10.0.2.137', port: 7000},
+                 {context: '/media/',    host: '10.0.2.137', port: 7000},
+                 {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
+
+                //Vitaly Kutin
+                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.197', port: 7001},
+                {context: '/hls/',      host: '10.0.3.197', port: 7001},
+                {context: '/media/',    host: '10.0.3.197', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
 
                 // Olya - external
                 /*{context: '/api/',      host: '95.31.136.2', port: 7011},
@@ -168,7 +186,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
                 // Nx1 Cloud 3.0
-                {context: '/api/',      host: '10.0.3.65', port: 7001},
+                /*{context: '/api/',      host: '10.0.3.65', port: 7001},
                 {context: '/ec2/',      host: '10.0.3.65', port: 7001},
                 {context: '/hls/',      host: '10.0.3.65', port: 7001},
                 {context: '/media/',    host: '10.0.3.65', port: 7001},
@@ -189,11 +207,11 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/',      host: '10.0.2.232', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.232', port: 7001},
-                {context: '/hls/',      host: '10.0.2.232', port: 7001},
-                {context: '/media/',    host: '10.0.2.232', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.232', port: 7001}/**/
+                /*{context: '/api/',      host: '10.0.2.232', port: 7002},
+                {context: '/ec2/',      host: '10.0.2.232', port: 7002},
+                {context: '/hls/',      host: '10.0.2.232', port: 7002},
+                {context: '/media/',    host: '10.0.2.232', port: 7002},
+                {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
 
             ],
             livereload: {
@@ -229,6 +247,8 @@ module.exports = function (grunt) {
             test: {
                 options: {
                     middleware: function (connect, options) {
+
+                        var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
                             options.base = [options.base];
                         }
@@ -238,12 +258,12 @@ module.exports = function (grunt) {
 
                         // Serve static files.
                         options.base.forEach(function (base) {
-                            middlewares.push(connect.static(base));
+                            middlewares.push(serveStatic(base));
                         });
 
                         // Make directory browse-able.
-                        var directory = options.directory || options.base[options.base.length - 1];
-                        middlewares.push(connect.directory(directory));
+                        // var directory = options.directory || options.base[options.base.length - 1];
+                        // middlewares.push(connect.directory(directory));
 
                         return middlewares;
                     },
@@ -291,7 +311,7 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js',
+                '<%= yeoman.app %>/scripts/**/*.js',
                 '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
@@ -317,12 +337,22 @@ module.exports = function (grunt) {
                 ]
             },
             server: '.tmp',
-
             publish:{
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/additional-resources/static/*'
+                        src: '<%= yeoman.app %>/../../../' + package_dir + '/external.dat'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            },
+            zip:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.app %>/../external.dat'
                     }
                 ],
                 options: {
@@ -349,7 +379,7 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the app
-       
+
         // Compiles Sass to CSS and generates necessary files if requested
         compass: {
             options: {
@@ -539,12 +569,28 @@ module.exports = function (grunt) {
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
             },
-            publish:{
+            zip:{
                 expand: true,
                 nonull:true,
-                cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver_core/maven/bin-resources/additional-resources/static/',
-                src: '**'
+                cwd: '<%= yeoman.app %>/../',
+                dest: '<%= yeoman.app %>/../../../' + package_dir,
+                src: 'external.dat'
+            }
+        },
+        compress: {
+            external: {
+                options: {
+                    archive: '<%= yeoman.app %>/../external.dat',
+                    mode: 'zip'
+                },
+                files: [
+                    { src: '<%= yeoman.dist %>/**' }
+                ]
+            }
+        },
+        shell: {
+            deploy: {
+                command: 'cd ~/develop/' + package_dir + '; rm .DS_Store; rm ../.DS_Store; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             }
         },
 
@@ -669,13 +715,23 @@ module.exports = function (grunt) {
 
     grunt.registerTask('publish', [
         'build',
+        'clean:zip',
         'clean:publish',
-        'copy:publish'
+        'compress:external'
     ]);
 
 
     grunt.registerTask('pub', [
         'publish'
+    ]);
+
+
+    grunt.registerTask('deploy', [
+        'publish',
+        'copy:zip',
+        'shell:deploy',
+        'clean:zip',
+        'clean:publish'
     ]);
 
     grunt.registerTask('demo', [

@@ -1,6 +1,8 @@
 #ifndef __STORAGE_MANAGER_H__
 #define __STORAGE_MANAGER_H__
 
+#include <random>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
 #include <QtCore/QMap>
@@ -249,6 +251,9 @@ private:
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
     std::unique_ptr<QnScheduleSync> m_scheduleSync;
     std::atomic<bool> m_firstStoragesTestDone;
+
+    std::random_device m_rd;
+    std::mt19937 m_gen;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

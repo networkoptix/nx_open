@@ -10,19 +10,37 @@ Item
 
     property Item visualParent;
     property string systemName;
-    property string host;
     property bool isRecentlyConnected;
 
     property Component centralAreaDelegate;
     property Component expandedAreaDelegate;
-    property bool allowExpanding: true;
+    property bool allowExpanding;
+
+    property string notAvailableLabelText: "";
+
+    property bool isAvailable: true;
+    property bool isExpandable: true;
+    property bool isOnline: false;
+    property bool isValidVersion: true;
+    property bool isValidCustomization: true;
+
     property bool isExpanded;
+
+    property color standardColor: Style.colors.custom.systemTile.background;
+    property color hoveredColor: Style.lighterColor(standardColor);
+    property color inactiveColor: Style.colors.shadow;
 
     Binding
     {
         target: thisComponent;
         property: "isExpanded";
         value: (tileHolder.state !== "collapsed") && allowExpanding;
+    }
+    Binding
+    {
+        target: thisComponent;
+        property: "allowExpanding";
+        value: isExpandable && isAvailable;
     }
 
     property alias centralArea: centralAreaLoader.item;
@@ -40,7 +58,7 @@ Item
     implicitHeight: 96;
     z: (transition.running ? 100 : 0)
 
-    Item
+    FocusScope
     {
         id: tileHolder;
 
@@ -63,6 +81,24 @@ Item
                     y: 0;
                     height: thisComponent.height;
                 }
+
+                PropertyChanges
+                {
+                    target: collapseTileButton;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: shadow;
+                    opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: expandedAreaLoader;
+                    opacity: 0;
+                }
             },
 
             State
@@ -76,6 +112,24 @@ Item
                     x: (visualParent.width - tileHolder.width) / 2;
                     y: (visualParent.height - expadedHeight) / 2;
                     height: expadedHeight;
+                }
+
+                PropertyChanges
+                {
+                    target: collapseTileButton;
+                    opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: shadow;
+                    opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: expandedAreaLoader;
+                    opacity: 1;
                 }
             }
         ]
@@ -100,10 +154,35 @@ Item
                     duration: 400;
                 }
             }
+            NumberAnimation
+            {
+                target: collapseTileButton;
+                properties: "opacity";
+                easing.type: Easing.OutCubic;
+                duration: 200;
+            }
+
+            NumberAnimation
+            {
+                target: shadow;
+                properties: "opacity";
+                easing.type: Easing.OutCubic;
+                duration: 400;
+            }
+
+            NumberAnimation
+            {
+                target: expandedAreaLoader;
+                properties: "opacity";
+                easing.type: Easing.OutCubic;
+                duration: 400;
+            }
         }
 
         DropShadow
         {
+            id: shadow;
+
             anchors.fill: tileArea;
 
             visible: thisComponent.isExpanded;
@@ -123,19 +202,31 @@ Item
             height: tileHolder.parent.height;
 
             hoverEnabled: true;
-            onClicked: { toggle(); }
+            onClicked:
+            {
+                if (thisComponent.enabled)
+                    thisComponent.toggle();
+            }
         }
 
         Rectangle
         {
             id: tileArea;
 
-            readonly property color standardColor: Style.colors.custom.systemTile.background;
-            readonly property color hoveredColor: Style.lighterColor(standardColor);
+            enabled: thisComponent.enabled;
+
             readonly property bool isHovered: (!thisComponent.isExpanded && hoverIndicator.containsMouse);
 
             clip: true;
-            color: (isHovered || isExpanded ? hoveredColor : standardColor);
+            color:
+            {
+                if (!thisComponent.isAvailable)
+                    return thisComponent.inactiveColor;
+                if (isHovered || thisComponent.isExpanded)
+                    return thisComponent.hoveredColor;
+
+                return thisComponent.standardColor;
+            }
 
             anchors.fill: parent;
             radius: 2;
@@ -155,6 +246,7 @@ Item
             {
                 id: systemNameText;
 
+                disableable: false;
                 anchors.left: parent.left;
                 anchors.right: parent.left;
                 anchors.top: parent.top;
@@ -166,24 +258,27 @@ Item
                 text: systemName;
 
                 height: Style.custom.systemTile.systemNameLabelHeight;
-                color: Style.colors.text;
+                color: (thisComponent.isAvailable ? Style.colors.text
+                    : Style.colors.midlight);
                 font: Style.fonts.systemTile.systemName;
             }
 
-            Button
+            NxButton
             {
                 id: collapseTileButton;
 
                 width: 40;
                 height: 40;
 
-                visible: thisComponent.isExpanded;
+                visible: (opacity != 0);
                 anchors.right: parent.right;
                 anchors.top: parent.top;
 
-                text: "X";
+                iconUrl: "qrc:/skin/welcome_page/close.png";
+                bkgColor: tileArea.color;
+                hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
 
-                onClicked: { toggle(); }
+                onClicked: { thisComponent.toggle(); }
             }
 
             Column
@@ -215,9 +310,30 @@ Item
                     anchors.left: parent.left;
                     anchors.right: parent.right;
 
-                    visible: (transition.running || isExpanded);
+                    visible: (opacity != 0);
                     sourceComponent: thisComponent.expandedAreaDelegate;
                 }
+            }
+
+            Indicator
+            {
+                id: errorLabel;
+
+                property bool isErrorIndicator: (!thisComponent.isValidCustomization
+                    || !thisComponent.isValidVersion);
+
+                anchors.right: parent.right;
+                anchors.bottom: parent.bottom;
+                anchors.rightMargin: 14;
+                anchors.bottomMargin: anchors.rightMargin;
+
+                visible: (!thisComponent.isAvailable
+                    && thisComponent.notAvailableLabelText.length);
+
+                text: thisComponent.notAvailableLabelText;
+                textColor: (isErrorIndicator ? Style.colors.shadow : Style.colors.windowText);
+                color: (isErrorIndicator ? Style.colors.red_main
+                    : Style.colors.custom.systemTile.offlineIndicatorBkg);
             }
         }
     }

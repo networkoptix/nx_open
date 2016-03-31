@@ -20,6 +20,7 @@
 #include <common/common_globals.h>
 #include <utils/mac_utils.h>
 #include <utils/common/app_info.h>
+#include <nx/utils/thread/mutex.h>
 
 
 bool removeDir(const QString &dirName)
@@ -192,7 +193,7 @@ qint64 getDiskTotalSpace(const QString& root) {
 
 #else
 
-//TODO #ak introduce single function for getting partition info 
+//TODO #ak introduce single function for getting partition info
     //and place platform-specific code in a single pace
 
 #ifdef __APPLE__
@@ -246,7 +247,7 @@ quint64 getUsecTimer()
     static QnMutex timeMutex;
     QnMutexLocker lock( &timeMutex );
     quint32 tics = (qint32) timeGetTime();
-    if (tics < prevTics) 
+    if (tics < prevTics)
         cycleCount+= 0x100000000ull;
     prevTics = tics;
     return ((quint64) tics + cycleCount) * 1000ull;
@@ -256,7 +257,7 @@ quint64 getUsecTimer()
     gettimeofday(&tv, 0);
     return tv.tv_sec * 1000000ull + tv.tv_usec;
 #endif
-} 
+}
 
 QString getValueFromString(const QString& line)
 {
@@ -336,7 +337,7 @@ int formatJSonStringInternal(const char* srcPtr, const char* srcEnd, char* dstPt
 
         if (symbolIdx >= 0 && !quoted)
         {
-            if (dstPtrBase) 
+            if (dstPtrBase)
                 memcpy(dstPtr, OUTPUT_DELIMITER.data(), OUTPUT_DELIMITER.size());
             dstPtr += OUTPUT_DELIMITER.size();
             indent += INDENT_SIZE * INDENTS[symbolIdx];
@@ -373,7 +374,7 @@ QByteArray dateTimeToHTTPFormat(const QDateTime& value)
     const QDate& date = value.date();
     const QTime& time = value.time();
     const int offsetFromUtcSeconds = value.offsetFromUtc();
-    const int offsetFromUtcHHMM = 
+    const int offsetFromUtcHHMM =
         (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
         (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
 

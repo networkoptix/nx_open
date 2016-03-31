@@ -16,6 +16,7 @@ $light_offset:  #0A0807;
   @return $light_core - ($index - $light_core_index) * $light_offset;
 }
 
+$blue12:        #1B82AD;
 $blue11:        #2592C3;
 $blue10:        #2FA2DB;
 $blue8:         #43C2FF;
@@ -61,7 +62,15 @@ $light16: light(16);
 $light17: light(17);
 
 
-$brand_d4:                #076281;
+$brand_l4:  #77D2FF;
+$brand_l3:  #5ECBFF;
+$brand_l2:  #43C2FF;
+$brand_l1:  #39B2EF;
+$brand_core: #2FA2DB;
+$brand_d1:  #2592C3;
+$brand_d2:  #1B82AD;
+$brand_d3:  #117297;
+$brand_d4:  #076281;
 
 
 
@@ -82,10 +91,17 @@ $windowText:              $light16;
 $link:                    $blue10;
 $linkVisited:             $blue11;
 
+
 $brandContrast:           white;
 
 
 
+
+
+$button_l1:   $dark10;
+$button:      $dark11;
+$button_d1:   $dark12;
+$button_d2:   $dark13;
 
 
 

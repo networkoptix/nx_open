@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtGui/QMatrix4x4>
+#include <QtCore/QtMath>
 
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
@@ -76,7 +77,7 @@ static bool saveTransformImage(const QPointF *transform, int width, int height, 
             line[stride * y + x * 4 + 3] = 255;
         }
     }
-    
+
     return image.save(fileName);
 }
 #endif
@@ -176,7 +177,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
     //TODO: C fallback routine
 #endif
 
-    if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat) 
+    if (imageSize != m_lastImageSize || frame->format != m_lastImageFormat)
     {
         for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
         {
@@ -215,7 +216,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
                 const QPointF* dstPixel = m_transform[plane] + index;
                 quint8 pixel = GetPixel(m_tmpBuffer->data[plane], m_tmpBuffer->linesize[plane], dstPixel->x(), dstPixel->y());
                 dstLine[x] = pixel;
-                
+
                 index++;
             }
         }
@@ -333,7 +334,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
 void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& imageSize, int plane, qreal aspectRatio)
 {
     qreal fovRot = qDegreesToRadians(m_mediaDewarping.fovRot);
-    QMatrix4x4 perspectiveMatrix( 
+    QMatrix4x4 perspectiveMatrix(
         1.0,    0.0,               0.0,               0.0,
         0.0,    cos(-fovRot),     -sin(-fovRot),      0.0,
         0.0,    sin(-fovRot),      cos(-fovRot),      0.0,
@@ -357,7 +358,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     qreal yCenter = m_mediaDewarping.yCenter;
 
     QPointF* dstPos = m_transform[plane];
-    
+
     int dstDelta = 1;
     if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::VerticalDown) {
         dstPos += imageSize.height()*imageSize.width() - 1;
@@ -400,7 +401,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             // return from polar coordinates
             pos = QVector2D(cos(theta), sin(theta)) * r;
             pos = pos * xy3 + xy4;
-            
+
             qreal dstX = pos.x() * (imageSize.width()-1);
             qreal dstY = pos.y() * (imageSize.height()-1);
 
@@ -410,7 +411,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
                 dstX = imageSize.width();
                 dstY = 0.0;
             }
-            
+
             *dstPos = QPointF(dstX, dstY);
             dstPos += dstDelta;
         }

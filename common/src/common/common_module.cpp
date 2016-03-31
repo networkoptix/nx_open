@@ -6,7 +6,11 @@
 #include <QtCore/QFile>
 #include <QtCore/QCryptographicHash>
 
+#include <api/global_settings.h>
+#include "api/runtime_info_manager.h"
+
 #include <common/common_meta_types.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -19,7 +23,7 @@
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
 #include "utils/common/synctime.h"
-#include "api/runtime_info_manager.h"
+
 
 #include <nx/network/socket_global.h>
 
@@ -51,6 +55,8 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     instance<QnServerAdditionalAddressesDictionary>();
 
     instance<QnResourcePool>();
+
+    instance<QnGlobalSettings>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();

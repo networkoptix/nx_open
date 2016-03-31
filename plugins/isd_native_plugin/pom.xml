@@ -23,21 +23,13 @@
     <properties>
         <product.title>${project.name}</product.title>
         <guid>${isd_native_plugin.guid}</guid>
-        <!--Global libs-->
+
         <qt.libs>core network concurrent</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
         <global.libs>-lcommon -lnx_streaming</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib common.lib Iphlpapi.lib</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs/>
-        <!--Global defines-->
-        <global.defines/>
-        <linux.defines/>
-        <mac.defines/>
-        <!--Specific os defines-->
+
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
+
         <rdep.packages>openssl</rdep.packages>
     </properties>
     <dependencies>

@@ -6,6 +6,7 @@
 extern "C"
 {
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 }
 
 #include "transcoder.h"
@@ -52,7 +53,7 @@ private:
     int m_videoBitrate;
     AVFormatContext* m_formatCtx;
     QString m_lastErrMessage;
-   
+
     AVIOContext* m_ioContext;
     QString m_container;
     qint64 m_baseTime;

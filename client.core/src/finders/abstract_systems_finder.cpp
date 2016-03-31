@@ -8,9 +8,3 @@ QnAbstractSystemsFinder::QnAbstractSystemsFinder(QObject *parent)
 QnAbstractSystemsFinder::~QnAbstractSystemsFinder()
 {}
 
-QnAbstractSystemsFinder::SystemDescriptionList QnAbstractSystemsFinder::systems() const
-{
-    return SystemDescriptionList();
-}
-
-

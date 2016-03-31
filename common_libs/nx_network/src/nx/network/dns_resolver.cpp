@@ -90,7 +90,8 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
 
     if (status != 0)
     {
-        SystemError::setLastErrorCode( status );
+        // TODO: #mux Translate status into corresponding SystemError?
+        SystemError::setLastErrorCode( SystemError::dnsServerFailure );
         return false;
     }
 

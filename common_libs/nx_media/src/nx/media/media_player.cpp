@@ -74,7 +74,7 @@ public:
     bool reconnectOnPlay;
 
     // UTC Playback position at msec. Holds QT property value.
-    qint64 position;
+    qint64 positionMs;
 
     // Video surface to render. Holds QT property value.
     QAbstractVideoSurface* videoSurface;
@@ -126,7 +126,11 @@ public:
 
     // Live buffer overflow counter.
     int overflowCounter;
+    
+    // Video quality
+    Player::VideoQuality videoQuality;
 
+    void updateVideoQuality();
 private:
     PlayerPrivate(Player* parent);
 
@@ -158,7 +162,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     mediaStatus(Player::MediaStatus::NoMedia),
     liveMode(true),
     reconnectOnPlay(false),
-    position(0),
+    positionMs(0),
     videoSurface(0),
     maxTextureSize(kDefaultMaxTextureSize),
     ptsTimerBase(0),
@@ -167,7 +171,8 @@ PlayerPrivate::PlayerPrivate(Player *parent)
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
-    overflowCounter(0)
+    overflowCounter(0),
+    videoQuality(Player::VideoQuality::Auto)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -207,10 +212,10 @@ void PlayerPrivate::setLiveMode(bool value)
 
 void PlayerPrivate::setPosition(qint64 value)
 {
-    if (position == value)
+    if (positionMs == value)
         return;
 
-    position = value;
+    positionMs = value;
     Q_Q(Player);
     emit q->positionChanged();
 }
@@ -248,11 +253,11 @@ void PlayerPrivate::at_gotVideoFrame()
 
 void PlayerPrivate::presentNextFrameDelayed()
 {
-    if (!videoFrameToRender)
+    if (!videoFrameToRender || !dataConsumer)
         return;
 
     qint64 delayToRenderMs = 0;
-    if (dataConsumer && dataConsumer->audioOutput())
+    if (dataConsumer->audioOutput())
     {
         if (dataConsumer->audioOutput()->isBufferUnderflow())
         {
@@ -432,6 +437,19 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
     }
 }
 
+void PlayerPrivate::updateVideoQuality()
+{
+    if (!archiveReader)
+        return;
+
+    if (videoQuality == Player::VideoQuality::Auto)
+        archiveReader->setQuality(MEDIA_Quality_High, true); // MEDIA_Quality_Auto
+    else if (videoQuality == Player::VideoQuality::High)
+        archiveReader->setQuality(MEDIA_Quality_High, true);
+    else if (videoQuality == Player::VideoQuality::Low)
+        archiveReader->setQuality(MEDIA_Quality_Low, true);
+}
+
 bool PlayerPrivate::initDataProvider()
 {
     QnUuid id(url.path().mid(1));
@@ -443,6 +461,7 @@ bool PlayerPrivate::initDataProvider()
     }
 
     archiveReader.reset(new QnArchiveStreamReader(resource));
+    updateVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
     archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
@@ -474,10 +493,10 @@ bool PlayerPrivate::initDataProvider()
         }
     }
 
-    if (position != kLivePosition)
+    if (!liveMode)
     {
         // Second arg means precise seek.
-        archiveReader->jumpTo(msecToUsec(position), msecToUsec(position));
+        archiveReader->jumpTo(msecToUsec(positionMs), msecToUsec(positionMs));
     }
 
     dataConsumer->start();
@@ -528,7 +547,7 @@ QAbstractVideoSurface *Player::videoSurface() const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    return d->position;
+    return d->positionMs;
 }
 
 void Player::setPosition(qint64 value)
@@ -539,7 +558,7 @@ void Player::setPosition(qint64 value)
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
-        d->position = value;
+        d->positionMs = value;
 
     d->at_hurryUp(); //< renew receiving frames
 }
@@ -630,6 +649,23 @@ void Player::setReconnectOnPlay(bool reconnectOnPlay)
 {
     Q_D(Player);
     d->reconnectOnPlay = reconnectOnPlay;
+}
+
+Player::VideoQuality Player::videoQuality() const
+{
+    Q_D(const Player);
+    return d->videoQuality;
+}
+
+void Player::setVideoQuality(const VideoQuality& value)
+{
+    Q_D(Player);
+
+    if (d->videoQuality == value)
+        return;
+
+    d->videoQuality = value;
+    d->updateVideoQuality();
 }
 
 } // namespace media

@@ -26,7 +26,7 @@ public:
     virtual int decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
     virtual void setAllocator(AbstractResourceAllocator* allocator) override;
 private:
-    QScopedPointer<AndroidVideoDecoderPrivate> d_ptr;
+    std::shared_ptr<AndroidVideoDecoderPrivate> d;
     Q_DECLARE_PRIVATE(AndroidVideoDecoder);
 };
 

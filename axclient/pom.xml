@@ -22,19 +22,14 @@
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
         <template>lib</template>
-        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!--Global libs-->
+
+        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9 -lopenal32</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        
-        <global.defines/>
+
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         
-        <rdep.packages>openssl quazip festival festival-vox</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox</rdep.packages>
     </properties>
 
 <dependencies>

@@ -1,6 +1,7 @@
 #include "server_additional_addresses_dictionary.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/uuid.h>
 
 QnServerAdditionalAddressesDictionary::QnServerAdditionalAddressesDictionary(QObject *parent):
         QObject(parent)

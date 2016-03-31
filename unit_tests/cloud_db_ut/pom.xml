@@ -19,23 +19,14 @@
     <properties>
         <guid>${cloud_db_ut.guid}</guid>
         <product.title>cloud_db unit tests</product.title>
-        <!--Global libs-->
+
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_email -ludt -lcloud_db -lcloud_db_client</global.libs>
-        <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lfaac -lswscale -lmp3lame</linux.oslibs>
-        <linux.arm.oslibs></linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <mac.oslibs></mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
+
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-        <rdep.packages>openssl quazip</rdep.packages>
+
+        <rdep.packages>openssl quazip ffmpeg</rdep.packages>
     </properties>
 
     <dependencies>

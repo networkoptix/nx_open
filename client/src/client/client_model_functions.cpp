@@ -88,3 +88,20 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (Qn::DeprecatedEditCamerasPermission, "DeprecatedEditCamerasPermission")
     (Qn::DeprecatedViewExportArchivePermission, "DeprecatedViewExportArchivePermission")
     );
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    Qn::PaneState,
+    (Qn::PaneState::Unpinned, "Unpinned")
+    (Qn::PaneState::Opened, "Opened")
+    (Qn::PaneState::Closed, "Closed")
+    );
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    Qn::WorkbenchPane,
+    (Qn::WorkbenchPane::Title, "Title")
+    (Qn::WorkbenchPane::Tree, "Tree")
+    (Qn::WorkbenchPane::Notifications, "Notifications")
+    (Qn::WorkbenchPane::Navigation, "Navigation")
+    (Qn::WorkbenchPane::Calendar, "Calendar")
+    (Qn::WorkbenchPane::Thumbnails, "Thumbnails")
+    );

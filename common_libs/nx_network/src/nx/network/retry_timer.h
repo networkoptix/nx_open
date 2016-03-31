@@ -32,6 +32,11 @@ public:
         std::chrono::minutes(1);
 
     RetryPolicy();
+    RetryPolicy(
+        unsigned int maxRetryCount,
+        std::chrono::milliseconds initialDelay,
+        unsigned int delayMultiplier,
+        std::chrono::milliseconds maxDelay);
 
     void setMaxRetryCount(unsigned int retryCount);
     unsigned int maxRetryCount() const;

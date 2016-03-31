@@ -2,6 +2,11 @@
 /*exported Config */
 
 var Config = {
+
+    defaultLogin: 'admin',
+    defaultPassword: 'admin',
+    newServerFlag: 'SF_NewSystem',
+
     globalEditServersPermissions:0x00000020 ,
     globalViewArchivePermission:0x00000100,
     globalViewLivePermission:0x00000080,
@@ -12,9 +17,9 @@ var Config = {
         portalUrl: 'http://cloud-demo.hdw.mx',
         portalRegisterUrl: 'http://cloud-demo.hdw.mx/static/index.html#/register',
 
-        portalSystemUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}?inline',
-        portalConnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/connect/{systemName}?inline',
-        portalDisconnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}/disconnect?inline'
+        portalSystemUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}',
+        portalConnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/connect/{systemName}',
+        portalDisconnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}/disconnect'
     },
 
     cloudLocalhost:{

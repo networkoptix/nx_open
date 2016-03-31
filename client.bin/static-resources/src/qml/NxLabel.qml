@@ -6,10 +6,54 @@ Text
 {
     id: thisComponent;
 
-    property color defaultColor: Style.label.color;
+    property bool acceptClicks: false;
+    property bool autoHoverable: false;
+    property bool isHovered: false;
+    property bool disableable: true;
 
-    color: defaultColor;
+    property color standardColor: Style.label.color;
+    property color hoveredColor: Style.lighterColor(Style.label.color);
+    property color disabledColor: standardColor;
+    property var hoveredCursorShape: Qt.ArrowCursor;
+
+    signal clicked();
+
+    opacity: (disableable && !enabled ? 0.3 : 1.0);
+
+    color:
+    {
+        if (!enabled)
+            return disabledColor;
+
+        return (isHovered ? hoveredColor : standardColor);
+    }
+
     height: Style.label.height;
     font: Style.label.font;
-    renderType: Text.NativeRendering;
+
+    renderType: Text.QtRendering;
+    verticalAlignment: Text.AlignVCenter;
+
+    Binding
+    {
+        target: thisComponent;
+        property: "isHovered";
+        when: thisComponent.autoHoverable;
+        value: hoverArea.containsMouse;
+    }
+
+    MouseArea
+    {
+        id: hoverArea;
+
+        anchors.fill: parent;
+        acceptedButtons: (acceptClicks ? Qt.AllButtons : Qt.NoButton);
+        hoverEnabled: thisComponent.autoHoverable;
+
+        cursorShape: (thisComponent.isHovered
+            ? thisComponent.hoveredCursorShape
+            : Qt.ArrowCursor);
+
+        onClicked: thisComponent.clicked();
+    }
 }

@@ -5,13 +5,15 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <libavutil/pixfmt.h>
+
 #include "abstract_image_filter.h"
 
 class QnScaleImageFilter: public QnAbstractImageFilter
 {
 public:
     QnScaleImageFilter(const QSize& size, PixelFormat format = PIX_FMT_NONE);
-    
+
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& srcSize) override;

@@ -52,7 +52,10 @@ TEST_F(CloudStreamSocketTest, simple)
     const size_t repeatCount = 100;
 
     //starting local tcp server
-    test::RandomDataTcpServer server(bytesToSendThroughConnection);
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -73,6 +76,17 @@ TEST_F(CloudStreamSocketTest, simple)
         ASSERT_EQ(bytesToSendThroughConnection, bytesRead);
     }
 
+    // also try to connect just by system name
+    {
+        CloudStreamSocket cloudSocket;
+        ASSERT_TRUE(cloudSocket.connect(SocketAddress("bla"), 0));
+        QByteArray data;
+        data.resize(bytesToSendThroughConnection);
+        const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
+        ASSERT_EQ(bytesToSendThroughConnection, bytesRead);
+    }
+
+    server.pleaseStopSync();
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
         serverAddress);
@@ -94,7 +108,10 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         });
 
     //starting local tcp server
-    test::RandomDataTcpServer server(bytesToSendThroughConnection);
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -107,16 +124,16 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
     test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(tempHostName),
         maxSimultaneousConnections,
-        bytesToSendThroughConnection);
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        test::ConnectionsGenerator::kInfiniteConnectionCount,
+        test::TestTransmissionMode::spam);
     connectionsGenerator.start();
 
     std::this_thread::sleep_for(testDuration);
 
-    connectionsGenerator.pleaseStop();
-    connectionsGenerator.join();
-
-    server.pleaseStop();
-    server.join();
+    connectionsGenerator.pleaseStopSync();
+    server.pleaseStopSync();
 
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
@@ -155,6 +172,18 @@ TEST_F(CloudStreamSocketTest, simple_socket_test)
         serverAddress,
         SocketAddress(tempHostName));
 
+    test::socketSimpleSync(
+        createServerSocketFunc,
+        createClientSocketFunc,
+        serverAddress,
+        SocketAddress("bla"));
+
+    test::socketSimpleAsync(
+        createServerSocketFunc,
+        createClientSocketFunc,
+        serverAddress,
+        SocketAddress("bla"));
+
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
         serverAddress);
@@ -187,7 +216,10 @@ TEST_F(CloudStreamSocketTest, cancellation)
     const size_t repeatCount = 100;
 
     //starting local tcp server
-    test::RandomDataTcpServer server(bytesToSendThroughConnection);
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::outgoing,
+        bytesToSendThroughConnection,
+        test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();

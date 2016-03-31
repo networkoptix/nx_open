@@ -7,8 +7,8 @@ var Page = function () {
 
     this.storagesRows = element.all(by.repeater("storage in storages"));
 
-    this.dangerAlert = element(by.id("alert-danger-page"));
-    this.saveButton = element(by.buttonText("Save"));
+    this.dangerAlert = element.all(by.css(".alert-danger")).first();
+    this.saveButton = element(by.name("form")).element(by.buttonText("Save"));
 
     this.cancelButton = element(by.buttonText("Cancel"));
 

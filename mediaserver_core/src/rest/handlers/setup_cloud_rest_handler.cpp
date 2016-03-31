@@ -1,5 +1,7 @@
 #include "setup_cloud_rest_handler.h"
 
+#include <api/global_settings.h>
+
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
 #include "save_cloud_system_credentials.h"
@@ -49,9 +51,7 @@ int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequ
 
 int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRestResult &result)
 {
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-    if (!systemName.isDefault())
+    if (!qnGlobalSettings->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
         return nx_http::StatusCode::ok;
@@ -66,13 +66,18 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRes
 
     if (!qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Cannot find self server resource."));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
 
     QnSaveCloudSystemCredentialsHandler subHundler;
     int httpResult = subHundler.execute(data, result);
     if (result.error == QnJsonRestResult::NoError)
+    {
         changeSystemName(newSystemName, 0, 0);
+        qnGlobalSettings->setNewSystem(false);
+        if (qnGlobalSettings->synchronizeNowSync())
+            qnCommon->updateModuleInformation();
+    }
     return httpResult;
 }

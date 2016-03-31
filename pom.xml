@@ -116,7 +116,6 @@
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile></newmobile>
-        <ffmpeg.libs></ffmpeg.libs>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -140,7 +139,7 @@
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
-        <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+        <ffmpeg.version>0.11.4</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
@@ -150,6 +149,22 @@
         <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
+        <server-external.version>3.0.0</server-external.version>
+
+        <qt.libs/>
+        <global.libs/>
+        <windows.oslibs/>
+        <linux.oslibs/>
+        <mac.oslibs/>
+        <android.oslibs/>
+        <ios.oslibs/>
+
+        <global.defines/>
+        <windows.defines/>
+        <linux.defines/>
+        <mac.defines/>
+        <android.defines/>
+        <ios.defines/>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
@@ -688,7 +703,7 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
                 <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
@@ -717,7 +732,7 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
@@ -748,7 +763,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
             </properties>
@@ -777,7 +792,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <qt.spec/>
@@ -805,7 +820,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
             </properties>
@@ -950,8 +965,9 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
+                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.2d</openssl.version>
-                <additional.defines>DISABLE_FFMPEG</additional.defines>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>android-${arch}</rdep.target>
             </properties>
@@ -1003,5 +1019,21 @@
                 <rdep.target>ios</rdep.target>
             </properties>
         </profile>
+        <profile>
+            <id>webadmin</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>webadmin</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <modules>
+                <module>webadmin</module>
+            </modules>            
+        </profile>        
     </profiles>
 </project>

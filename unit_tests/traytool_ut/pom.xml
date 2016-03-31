@@ -23,14 +23,12 @@
     <properties>
         <product.title>HD Witness Image Library Plugin Unit Tests</product.title>  
         <root.dir>${basedir}/../..</root.dir>
-        <!--Specify the project to test-->      
         <master.project.directory>traytool</master.project.directory>
-        <!--Global libs-->      
+
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-ltraytool -lonvif</global.libs>
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
-        <linux.defines/>
-        <mac.defines/>  
+
         <path>${env.PATH}</path>
         <rdep.packages>quazip</rdep.packages>
     </properties>

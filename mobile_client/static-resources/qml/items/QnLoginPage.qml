@@ -40,7 +40,7 @@ QnPage {
             if (state != "New")
             {
                 if (connecting)
-                    connectionManager.disconnectFromServer()
+                    connectionManager.disconnectFromServer(true)
                 Main.gotoMainScreen()
             }
         }

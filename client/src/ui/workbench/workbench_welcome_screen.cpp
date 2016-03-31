@@ -9,9 +9,12 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <utils/common/delayed.h>
+#include <nx/utils/raii_guard.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
+#include <ui/models/system_hosts_model.h>
 #include <ui/models/last_system_users_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
@@ -29,6 +32,7 @@ namespace
         static const auto kContextVariableName = lit("context");
 
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
+        qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
 
         const auto quickWidget = new QQuickWidget();
@@ -59,11 +63,13 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
+    , m_visibleControls(true)
+    , m_visible(false)
+    , m_connectingNow(false)
     , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
     , m_pageSize(m_widget->size())
-    , m_visible(false)
 {
     NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
     connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
@@ -141,10 +147,42 @@ void QnWorkbenchWelcomeScreen::setPageSize(const QSize &size)
     emit pageSizeChanged();
 }
 
+bool QnWorkbenchWelcomeScreen::visibleControls() const
+{
+    return m_visibleControls;
+}
+
+void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
+{
+    if (m_visibleControls == visible)
+        return;
+
+    m_visibleControls = visible;
+    emit visibleControlsChanged();
+}
+
+bool QnWorkbenchWelcomeScreen::connectingNow() const
+{
+    return m_connectingNow;
+}
+
+void QnWorkbenchWelcomeScreen::setConnectingNow(bool value)
+{
+    if (m_connectingNow == value)
+        return;
+
+    m_connectingNow = value;
+    emit connectingNowChanged();
+}
+
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
     , const QString &password)
 {
+    setConnectingNow(true);
+    const auto controlsGuard = QnRaiiGuard::createDestructable(
+        [this]() { setConnectingNow(false); });
+
     QUrl url = QUrl::fromUserInput(serverUrl);
     url.setScheme(lit("http"));
     if (!password.isEmpty())
@@ -175,9 +213,27 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 {
-    /* We are receiving string with port but without protocol, so we must parse it. */
-    QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(QUrl::fromUserInput(serverUrl), mainWindow()));
-    dialog->exec();
+    setVisibleControls(false);
+    const auto controlsGuard = QnRaiiGuard::createDestructable(
+        [this]() { setVisibleControls(true); });
+
+    const auto showDialogHandler = [this, serverUrl, controlsGuard]()
+    {
+        /* We are receiving string with port but without protocol, so we must parse it. */
+        const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindow()));
+        dialog->setUrl(QUrl::fromUserInput(serverUrl));
+        if (isLoggedInToCloud())
+        {
+            dialog->setCloudLogin(m_cloudWatcher->cloudLogin());
+            dialog->setCloudPassword(m_cloudWatcher->cloudPassword());
+        }
+        dialog->exec();
+    };
+
+    // Use delayed handling for proper animation
+    enum { kNextEventDelay = 100 };
+    executeDelayedParented(showDialogHandler
+        , kNextEventDelay, this);
 }
 
 void QnWorkbenchWelcomeScreen::logoutFromCloud()
