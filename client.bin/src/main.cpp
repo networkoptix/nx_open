@@ -540,20 +540,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 #endif
 
-    /* Process pending events before executing actions. */
-    qApp->processEvents();
-
-    // show beta version warning message for the main instance only
-    if (!startupParams.allowMultipleClientInstances &&
-        !qnRuntime->isDevMode() &&
-        QnAppInfo::beta())
-        context->action(QnActions::BetaVersionMessageAction)->trigger();
-
-#ifdef _DEBUG
-    /* Show FPS in debug. */
-    context->menu()->trigger(QnActions::ShowFpsAction);
-#endif
-
     /************************************************************************/
     /* Initializing resource searchers                                      */
     /************************************************************************/
@@ -639,6 +625,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
         context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
+
+    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(lit("cloud1@gdm.su"), lit("qweasd123"), true);
+
+
+
+    // show beta version warning message for the main instance only
+    if (!startupParams.allowMultipleClientInstances &&
+        !qnRuntime->isDevMode() &&
+        QnAppInfo::beta())
+        context->action(QnActions::BetaVersionMessageAction)->trigger();
+
+#ifdef _DEBUG
+    /* Show FPS in debug. */
+    context->menu()->trigger(QnActions::ShowFpsAction);
+#endif
 
     result = application->exec();
 
