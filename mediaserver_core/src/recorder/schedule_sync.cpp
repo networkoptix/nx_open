@@ -212,7 +212,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         if (!fromFile) 
         {   // This means that source storage is not available or 
             // source file's been removed by external force.
-            if (fromStorage->isAvailable())
+            if (fromStorage->initOrUpdate())
             {   // File's gone. Log this and skip this file.
                 NX_LOG(
                     lit("[Backup::copyFile] Source file %1 open failed. Skipping.")

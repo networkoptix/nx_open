@@ -15,7 +15,7 @@ QnMobileClientTranslationManager::~QnMobileClientTranslationManager()
 
 void QnMobileClientTranslationManager::updateTranslation()
 {
-    QString localeName = QLocale().name();
+    QString localeName = QLocale::system().name();
     QString langName = localeName.split(L'_').first();
 
     QnTranslation bestTranslation;

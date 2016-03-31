@@ -66,8 +66,8 @@ TEST(AbstractStorageResourceTest, Init)
                 false
             )
         );
-        EXPECT_TRUE(ftpStorage && ftpStorage->isAvailable());
-        if (ftpStorage && ftpStorage->isAvailable())
+        EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate());
+        if (ftpStorage && ftpStorage->initOrUpdate())
         {
             ftpStorage->setUrl(tg->ftpStorageUrl);
             tg->storageManager->addStorage(ftpStorage);
@@ -104,7 +104,7 @@ TEST(AbstractStorageResourceTest, Capabilities)
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::ReadFile);
         ASSERT_TRUE(storageCapabilities | QnAbstractStorageResource::cap::WriteFile);
 
-        ASSERT_TRUE(storage->isAvailable());
+        ASSERT_TRUE(storage->initOrUpdate());
         ASSERT_TRUE(storage->getFreeSpace() > 0);
         ASSERT_TRUE(storage->getTotalSpace() > 0);
     }
@@ -377,7 +377,7 @@ public:
         return 0;
     }
 
-    virtual bool isAvailable() const override {
+    virtual bool initOrUpdate() const override {
         assert(0);
         return true;
     }
@@ -413,7 +413,8 @@ public:
     }
 };
 
-TEST(Storage_load_balancing_algorithm_test, Main) {
+TEST(Storage_load_balancing_algorithm_test, Main) 
+{
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
@@ -467,49 +468,51 @@ TEST(Storage_load_balancing_algorithm_test, Main) {
     storage2->setStatus(Qn::Online, true);
     storage3->setStatus(Qn::Online, true);
 
-    ASSERT_TRUE(storage1->calcUsageCoeff() == 0.0);
-    ASSERT_TRUE(storage2->calcUsageCoeff() == 0.0);
-    ASSERT_TRUE(storage3->calcUsageCoeff() == 0.0);
-    
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int64_t> dist(1 * 1024 * 1024, 50 * 1024 * 1024);
-    
-    const int writeCount = 1000000;
-    int64_t totalWrited = 0;
-    QnUuid currentStorageId;
-    int currentStorageUseCount = 0;
-    const int MAX_STORAGE_USE_IN_A_ROW = 10;
-    const int MAX_USAGE_DELTA = 1024;
+    storage1->setWritedCoeff(0.3);
+    storage1->setWritedCoeff(0.3);
+    storage1->setWritedCoeff(0.4);
 
-    for (int i = 0; i < writeCount; ++i) {
+    const int writeCount = 1000 * 1000 * 1;
+    QnUuid currentStorageId;
+
+    int currentStorageUseCount = 0;
+    int useInARowOverflowCount = 0;
+
+    const int kMaxStorageUseInARow = 15;
+    const int kMaxUseInARowOverflowCount = 5;
+    const double kMaxUsageDelta = 50;
+
+    for (int i = 0; i < writeCount; ++i) 
+    {
         auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
         ASSERT_TRUE(storage);
-        if (currentStorageId != storage->getId()) {
+        if (currentStorageId != storage->getId()) 
+        {
             currentStorageId = storage->getId();
+            if (currentStorageUseCount > kMaxStorageUseInARow)
+                ++useInARowOverflowCount;
             currentStorageUseCount = 0;
-        } else {
+        }
+        else 
+        {
             ++currentStorageUseCount;
         }
-        ASSERT_TRUE(currentStorageUseCount < MAX_STORAGE_USE_IN_A_ROW);
-        int64_t fileSize = dist(gen);
-        totalWrited += fileSize;
-        storage->addWrited(fileSize);
+        storage->addWrited(1000.0);
     }
+    /*  Actually, due to probabilistic nature of selecting storage algorithm
+    *   some storage may be selected more than kMaxStorageUseIARow times.
+    *   Let's at least check that such peaks are not too often.
+    *   kMaxUseInARowOverflowCount peak breaches on 1 * 1000 * 1000 selections seem fair enough.
+    */
+    ASSERT_TRUE(useInARowOverflowCount < kMaxUseInARowOverflowCount);
 
-    ASSERT_TRUE(totalWrited > 0);
+    double storage1UsageCoeff = storage1->calcUsageCoeff();
+    double storage2UsageCoeff = storage2->calcUsageCoeff();
+    double storage3UsageCoeff = storage3->calcUsageCoeff();
 
-    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
-    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
-    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
-
-    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage3->calcUsageCoeff()) < MAX_USAGE_DELTA);
-    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage3->calcUsageCoeff()) < MAX_USAGE_DELTA);
-    ASSERT_TRUE(qAbs(storage1->calcUsageCoeff() - storage3->calcUsageCoeff()) < MAX_USAGE_DELTA);
-
-    ASSERT_TRUE(qAbs(storage3->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
-    ASSERT_TRUE(qAbs(storage3->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
-    ASSERT_TRUE(qAbs(storage3->calcUsageCoeff() - storage2->calcUsageCoeff()) < MAX_USAGE_DELTA);
+    ASSERT_TRUE(qAbs(storage1UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
+    ASSERT_TRUE(qAbs(storage1UsageCoeff - storage3UsageCoeff) < kMaxUsageDelta);
+    ASSERT_TRUE(qAbs(storage3UsageCoeff - storage2UsageCoeff) < kMaxUsageDelta);
 }
 
 TEST(AbstractStorageResourceTest, fini)

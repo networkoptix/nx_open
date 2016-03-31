@@ -253,6 +253,10 @@ protected:
     qint64 m_firstTime;
 protected:
     bool m_initialized;
+    //! Make sure to correctly fill these member variables in overriden open() function.
+    bool m_initializedAudio;    // Incoming audio packets will be ignored.
+    bool m_initializedVideo;    // Incoming video packets will be ignored.
+
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;

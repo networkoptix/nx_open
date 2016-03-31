@@ -334,7 +334,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
     return 0; // not implemented
 }
 
-bool QnLayoutFileStorageResource::isAvailable() const
+bool QnLayoutFileStorageResource::initOrUpdate() const
 {
     QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);

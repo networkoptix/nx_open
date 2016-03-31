@@ -402,7 +402,7 @@ void DeviceFileCatalog::setLastSyncTime(int64_t time)
 {
     qnServerDb->setLastBackupTime(
         m_storagePool,
-        qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
+        guidFromArbitraryData(m_cameraUniqueId),
         m_catalog,
         time 
     );
@@ -415,7 +415,7 @@ int64_t DeviceFileCatalog::getLastSyncTimeFromDBNoLock() const
 {
     int64_t ret = qnServerDb->getLastBackupTime(
         m_storagePool,
-        qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
+        guidFromArbitraryData(m_cameraUniqueId),
         m_catalog
     );
     return ret;
@@ -791,7 +791,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
     {
         QnMutexLocker lock( &m_mutex );
 
-        if (m_chunks.empty())
+        if (m_chunks.empty() || (m_chunks.size() == 1 && m_chunks[0].durationMs == 0))
             return deletedChunk;
         else
         {
