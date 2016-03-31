@@ -178,10 +178,10 @@
     <button class="btn btn-default" ng-if="activeStep.back"
             ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
     <button class="btn btn-primary pull-right" ng-if="activeStep.next"
-            ng-disabled="cantGoNext()"
+            ng-disabled="lockNextButton || cantGoNext()"
             enter-button
             ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
     <button class="btn btn-primary pull-right" ng-if="activeStep.finish"
             enter-button
-            ng-click="finish()" autofocus>Finish</button>
+            ng-click="finish()" ng-disabled="lockNextButton" autofocus>Finish</button>
 </div>
