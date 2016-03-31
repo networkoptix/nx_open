@@ -4,18 +4,6 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-
-        p.get();
-        p.emailInput.sendKeys(p.helper.userEmailWrong);
-        p.passwordInput.sendKeys(p.helper.userPassword);
-        p.alert.submitButton.click();
-
-        deferred.fulfill();
-        return deferred.promise;
-    }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
-
     it("should open login dialog in anonymous state", function () {
         browser.sleep(1000);
         p.get();
@@ -73,6 +61,18 @@ describe('Login suite', function () {
 
         p.logout();
     });
+
+    p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
+        p.get();
+        p.emailInput.sendKeys(p.helper.userEmailWrong);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
+    }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
 
     it("should not log in with wrong email", function () {
         p.get();
@@ -231,12 +231,32 @@ describe('Login suite', function () {
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
-    xit("should not log in and show error for inactivated user", function () {
-        expect("test").toBe("written");
+    it("should not log in and show error for inactivated user", function () {
+        var userEmail = p.helper.register();
+
+        p.get();
+        p.emailInput.sendKeys(userEmail);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.dialogLoginButton.click();
+        p.alert.catchAlert(p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger)
     });
 
+    p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+
+        var userEmail = p.helper.register();
+
+        p.get();
+        p.emailInput.sendKeys(userEmail);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.alert.submitButton.click();
+
+        deferred.fulfill();
+        return deferred.promise;
+    }, p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger, true);
+
     xit("should log in with Remember Me checkmark switched on, close browser, open browser and enter same session", function () {
-        //TODO: check remember me function by closing browser instance and opening it again
+        //check remember me function by closing browser instance and opening it again
         expect("test").toBe("written");
     });
 

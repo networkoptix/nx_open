@@ -6,7 +6,7 @@ var AlertSuite = function () {
     this.alertTypes = {danger: 'danger', success: 'success'};
     this.alertMessages = {
         loginIncorrect: 'Login or password are incorrect',
-        loginNotActive: 'Your account was not confirmed',
+        loginNotActive: 'Your account wasn\'t confirmed yet',
         registerSuccess: 'Your account was successfully registered. Please, check your email to confirm it',
         registerConfirmSuccess: 'Your account was successfully activated.',
         registerConfirmError: 'Couldn\'t activate your account: Wrong confirmation code',
