@@ -17,5 +17,7 @@ win* {
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
-PRECOMPILED_HEADER = StdAfx.h
-PRECOMPILED_SOURCE = StdAfx.cpp
+win* {
+    PRECOMPILED_HEADER = StdAfx.h
+    PRECOMPILED_SOURCE = StdAfx.cpp
+}    
