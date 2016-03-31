@@ -29,7 +29,9 @@ angular.module('cloudApp')
             logout:function(){
                 cloudApi.logout().then(function(){
                     $localStorage.$reset(); // Clear session
-                    $location.path(Config.redirectUnauthorised);
+                    if(!doNotRedirect) {
+                        $location.path(Config.redirectUnauthorised);
+                    }
                     setTimeout(function(){
                         document.location.reload();
                     });
@@ -38,7 +40,7 @@ angular.module('cloudApp')
             logoutAuthorised:function(){
                 var self = this;
                 this.get().then(function(){
-                    self.logout();
+                    self.logout(true);
                 });
             }
         }
