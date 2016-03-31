@@ -87,6 +87,22 @@ var RegisterPage = function () {
         this.passwordInput.sendKeys(this.helper.userPassword);
     };
 
+    this.getActivationPage = function(userEmail) {
+        var deferred = protractor.promise.defer();
+
+        browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.helper.emailSubjects.register).then(function (email) {
+            // extract registration token from the link in the email message
+            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
+            var regCode = pattern.exec(email.html)[1];
+            console.log(regCode);
+            browser.get('/#/activate/' + regCode);
+
+            deferred.fulfill();
+        }));
+
+        return deferred.promise;
+    };
+
     this.termsConditions = element(by.linkText('Terms and Conditions'));
 };
 
