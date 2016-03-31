@@ -115,15 +115,18 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
         console.log("Waiting for an email...");
 
-        notifier.on("mail", function(mail){
+        function onMail(mail) {
             if((emailAddress === mail.headers.to) && (mail.subject.includes(emailSubject))) {
                 console.log("Catch email to: " + mail.headers.to);
                 deferred.fulfill(mail);
                 notifier.stop();
+                notifier.removeListener("mail", onMail);
                 return;
             }
             console.log("Ignore email to: " + mail.headers.to);
-        });
+        }
+
+        notifier.on("mail", onMail);
 
         notifier.start();
 
