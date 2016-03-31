@@ -42,7 +42,6 @@ public:
     int getStorageIndex(const QnStorageResourcePtr& storage);
     void removeSDB(const QnStorageResourcePtr &storage);
 
-    static bool getDBPath(const QnStorageResourcePtr& storage, QString* const dbDirectory, bool isSqliteDb = false);
     static QString getLocalGuid();
     void flush();
 private:

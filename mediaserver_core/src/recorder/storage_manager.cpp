@@ -49,27 +49,66 @@
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 //static const int DB_UPDATE_PER_RECORDS = 128;
-namespace {
-    static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
-    static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
-    static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
-    static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+namespace 
+{
+static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
+static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
+static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
+static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
-    const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
-    const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
+const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
+const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
 
-    const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
+const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 
-    struct TasksQueueInfo {
-        int tasksCount;
-        int currentTask;
+struct TasksQueueInfo {
+    int tasksCount;
+    int currentTask;
 
-        TasksQueueInfo() : tasksCount(0), currentTask(0) {}
-        void reset(int size = 0) {tasksCount = size; currentTask = 0;}
-        bool isEmpty() const { return tasksCount == 0; }
-    };
+    TasksQueueInfo() : tasksCount(0), currentTask(0) {}
+    void reset(int size = 0) {tasksCount = size; currentTask = 0;}
+    bool isEmpty() const { return tasksCount == 0; }
+};
+
+const QString dbRefFileName( QLatin1String("%1_db_ref.guid") );
+
+bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath)
+{
+    QString storageUrl = storage->getUrl();
+    QString dbRefFilePath;
+
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid());
+    QByteArray dbRefGuidStr;
+
+    //checking for file db_ref.guid existence
+    if (storage->isFileExists(dbRefFilePath))
+    {
+        //have to use db from data directory, not from storage
+        //reading guid from file
+        auto dbGuidFile = std::unique_ptr<QIODevice>(storage->open(dbRefFilePath, QIODevice::ReadOnly));
+
+        if (!dbGuidFile)
+            return false;
+        dbRefGuidStr = dbGuidFile->readAll();
+        //dbGuidFile->close();
+    }
+
+    if( !dbRefGuidStr.isEmpty() )
+    {
+        dbFolderPath = QDir(getDataDirectory() + "/storage_db/" + dbRefGuidStr).absolutePath();
+        return true;
+    }
+    else if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
+    {
+        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+        dbFolderPath = fileStorage ? fileStorage->getLocalPath() : storage->getPath();
+        return true;
+    }
+    return false;
 }
+
+} // namespace <anonymous>
 
 class ArchiveScanPosition
 {
@@ -543,11 +582,13 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
 void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storage)
 {
     QString dbPath;
-    if (!QnStorageDbPool::getDBPath(storage, &dbPath, true))
+    if (!getSqlDbPath(storage, dbPath))
         return;
 
     QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
     QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+    if (!QFile::exists(fileName))
+        return;
 
     QSqlDatabase sqlDb = QSqlDatabase::addDatabase(lit("QSQLITE"), QString("QnStorageManager_%1").arg(fileName));
     sqlDb.setDatabaseName(fileName);
@@ -614,7 +655,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     sqlDb.close();
     QSqlDatabase::removeDatabase(sqlDb.connectionName());
-    storage->renameFile(fileName, fileName + lit("_deprecated"));
+    QFile::rename(fileName, fileName + lit("_deprecated"));
 
     auto sdb = qnStorageDbPool->getSDB(storage);
     auto newCatalogs = sdb->loadFullFileCatalog();
