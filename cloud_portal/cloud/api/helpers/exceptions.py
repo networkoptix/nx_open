@@ -228,8 +228,8 @@ def handle_exceptions(func):
             request_data = request_data.dict()
 
         if isinstance(error, APIException):
-            error_text = error.error_text
-            error_formatted = 'Status: {0}\nMessage: {1}\nError code: {2}\nError data: {3}'.\
+            error_text = "{}({})".format(error.error_text, error.error_code)
+            error_formatted = 'Status: {}\nMessage: {}\nError code: {}\nError data: {}'.\
                               format(error.status_code,
                                      error.error_text,
                                      error.error_code,
@@ -239,15 +239,15 @@ def handle_exceptions(func):
             error_text = 'unknown'
             error_formatted = 'Unexpected error'
 
-        error_formatted = '\n{0}:{7}\nPortal URL: {1}\nUser: {2}\nUser IP:{3}\nRequest: {4}\n{5}\nCall Stack: \n{6}'.\
+        error_formatted = '\n{}:{}\nPortal URL: {}\nUser: {}\nUser IP:{}\nRequest: {}\n{}\nCall Stack: \n{}'.\
             format(error.__class__.__name__,
+                   error_text,
                    page_url,
                    user_name,
                    ip,
                    request_data,
                    error_formatted,
-                   traceback.format_exc(),
-                   error_text
+                   traceback.format_exc()
                    )
 
         logger.error(error_formatted)
