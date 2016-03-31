@@ -26,7 +26,7 @@ angular.module('cloudApp')
                     $location.path(Config.redirectAuthorised);
                 });
             },
-            logout:function(){
+            logout:function(doNotRedirect){
                 cloudApi.logout().then(function(){
                     $localStorage.$reset(); // Clear session
                     if(!doNotRedirect) {
