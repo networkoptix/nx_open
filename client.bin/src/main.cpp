@@ -595,7 +595,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 switch (action)
                 {
                 case QnSystemUriResolver::Action::LoginToCloud:
-                    //TODO: #GDM implement me
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(resolver.result().login, resolver.result().password, true);
                     break;
                 case QnSystemUriResolver::Action::ConnectToServer:
                     context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, resolver.result().serverUrl));
