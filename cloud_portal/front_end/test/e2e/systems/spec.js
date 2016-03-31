@@ -7,10 +7,12 @@ describe('Systems list suite', function () {
     beforeAll(function() {
         p.getHomePage();
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
+        console.log("Systems start");
     });
 
     afterAll(function() {
         p.helper.logout();
+        console.log("Systems finish");
     });
 
     it("should show list of Systems", function () {

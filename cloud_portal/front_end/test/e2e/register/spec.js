@@ -3,6 +3,13 @@ var RegisterPage = require('./po.js');
 describe('Registration suite', function () {
     var p = new RegisterPage();
 
+    beforeAll(function() {
+        console.log('Registration suite start');
+    });
+    afterAll(function() {
+        console.log('Registration suite finish');
+    });
+
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
 
@@ -20,7 +27,7 @@ describe('Registration suite', function () {
         p.openRegisterButton.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Register to be happy');
+        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should open register page in anonymous state by clicking Register button on homepage", function () {
@@ -29,14 +36,14 @@ describe('Registration suite', function () {
         p.openRegisterButtonAdv.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Register to be happy');
+        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should open register page in anonymous state", function () {
         p.getByUrl();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Register to be happy');
+        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should register user with correct credentials", function () {

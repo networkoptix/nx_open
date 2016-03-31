@@ -8,6 +8,13 @@ describe('Restore password suite', function () {
         p.get(p.url);
     });
 
+    beforeAll(function() {
+        console.log('Restore pass start');
+    });
+    afterAll(function() {
+        console.log('Restore pass finish');
+    });
+
     it("should demand that email field is not empty", function () {
         p.emailInput.clear();
         p.submitButton.click();
