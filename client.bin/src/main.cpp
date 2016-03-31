@@ -1,4 +1,5 @@
 //#define QN_USE_VLD
+#define QN_DEMO_SHOW
 
 #include <cstdint>
 
@@ -626,11 +627,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
+#ifndef QN_DEMO_SHOW
     // show beta version warning message for the main instance only
     if (!startupParams.allowMultipleClientInstances &&
         !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
         context->action(QnActions::BetaVersionMessageAction)->trigger();
+#endif
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
