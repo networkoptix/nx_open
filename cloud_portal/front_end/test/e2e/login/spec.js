@@ -4,6 +4,13 @@ describe('Login suite', function () {
 
     var p = new LoginPage();
 
+    beforeAll(function() {
+        console.log('Login start');
+    });
+    afterAll(function() {
+        console.log('Login finish');
+    });
+
     it("should open login dialog in anonymous state", function () {
         browser.sleep(1000);
         p.get();

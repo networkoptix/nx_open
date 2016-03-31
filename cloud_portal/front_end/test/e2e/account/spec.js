@@ -5,10 +5,12 @@ describe('Account suite', function () {
     var p = new AccountPage();
 
     beforeAll(function() {
+        console.log('Account start');
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
 
     afterAll(function() {
+        console.log('Account finish');
         p.helper.logout();
     });
 

@@ -3,6 +3,13 @@ var RegisterPage = require('./po.js');
 describe('Registration step2', function () {
     var p = new RegisterPage();
 
+    beforeAll(function() {
+        console.log('Registration step2 start');
+    });
+    afterAll(function() {
+        console.log('Registration step2 finish');
+    });
+
     it("should activate registration with a registration code sent to an email", function () {
         var userEmail = p.helper.register();
 

@@ -24,7 +24,7 @@ var RegisterPage = function () {
     };
 
     this.openRegisterButton = element(by.linkText('Register'));
-    this.openRegisterButtonAdv = element(by.linkText('Register immediately!')); // Register button on home page
+    this.openRegisterButtonAdv = element(by.linkText('Register now')); // Register button on home page
 
     this.firstNameInput = element(by.model('account.firstName'));
     this.lastNameInput = element(by.model('account.lastName'));
