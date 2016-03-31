@@ -42,24 +42,24 @@ footer {
 
 
 
-.process-button{
-    display:inline-block;
-    position:relative;
-}
+.process-button {
+  display: inline-block;
+  position: relative;
 
-.process-button .processing{
+  .processing {
     visibility: hidden;
-}
+  }
 
-.process-button .progress{
-    width:100%;
-    height:100%;
-    position:absolute;
-}
+  .progress {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
 
-.process-button .progress-bar{
+  .progress-bar {
     font-size: 14px;
     padding: 6px 12px;
+  }
 }
 
 .loading .auth-visible,
@@ -224,8 +224,8 @@ footer {
 
 .btn-wrapper {
   display: inline-block;
-  padding-top: 10px;
-  padding-left: 10px;
+  padding-top: 12px;
+  padding-left: 8px;
 }
 
 @media (min-width: $screen-sm-min) {
@@ -321,7 +321,7 @@ a .product-name.add-version:after {
   color: $jumbotron-color;
 }
 .promo-block {
-  padding: 32px;
+  padding: 32px 74px;
   text-align: center;
   color: $light15;
 

@@ -130,7 +130,8 @@ h1>.label{
     margin-top: 0;
     text-align: left;
 
-    button{
+    &>button,
+    & .process-button {
       margin-right:8px;
     }
   }
@@ -322,8 +323,17 @@ label {
   background-color: $body-bg;
 }
 
+
+.navbar{
+  border-top:none;
+  border-left:none;
+  border-right:none;
+  border-radius:0;
+}
+
 .navbar-default .navbar-nav>li.open>a{
   border: 1px solid $dropdown-border;
+  color: $navbar-default-link-color !important;
   border-bottom: none;
   padding:15px;
   @include box-shadow(0 2px 4px transparentize($dark15,0.7));
