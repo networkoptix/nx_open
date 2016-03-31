@@ -626,10 +626,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
-    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(lit("cloud1@gdm.su"), lit("qweasd123"), true);
-
-
-
     // show beta version warning message for the main instance only
     if (!startupParams.allowMultipleClientInstances &&
         !qnRuntime->isDevMode() &&
