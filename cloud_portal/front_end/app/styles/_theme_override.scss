@@ -42,6 +42,12 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
     &:focus {
       border-bottom: 3px solid $brand_core;
       padding-bottom: 13px;
+
+      padding-right:1px;
+      padding-left:1px;
+      margin-right:15px;
+      margin-left:15px;
+
       cursor: default;
       background-color: $navbar-default-bg !important;
     }

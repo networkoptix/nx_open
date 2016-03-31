@@ -1,6 +1,10 @@
 'use strict';
 
 angular.module('cloudApp')
+    .run(function($http,$templateCache) {
+        // Preload content into cache
+        $http.get('views/static/register-intro.html', {cache: $templateCache});
+    })
     .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, dialogs) {
 
         account.logoutAuthorised();
