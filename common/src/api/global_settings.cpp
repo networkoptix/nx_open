@@ -80,6 +80,8 @@ namespace
 
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
+    const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
+    const int kProxyConnectTimeoutDefault = 5;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
@@ -226,6 +228,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
         true,
         this);
     ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
+    m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kProxyConnectTimeout,
+        kProxyConnectTimeoutDefault,
+        this);
+    ec2Adaptors << m_proxyConnectTimeoutAdaptor;
 
     for (auto adaptor : ec2Adaptors)
         connect(
@@ -700,6 +707,11 @@ bool QnGlobalSettings::arecontRtspEnabled() const
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
     m_arecontRtspEnabledAdaptor->setValue(newVal);
+}
+
+std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
+{
+    return std::chrono::seconds(m_proxyConnectTimeoutAdaptor->value());
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
