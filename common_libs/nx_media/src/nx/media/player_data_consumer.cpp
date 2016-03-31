@@ -25,8 +25,6 @@ PlayerDataConsumer::PlayerDataConsumer(
     const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
 :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
-    m_videoDecoder(new SeamlessVideoDecoder()),
-    m_audioDecoder(new SeamlessAudioDecoder()),
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_hurryUpToFrame(0),
@@ -48,8 +46,11 @@ PlayerDataConsumer::~PlayerDataConsumer()
 void PlayerDataConsumer::pleaseStop()
 {
     base_type::pleaseStop();
-    m_videoDecoder->pleaseStop();
-    m_audioDecoder->pleaseStop();
+    QnMutexLocker lock(&m_queueMutex);
+    if (m_videoDecoder)
+        m_videoDecoder->pleaseStop();
+    if (m_audioDecoder)
+        m_audioDecoder->pleaseStop();
     m_queueWaitCond.wakeAll();
 }
 
@@ -98,6 +99,14 @@ const AudioOutput* PlayerDataConsumer::audioOutput() const
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
+    {
+        QnMutexLocker lock(&m_queueMutex);
+        if (!m_videoDecoder)
+            m_videoDecoder.reset(new SeamlessVideoDecoder());
+        if (!m_audioDecoder)
+            m_audioDecoder.reset(new SeamlessAudioDecoder());
+    }
+
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
@@ -272,6 +281,13 @@ void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/)
         // received.
         m_noDelayState = NoDelayState::WaitForNextBOF;
     }
+}
+
+void PlayerDataConsumer::endOfRun()
+{
+    QnMutexLocker lock(&m_queueMutex);
+    m_videoDecoder.reset();
+    m_audioDecoder.reset();
 }
 
 } // namespace media
