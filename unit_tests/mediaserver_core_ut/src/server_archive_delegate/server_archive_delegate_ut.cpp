@@ -353,21 +353,16 @@ private:
 
     void loadMedia()
     {
-        for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan :
-                                                     qnBackupStorageMan;
-            manager->getFileCatalog(lit("%1").arg(cameraFolder),
-                                    QnServer::LowQualityCatalog);
-
-            manager->getFileCatalog(lit("%1").arg(cameraFolder),
-                                    QnServer::HiQualityCatalog);
+        ec2::ApiCameraDataList archiveCameras;
+        for (int i = 0; i < m_storageUrls.size(); ++i) 
+        {
+            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::HiQualityCatalog);
             manager->m_rebuildCancelled = false;
 
-            manager->loadFullFileCatalogFromMedia(m_storages[i],
-                                                  QnServer::LowQualityCatalog);
-
-            manager->loadFullFileCatalogFromMedia(m_storages[i],
-                                                  QnServer::HiQualityCatalog);
+            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::LowQualityCatalog, archiveCameras);
+            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::HiQualityCatalog, archiveCameras);
         }
     }
 

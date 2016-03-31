@@ -135,7 +135,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
         {
             if (QFile::exists(oldFileName) && !QFile::exists(fileName))
                 QFile::rename(oldFileName, fileName);
-            sdb = QnStorageDbPtr(new QnStorageDb(QnStorageResourcePtr(), getStorageIndex(storage)));
+            sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
         }
 
         if (sdb->open(fileName)) {

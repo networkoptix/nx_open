@@ -13,9 +13,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
+#include "api/common_message_processor.h"
 #include "api/app_server_connection.h"
-
-#include <nx_ec/managers/abstract_camera_manager.h>
+#include "nx_ec/dummy_handler.h"
 
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
@@ -24,6 +24,7 @@
 #include <platform/monitoring/global_monitor.h>
 #include <platform/platform_abstraction.h>
 #include <plugins/resource/server_archive/dualquality_helper.h>
+#include <plugins/resource/archive_camera/archive_camera.h>
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
 
@@ -216,8 +217,8 @@ public:
     {
         bool fullscanProcessed = false;
         bool partialScanProcessed = false;
+        ec2::ApiCameraDataList archiveCameras;
 
-        /* Total count of tasks in the queue to maintain total progress. */
         TasksQueueInfo currentQueueInfo;
 
         while (!needToStop())
@@ -291,7 +292,7 @@ public:
             {
                 fullscanProcessed = true;
 
-                auto genProgressCallback = [this, totalProgressValue, totalProgressStep](const QString &url, qreal offset)
+                auto genProgressCallback = [this, totalProgressValue, totalProgressStep, &archiveCameras](const QString &url, qreal offset)
                   -> std::function<void(int, int)>
                 {
                     return [this, url, totalProgressValue, totalProgressStep, offset](int current, int total) {
@@ -309,8 +310,8 @@ public:
                 };
 
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 0.0, totalProgressValue));
-                m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, genProgressCallback(scanData.storage->getUrl(), 0.0));
-                m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, genProgressCallback(scanData.storage->getUrl(), 0.5));
+                m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, archiveCameras, genProgressCallback(scanData.storage->getUrl(), 0.0));
+                m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::HiQualityCatalog, archiveCameras, genProgressCallback(scanData.storage->getUrl(), 0.5));
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
             }
 
@@ -328,10 +329,42 @@ public:
                     // not data to process left
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
+
                     if (fullscanProcessed)
                     {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
+
+                        ec2::ApiCameraDataList camerasToAdd;
+                        for (const auto &camera : archiveCameras)
+                        {
+                            auto cameraLowCatalog = m_owner->getFileCatalog(camera.physicalId, QnServer::LowQualityCatalog);
+                            auto cameraHiCatalog = m_owner->getFileCatalog(camera.physicalId, QnServer::HiQualityCatalog);
+
+                            bool doAdd = cameraLowCatalog && !cameraLowCatalog->isEmpty() || cameraHiCatalog && !cameraHiCatalog->isEmpty();
+                            if (doAdd)
+                                camerasToAdd.push_back(camera);
+                        }
+
+                        QnAppServerConnectionFactory::getConnection2()
+                            ->getCameraManager()
+                            ->save(
+                                camerasToAdd, 
+                                ec2::DummyHandler::instance(), 
+                                &ec2::DummyHandler::onRequestDone
+                            );
+
+                        for (const auto &camera : camerasToAdd) 
+                        {
+                            QnResourcePtr existCamRes = qnResPool->getResourceById(camera.id);
+                            if (existCamRes && existCamRes->getTypeId() != camera.typeId)
+                                qnResPool->removeResource(existCamRes);
+                            QnCommonMessageProcessor::instance()->updateResource(camera);
+                        }
+
+                        archiveCameras.clear();
+                        m_owner->updateCameraHistory();
+
                         if (!m_fullScanCanceled)
                             emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
                     }
@@ -679,7 +712,51 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     m_archiveRebuildInfo = data;
 }
 
-void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, std::function<void(int current, int total)> progressCallback)
+void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ec2::ApiCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const
+{
+    const QString infoPath = closeDirPath(fileInfo.absoluteFilePath()) + lit("info.txt");
+    auto infoFile = std::unique_ptr<QIODevice>(storage->open(infoPath, QIODevice::ReadOnly));
+    if (!infoFile)
+        return;
+    //auto newCamera = QnVirtualCameraResourcePtr(new QnArchiveCamResource);
+    ec2::ApiCameraData newCamera;
+    QString line;
+    while (1) 
+    {
+        line = QString(infoFile->readLine());
+        if (line.isEmpty() || !line.contains("="))
+            break;
+        auto keyValue = line.split(lit("="));
+        assert(keyValue.size() == 2);
+
+        if (keyValue[0].contains("cameraName"))
+            newCamera.name = keyValue[1];
+        else if (keyValue[0].contains("cameraModel"))
+            newCamera.model = keyValue[1];
+    }
+    newCamera.physicalId = fileInfo.fileName();
+    auto cameraGuid = guidFromArbitraryData(newCamera.physicalId.toUtf8());
+    newCamera.id = cameraGuid;
+    newCamera.parentId = qnCommon->moduleGUID();
+
+    auto camTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
+    if (camTypeId.isNull())
+        return;
+    newCamera.typeId = camTypeId;
+
+    auto cameraIt = std::find_if( archiveCameraList.cbegin(), archiveCameraList.cend(),
+                                 [&cameraGuid] (const ec2::ApiCameraData &cam)
+                                 {
+                                     return cam.id == cameraGuid;
+                                 });
+    if (cameraIt != archiveCameraList.cend() || qnResPool->getResourceById(cameraGuid))
+        return;
+
+    archiveCameraList.push_back(newCamera);
+}
+
+void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
+                                                    ec2::ApiCameraDataList &archiveCameraList, std::function<void(int current, int total)> progressCallback)
 {
     ArchiveScanPosition scanPos(m_role);
     scanPos.load(); // load from persistent storage
@@ -729,6 +806,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     {
         if (m_rebuildCancelled)
             return; // cancel rebuild
+
+        loadCameraInfo(fi, archiveCameraList, storage);
 
         QString cameraUniqueId = fi.fileName();
         ArchiveScanPosition currentPos(m_role, storage, catalog, cameraUniqueId);
