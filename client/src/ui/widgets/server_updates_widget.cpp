@@ -291,8 +291,10 @@ void QnServerUpdatesWidget::loadDataToUi() {
     ui->updatesNotificationCheckbox->setChecked(qnGlobalSettings->isUpdateNotificationsEnabled());
 }
 
-void QnServerUpdatesWidget::applyChanges() {
+void QnServerUpdatesWidget::applyChanges()
+{
     qnGlobalSettings->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
+    qnGlobalSettings->synchronizeNow();
 }
 
 bool QnServerUpdatesWidget::hasChanges() const {

@@ -895,6 +895,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
     , Qn::CameraBackupQualities quality)
 {
     qnGlobalSettings->setBackupQualities(quality);
+    qnGlobalSettings->synchronizeNow();
 
     const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr &camera)
     {

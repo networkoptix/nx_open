@@ -50,29 +50,104 @@
        </property>
        <item>
         <widget class="QnPanel" name="introWidget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>8</number>
-          </property>
+         <layout class="QGridLayout" name="gridLayout">
           <property name="leftMargin">
-           <number>16</number>
+           <number>20</number>
           </property>
           <property name="topMargin">
-           <number>16</number>
+           <number>40</number>
           </property>
           <property name="rightMargin">
-           <number>16</number>
+           <number>20</number>
           </property>
           <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="verticalSpacing">
            <number>16</number>
           </property>
-          <item alignment="Qt::AlignHCenter">
+          <item row="1" column="0">
+           <widget class="QLabel" name="promo1TextLabel">
+            <property name="text">
+             <string>1. Create
+Cloud Account</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="promo2Label">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="promo3Label">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="promo1Label">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="promo2TextLabel">
+            <property name="text">
+             <string>2. Link system
+to the cloud</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="promo3TextLabel">
+            <property name="text">
+             <string>3. Connect to all your
+systems from everywhere</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3">
            <widget class="QLabel" name="learnMoreLabel">
             <property name="text">
              <string notr="true">Learn more about the cloud</string>
             </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>16</number>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>

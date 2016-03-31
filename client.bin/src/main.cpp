@@ -1,4 +1,5 @@
 //#define QN_USE_VLD
+#define QN_DEMO_SHOW
 
 #include <cstdint>
 
@@ -540,20 +541,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 #endif
 
-    /* Process pending events before executing actions. */
-    qApp->processEvents();
-
-    // show beta version warning message for the main instance only
-    if (!startupParams.allowMultipleClientInstances &&
-        !qnRuntime->isDevMode() &&
-        QnAppInfo::beta())
-        context->action(QnActions::BetaVersionMessageAction)->trigger();
-
-#ifdef _DEBUG
-    /* Show FPS in debug. */
-    context->menu()->trigger(QnActions::ShowFpsAction);
-#endif
-
     /************************************************************************/
     /* Initializing resource searchers                                      */
     /************************************************************************/
@@ -595,7 +582,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                 switch (action)
                 {
                 case QnSystemUriResolver::Action::LoginToCloud:
-                    //TODO: #GDM implement me
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(resolver.result().login, resolver.result().password, true);
                     break;
                 case QnSystemUriResolver::Action::ConnectToServer:
                     context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, resolver.result().serverUrl));
@@ -639,6 +626,19 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
         context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
+
+#ifndef QN_DEMO_SHOW
+    // show beta version warning message for the main instance only
+    if (!startupParams.allowMultipleClientInstances &&
+        !qnRuntime->isDevMode() &&
+        QnAppInfo::beta())
+        context->action(QnActions::BetaVersionMessageAction)->trigger();
+#endif
+
+#ifdef _DEBUG
+    /* Show FPS in debug. */
+    context->menu()->trigger(QnActions::ShowFpsAction);
+#endif
 
     result = application->exec();
 

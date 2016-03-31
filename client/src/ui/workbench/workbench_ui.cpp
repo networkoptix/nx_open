@@ -254,10 +254,13 @@ namespace
     const qreal kOpaque = 1.0;
     const qreal kHidden = 0.0;
 
-    const int hideConstrolsTimeoutMSec = 2000;
-    const int closeConstrolsTimeoutMSec = 2000;
+    const int kShowControlsTimeoutMs = 250;
+    const int kHideControlsTimeoutMs = 2000;
+    const int kCloseControlsTimeoutMs = 2000;
 
-    const int sliderAutoHideTimeoutMSec = 10000;
+    const int kSliderAutoHideTimeoutMs = 10000;
+
+    const int kButtonInactivityTimeoutMs = 300;
 
 } // anonymous namespace
 
@@ -354,6 +357,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarSizeAnimator(nullptr),
     m_calendarOpacityAnimatorGroup(nullptr),
     m_calendarOpacityProcessor(nullptr),
+    m_calendarHidingProcessor(nullptr),
+    m_calendarShowingProcessor(nullptr),
     m_inCalendarGeometryUpdate(false),
 
     m_inDayTimeGeometryUpdate(false),
@@ -370,14 +375,14 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(1000, this);
-    m_controlsActivityInstrument = new ActivityListenerInstrument(true, hideConstrolsTimeoutMSec, this);
+    m_controlsActivityInstrument = new ActivityListenerInstrument(true, kHideControlsTimeoutMs, this);
 
     m_instrumentManager->installInstrument(m_fpsCountingInstrument, InstallationMode::InstallBefore, display()->paintForwardingInstrument());
     m_instrumentManager->installInstrument(m_controlsActivityInstrument);
 
-    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped,   this,     &QnWorkbenchUi::at_activityStopped);
-    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed,   this,     &QnWorkbenchUi::at_activityStarted);
-    connect(m_fpsCountingInstrument,    &FpsCountingInstrument::fpsChanged,               this,     [this](qreal fps)
+    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityStopped,   this, &QnWorkbenchUi::at_activityStopped);
+    connect(m_controlsActivityInstrument, &ActivityListenerInstrument::activityResumed,   this, &QnWorkbenchUi::at_activityStarted);
+    connect(m_fpsCountingInstrument,     &FpsCountingInstrument::fpsChanged,              this, [this](qreal fps)
     {
 #ifdef QN_SHOW_FPS_MS
         QString fmt = lit("%1 (%2ms)");
@@ -427,9 +432,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Connect to display. */
     display()->view()->addAction(action(QnActions::FreespaceAction));
-    connect(display(),                  &QnWorkbenchDisplay::viewportGrabbed,       this,           &QnWorkbenchUi::disableProxyUpdates);
-    connect(display(),                  &QnWorkbenchDisplay::viewportUngrabbed,     this,           &QnWorkbenchUi::enableProxyUpdates);
-    connect(display(),                  &QnWorkbenchDisplay::widgetChanged,         this,           &QnWorkbenchUi::at_display_widgetChanged);
+    connect(display(),  &QnWorkbenchDisplay::viewportGrabbed,   this,   &QnWorkbenchUi::disableProxyUpdates);
+    connect(display(),  &QnWorkbenchDisplay::viewportUngrabbed, this,   &QnWorkbenchUi::enableProxyUpdates);
+    connect(display(),  &QnWorkbenchDisplay::widgetChanged,     this,   &QnWorkbenchUi::at_display_widgetChanged);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
     connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this, [this]()
@@ -1136,7 +1141,7 @@ void QnWorkbenchUi::updateTreeResizerGeometry()
 {
     if (m_updateTreeResizerGeometryLater)
     {
-        QTimer::singleShot(1, this, SLOT(updateTreeResizerGeometry()));
+        QTimer::singleShot(1, this, &QnWorkbenchUi::updateTreeResizerGeometry);
         return;
     }
 
@@ -1228,12 +1233,13 @@ void QnWorkbenchUi::at_treeResizerWidget_geometryChanged()
 
 void QnWorkbenchUi::at_treeShowingProcessor_hoverEntered()
 {
-    if (!isTreePinned() && !isTreeOpened()) {
+    if (!isTreePinned() && !isTreeOpened())
+    {
         setTreeOpened(true);
 
         /* So that the click that may follow won't hide it. */
         setTreeShowButtonUsed(false);
-        QTimer::singleShot(300, this, SLOT(setTreeShowButtonUsed()));
+        QTimer::singleShot(kButtonInactivityTimeoutMs, this, [this]() { setTreeShowButtonUsed(true); } );
     }
 
     m_treeHidingProcessor->forceHoverEnter();
@@ -1291,12 +1297,12 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     m_treeHidingProcessor->addTargetItem(m_treeItem);
     m_treeHidingProcessor->addTargetItem(m_treeShowButton);
     m_treeHidingProcessor->addTargetItem(m_treeResizerWidget);
-    m_treeHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
-    m_treeHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
+    m_treeHidingProcessor->setHoverLeaveDelay(kCloseControlsTimeoutMs);
+    m_treeHidingProcessor->setFocusLeaveDelay(kCloseControlsTimeoutMs);
 
     m_treeShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeShowingProcessor->addTargetItem(m_treeShowButton);
-    m_treeShowingProcessor->setHoverEnterDelay(250);
+    m_treeShowingProcessor->setHoverEnterDelay(kShowControlsTimeoutMs);
 
     m_treeXAnimator = new VariantAnimator(this);
     m_treeXAnimator->setTimer(m_instrumentManager->animationTimer());
@@ -1823,7 +1829,7 @@ void QnWorkbenchUi::at_notificationsShowingProcessor_hoverEntered()
 
         /* So that the click that may follow won't hide it. */
         setNotificationsShowButtonUsed(false);
-        QTimer::singleShot(300, this, SLOT(setNotificationsShowButtonUsed()));
+        QTimer::singleShot(kButtonInactivityTimeoutMs, this, [this]() { setNotificationsShowButtonUsed(true); } );
     }
 
     m_notificationsHidingProcessor->forceHoverEnter();
@@ -1890,12 +1896,12 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     m_notificationsHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_notificationsHidingProcessor->addTargetItem(m_notificationsItem);
     m_notificationsHidingProcessor->addTargetItem(m_notificationsShowButton);
-    m_notificationsHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
-    m_notificationsHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
+    m_notificationsHidingProcessor->setHoverLeaveDelay(kCloseControlsTimeoutMs);
+    m_notificationsHidingProcessor->setFocusLeaveDelay(kCloseControlsTimeoutMs);
 
     m_notificationsShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_notificationsShowingProcessor->addTargetItem(m_notificationsShowButton);
-    m_notificationsShowingProcessor->setHoverEnterDelay(250);
+    m_notificationsShowingProcessor->setHoverEnterDelay(kShowControlsTimeoutMs);
 
     m_notificationsXAnimator = new VariantAnimator(this);
     m_notificationsXAnimator->setTimer(m_instrumentManager->animationTimer());
@@ -1971,6 +1977,8 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
         return;
 
     ensureAnimationAllowed(animate);
+
+    m_calendarShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
     QSizeF newSize = opened ? QSizeF(250, 200) : QSizeF(250, 0);
     if (animate)
@@ -2067,6 +2075,26 @@ void QnWorkbenchUi::updateDayTimeWidgetGeometry()
     m_dayTimeItem->setPos(geometry.topLeft());
 }
 
+void QnWorkbenchUi::setCalendarShowButtonUsed(bool used)
+{
+    m_sliderItem->calendarButton()->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+}
+
+void QnWorkbenchUi::at_calendarShowingProcessor_hoverEntered()
+{
+    if (!isCalendarPinned() && !isCalendarOpened())
+    {
+        setCalendarOpened(true);
+
+        /* So that the click that may follow won't hide it. */
+        setCalendarShowButtonUsed(false);
+        QTimer::singleShot(kButtonInactivityTimeoutMs, this, [this]() { setCalendarShowButtonUsed(true); } );
+    }
+
+    m_calendarHidingProcessor->forceHoverEnter();
+    m_calendarOpacityProcessor->forceHoverEnter();
+}
+
 void QnWorkbenchUi::at_calendarItem_paintGeometryChanged()
 {
     const QRectF paintGeometry = m_calendarItem->paintGeometry();
@@ -2151,12 +2179,15 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     m_calendarOpacityProcessor->addTargetItem(m_calendarPinButton);
     m_calendarOpacityProcessor->addTargetItem(m_dayTimeMinimizeButton);
 
-    HoverFocusProcessor* calendarHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
-    calendarHidingProcessor->addTargetItem(m_calendarItem);
-    calendarHidingProcessor->addTargetItem(m_dayTimeItem);
-    calendarHidingProcessor->addTargetItem(m_calendarPinButton);
-    calendarHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
-    calendarHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
+    m_calendarHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_calendarHidingProcessor->addTargetItem(m_calendarItem);
+    m_calendarHidingProcessor->addTargetItem(m_dayTimeItem);
+    m_calendarHidingProcessor->addTargetItem(m_calendarPinButton);
+    m_calendarHidingProcessor->setHoverLeaveDelay(kCloseControlsTimeoutMs);
+    m_calendarHidingProcessor->setFocusLeaveDelay(kCloseControlsTimeoutMs);
+
+    m_calendarShowingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_calendarShowingProcessor->setHoverEnterDelay(kShowControlsTimeoutMs);
 
     m_calendarSizeAnimator = new VariantAnimator(this);
     m_calendarSizeAnimator->setTimer(m_instrumentManager->animationTimer());
@@ -2187,7 +2218,8 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     connect(m_calendarOpacityProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateCalendarOpacityAnimated);
     connect(m_calendarOpacityProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_calendarOpacityProcessor, &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(calendarHidingProcessor,    &HoverFocusProcessor::hoverLeft,        this,   [this](){ setCalendarOpened(false);});
+    connect(m_calendarHidingProcessor,  &HoverFocusProcessor::hoverLeft,        this,   [this](){ setCalendarOpened(false);});
+    connect(m_calendarShowingProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::at_calendarShowingProcessor_hoverEntered);
     connect(m_calendarItem,             &QnMaskedProxyWidget::paintRectChanged, this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
     connect(m_calendarItem,             &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
     connect(toggleCalendarAction,       &QAction::toggled,                      this,   [this](bool checked) { setCalendarOpened(checked); });
@@ -2268,7 +2300,7 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate)
     if (qnRuntime->isVideoWallMode())
     {
         if (visible)
-            m_sliderAutoHideTimer->start(sliderAutoHideTimeoutMSec);
+            m_sliderAutoHideTimer->start(kSliderAutoHideTimeoutMs);
         else
             m_sliderAutoHideTimer->stop();
     }
@@ -2328,7 +2360,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry()
 {
     if (m_ignoreSliderResizerGeometryLater)
     {
-        QTimer::singleShot(1, this, SLOT(updateSliderResizerGeometry()));
+        QTimer::singleShot(1, this, &QnWorkbenchUi::updateSliderResizerGeometry);
         return;
     }
 
@@ -2448,6 +2480,14 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     m_sliderItem->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+
+    /*
+    Calendar is created before navigation slider (alot of logic relies on that).
+    Therefore we have to bind calendar showing/hiding processors to navigation
+    pane button "CLND" here and not in createCalendarWidget()
+    */
+    m_calendarHidingProcessor->addTargetItem(m_sliderItem->calendarButton());
+    m_calendarShowingProcessor->addTargetItem(m_sliderItem->calendarButton());
 
     const auto toggleSliderAction = action(QnActions::ToggleSliderAction);
     m_sliderShowButton = newShowHideButton(m_controlsWidget, toggleSliderAction);
