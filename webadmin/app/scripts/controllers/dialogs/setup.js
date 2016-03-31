@@ -74,7 +74,7 @@ angular.module('webadminApp')
             }
         };
 
-        function tryToUpdateCredentials(){
+        function sendCredentialsToNativeClient(){
             if(nativeClientObject && nativeClientObject.updateCredentials){
                 $log.log("Send credentials to client app: " + $scope.activeLogin);
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
@@ -93,7 +93,7 @@ angular.module('webadminApp')
             mediaserver.systemCloudInfo().then(function(data){
                 $scope.settings.cloudSystemID = data.cloudSystemID;
                 $scope.settings.cloudEmail = data.cloudAccountName;
-                tryToUpdateCredentials();
+                sendCredentialsToNativeClient();
                 $log.log("System is in cloud! go to CloudSuccess");
                 $scope.next('cloudSuccess');
             },function(){
@@ -104,7 +104,7 @@ angular.module('webadminApp')
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                     }else{
-                        tryToUpdateCredentials();
+                        sendCredentialsToNativeClient();
                         $log.log("System is local - go to local success");
                         $scope.next('localSuccess');
                     }
@@ -117,10 +117,12 @@ angular.module('webadminApp')
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
-            return mediaserver.login(login, password).then(checkMySystem,function(error){
+            var promise = mediaserver.login(login, password);
+            promise.then(checkMySystem,function(error){
                 $log.error("Authorization on server with login " + login + " failed:");
                 logMediaserverError(error);
             });
+            return promise;
         }
 
 
