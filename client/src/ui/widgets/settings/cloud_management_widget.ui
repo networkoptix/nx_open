@@ -61,7 +61,7 @@
            <number>20</number>
           </property>
           <property name="bottomMargin">
-           <number>16</number>
+           <number>0</number>
           </property>
           <property name="verticalSpacing">
            <number>16</number>
@@ -145,6 +145,9 @@ systems from everywhere</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+            <property name="margin">
+             <number>16</number>
             </property>
             <property name="openExternalLinks">
              <bool>true</bool>
