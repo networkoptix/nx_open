@@ -314,6 +314,9 @@ void UPNPDeviceSearcher::updateReceiveSocket()
 
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
 
+    if(m_receiveSocket)
+        m_receiveSocket->cancelAsyncIO(aio::etNone);
+
     auto udpSock = make_shared<UDPSocket>();
     udpSock->setReuseAddrFlag(true);
     udpSock->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
@@ -327,8 +330,6 @@ void UPNPDeviceSearcher::updateReceiveSocket()
             this,
             udpSock.get(), _1, &m_receiveBuffer, _2 ) );
 
-    if(m_receiveSocket)
-        m_receiveSocket->cancelAsyncIO(aio::etNone);
     m_receiveSocket = udpSock;
 }
 
