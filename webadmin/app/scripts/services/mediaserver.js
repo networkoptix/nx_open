@@ -97,7 +97,7 @@ angular.module('webadminApp')
         function getNonce(){
             var deferred = $q.defer();
             function resolver(data){
-                $log.log("Server's response: " + JSON.stringify(data, null, 4));
+                $log.log("Server responsed: " + data.statusText);
                 var realm = ipCookie('realm');
                 var nonce = ipCookie('nonce');
                 $log.log("Authorization - reading nonce:" + nonce + " realm:" + realm);
@@ -158,7 +158,11 @@ angular.module('webadminApp')
                         },function(error){
                             deferred.reject(error);
                         });
+                    },function(error){
+                        deferred.reject(error);
                     });
+                },function(error){
+                    deferred.reject(error);
                 });
                 return deferred.promise;
             },

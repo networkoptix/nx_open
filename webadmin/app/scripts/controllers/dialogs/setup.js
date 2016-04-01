@@ -4,6 +4,12 @@ angular.module('webadminApp')
     .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
 
+        if( $location.search().retry) {
+            $log.log("This is second try");
+        }else{
+            $log.log("This is first try");
+        }
+
         /*
             This is kind of universal wizard controller.
         */
@@ -30,7 +36,7 @@ angular.module('webadminApp')
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var debugMode = $location.search().debug;
 
-        var cloudAuthorized = debugMode;
+        var cloudAuthorized = false;
 
         $log.log("check getCredentials from client");
         if(nativeClientObject && nativeClientObject.getCredentials){
@@ -51,9 +57,11 @@ angular.module('webadminApp')
                 $scope.settings.presetCloudPassword = authObject.cloudPassword;
             }
         }
+
         if(debugMode){
-            console.log("Wizard works in debug mode: no changes on server or portal will be made.")
-            $scope.settings.presetCloudEmail = "debug@hdw.mx";
+            console.log("Wizard works in debug mode: no changes on server or portal will be made.");
+        //    cloudAuthorized = true;
+        //    $scope.settings.presetCloudEmail = "debug@hdw.mx";
         }
 
         /* Funсtions for external calls (open links) */
@@ -245,11 +253,10 @@ angular.module('webadminApp')
 
 
         function logMediaserverError(error){
-            $log.error("Mediaserver error");
             if(error.data && error.data.error){
-                $log.error(JSON.stringify(error.data, null, 4));
+                $log.error("Mediaserver error: \n" + JSON.stringify(error.data, null, 4));
             }else{
-                $log.error(JSON.stringify(error, null, 4));
+                $log.error("Mediaserver error: \n" + error.statusText);
             }
         }
         /* Connect to cloud section */
@@ -419,6 +426,8 @@ angular.module('webadminApp')
         /* Wizard workflow */
 
         $scope.wizardFlow = {
+            0:{
+            },
             initFailure:{
                 cancel: !!nativeClientObject || debugMode,
                 next:function(){
