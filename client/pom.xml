@@ -82,7 +82,6 @@
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
 
-        <global.defines>CL_FORCE_LOGO</global.defines>
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <buildLib>sharedlib</buildLib>
         <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf</rdep.packages>
