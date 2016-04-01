@@ -24,7 +24,7 @@
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
     <h2>Give your System a name</h2>
     <p class="master-description">
-        It is used to help identify or locate your system.
+        System name helps you identify or find your system.
     </p>
     <form class="master-controls" name="systemNameForm">
         <div class="form-group" validate-field>
@@ -38,7 +38,7 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
-    <h2>Connect to your System to <span class="product-name add-version">Nx Cloud</span></h2>
+    <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
     <p class="master-description">
        Connect your system anywhere, anytime.<br>
         <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a><br/>
@@ -72,7 +72,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
 
-    <h2>Connect to your System to <span class="product-name add-version">Nx Cloud</span></h2>
+    <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
     <p class="master-description">
         Login to your account<br>
     </p>
@@ -146,10 +146,10 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
     <h2>System is ready to use</h2>
-    <p>You can connect to your system with</p>
-    <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)"><span class="product-name">Nx Cloud</span> portal</a></h4>
-    <p>or <span>Nx Witness</span> apps, using your cloud account:</p>
+    <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
+    <p>Sharing and account settings:</p>
+    <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">

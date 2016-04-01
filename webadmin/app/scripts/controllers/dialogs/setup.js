@@ -276,6 +276,7 @@ angular.module('webadminApp')
             $scope.settings.cloudError = false;
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
+                $scope.portalShortLink = Config.cloud.portalShortLink;
                 $scope.next('cloudSuccess');
                 return;
             }
@@ -441,12 +442,6 @@ angular.module('webadminApp')
         $scope.wizardFlow = {
             0:{
             },
-            initFailure:{
-                cancel: !!nativeClientObject || debugMode,
-                next:function(){
-                    initWizard();
-                }
-            },
             start:{
                 cancel: !!nativeClientObject || debugMode,
                 next: 'systemName'
@@ -511,6 +506,12 @@ angular.module('webadminApp')
             },
             localFailure:{
                 back:'systemName'
+            },
+            initFailure:{
+                cancel: !!nativeClientObject || debugMode,
+                next:function(){
+                    initWizard();
+                }
             }
 
         };
