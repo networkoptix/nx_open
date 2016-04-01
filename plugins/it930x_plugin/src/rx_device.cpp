@@ -9,7 +9,7 @@
 #include "discovery_manager.h"
 
 #if defined(_DEBUG)
-Logger logger("/var/log/it930x.log");
+Logger logger("/opt/networkoptix/mediaserver/var/log/it930x.log");
 #endif
 
 
