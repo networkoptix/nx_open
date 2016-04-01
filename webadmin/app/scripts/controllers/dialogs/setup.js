@@ -276,6 +276,7 @@ angular.module('webadminApp')
             $scope.settings.cloudError = false;
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
+                $scope.portalShortLink = Config.cloud.portalShortLink;
                 $scope.next('cloudSuccess');
                 return;
             }
@@ -410,7 +411,7 @@ angular.module('webadminApp')
         }
         $scope.next = function(target){
             lockNext();
-            if(!target) {
+            if(!target && target !==0) {
                 var activeStep = $scope.activeStep || $scope.wizardFlow[0];
                 target = activeStep.next || activeStep.finish;
             }
@@ -440,12 +441,6 @@ angular.module('webadminApp')
 
         $scope.wizardFlow = {
             0:{
-            },
-            initFailure:{
-                cancel: !!nativeClientObject || debugMode,
-                next:function(){
-                    initWizard();
-                }
             },
             start:{
                 cancel: !!nativeClientObject || debugMode,
@@ -511,6 +506,12 @@ angular.module('webadminApp')
             },
             localFailure:{
                 back:'systemName'
+            },
+            initFailure:{
+                cancel: !!nativeClientObject || debugMode,
+                next:function(){
+                    initWizard();
+                }
             }
 
         };
@@ -519,6 +520,7 @@ angular.module('webadminApp')
         /* initiate wizard */
 
         function initWizard(){
+            $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
                 $log.log("Couldn't run setup wizard: auth failed");
                 if( $location.search().retry) {
