@@ -290,7 +290,7 @@
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>        
             <ComponentRef Id="ClientVsRedistributable"/>
-            <!-- <ComponentRef Id="bespin" />         -->
+            <ComponentRef Id="bespin" />
         </Feature>
     </Fragment>
 </Wix>

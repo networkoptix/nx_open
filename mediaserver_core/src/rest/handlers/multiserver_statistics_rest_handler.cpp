@@ -60,6 +60,12 @@ namespace
         QnMetricHashesList dummy;
         return QJson::deserialize(body, &dummy);
     };
+
+    bool isSuccessHttpCode(nx_http::StatusCode::Value code)
+    {
+        return qBetween<int>(nx_http::StatusCode::ok, code
+            , nx_http::StatusCode::lastSuccessCode + 1);
+    }
 }
 
 namespace
@@ -225,13 +231,13 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
     Context context(request, port);
 
     QnStatisticsSettings settings;
-    nx_http::StatusCode::Value resultCode = nx_http::StatusCode::noContent;
+    nx_http::StatusCode::Value resultCode = nx_http::StatusCode::notFound;
 
     resultCode = loadSettingsLocally(settings);
-    if (resultCode == nx_http::StatusCode::ok)
+    if (isSuccessHttpCode(resultCode))
     {
         QnFusionRestHandlerDetail::serialize(settings, result, contentType
-            , request.format, request.extraFormatting);
+            , Qn::JsonFormat, request.extraFormatting);
         return nx_http::StatusCode::ok;
     }
 
@@ -245,15 +251,15 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
             continue;
 
         resultCode = loadSettingsRemotely(settings, server, &context);
-        if (resultCode == nx_http::StatusCode::ok)
+        if (isSuccessHttpCode(resultCode))
             break;
     }
 
-    if (resultCode != nx_http::StatusCode::ok)
+    if (!isSuccessHttpCode(resultCode))
         return resultCode;
 
     QnFusionRestHandlerDetail::serialize(settings, result, contentType
-        , request.format, request.extraFormatting);
+        , Qn::JsonFormat, request.extraFormatting);
     return nx_http::StatusCode::ok;
 }
 
@@ -262,7 +268,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     const auto moduleGuid = qnCommon->moduleGUID();
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
-        return nx_http::StatusCode::noContent;
+        return nx_http::StatusCode::serviceUnavailable;
 
     static const auto settingsUrl = []()
     {
@@ -283,9 +289,9 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisti
     SettingsCache::clear();
 
     nx_http::BufferType buffer;
-    int statusCode = nx_http::StatusCode::noContent;
+    int statusCode = nx_http::StatusCode::notFound;
     if (nx_http::downloadFileSync(settingsUrl, &statusCode, &buffer) != SystemError::noError)
-        return nx_http::StatusCode::noContent;
+        return nx_http::StatusCode::notFound;
 
     if (!QJson::deserialize(buffer, &outputSettings))
         return nx_http::StatusCode::internalServerError;
@@ -299,7 +305,7 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
     , const QnMediaServerResourcePtr &server
     , Context *context)
 {
-    auto result = nx_http::StatusCode::noContent;
+    auto result = nx_http::StatusCode::notFound;
     if (!hasInternetConnection(server))
         return result;
 
@@ -310,10 +316,9 @@ nx_http::StatusCode::Value SettingsActionHandler::loadSettingsRemotely(
 
         QnStatisticsSettings settings;
         bool success = false;
-        if ((osErrorCode == SystemError::noError)
-            && (httpCode == nx_http::StatusCode::ok))
+        if ((osErrorCode == SystemError::noError) && isSuccessHttpCode(httpCode))
         {
-            settings = QnUbjson::deserialized(body, settings, &success);
+            settings = QJson::deserialized(body, settings, &success);
         }
 
         const auto updateOutputDataCallback =
@@ -392,7 +397,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     nx_http::StatusCode::Value resultCode =
         sendStatisticsLocally(body, request.statisticsServerUrl);
 
-    if (request.isLocal)
+    if (request.isLocal || isSuccessHttpCode(resultCode))
         return resultCode;
 
     const auto moduleGuid = qnCommon->moduleGUID();
@@ -402,7 +407,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
             continue;
 
         resultCode = sendStatisticsRemotely(body, server, &context);
-        if (resultCode == nx_http::StatusCode::ok)
+        if (isSuccessHttpCode(resultCode))
             break;
     }
     return resultCode;
@@ -419,7 +424,8 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
 
     auto httpCode = nx_http::StatusCode::notAcceptable;
     const auto error = nx_http::uploadDataSync(statisticsServerUrl, metricsList
-        , kJsonContentType, kSendStatUser, kSendStatPass, &httpCode);
+        , kJsonContentType, kSendStatUser, kSendStatPass
+        , nx_http::AsyncHttpClient::authBasicAndDigest, &httpCode);
 
     return (error == SystemError::noError
         ? httpCode : nx_http::StatusCode::internalServerError);
@@ -453,6 +459,7 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsRemotely(
     runMultiserverUploadRequest(apiUrl, metricsList, kJsonContentType
         , kSendStatUser, kSendStatPass, server, completionFunc, context);
     context->waitForDone();
+
     return result;
 }
 //

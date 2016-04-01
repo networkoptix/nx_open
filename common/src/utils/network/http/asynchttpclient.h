@@ -79,6 +79,7 @@ namespace nx_http
         State state() const;
         //!Returns true if no response has been recevied due to transport error
         bool failed() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
         //!Start GET request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
@@ -242,6 +243,7 @@ namespace nx_http
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
+        SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
 
         AsyncHttpClient();
@@ -415,16 +417,18 @@ namespace nx_http
     bool uploadDataAsync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
-        , const QString &user
-        , const QString &password
         , const nx_http::HttpHeaders &extraHeaders
-        , const UploadCompletionHandler &callback);
+        , const UploadCompletionHandler &callback
+        , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
+        , const QString &user = QString()
+        , const QString &password = QString());
 
     SystemError::ErrorCode uploadDataSync(const QUrl &url
         , const QByteArray &data
         , const QByteArray &contentType
         , const QString &user
         , const QString &password
+        , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
         , nx_http::StatusCode::Value *httpCode = nullptr);
 }
 
