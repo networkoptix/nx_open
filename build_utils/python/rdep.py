@@ -177,8 +177,8 @@ def get_rsync_command(source,
                       additional_args = []):
 
     command = list(RSYNC)
+    command.append("--archive")    
     if not rdpack_file:
-        command.append("--archive")
         command.append("--delete")
 
     if show_progress:

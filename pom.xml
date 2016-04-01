@@ -160,7 +160,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines/>
+        <global.defines>QN_DEMO_SHOW</global.defines>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>

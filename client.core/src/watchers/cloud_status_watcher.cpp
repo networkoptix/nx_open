@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <QtCore/QUrl>
+#include <QtCore/QPointer>
 
 #include <cdb/connection.h>
 #include <utils/common/delayed.h>
@@ -162,17 +163,24 @@ void QnCloudStatusWatcher::updateSystems()
     if (!d->cloudConnection)
         return;
 
+    QPointer<QnCloudStatusWatcher> guard(this);
     d->cloudConnection->systemManager()->getSystems(
-            [this](api::ResultCode result, const api::SystemDataExList &systemsList)
+            [this, guard](api::ResultCode result, const api::SystemDataExList &systemsList)
             {
+                if (!guard)
+                    return;
+
                 QnCloudSystemList cloudSystems;
 
                 if (result == api::ResultCode::ok)
                     cloudSystems = getCloudSystemList(systemsList);
 
                 executeDelayed(
-                        [this, result, cloudSystems]()
+                        [this, guard, result, cloudSystems]()
                         {
+                            if (!guard)
+                                return;
+
                             Q_D(QnCloudStatusWatcher);
 
                             switch (result)

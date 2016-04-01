@@ -200,7 +200,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     };
 
     enum { kMinimalDelay = 1};
-    // We have to use delayed execution to prevent client crash 
+    // We have to use delayed execution to prevent client crash
     // when closing server that we are connecting to.
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
@@ -243,9 +243,15 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
             return;
 
         if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
+        {
             connectToLocalSystem(serverUrl, dialog->localLogin(), dialog->localPassword());
+        }
         else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
+        {
+            qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
             connectToLocalSystem(serverUrl, dialog->cloudLogin(), dialog->cloudPassword());
+        }
+
     };
 
     // Use delayed handling for proper animation

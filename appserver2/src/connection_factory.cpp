@@ -1095,8 +1095,10 @@ namespace ec2
         NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
                 cl_logDEBUG1 );
 
-        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
-            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
+        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo )
+        {
+            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
+        };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
         return reqID;
