@@ -43,6 +43,17 @@ var AccountPage = function () {
     this.passwordInput = element(by.model('pass.newPassword')).element(by.css('input[type=password]'));
     this.submitButton = element(by.css('[form=passwordForm]')).element(by.buttonText('Change password'));
 
+    this.invalidClassRequired = 'ng-invalid-required';
+
+    this.fieldWrap = function(field) {
+        return field.element(by.xpath('../..'));
+    };
+
+    this.checkInputInvalid = function (field, invalidClass) {
+        expect(field.getAttribute('class')).toContain(invalidClass);
+        expect(this.fieldWrap(field).getAttribute('class')).toContain('has-error');
+    };
+
     this.prepareToPasswordCheck = function () {
         this.currentPasswordInput.sendKeys(this.userPassword);
     };

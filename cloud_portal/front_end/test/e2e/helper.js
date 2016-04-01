@@ -6,7 +6,6 @@ var Helper = function () {
 
     var self = this;
 
-    this.baseEmail = 'noptixqa@gmail.com';
     this.basePassword = 'qweasd123';
 
     // Get valid email with random number between 100 and 1000
@@ -29,12 +28,23 @@ var Helper = function () {
     this.userNameSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
     this.userNameHierog = '您都可以享受源源不絕的好禮及優惠';
 
+    this.inputLong300 = 'qwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkl' +
+        'jzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnm' +
+        'qwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyui' +
+        'opasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfgh' +
+        'hkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy';
+    this.inputLongCut = this.inputLong300.substr(0, 255);
+
     this.userPasswordCyrillic = 'йцуфывячс';
     this.userPasswordSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
     this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordWrong = 'qweqwe123';
 
     this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
+
+    this.checkElementFocusedBy = function(element, attribute) {
+        expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
+    };
 
     this.login = function(email, password) {
 
