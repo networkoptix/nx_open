@@ -4,6 +4,12 @@ angular.module('webadminApp')
     .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
 
+        if( $location.search().retry) {
+            $log.log("This is second try");
+        }else{
+            $log.log("This is first try");
+        }
+
         /*
             This is kind of universal wizard controller.
         */
@@ -30,7 +36,7 @@ angular.module('webadminApp')
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var debugMode = $location.search().debug;
 
-        var cloudAuthorized = debugMode;
+        var cloudAuthorized = false;
 
         $log.log("check getCredentials from client");
         if(nativeClientObject && nativeClientObject.getCredentials){
@@ -51,9 +57,11 @@ angular.module('webadminApp')
                 $scope.settings.presetCloudPassword = authObject.cloudPassword;
             }
         }
+
         if(debugMode){
-            console.log("Wizard works in debug mode: no changes on server or portal will be made.")
-            $scope.settings.presetCloudEmail = "debug@hdw.mx";
+            console.log("Wizard works in debug mode: no changes on server or portal will be made.");
+            // cloudAuthorized = true;
+            // $scope.settings.presetCloudEmail = "debug@hdw.mx";
         }
 
         /* Funсtions for external calls (open links) */
@@ -119,8 +127,7 @@ angular.module('webadminApp')
             $scope.cloudCreds = isCloud;
             var promise = mediaserver.login(login, password);
             promise.then(checkMySystem,function(error){
-                $log.error("Authorization on server with login " + login + " failed:");
-                logMediaserverError(error);
+                logMediaserverError(error, "Authorization on server with login " + login + " failed:");
             });
             return promise;
         }
@@ -244,12 +251,16 @@ angular.module('webadminApp')
         }
 
 
-        function logMediaserverError(error){
-            $log.error("Mediaserver error");
+        function logMediaserverError(error, message){
+            if(message){
+                $log.log(message);
+            }
             if(error.data && error.data.error){
-                $log.error(JSON.stringify(error.data, null, 4));
+                $log.error("Mediaserver error: \n" + JSON.stringify(error.data, null, 4));
+                $scope.errorData = JSON.stringify(error.data, null, 4);
             }else{
-                $log.error(JSON.stringify(error, null, 4));
+                $log.error("Mediaserver error: \n" + error.statusText);
+                $scope.errorData = error.statusText;
             }
         }
         /* Connect to cloud section */
@@ -265,25 +276,28 @@ angular.module('webadminApp')
             $scope.settings.cloudError = false;
             if(debugMode){
                 $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
+                $scope.portalShortLink = Config.cloud.portalShortLink;
                 $scope.next('cloudSuccess');
                 return;
             }
             function cloudErrorHandler(error)
             {
-                $log.error("Cloud portal error");
-                $log.error(JSON.stringify(error, null, 4));
+                $log.error("Cloud portal error: \n" + JSON.stringify(error, null, 4));
+                $scope.errorData = JSON.stringify(error, null, 4);
 
                 if(error.status === 401){
-                    $log.error("Wrong login or password - show alert message");
-                    $log.error(JSON.stringify(error.data, null, 4));
+                    $log.log("Wrong login or password for cloud- show alert message");
 
                     if(error.data.resultCode) {
                         $scope.settings.cloudError = formatError(error.data.resultCode);
                     }else{
                         $scope.settings.cloudError = formatError('notAuthorized');
                     }
+
+                    releaseNext();
                     return;
                 }
+
                 $log.log("Go to cloud failure step");
                 // Do not go further here, show connection error
                 $scope.next('cloudFailure');
@@ -334,7 +348,7 @@ angular.module('webadminApp')
             }
             $scope.settings.localError = errorMessage;
 
-            $log.error(errorMessage);
+            $log.log(errorMessage);
             $log.log("Go to Local Failure step");
 
             $scope.next('localFailure');
@@ -388,9 +402,16 @@ angular.module('webadminApp')
         $scope.back = function(){
             $scope.next($scope.activeStep.back);
         };
-        $scope.next = function(target){
+
+        function lockNext(){
             $scope.lockNextButton = true;
-            if(!target) {
+        }
+        function releaseNext(){
+            $scope.lockNextButton = false;
+        }
+        $scope.next = function(target){
+            lockNext();
+            if(!target && target !==0) {
                 var activeStep = $scope.activeStep || $scope.wizardFlow[0];
                 target = activeStep.next || activeStep.finish;
             }
@@ -402,7 +423,7 @@ angular.module('webadminApp')
             if($scope.activeStep.onShow){
                 $scope.activeStep.onShow();
             }
-            $scope.lockNextButton = false;
+            releaseNext();
         };
         $scope.cantGoNext = function(){
             if($scope.activeStep.valid){
@@ -419,11 +440,7 @@ angular.module('webadminApp')
         /* Wizard workflow */
 
         $scope.wizardFlow = {
-            initFailure:{
-                cancel: !!nativeClientObject || debugMode,
-                next:function(){
-                    initWizard();
-                }
+            0:{
             },
             start:{
                 cancel: !!nativeClientObject || debugMode,
@@ -475,6 +492,7 @@ angular.module('webadminApp')
             },
 
             localLogin:{
+                back: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
                 next: initOfflineSystem,
                 valid: function(){
                     return required($scope.settings.localLogin) &&
@@ -488,6 +506,12 @@ angular.module('webadminApp')
             },
             localFailure:{
                 back:'systemName'
+            },
+            initFailure:{
+                cancel: !!nativeClientObject || debugMode,
+                next:function(){
+                    initWizard();
+                }
             }
 
         };
@@ -496,8 +520,9 @@ angular.module('webadminApp')
         /* initiate wizard */
 
         function initWizard(){
+            $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
-                $log.error("Couldn't run setup wizard: auth failed");
+                $log.log("Couldn't run setup wizard: auth failed");
                 if( $location.search().retry) {
                     $log.log("Second try: show error to user");
                     $scope.next("initFailure");
