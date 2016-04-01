@@ -91,17 +91,17 @@ namespace ite
         static const int WATCHDOG_GOOD_TIMEOUT = 3000;      // ms
         static const int WATCHDOG_BAD_TIMEOUT = 3 * 1000;  // ms
 
-        if(open())
-            ITE_LOG() << FMT("Open rx %d successfull", m_rxID);
-        else
-        {
-            ITE_LOG() << FMT("Open rx %d failed, device is not operational", m_rxID);
-            return;
-        }
-
         m_watchDogThread = std::thread(
             [this]
             {
+                if(open())
+                    ITE_LOG() << FMT("Open rx %d successfull", m_rxID);
+                else
+                {
+                    ITE_LOG() << FMT("Open rx %d failed, device is not operational", m_rxID);
+                    return;
+                }
+
                 int timeout = WATCHDOG_GOOD_TIMEOUT;
                 while (true)
                 {
