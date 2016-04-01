@@ -1980,7 +1980,10 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
 
     m_calendarShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    QSizeF newSize = opened ? QSizeF(250, 200) : QSizeF(250, 0);
+    QSizeF newSize(m_calendarItem->size());
+    if (!opened)
+        newSize.setHeight(0.0);
+
     if (animate)
     {
         m_calendarSizeAnimator->animateTo(newSize);
@@ -2003,7 +2006,10 @@ void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate)
 
     m_dayTimeOpened = opened;
 
-    QSizeF newSize = opened ? QSizeF(250, 120) : QSizeF(250, 0);
+    QSizeF newSize(m_dayTimeItem->size());
+    if (!opened)
+        newSize.setHeight(0.0);
+
     if (animate)
     {
         m_dayTimeSizeAnimator->animateTo(newSize);
@@ -2151,7 +2157,8 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
     calendarWidget->installEventFilter(m_calendarItem);
-    m_calendarItem->resize(250, 200);
+    m_calendarItem->resize(250, 192);
+
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
     const auto pinCalendarAction = action(QnActions::PinCalendarAction);
