@@ -17,6 +17,7 @@ static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
+static const int RECV_BUFFER_SIZE = 1024*1024;
 
 
 // ====================================================================
@@ -40,7 +41,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
     {
         UDPSocket* udpSock = new UDPSocket();
         udpSock->setReuseAddrFlag(true);
-        udpSock->setRecvBufferSize(1024*1024);
+        udpSock->setRecvBufferSize(RECV_BUFFER_SIZE);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
         for(const auto& iface: getAllIPv4Interfaces())
             udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
@@ -57,7 +58,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         //if (!sock->bindToInterface(iface))
         if( !sock->bind( SocketAddress( iface.address.toString() ) ) ||
             !sock->setMulticastIF( localAddress ) ||
-            !sock->setRecvBufferSize( 1024 * 512 ) )
+            !sock->setRecvBufferSize( RECV_BUFFER_SIZE ) )
         {
             return 0;
         }
