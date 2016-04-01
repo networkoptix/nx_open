@@ -67,6 +67,7 @@ bool QnSystemUriResolver::parseUri()
         m_result.serverUrl.setHost(system);
         m_result.serverUrl.setUserName(m_result.login);
         m_result.serverUrl.setPassword(m_result.password);
+        m_result.actions << Action::LoginToCloud;
         m_result.actions << Action::ConnectToServer;
     }
     /* Check connect to local system */

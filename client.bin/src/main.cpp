@@ -1,6 +1,4 @@
 //#define QN_USE_VLD
-#define QN_DEMO_SHOW
-
 #include <cstdint>
 
 #ifdef QN_USE_VLD

@@ -57,7 +57,8 @@ protected:
     
     /** Ask thread to stop. It's a non-blocking call. Thread will be stopped later. */
     virtual void pleaseStop() override;
-
+    
+    virtual void endOfRun() override;
 private:
     bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
     bool processVideoFrame(const QnCompressedVideoDataPtr& data);

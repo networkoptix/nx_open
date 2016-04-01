@@ -1,7 +1,5 @@
 TEMPLATE = app
 
-DEFINES += CL_FORCE_LOGO
-
 INCLUDEPATH += \
     ${root.dir}/appserver2/src/ \
     ${root.dir}/client.core/src/ \
