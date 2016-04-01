@@ -1,8 +1,5 @@
 #include "workbench_action_handler.h"
 
-//TODO: #GDM #high remove after demo
-#define QN_DEMO_SHOW
-
 #include <cassert>
 
 #include <QtCore/QProcess>
