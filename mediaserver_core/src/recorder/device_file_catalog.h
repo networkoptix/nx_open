@@ -131,8 +131,9 @@ public:
     Chunk updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration);
     qint64 lastChunkStartTime() const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
+    Chunk takeChunkUnsafe(qint64 startTimeMs, qint64 durationMs);
 
-    Chunk deleteFirstRecord(); 
+    Chunk deleteFirstRecord(qint64 exactTime = -1); 
 
     /** Delete first N records. Return deleted file timestamps */
     QVector<Chunk> deleteRecordsBefore(int idx);
@@ -154,7 +155,7 @@ public:
     qint64 minTime() const;
     qint64 maxTime() const;
     //bool lastFileDuplicateName() const;
-    qint64 firstTime() const;
+    qint64 firstTime(bool skipBeingRecorded = false) const;
     QnServer::ChunksCatalog getCatalog() const { return m_catalog; }
     //QByteArray getMac() const { return m_macAddress.toUtf8(); }
 

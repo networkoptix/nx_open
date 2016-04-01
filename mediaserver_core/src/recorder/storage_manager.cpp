@@ -1447,7 +1447,7 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
     for (FileCatalogMap::const_iterator itr = catalogMap.constBegin(); itr != catalogMap.constEnd(); ++itr)
     {
         DeviceFileCatalogPtr curCatalog = itr.value();
-        qint64 curMinTime = curCatalog->firstTime();
+        qint64 curMinTime = curCatalog->firstTime(true);
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
