@@ -94,7 +94,7 @@ private:
     mutable int         m_capabilities;
     mutable QString     m_localPath;
 
-    mutable std::atomic<qint64> m_cachedTotalSpace;
+    mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
 };
