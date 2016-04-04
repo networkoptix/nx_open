@@ -44,9 +44,7 @@ angular.module('cloudApp')
                 $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
                 return false;
             }
-        });
-
-        $scope.register.then(function(){
+        }).then(function(){
             $location.path('/register/success',false);
         });
     });

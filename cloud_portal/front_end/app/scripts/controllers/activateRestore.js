@@ -32,8 +32,7 @@ angular.module('cloudApp')
         },{
             notFound: L.errorCodes.wrongCode,
             notAuthorized: L.errorCodes.wrongCode
-        });
-        $scope.change.then(function(){
+        }).then(function(){
             $location.path("/restore_password/success", false); // Change url, do not reload
         });
 
@@ -52,8 +51,7 @@ angular.module('cloudApp')
         },{
             notFound: L.errorCodes.wrongCode,
             notAuthorized: L.errorCodes.wrongCode
-        });
-        $scope.activate.then(function(){
+        }).then(function(){
            $location.path("/activate/success", false); // Change url, do not reload
         });
 

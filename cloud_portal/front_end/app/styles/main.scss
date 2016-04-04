@@ -254,12 +254,8 @@ footer {
 .product-name.add-version:after{
   content: "\03B2";
   font-style: italic;
-  color: $gray-light;
+  opacity: 0.5;
   font-size: 90%;
-}
-
-a .product-name.add-version:after {
-  color: $link-color;
 }
 
 
