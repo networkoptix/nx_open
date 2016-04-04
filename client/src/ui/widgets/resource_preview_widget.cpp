@@ -5,13 +5,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 
+#include <ui/common/geometry.h>
+
 QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) :
     base_type(parent),
     m_thumbnailManager(new QnCameraThumbnailManager()),
     m_target(),
     m_pixmap()
 {
-    //m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->contentSize());
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, [this](const QnUuid& resourceId, const QPixmap& thumbnail)
     {
         if (m_target != resourceId)
@@ -19,14 +20,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
 
         m_pixmap = thumbnail;
         update();
-//         m_screenshotIndex = 1 - m_screenshotIndex;
-//         if (m_screenshotIndex == 0)
-//             ui->screenshotLabel->setPixmap(thumbnail);
-//         else
-//             ui->screenshotLabel_2->setPixmap(thumbnail);
-//         ui->screenshotWidget->setCurrentIndex(m_screenshotIndex);
     });
-
 
 }
 
@@ -76,7 +70,9 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent *event)
         return;
 
     painter->fillRect(paintRect, palette().window());
-    painter->drawPixmap(paintRect, m_pixmap);
+    QRect targetRect = QnGeometry::expanded(QnGeometry::aspectRatio(m_pixmap.size()), paintRect, Qt::KeepAspectRatio, Qt::AlignHCenter).toRect();
+
+    painter->drawPixmap(targetRect, m_pixmap);
 }
 
 QSize QnResourcePreviewWidget::sizeHint() const

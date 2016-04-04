@@ -37,17 +37,17 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="camerasTab">
+        <widget class="QnUserAccessRightsResourcesWidget" name="camerasTab">
          <attribute name="title">
           <string>Cameras</string>
          </attribute>
         </widget>
-        <widget class="QWidget" name="layoutsTab">
+        <widget class="QnUserAccessRightsResourcesWidget" name="layoutsTab">
          <attribute name="title">
           <string>Layouts</string>
          </attribute>
         </widget>
-        <widget class="QWidget" name="serversTab">
+        <widget class="QnUserAccessRightsResourcesWidget" name="serversTab">
          <attribute name="title">
           <string>Servers</string>
          </attribute>
@@ -64,6 +64,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnUserAccessRightsResourcesWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/user_access_rights_resources_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

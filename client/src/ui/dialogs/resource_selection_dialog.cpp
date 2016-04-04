@@ -5,8 +5,6 @@
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QPushButton>
 
-#include <camera/camera_thumbnail_manager.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
