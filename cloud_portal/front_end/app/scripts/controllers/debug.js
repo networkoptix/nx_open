@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DebugCtrl', function ($scope, cloudApi, account, process, $q, $timeout) {
+    .controller('DebugCtrl', function ($scope, cloudApi, account, process, $q, $timeout,dialogs) {
 
         account.requireLogin();
 
@@ -29,9 +29,18 @@ angular.module('cloudApp')
                     }
                 }, 2000);
                 return deferred.promise;
+            },{
+                successMessage:'Success!',
+                errorPrefix:'Fail!'
             })
         };
-
+        var notifyCounter = 0;
+        $scope.notify = function(){
+            var states = ['warning','info','success','danger'];
+            var type = states[Math.floor(Math.random() * states.length)];
+            var hold = Math.random() > 0.9;
+            dialogs.notify((notifyCounter++) + ":" + type + ": " + hold, type, hold);
+        };
         $scope.testNotification = function(){
             var message = $scope.message;
             try {

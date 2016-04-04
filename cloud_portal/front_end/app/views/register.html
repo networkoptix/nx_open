@@ -1,10 +1,10 @@
 <ng-include src="'views/static/register-intro.html'"></ng-include>
 <div class="auth-hidden">
-    <process-alert process="register"  alert-timeout="0"
-                   success-message="'Your account was successfully registered. Please, check your email to confirm it'"
-                   error-prefix="'Some error has happened:'"></process-alert>
+    <p ng-if="register.success || registerSuccess">
+        Your account was successfully registered. Please, check your email to confirm it
+    </p>
 
-    <form name="registerForm" class="form-horizontal" ng-if="!register.success" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
+    <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
         <input type="password" style="display:none">

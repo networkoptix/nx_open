@@ -7,8 +7,6 @@
                       ng-class="Config.systemStatuses[system.info.status].style || Config.systemStatuses.default.style">
                       {{Config.systemStatuses[system.info.status].label||system.info.status}}</span>
             </h1>
-            <process-alert process="gettingSystem"
-                           error-prefix="'System info is unavailable:'"></process-alert>
         </div>
         <div class="col-sm-6">
             <div class="pull-right-sm">
@@ -62,17 +60,6 @@
                  process-loading="gettingSystemUsers">
                 <div class="panel-body" ng-if="system.info.sharingPermissions.length">
                     <h2>Users</h2>
-
-                    <process-alert process="deletingSystem"
-                                   error-prefix="'Cannot delete the system:'"></process-alert>
-
-                    <process-alert process="gettingSystemUsers"
-                                   error-prefix="'Users list is unavailable:'"></process-alert>
-
-                    <process-alert process="unsharing"
-                                   success-message="unsharingMessage"
-                                   error-prefix="'Sharing failed:'"></process-alert>
-
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover" ng-if="system.users.length">

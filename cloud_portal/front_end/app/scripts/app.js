@@ -8,9 +8,26 @@ angular.module('cloudApp', [
     'ngRoute',
     'ui.bootstrap',
     'ngStorage',
-    'base64'
-]).config(function ($routeProvider) {
+    'base64',
+    'ngToast'
+]).config(['ngToastProvider', function(ngToastProvider) {
+    ngToastProvider.configure({
+        timeout: Config.alertTimeout,
+        animation: 'fade',
+        horizontalPosition: 'center',
+        maxNumber: Config.alertsMaxCount,
+        combineDuplications: true,
+        newestOnTop: false
+    });
+}]).config(function ($routeProvider) {
     $routeProvider
+        .when('/register/success', {
+            templateUrl: 'views/register.html',
+            controller: 'RegisterCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
+            }
+        })
         .when('/register/:email', {
             templateUrl: 'views/register.html',
             controller: 'RegisterCtrl'
@@ -59,28 +76,18 @@ angular.module('cloudApp', [
         })
 
 
-        .when('/systems/:systemId/disconnect', {
-            templateUrl: 'views/connectDisconnectSystem.html',
-            controller: 'ConnectDisconnectCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.connect = false; }]
-            }
-        })
-        .when('/systems/connect/:systemName', {
-            templateUrl: 'views/connectDisconnectSystem.html',
-            controller: 'ConnectDisconnectCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.connect = true; }]
-            }
-        })
-
-
-
         .when('/activate', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
+            }
+        })
+        .when('/activate/success',{
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.activationSuccess = true; }]
             }
         })
         .when('/activate/:activateCode', {
@@ -92,6 +99,13 @@ angular.module('cloudApp', [
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoring = true; }]
+            }
+        })
+        .when('/restore_password/success', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.changeSuccess = true; }]
             }
         })
         .when('/restore_password/:restoreCode', {

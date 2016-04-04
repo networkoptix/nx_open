@@ -19,11 +19,18 @@ angular.module('cloudApp')
 
         $scope.save = process.init(function() {
             return cloudApi.accountPost($scope.account.first_name,$scope.account.last_name,$scope.account.subscribe);
+        },{
+            successMessage:'Your account was successfully saved.',
+            errorPrefix:'Couldn\'t save your data:'
         });
         $scope.changePassword = process.init(function() {
             return cloudApi.changePassword($scope.pass.newPassword,$scope.pass.password);
         },{
-            notAuthorized: L.errorCodes.oldPasswordMistmatch
+            errorCodes:{
+                notAuthorized: L.errorCodes.oldPasswordMistmatch
+            },
+            successMessage:'Your password was successfully changed.',
+            errorPrefix:'Couldn\'t change your password:'
         }).then(function(){
             $scope.session.password = $scope.newPassword;
         });

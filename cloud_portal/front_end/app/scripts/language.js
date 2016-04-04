@@ -92,6 +92,9 @@ var L = {
         confirmUnshareTitle: "Delete User?",
         confirmUnshareAction: "Delete",
 
+        successDisconnected: 'System {systemName} was successfully disconnected from Nx Cloud',
+        successDeleted: 'System {systemName} was successfully deleted from your account',
+
         permissionsRemoved: 'Permissions were removed from {accountEmail}'
     }
 };

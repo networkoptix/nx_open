@@ -2,22 +2,20 @@
 
     <form name="loginForm" novalidate>
     <div class="modal-body" >
-        <process-alert process="login" ></process-alert>
-
-            <div class="form-group" validate-field>
-                <label for="email">Email address</label>
-                <input type="email" class="form-control" ng-model="auth.email" id="email" name="email"
-                       validate-email maxlength="255"
-                       required autofocus>
-            </div>
-            <div class="form-group" validate-field>
-                <label for="password">Password</label>
-                <input type="password" class="form-control" ng-model="auth.password" name="password" id="password" maxlength="255"
-                       required>
-            </div>
-            <div class="checkbox">
-                <label ><input type="checkbox" ng-model="auth.remember" name="remember" id="remember"> Remember me</label>
-            </div>
+        <div class="form-group" validate-field>
+            <label for="email">Email address</label>
+            <input type="email" class="form-control" ng-model="auth.email" id="email" name="email"
+                   validate-email maxlength="255"
+                   required autofocus>
+        </div>
+        <div class="form-group" validate-field>
+            <label for="password">Password</label>
+            <input type="password" class="form-control" ng-model="auth.password" name="password" id="password" maxlength="255"
+                   required>
+        </div>
+        <div class="checkbox">
+            <label ><input type="checkbox" ng-model="auth.remember" name="remember" id="remember"> Remember me</label>
+        </div>
     </div>
     <div class="modal-footer">
         <process-button process="login"

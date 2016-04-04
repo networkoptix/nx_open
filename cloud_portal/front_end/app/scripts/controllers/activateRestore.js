@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account, $location) {
 
         $scope.session = $localStorage;
 
@@ -15,6 +15,8 @@ angular.module('cloudApp')
         };
 
         $scope.reactivating = $routeParams.reactivating;
+        $scope.activationSuccess = $routeParams.activationSuccess;
+        $scope.changeSuccess = $routeParams.changeSuccess;
         $scope.restoring = $routeParams.restoring;
 
         if($scope.reactivating){
@@ -28,8 +30,14 @@ angular.module('cloudApp')
         $scope.change = process.init(function(){
             return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
         },{
-            notFound: L.errorCodes.wrongCode,
-            notAuthorized: L.errorCodes.wrongCode
+            errorCodes:{
+                notFound: L.errorCodes.wrongCode,
+                notAuthorized: L.errorCodes.wrongCode
+            },
+            holdAlerts:true,
+            errorPrefix:'Couldn\'t save new password:'
+        }).then(function(){
+            $location.path("/restore_password/success", false); // Change url, do not reload
         });
 
         $scope.directChange = function(){
@@ -39,22 +47,38 @@ angular.module('cloudApp')
         $scope.restore = process.init(function(){
             return cloudApi.restorePasswordRequest($scope.data.email);
         },{
-            notFound: L.errorCodes.emailNotFound
+            errorCodes:{
+                notFound: L.errorCodes.emailNotFound
+            },
+            holdAlerts:true,
+            successMessage: 'Confirmation link was sent to your email. Check it for creating a new password',
+            errorPrefix:'Couldn\'t send confirmation email:'
+
         });
 
         $scope.activate = process.init(function(){
             return cloudApi.activate($scope.data.activateCode);
         },{
-            notFound: L.errorCodes.wrongCode,
-            notAuthorized: L.errorCodes.wrongCode
+            errorCodes:{
+                notFound: L.errorCodes.wrongCode,
+                notAuthorized: L.errorCodes.wrongCode
+            },
+            errorPrefix:'Couldn\'t activate your account:'
+        }).then(function(){
+           $location.path("/activate/success", false); // Change url, do not reload
         });
 
 
         $scope.reactivate = process.init(function(){
             return cloudApi.reactivate($scope.data.email);
         },{
-            forbidden: L.errorCodes.accountAlreadyActivated,
-            notFound: L.errorCodes.emailNotFound
+            errorCodes:{
+                forbidden: L.errorCodes.accountAlreadyActivated,
+                notFound: L.errorCodes.emailNotFound
+            },
+            holdAlerts:true,
+            successMessage:'Confirmation link was sent to your email. Check it to continue.',
+            errorPrefix:'Couldn\'t send confirmation email:'
         });
 
         if($scope.data.activateCode){
