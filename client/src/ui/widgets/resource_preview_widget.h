@@ -27,6 +27,9 @@ protected:
     virtual QSize minimumSizeHint() const override;
 
 private:
+    QRect pixmapRect() const;
+
+private:
     QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
     QnUuid m_target;
     QPixmap m_pixmap;

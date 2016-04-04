@@ -19,6 +19,7 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
             return;
 
         m_pixmap = thumbnail;
+        updateGeometry();
         update();
     });
 
@@ -70,19 +71,31 @@ void QnResourcePreviewWidget::paintEvent(QPaintEvent *event)
         return;
 
     painter->fillRect(paintRect, palette().window());
-    QRect targetRect = QnGeometry::expanded(QnGeometry::aspectRatio(m_pixmap.size()), paintRect, Qt::KeepAspectRatio, Qt::AlignHCenter).toRect();
-
-    painter->drawPixmap(targetRect, m_pixmap);
+    painter->drawPixmap(pixmapRect(), m_pixmap);
 }
 
 QSize QnResourcePreviewWidget::sizeHint() const
 {
     if (m_pixmap.isNull())
         return QSize();
-    return m_pixmap.size();
+    return pixmapRect().size();
 }
 
 QSize QnResourcePreviewWidget::minimumSizeHint() const
 {
-    return thumbnailSize();
+    return pixmapRect().size();
+}
+
+QRect QnResourcePreviewWidget::pixmapRect() const
+{
+    QRect baseRect = this->rect();
+    if (m_pixmap.isNull())
+        return baseRect;
+    if (m_pixmap.width() == baseRect.width())
+        return m_pixmap.rect();
+
+    QRect maxRect(baseRect);
+    maxRect.setHeight(m_pixmap.height());
+
+    return QnGeometry::expanded(QnGeometry::aspectRatio(m_pixmap.size()), maxRect, Qt::KeepAspectRatio, Qt::AlignHCenter).toRect();
 }
