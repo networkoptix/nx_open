@@ -122,20 +122,8 @@ namespace
         qreal height = baseSize * sizeMultiplier;
         qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
-        QnImageButtonWidget *button;
-
-        qreal rotationSpeed = action->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
-        if (!qFuzzyIsNull(rotationSpeed))
-        {
-            QnRotatingImageButtonWidget *rotatingButton =
-                new QnRotatingImageButtonWidget(aliasFromAction(action), parent);
-            rotatingButton->setRotationSpeed(rotationSpeed);
-            button = rotatingButton;
-        }
-        else
-        {
-            button = new QnImageButtonWidget(aliasFromAction(action), parent);
-        }
+        QnImageButtonWidget *button =
+                new QnImageButtonWidget(aliasFromAction(action), parent);
 
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
         button->setFixedSize(width, height);

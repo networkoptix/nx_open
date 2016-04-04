@@ -165,7 +165,6 @@ void QnNxStyle::drawPrimitive(
     case PE_FrameFocusRect:
         return;
 
-    case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
         {
             const bool pressed = option->state.testFlag(State_Sunken);
@@ -204,6 +203,29 @@ void QnNxStyle::drawPrimitive(
             painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
             painter->setBrush(buttonColor);
             painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
+        }
+        return;
+    case PE_PanelButtonTool:
+        {
+            const bool pressed = option->state.testFlag(State_Sunken);
+            const bool hovered = option->state.testFlag(State_MouseOver) ||
+                                 option->state.testFlag(State_HasFocus);
+
+            QnPaletteColor mainColor = findColor(option->palette.window().color());
+
+            if (option->state.testFlag(State_Enabled))
+            {
+                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
+                    mainColor = this->mainColor(Colors::kBlue);
+            }
+
+            QColor buttonColor = mainColor;
+            if (pressed)
+                buttonColor = mainColor.darker(1);
+            else if (hovered)
+                buttonColor = mainColor.lighter(1);
+
+            painter->fillRect(option->rect, buttonColor);
         }
         return;
 
