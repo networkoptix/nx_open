@@ -22,7 +22,7 @@ namespace
     // @return Resulting text length
     int elideTextNode(QDomNode &node
         , int maxLength
-        , const QString &tail)
+        , const QString &/*tail*/)
     {
         auto textNode = node.toText();
         if (textNode.isNull())
@@ -547,18 +547,38 @@ QByteArray generateRandomName(int length)
     return str;
 }
 
-QString bytesToPrettyString(uint64_t bytes)
+QString bytesToString(uint64_t bytes)
 {
-    constexpr const uint64_t KB = 1000;
-    constexpr const uint64_t MB = 1000000;
-    constexpr const uint64_t GB = 1000000000;
+    constexpr const uint64_t KB = 1024;
+    constexpr const uint64_t MB = 1024 * 1024;
+    constexpr const uint64_t GB = 1024 * 1024 * 1024;
 
     if (bytes > GB)
-        return lm("%1GB").arg(bytes / GB);
+        return lm("%1G").arg(bytes / GB);
     else if (bytes > MB)
-        return lm("%1MB").arg(bytes / MB);
+        return lm("%1M").arg(bytes / MB);
     else if (bytes > KB)
-        return lm("%1KB").arg(bytes / KB);
+        return lm("%1K").arg(bytes / KB);
     else
         return lm("%1").arg(bytes);
+}
+
+uint64_t stringToBytes(const QString& str, bool* isOk)
+{
+    uint64_t ret = 0;
+    const auto subint = [&](uint64_t multi)
+    {
+        ret = QStringRef(&str, 0, str.size() - 1).toULongLong(isOk) * multi;
+    };
+
+    if (str.endsWith(L'K', Qt::CaseInsensitive))
+        subint(1024);
+    else if (str.endsWith(L'M', Qt::CaseInsensitive))
+        subint(1024 * 1024);
+    else if (str.endsWith(L'G', Qt::CaseInsensitive))
+        subint(1024 * 1024 * 1024);
+    else
+        ret = str.toULongLong(isOk);
+
+    return ret;
 }

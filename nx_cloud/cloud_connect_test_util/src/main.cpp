@@ -14,6 +14,7 @@
 #include <nx/network/test_support/socket_test_helper.h>
 
 #include <utils/common/command_line_parser.h>
+#include <utils/common/string.h>
 
 #include "listen_mode.h"
 
@@ -66,48 +67,6 @@ const auto kDefaultTotalConnections = 100;
 const int kDefaultMaxConcurrentConnections = 1;
 const int kDefaultBytesToReceive = 1024 * 1024;
 
-static int stringToBytes(const QString& value)
-{
-    bool isOk;
-    int ret;
-    const auto subint = [&](int multi)
-    {
-        ret = QStringRef(&value, 0, value.size() - 1).toInt(&isOk) * multi;
-    };
-
-    if (value.endsWith('k', Qt::CaseInsensitive)) subint(1024);
-    else
-    if (value.endsWith('m', Qt::CaseInsensitive)) subint(1024 * 1024);
-    else
-    if (value.endsWith('g', Qt::CaseInsensitive)) subint(1024 * 1024 * 1024);
-    else
-        ret = value.toInt(&isOk);
-
-    if (!isOk)
-    {
-        ret = kDefaultBytesToReceive;
-        std::cerr << "Can not convert '" << value.toStdString() << "' to bytes, "
-            "use " << ret << " instead" << std::endl;
-    }
-
-    return ret;
-}
-
-QString bytesToString(int value)
-{
-    static const std::vector<const char*> kSuffixes = { "", "k", "m", "g" };
-
-    float dValue = static_cast<float>(value);
-    size_t index = 0;
-    while (index < kSuffixes.size() && dValue >= 1024.0)
-    {
-        index++;
-        dValue /= 1024;
-    }
-
-    return lm("%1%2").arg(dValue).arg(kSuffixes[index]);
-}
-
 int runInConnectMode(const std::multimap<QString, QString>& args)
 {
     QString target;
@@ -151,11 +110,12 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
             });
     }
 
+    const uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),
         maxConcurrentConnections,
         trafficLimitType,
-        stringToBytes(trafficLimit),
+        trafficLimitBytes != 0 ? trafficLimitBytes : kDefaultBytesToReceive,
         totalConnections,
         transmissionMode);
 
@@ -266,6 +226,7 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 //--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
 //LA server:
 //--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
+//--http-client --url=http://admin:admin@ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
 //--connect --target=server1.ec0fc8ba-9dd1-417f-aa88-f36400953ade --max-concurrent-connections=10
 //--listen --server-id=server1 --cloud-credentials=ec0fc8ba-9dd1-417f-aa88-f36400953ade:1cc88e0d-1c08-4051-ae01-dfe3f5b5b90a
 
