@@ -177,13 +177,12 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         return;
     }
 
-    auto currentServer = qnResPool->getResourceById(camera->getParentId());
     QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
     /* Or check if archive belong to the current server only */
     if (mediaServerList.isEmpty() ||
-        mediaServerList.size() == 1 && mediaServerList[0] == currentServer)
+        mediaServerList.size() == 1 && mediaServerList[0] == camera->getParentServer())
     {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
