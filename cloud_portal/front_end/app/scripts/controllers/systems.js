@@ -27,6 +27,8 @@ angular.module('cloudApp')
         }
         $scope.gettingSystems = process.init(function(){
             return cloudApi.systems();
+        },{
+            errorPrefix: 'Systems list is unavailable:'
         }).then(function(result){
             $scope.systems = sortSystems(result.data);
         });

@@ -1,8 +1,5 @@
 <ng-include src="'views/static/register-intro.html'"></ng-include>
 <div class="auth-hidden">
-    <process-alert process="register" alert-timeout="0"
-                   error-prefix="'Some error has happened:'"></process-alert>
-
     <p ng-if="register.success || registerSuccess">
         Your account was successfully registered. Please, check your email to confirm it
     </p>

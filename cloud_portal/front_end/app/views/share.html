@@ -1,7 +1,6 @@
 <div ng-controller="ShareCtrl">
     <form name="shareForm" novalidate>
         <div class="modal-body">
-            <process-alert process="sharing" ></process-alert>
             <div class="form-group" validate-field>
                 <label ng-if="lockEmail" for="lockedEmail">User</label>
                 <label ng-if="!lockEmail" for="email">Email</label>

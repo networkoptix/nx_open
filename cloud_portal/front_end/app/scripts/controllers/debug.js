@@ -29,6 +29,9 @@ angular.module('cloudApp')
                     }
                 }, 2000);
                 return deferred.promise;
+            },{
+                successMessage:'Success!',
+                errorPrefix:'Fail!'
             })
         };
         var notifyCounter = 0;

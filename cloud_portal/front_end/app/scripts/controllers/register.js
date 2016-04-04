@@ -40,10 +40,14 @@ angular.module('cloudApp')
                 $scope.account.lastName,
                 $scope.account.subscribe);
         },{
-            alreadyExists: function(error){
-                $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
-                return false;
-            }
+            errorCodes:{
+                alreadyExists: function(error){
+                    $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
+                    return false;
+                }
+            },
+            holdAlerts:true,
+            errorPrefix:'Some error has happened:'
         }).then(function(){
             $location.path('/register/success',false);
         });

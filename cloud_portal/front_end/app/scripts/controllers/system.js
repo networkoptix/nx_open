@@ -25,9 +25,12 @@ angular.module('cloudApp')
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
             return cloudApi.system(systemId);
-        },{
-            forbidden: L.errorCodes.systemForbidden,
-            notFound: L.errorCodes.systemNotFound
+        }, {
+            errorCodes: {
+                forbidden: L.errorCodes.systemForbidden,
+                notFound: L.errorCodes.systemNotFound
+            },
+            errorPrefix:'System info is unavailable:'
         }).then(function(result){
             $scope.system.info = result.data[0];
             $scope.isOwner = $scope.system.info.ownerAccountEmail == $scope.account.email;
@@ -39,10 +42,11 @@ angular.module('cloudApp')
         function cleanUrl(){
             $location.path('/systems/' + systemId, false);
         }
-
         //Retrieve users list
         $scope.gettingSystemUsers = process.init(function(){
             return cloudApi.users(systemId);
+        },{
+            errorPrefix:'Users list is unavailable:'
         }).then(function(result){
             var users = result.data;
             // Sort users here
@@ -69,8 +73,6 @@ angular.module('cloudApp')
                     $scope.share().finally(cleanUrl);
                 }
             }
-
-
         });
 
 
@@ -93,12 +95,16 @@ angular.module('cloudApp')
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.disconnect(systemId);
+                        },{
+                            successMessage: L.system.successDisconnected.replace('{systemName}', $scope.system.info.name),
+                            errorPrefix:'Cannot delete the system:'
                         }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });
 
             }
         };
+
         $scope.delete= function(){
             if(!$scope.isOwner ){
                 // User is not owner. Deleting means he'll lose access to it
@@ -106,6 +112,9 @@ angular.module('cloudApp')
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.unshare(systemId, $scope.account.email);
+                        },{
+                            successMessage: L.system.successDeleted.replace('{systemName}', $scope.system.info.name),
+                            errorPrefix:'Cannot delete the system:'
                         }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });
@@ -129,16 +138,17 @@ angular.module('cloudApp')
             dialogs.confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger').
                 then(function(){
                     // Run a process of sharing
-                    $scope.unsharingMessage = L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail);
                     $scope.unsharing = process.init(function(){
                         return cloudApi.unshare(systemId, user.accountEmail);
+                    },{
+                        successMessage: L.system.permissionsRemoved.replace('{accountEmail}',user.accountEmail),
+                        errorPrefix:'Sharing failed:'
                     }).then(function(){
                         // Update users list
                         $scope.system.users = _.without($scope.system.users, user);
                     });
                     $scope.unsharing.run();
                 });
-
         };
 
     });
