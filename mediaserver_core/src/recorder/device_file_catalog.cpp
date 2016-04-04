@@ -674,41 +674,20 @@ void DeviceFileCatalog::removeRecord(int idx)
         m_chunks.erase(m_chunks.begin() + idx);
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs)
-{
-    QnMutexLocker lk(&m_mutex);
-    return takeChunkUnsafe(startTimeMs, durationMs);
-}
+DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
+    QnMutexLocker lock( &m_mutex );
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunkUnsafe(qint64 startTimeMs, qint64 durationMs) 
-{
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTimeMs);
     if (itr > m_chunks.begin())
         --itr;
+    while (itr > m_chunks.begin() && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
+        --itr;
 
-    if (durationMs != -1)
-    {
-        while (itr > m_chunks.begin() && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
-            --itr;
-        if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) 
-        {
-            Chunk result = *itr;
-            int idx = itr - m_chunks.begin();
-            removeRecord(idx);
-            return result;
-        }
-    }
-    else
-    {
-        while (itr > m_chunks.begin() && itr->startTimeMs == startTimeMs)
-            --itr;
-        if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs) 
-        {
-            Chunk result = *itr;
-            int idx = itr - m_chunks.begin();
-            removeRecord(idx);
-            return result;
-        }
+    if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
+        Chunk result = *itr;
+        int idx = itr - m_chunks.begin();
+        removeRecord(idx);
+        return result;
     }
 
     return Chunk();
@@ -803,7 +782,7 @@ bool DeviceFileCatalog::isEmpty() const
     return m_chunks.empty();
 }
 
-DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord(qint64 exactTime)
+DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
 {
     QnStorageResourcePtr storage;
     QString delFileName;
@@ -816,22 +795,11 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord(qint64 exactTime)
             return deletedChunk;
         else
         {
-            if (exactTime == -1)
-            {
-                storageIndex = m_chunks[0].storageIndex;
-                delFileName = fullFileName(m_chunks[0]);
-                deletedChunk = m_chunks[0];
+            storageIndex = m_chunks[0].storageIndex;
+            delFileName = fullFileName(m_chunks[0]);
+            deletedChunk = m_chunks[0];
 
-                removeRecord(0);
-            }
-            else
-            {
-                deletedChunk = takeChunkUnsafe(exactTime, -1);
-                if (deletedChunk.startTimeMs == -1)
-                    return deletedChunk;
-                storageIndex = deletedChunk.storageIndex;
-                delFileName = fullFileName(deletedChunk);
-            }
+            removeRecord(0);
         }
     }
 
@@ -1000,22 +968,13 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
         return DeviceFileCatalog::Chunk();
 }
 
-qint64 DeviceFileCatalog::firstTime(bool skipBeingRecorded) const
+qint64 DeviceFileCatalog::firstTime() const
 {
     QnMutexLocker lock( &m_mutex );
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-    {
-        if (!skipBeingRecorded || m_chunks[0].durationMs != 0)
-            return m_chunks[0].startTimeMs;
-        else if (m_chunks[0].durationMs == 0)
-        {
-            if (m_chunks.size() >= 2)
-                return m_chunks[1].startTimeMs;
-        }
-    }
-    return AV_NOPTS_VALUE;
+        return m_chunks[0].startTimeMs;
 }
 
 void DeviceFileCatalog::close()
