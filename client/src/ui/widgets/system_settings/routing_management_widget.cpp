@@ -20,7 +20,7 @@
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/custom_style.h"
 #include <ui/delegates/switch_item_delegate.h>
-#include <ui/widgets/snapped_scrollbar.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <nx/network/socket_common.h>
 #include "utils/common/string.h"

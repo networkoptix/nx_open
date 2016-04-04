@@ -4,7 +4,7 @@
 #include <QtWidgets/QWidget>
 #include <QtNetwork/QHostAddress>
 
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
