@@ -83,6 +83,13 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
+        .when('/activate/success',{
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.activationSuccess = true; }]
+            }
+        })
         .when('/activate/:activateCode', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'

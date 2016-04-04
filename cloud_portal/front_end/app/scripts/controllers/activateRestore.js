@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account, $location) {
 
         $scope.session = $localStorage;
 
@@ -15,6 +15,7 @@ angular.module('cloudApp')
         };
 
         $scope.reactivating = $routeParams.reactivating;
+        $scope.activationSuccess = $routeParams.activationSuccess;
         $scope.restoring = $routeParams.restoring;
 
         if($scope.reactivating){
@@ -47,6 +48,9 @@ angular.module('cloudApp')
         },{
             notFound: L.errorCodes.wrongCode,
             notAuthorized: L.errorCodes.wrongCode
+        });
+        $scope.activate.then(function(){
+           $location.path("/activate/success", false); // Change url, do not reload
         });
 
 
