@@ -8,7 +8,6 @@ angular.module('cloudApp').directive('processAlert', function () {
                 process:'=',
                 errorPrefix:'=',
                 successMessage:'=',
-                processMessage:'=',
                 alertTimeout:'@'
             },
             link:function(scope,element,attrs){

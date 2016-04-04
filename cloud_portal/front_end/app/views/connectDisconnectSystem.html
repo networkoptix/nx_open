@@ -1,6 +1,5 @@
 <div ng-if="connect && !connecting.finished" >
     <process-alert process="connecting"
-            process-message="'Registering system in cloud ...'"
             success-message="'Registered in cloud portal'"
             error-prefix="'Couldn\'t register your system:'"></process-alert>
 
@@ -13,7 +12,6 @@
 
 <div ng-if="!connect && !disconnecting.finished" >
     <process-alert process="disconnecting"
-                   process-message="'Disconnect system from cloud ...'"
                    success-message="'System was disconnected from cloud portal'"
                    error-prefix="'Couldn\'t disconnect your system:'"></process-alert>
 
