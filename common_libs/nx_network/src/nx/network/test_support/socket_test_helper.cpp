@@ -423,8 +423,8 @@ QString toString(const ConnectionTestStatistics& data)
 {
     return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4")
         .arg(data.onlineConnections).arg(data.totalConnections)
-        .arg(bytesToPrettyString(data.bytesReceived))
-        .arg(bytesToPrettyString(data.bytesSent));
+        .arg(bytesToString(data.bytesReceived))
+        .arg(bytesToString(data.bytesSent));
 }
 
 bool operator==(
