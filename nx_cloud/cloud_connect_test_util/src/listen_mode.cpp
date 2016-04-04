@@ -88,35 +88,9 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         return 1;
     }
 
-#if 0
-    const auto showHelp = []()
-    {
-        std::cout <<
-            "Commands: \n"
-            "    help       Print this message\n"
-            "    status     Print status line\n"
-            "    exit       Exit\n";
-    };
-
-    showHelp();
-    std::cout << ">> ";
-    for (std::string s; getline(std::cin, s); std::cout << ">> ")
-    {
-        if (s == "help")
-            showHelp();
-        else
-            if (s == "st" || s == "status")
-                std::cout << server.statusLine().toStdString() << std::endl;
-            else
-                if (s == "exit")
-                    break;
-    }
-    const int result = 0;
-#else
     const int result = printStatsAndWaitForCompletion(
         &server,
         nx::utils::MoveOnlyFunc<bool()>());
-#endif
     server.pleaseStopSync();
     return result;
 }
