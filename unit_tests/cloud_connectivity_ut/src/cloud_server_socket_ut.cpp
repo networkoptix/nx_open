@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <libconnection_mediator/src/test_support/socket_globals_holder.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
@@ -17,10 +18,11 @@ namespace cloud {
 /**
  * Accepts usual TCP connections
  */
-struct FakeTcpTunnelConnection
+class FakeTcpTunnelConnection
 :
-    AbstractIncomingTunnelConnection
+    public AbstractIncomingTunnelConnection
 {
+public:
     FakeTcpTunnelConnection(
         String connectionId, SocketAddress address, size_t sockets = 1000)
     :
@@ -70,6 +72,7 @@ struct FakeTcpTunnelConnection
             });
     }
 
+private:
     size_t m_sockets;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
 };
@@ -134,6 +137,7 @@ struct CloudServerSocketTcpTester
     bool listen(int queueLen) override
     {
         initTunnelPool(queueLen);
+        moveToListeningState();
         for (quint16 i = 0; i < nAcceptors; i++)
         {
             auto addr = nx::network::test::kServerAddress;
@@ -151,13 +155,14 @@ struct CloudServerSocketTcpTester
     }
 };
 
-struct CloudServerSocketTest
+class CloudServerSocketTest
 :
     public ::testing::Test
 {
 public:
     CloudServerSocketTest()
     {
+        SocketGlobalsHolder::instance()->reinitialize();
         init();
     }
 
@@ -176,12 +181,13 @@ private:
                 system.id,
                 server->serverId(),
                 system.authKey));
-        nx::network::SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.endpoint());
+        SocketGlobals::mediatorConnector().enable(true);
     }
 };
 
 template<typename ServerSocket>
-struct CloudServerSocketTcpTest
+class CloudServerSocketTcpTest
 :
     public CloudServerSocketTest
 {
@@ -224,7 +230,13 @@ static void testTunnelConnect(bool isSuccessExpected)
     client->pleaseStopSync();
 }
 
-TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
+class CloudServerSocketBaseTcpTest
+:
+    public CloudServerSocketTest
+{
+};
+
+TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 {
     auto stunAsyncClient = std::make_shared<network::test::StunAsyncClientMock>();
     EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
@@ -247,8 +259,9 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
         std::move(acceptorMakers));
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->listen(1));
+    server->moveToListeningState();
 
-    // there is not tunnel yet
+    // there is no tunnel yet
     testTunnelConnect(false);
 
     hpm::api::ConnectionRequestedEvent event;
@@ -260,6 +273,9 @@ TEST(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
         stun::cc::indications::connectionRequested));
     event.serialize(&message);
     stunAsyncClient->emulateIndication(message);
+
+    //giving server socket time to process indication
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // now we can use estabilished tunnel
     testTunnelConnect(true);
@@ -308,13 +324,15 @@ protected:
                     it->second, kClientCount);
             });
 
-        m_server = std::make_unique<CloudServerSocket>(
+        auto cloudServerSocket = std::make_unique<CloudServerSocket>(
             std::make_shared<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient, &SocketGlobals::mediatorConnector()),
             nx::network::RetryPolicy(),
             std::move(acceptorMakers));
-        ASSERT_TRUE(m_server->setNonBlockingMode(true));
-        ASSERT_TRUE(m_server->listen(10));
+        ASSERT_TRUE(cloudServerSocket->setNonBlockingMode(true));
+        ASSERT_TRUE(cloudServerSocket->listen(10));
+        cloudServerSocket->moveToListeningState();
+        m_server = std::move(cloudServerSocket);
         acceptServerForever();
     }
 

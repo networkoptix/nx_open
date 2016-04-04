@@ -17,6 +17,11 @@ IncomingTunnelPool::IncomingTunnelPool(
     m_ioThreadSocket->bindToAioThread(ioThread);
 }
 
+IncomingTunnelPool::~IncomingTunnelPool()
+{
+    int x = 0;
+}
+
 void IncomingTunnelPool::addNewTunnel(
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
@@ -139,17 +144,22 @@ void IncomingTunnelPool::callAcceptHandler(bool timeout)
     m_ioThreadSocket->cancelIOSync(aio::etTimedOut);
 
     QnMutexLocker lock(&m_mutex);
-    if (!m_acceptHandler || m_acceptedSockets.empty())
+    if (!m_acceptHandler)
+        return;
+
+    if (timeout)
+    {
+        const auto handler = std::move(m_acceptHandler);
+        m_acceptHandler = nullptr;
+        lock.unlock();
+        return handler(nullptr);
+    }
+
+    if (m_acceptedSockets.empty())
         return;
 
     const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;
-
-    if (timeout)
-    {
-        lock.unlock();
-        return handler(nullptr);
-    }
 
     auto socket = std::move(m_acceptedSockets.front());
     m_acceptedSockets.pop_front();
