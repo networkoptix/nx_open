@@ -602,6 +602,12 @@ module.exports = function (grunt) {
             },
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
+            },
+            version: {
+                command: 'hg parent > static/version.txt'
+            },
+            print_version:{
+                command: 'hg parent'
             }
         },
 
@@ -692,6 +698,7 @@ module.exports = function (grunt) {
         'autoprefixer',
         'connect:test',
         'protractor_webdriver',
+        'shell:print_version',
         'protractor:all',
         'newer:jshint'
         //'karma'
@@ -714,7 +721,8 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'shell:version'
     ]);
 
     grunt.registerTask('default', [
