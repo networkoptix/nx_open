@@ -239,18 +239,18 @@ public:
 
         qint64 prevStartTime;
         int prevDuration;
-        qDebug() << "Time periods details: ";
+        //qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin();
              it != m_timeLine.m_timeLine.cend();
              ++it) {
-            qDebug() << it->startTimeMs << " " << it->durationMs;
-            if (it != m_timeLine.m_timeLine.cbegin()) {
-                qDebug() << "\tGap from previous: "
-                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
-                         << (it->startTimeMs - (prevStartTime + prevDuration))/1000
-                         << "s )";
-            }
+            //qDebug() << it->startTimeMs << " " << it->durationMs;
+            //if (it != m_timeLine.m_timeLine.cbegin()) {
+            //    qDebug() << "\tGap from previous: "
+            //             << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
+            //             << (it->startTimeMs - (prevStartTime + prevDuration))/1000
+            //             << "s )";
+            //}
             prevStartTime = it->startTimeMs;
             prevDuration = it->durationMs;
         }
