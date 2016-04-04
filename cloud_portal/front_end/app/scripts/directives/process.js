@@ -1,40 +1,6 @@
 'use strict';
 
-angular.module('cloudApp').directive('processAlert', function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'views/components/process-alert.html',
-            scope:{
-                process:'=',
-                errorPrefix:'=',
-                successMessage:'=',
-                alertTimeout:'@'
-            },
-            link:function(scope,element,attrs){
-                scope.attrs = attrs;
-                scope.shown = {};
-
-                if(typeof(scope.alertTimeout)=='undefined') {
-                    scope.alertTimeout = Config.alertTimeout;
-                }
-
-                if(scope.alertTimeout === 0 || scope.alertTimeout === '0'){
-                    scope.alertTimeout = 365*24*3600*1000; // long enough )
-                }
-
-
-                scope.alertTimeout2 = scope.alertTimeout;
-
-                scope.closeAlert = function(type){
-                    scope.shown[type] = true;
-                };
-
-                scope.$watch('process.processing',function(){
-                    scope.shown = {};
-                });
-            }
-        };
-    }).directive('processButton', ['$timeout',function ($timeout) {
+angular.module('cloudApp').directive('processButton', ['$timeout',function ($timeout) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/process-button.html',

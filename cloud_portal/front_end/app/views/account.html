@@ -1,11 +1,6 @@
 
 <div ng-if="accountMode">
     <h1>Account</h1>
-    <process-alert process="save"
-                   success-message="'Your account was successfully saved.'"
-                   error-prefix="'Couldn\'t save your data:'"></process-alert>
-
-
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group">
@@ -54,10 +49,6 @@
 
 <div ng-if="passwordMode" >
     <h1>Change password</h1>
-    <process-alert process="changePassword"
-                   success-message="'Your password was successfully changed.'"
-                   error-prefix="'Couldn\'t change your password:'"></process-alert>
-
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group" validate-field>
             <label for="password"  class="col-sm-4 control-label">Current password</label>

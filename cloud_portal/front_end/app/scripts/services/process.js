@@ -2,7 +2,7 @@
 
 
 angular.module('cloudApp')
-    .factory('process', function ($q) {
+    .factory('process', function ($q, dialogs) {
 
         function formatError(error,errorCodes){
             if(!error || !error.resultCode){
@@ -23,7 +23,18 @@ angular.module('cloudApp')
 
         return {
             formatError:formatError,
-            init:function(caller, errorCodes){
+            init:function(caller, settings){
+                /*
+                settings: {
+                    errorCodes,
+
+                    holdAlerts
+                    successMessage,
+                    errorPrefix,
+                }
+                settings.successMessage
+                 */
+                var errorCodes = settings.errorCodes;
                 return {
                     success:false,
                     error:false,
@@ -50,25 +61,32 @@ angular.module('cloudApp')
                             this.processHandler
                         );
 
+                        function handleError(data){
+                            self.processing = false;
+                            self.finished = true;
+                            self.error = true;
+                            self.errorData = data;
+                            self.errorMessage = formatError(data.data, errorCodes);
+                            // Error handler here
+                            var prefix = (settings.errorPrefix + ' ') || '';
+                            dialogs.notify(prefix + self.errorMessage, 'danger', settings.holdAlerts);
+                            deferred.reject(data);
+                        }
                         return caller().then(function(data){
                             self.processing = false;
                             self.finished = true;
                             if(data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
-                                self.error = true;
-                                self.errorData = data;
-                                self.errorMessage = formatError(data.data, errorCodes);
-                                deferred.reject(data);
+                                handleError(data);
                             }else {
                                 self.success = true;
+
+                                if(settings.successMessage){
+                                    dialogs.notify(settings.successMessage, 'success', settings.holdAlerts);
+                                }
                                 deferred.resolve(data);
                             }
                         },function(error){
-                            self.processing = false;
-                            self.finished = true;
-                            self.error = true;
-                            self.errorData = error;
-                            self.errorMessage = formatError(error.data, errorCodes);
-                            deferred.reject(error);
+                            handleError(error);
                         },function(progress){
                             deferred.notify(progress);
                         });
