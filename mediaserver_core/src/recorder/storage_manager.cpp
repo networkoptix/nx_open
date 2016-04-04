@@ -792,7 +792,9 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
                                  });
     if (cameraIt != archiveCameraList.cend() || qnResPool->getResourceById(cameraGuid))
         return;
-
+    // Mac shouldn't be null for db saveCamera transaction to succeed.
+    // It will be replaced with the real one when/if camera is discovered.
+    newCamera.mac = "1"; 
     archiveCameraList.push_back(newCamera);
 }
 
