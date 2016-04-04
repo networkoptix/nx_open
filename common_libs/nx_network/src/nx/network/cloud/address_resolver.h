@@ -197,6 +197,7 @@ private:
             HostAddress _address, bool _natTraversal, ResolveHandler _handler);
     };
 
+    void tryFastDomainResolve(HaInfoIterator info);
     void dnsResolve(HaInfoIterator info);
     void mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk);
 

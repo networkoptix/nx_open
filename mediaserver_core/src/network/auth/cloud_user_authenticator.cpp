@@ -41,7 +41,7 @@ CloudUserAuthenticator::~CloudUserAuthenticator()
 
 QnResourcePtr CloudUserAuthenticator::findResByName(const QByteArray& nxUserName) const
 {
-    //NOTE this method returns NULL for cloud login. 
+    //NOTE this method returns NULL for cloud login.
     //  This is OK, since NULL from this method does not signal authentication failure
     return m_defaultAuthenticator->findResByName(nxUserName);
 }
@@ -219,13 +219,20 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     nx::cdb::api::ResultCode resultCode;
     nx::cdb::api::AuthResponse authResponse;
     const auto connection = CloudConnectionManager::instance()->getCloudConnection();
-    std::tie(resultCode, authResponse) =
-        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::AuthResponse>(
-            std::bind(
-                &nx::cdb::api::AuthProvider::getAuthenticationResponse,
-                connection->authProvider(),
-                std::move(authRequest),
-                std::placeholders::_1));
+    if (connection)
+    {
+        std::tie(resultCode, authResponse) =
+            makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::AuthResponse>(
+                std::bind(
+                    &nx::cdb::api::AuthProvider::getAuthenticationResponse,
+                    connection->authProvider(),
+                    std::move(authRequest),
+                    std::placeholders::_1));
+    }
+    else
+    {
+        resultCode = nx::cdb::api::ResultCode::forbidden;
+    }
 
     lk->relock();
 

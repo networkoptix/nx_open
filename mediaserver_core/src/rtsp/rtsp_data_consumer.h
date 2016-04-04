@@ -132,6 +132,6 @@ private:
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
     int m_videoChannels;
-    bool m_needKeyData[CL_MAX_CHANNELS];
+    std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

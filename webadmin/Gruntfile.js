@@ -142,7 +142,7 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
 
                 // Gdm
-                {context: '/api/',      host: '10.0.2.240', port: 7001},
+                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
                 {context: '/ec2/',      host: '10.0.2.240', port: 7001},
                 {context: '/hls/',      host: '10.0.2.240', port: 7001},
                 {context: '/media/',    host: '10.0.2.240', port: 7001},
@@ -165,7 +165,7 @@ module.exports = function (grunt) {
                  {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
 
                 //Vitaly Kutin
-                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
+                {context: '/api/',      host: '10.0.3.197', port: 7001},
                 {context: '/ec2/',      host: '10.0.3.197', port: 7001},
                 {context: '/hls/',      host: '10.0.3.197', port: 7001},
                 {context: '/media/',    host: '10.0.3.197', port: 7001},
@@ -212,6 +212,14 @@ module.exports = function (grunt) {
                 {context: '/hls/',      host: '10.0.2.232', port: 7002},
                 {context: '/media/',    host: '10.0.2.232', port: 7002},
                 {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
+
+
+                //Surface
+                /*{context: '/api/',      host: '10.0.3.203', port: 7001},
+                 {context: '/ec2/',      host: '10.0.3.203', port: 7001},
+                 {context: '/hls/',      host: '10.0.3.203', port: 7001},
+                 {context: '/media/',    host: '10.0.3.203', port: 7001},
+                 {context: '/proxy/',    host: '10.0.3.203', port: 7001}/**/
 
             ],
             livereload: {
@@ -591,6 +599,9 @@ module.exports = function (grunt) {
         shell: {
             deploy: {
                 command: 'cd ~/develop/' + package_dir + '; rm .DS_Store; rm ../.DS_Store; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+            },
+            merge: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
             }
         },
 
@@ -725,6 +736,9 @@ module.exports = function (grunt) {
         'publish'
     ]);
 
+    grunt.registerTask('merge', [
+        'shell:merge'
+    ]);
 
     grunt.registerTask('deploy', [
         'publish',

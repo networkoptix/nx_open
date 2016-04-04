@@ -98,7 +98,7 @@
             <Component>
                 <File Id="ServerUdtLib" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="3" />
             </Component>
-        </ComponentGroup>
+        </ComponentGroup>    
 
         <!-- Component groups -->
         <ComponentGroup Id="ServerFFmpegLibraries" Directory="${customization}MediaServerDir">
@@ -134,6 +134,12 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="ServerWeb" Directory="${customization}MediaServerDir">
+            <Component>
+                <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat" DiskId="6" />
+            </Component>
+        </ComponentGroup>            
+        
         <ComponentGroup Id="ServerQTLibraries" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="ServerQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" DiskId="6"/>
@@ -223,6 +229,7 @@
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
             <ComponentGroupRef Id="Vs2015crtComponent"/>
+            <ComponentGroupRef Id="ServerWeb"/>
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerLibs"/>
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>

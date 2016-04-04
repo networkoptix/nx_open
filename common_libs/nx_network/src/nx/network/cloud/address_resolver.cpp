@@ -7,8 +7,14 @@
 #include <nx/network/stun/cc/custom_stun.h>
 #include <utils/serialization/lexical.h>
 
+
+#ifdef QN_DEMO_SHOW
+static const auto DNS_CACHE_TIME = std::chrono::seconds(1);
+static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(1);
+#else
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
 static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(10);
+#endif
 
 namespace nx {
 namespace network {
@@ -102,6 +108,10 @@ void AddressResolver::addFixedAddress(
     NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
     NX_ASSERT(hostAddress.address.isResolved());
 
+    NX_LOGX(lit("Added fixed address for %1: %2")
+        .arg(hostName.toString())
+        .arg(hostAddress.toString()), cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
     auto& entries = m_info[hostName].fixedEntries;
@@ -123,6 +133,11 @@ void AddressResolver::addFixedAddress(
 void AddressResolver::removeFixedAddress(
     const HostAddress& hostName, const SocketAddress& hostAddress)
 {
+
+    NX_LOGX(lit("Removed fixed address for %1: %2")
+        .arg(hostName.toString())
+        .arg(hostAddress.toString()), cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
     auto& entries = m_info[hostName].fixedEntries;
@@ -189,6 +204,7 @@ void AddressResolver::resolveAsync(
     QnMutexLocker lk( &m_mutex );
     auto info = m_info.emplace( hostName, HostAddressInfo() ).first;
     info->second.checkExpirations();
+    tryFastDomainResolve(info);
     if( info->second.isResolved( natTraversal ) )
     {
         auto entries = info->second.getAll();
@@ -362,6 +378,27 @@ AddressResolver::RequestInfo::RequestInfo(RequestInfo&& right)
     handler(std::move(right.handler)),
     guard(std::move(right.guard))
 {
+}
+
+void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
+{
+    const auto domain = info->first.toString();
+    if (domain.indexOf(lit(".")) != -1)
+        return; // only top level domains might be fast resolved
+
+    // TODO: #mux Think about better representation to increase performance
+    const auto suffix = lit(".") + domain;
+    for (const auto& other : m_info)
+    {
+        if (other.first.toString().endsWith(suffix) &&
+            !other.second.fixedEntries.empty())
+        {
+            info->second.fixedEntries = other.second.fixedEntries;
+            return; // just resolve to first avaliable
+        }
+    }
+
+    info->second.fixedEntries.clear();
 }
 
 void AddressResolver::dnsResolve(HaInfoIterator info)

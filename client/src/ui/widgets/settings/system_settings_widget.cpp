@@ -97,6 +97,7 @@ void QnSystemSettingsWidget::applyChanges()
     qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
 
     ui->settingsWarningLabel->setVisible(false);
+    qnGlobalSettings->synchronizeNow();
 }
 
 bool QnSystemSettingsWidget::hasChanges() const

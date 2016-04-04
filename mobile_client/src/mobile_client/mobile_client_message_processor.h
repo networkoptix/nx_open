@@ -20,7 +20,7 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const override;
 
 private:
-    void updateMainServerApiUrl();
+    void updateMainServerApiUrl(const QnMediaServerResourcePtr& server);
 };
 
 #endif // MOBILE_CLIENT_MESSAGE_PROCESSOR_H

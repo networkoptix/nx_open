@@ -221,8 +221,9 @@ private slots:
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
-    void setTreeShowButtonUsed(bool used = true);
-    void setNotificationsShowButtonUsed(bool used = true);
+    void setTreeShowButtonUsed(bool used);
+    void setNotificationsShowButtonUsed(bool used);
+    void setCalendarShowButtonUsed(bool used);
 
     void at_freespaceAction_triggered();
     void at_activityStopped();
@@ -249,6 +250,7 @@ private slots:
     void at_notificationsShowingProcessor_hoverEntered();
     void at_notificationsItem_geometryChanged();
 
+    void at_calendarShowingProcessor_hoverEntered();
     void at_calendarItem_paintGeometryChanged();
     void at_dayTimeItem_paintGeometryChanged();
 
@@ -429,6 +431,10 @@ private:
     AnimatorGroup *m_calendarOpacityAnimatorGroup;
 
     HoverFocusProcessor *m_calendarOpacityProcessor;
+
+    HoverFocusProcessor *m_calendarHidingProcessor;
+
+    HoverFocusProcessor *m_calendarShowingProcessor;
 
     bool m_inCalendarGeometryUpdate;
 
