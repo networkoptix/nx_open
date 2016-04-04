@@ -10,6 +10,50 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 
+namespace
+{
+    const int kTitleBarHeight = 24;
+    const QSize kControlButtonSize(40, kTitleBarHeight);
+
+    QToolButton* newActionButton(
+            QAction *action,
+            int helpTopicId = Qn::Empty_Help,
+            bool popup = false,
+            const QSize& fixedSize = QSize())
+    {
+        QToolButton* button = new QToolButton();
+        button->setDefaultAction(action);
+        button->setFocusPolicy(Qt::NoFocus);
+        button->setIconSize(button->icon().actualSize(QSize(1024, 1024)));
+        button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
+
+        if (popup)
+        {
+            /* We want the button to activate the corresponding action so that menu is updated.
+            * However, menu buttons do not activate their corresponding actions as they do not receive release events.
+            * We work this around by making some hacky connections. */
+            button->setPopupMode(QToolButton::InstantPopup);
+
+            QObject::disconnect(button, SIGNAL(pressed()), button, SLOT(_q_buttonPressed()));
+            QObject::connect(button, SIGNAL(pressed()), button->defaultAction(), SLOT(trigger()));
+            QObject::connect(button, SIGNAL(pressed()), button, SLOT(_q_buttonPressed()));
+        }
+
+        if (helpTopicId != Qn::Empty_Help)
+            setHelpTopic(button, helpTopicId);
+
+        return button;
+    }
+
+    QToolButton* newActionButton(
+            QAction* action,
+            bool popup,
+            const QSize& fixedSize = QSize())
+    {
+        return newActionButton(action, Qn::Empty_Help, popup, fixedSize);
+    }
+}
+
 class QnMainWindowTitleBarWidgetPrivate : public QObject
 {
     QnMainWindowTitleBarWidget* q_ptr;
@@ -53,12 +97,15 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     setFocusPolicy(Qt::NoFocus);
     setAutoFillBackground(true);
+    setFixedHeight(kTitleBarHeight);
 
     d->mainMenuButton = newActionButton(
-            action(QnActions::MainMenuAction), true, 1.5,
-            Qn::MainWindow_TitleBar_MainMenu_Help);
+            action(QnActions::MainMenuAction),
+            Qn::MainWindow_TitleBar_MainMenu_Help,
+            true);
 
     d->tabBar = new QnLayoutTabBar(this);
+    d->tabBar->setFixedHeight(kTitleBarHeight);
     connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested,  d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
     connect(d->tabBar, &QnLayoutTabBar::currentChanged,     d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
     connect(action(QnActions::MainMenuAction), &QAction::triggered, d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
@@ -80,16 +127,28 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     layout->addWidget(d->mainMenuButton);
     layout->addWidget(d->tabBar);
-    layout->addWidget(newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
-    layout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
+    layout->addWidget(newActionButton(action(QnActions::OpenNewTabAction),
+                                      Qn::MainWindow_TitleBar_NewLayout_Help));
+    layout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu),
+                                      true));
     layout->addStretch(1);
     layout->addSpacing(80);
     layout->addWidget(cloudPanel);
-    layout->addWidget(newActionButton(action(QnActions::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
-    layout->addWidget(newActionButton(action(QnActions::WhatsThisAction), false, 1.0, Qn::MainWindow_ContextHelp_Help));
-    layout->addWidget(newActionButton(action(QnActions::MinimizeAction)));
-    layout->addWidget(newActionButton(action(QnActions::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
-    layout->addWidget(newActionButton(action(QnActions::ExitAction)));
+    layout->addWidget(newActionButton(
+            action(QnActions::OpenLoginDialogAction),
+            Qn::Login_Help, false, kControlButtonSize));
+    layout->addWidget(newActionButton(
+            action(QnActions::WhatsThisAction),
+            Qn::MainWindow_ContextHelp_Help, false, kControlButtonSize));
+    layout->addWidget(newActionButton(
+            action(QnActions::MinimizeAction),
+            false, kControlButtonSize));
+    layout->addWidget(newActionButton(
+            action(QnActions::EffectiveMaximizeAction),
+            Qn::MainWindow_Fullscreen_Help, false, kControlButtonSize));
+    layout->addWidget(newActionButton(
+            action(QnActions::ExitAction),
+            false, kControlButtonSize));
 }
 
 QnMainWindowTitleBarWidget::~QnMainWindowTitleBarWidget()
@@ -100,36 +159,6 @@ QnLayoutTabBar* QnMainWindowTitleBarWidget::tabBar() const
 {
     Q_D(const QnMainWindowTitleBarWidget);
     return d->tabBar;
-}
-
-QToolButton* QnMainWindowTitleBarWidget::newActionButton(QAction *action, bool popup /*= false*/, qreal sizeMultiplier /*= 1.0*/, int helpTopicId /*= Qn::Empty_Help*/)
-{
-    QToolButton *button = new QToolButton();
-    button->setDefaultAction(action);
-
-    qreal aspectRatio = QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
-    int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
-    int iconWidth = iconHeight * aspectRatio;
-    button->setFixedSize(iconWidth, iconHeight);
-    button->setFocusPolicy(Qt::NoFocus);
-
-    button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
-
-    if (popup) {
-        /* We want the button to activate the corresponding action so that menu is updated.
-        * However, menu buttons do not activate their corresponding actions as they do not receive release events.
-        * We work this around by making some hacky connections. */
-        button->setPopupMode(QToolButton::InstantPopup);
-
-        QObject::disconnect(button, SIGNAL(pressed()), button, SLOT(_q_buttonPressed()));
-        QObject::connect(button, SIGNAL(pressed()), button->defaultAction(), SLOT(trigger()));
-        QObject::connect(button, SIGNAL(pressed()), button, SLOT(_q_buttonPressed()));
-    }
-
-    if (helpTopicId != Qn::Empty_Help)
-        setHelpTopic(button, helpTopicId);
-
-    return button;
 }
 
 bool QnMainWindowTitleBarWidget::event(QEvent* event)

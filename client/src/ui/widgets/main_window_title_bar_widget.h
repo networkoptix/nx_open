@@ -23,12 +23,6 @@ public:
 
     QnLayoutTabBar* tabBar() const;
 
-    static QToolButton* newActionButton(
-            QAction* action,
-            bool popup = false,
-            qreal sizeMultiplier = 1.0,
-            int helpTopicId = Qn::Empty_Help);
-
 protected:
     virtual bool event(QEvent* event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
