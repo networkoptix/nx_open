@@ -8,6 +8,7 @@
     "grunt": "^0.4.5",
     "grunt-bower-install": "^1.6.0",
     "grunt-scp": "^0.1.8",
+    "grunt-shell": "^1.2.1",
     "grunt-usemin": "^3.0.0",
     "mime-db": "^1.22.0",
     "selenium-standalone": "^5.0.0",

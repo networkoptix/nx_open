@@ -487,6 +487,15 @@ module.exports = function (grunt) {
 
             }
         },
+        shell:{
+            version: {
+                command: 'hg parent > dist/version.txt'
+            },
+            print_version: {
+                command: 'hg parent'
+            }
+
+        },
 
         scp: grunt.file.readJSON('publish.json')
     });
@@ -525,6 +534,7 @@ module.exports = function (grunt) {
         'autoprefixer',
         'connect:test',
         'protractor_webdriver',
+        'shell:print_version',
         'protractor:all'
         //'newer:jshint'
         //'karma'
@@ -547,7 +557,8 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'shell:version'
     ]);
 
     grunt.registerTask('default', [
