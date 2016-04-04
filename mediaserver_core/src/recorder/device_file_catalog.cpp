@@ -791,7 +791,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
     {
         QnMutexLocker lock( &m_mutex );
 
-        if (m_chunks.empty() || (m_chunks.size() == 1 && m_chunks[0].durationMs == 0))
+        if (m_chunks.empty())
             return deletedChunk;
         else
         {

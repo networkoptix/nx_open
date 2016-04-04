@@ -2025,15 +2025,9 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     if (catalog == 0)
         return false;
     QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
-    DeviceFileCatalog::Chunk newChunk = catalog->updateDuration(durationMs, fileSize, renameOK);
-    if (newChunk.startTimeMs != -1)
-    {
-        if (sdb)
-            sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), newChunk);
-        return true;
-    }
-    else
-        return false;
+    if (sdb)
+        sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize, renameOK));
+    return true;
 }
 
 bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
