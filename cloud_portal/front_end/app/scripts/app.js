@@ -11,6 +11,13 @@ angular.module('cloudApp', [
     'base64'
 ]).config(function ($routeProvider) {
     $routeProvider
+        .when('/register/success', {
+            templateUrl: 'views/register.html',
+            controller: 'RegisterCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
+            }
+        })
         .when('/register/:email', {
             templateUrl: 'views/register.html',
             controller: 'RegisterCtrl'

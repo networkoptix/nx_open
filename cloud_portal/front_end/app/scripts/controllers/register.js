@@ -15,6 +15,8 @@ angular.module('cloudApp')
         var registerEmail = $routeParams.email || '';
         $scope.lockEmail = !!$routeParams.email;
 
+        $scope.registerSuccess = $routeParams.registerSuccess;
+
         $scope.account = {
             email: registerEmail,
             password: '',
@@ -42,5 +44,9 @@ angular.module('cloudApp')
                 $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
                 return false;
             }
+        });
+
+        $scope.register.then(function(){
+            $location.path('/register/success',false);
         });
     });
