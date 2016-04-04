@@ -551,8 +551,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!resyncTransactionLog())
 		    return false;
     }
-    else {
-        //TODO: #GDM #resync videowalls, webpages, access rights...
+    else
+    {
         if (m_needResyncLicenses) {
             if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
                 return false;
