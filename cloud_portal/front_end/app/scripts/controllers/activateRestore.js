@@ -16,6 +16,7 @@ angular.module('cloudApp')
 
         $scope.reactivating = $routeParams.reactivating;
         $scope.activationSuccess = $routeParams.activationSuccess;
+        $scope.changeSuccess = $routeParams.changeSuccess;
         $scope.restoring = $routeParams.restoring;
 
         if($scope.reactivating){
@@ -31,6 +32,9 @@ angular.module('cloudApp')
         },{
             notFound: L.errorCodes.wrongCode,
             notAuthorized: L.errorCodes.wrongCode
+        });
+        $scope.change.then(function(){
+            $location.path("/restore_password/success", false); // Change url, do not reload
         });
 
         $scope.directChange = function(){

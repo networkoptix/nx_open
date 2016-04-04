@@ -108,6 +108,13 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.restoring = true; }]
             }
         })
+        .when('/restore_password/success', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.changeSuccess = true; }]
+            }
+        })
         .when('/restore_password/:restoreCode', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'

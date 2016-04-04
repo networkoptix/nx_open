@@ -77,10 +77,12 @@
     <div ng-if="data.restoreCode">
         <h1>Set new password</h1>
         <process-alert process="change" alert-timeout="0"
-                       success-message="'Password successfully saved'"
                        error-prefix="'Couldn\'t save new password:'"></process-alert>
 
-        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success" novalidate>
+        <p ng-if="change.success || changeSuccess ">
+            Password successfully saved.
+        </p>
+        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
 
             <password-input ng-model="data.newPassword" id="'newPassword'" label="'New password'"></password-input>
 
