@@ -66,23 +66,6 @@ angular.module('cloudApp', [
         })
 
 
-        .when('/systems/:systemId/disconnect', {
-            templateUrl: 'views/connectDisconnectSystem.html',
-            controller: 'ConnectDisconnectCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.connect = false; }]
-            }
-        })
-        .when('/systems/connect/:systemName', {
-            templateUrl: 'views/connectDisconnectSystem.html',
-            controller: 'ConnectDisconnectCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.connect = true; }]
-            }
-        })
-
-
-
         .when('/activate', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
