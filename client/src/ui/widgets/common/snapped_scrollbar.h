@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QScrollBar>
 
-#include <ui/widgets/scroll_bar_proxy.h>
+#include <ui/widgets/common/scroll_bar_proxy.h>
 
 class QnSnappedScrollBarPrivate;
 

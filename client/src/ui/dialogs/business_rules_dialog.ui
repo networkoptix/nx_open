@@ -189,7 +189,7 @@
   <customwidget>
    <class>QnTableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/table_view.h</header>
+   <header location="global">ui/widgets/common/table_view.h</header>
   </customwidget>
   <customwidget>
    <class>QnBusinessRuleWidget</class>

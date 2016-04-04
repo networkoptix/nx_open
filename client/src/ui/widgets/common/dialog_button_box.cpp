@@ -5,7 +5,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QHBoxLayout>
 
-#include <ui/widgets/progress_widget.h>
+#include <ui/widgets/common/progress_widget.h>
 
 #include <ui/style/skin.h>
 

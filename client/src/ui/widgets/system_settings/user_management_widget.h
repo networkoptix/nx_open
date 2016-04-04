@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>

@@ -25,7 +25,7 @@
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/dialogs/message_box.h>
-#include <ui/widgets/snapped_scrollbar.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
@@ -43,10 +43,10 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());
 
     QList<QnLicenseListModel::Column> columns;
-    columns 
-        << QnLicenseListModel::TypeColumn 
-        << QnLicenseListModel::CameraCountColumn 
-        << QnLicenseListModel::LicenseKeyColumn 
+    columns
+        << QnLicenseListModel::TypeColumn
+        << QnLicenseListModel::CameraCountColumn
+        << QnLicenseListModel::LicenseKeyColumn
         << QnLicenseListModel::ExpirationDateColumn
         << QnLicenseListModel::ServerColumn
         << QnLicenseListModel::LicenseStatusColumn
@@ -135,7 +135,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         QnCamLicenseUsageHelper camUsageHelper;
         QnVideoWallLicenseUsageHelper vwUsageHelper;
         QList<QnLicenseUsageHelper*> helpers;
-        helpers 
+        helpers
             << &camUsageHelper
             << &vwUsageHelper
             ;
@@ -148,7 +148,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         }
 
         foreach (QnLicenseUsageHelper *helper, helpers) {
-            if (!helper->isValid()) 
+            if (!helper->isValid())
             {
                 useRedLabel = true;
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
@@ -200,7 +200,7 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
     messageBox->exec();
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url) 
+void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url)
 {
     const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
     const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
@@ -306,7 +306,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
         m_handleKeyMap[handle] = licenseKey;
     }
 
-    /* There is an issue when we are trying to activate and Edge license on the PC. 
+    /* There is an issue when we are trying to activate and Edge license on the PC.
      * In this case activation server will return no error but local check will fail.  */
     if (!keyLicense) {
         /* QNetworkReply slots should not start event loop. */
@@ -329,14 +329,14 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license) {
     dialog->exec();
 }
 
-void QnLicenseManagerWidget::updateDetailsButtonEnabled() 
+void QnLicenseManagerWidget::updateDetailsButtonEnabled()
 {
     QModelIndex idx = ui->gridLicenses->selectionModel()->currentIndex();
     ui->detailsButton->setEnabled(idx.isValid());
     QnLicensePtr license = m_model->license(idx);
 
     QnLicense::ErrorCode errCode = QnLicense::NoError; /* Do not allow to remove valid licenses. */
-    ui->removeButton->setEnabled(license && !license->isValid(&errCode) && errCode != QnLicense::FutureLicense); 
+    ui->removeButton->setEnabled(license && !license->isValid(&errCode) && errCode != QnLicense::FutureLicense);
 }
 
 
@@ -353,7 +353,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
 
     QnLicenseListHelper licenseListHelper(licenses);
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
-        
+
     QString message;
     if (!license || (errorCode != ec2::ErrorCode::ok))
         message = tr("There was a problem activating your license key. A network error has occurred.");
@@ -397,7 +397,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
     // TODO: #Elric use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
     QJsonObject errorMessage;
-    if (QJson::deserialize(replyData, &errorMessage)) 
+    if (QJson::deserialize(replyData, &errorMessage))
     {
         QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
         /* QNetworkReply slots should not start eventLoop */
@@ -455,7 +455,7 @@ void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
     showLicenseDetails(m_model->license(index));
 }
 
-void QnLicenseManagerWidget::at_removeButton_clicked() 
+void QnLicenseManagerWidget::at_removeButton_clicked()
 {
     QModelIndex index = ui->gridLicenses->selectionModel()->currentIndex();
     QnLicensePtr license = m_model->license(index);
@@ -521,7 +521,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
                 emit showMessageLater(tr("License Activation"), message, true);
         }
 
-        
+
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }

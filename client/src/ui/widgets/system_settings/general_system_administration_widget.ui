@@ -240,13 +240,13 @@
   <customwidget>
    <class>QnSystemSettingsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/settings/system_settings_widget.h</header>
+   <header location="global">ui/widgets/system_settings/system_settings_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnDatabaseManagementWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/settings/database_management_widget.h</header>
+   <header location="global">ui/widgets/system_settings/database_management_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

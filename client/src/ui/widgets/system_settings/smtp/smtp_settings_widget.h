@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 
 #include <utils/email/email_fwd.h>
 

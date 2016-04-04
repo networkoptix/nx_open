@@ -9,7 +9,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/view/graphics_scene.h>
 
-#include "emulated_frame_widget.h"
+#include <ui/widgets/common/emulated_frame_widget.h>
 
 class QTabBar;
 class QBoxLayout;

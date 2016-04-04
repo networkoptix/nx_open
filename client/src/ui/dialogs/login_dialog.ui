@@ -299,7 +299,7 @@
   <customwidget>
    <class>QnTreeComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">ui/widgets/tree_combo_box.h</header>
+   <header location="global">ui/widgets/common/tree_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

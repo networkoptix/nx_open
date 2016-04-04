@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui
 {

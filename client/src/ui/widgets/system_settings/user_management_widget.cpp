@@ -16,7 +16,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
-#include <ui/widgets/snapped_scrollbar.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
@@ -41,7 +41,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
 
     m_sortModel->setSourceModel(m_usersModel);
 
-    ui->usersTable->setModel(m_sortModel);  
+    ui->usersTable->setModel(m_sortModel);
     ui->usersTable->setHeader(m_header);
     ui->usersTable->setItemDelegateForColumn(QnUserListModel::EnabledColumn, new QnSwitchItemDelegate(this));
 
@@ -108,7 +108,7 @@ void QnUserManagementWidget::loadDataToUi() {
 }
 
 void QnUserManagementWidget::applyChanges() {
-    /* All changes are instant. */ 
+    /* All changes are instant. */
 }
 
 bool QnUserManagementWidget::hasChanges() const {
@@ -140,21 +140,21 @@ void QnUserManagementWidget::updateSelection() {
     using boost::algorithm::any_of;
 
     ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
-        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission) 
+        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
             && !user->isEnabled();
     }));
 
     ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
-        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission) 
+        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
             && user->isEnabled()
             && !user->isAdmin();
     }));
 
     ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
-        return accessController()->hasPermissions(user, Qn::RemovePermission) 
+        return accessController()->hasPermissions(user, Qn::RemovePermission)
             && !user->isAdmin();
     }));
-    
+
     update();
 }
 
@@ -175,7 +175,7 @@ void QnUserManagementWidget::fetchUsers() {
     if (!context()->user() || context()->user()->isLdap())
         return;
 
-    if (!QnGlobalSettings::instance()->ldapSettings().isValid()) 
+    if (!QnGlobalSettings::instance()->ldapSettings().isValid())
         return;
 
     QScopedPointer<QnLdapUsersDialog> dialog(new QnLdapUsersDialog(this));
@@ -226,7 +226,7 @@ void QnUserManagementWidget::setSelectedEnabled(bool enabled) {
             continue;
         if (!accessController()->hasPermissions(user, Qn::WritePermission))
             continue;
-        
+
         qnResourcesChangesManager->saveUser(user, [enabled](const QnUserResourcePtr &user) {
             user->setEnabled(enabled);
         });

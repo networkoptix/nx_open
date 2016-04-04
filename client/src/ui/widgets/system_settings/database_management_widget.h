@@ -4,7 +4,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 struct QnHTTPRawResponse;

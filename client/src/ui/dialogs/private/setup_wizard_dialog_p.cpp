@@ -5,7 +5,7 @@
 #include <QtGui/QDesktopServices>
 #include <QtWebKitWidgets/QWebFrame>
 
-#include <ui/widgets/web_page.h>
+#include <ui/widgets/common/web_page.h>
 
 #include <nx/utils/log/log.h>
 
