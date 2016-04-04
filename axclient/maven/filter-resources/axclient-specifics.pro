@@ -4,7 +4,6 @@ DEF_FILE = ${basedir}/contrib/activeqt/control/qaxserver.def
 
 DEFINES += HDW_SDK
 # CL_TRIAL_MODE 
-DEFINES += CL_FORCE_LOGO
 
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \

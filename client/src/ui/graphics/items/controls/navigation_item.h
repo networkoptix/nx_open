@@ -21,21 +21,12 @@ public:
     explicit QnNavigationItem(QGraphicsItem *parent = NULL);
     ~QnNavigationItem();
 
-    QnTimeSlider *timeSlider() const {
-        return m_timeSlider;
-    }
+    QnTimeSlider* timeSlider() const            { return m_timeSlider;     }
+    QnSpeedSlider* speedSlider() const          { return m_speedSlider;    }
+    QnVolumeSlider* volumeSlider() const        { return m_volumeSlider;   }
+    QnTimeScrollBar* timeScrollBar() const      { return m_timeScrollBar;  }
 
-    QnSpeedSlider *speedSlider() const {
-        return m_speedSlider;
-    }
-
-    QnVolumeSlider *volumeSlider() const {
-        return m_volumeSlider;
-    }
-
-    QnTimeScrollBar *timeScrollBar() const {
-        return m_timeScrollBar;
-    }
+    QnImageButtonWidget* calendarButton() const { return m_calendarButton; }
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 

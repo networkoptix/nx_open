@@ -18,6 +18,9 @@ public slots:
 
     QString getCredentials() const;
 
+    void updateCredentials(const QString& login, const QString& password, bool isCloud);
+
+    void cancel();
 public:
     struct LoginInfo
     {

@@ -18,10 +18,12 @@ class QnAuditLogModel: public Customized<QAbstractListModel>, public QnWorkbench
 {
     Q_OBJECT
     Q_PROPERTY(QnAuditLogColors colors READ colors WRITE setColors)
-    
+
     typedef Customized<QAbstractListModel> base_type;
+
 public:
-    enum Column {
+    enum Column
+    {
         SelectRowColumn,
         TimestampColumn,
         EndTimestampColumn,
@@ -34,10 +36,10 @@ public:
         EventTypeColumn,
         DescriptionColumn,
         PlayButtonColumn,
-        
+
         CameraNameColumn,
         CameraIpColumn,
-        
+
         ColumnCount
     };
 
@@ -51,7 +53,7 @@ public:
     * Model uses reference to the data. Data MUST be alive till model clear call
     */
     virtual void setData(const QnAuditRecordRefList &data);
-    
+
     /*
     * Interleave colors for grouping records from a same session
     */
@@ -59,11 +61,8 @@ public:
     void clearData();
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     void setData(const QModelIndexList &indexList, const QVariant &value, int role = Qt::EditRole);
-    QnAuditRecordRefList data() const;
     QnAuditRecordRefList checkedRows();
-    
 
-    QList<Column> columns() const;
     virtual void setColumns(const QList<Column> &columns);
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -86,12 +85,16 @@ public:
     static bool hasDetail(const QnAuditRecord* record);
     static void setDetail(QnAuditRecord* record, bool showDetail);
     static QString eventTypeToString(Qn::AuditRecordType recordType);
+
 signals:
     void colorsChanged();
+
 public slots:
     void clear();
+
 protected:
     QnAuditRecord* rawData(int row) const;
+
 private:
     class DataIndex;
 
@@ -104,21 +107,18 @@ private:
     static QString buttonNameForEvent(Qn::AuditRecordType eventType);
     QString textData(const Column& column,const QnAuditRecord* action) const;
     bool skipDate(const QnAuditRecord *record, int row) const;
-    
-    int minWidthForColumn(const Column &column) const;
-    QSize sectionSizeFromContents(int logicalIndex) const;
     static QString getResourcesString(const std::vector<QnUuid>& resources);
     static QnVirtualCameraResourceList getCameras(const std::vector<QnUuid>& resources);
     QString searchData(const Column& column, const QnAuditRecord* data) const;
     QString descriptionTooltip(const QnAuditRecord *record) const;
     bool isDetailDataSupported(const QnAuditRecord *record) const;
+
 protected:
     QScopedPointer<DataIndex> m_index;
     QList<Column> m_columns;
     QnAuditLogColors m_colors;
     int m_headerHeight;
     QVector<int> m_interleaveInfo;
-private:
 };
 
 #endif // QN_AUDIT_LOG_MODEL_H

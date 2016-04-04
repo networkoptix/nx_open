@@ -176,4 +176,5 @@ void QnBackupCamerasDialog::buttonBoxClicked( QDialogButtonBox::StandardButton b
 
     const auto dialogDelegate = dynamic_cast<BackupCamerasDialogDelegate*>(this->delegate());
     qnGlobalSettings->setBackupNewCamerasByDefault(dialogDelegate->backupNewCameras());
+    qnGlobalSettings->synchronizeNow();
 }

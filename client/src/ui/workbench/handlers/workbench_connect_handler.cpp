@@ -66,6 +66,8 @@
 #include <network/router.h>
 #include <utils/reconnect_helper.h>
 
+#include <nx/utils/log/log.h>
+
 #include "compatibility.h"
 
 namespace
@@ -321,21 +323,37 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
 
     QnEc2ConnectionRequestResult result;
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-        appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
-    if (!silent)
-        m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
+    ec2::ErrorCode errCode = ec2::ErrorCode::ok;
 
-    //here we are going to inner event loop
-    ec2::ErrorCode errCode = static_cast<ec2::ErrorCode>(result.exec());
+#ifdef QN_DEMO_SHOW
+    /* We surely must not compile client without this define for now */
+    int retryCount = appServerUrl.port() > 0 ? 1 : 50;
+#endif
 
-    /* Check if we have entered 'connect' method again while were in 'connecting...' state */
-    if (m_connectingHandle != result.handle())
-        return ec2::ErrorCode::ok;
+    for (int i = 0; i < retryCount; ++i)
+    {
+        m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+            appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply);
+        if (!silent)
+            m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
+
+        //here we are going to inner event loop
+        errCode = static_cast<ec2::ErrorCode>(result.exec());
+        NX_LOG(lit("Connection error %1").arg((int)errCode), cl_logDEBUG2);
+
+        /* Check if we have entered 'connect' method again while were in 'connecting...' state */
+        if (m_connectingHandle != result.handle())
+            return ec2::ErrorCode::ok;
+
+        if (errCode == ec2::ErrorCode::ok)
+            break;
+
+        QThread::msleep(16);
+
+        /* Hiding message box from current connect. */
+        hideMessageBox();
+    }
     m_connectingHandle = 0;
-
-    /* Hiding message box from current connect. */
-    hideMessageBox();
 
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!

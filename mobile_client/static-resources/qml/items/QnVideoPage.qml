@@ -129,6 +129,8 @@ QnPage {
 
         title: resourceHelper.resourceName
 
+        opacity: liteMode ? 0.0 : 1.0
+
         QnMenuBackButton {
             x: dp(10)
             anchors.verticalCenter: parent.verticalCenter
@@ -273,6 +275,7 @@ QnPage {
         height: video.height
         anchors.left: parent.right
         anchors.top: video.top
+        opacity: liteMode ? 0.0 : 1.0
 
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
     }
@@ -304,7 +307,7 @@ QnPage {
         width: parent.width
 
         visible: opacity > 0
-        opacity: 1.0
+        opacity: liteMode ? 0.0 : 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
         Component.onCompleted: {
@@ -399,9 +402,22 @@ QnPage {
         Main.backPressed()
     }
 
+    Keys.onSpacePressed:
+    {
+        if (navigationLoader.visible)
+            hideUi()
+        else
+            showUi()
+    }
+
     onActivePageChanged:
     {
         if (activePage)
+        {
             player.playLive()
+
+            if (liteMode)
+                hideUi()
+        }
     }
 }

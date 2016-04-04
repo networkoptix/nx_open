@@ -7,8 +7,14 @@
 #include <nx/network/stun/cc/custom_stun.h>
 #include <utils/serialization/lexical.h>
 
+
+#ifdef QN_DEMO_SHOW
+static const auto DNS_CACHE_TIME = std::chrono::seconds(1);
+static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(1);
+#else
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
 static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(10);
+#endif
 
 namespace nx {
 namespace network {
@@ -102,6 +108,10 @@ void AddressResolver::addFixedAddress(
     NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
     NX_ASSERT(hostAddress.address.isResolved());
 
+    NX_LOGX(lit("Added fixed address for %1: %2")
+        .arg(hostName.toString())
+        .arg(hostAddress.toString()), cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
     auto& entries = m_info[hostName].fixedEntries;
@@ -123,6 +133,11 @@ void AddressResolver::addFixedAddress(
 void AddressResolver::removeFixedAddress(
     const HostAddress& hostName, const SocketAddress& hostAddress)
 {
+
+    NX_LOGX(lit("Removed fixed address for %1: %2")
+        .arg(hostName.toString())
+        .arg(hostAddress.toString()), cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     AddressEntry entry(hostAddress);
     auto& entries = m_info[hostName].fixedEntries;

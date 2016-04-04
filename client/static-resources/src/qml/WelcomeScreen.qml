@@ -51,16 +51,17 @@ Rectangle
             property int desiredColumns:(itemsSource.count > 3
                 ? ((itemsSource.count + 1) / 2) : itemsSource.count);
 
-            rows: (itemsSource.count > 3 ? 2 : 1);
-            columns: Math.min(desiredColumns, maxColumns);
-
-            spacing: 16;
-
             property QtObject watcher: SingleActiveItemSelector
             {
                 variableName: "isExpanded";
                 deactivateFunc: function(item) { item.toggle(); };
             }
+
+            rows: (itemsSource.count > 3 ? 2 : 1);
+            columns: Math.min(desiredColumns, maxColumns);
+
+            spacing: 16;
+
 
             Connections
             {
@@ -102,6 +103,8 @@ Rectangle
                                     , ">, host <", host, ">");
                                 context.setupFactorySystem(host);
                             }
+
+                            visible: (index < grid.rows * grid.columns);
                         }
                     }
 
@@ -146,6 +149,7 @@ Rectangle
                             }
 
                             enabled: (!isExpanded || !context.connectingNow);
+                            visible: (index < grid.rows * grid.columns);
                         }
                     }
 
@@ -184,6 +188,7 @@ Rectangle
                                     , ">, throug the host <", hostsModel.firstHost, ">");
                                 context.connectToCloudSystem(hostsModel.firstHost);
                             }
+                            visible: (index < grid.rows * grid.columns);
                         }
                     }
 

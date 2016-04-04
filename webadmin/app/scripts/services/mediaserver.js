@@ -96,7 +96,8 @@ angular.module('webadminApp')
 
         function getNonce(){
             var deferred = $q.defer();
-            function resolver(){
+            function resolver(data){
+                $log.log("Server responsed: " + data.statusText);
                 var realm = ipCookie('realm');
                 var nonce = ipCookie('nonce');
                 $log.log("Authorization - reading nonce:" + nonce + " realm:" + realm);
@@ -108,6 +109,7 @@ angular.module('webadminApp')
                     nonce: nonce
                 });
             }
+            $log.log("Request nonce");
             $http.get(proxy + '/api/getCurrentUser').then(resolver,resolver);
             return deferred.promise;
         }
@@ -156,7 +158,11 @@ angular.module('webadminApp')
                         },function(error){
                             deferred.reject(error);
                         });
+                    },function(error){
+                        deferred.reject(error);
                     });
+                },function(error){
+                    deferred.reject(error);
                 });
                 return deferred.promise;
             },

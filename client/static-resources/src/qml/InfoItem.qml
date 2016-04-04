@@ -41,6 +41,7 @@ MaskedComboBox
             {
                 id: textItem;
 
+                disableable: thisComponent.isAvailable;
                 isHovered: hoverArea.containsMouse;
                 font: Style.fonts.systemTile.info;
                 disabledColor: thisComponent.disabledLabelColor;
@@ -49,8 +50,7 @@ MaskedComboBox
                 {
                     target: textItem;
                     property: "text";
-                    value: (thisComponent.value.length
-                        ? thisComponent.value : qsTr("No host specified")); // TODO: cancel all values if we are not connected
+                    value: thisComponent.value;
                 }
             }
         }
