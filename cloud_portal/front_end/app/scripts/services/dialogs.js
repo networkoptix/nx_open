@@ -4,9 +4,11 @@
 angular.module('cloudApp').run(function($http,$templateCache) {
         $http.get('views/login.html', {cache: $templateCache});
         $http.get('views/share.html', {cache: $templateCache});
+        $http.get('views/components/notifications.html', {cache: $templateCache});
         $http.get('views/components/dialog.html', {cache: $templateCache});
     })
-    .factory('dialogs', function ($http, $uibModal, $q, $location) {
+    .factory('dialogs', function ($http, $uibModal, $q, $location, ngToast) {
+
         function openDialog(settings ){
 
             function isInline(){
@@ -76,6 +78,17 @@ angular.module('cloudApp').run(function($http,$templateCache) {
         }
 
         return {
+            notify:function(message, type, hold){
+                type = type || 'info';
+
+                return ngToast.create({
+                    className: type,
+                    content:message,
+                    dismissOnTimeout: !hold,
+                    dismissOnClick: !hold,
+                    dismissButton: hold
+                });
+            },
             alert:function(message, title){
                 return openDialog({
                     title:title,

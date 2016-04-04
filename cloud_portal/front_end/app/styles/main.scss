@@ -264,6 +264,41 @@ footer {
 }
 
 
+.ng-toast {
+  margin-top: 34px;
+
+  .alert {
+    margin-bottom: 8px;
+
+    @media (max-width: $screen-sm-max) {
+      min-width: 100%;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      min-width: 600px;
+    }
+
+
+    &.ng-animate {
+      transition: 0.5s linear all;
+
+      &.ng-enter {
+        opacity: 0;
+      }
+      &.ng-enter-active{
+        opacity: 1;
+      }
+
+      &.ng-leave {
+        opacity: 1;
+      }
+      &.ng-leave-active{
+        opacity: 0;
+      }
+    }
+  }
+}
+
 .alert-top{
   position:fixed;
   top: 34px;

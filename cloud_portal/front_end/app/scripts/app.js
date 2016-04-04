@@ -8,8 +8,18 @@ angular.module('cloudApp', [
     'ngRoute',
     'ui.bootstrap',
     'ngStorage',
-    'base64'
-]).config(function ($routeProvider) {
+    'base64',
+    'ngToast'
+]).config(['ngToastProvider', function(ngToastProvider) {
+    ngToastProvider.configure({
+        timeout: Config.alertTimeout,
+        animation: 'fade',
+        horizontalPosition: 'center',
+        maxNumber: Config.alertsMaxCount,
+        combineDuplications: true,
+        newestOnTop: false
+    });
+}]).config(function ($routeProvider) {
     $routeProvider
         .when('/register/success', {
             templateUrl: 'views/register.html',
