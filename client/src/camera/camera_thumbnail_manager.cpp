@@ -76,7 +76,12 @@ void QnCameraThumbnailManager::selectResource(const QnVirtualCameraResourcePtr &
     emit thumbnailReadyDelayed(camera->getId(), thumbnail);
 }
 
-QPixmap QnCameraThumbnailManager::statusPixmap( ThumbnailStatus status ) {
+QSize QnCameraThumbnailManager::thumbnailSize() const
+{
+    return m_thumnailSize;
+}
+
+QPixmap QnCameraThumbnailManager::statusPixmap(ThumbnailStatus status) {
     return m_statusPixmaps[status];
 }
 

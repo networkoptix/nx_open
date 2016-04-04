@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UserAccessRightsWidget</class>
+ <widget class="QWidget" name="UserAccessRightsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="accessRightsGroupBox">
+     <property name="title">
+      <string>Access Rights</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="camerasTab">
+         <attribute name="title">
+          <string>Cameras</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="layoutsTab">
+         <attribute name="title">
+          <string>Layouts</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="serversTab">
+         <attribute name="title">
+          <string>Servers</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="permissionsTab">
+         <attribute name="title">
+          <string>Permissions</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
