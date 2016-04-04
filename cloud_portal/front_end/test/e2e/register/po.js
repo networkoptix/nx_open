@@ -13,16 +13,6 @@ var RegisterPage = function () {
 
     this.url = '/#/register';
 
-    this.getHomePage = function () {
-        browser.get('/');
-        browser.waitForAngular();
-    };
-
-    this.getByUrl = function () {
-        browser.get(this.url);
-        browser.waitForAngular();
-    };
-
     this.openRegisterButton = element(by.linkText('Register'));
     this.openRegisterButtonAdv = element(by.linkText('Register now')); // Register button on home page
 
@@ -45,6 +35,7 @@ var RegisterPage = function () {
     this.invalidClassExists = 'ng-invalid-already-exists';
 
     this.checkInputInvalid = function (field, invalidClass) {
+        field.getAttribute('class');
         expect(field.getAttribute('class')).toContain(invalidClass);
         expect(this.fieldWrap(field).getAttribute('class')).toContain('has-error');
     };
@@ -104,6 +95,15 @@ var RegisterPage = function () {
     };
 
     this.termsConditions = element(by.linkText('Terms and Conditions'));
+
+    this.checkEmail = function (email) {
+        this.emailInput.clear().sendKeys(email);
+        this.submitButton.click();
+        this.checkInputInvalid(this.emailInput, this.invalidClass);
+    };
+
+    this.accountFirstNameInput = element(by.model('account.first_name'));
+    this.accountLastNameInput = element(by.model('account.last_name'));
 };
 
 module.exports = RegisterPage;

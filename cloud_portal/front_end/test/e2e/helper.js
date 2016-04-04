@@ -8,10 +8,20 @@ var Helper = function () {
 
     this.basePassword = 'qweasd123';
 
+    this.get = function (url) {
+        browser.get(url);
+        browser.waitForAngular();
+    };
+
     // Get valid email with random number between 100 and 1000
     this.getRandomEmail = function() {
         var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
         return 'noptixqa+' + randomNumber + '@gmail.com';
+    };
+    // Get valid email with random number between 100 and 1000
+    this.getRandomEmailWith = function(addition) {
+        var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
+        return 'noptixqa+'+ addition + randomNumber + '@gmail.com';
     };
     this.userEmail = 'noptixqa+1@gmail.com'; // valid existing email
     this.userEmail2 = 'noptixqa+2@gmail.com';
@@ -34,6 +44,8 @@ var Helper = function () {
         'opasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfgh' +
         'hkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnmyy';
     this.inputLongCut = this.inputLong300.substr(0, 255);
+
+    this.inputSymb = '|`~-=!@#$%^&*()_:\";\'{}[]+<>?,./';
 
     this.userPasswordCyrillic = 'йцуфывячс';
     this.userPasswordSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
@@ -106,9 +118,6 @@ var Helper = function () {
         submitButton.click();
 
         this.alert.catchAlert( this.alert.alertMessages.registerSuccess, this.alert.alertTypes.success);
-
-        // Check that registration form element is NOT displayed on page
-        expect(firstNameInput.isPresent()).toBe(false);
 
         return userEmail;
     };

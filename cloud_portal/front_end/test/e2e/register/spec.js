@@ -6,14 +6,18 @@ describe('Registration suite', function () {
     beforeAll(function() {
         console.log('Registration suite start');
     });
+
     afterAll(function() {
         console.log('Registration suite finish');
+    });
+
+    beforeEach(function() {
+        p.helper.get(p.url);
     });
 
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
 
-        p.getByUrl();
         p.prepareToAlertCheck();
         p.alert.submitButton.click();
 
@@ -22,7 +26,16 @@ describe('Registration suite', function () {
     }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
 
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
-        p.getHomePage();
+        p.helper.get('/');
+
+        p.openRegisterButton.click();
+
+        expect(browser.getCurrentUrl()).toContain('register');
+        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+    });
+
+    it("should open register page from register success page by clicking Register button on top right corner", function () {
+        p.helper.get('/');
 
         p.openRegisterButton.click();
 
@@ -31,7 +44,7 @@ describe('Registration suite', function () {
     });
 
     it("should open register page in anonymous state by clicking Register button on homepage", function () {
-        p.getHomePage();
+        p.helper.get('/');
 
         p.openRegisterButtonAdv.click();
 
@@ -40,15 +53,11 @@ describe('Registration suite', function () {
     });
 
     it("should open register page in anonymous state", function () {
-        p.getByUrl();
-
         expect(browser.getCurrentUrl()).toContain('register');
         expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should register user with correct credentials", function () {
-        p.getByUrl();
-
         p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.sendKeys(p.helper.userLastName);
         p.emailInput.sendKeys(p.helper.getRandomEmail());
@@ -57,14 +66,9 @@ describe('Registration suite', function () {
         p.submitButton.click();
 
         p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
-
-        // Check that registration form element is NOT displayed on page
-        expect(p.firstNameInput.isPresent()).toBe(false);
     });
 
     it("should register user with cyrillic First and Last names and correct credentials", function () {
-        p.getByUrl();
-
         p.firstNameInput.sendKeys(p.helper.userNameCyrillic);
         p.lastNameInput.sendKeys(p.helper.userNameCyrillic);
         p.emailInput.sendKeys(p.helper.getRandomEmail());
@@ -73,14 +77,9 @@ describe('Registration suite', function () {
         p.submitButton.click();
 
         p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
-
-        // Check that registration form element is NOT displayed on page
-        expect(p.firstNameInput.isPresent()).toBe(false);
     });
 
     it("should register user with smile symbols in First and Last name fields and correct credentials", function () {
-        p.getByUrl();
-
         p.firstNameInput.sendKeys(p.helper.userNameSmile);
         p.lastNameInput.sendKeys(p.helper.userNameSmile);
         p.emailInput.sendKeys(p.helper.getRandomEmail());
@@ -89,14 +88,9 @@ describe('Registration suite', function () {
         p.submitButton.click();
 
         p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
-
-        // Check that registration form element is NOT displayed on page
-        expect(p.firstNameInput.isPresent()).toBe(false);
     });
 
     it("should register user with hieroglyphic symbols in First and Last name fields and correct credentials", function () {
-        p.getByUrl();
-
         p.firstNameInput.sendKeys(p.helper.userNameHierog);
         p.lastNameInput.sendKeys(p.helper.userNameHierog);
         p.emailInput.sendKeys(p.helper.getRandomEmail());
@@ -105,13 +99,9 @@ describe('Registration suite', function () {
         p.submitButton.click();
 
         p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
-
-        // Check that registration form element is NOT displayed on page
-        expect(p.firstNameInput.isPresent()).toBe(false);
     });
 
     it("should not allow to register without all fields filled", function () {
-        p.getByUrl();
         p.submitButton.click();
 
         // Check that all input fields are marked as incorrect
@@ -121,9 +111,42 @@ describe('Registration suite', function () {
         p.checkPasswordInvalid(p.invalidClassRequired);
     });
 
-    it("should not allow to register without email", function () {
-        p.getByUrl();
+    it("should not allow to register with blank spaces in in First and Last name fields", function () {
+        p.firstNameInput.sendKeys(' ');
+        p.lastNameInput.sendKeys(' ');
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
 
+        p.submitButton.click();
+
+        p.checkInputInvalid(p.firstNameInput, p.invalidClassRequired);
+        p.checkInputInvalid(p.lastNameInput, p.invalidClassRequired);
+    });
+
+    it("should allow  `~!@#$%^&*()_:\";\'{}[]+<>?,./  in First and Last name fields", function () {
+        p.firstNameInput.sendKeys(p.helper.inputSymb);
+        p.lastNameInput.sendKeys(p.helper.inputSymb);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
+
+        p.submitButton.click();
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+    });
+
+    it("should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./  in email field", function () {
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+
+        p.emailInput.sendKeys(p.helper.getRandomEmailWith('#!$%&\'*+-/=?^_\`{}|~@gmail.com'));
+
+        p.submitButton.click();
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+    });
+
+
+
+    it("should not allow to register without email", function () {
         p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.sendKeys(p.helper.userLastName);
         p.passwordInput.sendKeys(p.helper.userPassword);
@@ -139,33 +162,48 @@ describe('Registration suite', function () {
         p.checkPasswordValid(p.invalidClassRequired);
     });
 
-    it("should not allow to register with email in non-email format", function () {
-        p.getByUrl();
-
+    it("should respond to Enter key and save data", function () {
         p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.sendKeys(p.helper.userLastName);
-        p.emailInput.sendKeys('vert546 464w6345');
-        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword).sendKeys(protractor.Key.ENTER);
 
-        p.submitButton.click();
-
-        p.checkInputInvalid(p.emailInput, p.invalidClass);
+        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
     });
 
-    xit("should validate email for various deviations", function () {
-        //TODO: Write checks for different wrong email patterns, see testrail for cases
+    it("should respond to Tab key", function () {
+        // Navigate to next field using TAB key
+        p.firstNameInput.sendKeys(protractor.Key.TAB);
+        p.helper.checkElementFocusedBy(p.lastNameInput, 'id');
+    });
+
+    it("should not allow to register with email in non-email format", function () {
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+
+        p.checkEmail('noptixqagmail.com');
+        //p.checkEmail('noptixqa@gmailcom');
+        //p.checkEmail('noptixqa@gmail.');
+        p.checkEmail('@gmail.com');
+        p.checkEmail('noptixqa@gmail..com');
+        p.checkEmail('noptixqa@192.168.1.1.0');
+        p.checkEmail('noptixqa.@gmail.com');
+        p.checkEmail('noptixq..a@gmail.c');
+        //p.checkEmail('noptixqa<noptixqa@gmail.com>');
+        //p.checkEmail('noptixqa@noptixqa@gmail.com');
+        p.checkEmail('noptixqa@-gmail.com');
+        //p.checkEmail('noptixqa@gmail.com(noptixqa)');
     });
 
     p.passwordField.check(function(){
         var deferred = protractor.promise.defer();
-        p.getByUrl();
         p.prepareToPasswordCheck();
         deferred.fulfill();
         return deferred.promise;
     }, p);
 
     it("should open Terms and conditions in a new page", function () {
-        p.getByUrl();
         p.termsConditions.click();
 
         // Switch to just opened new tab
@@ -179,8 +217,6 @@ describe('Registration suite', function () {
     });
 
     it("should not allow registration with existing email and show error", function () {
-        p.getByUrl();
-
         p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.sendKeys(p.helper.userLastName);
         p.emailInput.sendKeys(p.helper.userEmail);
