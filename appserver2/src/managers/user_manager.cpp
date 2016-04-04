@@ -20,6 +20,21 @@ namespace ec2
         emit removed(tran.params.id);
     }
 
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiAccessRightsData>& tran)
+    {
+        NX_ASSERT(tran.command == ApiCommand::addAccess || tran.command == ApiCommand::removeAccess);
+        switch (tran.command)
+        {
+        case ApiCommand::addAccess:
+            emit accessAdded(tran.params);
+            break;
+        case ApiCommand::removeAccess:
+            emit accessRemoved(tran.params);
+            break;
+        default:
+            break;
+        }
+    }
 
     template<class QueryProcessorType>
     QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor)
@@ -97,6 +112,46 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran(ApiCommand::removeUser, id);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::getAccessRights(impl::GetAccessRightsHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiAccessRightsDataList& result)
+        {
+            handler->done(reqID, errorCode, result);
+        };
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiAccessRightsDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getAccessRights, nullptr, queryDoneHandler);
+        return reqID;
+    }
+
+
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::addAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiAccessRightsData> tran(ApiCommand::addAccess, access);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+
+    template<class QueryProcessorType>
+    int QnUserManager<QueryProcessorType>::removeAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiAccessRightsData> tran(ApiCommand::removeAccess, access);
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
