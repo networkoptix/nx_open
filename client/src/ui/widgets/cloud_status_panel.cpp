@@ -1,11 +1,11 @@
 #include "cloud_status_panel.h"
 
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QMenu>
 
 #include <common/common_module.h>
 #include <watchers/cloud_status_watcher.h>
 #include <ui/style/custom_style.h>
+#include <ui/style/helper.h>
 
 class QnCloudStatusPanelPrivate : public QObject
 {
@@ -33,16 +33,12 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     Q_D(QnCloudStatusPanel);
 
     connect(this, &QnCloudStatusPanel::clicked, d, &QnCloudStatusPanelPrivate::at_clicked);
+    setPopupMode(QToolButton::InstantPopup);
 
-    setFlat(true);
-
-    d->originalPalette = this->palette();
-    d->originalPalette.setColor(QPalette::Window, qApp->palette().color(QPalette::Window));
-    d->cloudMenu->setPalette(d->originalPalette);
-    d->originalPalette.setColor(QPalette::Window, Qt::transparent);
-    d->originalPalette.setColor(QPalette::Button, Qt::transparent);
-    d->originalPalette.setColor(QPalette::Highlight, Qt::transparent);
-    setPalette(d->originalPalette);
+    setProperty(style::Properties::kDontPolishFontProperty, true);
+    QFont font = qApp->font();
+    font.setPixelSize(font.pixelSize() - 1);
+    setFont(font);
 
     d->updateUi();
 }
@@ -120,7 +116,7 @@ void QnCloudStatusPanelPrivate::at_clicked()
 {
     Q_Q(QnCloudStatusPanel);
 
-    if (q->QPushButton::menu())
+    if (q->base_type::menu())
     {
         qnCommon->instance<QnCloudStatusWatcher>()->updateSystems();
         return;

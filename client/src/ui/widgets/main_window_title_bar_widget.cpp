@@ -129,6 +129,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
 
     QnCloudStatusPanel* cloudPanel = new QnCloudStatusPanel(this);
     cloudPanel->setFocusPolicy(Qt::NoFocus);
+    cloudPanel->setFixedHeight(kTitleBarHeight);
 
     /* Layout for window buttons that can be removed from the title bar. */
     QHBoxLayout* layout = new QHBoxLayout(this);
