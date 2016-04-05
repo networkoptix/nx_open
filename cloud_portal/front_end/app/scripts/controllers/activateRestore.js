@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account, $location) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account, $location, urlProtocol) {
 
         $scope.session = $localStorage;
 
@@ -56,6 +56,10 @@ angular.module('cloudApp')
 
         });
 
+        $scope.openClient = function(){
+            urlProtocol.open();
+        };
+
         $scope.activate = process.init(function(){
             return cloudApi.activate($scope.data.activateCode);
         },{
@@ -65,7 +69,11 @@ angular.module('cloudApp')
             },
             errorPrefix:'Couldn\'t activate your account:'
         }).then(function(){
-           $location.path("/activate/success", false); // Change url, do not reload
+            $location.path("/activate/success", false); // Change url, do not reload
+
+            if($scope.session.fromClient){
+                urlProtocol.open();
+            }
         });
 
 

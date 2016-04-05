@@ -8,11 +8,10 @@ angular.module('cloudApp')
     .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, urlProtocol) {
 
         account.logoutAuthorised();
-
-        $scope.fromClient = urlProtocol.source.isApp;
-
         $scope.Config = Config;
         $scope.session = $localStorage;
+
+        $scope.session.fromClient = urlProtocol.source.isApp;
 
         var registerEmail = $routeParams.email || '';
         $scope.lockEmail = !!$routeParams.email;
