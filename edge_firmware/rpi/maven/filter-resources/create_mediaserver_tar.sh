@@ -67,7 +67,7 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
-libudt.so.${udt.version} \
+libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
@@ -172,7 +172,8 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" ]]; then
-    cp -f $environment/packages/${box}/gcc-4.8.3/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/${box}/gcc-4.8.3/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
