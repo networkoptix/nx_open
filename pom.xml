@@ -151,6 +151,7 @@
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
         <server-external.version>3.0.0</server-external.version>
+        <udt.version>4110.0.0</udt.version>
 
         <qt.libs/>
         <global.libs/>
