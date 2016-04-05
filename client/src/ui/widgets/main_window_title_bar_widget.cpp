@@ -13,7 +13,8 @@
 namespace
 {
     const int kTitleBarHeight = 24;
-    const QSize kControlButtonSize(40, kTitleBarHeight);
+    const int kVLineWidth = 1;
+    const QSize kControlButtonSize(40 - kVLineWidth, kTitleBarHeight);
 
     QToolButton* newActionButton(
             QAction *action,
@@ -51,6 +52,15 @@ namespace
             const QSize& fixedSize = QSize())
     {
         return newActionButton(action, Qn::Empty_Help, popup, fixedSize);
+    }
+
+    QFrame* newVLine()
+    {
+        QFrame* line = new QFrame();
+        line->setFrameShape(QFrame::VLine);
+        line->setFrameShadow(QFrame::Plain);
+        line->setFixedWidth(1);
+        return line;
     }
 }
 
@@ -126,26 +136,34 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->setSpacing(0);
 
     layout->addWidget(d->mainMenuButton);
+    layout->addWidget(newVLine());
     layout->addWidget(d->tabBar);
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(action(QnActions::OpenNewTabAction),
                                       Qn::MainWindow_TitleBar_NewLayout_Help));
     layout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu),
                                       true));
     layout->addStretch(1);
     layout->addSpacing(80);
+    layout->addWidget(newVLine());
     layout->addWidget(cloudPanel);
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
             action(QnActions::OpenLoginDialogAction),
             Qn::Login_Help, false, kControlButtonSize));
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
             action(QnActions::WhatsThisAction),
             Qn::MainWindow_ContextHelp_Help, false, kControlButtonSize));
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
             action(QnActions::MinimizeAction),
             false, kControlButtonSize));
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
             action(QnActions::EffectiveMaximizeAction),
             Qn::MainWindow_Fullscreen_Help, false, kControlButtonSize));
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(
             action(QnActions::ExitAction),
             false, kControlButtonSize));

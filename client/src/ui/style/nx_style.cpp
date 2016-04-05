@@ -839,35 +839,46 @@ void QnNxStyle::drawControl(
                 return;
 
             case QFrame::HLine:
+            case QFrame::VLine:
                 {
-                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark)).darker(1);
+                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Shadow));
 
-                    QColor topColor = mainColor.darker(2);
-                    QColor bottomColor;
+                    QColor firstColor = mainColor;
+                    QColor secondColor;
 
                     if (frame->state.testFlag(State_Sunken))
                     {
-                        bottomColor = mainColor;
+                        secondColor = mainColor.lighter(4);
                     }
                     else if (frame->state.testFlag(State_Raised))
                     {
-                        bottomColor = topColor;
-                        topColor = mainColor;
+                        secondColor = firstColor;
+                        firstColor = mainColor.lighter(4);
                     }
 
-                    painter->save();
-
-                    painter->setPen(topColor);
-                    painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
-
-                    if (bottomColor.isValid())
+                    QPoint p1 = frame->rect.topLeft();
+                    QPoint p2;
+                    QPoint shift;
+                    if (frame->frameShape == QFrame::HLine)
                     {
-                        painter->setPen(bottomColor);
-                        painter->drawLine(frame->rect.left(), frame->rect.top() + 1,
-                                          frame->rect.right(), frame->rect.top() + 1);
+                        p2 = frame->rect.topRight();
+                        shift = QPoint(0, 1);
+                    }
+                    else
+                    {
+                        p2 = frame->rect.bottomLeft();
+                        shift = QPoint(1, 0);
                     }
 
-                    painter->restore();
+                    QnScopedPainterPenRollback penRollback(painter, firstColor);
+
+                    painter->drawLine(p1, p2);
+
+                    if (secondColor.isValid())
+                    {
+                        painter->setPen(secondColor);
+                        painter->drawLine(p1 + shift, p2 + shift);
+                    }
                 }
                 return;
 
