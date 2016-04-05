@@ -370,18 +370,6 @@ bool QnMainWindow::isTitleVisible() const
 
 void QnMainWindow::updateWidgetsVisibility()
 {
-    const auto updateTitleBarVisibility = [this](bool visible)
-    {
-        if (visible)
-        {
-            m_globalLayout->insertWidget(0, m_titleBar);
-            return;
-        }
-
-        m_globalLayout->takeAt(0);
-        m_titleBar->setParent(nullptr);
-    };
-
     const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
     {
@@ -392,7 +380,7 @@ void QnMainWindow::updateWidgetsVisibility()
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
-    updateTitleBarVisibility(isTitleVisible());
+    m_titleBar->setVisible(isTitleVisible());
     updateWelcomeScreenVisibility(m_welcomeScreenVisible);
     updateDwmState();
 }
