@@ -1,1 +1,0 @@
-#include "abstract_camera_manager.h"

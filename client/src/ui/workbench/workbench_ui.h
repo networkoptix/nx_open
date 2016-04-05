@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_UI_H
-#define QN_WORKBENCH_UI_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
@@ -147,8 +146,6 @@ public slots:
     void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
 
 protected:
-    virtual bool event(QEvent *event) override;
-
     virtual void tick(int deltaMSecs) override;
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
@@ -245,7 +242,6 @@ private slots:
     void at_pinNotificationsAction_toggled(bool checked);
 
     void at_titleItem_geometryChanged();
-    void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
 
     void at_notificationsShowingProcessor_hoverEntered();
     void at_notificationsItem_geometryChanged();
@@ -377,20 +373,11 @@ private:
     /* Title-related state. */
 
     /** Title bar widget. */
-    QnClickableWidget *m_titleItem;
+    QGraphicsProxyWidget *m_titleItem;
 
     QnImageButtonWidget *m_titleShowButton;
 
-    QnImageButtonWidget *m_mainMenuButton;
-
-    QnLayoutTabBar *m_tabBarWidget;
-
-    QGraphicsProxyWidget *m_tabBarItem;
-
     AnimatorGroup *m_titleOpacityAnimatorGroup;
-
-    /** Background widget for the title bar. */
-    QnFramedWidget *m_titleBackgroundItem;
 
     /** Animator for title's position. */
     VariantAnimator *m_titleYAnimator;
@@ -453,5 +440,3 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Panels)
-
-#endif // QN_WORKBENCH_UI_H

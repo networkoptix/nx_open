@@ -30,7 +30,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
 #include <ui/style/resource_icon_cache.h>
-#include <ui/widgets/snapped_scrollbar.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>

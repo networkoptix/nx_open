@@ -19,6 +19,15 @@ MaskedItem
         editable: thisComponent.isEditableComboBox;
         isEditMode: editable;
 
+        onVisibleChanged:
+        {
+            if (editable && visible)
+                forceActiveFocus();
+        }
+
         onTextChanged: { thisComponent.value = text; }
+
+        KeyNavigation.tab: thisComponent.KeyNavigation.tab;
+        KeyNavigation.backtab: thisComponent.KeyNavigation.backtab;
     }
 }

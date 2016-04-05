@@ -17,6 +17,15 @@ MaskedComboBox
 
     isEditableComboBox: true;
 
+    onActiveFocusChanged:
+    {
+        if (!activeFocus || !isAvailable)
+            return;
+
+        isMaskedPrivate = true;
+        area.forceActiveFocus();
+    }
+
     areaDelegate: Item
     {
         width: row.width;

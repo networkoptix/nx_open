@@ -3,7 +3,7 @@
 
 #include <ui/models/license_list_model.h>
 #include "utils/common/synctime.h"
-#include <ui/widgets/snapped_scrollbar.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 
 QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::WindowFlags windowFlags):

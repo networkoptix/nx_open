@@ -1,7 +1,7 @@
 #include "update_dialog.h"
 #include "ui_update_dialog.h"
 
-#include <ui/widgets/server_updates_widget.h>
+#include <ui/widgets/system_settings/server_updates_widget.h>
 
 QnUpdateDialog::QnUpdateDialog(QnWorkbenchContext *context, QWidget *parent) :
     base_type(parent),

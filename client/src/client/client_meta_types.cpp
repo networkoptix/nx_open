@@ -15,7 +15,6 @@
 #include <ui/customization/customization.h>
 #include <ui/customization/palette_data.h>
 #include <ui/customization/pen_data.h>
-#include <ui/widgets/settings/cloud_management_widget.h>
 
 #include <update/updates_common.h>
 #include <update/update_info.h>

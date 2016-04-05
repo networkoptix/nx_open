@@ -117,7 +117,7 @@
   <customwidget>
    <class>QnTreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/tree_view.h</header>
+   <header location="global">ui/widgets/common/tree_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

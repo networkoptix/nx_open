@@ -25,6 +25,7 @@
         <guid>${libcloud_db.guid}</guid>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} libcloud_db</product.title>
+        <product.display.title>${company.name} Cloud Database</product.display.title>
         <template>lib</template>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
