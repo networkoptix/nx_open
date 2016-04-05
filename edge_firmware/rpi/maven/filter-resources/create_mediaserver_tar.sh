@@ -172,7 +172,8 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" ]]; then
-    cp -f $environment/packages/${box}/gcc-4.8.3/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/${box}/gcc-4.8.3/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
