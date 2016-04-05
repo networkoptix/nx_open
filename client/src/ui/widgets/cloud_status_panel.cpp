@@ -6,6 +6,7 @@
 #include <watchers/cloud_status_watcher.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
+#include <ui/style/skin.h>
 
 class QnCloudStatusPanelPrivate : public QObject
 {
@@ -23,6 +24,8 @@ public:
     QMenu *cloudMenu;
     QMenu *systemsMenu;
     QPalette originalPalette;
+    QIcon onlineIcon;
+    QIcon offlineIcon;
 };
 
 QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
@@ -40,6 +43,10 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     font.setPixelSize(font.pixelSize() - 1);
     setFont(font);
 
+    setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    setIcon(d->offlineIcon);
+    setIconSize(QSize(24, 24));
+
     d->updateUi();
 }
 
@@ -52,6 +59,8 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
     , q_ptr(parent)
     , cloudMenu(new QMenu(parent))
     , systemsMenu(nullptr)
+    , onlineIcon(qnSkin->icon("titlebar/cloud_logged.png"))
+    , offlineIcon(qnSkin->icon("titlebar/cloud_not_logged.png"))
 {
     Q_Q(QnCloudStatusPanel);
 
@@ -79,7 +88,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     if (!isLogged)
     {
         q->setText(tr("Login to cloud..."));
-        q->setIcon(QIcon());
+        q->setIcon(offlineIcon);
         q->setMenu(nullptr);
         return;
     }
@@ -91,7 +100,7 @@ void QnCloudStatusPanelPrivate::updateUi()
         setWarningStyle(q);
 
     q->setText(cloudStatusWatcher->cloudLogin());
-    // q->setIcon(); TODO: #dklychkov
+    q->setIcon(onlineIcon);
     q->setMenu(cloudMenu);
 }
 
