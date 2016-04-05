@@ -608,7 +608,8 @@ void RandomDataTcpServer::onConnectionDone(
 ////////////////////////////////////////////////////////////
 //// class ConnectionsGenerator
 ////////////////////////////////////////////////////////////
-ConnectionsGenerator::ConnectionsGenerator(const SocketAddress& remoteAddress,
+ConnectionsGenerator::ConnectionsGenerator(
+    const SocketAddress& remoteAddress,
     size_t maxSimultaneousConnectionsCount,
     TestTrafficLimitType limitType,
     size_t trafficLimit,
@@ -680,6 +681,12 @@ void ConnectionsGenerator::setOnFinishedHandler(
 void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
 {
     m_localAddress = std::move(addr);
+}
+
+void ConnectionsGenerator::setRemoteAddress(SocketAddress remoteAddress)
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_remoteAddress = std::move(remoteAddress);
 }
 
 void ConnectionsGenerator::start()

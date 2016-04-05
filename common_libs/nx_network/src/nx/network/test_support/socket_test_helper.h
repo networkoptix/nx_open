@@ -27,14 +27,14 @@ enum class TestTrafficLimitType
 {
     none, // never quit
     incoming, // quits when sends over limit
-    outgoing, // quits when recieves over limit
+    outgoing, // quits when receives over limit
 };
 
 enum class TestTransmissionMode
 {
-    spam, // spams random data as fast as follible, recieves alweys
-    echo, // reads and sends the same data as avaliable
-    echoTest, // sends randome data and verifies if it comes back
+    spam, // send random data as fast as possible, receive always
+    echo, // reads 4K buffer, sends same buffer, waits for futher data...
+    echoTest, // sends random data and verifies if it comes back
 };
 
 //!Reads/writes random data to/from connection
@@ -177,8 +177,10 @@ private:
     uint64_t m_totalBytesReceivedByClosedConnections;
     uint64_t m_totalBytesSentByClosedConnections;
 
-    void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
-    void onConnectionDone( TestConnection* connection );
+    void onNewConnection(
+        SystemError::ErrorCode errorCode,
+        AbstractStreamSocket* newConnection);
+    void onConnectionDone(TestConnection* connection);
 };
 
 //!Establishes numerous connections to specified address, reads all connections (ignoring data) and sends random data back
@@ -211,6 +213,7 @@ public:
     void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
+    void setRemoteAddress(SocketAddress remoteAddress);
     void start();
 
     virtual ConnectionTestStatistics statistics() const override;
@@ -225,7 +228,7 @@ private:
     /** map<connection id, connection> */
     typedef std::map<int, std::unique_ptr<TestConnection>> ConnectionsContainer;
 
-    const SocketAddress m_remoteAddress;
+    SocketAddress m_remoteAddress;
     size_t m_maxSimultaneousConnectionsCount;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;
