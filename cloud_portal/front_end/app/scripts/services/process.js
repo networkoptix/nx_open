@@ -34,7 +34,17 @@ angular.module('cloudApp')
                 }
                 settings.successMessage
                  */
-                var errorCodes = settings.errorCodes;
+                var errorCodes = null;
+                var errorPrefix = null;
+                var holdAlerts = false;
+                var successMessage = null;
+                if(settings){
+                    errorCodes = settings.errorCodes;
+                    holdAlerts = settings.holdAlerts;
+                    successMessage = settings.successMessage;
+
+                    errorPrefix = settings.errorPrefix? (settings.errorPrefix + ' ') : '';
+                }
                 return {
                     success:false,
                     error:false,
@@ -68,8 +78,7 @@ angular.module('cloudApp')
                             self.errorData = data;
                             self.errorMessage = formatError(data.data, errorCodes);
                             // Error handler here
-                            var prefix = (settings.errorPrefix + ' ') || '';
-                            dialogs.notify(prefix + self.errorMessage, 'danger', settings.holdAlerts);
+                            dialogs.notify(errorPrefix + self.errorMessage, 'danger', holdAlerts);
                             deferred.reject(data);
                         }
                         return caller().then(function(data){
@@ -80,8 +89,8 @@ angular.module('cloudApp')
                             }else {
                                 self.success = true;
 
-                                if(settings.successMessage){
-                                    dialogs.notify(settings.successMessage, 'success', settings.holdAlerts);
+                                if(successMessage){
+                                    dialogs.notify(successMessage, 'success', holdAlerts);
                                 }
                                 deferred.resolve(data);
                             }

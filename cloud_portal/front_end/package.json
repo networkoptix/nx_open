@@ -10,6 +10,7 @@
     "grunt-scp": "^0.1.8",
     "grunt-shell": "^1.2.1",
     "grunt-usemin": "^3.0.0",
+    "mail-notifier": "^0.3.0",
     "mime-db": "^1.22.0",
     "selenium-standalone": "^5.0.0",
     "serve-static": "^1.10.0",
