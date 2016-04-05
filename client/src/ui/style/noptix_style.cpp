@@ -46,7 +46,6 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 {
     m_branchClosed = m_skin->icon("tree/branch_closed.png");
     m_branchOpen = m_skin->icon("tree/branch_open.png");
-    m_closeTab = m_skin->icon("titlebar/close_tab.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {

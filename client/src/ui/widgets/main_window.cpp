@@ -133,19 +133,18 @@ extern "C" {
 }
 #endif
 
-QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags):
+QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
 #ifdef Q_OS_MACX
-    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
+        | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
 #endif
-    ),
+        ),
     QnWorkbenchContextAware(context),
-    m_controller(0),
+    m_dwm(nullptr),
     m_currentPageHolder(new QStackedWidget()),
     m_titleBar(new QnMainWindowTitleBarWidget(this)),
     m_welcomeScreenVisible(true),
     m_titleVisible(true),
-    m_dwm(NULL),
     m_drawCustomFrame(false),
     m_inFullscreenTransition(false)
 {

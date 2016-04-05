@@ -798,8 +798,7 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(lit("Alt+R")).
             shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
-            autoRepeat(false).
-            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png"));
+            autoRepeat(false);
 
         factory().
             flags(Qn::Main).
