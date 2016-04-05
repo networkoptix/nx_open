@@ -17,6 +17,11 @@ IncomingTunnelPool::IncomingTunnelPool(
     m_ioThreadSocket->bindToAioThread(ioThread);
 }
 
+IncomingTunnelPool::~IncomingTunnelPool()
+{
+    int x = 0;
+}
+
 void IncomingTunnelPool::addNewTunnel(
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
@@ -90,7 +95,7 @@ void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 void IncomingTunnelPool::acceptTunnel(
     std::shared_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    NX_LOGX(lm("accept tunnel %1").arg(connection), cl_logDEBUG1);
+    NX_LOGX(lm("accept tunnel %1").arg(connection), cl_logDEBUG2);
     connection->accept(
         [this, connection](
             SystemError::ErrorCode code,
@@ -103,7 +108,7 @@ void IncomingTunnelPool::acceptTunnel(
 
                 if (code != SystemError::noError)
                 {
-                    NX_LOGX(lm("tunnel %1 is brocken: %2")
+                    NX_LOGX(lm("tunnel %1 is broken: %2")
                         .arg(connection).arg(SystemError::toString(code)),
                         cl_logDEBUG1);
 
@@ -139,17 +144,22 @@ void IncomingTunnelPool::callAcceptHandler(bool timeout)
     m_ioThreadSocket->cancelIOSync(aio::etTimedOut);
 
     QnMutexLocker lock(&m_mutex);
-    if (!m_acceptHandler || m_acceptedSockets.empty())
+    if (!m_acceptHandler)
+        return;
+
+    if (timeout)
+    {
+        const auto handler = std::move(m_acceptHandler);
+        m_acceptHandler = nullptr;
+        lock.unlock();
+        return handler(nullptr);
+    }
+
+    if (m_acceptedSockets.empty())
         return;
 
     const auto handler = std::move(m_acceptHandler);
     m_acceptHandler = nullptr;
-
-    if (timeout)
-    {
-        lock.unlock();
-        return handler(nullptr);
-    }
 
     auto socket = std::move(m_acceptedSockets.front());
     m_acceptedSockets.pop_front();

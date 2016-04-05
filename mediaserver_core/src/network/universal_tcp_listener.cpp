@@ -6,12 +6,22 @@
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/async_client.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
 
 #include "cloud/cloud_connection_manager.h"
 #include "proxy_sender_connection_processor.h"
 #include "universal_request_processor.h"
 
+
+//#define LISTEN_ON_UDT_SOCKET
+#ifdef LISTEN_ON_UDT_SOCKET
+static const int kCloudSocketIndex = 2;
+static const int kTotalListeningSockets = 3;
+#else
+static const int kCloudSocketIndex = 1;
+static const int kTotalListeningSockets = 2;
+#endif
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     const CloudConnectionManager& cloudConnectionManager,
@@ -85,6 +95,18 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     if (!multipleServerSocket->addSocket(
             std::unique_ptr<AbstractStreamServerSocket>(regularSocket)))
         return nullptr;
+
+#ifdef LISTEN_ON_UDT_SOCKET
+    auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
+    if (!udtServerSocket->setReuseAddrFlag(true) ||
+        !udtServerSocket->bind(localAddress) ||
+        !udtServerSocket->listen())
+    {
+        return nullptr;
+    }
+    multipleServerSocket->addSocket(std::move(udtServerSocket));
+#endif
+
     m_multipleServerSocket = std::move(multipleServerSocket);
 
     if (m_boundToCloud)
@@ -142,7 +164,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
 
     if (m_boundToCloud)
     {
-        NX_ASSERT(m_multipleServerSocket->count() == 1);
+        NX_ASSERT(m_multipleServerSocket->count() == kCloudSocketIndex);
 
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
         registrationOnMediatorRetryPolicy.setMaxRetryCount(
@@ -157,7 +179,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
     }
     else
     {
-        NX_ASSERT(m_multipleServerSocket->count() == 2);
-        m_multipleServerSocket->removeSocket(1);
+        NX_ASSERT(m_multipleServerSocket->count() == kTotalListeningSockets);
+        m_multipleServerSocket->removeSocket(kCloudSocketIndex);
     }
 }

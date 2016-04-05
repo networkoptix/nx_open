@@ -72,6 +72,9 @@ public:
     /** Invokes listen on mediator */
     bool registerOnMediatorSync();
 
+    /** test only */
+    void moveToListeningState();
+
 protected:
     enum class State
     {

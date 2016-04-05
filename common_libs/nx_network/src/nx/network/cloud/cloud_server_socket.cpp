@@ -324,6 +324,18 @@ bool CloudServerSocket::registerOnMediatorSync()
     return false;
 }
 
+void CloudServerSocket::moveToListeningState()
+{
+    if (!m_tunnelPool)
+        initTunnelPool(m_acceptQueueLen);
+    m_mediatorConnection->setOnConnectionRequestedHandler(
+        std::bind(
+            &CloudServerSocket::onConnectionRequested,
+            this,
+            std::placeholders::_1));
+    m_state = State::listening;
+}
+
 void CloudServerSocket::initTunnelPool(int queueLen)
 {
     m_tunnelPool = std::make_unique<IncomingTunnelPool>(
