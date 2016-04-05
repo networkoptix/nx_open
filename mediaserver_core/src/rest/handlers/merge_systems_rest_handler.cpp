@@ -132,9 +132,9 @@ int QnMergeSystemsRestHandler::executeGet(
     client.close();
 
     QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(data);
-    QnModuleInformationWithAddresses moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
+    QnModuleInformationWithAddresses remoteModuleInformation = json.deserialized<QnModuleInformationWithAddresses>();
 
-    if (moduleInformation.systemName.isEmpty()) {
+    if (remoteModuleInformation.systemName.isEmpty()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Remote (%1) system name is empty")
             .arg(url.toString()), cl_logDEBUG1);
         /* Hmm there's no system name. It would be wrong system. Reject it. */
@@ -142,14 +142,24 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
-                           moduleInformation.customization.isEmpty() ||
+    if (!remoteModuleInformation.cloudSystemId.isEmpty() &&
+        !qnCommon->moduleInformation().cloudSystemId.isEmpty() &&
+        remoteModuleInformation.cloudSystemId != qnCommon->moduleInformation().cloudSystemId)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge systems bound to cloud")
+            .arg(url.toString()), cl_logDEBUG1);
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("BOTH_SYSTEMS_BOUND_TO_CLOUD"));
+        return nx_http::StatusCode::ok;
+    }
+
+    bool customizationOK = remoteModuleInformation.customization == QnAppInfo::customizationName() ||
+                           remoteModuleInformation.customization.isEmpty() ||
                            QnModuleFinder::instance()->isCompatibilityMode();
-    bool compatible = moduleInformation.hasCompatibleVersion();
+    bool compatible = remoteModuleInformation.hasCompatibleVersion();
 
     if ((!ignoreIncompatible && !compatible) || !customizationOK) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Incompatible systems. Local customization %1, remote customization %2")
-            .arg(QnAppInfo::customizationName()).arg(moduleInformation.customization),
+            .arg(QnAppInfo::customizationName()).arg(remoteModuleInformation.customization),
             cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return nx_http::StatusCode::ok;
@@ -163,7 +173,7 @@ int QnMergeSystemsRestHandler::executeGet(
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, moduleInformation.systemName, password, admin, owner)) {
+        if (!applyRemoteSettings(url, remoteModuleInformation.systemName, password, admin, owner)) {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
@@ -193,21 +203,21 @@ int QnMergeSystemsRestHandler::executeGet(
     }
 
     /* Save additional address if needed */
-    if (!moduleInformation.remoteAddresses.contains(url.host())) {
+    if (!remoteModuleInformation.remoteAddresses.contains(url.host())) {
         QUrl simpleUrl;
         simpleUrl.setScheme(lit("http"));
         simpleUrl.setHost(url.host());
-        if (url.port() != moduleInformation.port)
+        if (url.port() != remoteModuleInformation.port)
             simpleUrl.setPort(url.port());
-        ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(remoteModuleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 
     /* Connect to server if it is compatible */
     if (compatible && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(moduleInformation, SocketAddress(url.host(), moduleInformation.port));
+        QnServerConnector::instance()->addConnection(remoteModuleInformation, SocketAddress(url.host(), remoteModuleInformation.port));
 
-    result.setReply(moduleInformation);
+    result.setReply(remoteModuleInformation);
 
     QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_SystemmMerge);
     qnAuditManager->addAuditRecord(auditRecord);
