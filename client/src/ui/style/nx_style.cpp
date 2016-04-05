@@ -1975,18 +1975,24 @@ void QnNxStyle::polish(QWidget *widget)
     if (qobject_cast<QPushButton*>(widget) ||
         qobject_cast<QToolButton*>(widget))
     {
-        QFont font = widget->font();
-        font.setWeight(QFont::DemiBold);
-        widget->setFont(font);
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setWeight(QFont::DemiBold);
+            widget->setFont(font);
+        }
         widget->setAttribute(Qt::WA_Hover);
     }
 
     if (qobject_cast<QHeaderView*>(widget))
     {
-        QFont font = widget->font();
-        font.setWeight(QFont::DemiBold);
-        font.setPixelSize(dp(14));
-        widget->setFont(font);
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setWeight(QFont::DemiBold);
+            font.setPixelSize(dp(14));
+            widget->setFont(font);
+        }
         widget->setAttribute(Qt::WA_Hover);
     }
 
@@ -2019,10 +2025,13 @@ void QnNxStyle::polish(QWidget *widget)
 
 void QnNxStyle::unpolish(QWidget *widget)
 {
-    if (qobject_cast<QAbstractButton*>(widget)
-        || qobject_cast<QTabBar*>(widget))
+    if (qobject_cast<QAbstractButton*>(widget) ||
+        qobject_cast<QHeaderView*>(widget))
     {
-        widget->setFont(qApp->font());
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            widget->setFont(qApp->font());
+        }
     }
 
     base_type::unpolish(widget);
