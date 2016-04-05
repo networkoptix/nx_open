@@ -66,15 +66,15 @@ RestorePasswordPage = function () {
         expect(this.passwordInput.isPresent()).toBe(true);
         this.passwordInput.sendKeys(newPassword);
         this.savePasswordButton.click();
-        this.alert.catchAlert( this.alert.alertMessages.restorePassSuccess, this.alert.alertTypes.success);
+        expect(this.helper.htmlBody.getText()).toContain(this.alert.alertMessages.restorePassSuccess);
     };
 
-    this.verifySecondAttemptFails = function(newPassword) {
-        browser.refresh();
-        this.passwordInput.sendKeys(newPassword);
-        this.savePasswordButton.click();
-        this.alert.catchAlert( this.alert.alertMessages.restorePassWrongCode, this.alert.alertTypes.danger);
-    };
+    //this.verifySecondAttemptFails = function(newPassword) {
+    //    browser.refresh();
+    //    this.passwordInput.sendKeys(newPassword);
+    //    this.savePasswordButton.click();
+    //    this.alert.catchAlert( this.alert.alertMessages.restorePassWrongCode, this.alert.alertTypes.danger);
+    //};
 
     this.getRestorePassPage = function(userEmail) {
         var deferred = protractor.promise.defer();

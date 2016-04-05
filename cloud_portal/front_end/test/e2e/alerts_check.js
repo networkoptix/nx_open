@@ -20,7 +20,7 @@ var AlertSuite = function () {
     };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));
-    this.alert = element(by.css('process-alert')).element(by.css('.alert'));
+    this.alert = element(by.css('.ng-toast__message')).element(by.css('.alert'));
     this.alertCloseButton = this.alert.element(by.css('button.close'));
 
     function waitAlert(){
@@ -31,7 +31,7 @@ var AlertSuite = function () {
 
     function checkAlertContent(message, type){
         expect(self.alert.getText()).toContain(message);
-        expect(self.alert.getAttribute('type')).toContain(type);
+        expect(self.alert.getAttribute('class')).toContain(type);
     }
 
     function closeAlert(){
@@ -61,11 +61,11 @@ var AlertSuite = function () {
 
     this.checkAlert = function (callAlert, message, type, shouldCloseOnTimeout){
 
-        it("should show error alert and close it by button",function(){
+        it("should show error alert",function(){
             callAlert().then(function(){
                 waitAlert();
                 checkAlertContent(message, type);
-                closeAlert();
+                //closeAlert();
                 finishAlertCheck();
             });
         });

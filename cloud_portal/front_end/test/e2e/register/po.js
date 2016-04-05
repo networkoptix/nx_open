@@ -24,8 +24,6 @@ var RegisterPage = function () {
 
     this.submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
 
-    this.htmlBody = element(by.css('body'));
-
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));
     };
@@ -69,13 +67,6 @@ var RegisterPage = function () {
         this.firstNameInput.sendKeys(this.helper.userFirstName);
         this.lastNameInput.sendKeys(this.helper.userLastName);
         this.emailInput.sendKeys(this.helper.getRandomEmail());
-    };
-
-    this.prepareToAlertCheck = function () {
-        this.firstNameInput.sendKeys(this.helper.userFirstName);
-        this.lastNameInput.sendKeys(this.helper.userLastName);
-        this.emailInput.sendKeys(this.helper.getRandomEmail());
-        this.passwordInput.sendKeys(this.helper.userPassword);
     };
 
     this.getActivationPage = function(userEmail) {

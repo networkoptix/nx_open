@@ -15,23 +15,13 @@ describe('Registration suite', function () {
         p.helper.get(p.url);
     });
 
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-
-        p.prepareToAlertCheck();
-        p.alert.submitButton.click();
-
-        deferred.fulfill();
-        return deferred.promise;
-    }, p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success, true);
-
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.helper.get('/');
-
+    
         p.openRegisterButton.click();
-
+    
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should open register page from register success page by clicking Register button on top right corner", function () {
@@ -40,7 +30,7 @@ describe('Registration suite', function () {
         p.openRegisterButton.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should open register page in anonymous state by clicking Register button on homepage", function () {
@@ -49,12 +39,12 @@ describe('Registration suite', function () {
         p.openRegisterButtonAdv.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should open register page in anonymous state", function () {
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
     });
 
     it("should register user with correct credentials", function () {
@@ -64,8 +54,7 @@ describe('Registration suite', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
-
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
     it("should register user with cyrillic First and Last names and correct credentials", function () {
@@ -75,8 +64,7 @@ describe('Registration suite', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
-
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
     it("should register user with smile symbols in First and Last name fields and correct credentials", function () {
@@ -86,8 +74,7 @@ describe('Registration suite', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
-
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
     it("should register user with hieroglyphic symbols in First and Last name fields and correct credentials", function () {
@@ -97,8 +84,7 @@ describe('Registration suite', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
-
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
     it("should not allow to register without all fields filled", function () {
@@ -130,7 +116,7 @@ describe('Registration suite', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
 
         p.submitButton.click();
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
     it("should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./  in email field", function () {
@@ -141,7 +127,7 @@ describe('Registration suite', function () {
         p.emailInput.sendKeys(p.helper.getRandomEmailWith('#!$%&\'*+-/=?^_\`{}|~@gmail.com'));
 
         p.submitButton.click();
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
 
@@ -166,9 +152,9 @@ describe('Registration suite', function () {
         p.firstNameInput.sendKeys(p.helper.userFirstName);
         p.lastNameInput.sendKeys(p.helper.userLastName);
         p.emailInput.sendKeys(p.helper.getRandomEmail());
-        p.passwordInput.sendKeys(p.helper.userPassword).sendKeys(protractor.Key.ENTER);
-
-        p.alert.catchAlert( p.alert.alertMessages.registerSuccess, p.alert.alertTypes.success);
+        p.passwordInput.sendKeys(p.helper.userPassword)
+            .sendKeys(protractor.Key.ENTER);
+        expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
     });
 
     it("should respond to Tab key", function () {
@@ -211,7 +197,7 @@ describe('Registration suite', function () {
             var newWindowHandle = handles[1];
             browser.switchTo().window(newWindowHandle).then(function () {
                 expect(browser.getCurrentUrl()).toContain('static/eula'); // Check that url is correct
-                expect(p.htmlBody.getText()).toContain('Terms and conditions'); // Check that it is Terms and conditions page
+                expect(p.helper.htmlBody.getText()).toContain('Terms and conditions'); // Check that it is Terms and conditions page
             });
         });
     });

@@ -53,6 +53,8 @@ var Helper = function () {
     this.userPasswordWrong = 'qweqwe123';
 
     this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
+    //this.loggedOutElement = element(by.css('.container.ng-scope')).all(by.css('.auth-hidden')).first(); // some element on page visible to not auth user
+    this.htmlBody = element(by.css('body'));
 
     this.checkElementFocusedBy = function(element, attribute) {
         expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
@@ -116,8 +118,7 @@ var Helper = function () {
         passwordInput.sendKeys(this.userPassword);
 
         submitButton.click();
-
-        this.alert.catchAlert( this.alert.alertMessages.registerSuccess, this.alert.alertTypes.success);
+        expect(this.htmlBody.getText()).toContain(this.alert.alertMessages.registerSuccess);
 
         return userEmail;
     };

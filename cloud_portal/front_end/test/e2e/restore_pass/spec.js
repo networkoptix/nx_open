@@ -77,24 +77,15 @@ describe('Restore password suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.restorePassConfirmSent, p.alert.alertTypes.success, false);
 
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-        p.getRestorePassPage(p.helper.userEmail).then(function(){
-            p.setNewPassword(p.helper.userPassword);
-            deferred.fulfill();
-        });
-        return deferred.promise;
-    }, p.alert.alertMessages.restorePassSuccess, p.alert.alertTypes.success, false);
-
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-        p.getRestorePassPage(p.helper.userEmail).then(function(){
-            p.setNewPassword(p.helper.userPassword);
-            p.verifySecondAttemptFails(p.helper.userPassword);
-            deferred.fulfill();
-        });
-        return deferred.promise;
-    }, p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger, false);
+    //p.alert.checkAlert(function(){
+    //    var deferred = protractor.promise.defer();
+    //    p.getRestorePassPage(p.helper.userEmail).then(function(){
+    //        p.setNewPassword(p.helper.userPassword);
+    //        p.verifySecondAttemptFails(p.helper.userPassword);
+    //        deferred.fulfill();
+    //    });
+    //    return deferred.promise;
+    //}, p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger, false);
 
     it("should set new password, login with new password", function () {
         p.getRestorePassPage(p.helper.userEmail).then(function() {
@@ -105,12 +96,12 @@ describe('Restore password suite', function () {
         });
     });
 
-    it("should not allow to use one restore link twice", function () {
-        p.getRestorePassPage(p.helper.userEmail).then(function() {
-            p.setNewPassword(p.helper.userPassword);
-            p.verifySecondAttemptFails(p.helper.userPassword);
-        });
-    });
+    //xit("should not allow to use one restore link twice", function () {
+    //    p.getRestorePassPage(p.helper.userEmail).then(function() {
+    //        p.setNewPassword(p.helper.userPassword);
+    //        p.verifySecondAttemptFails(p.helper.userPassword);
+    //    });
+    //});
 
     it("should make not-activated user active by restoring password", function () {
         var userEmail = p.helper.register();
