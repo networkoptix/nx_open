@@ -117,9 +117,6 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->tabBar = new QnLayoutTabBar(this);
     d->tabBar->setFixedHeight(kTitleBarHeight);
     connect(d->tabBar, &QnLayoutTabBar::tabCloseRequested,  d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
-    connect(d->tabBar, &QnLayoutTabBar::currentChanged,     d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
-    connect(action(QnActions::MainMenuAction), &QAction::triggered, d, &QnMainWindowTitleBarWidgetPrivate::setSkipDoubleClick);
-
     connect(d->tabBar, &QnLayoutTabBar::closeRequested,
             this, [this](QnWorkbenchLayout* layout)
     {
