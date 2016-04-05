@@ -32,7 +32,7 @@ namespace Qn {
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }
 
-QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent): 
+QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
     m_mode(Mode::Invalid),
@@ -52,7 +52,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
 
     std::fill(m_valid.begin(), m_valid.end(), true);
     std::fill(m_flags.begin(), m_flags.end(), Editable | Visible);
-    
+
     setHelpTopic(ui->accessRightsLabel, ui->accessRightsComboBox,   Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->accessRightsGroupbox,                          Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->enabledCheckBox,                               Qn::UserSettings_DisableUser_Help);
@@ -115,7 +115,7 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         qnWarning("Invalid element '%1'.", static_cast<int>(element));
         return;
     }
-    
+
     m_flags[element] = flags;
 
     bool visible = flags & Visible;
@@ -330,7 +330,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if(ui->loginEdit->text().trimmed().isEmpty()) {
             hint = tr("Login cannot be empty.");
             valid = false;
-        } 
+        }
         if(m_userByLogin.contains(ui->loginEdit->text().trimmed().toLower()) && m_userByLogin.value(ui->loginEdit->text().trimmed().toLower()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
@@ -364,7 +364,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
                 hint = tr("User has been renamed. Password must be updated.");
                 valid = false;
             }
-        } 
+        }
 
         /* Show warning if password and confirmation do not match. */
         if (ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
@@ -591,7 +591,7 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
             widget->layout()->update();
             widget->layout()->activate();
         }
-        
+
         widget = widget->parentWidget();
     }
     updateSizeLimits();

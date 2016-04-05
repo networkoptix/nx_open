@@ -348,7 +348,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         if (errCode == ec2::ErrorCode::ok)
             break;
 
-        QThread::msleep(16);
+        QThread::msleep(500);
 
         /* Hiding message box from current connect. */
         hideMessageBox();

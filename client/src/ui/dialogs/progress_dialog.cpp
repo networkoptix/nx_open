@@ -63,9 +63,9 @@
 #include <QtGui/qdesktopwidget.h>
 #endif
 
-#include <ui/widgets/elided_label.h>
-#include <ui/widgets/dialog_button_box.h>
-#include <ui/widgets/progress_widget.h>
+#include <ui/widgets/common/elided_label.h>
+#include <ui/widgets/common/dialog_button_box.h>
+#include <ui/widgets/common/progress_widget.h>
 
 
 namespace {
@@ -150,7 +150,7 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     autoClose = true;
     autoReset = true;
     forceHide = false;
-    
+
     label = new QnElidedLabel(q);
     label->setText(labelText);
     label->setAlignment(Qt::Alignment(Qt::AlignLeft));
@@ -304,7 +304,7 @@ void QnProgressDialogPrivate::showInfiniteProgress(bool enable)
   setMinimum(), setMaximum()
 */
 
-QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f): 
+QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f):
     base_type(parent, f),
     d_ptr(new QnProgressDialogPrivate())
 {
@@ -319,7 +319,7 @@ QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f):
 
    The \a labelText is the text used to remind the user what is progressing.
 
-   The \a cancelButtonText is the text to display on the cancel button.  If 
+   The \a cancelButtonText is the text to display on the cancel button.  If
    QString() is passed then no cancel button is shown.
 
    The \a minimum and \a maximum is the number of steps in the operation for
@@ -339,7 +339,7 @@ QnProgressDialog::QnProgressDialog(QWidget *parent, Qt::WindowFlags f):
 QnProgressDialog::QnProgressDialog(const QString &labelText,
                                  const QString &cancelButtonText,
                                  int minimum, int maximum,
-                                 QWidget *parent, Qt::WindowFlags f): 
+                                 QWidget *parent, Qt::WindowFlags f):
     base_type(parent, f),
     d_ptr(new QnProgressDialogPrivate())
 {
@@ -463,7 +463,7 @@ void QnProgressDialog::addButton(QPushButton *button, QDialogButtonBox::ButtonRo
 
 /*!
   Sets the cancel button's text to \a cancelButtonText.  If the text
-  is set to QString() then it will cause the cancel button to be 
+  is set to QString() then it will cause the cancel button to be
   hidden and deleted.
 
   \sa setCancelButton()

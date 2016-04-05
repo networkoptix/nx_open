@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>327</width>
-    <height>352</height>
+    <width>538</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,32 +19,32 @@
   <property name="windowTitle">
    <string>Create New User</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="sizeConstraint">
-    <enum>QLayout::SetMinAndMaxSize</enum>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
    <property name="leftMargin">
-    <number>0</number>
+    <number>8</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>8</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>8</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>8</number>
    </property>
    <item>
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QGroupBox" name="userInfoGroupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="title">
+      <string>User Information</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
      </property>
      <layout class="QFormLayout" name="formLayout">
       <property name="horizontalSpacing">
@@ -231,6 +231,9 @@
     </widget>
    </item>
    <item>
+    <widget class="QnUserAccessRightsWidget" name="accessRightsWidget" native="true"/>
+   </item>
+   <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -249,6 +252,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnUserAccessRightsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/user_access_rights_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>loginEdit</tabstop>
   <tabstop>currentPasswordEdit</tabstop>

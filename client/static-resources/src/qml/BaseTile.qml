@@ -29,6 +29,8 @@ Item
     property color standardColor: Style.colors.custom.systemTile.background;
     property color hoveredColor: Style.lighterColor(standardColor);
     property color inactiveColor: Style.colors.shadow;
+    property alias collapseButton: collapseTileButton;
+    property Item collapseButtonTabItem: null;
 
     Binding
     {
@@ -279,6 +281,7 @@ Item
                 hoveredColor: Style.colors.custom.systemTile.closeButtonBkg;
 
                 onClicked: { thisComponent.toggle(); }
+                KeyNavigation.tab: thisComponent.collapseButtonTabItem;
             }
 
             Column

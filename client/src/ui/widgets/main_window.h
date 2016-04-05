@@ -9,7 +9,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/view/graphics_scene.h>
 
-#include "emulated_frame_widget.h"
+#include <ui/widgets/common/emulated_frame_widget.h>
 
 class QTabBar;
 class QBoxLayout;
@@ -27,6 +27,7 @@ class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
+class QnMainWindowTitleBarWidget;
 
 class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -64,8 +65,6 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void dropEvent(QDropEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void moveEvent(QMoveEvent *event) override;
@@ -84,7 +83,6 @@ protected slots:
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
-    void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
     void updateWidgetsVisibility();
@@ -92,37 +90,30 @@ private:
     void showFullScreen();
     void showNormal();
 
-    void skipDoubleClick();
-
     void updateScreenInfo();
 
     void updateHelpTopic();
 
 private:
+    QnDwm *m_dwm;
+
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGraphicsView> m_view;
     QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
     QScopedPointer<QnWorkbenchUi> m_ui;
 
-    QnLayoutTabBar *m_tabBar;
-    QToolButton *m_mainMenuButton;
-
     QStackedWidget * const m_currentPageHolder;
-    QBoxLayout *m_titleLayout;
+
+    QnMainWindowTitleBarWidget *m_titleBar;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 
     bool m_welcomeScreenVisible;
     bool m_titleVisible;
 
-    /** Set the flag to skip next double-click. Used to workaround invalid double click when
-     *  the first mouse click was handled and changed the widget state. */
-    bool m_skipDoubleClick;
-
     QnResourceList m_dropResources;
 
-    QnDwm *m_dwm;
     bool m_drawCustomFrame;
 
     Options m_options;

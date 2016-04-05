@@ -293,7 +293,7 @@
   <customwidget>
    <class>QnFramedLabel</class>
    <extends>QLabel</extends>
-   <header location="global">ui/widgets/framed_label.h</header>
+   <header location="global">ui/widgets/common/framed_label.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

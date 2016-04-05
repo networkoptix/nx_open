@@ -3,18 +3,16 @@
 
 #include <common/common_module.h>
 
-#include <ui/widgets/settings/popup_settings_widget.h>
-#include <ui/widgets/settings/license_manager_widget.h>
-#include <ui/widgets/settings/system_settings_widget.h>
-#include <ui/widgets/settings/database_management_widget.h>
-#include <ui/widgets/settings/time_server_selection_widget.h>
-#include <ui/widgets/settings/general_system_administration_widget.h>
-#include <ui/widgets/settings/user_management_widget.h>
-#include <ui/widgets/settings/cloud_management_widget.h>
-#include <ui/widgets/server_updates_widget.h>
-#include <ui/widgets/routing_management_widget.h>
-
-#include <ui/widgets/system_settings/smtp_settings_widget.h>
+#include <ui/widgets/system_settings/license_manager_widget.h>
+#include <ui/widgets/system_settings/system_settings_widget.h>
+#include <ui/widgets/system_settings/database_management_widget.h>
+#include <ui/widgets/system_settings/time_server_selection_widget.h>
+#include <ui/widgets/system_settings/general_system_administration_widget.h>
+#include <ui/widgets/system_settings/user_management_widget.h>
+#include <ui/widgets/system_settings/cloud_management_widget.h>
+#include <ui/widgets/system_settings/server_updates_widget.h>
+#include <ui/widgets/system_settings/routing_management_widget.h>
+#include <ui/widgets/system_settings/smtp/smtp_settings_widget.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -23,7 +21,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) 
+QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     : base_type(parent)
     , ui(new Ui::QnSystemAdministrationDialog)
 {

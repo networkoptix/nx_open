@@ -35,6 +35,8 @@ BaseTile
         deactivateFunc: function(item ) { item.isMaskedPrivate = false; };
     }
 
+    collapseButtonTabItem: centralArea.hostChooseField;
+
     onIsExpandedChanged:
     {
         if (!isExpanded)
@@ -45,6 +47,9 @@ BaseTile
     {
         property alias host: hostChooseItem.value;
         property alias userName: userChooseItem.value;
+
+        property alias userChooseField: userChooseItem;
+        property alias hostChooseField: hostChooseItem;
 
         topPadding: 12; // TODO: paddings do not work??
         spacing: 2;
@@ -66,6 +71,9 @@ BaseTile
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/server_disabled.png";
             Component.onCompleted: activeItemSelector.addItem(this);
+
+            KeyNavigation.tab: userChooseItem;
+            KeyNavigation.backtab: thisComponent.collapseButton;
         }
 
         InfoItem
@@ -85,6 +93,9 @@ BaseTile
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
 
             Component.onCompleted: activeItemSelector.addItem(this);
+
+            KeyNavigation.tab: expandedArea.loginTextItem;
+            KeyNavigation.backtab: hostChooseItem;
         }
     }
 
@@ -92,6 +103,7 @@ BaseTile
     {
         property alias login: loginTextField.text;
         property alias password: passwordTextField.text;
+        property alias loginTextItem: loginTextField;
 
         topPadding: 16;
         bottomPadding: 16;
@@ -104,7 +116,16 @@ BaseTile
         {
             width: parent.width;
 
+            onVisibleChanged:
+            {
+                if (loginTextField.visible)
+                    loginTextField.forceActiveFocus();
+                else
+                    passwordTextField.forceActiveFocus();
+            }
+
             spacing: 8;
+
             NxLabel
             {
                 visible: !thisComponent.isRecentlyConnected;
@@ -119,6 +140,10 @@ BaseTile
                 width: parent.width;
 
                 onAccepted: thisComponent.connectClicked();
+
+                KeyNavigation.tab: passwordTextField;
+                KeyNavigation.backtab: (centralArea.userChooseField
+                    ? centralArea.userChooseField : collapseButton);
             }
 
             NxLabel
@@ -133,6 +158,9 @@ BaseTile
                 echoMode: TextInput.Password;
 
                 onAccepted: thisComponent.connectClicked();
+
+                KeyNavigation.tab: savePasswordCheckBox;
+                KeyNavigation.backtab: loginTextField;
             }
 
             NxCheckBox
@@ -157,6 +185,8 @@ BaseTile
             text: qsTr("Connect");
 
             onClicked: thisComponent.connectClicked();
+
+            KeyNavigation.tab: thisComponent.collapseButton;
         }
     }
 }

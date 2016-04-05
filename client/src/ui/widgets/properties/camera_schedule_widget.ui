@@ -641,7 +641,7 @@
   <customwidget>
    <class>QnCheckedButton</class>
    <extends>QToolButton</extends>
-   <header>ui/widgets/checked_button.h</header>
+   <header location="global">ui/widgets/common/checked_button.h</header>
   </customwidget>
   <customwidget>
    <class>QnLicensesUsageWidget</class>

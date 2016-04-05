@@ -50,7 +50,8 @@
 #include "managers/system_manager.h"
 #include "stree/stree_manager.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
+#include <libcloud_db_app_info.h>
 
 
 static int registerQtResources()
@@ -65,14 +66,14 @@ namespace cdb {
 static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
 
 CloudDBProcess::CloudDBProcess( int argc, char **argv )
-: 
-    QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
+:
+    QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
     m_timerID( -1 )
 {
-    setServiceDescription(QN_APPLICATION_NAME);
+    setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
 
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
@@ -112,23 +113,23 @@ int CloudDBProcess::executeApplication()
             settings.printCmdLineArgsHelp();
             return 0;
         }
-    
+
         initializeLogging( settings );
-    
+
         const auto& httpAddrToListenList = settings.endpointsToListen();
         if( httpAddrToListenList.empty() )
         {
             NX_LOG( "No HTTP address to listen", cl_logALWAYS );
             return 1;
         }
-    
+
         nx::db::DBManager dbManager(settings.dbConnectionOptions());
         if( !initializeDB(&dbManager) )
         {
             NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
             return 2;
         }
-    
+
         std::unique_ptr<AbstractEmailManager> emailManager(
             EMailManagerFactory::create(settings));
         StreeManager streeManager(settings.auth());
@@ -143,11 +144,11 @@ int CloudDBProcess::executeApplication()
             &tempPasswordManager,
             &dbManager,
             emailManager.get());
-    
+
         SystemManager systemManager(
             accountManager,
             &dbManager);
-    
+
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
@@ -158,7 +159,7 @@ int CloudDBProcess::executeApplication()
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
         authDataProviders.push_back(&accountManager);
         authDataProviders.push_back(&systemManager);
-        AuthenticationManager authenticationManager( 
+        AuthenticationManager authenticationManager(
             std::move(authDataProviders),
             authRestrictionList,
             streeManager);
@@ -167,7 +168,7 @@ int CloudDBProcess::executeApplication()
             streeManager,
             accountManager,
             systemManager);
-    
+
         AuthenticationProvider authProvider(
             accountManager,
             systemManager);
@@ -180,7 +181,7 @@ int CloudDBProcess::executeApplication()
             &accountManager,
             &systemManager,
             &authProvider);
-    
+
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
@@ -192,16 +193,16 @@ int CloudDBProcess::executeApplication()
 
         // process privilege reduction
         CurrentProcess::changeUser( settings.changeUser() );
-    
+
         if( !multiAddressHttpServer.listen() )
             return 5;
 
         application()->installEventFilter(this);
         if (m_terminated)
             return 0;
-    
-        NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
-        std::cout << QN_APPLICATION_NAME <<" has been started" << std::endl;
+
+        NX_LOG( lit( "%1 has been started" ).arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS );
+        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().data() <<" has been started" << std::endl;
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
@@ -212,7 +213,7 @@ int CloudDBProcess::executeApplication()
         //TODO #ak remove qt event loop
         //application's main loop
         const int result = application()->exec();
-    
+
         return result;
     }
     catch( const std::exception& e )
@@ -259,7 +260,7 @@ void CloudDBProcess::initializeLogging( const conf::Settings& settings )
     if( settings.logging().logLevel != QString::fromLatin1("none") )
     {
         const QString& logDir = settings.logging().logDir;
-            
+
         QDir().mkpath(logDir);
         const QString& logFileName = logDir + lit("/log_file");
         if( cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1) )
@@ -267,9 +268,9 @@ void CloudDBProcess::initializeLogging( const conf::Settings& settings )
         else
             std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
         NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QN_APPLICATION_NAME), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QN_APPLICATION_VERSION), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QN_APPLICATION_REVISION), cl_logALWAYS);
+        NX_LOG(lit("%1 started").arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
+        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
+        NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     }
 }
 

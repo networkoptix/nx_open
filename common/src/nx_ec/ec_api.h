@@ -31,6 +31,7 @@
 #include <nx_ec/data/api_client_info_data.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 #include <nx_ec/data/api_media_server_data.h>
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include "ec_api_fwd.h"
 

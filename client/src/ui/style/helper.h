@@ -30,6 +30,7 @@ namespace style
         static const char *kHoveredRowProperty;
         static const char *kAccentStyleProperty;
         static const char *kSliderLength; /**< Name of a property to change default width of the slider handle. */
+        static const char *kDontPolishFontProperty;
     };
 
     qreal dpr(qreal value);

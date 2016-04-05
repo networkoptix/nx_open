@@ -11,7 +11,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
 
-#include <ui/widgets/dialog_button_box.h>
+#include <ui/widgets/common/dialog_button_box.h>
 
 QnAbstractPtzDialog::QnAbstractPtzDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
@@ -190,7 +190,7 @@ void QnAbstractPtzDialog::at_controller_finished(Qn::PtzCommand command, const Q
         m_loaded = true;
     }
 
-    if (m_commands.isEmpty()) 
+    if (m_commands.isEmpty())
         emit synchronized();
 }
 

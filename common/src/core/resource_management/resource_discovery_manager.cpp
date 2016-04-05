@@ -467,7 +467,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( camRes->getPhysicalId() );
         if( existingRes )
         {
-            const QnSecurityCamResourcePtr existingCamRes = existingRes.dynamicCast<QnSecurityCamResource>();
+            /* Speed optimization for ARM servers. --ak */
+            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
 #ifdef EDGE_SERVER
@@ -522,7 +523,8 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
             return false;
 
         const QnResourcePtr& rpResource = qnResPool->getResourceByUniqueId((*it)->getUniqueId());
-        QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
+        /* Speed optimization for ARM servers. --ak */
+        QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(rpResource.data());
         if (rpNetRes) {
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
             if (newNetRes)
@@ -531,7 +533,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
         }
         else {
-            ++it; // new resource => shouls keep it
+            ++it; // new resource => should keep it
         }
     }
 
