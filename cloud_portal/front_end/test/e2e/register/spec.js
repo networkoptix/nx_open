@@ -21,7 +21,7 @@ describe('Registration suite', function () {
         p.openRegisterButton.click();
     
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
     });
 
     it("should open register page from register success page by clicking Register button on top right corner", function () {
@@ -30,7 +30,7 @@ describe('Registration suite', function () {
         p.openRegisterButton.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
     });
 
     it("should open register page in anonymous state by clicking Register button on homepage", function () {
@@ -39,12 +39,12 @@ describe('Registration suite', function () {
         p.openRegisterButtonAdv.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
     });
 
     it("should open register page in anonymous state", function () {
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
     });
 
     it("should register user with correct credentials", function () {
