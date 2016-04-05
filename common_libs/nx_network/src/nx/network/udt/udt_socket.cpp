@@ -663,13 +663,19 @@ bool UdtStreamSocket::connect(
     return true;
 }
 
-int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags )
+int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
+    if (m_impl->udtHandle == UDT::INVALID_SOCK)
+    {
+        SystemError::setLastErrorCode(SystemError::badDescriptor);
+        return -1;
+    }
+
     int sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
     if (sz == UDT::ERROR)
     {
-        const auto sysErrorCode =
-            detail::convertToSystemError(UDT::getlasterror().getErrorCode());
+        const int udtErrorCode = UDT::getlasterror().getErrorCode();
+        const auto sysErrorCode = detail::convertToSystemError(udtErrorCode);
 
         if (sysErrorCode != SystemError::wouldBlock)
             m_impl->m_state = detail::UdtSocketImpl::SocketState::open;
@@ -677,12 +683,11 @@ int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags )
         // UDT doesn't translate the EOF into a recv with zero return, but instead
         // it returns error with 2001 error code. We need to detect this and translate
         // back with a zero return here .
-        int error_code = UDT::getlasterror().getErrorCode();
-        if (error_code == CUDTException::ECONNLOST)
+        if (udtErrorCode == CUDTException::ECONNLOST)
         {
             return 0;
         }
-        else if (error_code == CUDTException::EINVSOCK)
+        else if (udtErrorCode == CUDTException::EINVSOCK)
         {
             // This is another very ugly hack since after our patch for UDT.
             // UDT cannot distinguish a clean close or a crash. And I cannot
@@ -703,7 +708,6 @@ int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags )
 
 int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 {
-    NX_ASSERT(!m_impl->IsClosed());
     int sz = UDT::send(m_impl->udtHandle, reinterpret_cast<const char*>(buffer), bufferLen, 0);
     if (sz == UDT::ERROR)
     {
