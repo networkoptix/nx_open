@@ -856,28 +856,29 @@ void QnNxStyle::drawControl(
                         firstColor = mainColor.lighter(4);
                     }
 
-                    QPoint p1 = frame->rect.topLeft();
-                    QPoint p2;
-                    QPoint shift;
+                    QRect rect = frame->rect;
+
                     if (frame->frameShape == QFrame::HLine)
                     {
-                        p2 = frame->rect.topRight();
-                        shift = QPoint(0, 1);
+                        rect.setHeight(frame->lineWidth);
+                        painter->fillRect(rect, firstColor);
+
+                        if (secondColor.isValid())
+                        {
+                            rect.moveTop(rect.top() + rect.height());
+                            painter->fillRect(rect, secondColor);
+                        }
                     }
                     else
                     {
-                        p2 = frame->rect.bottomLeft();
-                        shift = QPoint(1, 0);
-                    }
+                        rect.setWidth(frame->lineWidth);
+                        painter->fillRect(rect, firstColor);
 
-                    QnScopedPainterPenRollback penRollback(painter, firstColor);
-
-                    painter->drawLine(p1, p2);
-
-                    if (secondColor.isValid())
-                    {
-                        painter->setPen(secondColor);
-                        painter->drawLine(p1 + shift, p2 + shift);
+                        if (secondColor.isValid())
+                        {
+                            rect.moveLeft(rect.left() + rect.width());
+                            painter->fillRect(rect, secondColor);
+                        }
                     }
                 }
                 return;
