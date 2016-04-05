@@ -47,3 +47,11 @@ body {
   background-size: 88px 88px;
   background-image:url('../images/native-theme/success.png')
 }
+
+.master-success .glyphicon.glyphicon-remove-circle{
+  @include kill-glyphicon;
+  width:88px;
+  height: 88px;
+  background-size: 88px 88px;
+  background-image:url('../images/native-theme/error.png')
+}

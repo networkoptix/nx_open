@@ -5,12 +5,14 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('initFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
     <h2>Couldn't initiate your system</h2>
     <p class="master-description">
-        Authorization failed for some reason.<br>
-        Press "Next" to try again.
+        Authorization failed for some reason.
     </p>
-    <div class="master-success">x_x</div>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+    </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('start')">
@@ -143,6 +145,15 @@
 
 </div>
 
+
+<div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
+    <div class="master-success"><span class="glyphicon glyphicon-refresh"></span></div>
+    <h2>Merging systems ...</h2>
+    <p class="master-description">It may take several minutes</p>
+</div>
+
+
+
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
     <h2>System is ready to use</h2>
@@ -162,21 +173,21 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
     <h2>Couldn't connect to cloud</h2>
     <p class="master-description">
         You need internet connection on server in order to connect your system<br> to the <span class="product-name">Nx Cloud</span>.<br>
         Please, check your connection or firewall settings,<br>
         or press "Next" if you are going to connect your system to Nx Cloud later.
     </p>
-    <div class="master-success">x_x</div>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
     <h2>Couldn't setup your system</h2>
     <p class="master-description">Something went totally wrong. It seems you can't use your server. I'm sorry.<br>
         Error description: {{settings.localError}}
     </p>
-    <div class="master-success">x_x</div>
 </div>
 
 <div class="panel-footer">

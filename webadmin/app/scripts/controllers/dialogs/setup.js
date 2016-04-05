@@ -224,6 +224,7 @@ angular.module('webadminApp')
         }
 
         function connectToAnotherSystem(){
+            $scope.next('mergeProcess');
             $log.log("Connect to another system");
             $scope.settings.remoteError = false;
             if(debugMode){
@@ -389,6 +390,17 @@ angular.module('webadminApp')
                 window.location.reload();
             }
         };
+        $scope.retry = function(){
+            if($scope.activeStep.retry){
+                $scope.activeStep.retried = true;
+                $scope.activeStep.retry();
+            }else{
+                $scope.back();
+            }
+        };
+        $scope.canRetry = function(){
+            return !!$scope.activeStep.retry && !$scope.activeStep.retried;
+        };
         $scope.cancel = function(){
             if(nativeClientObject) {
                 if(nativeClientObject.cancel){
@@ -487,6 +499,9 @@ angular.module('webadminApp')
                         required($scope.settings.remotePassword);
                 }
             },
+            mergeProcess:{
+
+            },
             mergeSuccess:{
                 finish: true
             },
@@ -509,7 +524,7 @@ angular.module('webadminApp')
             },
             initFailure:{
                 cancel: !!nativeClientObject || debugMode,
-                next:function(){
+                retry: function(){
                     initWizard();
                 }
             }
