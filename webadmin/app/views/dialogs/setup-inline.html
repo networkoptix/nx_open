@@ -28,7 +28,7 @@
     <p class="master-description">
         System name helps you identify or find your system.
     </p>
-    <form class="master-controls" name="systemNameForm">
+    <form class="master-controls" name="systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
                    placeholder="System name" required autofocus>
@@ -72,49 +72,50 @@
     </div>
 </div>
 
-<div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
+<div class="panel-body text-center" ng-hide="!stepIs('cloudLogin')">
 
     <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
     <p class="master-description">
         Login to your account<br>
     </p>
 
-    <form class="master-controls" name="cloudForm" disable-autocomplete>
+    <form class="master-controls" name="cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="Email" required autofocus>
+                   type="email" placeholder="Email" required autofocus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" required placeholder="Password">
+                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
+        </div>
+        <div class="form-group" ng-if="settings.cloudError">
+            <p class="help-block">
+                {{settings.cloudError}}
+            </p>
         </div>
     </form>
-
-    <div class="alert alert-danger" ng-if="settings.cloudError">
-        {{settings.cloudError}}
-    </div>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localLogin')">
-    <h2>Create administrator user</h2>
-    <form class="master-controls" name="localForm" disable-autocomplete>
+    <h2>Set up administrator's password</h2>
+    <form class="master-controls" name="localForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
             <input ng-model="settings.localLogin" name="localLogin" class="form-control"
                    type="text" placeholder="Login" required readonly>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.localPassword" name="localPassword" class="form-control"
-                   type="password" placeholder="Password" required autofocus></div>
+                   type="password" autocomplete="new-password" placeholder="Password" required autofocus></div>
         <div class="form-group" validate-field>
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" placeholder="Repeat password" required>
+                   type="password" autocomplete="new-password" placeholder="Repeat password" required>
         </div>
     </form>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('merge')">
     <h2>Connect server to existing system</h2>
-    <form class="master-controls" name="remoteSystemForm" disable-autocomplete>
+    <form class="master-controls" name="remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group">
             <ui-select ng-model="settings.remoteSystem" reset-search-input="false" required autofocus>
                 <ui-select-match placeholder="Systems..."
@@ -134,7 +135,8 @@
                    placeholder="Login" required>
         </div>
         <div class="form-group" validate-field>
-            <input ng-model="settings.remotePassword" name="remotePassword" class="form-control" type="password"
+            <input ng-model="settings.remotePassword"
+                   name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    placeholder="Password" required>
         </div>
     </form>

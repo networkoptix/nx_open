@@ -165,7 +165,7 @@ module.exports = function (grunt) {
                  {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
 
                 //Vitaly Kutin
-                {context: '/api/',      host: '10.0.3.197', port: 7001},
+                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
                 {context: '/ec2/',      host: '10.0.3.197', port: 7001},
                 {context: '/hls/',      host: '10.0.3.197', port: 7001},
                 {context: '/media/',    host: '10.0.3.197', port: 7001},
@@ -215,7 +215,7 @@ module.exports = function (grunt) {
 
 
                 //Surface
-                /*{context: '/api/',      host: '10.0.3.203', port: 7001},
+                {context: '/api/',      host: '10.0.3.203', port: 7001},
                  {context: '/ec2/',      host: '10.0.3.203', port: 7001},
                  {context: '/hls/',      host: '10.0.3.203', port: 7001},
                  {context: '/media/',    host: '10.0.3.203', port: 7001},

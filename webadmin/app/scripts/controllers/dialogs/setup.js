@@ -59,7 +59,7 @@ angular.module('webadminApp')
         }
 
         if(debugMode){
-            console.log("Wizard works in debug mode: no changes on server or portal will be made.");
+            $log.log("Wizard works in debug mode: no changes on server or portal will be made.");
             // cloudAuthorized = true;
             // $scope.settings.presetCloudEmail = "debug@hdw.mx";
         }
@@ -76,7 +76,6 @@ angular.module('webadminApp')
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.openLink = function($event){
             if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                console.log($event);
                 nativeClientObject.openUrlInBrowser($scope.portalUrl);
                 $event.preventDefault();
             }
@@ -266,6 +265,9 @@ angular.module('webadminApp')
         }
         /* Connect to cloud section */
 
+        $scope.clearCloudError = function(){
+            $scope.settings.cloudError = false;
+        };
 
         function connectToCloud(preset){
             $log.log("Connect to cloud");
@@ -281,13 +283,14 @@ angular.module('webadminApp')
                 $scope.next('cloudSuccess');
                 return;
             }
+
             function cloudErrorHandler(error)
             {
                 $log.error("Cloud portal error: \n" + JSON.stringify(error, null, 4));
                 $scope.errorData = JSON.stringify(error, null, 4);
 
                 if(error.status === 401){
-                    $log.log("Wrong login or password for cloud- show alert message");
+                    $log.log("Wrong login or password for cloud - show red message");
 
                     if(error.data.resultCode) {
                         $scope.settings.cloudError = formatError(error.data.resultCode);
@@ -316,7 +319,7 @@ angular.module('webadminApp')
             cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                 function(message){
                     //2. Save settings to local server
-                    console.log("Cloud portal returned success: " + JSON.stringify(message.data));
+                    $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
                     $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
 
