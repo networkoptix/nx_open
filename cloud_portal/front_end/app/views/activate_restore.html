@@ -1,16 +1,16 @@
 <div>
     <div ng-if="data.activateCode">
-        <h1>Account activation</h1>
-        <p process-loading="activate">
-            Your account was successfully activated.
-        </p>
+        <h1 class="process-success" process-loading="activate">
+            Your account was successfully activated.<br>
+            <a href="#/Login">Login</a>
+        </h1>
     </div>
 
     <div ng-if="activationSuccess">
-        <h1>Account activation</h1>
-        <p>
-            Your account was successfully activated.
-        </p>
+        <h1 class="process-success">
+            Your account was successfully activated.<br>
+            <a href="#/Login">Login</a>
+        </h1>
     </div>
 
     <div ng-if="reactivating">
@@ -69,9 +69,9 @@
     <div ng-if="data.restoreCode">
         <h1>Set new password</h1>
 
-        <p ng-if="change.success || changeSuccess ">
+        <h2 class="process-success" ng-if="change.success || changeSuccess ">
             Password successfully saved.
-        </p>
+        </h2>
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
 
             <password-input ng-model="data.newPassword" id="'newPassword'" label="'New password'"></password-input>
