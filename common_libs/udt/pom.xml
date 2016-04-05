@@ -19,8 +19,6 @@
         <template>lib</template>
         <qt.libs>core</qt.libs>
         <template>lib</template>
-        <release.version>${udt.version}</release.version>
-        <linux.release.version>${udt.version}</linux.release.version>
 
         <windows.oslibs>-lws2_32</windows.oslibs>
         <mac.oslibs>-lstdc++ -lpthread -lm</mac.oslibs>
