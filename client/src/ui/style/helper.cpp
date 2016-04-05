@@ -9,6 +9,7 @@ namespace style
     const int Metrics::kMenuItemVPadding = dp(5);
     const int Metrics::kMenuItemTextLeftPadding = dp(28);
     const int Metrics::kArrowSize = dp(8);
+    const int Metrics::kCrossSize = dp(8);
     const int Metrics::kCheckIndicatorSize = dp(16);
     const int Metrics::kExclusiveIndicatorSize = dp(16);
     const int Metrics::kMenuCheckSize = dp(16);

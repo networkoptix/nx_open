@@ -413,6 +413,16 @@ QSize QnGeometry::eroded(const QSize &size, const QMargins &amount) {
     return size - sizeDelta(amount);
 }
 
+QSize QnGeometry::eroded(const QSize& size, int amount)
+{
+    return QSize(size.width() - amount, size.height() - amount);
+}
+
+QSize QnGeometry::eroded(const QSizeF& size, qreal amount)
+{
+    return QSize(size.width() - amount, size.height() - amount);
+}
+
 bool QnGeometry::contains(const QSizeF &size, const QSizeF &otherSize) {
     return size.width() >= otherSize.width() && size.height() >= otherSize.height();
 }

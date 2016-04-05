@@ -268,3 +268,19 @@ void QnNxStylePrivate::drawSortIndicator(QPainter *painter, const QStyleOption *
         y += ystep;
     }
 }
+
+void QnNxStylePrivate::drawCross(
+        QPainter* painter,
+        const QRect& rect,
+        const QColor& color) const
+{
+    const QSizeF crossSize(Metrics::kCrossSize, Metrics::kCrossSize);
+    QRectF crossRect = aligned(crossSize, rect);
+
+    QPen pen(color, 1.5, Qt::SolidLine, Qt::FlatCap);
+    QnScopedPainterPenRollback penRollback(painter, pen);
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+    painter->drawLine(crossRect.topLeft(), crossRect.bottomRight());
+    painter->drawLine(crossRect.topRight(), crossRect.bottomLeft());
+}

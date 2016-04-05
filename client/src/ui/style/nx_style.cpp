@@ -391,6 +391,16 @@ void QnNxStyle::drawPrimitive(
         d->drawSortIndicator(painter, option, widget);
         return;
 
+    case PE_IndicatorTabClose:
+        {
+            bool selected = option->state.testFlag(QStyle::State_Selected);
+            QColor color = option->palette.color(
+                    selected ? QPalette::Text : QPalette::Light);
+
+            d->drawCross(painter, option->rect, color);
+            return;
+        }
+
     case PE_FrameMenu:
         return;
 
@@ -1789,6 +1799,10 @@ int QnNxStyle::pixelMetric(
         return dp(20);
 
     case PM_ToolBarIconSize:
+        return dp(18);
+
+    case PM_TabCloseIndicatorWidth:
+    case PM_TabCloseIndicatorHeight:
         return dp(18);
 
     default:
