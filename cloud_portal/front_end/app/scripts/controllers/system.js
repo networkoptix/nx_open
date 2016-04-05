@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemCtrl', function ($scope, cloudApi, $routeParams, $location, nativeClient, dialogs, process, account) {
+    .controller('SystemCtrl', function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account) {
 
 
         $scope.Config = Config;
@@ -78,7 +78,7 @@ angular.module('cloudApp')
 
 
         $scope.open = function(){
-            nativeClient.open(systemId);
+            urlProtocol.open(systemId);
         };
 
         function reloadSystems(){
