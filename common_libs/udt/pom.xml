@@ -8,8 +8,7 @@
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <!-- This component has its own version! Don't change to Nx version. -->
-    <version>4.11.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>udt</artifactId>
     <packaging>pom</packaging>
@@ -20,6 +19,8 @@
         <template>lib</template>
         <qt.libs>core</qt.libs>
         <template>lib</template>
+        <release.version>${udt.version}</release.version>
+        <linux.release.version>${udt.version}</linux.release.version>
 
         <windows.oslibs>-lws2_32</windows.oslibs>
         <mac.oslibs>-lstdc++ -lpthread -lm</mac.oslibs>
