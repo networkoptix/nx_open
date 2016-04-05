@@ -1,4 +1,4 @@
-<ng-include src="'views/static/register-intro.html'"></ng-include>
+<ng-include ng-if="!register.success && !registerSuccess && fromClient" src="'views/static/register-intro.html'"></ng-include>
 <div class="auth-hidden">
     <p ng-if="register.success || registerSuccess">
         Your account was successfully registered. Please, check your email to confirm it

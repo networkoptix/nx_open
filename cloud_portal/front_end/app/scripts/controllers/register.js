@@ -5,9 +5,11 @@ angular.module('cloudApp')
         // Preload content into cache
         $http.get('views/static/register-intro.html', {cache: $templateCache});
     })
-    .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, dialogs) {
+    .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, urlProtocol) {
 
         account.logoutAuthorised();
+
+        $scope.fromClient = urlProtocol.source.isApp;
 
         $scope.Config = Config;
         $scope.session = $localStorage;

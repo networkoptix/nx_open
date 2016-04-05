@@ -35,7 +35,7 @@ angular.module('cloudApp')
                 settings.successMessage
                  */
                 var errorCodes = null;
-                var errorPrefix = null;
+                var errorPrefix = '';
                 var holdAlerts = false;
                 var successMessage = null;
                 if(settings){

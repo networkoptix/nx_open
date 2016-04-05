@@ -1,7 +1,18 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('urlProtocol', ['$base64','$localStorage',function ($base64,$localStorage) {
+    .factory('urlProtocol', ['$base64','$localStorage','$location',function ($base64,$localStorage,$location) {
+
+        function parseSource() {
+            var search = $location.search();
+            var source = {
+                from: search.from || 'portal',
+                context: search.context || 'none'
+            };
+            source.isApp = (source.from === 'client' || source.from === 'mobile' );
+            return source;
+        }
+
         return {
             open:function(systemId){
 
@@ -21,6 +32,8 @@ angular.module('cloudApp')
                 var url = protocol + system + '?' + $.param(params);
                 window.location.href = url;
                 //window.open(url);
-            }
+            },
+            getSource: parseSource,
+            source:parseSource()
         }
     }]);
