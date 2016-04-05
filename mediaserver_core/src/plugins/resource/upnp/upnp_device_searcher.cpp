@@ -283,18 +283,66 @@ void UPNPDeviceSearcher::dispatchDiscoverPackets()
 
         QByteArray data;
 
-        data.append("M-SEARCH * HTTP/1.1\r\n");
-        //data.append("Host: 192.168.0.150:1900\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(QnAppInfo::organizationName()));
-        data.append("Man:\"ssdp:discover\"\r\n");
-        data.append("MX:3\r\n\r\n");
+        data.append(lit("M-SEARCH * HTTP/1.1\r\n"));
+        data.append(lit("HOST: "))
+            .append(groupAddress.toString())
+            .append(lit(":"))
+            .append(QString::number(GROUP_PORT))
+            .append(lit("\r\n"));
+        data.append(lit("MAN: \"ssdp:discover\"\r\n"));
+        data.append(lit("MX: 3\r\n"));
+        data.append(lit("ST: ssdp:all\r\n\r\n"));
+
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
     }
 }
 
+bool UPNPDeviceSearcher::isInterfaceListChanged() const
+{
+    auto ifaces = getAllIPv4Interfaces().toSet();
+    bool changed = false;
+
+    if( changed = ifaces != m_interfacesCache)
+        m_interfacesCache = ifaces;
+
+    return changed;
+}
+
+void UPNPDeviceSearcher::updateReceiveSocket()
+{
+    using namespace std::placeholders;
+
+    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
+
+    if(m_receiveSocket)
+        m_receiveSocket->cancelAsyncIO(aio::etNone);
+
+    auto udpSock = make_shared<UDPSocket>();
+    udpSock->setReuseAddrFlag(true);
+    udpSock->setRecvBufferSize(MAX_UPNP_RESPONSE_PACKET_SIZE);
+    udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
+    for(const auto iface: getAllIPv4Interfaces())
+        udpSock->joinGroup( groupAddress.toString(), iface.address.toString() );
+    udpSock->readSomeAsync(
+        &m_receiveBuffer,
+        std::bind(
+            &UPNPDeviceSearcher::onSomeBytesRead,
+            this,
+            udpSock.get(), _1, &m_receiveBuffer, _2 ) );
+
+    m_receiveSocket = udpSock;
+}
+
 std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const QnInterfaceAndAddr& iface )
 {
+    using namespace std::placeholders;
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        if(isInterfaceListChanged())
+            updateReceiveSocket();
+    }
+
     const QString& localAddress = iface.address.toString();
 
     pair<map<QString, SocketReadCtx>::iterator, bool> p;
@@ -308,16 +356,18 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
     //creating new socket
     std::shared_ptr<UDPSocket> sock( new UDPSocket() );
 
-    using namespace std::placeholders;
-
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
     if( !sock->setReuseAddrFlag( true ) ||
-        !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
-        !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
+        !sock->bind( SocketAddress( localAddress ) ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !sock->readSomeAsync( &p.first->second.buf, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
+        !sock->readSomeAsync(
+            &p.first->second.buf,
+            std::bind(
+                &UPNPDeviceSearcher::onSomeBytesRead,
+                this,
+                sock.get(), _1, &p.first->second.buf, _2 ) ))
     {
         QnMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );
