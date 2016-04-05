@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('nativeClient', ['$base64','$localStorage',function ($base64,$localStorage) {
+    .factory('urlProtocol', ['$base64','$localStorage',function ($base64,$localStorage) {
         return {
             open:function(systemId){
 
