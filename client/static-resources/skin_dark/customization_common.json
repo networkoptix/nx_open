@@ -179,6 +179,14 @@
             "window": "dark4"
         }}
     },
+
+    "QnMainWindowTitleBarWidget": {
+        "palette": {
+            "default": {
+                "window": "dark7"
+            }
+        }
+    },
     
     "QnNavigationItem": {
         "palette": { "default": { 

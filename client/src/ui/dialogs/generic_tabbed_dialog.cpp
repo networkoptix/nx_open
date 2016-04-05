@@ -4,7 +4,7 @@
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -16,7 +16,7 @@ namespace {
     const int invalidPage = -1;
 }
 
-QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */, Qt::WindowFlags windowFlags /* = 0 */) 
+QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */, Qt::WindowFlags windowFlags /* = 0 */)
     : base_type(parent, windowFlags)
     , m_pages()
     , m_tabWidget(nullptr)
@@ -101,7 +101,7 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
         initializeTabWidget();
 
     NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
-    if (!m_tabWidget) 
+    if (!m_tabWidget)
         return;
 
     for(const Page &page: m_pages) {
@@ -126,7 +126,7 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
 void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled) {
     NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
 
-    if (!m_tabWidget) 
+    if (!m_tabWidget)
         return;
 
     for(const Page &page: m_pages) {

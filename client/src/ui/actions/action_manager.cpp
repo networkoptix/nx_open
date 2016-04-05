@@ -287,12 +287,6 @@ public:
         return *this;
     }
 
-    QnActionBuilder rotationSpeed(qreal rotationSpeed) {
-        m_action->setProperty(Qn::ToolButtonCheckedRotationSpeed, rotationSpeed);
-
-        return *this;
-    }
-
 private:
     QnAction *m_action;
 };
@@ -805,8 +799,7 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
             autoRepeat(false).
-            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png")).
-            rotationSpeed(180.0);
+            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png"));
 
         factory().
             flags(Qn::Main).

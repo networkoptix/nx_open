@@ -65,7 +65,7 @@
   <customwidget>
    <class>QnTableView</class>
    <extends>QTableView</extends>
-   <header>ui/widgets/table_view.h</header>
+   <header>ui/widgets/common/table_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

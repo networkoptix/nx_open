@@ -26,6 +26,12 @@ ComboBox
 
     opacity: (enabled ? 1.0 : 0.3);
 
+    onActiveFocusChanged:
+    {
+        if (activeFocus)
+            textInputItem.forceActiveFocus();
+    }
+
     Binding
     {
         target: thisComponent;
@@ -89,6 +95,9 @@ ComboBox
             font: Style.textEdit.font;
             color: Style.textEdit.color;
             verticalAlignment: Text.AlignVCenter;
+
+            KeyNavigation.tab: thisComponent.KeyNavigation.tab;
+            KeyNavigation.backtab: thisComponent.KeyNavigation.backtab;
         }
 
         NxLabel

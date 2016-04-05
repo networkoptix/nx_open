@@ -165,7 +165,6 @@ void QnNxStyle::drawPrimitive(
     case PE_FrameFocusRect:
         return;
 
-    case PE_PanelButtonTool:
     case PE_PanelButtonCommand:
         {
             const bool pressed = option->state.testFlag(State_Sunken);
@@ -204,6 +203,29 @@ void QnNxStyle::drawPrimitive(
             painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
             painter->setBrush(buttonColor);
             painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
+        }
+        return;
+    case PE_PanelButtonTool:
+        {
+            const bool pressed = option->state.testFlag(State_Sunken);
+            const bool hovered = option->state.testFlag(State_MouseOver) ||
+                                 option->state.testFlag(State_HasFocus);
+
+            QnPaletteColor mainColor = findColor(option->palette.window().color());
+
+            if (option->state.testFlag(State_Enabled))
+            {
+                if (widget && widget->property(Properties::kAccentStyleProperty).toBool())
+                    mainColor = this->mainColor(Colors::kBlue);
+            }
+
+            QColor buttonColor = mainColor;
+            if (pressed)
+                buttonColor = mainColor.darker(1);
+            else if (hovered)
+                buttonColor = mainColor.lighter(1);
+
+            painter->fillRect(option->rect, buttonColor);
         }
         return;
 
@@ -817,35 +839,47 @@ void QnNxStyle::drawControl(
                 return;
 
             case QFrame::HLine:
+            case QFrame::VLine:
                 {
-                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark)).darker(1);
+                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Shadow));
 
-                    QColor topColor = mainColor.darker(2);
-                    QColor bottomColor;
+                    QColor firstColor = mainColor;
+                    QColor secondColor;
 
                     if (frame->state.testFlag(State_Sunken))
                     {
-                        bottomColor = mainColor;
+                        secondColor = mainColor.lighter(4);
                     }
                     else if (frame->state.testFlag(State_Raised))
                     {
-                        bottomColor = topColor;
-                        topColor = mainColor;
+                        secondColor = firstColor;
+                        firstColor = mainColor.lighter(4);
                     }
 
-                    painter->save();
+                    QRect rect = frame->rect;
 
-                    painter->setPen(topColor);
-                    painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
-
-                    if (bottomColor.isValid())
+                    if (frame->frameShape == QFrame::HLine)
                     {
-                        painter->setPen(bottomColor);
-                        painter->drawLine(frame->rect.left(), frame->rect.top() + 1,
-                                          frame->rect.right(), frame->rect.top() + 1);
-                    }
+                        rect.setHeight(frame->lineWidth);
+                        painter->fillRect(rect, firstColor);
 
-                    painter->restore();
+                        if (secondColor.isValid())
+                        {
+                            rect.moveTop(rect.top() + rect.height());
+                            painter->fillRect(rect, secondColor);
+                        }
+                    }
+                    else
+                    {
+                        rect.setWidth(frame->lineWidth);
+                        painter->fillRect(rect, firstColor);
+
+                        if (secondColor.isValid())
+                        {
+                            rect.moveLeft(rect.left() + rect.width());
+                            painter->fillRect(rect, secondColor);
+                        }
+                    }
                 }
                 return;
 
@@ -1942,18 +1976,24 @@ void QnNxStyle::polish(QWidget *widget)
     if (qobject_cast<QPushButton*>(widget) ||
         qobject_cast<QToolButton*>(widget))
     {
-        QFont font = widget->font();
-        font.setWeight(QFont::DemiBold);
-        widget->setFont(font);
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setWeight(QFont::DemiBold);
+            widget->setFont(font);
+        }
         widget->setAttribute(Qt::WA_Hover);
     }
 
     if (qobject_cast<QHeaderView*>(widget))
     {
-        QFont font = widget->font();
-        font.setWeight(QFont::DemiBold);
-        font.setPixelSize(dp(14));
-        widget->setFont(font);
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setWeight(QFont::DemiBold);
+            font.setPixelSize(dp(14));
+            widget->setFont(font);
+        }
         widget->setAttribute(Qt::WA_Hover);
     }
 
@@ -1986,10 +2026,13 @@ void QnNxStyle::polish(QWidget *widget)
 
 void QnNxStyle::unpolish(QWidget *widget)
 {
-    if (qobject_cast<QAbstractButton*>(widget)
-        || qobject_cast<QTabBar*>(widget))
+    if (qobject_cast<QAbstractButton*>(widget) ||
+        qobject_cast<QHeaderView*>(widget))
     {
-        widget->setFont(qApp->font());
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            widget->setFont(qApp->font());
+        }
     }
 
     base_type::unpolish(widget);

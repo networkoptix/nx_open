@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UserAccessRightsWidget</class>
+ <widget class="QWidget" name="UserAccessRightsWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="accessRightsGroupBox">
+     <property name="title">
+      <string>Access Rights</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="tabShape">
+         <enum>QTabWidget::Triangular</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QnUserAccessRightsResourcesWidget" name="camerasTab">
+         <attribute name="title">
+          <string>Cameras</string>
+         </attribute>
+        </widget>
+        <widget class="QnUserAccessRightsResourcesWidget" name="layoutsTab">
+         <attribute name="title">
+          <string>Layouts</string>
+         </attribute>
+        </widget>
+        <widget class="QnUserAccessRightsResourcesWidget" name="serversTab">
+         <attribute name="title">
+          <string>Servers</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="permissionsTab">
+         <attribute name="title">
+          <string>Permissions</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnUserAccessRightsResourcesWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/user_access_rights_resources_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

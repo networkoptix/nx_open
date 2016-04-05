@@ -42,8 +42,6 @@ public:
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
-    bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
-    bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
 
@@ -74,12 +72,6 @@ private:
  * default opacity if its items' background.
  */
 #define ItemViewItemBackgroundOpacity   _id("_qn_itemViewItemBackgroundOpacity")
-
-/**
- * Name of a property to set on a <tt>QToolButton</tt> to make it rotate
- * when checked. Value defines rotation speed in degrees per second.
- */
-#define ToolButtonCheckedRotationSpeed  _id("_qn_toolButtonCheckedRotationSpeed")
 
 /**
  * Name of a property to set on a <tt>QTreeView</tt> to make it hide
