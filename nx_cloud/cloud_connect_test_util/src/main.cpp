@@ -223,16 +223,16 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 
 //--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
 //AK server:
-//--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
+//--http-client --url=http://admin:admin@47bf37a0-72a6-2890-b967-5da9c390d28a.c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
 //LA server:
-//--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
-//--http-client --url=http://admin:admin@ec0fc8ba-9dd1-417f-aa88-f36400953ade/api/gettime
-//--connect --target=server1.ec0fc8ba-9dd1-417f-aa88-f36400953ade --max-concurrent-connections=10
-//--listen --server-id=server1 --cloud-credentials=ec0fc8ba-9dd1-417f-aa88-f36400953ade:1cc88e0d-1c08-4051-ae01-dfe3f5b5b90a
+//--http-client --url=http://admin:admin@1af3ebeb-c327-3665-40f1-fa4dba0df78f.c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
+//--http-client --url=http://admin:admin@c2cd3804-c66c-4ba4-900e-c27fd4d9180d/api/gettime
+//--connect --target=server1.c2cd3804-c66c-4ba4-900e-c27fd4d9180d --max-concurrent-connections=10
+//--listen --server-id=server1 --cloud-credentials=c2cd3804-c66c-4ba4-900e-c27fd4d9180d:02e780b8-2dc3-4389-9af3-8170de591835
 
 /** AK old PC mediator test:
 
---enforce-mediator=10.0.2.41:3345 --listen --echo --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:32cfaaf7-19fe-4bb2-a06d-4b6bac489757 --server-id=xxx
+--enforce-mediator=10.0.2.41:3345 --listen --echo --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:02e780b8-2dc3-4389-9af3-8170de591835 --server-id=xxx
 --enforce-mediator=10.0.2.41:3345 --connect --echo --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0 --bytes-to-recieve=1m --total-connections=5 --max-concurrent-connections=5
 
 
