@@ -57,7 +57,7 @@ private:
     QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
     QnCustomizer *m_customizer;
-    QIcon m_branchClosed
+    QIcon m_branchClosed;
     QIcon m_branchOpen;
 };
 
