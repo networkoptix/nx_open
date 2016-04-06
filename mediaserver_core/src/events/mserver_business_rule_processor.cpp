@@ -82,6 +82,9 @@ namespace {
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
     static const int kEmailSendDelay = 1000 * 3;
+
+    static const QChar kOldEmailDelimiter(L';');
+    static const QChar kNewEmailDelimiter(L' ');
 };
 
 struct QnEmailAttachmentData {
@@ -375,15 +378,6 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 
     QStringList recipients = getRecipients(action);
 
-    QStringList additional = action->getParams().emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
-    for(const QString &email: additional) {
-        QString trimmed = email.trimmed();
-        if (trimmed.isEmpty())
-            continue;
-        if (QnEmailAddress::isValid(trimmed))
-            recipients << email;
-    }
-
     if( recipients.isEmpty() )
     {
         NX_LOG( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
@@ -449,14 +443,9 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 {
     //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
-
-    QStringList recipients = getRecipients(action);
-    /*
-     * This action instance is not used anymore but storing into the Events Log db.
-     * Therefore we are storing all used emails in order to not recalculate them in
-     * the event log processing methods. --rvasilenko
-     */
-    action->getParams().emailAddress = formatEmailList(recipients);
+    // Add user's email addresses to action emailAddress field and filter invalid addresses
+    updateRecipientsList(action);
+	QStringList recipients = getRecipients(action);
 
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
@@ -576,18 +565,6 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     return contextMap;
 }
 
-QString QnMServerBusinessRuleProcessor::formatEmailList(const QStringList &value) const
-{
-    QString result;
-    for (int i = 0; i < value.size(); ++i)
-    {
-        if (i > 0)
-            result.append(L' ');
-        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
-    }
-    return result;
-}
-
 QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
                                                                 const QnBusinessAggregationInfo& aggregationInfo,
                                                                 bool useIp)
@@ -705,12 +682,22 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 
 QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusinessActionPtr& action) const
 {
-    QStringList recipients;
+    QString email = action->getParams().emailAddress;
+    return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
+}
+
+void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
+{
+    QStringList unfiltered = getRecipients(action);
     for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
+        unfiltered << user->getEmail();
+
+    auto recipientsFilter = [](const QString& email)
     {
-        QString email = user->getEmail();
-        if (!email.isEmpty() && QnEmailAddress::isValid(email))
-            recipients << email;
-    }
-    return recipients;
+        QString trimmed = email.trimmed();
+        return !trimmed.isEmpty() && QnEmailAddress::isValid(trimmed);
+    };
+    QStringList recipients;
+    std::copy_if(unfiltered.cbegin(), unfiltered.cend(), std::back_inserter(recipients), recipientsFilter);
+    action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }
