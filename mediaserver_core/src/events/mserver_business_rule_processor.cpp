@@ -46,6 +46,7 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
+#include <business/business_event_connector.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -403,7 +404,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 
     executeDelayed([this, action, recipients, aggregatedResCount]() {
         QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
-    }, kEmailSendDelay);
+    }, kEmailSendDelay, qnBusinessRuleConnector->thread());
 
     /*
      * This action instance is not used anymore but storing into the Events Log db.
