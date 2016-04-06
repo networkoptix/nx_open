@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx_ec/data/api_fwd.h>
+#include <nx_ec/data/api_access_rights_data.h>
 
 #include <nx/utils/singleton.h>
 
