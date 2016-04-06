@@ -25,6 +25,7 @@ namespace style
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
     const char *Properties::kSliderLength = "_qn_sliderLength";
     const char *Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
+    const char *Properties::kTabShape = "_qn_tabShape";
 
     qreal dpr(qreal value)
     {
@@ -45,11 +46,6 @@ namespace style
     bool isDark(const QColor &color)
     {
         return color.toHsl().lightness() < 128;
-    }
-
-    bool isTabRounded(QTabBar::Shape shape)
-    {
-        return shape <= QTabBar::RoundedEast;
     }
 
 

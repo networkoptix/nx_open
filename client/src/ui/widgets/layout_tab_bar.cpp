@@ -30,6 +30,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/custom_style.h>
 
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
@@ -43,9 +44,9 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     setMovable(false);
     setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     setDrawBase(false);
-    setShape(QTabBar::RoundedNorth);
     setTabsClosable(true);
-    setMaximumHeight(32);
+    setElideMode(Qt::ElideRight);
+    setTabShape(this, style::TabShape::Rectangular);
 
     connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));

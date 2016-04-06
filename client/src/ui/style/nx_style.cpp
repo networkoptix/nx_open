@@ -102,6 +102,14 @@ namespace
 
         painter->restore();
     }
+
+    TabShape tabShape(const QWidget* widget)
+    {
+        if (!widget)
+            return TabShape::Default;
+
+        return static_cast<TabShape>(widget->property(Properties::kTabShape).toInt());
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -333,23 +341,21 @@ void QnNxStyle::drawPrimitive(
             QRect rect;
             bool drawBackground = true;
 
-            if (const QStyleOptionTabWidgetFrame *tabWidget =
-                    qstyleoption_cast<const QStyleOptionTabWidgetFrame *>(option))
+            if (const QTabWidget* tabWidget = qobject_cast<const QTabWidget*>(widget))
             {
-                rect = tabWidget->tabBarRect;
-                drawBackground = isTabRounded(tabWidget->shape);
+                rect = tabWidget->tabBar()->geometry();
+                drawBackground = (tabShape(tabWidget->tabBar()) == TabShape::Default);
             }
-            else if (const QStyleOptionTabBarBase *tabBar =
-                        qstyleoption_cast<const QStyleOptionTabBarBase *>(option))
+            else if (const QTabBar* tabBar = qobject_cast<const QTabBar*>(widget))
             {
-                rect = tabBar->tabBarRect;
-                drawBackground = isTabRounded(tabBar->shape);
+                rect = tabBar->rect();
+                drawBackground = (tabShape(tabBar) == TabShape::Default);
             }
 
             rect.setLeft(option->rect.left());
             rect.setRight(option->rect.right());
 
-            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(2);
+            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(2);
 
             QnScopedPainterPenRollback penRollback(painter);
 
@@ -394,8 +400,16 @@ void QnNxStyle::drawPrimitive(
     case PE_IndicatorTabClose:
         {
             bool selected = option->state.testFlag(QStyle::State_Selected);
+
             QColor color = option->palette.color(
                     selected ? QPalette::Text : QPalette::Light);
+
+            if (option->state.testFlag(State_MouseOver))
+            {
+                QnPaletteColor background = findColor(
+                        option->palette.color(selected ? QPalette::Midlight : QPalette::Dark)).lighter(1);
+                painter->fillRect(option->rect, background);
+            }
 
             d->drawCross(painter, option->rect, color);
             return;
@@ -926,24 +940,54 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab*>(option))
         {
-            if (!isTabRounded(tab->shape))
+            TabShape shape = tabShape(widget);
+
+            switch (shape)
+            {
+            case TabShape::Compact:
                 return;
 
-            if (!tab->state.testFlag(QStyle::State_Selected) &&
-                (tab->state.testFlag(QStyle::State_MouseOver) || tab->state.testFlag(State_HasFocus)))
-            {
-                painter->save();
+            case TabShape::Default:
+                if (!tab->state.testFlag(State_Selected) &&
+                    (tab->state.testFlag(State_MouseOver) || tab->state.testFlag(State_HasFocus)))
+                {
+                    QnPaletteColor mainColor = findColor(
+                            option->palette.window().color()).lighter(3);
 
-                QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(3);
+                    painter->fillRect(tab->rect.adjusted(0, 0, 0, -1), mainColor);
 
-                painter->fillRect(tab->rect.adjusted(0, 0, 0, -1), mainColor);
+                    QnScopedPainterPenRollback penRollback(
+                            painter, QPen(mainColor.lighter(2)));
+                    painter->drawLine(tab->rect.topLeft(), tab->rect.topRight());
+                }
+                return;
 
-                painter->setPen(mainColor.lighter(2));
-                painter->drawLine(tab->rect.topLeft(), tab->rect.topRight());
+            case TabShape::Rectangular:
+                {
+                    QnPaletteColor mainColor = findColor(
+                            option->palette.window().color()).lighter(1);
 
-                painter->restore();
+                    QColor color = mainColor;
+
+                    if (tab->state.testFlag(State_Selected))
+                    {
+                        color = option->palette.midlight().color();
+                    }
+                    else if (tab->state.testFlag(State_MouseOver) ||
+                             tab->state.testFlag(State_HasFocus))
+                    {
+                        color = mainColor.lighter(1);
+                    }
+
+                    painter->fillRect(tab->rect, color);
+
+                    QnScopedPainterPenRollback penRollback(
+                                painter, option->palette.shadow().color());
+                    painter->drawLine(tab->rect.topRight(),
+                                      tab->rect.bottomRight());
+                }
+                return;
             }
-            return;
         }
         break;
 
@@ -951,61 +995,75 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab*>(option))
         {
-            painter->save();
+            TabShape shape = tabShape(widget);
+            int textFlags = Qt::TextHideMnemonic;
 
-            QFont font = painter->font();
-            font.setPixelSize(font.pixelSize() - 1);
-            painter->setFont(font);
+            QColor color;
 
-            int textFlags = Qt::AlignCenter | Qt::TextHideMnemonic;
-            QnPaletteColor mainColor = findColor(tab->palette.color(QPalette::Light)).darker(2);
-            QColor color = mainColor;
+            QRect textRect = tab->rect;
 
-            QFontMetrics fm(painter->font());
-
-            QRect rect = fm.boundingRect(tab->rect, textFlags, tab->text);
-
-            switch (tab->shape)
+            if (shape == TabShape::Rectangular)
             {
-            case QTabBar::RoundedNorth:
-            case QTabBar::RoundedSouth:
-                rect.setTop(tab->rect.bottom() - 2);
-                rect.setBottom(tab->rect.bottom() - 1);
-                break;
+                textFlags |= Qt::AlignLeft | Qt::AlignVCenter;
 
-            case QTabBar::TriangularNorth:
-            case QTabBar::TriangularSouth:
-                rect.setTop(tab->rect.bottom());
-                rect.setBottom(tab->rect.bottom());
-                break;
+                if (tab->state.testFlag(QStyle::State_Selected))
+                    color = tab->palette.text().color();
+                else
+                    color = tab->palette.light().color();
 
-            default:
-                break;
+                int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget);
+                textRect.adjust(hspace, 0, -hspace, 0);
             }
+            else
+            {
+                textFlags |= Qt::AlignCenter;
 
-            if (tab->state & QStyle::State_Selected)
-            {
-                color = tab->palette.color(QPalette::Highlight);
-                painter->fillRect(rect, color);
-            }
-            else if (tab->state.testFlag(State_MouseOver) || tab->state.testFlag(State_HasFocus))
-            {
-                if (isTabRounded(tab->shape))
+                QnPaletteColor mainColor = findColor(tab->palette.light().color()).darker(2);
+                color = mainColor;
+
+                QFontMetrics fm(painter->font());
+                QRect rect = fm.boundingRect(textRect, textFlags, tab->text);
+
+                if (shape == TabShape::Compact)
                 {
-                    color = mainColor.lighter(1);
+                    rect.setBottom(textRect.bottom());
+                    rect.setTop(rect.bottom());
                 }
                 else
                 {
-                    color = mainColor.lighter(2);
-                    painter->fillRect(rect, findColor(option->palette.color(QPalette::Window)).lighter(6));
+                    rect.setBottom(textRect.bottom() - 1);
+                    rect.setTop(rect.bottom() - 1);
+                }
+
+                if (tab->state.testFlag(QStyle::State_Selected))
+                {
+                    color = tab->palette.highlight().color();
+                    painter->fillRect(rect, color);
+                }
+                else if (tab->state.testFlag(State_MouseOver) ||
+                         tab->state.testFlag(State_HasFocus))
+                {
+                    if (shape == TabShape::Compact)
+                    {
+                        color = mainColor.lighter(2);
+                        painter->fillRect(rect, findColor(
+                                option->palette.window().color()).lighter(6));
+                    }
+                    else
+                    {
+                        color = mainColor.lighter(1);
+                    }
                 }
             }
 
-            painter->setPen(color);
-            drawItemText(painter, tab->rect, Qt::AlignCenter | Qt::TextHideMnemonic,
-                         tab->palette, tab->state & QStyle::State_Enabled, tab->text);
+            QnScopedPainterPenRollback penRollback(painter, color);
 
-            painter->restore();
+            drawItemText(painter,
+                         textRect,
+                         textFlags,
+                         tab->palette,
+                         tab->state.testFlag(QStyle::State_Enabled),
+                         tab->text);
         }
         return;
 
@@ -1649,25 +1707,39 @@ QRect QnNxStyle::subElementRect(
         break;
 
     case SE_TabWidgetTabBar:
-        if (const QTabWidget *tabWidget = qobject_cast<const QTabWidget *>(widget))
+        if (const QTabWidget* tabWidget = qobject_cast<const QTabWidget*>(widget))
         {
             int hspace = pixelMetric(PM_TabBarTabHSpace, option, widget) / 2;
 
             QRect rect = base_type::subElementRect(subElement, option, widget);
 
-            if (tabWidget->tabShape() == QTabWidget::Triangular)
-            {
+            if (tabShape(tabWidget->tabBar()) == TabShape::Compact)
                 rect.adjust(-hspace, 0, -hspace, 0);
-            }
             else
-            {
                 rect.adjust(hspace, 0, hspace, 0);
-            }
 
             if (rect.right() > option->rect.right())
                 rect.setRight(option->rect.right());
 
             return rect;
+        }
+        break;
+
+    case SE_TabBarTabLeftButton:
+        if (const QStyleOptionTab* tabBar = qstyleoption_cast<const QStyleOptionTab*>(option))
+        {
+            QSize size = tabBar->leftButtonSize;
+            size.setHeight(std::min(size.height(), tabBar->rect.height()));
+            return aligned(size, tabBar->rect, Qt::AlignLeft | Qt::AlignVCenter);
+        }
+        break;
+
+    case SE_TabBarTabRightButton:
+        if (const QStyleOptionTab* tabBar = qstyleoption_cast<const QStyleOptionTab*>(option))
+        {
+            QSize size = tabBar->rightButtonSize;
+            size.setHeight(std::min(size.height(), tabBar->rect.height()));
+            return aligned(size, tabBar->rect.adjusted(0, 0, -1, 0), Qt::AlignRight | Qt::AlignVCenter);
         }
         break;
 
@@ -1796,14 +1868,14 @@ int QnNxStyle::pixelMetric(
 
     case PM_TabBarTabHSpace:
     case PM_TabBarTabVSpace:
-        return dp(20);
+        return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
     case PM_ToolBarIconSize:
         return dp(18);
 
     case PM_TabCloseIndicatorWidth:
     case PM_TabCloseIndicatorHeight:
-        return dp(18);
+        return dp(24);
 
     default:
         break;
@@ -1861,35 +1933,23 @@ QSize QnNxStyle::sizeFromContents(
     }
 
     case CT_TabBarTab:
-        if (const QStyleOptionTab *tab =
-                qstyleoption_cast<const QStyleOptionTab *>(option))
+        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
         {
-            const int kRoundedSize = dp(36);
-            const int kTriangularSize = dp(32);
+            TabShape shape = tabShape(widget);
 
-            const QTabBar *tabBar = qobject_cast<const QTabBar*>(widget);
+            const int kRoundedSize = dp(36);
+            const int kCompactSize = dp(32);
 
             int width = size.width();
             int height = size.height();
 
-            width += tab->leftButtonSize.width() + tab->rightButtonSize.width();
+            if (shape != TabShape::Rectangular)
+                height = qMax(height, (shape == TabShape::Default) ? kRoundedSize : kCompactSize);
 
-            switch (tab->shape)
-            {
-            case QTabBar::RoundedNorth:
-            case QTabBar::RoundedSouth:
-            case QTabBar::TriangularNorth:
-            case QTabBar::TriangularSouth:
-                {
-                    height = qMax(height, isTabRounded(tab->shape) ? kRoundedSize : kTriangularSize);
-                    if (tabBar)
-                        height = qMin(height, widget->maximumHeight());
-                }
-                return QSize(width, height);
+            if (widget)
+                height = qMin(height, widget->maximumHeight());
 
-            default:
-                break;
-            }
+            return QSize(width, height);
         }
         break;
 
@@ -2017,10 +2077,22 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||
-        qobject_cast<QTabBar*>(widget) ||
         qobject_cast<QSlider*>(widget) ||
         qobject_cast<QScrollBar*>(widget))
     {
+        widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QTabBar*>(widget))
+    {
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setPixelSize(dp(12));
+            if (tabShape(widget) == TabShape::Rectangular)
+                font.setWeight(QFont::DemiBold);
+            widget->setFont(font);
+        }
         widget->setAttribute(Qt::WA_Hover);
     }
 
@@ -2041,12 +2113,11 @@ void QnNxStyle::polish(QWidget *widget)
 void QnNxStyle::unpolish(QWidget *widget)
 {
     if (qobject_cast<QAbstractButton*>(widget) ||
-        qobject_cast<QHeaderView*>(widget))
+        qobject_cast<QHeaderView*>(widget) ||
+        qobject_cast<QTabBar*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
-        {
             widget->setFont(qApp->font());
-        }
     }
 
     base_type::unpolish(widget);

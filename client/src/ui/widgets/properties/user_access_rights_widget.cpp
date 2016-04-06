@@ -1,12 +1,14 @@
 #include "user_access_rights_widget.h"
 #include "ui_user_access_rights_widget.h"
 
+#include <ui/style/custom_style.h>
 
 QnUserAccessRightsWidget::QnUserAccessRightsWidget(QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::UserAccessRightsWidget())
 {
     ui->setupUi(this);
+    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
     connect(ui->camerasTab, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 

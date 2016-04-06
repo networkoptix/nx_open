@@ -32,13 +32,13 @@ namespace style
         static const char *kAccentStyleProperty;
         static const char *kSliderLength; /**< Name of a property to change default width of the slider handle. */
         static const char *kDontPolishFontProperty;
+        static const char *kTabShape;
     };
 
     qreal dpr(qreal value);
     int dp(qreal value);
 
     bool isDark(const QColor &color);
-    bool isTabRounded(QTabBar::Shape shape);
 
     class RectCoordinates
     {
@@ -57,4 +57,13 @@ namespace style
         Left,
         Right
     };
+
+    enum class TabShape
+    {
+        Default,
+        Compact,
+        Rectangular
+    };
 }
+
+Q_DECLARE_METATYPE(style::TabShape)
