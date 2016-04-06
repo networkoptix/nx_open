@@ -373,18 +373,10 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 {
     Q_ASSERT( action );
 
-    QStringList log;
-    QStringList recipients;
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
-        QString email = user->getEmail();
-        log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
-        if (!email.isEmpty() && QnEmailAddress::isValid(email))
-            recipients << email;
-    }
+    QStringList recipients = getRecipients(action);
 
     QStringList additional = action->getParams().emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
     for(const QString &email: additional) {
-        log << email;
         QString trimmed = email.trimmed();
         if (trimmed.isEmpty())
             continue;
@@ -395,7 +387,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     if( recipients.isEmpty() )
     {
         NX_LOG( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
-        NX_LOG( lit("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
+        NX_LOG( lit("All recipients: ") + recipients.join(QLatin1String("; ")), cl_logWARNING );
         return false;
     }
 
@@ -406,12 +398,6 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
         QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
     }, kEmailSendDelay, qnBusinessRuleConnector->thread());
 
-    /*
-     * This action instance is not used anymore but storing into the Events Log db.
-     * Therefore we are storing all used emails in order to not recalculate them in
-     * the event log processing methods. --rvasilenko
-     */
-    action->getParams().emailAddress = formatEmailList(recipients);
     return true;
 }
 
@@ -463,18 +449,20 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 {
     //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
+
+    QStringList recipients = getRecipients(action);
+    /*
+     * This action instance is not used anymore but storing into the Events Log db.
+     * Therefore we are storing all used emails in order to not recalculate them in
+     * the event log processing methods. --rvasilenko
+     */
+    action->getParams().emailAddress = formatEmailList(recipients);
+
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
-    }
-
-    QStringList recipients;
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
-        QString email = user->getEmail();
-        if (!email.isEmpty() && QnEmailAddress::isValid(email))
-            recipients << email;
     }
 
     SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
@@ -713,4 +701,16 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         break;
     }
     return detailsMap;
+}
+
+QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusinessActionPtr& action) const
+{
+    QStringList recipients;
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
+    {
+        QString email = user->getEmail();
+        if (!email.isEmpty() && QnEmailAddress::isValid(email))
+            recipients << email;
+    }
+    return recipients;
 }

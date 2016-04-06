@@ -87,6 +87,7 @@ private:
     bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
     void sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount);
     QString formatEmailList(const QStringList& value) const;
+    QStringList getRecipients(const QnSendMailBusinessActionPtr& action) const;
 
     static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
 
