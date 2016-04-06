@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <nx/utils/thread/mutex.h>
-#include <QtXml/QXmlDefaultHandler>
 
 #include <api/global_settings.h>
 #include <common/common_globals.h>
@@ -22,60 +21,6 @@ static const int GROUP_PORT = 1900;
 static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512*1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5*60*1000;
 static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24*60*60*1000;
-
-//!Partial parser for SSDP descrition xml (UPnP(TM) Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionSaxHandler
-:
-    public QXmlDefaultHandler
-{
-    UpnpDeviceInfo m_deviceInfo;
-    QString m_currentElementName;
-
-public:
-    virtual bool startDocument()
-    {
-        return true;
-    }
-
-    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
-    {
-        m_currentElementName = qName;
-        return true;
-    }
-
-    virtual bool characters( const QString& ch )
-    {
-        if( m_currentElementName == QLatin1String("friendlyName") )
-            m_deviceInfo.friendlyName = ch;
-        else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_deviceInfo.manufacturer = ch;
-        else if( m_currentElementName == QLatin1String("modelName") )
-            m_deviceInfo.modelName = ch;
-        else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") ) {
-            if (ch.endsWith(lit("/")))
-                m_deviceInfo.presentationUrl = ch.left(ch.length()-1);
-            else
-                m_deviceInfo.presentationUrl = ch;
-        }
-
-        return true;
-    }
-
-    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
-    {
-        m_currentElementName.clear();
-        return true;
-    }
-
-    virtual bool endDocument()
-    {
-        return true;
-    }
-
-    const UpnpDeviceInfo& deviceInfo() const { return m_deviceInfo; }
-};
 
 
 ////////////////////////////////////////////////////////////
@@ -315,8 +260,8 @@ void UPNPDeviceSearcher::updateReceiveSocket()
 
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
 
-    if(m_receiveSocket)
-        m_receiveSocket->cancelAsyncIO(aio::etNone);
+    if (m_receiveSocket)
+        m_receiveSocket->cancelIOSync(nx::network::aio::etNone);
 
     auto udpSock = make_shared<UDPSocket>();
     udpSock->setReuseAddrFlag(true);
@@ -434,7 +379,7 @@ void UPNPDeviceSearcher::processDeviceXml(
     const QByteArray& foundDeviceDescription )
 {
     //parsing description xml
-    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    nx_upnp::DeviceDescriptionHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );

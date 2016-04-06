@@ -248,11 +248,11 @@ QString extractWord(int index, const QByteArray& rawData)
 }*/
 
 void QnPlISDResourceSearcher::processPacket(
-        const QHostAddress& discoveryAddr,
-        const HostAddress& host,
-        const UpnpDeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo,
-        QnResourceList& result )
+    const QHostAddress& /*discoveryAddr*/,
+    const SocketAddress& /*deviceEndpoint*/,
+    const nx_upnp::DeviceInfo& devInfo,
+    const QByteArray& /*xmlDevInfo*/,
+    QnResourceList& result )
 {
 
     QAuthenticator auth;
@@ -277,7 +277,7 @@ void QnPlISDResourceSearcher::processPacket(
 }
 
 void QnPlISDResourceSearcher::createResource(
-    const UpnpDeviceInfo& devInfo,
+    const nx_upnp::DeviceInfo& devInfo,
     const QnMacAddress& mac,
     const QAuthenticator& auth,
     QnResourceList& result )

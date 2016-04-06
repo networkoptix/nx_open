@@ -21,60 +21,6 @@
 //    QString presentationUrl;
 //};
 
-//!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionSaxHandler : public QXmlDefaultHandler
-{
-    nx_upnp::UpnpDeviceInfo m_deviceInfo;
-    QString m_currentElementName;
-public:
-    virtual bool startDocument()
-    {
-        return true;
-    }
-
-    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
-    {
-        m_currentElementName = qName;
-        return true;
-    }
-
-    virtual bool characters( const QString& ch )
-    {
-        if( m_currentElementName == QLatin1String("friendlyName") )
-            m_deviceInfo.friendlyName = ch;
-        else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_deviceInfo.manufacturer = ch;
-        else if( m_currentElementName == QLatin1String("modelName") )
-            m_deviceInfo.modelName = ch;
-        else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") )
-            m_deviceInfo.presentationUrl = ch;
-
-        return true;
-    }
-
-    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
-    {
-        m_currentElementName.clear();
-        return true;
-    }
-
-    virtual bool endDocument()
-    {
-        return true;
-    }
-
-    /*
-    QString friendlyName() const { return m_friendlyName; }
-    QString manufacturer() const { return m_manufacturer; }
-    QString modelName() const { return m_modelName; }
-    QString serialNumber() const { return m_serialNumber; }
-    QString presentationUrl() const { return m_presentationUrl; }
-    */
-    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
-};
-
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
@@ -99,10 +45,12 @@ protected:
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
         QnResourceList& result) = 0;
+
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const HostAddress& host);
     void processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
+
 protected:
     void readDeviceXml(
         const QByteArray& uuidStr,
@@ -114,6 +62,7 @@ protected:
         const HostAddress& host,
         const HostAddress& sender,
         QnResourceList& result );
+
 private:
     QMap<QString, AbstractDatagramSocket*> m_socketList;
     AbstractDatagramSocket* sockByName(const QnInterfaceAndAddr& iface);

@@ -49,7 +49,7 @@ QnResourceList QnActiResourceSearcher::findResources(void)
         if (shouldStop())
             break;
 
-        QString removeAddress = data[i].remoteAddress;
+        QString remoteAddress = data[i].remoteAddress;
         QByteArray uuidStr("ACTI");
         uuidStr += data[i].remoteAddress.toUtf8();
         QByteArray response = data[i].response;
@@ -59,12 +59,13 @@ QnResourceList QnActiResourceSearcher::findResources(void)
                 continue;
             if (response.contains("AXIS"))
                 continue;
-            QByteArray response = getDeviceXml(
+            QByteArray response =
+                getDeviceXml(
                     QString(QLatin1String("http://%1:%2/devicedesc.xml"))
-                        .arg(removeAddress)
+                        .arg(remoteAddress)
                         .arg(ACTI_DEVICEXML_PORT)); // async request
             //QByteArray response = getDeviceXml(QString(QLatin1String("http://%1:%2")).arg(removeAddress).arg(80)); // test request
-            processDeviceXml(response, removeAddress, removeAddress, result);
+            processDeviceXml(response, remoteAddress, remoteAddress, result);
             processedUuid << uuidStr;
         }
     }
@@ -103,7 +104,7 @@ void QnActiResourceSearcher::processDeviceXml(
     const HostAddress& sender,
     QnResourceList& result )
 {
-    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    nx_upnp::DeviceDescriptionHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );
@@ -113,7 +114,12 @@ void QnActiResourceSearcher::processDeviceXml(
     if( !xmlReader.parse( &input ) )
         return;
 
-    processPacket(QHostAddress(sender.toString()), host, xmlHandler.deviceInfo(), foundDeviceDescription, result);
+    processPacket(
+        QHostAddress(sender.toString()),
+        SocketAddress(host, 80),    //TODO which port?
+        xmlHandler.deviceInfo(),
+        foundDeviceDescription,
+        result);
 }
 
 void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply)
@@ -221,7 +227,7 @@ static QString serialNumberToPhysicalID( const QString& serialNumber )
 
 void QnActiResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const HostAddress& /*host*/,
+    const SocketAddress& /*deviceEndpoint*/,
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
     QnResourceList& result )
@@ -264,7 +270,7 @@ void QnActiResourceSearcher::processPacket(
         }
     }
 
-    createResource( realDevInfo, cameraMAC, auth, result );
+    createResource( realDevInfo, cameraMAC, cameraAuth, result );
 }
 
 void QnActiResourceSearcher::createResource(
@@ -316,9 +322,6 @@ void QnActiResourceSearcher::createResource(
 }
 
 bool QnActiResourceSearcher::isNxDevice(const nx_upnp::DeviceInfo& devInfo) const
-}
-
-bool QnActiResourceSearcher::isNxDevice(const UpnpDeviceInfo& devInfo) const
 {
     return devInfo.manufacturer.toLower().trimmed() == NX_VENDOR.toLower() ||
         devInfo.friendlyName.toLower().trimmed() == NX_VENDOR.toLower();

@@ -24,16 +24,16 @@ public:
 protected:
 
     virtual void processPacket(
-            const QHostAddress& discoveryAddr,
-            const HostAddress& host,
-            const UpnpDeviceInfo& devInfo,
-            const QByteArray& xmlDevInfo,
-            QnResourceList& result) override;
+        const QHostAddress& discoveryAddr,
+        const SocketAddress& deviceEndpoint,
+        const nx_upnp::DeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result) override;
 
 private:
 
     void createResource(
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QnMacAddress& mac,
         const QAuthenticator& auth,
         QnResourceList& result );

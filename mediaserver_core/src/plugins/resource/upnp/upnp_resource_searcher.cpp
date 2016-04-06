@@ -23,6 +23,62 @@ using nx::network::UDPSocket;
 
 // TODO: #mu try to replace with UpnpDeviceDescriptionHandler when upnp camera is avaliable
 
+//!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
+class UpnpResourceDescriptionSaxHandler: public QXmlDefaultHandler
+{
+    nx_upnp::DeviceInfo m_deviceInfo;
+    QString m_currentElementName;
+public:
+    virtual bool startDocument()
+    {
+        return true;
+    }
+
+    virtual bool startElement(const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/)
+    {
+        m_currentElementName = qName;
+        return true;
+    }
+
+    virtual bool characters(const QString& ch)
+    {
+        if (m_currentElementName == QLatin1String("friendlyName"))
+            m_deviceInfo.friendlyName = ch;
+        else if (m_currentElementName == QLatin1String("manufacturer"))
+            m_deviceInfo.manufacturer = ch;
+        else if (m_currentElementName == QLatin1String("modelName"))
+            m_deviceInfo.modelName = ch;
+        else if (m_currentElementName == QLatin1String("serialNumber"))
+            m_deviceInfo.serialNumber = ch;
+        else if (m_currentElementName == QLatin1String("presentationURL"))
+            m_deviceInfo.presentationUrl = ch;
+
+        return true;
+    }
+
+    virtual bool endElement(const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/)
+    {
+        m_currentElementName.clear();
+        return true;
+    }
+
+    virtual bool endDocument()
+    {
+        return true;
+    }
+
+    /*
+    QString friendlyName() const { return m_friendlyName; }
+    QString manufacturer() const { return m_manufacturer; }
+    QString modelName() const { return m_modelName; }
+    QString serialNumber() const { return m_serialNumber; }
+    QString presentationUrl() const { return m_presentationUrl; }
+    */
+    nx_upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
+};
+
+
+
 
 // ====================================================================
 QnUpnpResourceSearcher::QnUpnpResourceSearcher():
