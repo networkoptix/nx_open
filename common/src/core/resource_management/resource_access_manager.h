@@ -13,9 +13,13 @@ public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
     void reset(const ec2::ApiAccessRightsDataList& accessRights);
+    ec2::ApiAccessRightsDataList allAccessRights() const;
+
+    ec2::ApiAccessRightsData accessRights(const QnUuid& userId) const;
+    void setAccessRights(const ec2::ApiAccessRightsData& accessRights);
 
 private:
-
+    ec2::ApiAccessRightsDataList m_values;
 };
 
 #define qnResourceAccessManager QnResourceAccessManager::instance()

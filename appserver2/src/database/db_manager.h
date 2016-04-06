@@ -482,8 +482,7 @@ namespace ec2
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode addAccess(const QnUuid& userId, const QnUuid& resourceId);
-        ErrorCode removeAccess(const QnUuid& userId, const QnUuid& resourceId);
+        ErrorCode setAccessRights(const ApiAccessRightsData& data);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);

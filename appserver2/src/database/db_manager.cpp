@@ -2656,48 +2656,93 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::addAccess(const QnUuid& userId, const QnUuid& resourceId)
+ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
-    qint32 user_ptr_id = getResourceInternalId(userId);
-    qint32 resource_ptr_id = getResourceInternalId(resourceId);
-    if (user_ptr_id <= 0 || resource_ptr_id <= 0)
+    qint32 user_ptr_id = getResourceInternalId(data.userId);
+    if (user_ptr_id <= 0)
         return ErrorCode::dbError;
 
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare(R"(
-        INSERT OR REPLACE
-        INTO vms_access_rights
-        (user_ptr_id, resource_ptr_id)
-        VALUES (:user_ptr_id, :resource_ptr_id)
-    )");
-    query.bindValue(QLatin1String(":user_ptr_id"), user_ptr_id);
-    query.bindValue(QLatin1String(":resource_ptr_id"), resource_ptr_id);
-    if (!execSQLQuery(&query, Q_FUNC_INFO))
-        return ErrorCode::dbError;
+    /* Get list of resources, user already has access to. */
+    QSet<QnUuid> accessibleResources;
+    {
+        QString selectQueryString = R"(
+            SELECT resource.guid as resourceId
+            FROM vms_access_rights rights
+            JOIN vms_resource resource on resource.id = rights.resource_ptr_id
+            WHERE rights.user_ptr_id = :user_ptr_id
+        )";
+
+        QSqlQuery selectQuery(m_sdb);
+        selectQuery.setForwardOnly(true);
+        if (!prepareSQLQuery(&selectQuery, selectQueryString, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        selectQuery.bindValue(":user_ptr_id", user_ptr_id);
+        if (!execSQLQuery(&selectQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        while (selectQuery.next())
+            accessibleResources.insert(QnUuid::fromRfc4122(selectQuery.value(0).toByteArray()));
+
+    }
+
+    QSet<QnUuid> newAccessibleResources;
+    for (const QnUuid& id : data.resourceIds)
+        newAccessibleResources << id;
+
+    QSet<QnUuid> resourcesToAdd = newAccessibleResources - accessibleResources;
+    if (!resourcesToAdd.empty())
+    {
+        QString insertQueryString = R"(
+            INSERT INTO vms_access_rights
+            (user_ptr_id, resource_ptr_id)
+            VALUES
+        )";
+
+        QStringList values;
+        for (const QnUuid& resourceId : resourcesToAdd)
+        {
+            qint32 resource_ptr_id = getResourceInternalId(resourceId);
+            if (resource_ptr_id <= 0)
+                return ErrorCode::dbError;
+            values << QString("(%1, %2)").arg(user_ptr_id).arg(resource_ptr_id);
+        }
+        insertQueryString.append(values.join(L',')).append(L';');
+
+        QSqlQuery insertQuery(m_sdb);
+        insertQuery.setForwardOnly(true);
+        if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+        if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+    }
+
+    QSet<QnUuid> resourcesToRemove = accessibleResources - newAccessibleResources;
+    if (!resourcesToRemove.empty())
+    {
+        QSqlQuery removeQuery(m_sdb);
+        removeQuery.prepare(R"(
+            DELETE FROM vms_access_rights
+            WHERE user_ptr_id = :user_ptr_id
+            AND resource_ptr_id IN (:resources);
+        )");
+        removeQuery.bindValue(":user_ptr_id", user_ptr_id);
+
+        QStringList values;
+        for (const QnUuid& resourceId : resourcesToRemove)
+        {
+            qint32 resource_ptr_id = getResourceInternalId(resourceId);
+            if (resource_ptr_id <= 0)
+                return ErrorCode::dbError;
+            values << QString::number(resource_ptr_id);
+        }
+        removeQuery.bindValue(":resources", values.join(L','));
+        if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+    }
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::removeAccess(const QnUuid& userId, const QnUuid& resourceId)
-{
-    qint32 user_ptr_id = getResourceInternalId(userId);
-    qint32 resource_ptr_id = getResourceInternalId(resourceId);
-    if (user_ptr_id <= 0 || resource_ptr_id <= 0)
-        return ErrorCode::dbError;
-
-    QSqlQuery query(m_sdb);
-    query.prepare(R"(
-        DELETE
-        FROM vms_access_rights
-        WHERE user_ptr_id = :user_ptr_id
-        AND resource_ptr_id = :resource_ptr_id
-    )");
-    query.bindValue(QLatin1String(":user_ptr_id"), user_ptr_id);
-    query.bindValue(QLatin1String(":resource_ptr_id"), resource_ptr_id);
-    if (!execSQLQuery(&query, Q_FUNC_INFO))
-        return ErrorCode::dbError;
-    return ErrorCode::ok;
-}
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
@@ -2717,17 +2762,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
 {
-    switch (tran.command)
-    {
-    case ApiCommand::addAccess:
-        return addAccess(tran.params.userId, tran.params.resourceId);
-    case ApiCommand::removeAccess:
-        return removeAccess(tran.params.userId, tran.params.resourceId);
-    default:
-        break;
-    }
-    NX_ASSERT(false, Q_FUNC_INFO, "Unsupported transaction");
-    return ec2::ErrorCode::serverError;
+    NX_ASSERT(tran.command == ApiCommand::setAccessRights, Q_FUNC_INFO, "Unsupported transaction");
+    if (tran.command != ApiCommand::setAccessRights)
+        return ec2::ErrorCode::serverError;
+
+    return setAccessRights(tran.params);
 }
 
 ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
@@ -3525,7 +3564,24 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
-    QnSql::fetch_many(query, &accessRightsList);
+    ApiAccessRightsData current;
+    while (query.next())
+    {
+        QnUuid userId = QnUuid::fromRfc4122(query.value(0).toByteArray());
+        if (userId != current.userId)
+        {
+            if (!current.userId.isNull())
+                accessRightsList.push_back(current);
+
+            current.userId = userId;
+            current.resourceIds.clear();
+        }
+
+        QnUuid resourceId = QnUuid::fromRfc4122(query.value(1).toByteArray());
+        current.resourceIds.push_back(resourceId);
+    }
+    if (!current.userId.isNull())
+        accessRightsList.push_back(current);
 
     return ErrorCode::ok;
 }

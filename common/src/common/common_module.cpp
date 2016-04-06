@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
@@ -53,6 +54,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     instance<QnResourcePropertyDictionary>();
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
+    instance<QnResourceAccessManager>();
 
     instance<QnResourcePool>();
 

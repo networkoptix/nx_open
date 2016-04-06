@@ -676,7 +676,25 @@ namespace ec2
          */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
 
+        /**%apidoc GET /ec2/getAccessRights
+        * Return list of accessible resources ids for each user in the system.
+        * %param[default] format
+        * %return Return object in requested format
+        * %// AbstractUserManager::getAccessRights
+        */
         registerGetFuncHandler<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
+
+        /**%apidoc POST /ec2/setAccessRights
+        * <p>
+        * Parameters should be passed as a JSON object in POST message body with
+        * content type "application/json". Example of such object can be seen in
+        * the result of the corresponding GET function.
+        * </p>
+        * %param userId User unique id.
+        * %param resourceIds List of accessible resources ids.
+        * %// AbstractUserManager::setAccessRights
+        */
+        registerUpdateFuncHandler<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
 
         /**%apidoc POST /ec2/saveUser
          * <p>

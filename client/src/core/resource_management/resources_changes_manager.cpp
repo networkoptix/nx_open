@@ -6,6 +6,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -297,6 +298,10 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     ec2::ApiUserData backup;
     ec2::fromResourceToApi(user, backup);
 
+    QnUuid userId = user->getId();
+
+    ec2::ApiAccessRightsData accessRightsBackup = qnResourceAccessManager->accessRights(userId);
+
     applyChanges(user);
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -306,7 +311,8 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     ec2::ApiUserData apiUser;
     fromResourceToApi(user, apiUser);
 
-    connection->getUserManager()->save(apiUser, user->getPassword(), this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
+    connection->getUserManager()->save(apiUser, user->getPassword(), this,
+        [this, user, userId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
 
@@ -318,13 +324,30 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        QnUuid userId = user->getId();
         QnUserResourcePtr existingUser = qnResPool->getResourceById<QnUserResource>(userId);
         if (existingUser)
             ec2::fromApiToResource(backup, existingUser);
 
         emit saveChangesFailed(QnResourceList() << user);
     } );
+
+    connection->getUserManager()->setAccessRights(qnResourceAccessManager->accessRights(userId), this,
+        [this, user, sessionGuid, accessRightsBackup](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        qnResourceAccessManager->setAccessRights(accessRightsBackup);
+
+        emit saveChangesFailed(QnResourceList() << user);
+    });
 }
 
 /************************************************************************/

@@ -11,6 +11,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
@@ -77,6 +78,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
 
     //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
+
+    connect(ui->accessRightsWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]() { setHasChanges(); });
 
     setWarningStyle(ui->hintLabel);
 
@@ -241,6 +244,10 @@ void QnUserSettingsDialog::updateFromResource() {
     updateLogin();
     updatePassword();
 
+    ec2::ApiAccessRightsData accessRights = qnResourceAccessManager->accessRights(m_user->getId());
+    ui->accessRightsWidget->setAccessRights(accessRights);
+    ui->accessRightsWidget->loadDataToUi();
+
     setHasChanges(false);
 }
 
@@ -270,6 +277,11 @@ void QnUserSettingsDialog::submitToResource() {
 
     if (m_enabledModified)
         m_user->setEnabled(ui->enabledCheckBox->isChecked());
+
+    ui->accessRightsWidget->applyChanges();
+    ec2::ApiAccessRightsData userAccessRights = ui->accessRightsWidget->accessRights();
+    userAccessRights.userId = m_user->getId();
+    qnResourceAccessManager->setAccessRights(userAccessRights);
 
     setHasChanges(false);
 }
