@@ -683,6 +683,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusinessActionPtr& action) const
 {
     QString email = action->getParams().emailAddress;
+    if (email.isEmpty())
+        return QStringList();
     return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
 }
 
