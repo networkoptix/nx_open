@@ -6,6 +6,7 @@
 #ifndef NX_CDB_UT_TEST_SETUP_H
 #define NX_CDB_UT_TEST_SETUP_H
 
+#include <chrono>
 #include <future>
 #include <vector>
 
@@ -70,6 +71,10 @@ protected:
         const std::string& email,
         std::string* const confirmationCode);
 
+    api::ResultCode bindRandomNotActivatedSystem(
+        const std::string& email,
+        const std::string& password,
+        api::SystemData* const systemData);
     api::ResultCode bindRandomSystem(
         const std::string& email,
         const std::string& password,

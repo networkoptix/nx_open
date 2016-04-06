@@ -216,16 +216,16 @@ TEST_F(CdbFunctionalTest, system_activation)
         api::SystemData system1;
         ASSERT_EQ(
             api::ResultCode::ok,
-            bindRandomSystem(account1.email, account1Password, &system1));
+            bindRandomNotActivatedSystem(account1.email, account1Password, &system1));
 
         //checking account1 system list
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
-            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-            ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
+            ASSERT_EQ(systems.size(), 0);   //only activated systems are provided
+            //ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+            //ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            //ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
         }
 
         if (i == 0)

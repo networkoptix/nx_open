@@ -201,8 +201,11 @@ int CloudDBProcess::executeApplication()
         if (m_terminated)
             return 0;
 
-        NX_LOG( lit( "%1 has been started" ).arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS );
-        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().data() <<" has been started" << std::endl;
+        NX_LOG(lit("%1 has been started")
+                .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
+               cl_logALWAYS);
+        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().toStdString()
+            << " has been started" << std::endl;
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();

@@ -150,6 +150,9 @@ void SystemManager::getSystems(
     data::DataFilter filter,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
 {
+    //always providing only activated systems
+    filter.rc().put(attr::systemStatus, api::SystemStatus::ssActivated);
+
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
@@ -174,7 +177,7 @@ void SystemManager::getSystems(
         for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
         {
             auto system = m_cache.find(it->systemID);
-            if (system)
+            if (static_cast<bool>(system) && applyFilter(system.get(), filter))
                 resultData.systems.push_back(system.get());
         }
     }
@@ -190,6 +193,7 @@ void SystemManager::getSystems(
 
     if (accountEmail)
     {
+        //returning rights account has for each system
         for (auto& systemDataEx: resultData.systems)
         {
             const auto accountData = 
@@ -477,6 +481,10 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
     QSqlDatabase* const connection,
     const data::SystemID& systemID)
 {
+    //TODO #ak marking system as "deleted"
+    //TODO #ak adding persistent timer to permanently remove system
+
+
     QSqlQuery removeSystemToAccountBinding(*connection);
     removeSystemToAccountBinding.prepare(
         "DELETE FROM system_to_account WHERE system_id=:systemID");
