@@ -27,7 +27,7 @@ TEST_F(CdbFunctionalTest, client_cancellation)
         api::ResultCode::ok,
         bindRandomSystem(account1.email, account1Password, &system0));
 
-    for (std::atomic<int> seq = 0; seq < 100; ++seq)
+    for (std::atomic<int> seq(0); seq < 100; ++seq)
     {
         auto connection = connectionFactory()->createConnection(
             system0.id, system0.authKey);
