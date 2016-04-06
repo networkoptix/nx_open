@@ -6,12 +6,12 @@ describe('Systems list suite', function () {
 
     beforeAll(function() {
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
-        console.log("Systems start");
+        console.log("\nSystems start\n");
     });
 
     afterAll(function() {
         p.helper.logout();
-        console.log("Systems finish");
+        console.log("\nSystems finish\n");
     });
 
     it("should show list of Systems", function () {
@@ -76,8 +76,7 @@ describe('Systems list suite', function () {
                 p.systemsList.get(i).click();
                 // TODO: Write appropriate checks that system page is opened
                 expect(browser.getCurrentUrl()).toContain('#/systems/');
-                browser.navigate().back();
-                browser.waitForAngular();
+                p.helper.navigateBack();
             }
         });
     });
