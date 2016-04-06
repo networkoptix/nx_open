@@ -15,7 +15,7 @@ angular.module('webadminApp')
         };
 
 
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             $scope.systems.systemName =  r.data.reply.systemName;
 
             /*$scope.systems.discoveredUrls = _.filter($scope.systems.discoveredUrls, function(module){

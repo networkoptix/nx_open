@@ -24,7 +24,7 @@ angular.module('webadminApp')
 
         ipCookie('Authorization','Digest', { path: '/' });
 
-        function getSettings(){
+        function getModuleInformation(){
             return $http.get(proxy + '/api/moduleInformation?showAddresses=true');
         }
 
@@ -57,7 +57,7 @@ angular.module('webadminApp')
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
-                getSettings(true).catch(function (/*error*/) {
+                getModuleInformation(true).catch(function (/*error*/) {
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',
@@ -240,15 +240,15 @@ angular.module('webadminApp')
             execute:function(script,mode){
                 return $http.post('/api/execute/' + script + '?' + (mode||''));
             },
-            getSettings: function(url) {
+            getModuleInformation: function(url) {
                 url = url || proxy;
                 if(url === true){//force reload cache
                     cacheModuleInfo = null;
-                    return getSettings();
+                    return getModuleInformation();
                 }
                 if(url===''){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
                     if(cacheModuleInfo === null){
-                        cacheModuleInfo = wrapRequest(getSettings());
+                        cacheModuleInfo = wrapRequest(getModuleInformation());
                     }
                     // on error - clear object to reload next time
                     return cacheModuleInfo;

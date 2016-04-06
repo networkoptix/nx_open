@@ -8,7 +8,7 @@ angular.module('webadminApp')
         $scope.logUrl = mediaserver.logUrl();
 
 
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
         });
 
