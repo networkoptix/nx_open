@@ -6,11 +6,16 @@ var SystemsListPage = function () {
 
     this.url = '/#/systems';
 
-    this.htmlBody = element(by.css('body'));
+    this.activeMenuItem = element(by.css('.navbar-nav')).element(by.css('.active'));
     this.systemsList = element.all(by.repeater('system in systems'));
-    this.openInNxButton = element(by.buttonText('Open in Nx Witness'));
-    this.notActivatedLabel = element(by.cssContainingText('.label-danger', 'not activated'));
 
+    //These functions allows to find desired child in provided element
+    this.openInNxButton = function(ancestor) {
+        return ancestor.element(by.buttonText('Open in Nx Witness'));
+    };
+    this.systemOwner = function(ancestor) {
+        return ancestor.element(by.css('.system-owner'));
+    };
 };
 
 module.exports = SystemsListPage;

@@ -123,6 +123,19 @@ var Helper = function () {
         return userEmail;
     };
 
+    this.changeAccountNames = function(firstName, lastName) {
+        var firstNameInput = element(by.model('account.first_name'));
+        var lastNameInput = element(by.model('account.last_name'));
+        var saveButton = element(by.css('[form=accountForm]')).element(by.buttonText('Save'));
+
+        this.get('/#/account');
+        firstNameInput.clear().sendKeys(firstName);
+        lastNameInput.clear().sendKeys(lastName);
+        saveButton.click();
+
+        this.alert.catchAlert( this.alert.alertMessages.accountSuccess, this.alert.alertTypes.success);
+    };
+
     this.emailSubjects = {
         register: "Confirm your account",
         restorePass: "Restore your password"};
@@ -157,6 +170,10 @@ var Helper = function () {
         this.restorePassObj.getRestorePassPage(userEmail).then(function() {
             self.restorePassObj.setNewPassword(newPassword);
         });
+    };
+
+    this.isSubstr = function(string, substring) {
+        if (string.indexOf(substring) > -1) return true;
     }
 };
 

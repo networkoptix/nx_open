@@ -5,7 +5,6 @@ describe('Systems list suite', function () {
     var p = new SystemsListPage();
 
     beforeAll(function() {
-        p.helper.get('/');
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
         console.log("Systems start");
     });
@@ -15,50 +14,88 @@ describe('Systems list suite', function () {
         console.log("Systems finish");
     });
 
-    beforeEach(function() {
-        //p.helper.get(p.url);
-    });
-
     it("should show list of Systems", function () {
         expect(browser.getCurrentUrl()).toContain('systems');
-        expect(p.htmlBody.getText()).toContain('Systems');
+        expect(p.helper.htmlBody.getText()).toContain('Systems');
 
         expect(p.systemsList.first().isDisplayed()).toBe(true);
     });
 
+    it("should display menu item 'Systems' as active", function () {
+        expect(p.activeMenuItem.getText()).toContain('Systems');
+    });
+
     it("should show Open in NX client button for every online system", function () {
-        p.systemsList.each(function (element, index) {
-            browser.sleep(5000);
-            element.getInnerHtml().then(function(content) {
-                if(content.indexOf('not activated') <= -1) {
-                    expect(element.element(by.buttonText('Open in Nx Witness')).isDisplayed()).toBe(true);
-                }
-                console.log(index);
+        p.systemsList.filter(function(elem) {
+            // First filter systems that are activated
+            return elem.getInnerHtml().then(function(content) {
+                return !p.helper.isSubstr(content, 'not activated');
             });
+        }).each(function (elem) {
+            // Then for every activated system, check that button is visible
+            expect(p.openInNxButton(elem).isDisplayed()).toBe(true);
         });
     });
-    //xit("should оpen in NX client, when clicking 'Open in NX client' button", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should not open system page, when clicking 'Open in NX client'", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should not show Open in NX client button for offline system", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should show system's state for systems (activated, not activated, online, offline)", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should show system's owner for every system in the list, 'Your system' for user's systems", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should show email for every system, if system owner's name is empty", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should opens system page (users list) when clicked on system", function () {
-    //    expect("test").toBe("written");
-    //});
-    //xit("should update owner name in systems list, if it's changed", function () {
-    //    expect("test").toBe("written");
-    //});
+
+    it("should not show Open in NX client button for offline system", function () {
+        p.systemsList.filter(function(elem) {
+            // First filter systems that are not activated or offline
+            return elem.getInnerHtml().then(function(content) {
+                return (p.helper.isSubstr(content, 'not activated') || p.helper.isSubstr(content, 'offline'))
+            });
+        }).each(function (elem) {
+            // Then for every such system, check that button is not visible
+            expect(p.openInNxButton(elem).isPresent()).toBe(false);
+        });
+    });
+
+    xit("should show system's state for systems (activated, online, offline)", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should not show not activated systems in the list", function () {
+        expect("test").toBe("written");
+    });
+
+    xit("should show system's owner for every system in the list, 'Your system' for user's systems", function () {
+        p.systemsList.each(function (elem) {
+            expect(p.systemOwner(elem).getText()).toContain('Your system'); // how to find out, who is the owner?
+        });
+    });
+
+    xit("should show email for every system, if system owner's name is empty", function () {
+        // system owner name is required now. it can't be empty
+        p.systemsList.each(function (elem) {
+            expect(p.systemOwner(elem).getText()).toContain('Your system');
+        });
+    });
+
+    it("should open system page (users list) when clicked on system", function () {
+        p.systemsList.count().then(function(count) {
+            for (var i= 0; i < count; i++) {
+                p.systemsList.get(i).click();
+                // TODO: Write appropriate checks that system page is opened
+                expect(browser.getCurrentUrl()).toContain('#/systems/');
+                browser.navigate().back();
+                browser.waitForAngular();
+            }
+        });
+    });
+
+    it("should update owner name in systems list, if it's changed", function () {
+        var newFirstName = 'newFirstName';
+        var newLastName = 'newLastName';
+        p.helper.changeAccountNames(newFirstName, newLastName);
+        p.helper.logout();
+        p.helper.login(p.helper.userEmail2, p.helper.userPassword);
+        // TODO: use systemName to identify system here
+        expect(p.systemOwner(p.systemsList.first()).getText()).toContain(newFirstName);
+        expect(p.systemOwner(p.systemsList.first()).getText()).toContain(newLastName);
+
+        p.helper.logout();
+        p.helper.login(p.helper.userEmail, p.helper.userPassword);
+    });
+
+    xit("should display systems sorted (status, then owner); user's systems go first", function () {
+    });
 });
