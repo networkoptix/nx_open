@@ -926,20 +926,24 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
 
 void QnTransactionTransport::monitorConnectionForClosure(
     SystemError::ErrorCode errorCode,
-    size_t bytesRead )
+    size_t bytesRead)
 {
     QnMutexLocker lock( &m_mutex );
 
-    if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
+    if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed by remote peer").
-            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()), cl_logWARNING );
-        return setStateNoLock( State::Error );
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("transaction connection %1 received from %2 failed: %3")
+                .arg(m_connectionGuid.toString())
+                .arg(m_outgoingDataSocket->getForeignAddress().toString())
+                .arg(SystemError::toString(errorCode)),
+            cl_logWARNING);
+        return setStateNoLock(State::Error);
     }
 
-    if( bytesRead == 0 )
+    if (bytesRead == 0)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed").
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed by remote peer").
             arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()),
             cl_logWARNING );
         return setStateNoLock( State::Error );
@@ -1561,8 +1565,11 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
 
     if( client->failed() || !client->response() )
     {
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Unknown network error posting transaction to %1").
-            arg(m_postTranBaseUrl.toString()), cl_logWARNING );
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("Network error posting transaction to %1. system result code: %2")
+                .arg(m_postTranBaseUrl.toString())
+                .arg(SystemError::toString(client->lastSysErrorCode())),
+            cl_logWARNING);
         setStateNoLock( Error );
         return;
     }

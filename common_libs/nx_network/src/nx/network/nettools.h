@@ -28,9 +28,25 @@ struct NX_NETWORK_API QnInterfaceAndAddr
     QHostAddress address;
     QHostAddress netMask;
     QNetworkInterface netIf;
+
+
 };
 
-QString NX_NETWORK_API MACToString(const unsigned char *mac);
+inline bool operator ==(const QnInterfaceAndAddr& lhs, const QnInterfaceAndAddr& rhs)
+{
+    return  lhs.name == rhs.name
+        && lhs.address == rhs.address
+        && lhs.netMask == rhs.netMask;
+}
+
+inline uint qHash(const QnInterfaceAndAddr& iface, uint seed=0)
+{
+    return  qHash(iface.name, seed^0xa03f)
+        + qHash(iface.address, seed^0x17a317a3)
+        + qHash(iface.netMask, seed^0x17a317a3);
+}
+
+NX_NETWORK_API QString MACToString(const unsigned char *mac);
 
 NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
 NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);

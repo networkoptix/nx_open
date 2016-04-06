@@ -24,8 +24,7 @@ static const QString NX_DEVICE_MODEL_PARAMETER_NAME(QLatin1String("nxDeviceModel
 static const int ACTI_DEVICEXML_PORT = 49152;
 static const int CACHE_UPDATE_TIME = 60 * 1000;
 
-QnActiResourceSearcher::QnActiResourceSearcher():
-    QObject(), QnUpnpResourceSearcher()
+QnActiResourceSearcher::QnActiResourceSearcher()
 {
     QnMdnsListener::instance()->registerConsumer((long) this);
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
@@ -37,8 +36,10 @@ QnActiResourceSearcher::~QnActiResourceSearcher()
 
 QnResourceList QnActiResourceSearcher::findResources(void)
 {
-    // find via pnp
-    QnResourceList result = QnUpnpResourceSearcher::findResources();
+    /*// find via pnp
+    QnResourceList result = QnUpnpResourceSearcher::findResources();*/
+
+    QnResourceList result;
 
     // find via MDNS
     QList<QByteArray> processedUuid;
@@ -94,6 +95,25 @@ QByteArray QnActiResourceSearcher::getDeviceXml(const QUrl& url)
     }
 
     return m_cachedXml.value(host).xml;
+}
+
+void QnActiResourceSearcher::processDeviceXml(
+    const QByteArray& foundDeviceDescription,
+    const HostAddress& host,
+    const HostAddress& sender,
+    QnResourceList& result )
+{
+    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    QXmlSimpleReader xmlReader;
+    xmlReader.setContentHandler( &xmlHandler );
+    xmlReader.setErrorHandler( &xmlHandler );
+
+    QXmlInputSource input;
+    input.setData( foundDeviceDescription );
+    if( !xmlReader.parse( &input ) )
+        return;
+
+    processPacket(QHostAddress(sender.toString()), host, xmlHandler.deviceInfo(), foundDeviceDescription, result);
 }
 
 void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply)
@@ -204,7 +224,6 @@ void QnActiResourceSearcher::processPacket(
     const HostAddress& /*host*/,
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
-    const QAuthenticator& auth,
     QnResourceList& result )
 {
 
@@ -217,7 +236,7 @@ void QnActiResourceSearcher::processPacket(
     QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( serialNumberToPhysicalID(devInfo.serialNumber) );
     QAuthenticator cameraAuth;
     const QString defaultLogin = isNx ? DEFAULT_NX_LOGIN : DEFAULT_LOGIN;
-    const QString defaultPassword = isNx ? DEFAULT_NX_PASSWORD : DEFAULT_LOGIN;
+    const QString defaultPassword = isNx ? DEFAULT_NX_PASSWORD : DEFAULT_PASSWORD;
 
     cameraAuth.setUser(defaultLogin);
     cameraAuth.setPassword(defaultPassword);
@@ -297,6 +316,9 @@ void QnActiResourceSearcher::createResource(
 }
 
 bool QnActiResourceSearcher::isNxDevice(const nx_upnp::DeviceInfo& devInfo) const
+}
+
+bool QnActiResourceSearcher::isNxDevice(const UpnpDeviceInfo& devInfo) const
 {
     return devInfo.manufacturer.toLower().trimmed() == NX_VENDOR.toLower() ||
         devInfo.friendlyName.toLower().trimmed() == NX_VENDOR.toLower();

@@ -17,58 +17,11 @@ static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
+static const int RECV_BUFFER_SIZE = 1024*1024;
 
 using nx::network::UDPSocket;
 
 // TODO: #mu try to replace with UpnpDeviceDescriptionHandler when upnp camera is avaliable
-//!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
-class UpnpResourceDescriptionSaxHandler
-:
-    public QXmlDefaultHandler
-{
-    nx_upnp::DeviceInfo m_deviceInfo;
-    QString m_currentElementName;
-public:
-    virtual bool startDocument()
-    {
-        return true;
-    }
-
-    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
-    {
-        m_currentElementName = qName;
-        return true;
-    }
-
-    virtual bool characters( const QString& ch )
-    {
-        if( m_currentElementName == QLatin1String("friendlyName") )
-            m_deviceInfo.friendlyName = ch;
-        else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_deviceInfo.manufacturer = ch;
-        else if( m_currentElementName == QLatin1String("modelName") )
-            m_deviceInfo.modelName = ch;
-        else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") )
-            m_deviceInfo.presentationUrl = ch;
-
-        return true;
-    }
-
-    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
-    {
-        m_currentElementName.clear();
-        return true;
-    }
-
-    virtual bool endDocument()
-    {
-        return true;
-    }
-
-    const nx_upnp::DeviceInfo& deviceInfo() const { return m_deviceInfo; }
-};
 
 
 // ====================================================================
@@ -92,11 +45,10 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
     {
         UDPSocket* udpSock = new UDPSocket();
         udpSock->setReuseAddrFlag(true);
+        udpSock->setRecvBufferSize(RECV_BUFFER_SIZE);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
-
-        for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) {
+        for(const auto& iface: getAllIPv4Interfaces())
             udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
-        }
         m_receiveSocket = udpSock;
     }
 
@@ -110,7 +62,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         //if (!sock->bindToInterface(iface))
         if( !sock->bind( SocketAddress( iface.address.toString() ) ) ||
             !sock->setMulticastIF( localAddress ) ||
-            !sock->setRecvBufferSize( 1024 * 512 ) )
+            !sock->setRecvBufferSize( RECV_BUFFER_SIZE ) )
         {
             return 0;
         }
@@ -257,12 +209,15 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 
         QByteArray data;
 
-        data.append("M-SEARCH * HTTP/1.1\r\n");
-        //data.append("Host: 192.168.0.150:1900\r\n");
-        data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(QnAppInfo::organizationName()));
-        data.append("Man:\"ssdp:discover\"\r\n");
-        data.append("MX:3\r\n\r\n");
+        data.append(lit("M-SEARCH * HTTP/1.1\r\n"));
+        data.append(lit("HOST: "))
+            .append(groupAddress.toString())
+            .append(lit(":"))
+            .append(QString::number(GROUP_PORT))
+            .append(lit("\r\n"));
+        data.append(lit("MAN: \"ssdp:discover\"\r\n"));
+        data.append(lit("MX: 3\r\n"));
+        data.append(lit("ST: ssdp:all\r\n\r\n"));
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);
 
         /*
