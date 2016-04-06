@@ -30,13 +30,16 @@ using namespace style;
 
 namespace
 {
-    void drawArrow(Direction direction, QPainter *painter, const QRectF &rect, const QColor &color)
+    void drawArrow(Direction direction,
+                   QPainter *painter,
+                   const QRectF &rect,
+                   const QColor &color,
+                   const int size = Metrics::kArrowSize,
+                   const qreal width = 1.2)
     {
         QPainterPath path;
 
-        QRectF arrowRect(QPointF(), QSizeF(Metrics::kArrowSize, Metrics::kArrowSize));
-        arrowRect.moveTo(rect.left() + (rect.width() - Metrics::kArrowSize) / 2,
-                         rect.top() + (rect.height() - Metrics::kArrowSize) / 2);
+        QRectF arrowRect = QnGeometry::aligned(QSizeF(size, size), rect);
 
         RectCoordinates rc(arrowRect);
 
@@ -64,17 +67,14 @@ namespace
             break;
         }
 
-        QPen pen(color, dpr(1.2));
+        QPen pen(color, dpr(width));
         pen.setJoinStyle(Qt::MiterJoin);
         pen.setCapStyle(Qt::FlatCap);
 
-        painter->save();
+        QnScopedPainterPenRollback penRollback(painter, pen);
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
 
-        painter->setPen(pen);
-        painter->setRenderHint(QPainter::Antialiasing);
         painter->drawPath(path);
-
-        painter->restore();
     }
 
     void drawMenuCheckMark(QPainter *painter, const QRect &rect, const QColor &color)
@@ -415,6 +415,61 @@ void QnNxStyle::drawPrimitive(
             return;
         }
 
+    case PE_IndicatorArrowUp:
+    case PE_IndicatorArrowDown:
+    case PE_IndicatorArrowLeft:
+    case PE_IndicatorArrowRight:
+        {
+            QColor color = option->palette.text().color();
+            int size = Metrics::kArrowSize;
+            qreal width = 1.2;
+
+            if (qobject_cast<const QToolButton*>(widget))
+            {
+                size = widget->height() / 2 - 2;
+
+                if (const QTabBar* tabBar = qobject_cast<const QTabBar*>(widget->parent()))
+                {
+                    switch (tabShape(tabBar))
+                    {
+                    case TabShape::Default:
+                    case TabShape::Compact:
+                        size = dp(14);
+                        color = findColor(option->palette.light().color()).darker(2);
+                        width = 1.5;
+                        break;
+                    case TabShape::Rectangular:
+                        width = 1.3;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+
+            Direction direction = Up;
+            switch (element)
+            {
+            case PE_IndicatorArrowUp:
+                direction = Up;
+                break;
+            case PE_IndicatorArrowDown:
+                direction = Down;
+                break;
+            case PE_IndicatorArrowLeft:
+                direction = Left;
+                break;
+            case PE_IndicatorArrowRight:
+                direction = Right;
+                break;
+            default:
+                break;
+            }
+
+            drawArrow(direction, painter, option->rect, color, size, width);
+        }
+        return;
+
     case PE_FrameMenu:
         return;
 
@@ -483,7 +538,7 @@ void QnNxStyle::drawComplexControl(
                 proxy()->drawPrimitive(PE_PanelButtonCommand, &buttonOption, painter, widget);
             }
 
-            if (comboBox->subControls & SC_ComboBoxArrow)
+            if (comboBox->subControls.testFlag(SC_ComboBoxArrow))
             {
                 QRectF rect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxArrow, widget);
                 drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
@@ -827,6 +882,17 @@ void QnNxStyle::drawComplexControl(
             if (scrollBar->subControls & SC_ScrollBarSlider)
                 painter->fillRect(scrollBarSlider, sliderColor);
 
+            return;
+        }
+        break;
+
+    case CC_ToolButton:
+        if (const QStyleOptionToolButton* button =
+                qstyleoption_cast<const QStyleOptionToolButton*>(option))
+        {
+            QStyleOptionToolButton opt(*button);
+            opt.features &= ~QStyleOptionToolButton::HasMenu;
+            base_type::drawComplexControl(control, &opt, painter, widget);
             return;
         }
         break;
@@ -1876,6 +1942,9 @@ int QnNxStyle::pixelMetric(
     case PM_TabCloseIndicatorWidth:
     case PM_TabCloseIndicatorHeight:
         return dp(24);
+
+    case PM_TabBarScrollButtonWidth:
+        return std::min(dp(36), widget->height());
 
     default:
         break;
