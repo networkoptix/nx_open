@@ -35,7 +35,7 @@
         </div>
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('merge')">Merge server with existing system</a>
+        <a href="" ng-click="skip()">Merge server with existing system</a>
     </p>
 </div>
 
@@ -50,7 +50,7 @@
         <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
     </p>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('localLogin')">Skip this step for now</a>
+        <a href="" ng-click="skip()">Skip this step for now</a>
     </p>
 </div>
 
@@ -67,7 +67,7 @@
             <a href="" ng-click="next('cloudLogin')">Connect to another account</a>
         </p>
         <p>
-            <a href="" ng-click="next('localLogin')">Do not connect to <span class='product name'>Nx Cloud</span> now</a>
+            <a href="" ng-click="skip()">Skip this step for now</a>
         </p>
     </div>
 </div>
@@ -174,13 +174,41 @@
     <h4>{{settings.localLogin}}</h4>
 </div>
 
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
+    <h2>Connect your server to internet</h2>
+    <p class="master-description">
+        Set up internet connection on your server to be able <br> to connect to it anywhere using Nx Cloud.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
+    <h2>Connect to internet</h2>
+    <p class="master-description">
+        Connect to internet on your device to connect your system to Nx Cloud.<br>
+        {{internetError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+    </p>
+</div>
+
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
     <h2>Couldn't connect to cloud</h2>
     <p class="master-description">
-        You need internet connection on server in order to connect your system<br> to the <span class="product-name">Nx Cloud</span>.<br>
-        Please, check your connection or firewall settings,<br>
-        or press "Next" if you are going to connect your system to Nx Cloud later.
+        {{cloudError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
     </p>
 </div>
 

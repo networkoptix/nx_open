@@ -87,6 +87,34 @@ angular.module('webadminApp')
                 nativeClientObject.updateCredentials ($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
             }
         }
+
+        function checkInternet(reload){
+
+            if(debugMode){
+                $scope.hasInternetOnServer = true;
+                $scope.hasInternetOnClient = true;
+            }
+
+            mediaserver.getModuleInformation(reload).then(function(r){
+                $scope.serverInfo = r.data.reply;
+                $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
+            },function(){
+                $scope.hasInternetOnServer = false ;
+            });
+
+            cloudAPI.ping().then(function(message){
+                if(message.data.resultCode && message.data.resultCode !== 'ok'){
+                    $scope.settings.internetError = formatError(error.data.resultCode);
+                    $scope.hasInternetOnClient = false;
+                    return;
+                }
+                $scope.hasInternetOnClient = true;
+            },function(){
+                $scope.hasInternetOnClient = false;
+            });
+
+        }
+
         /* Common helpers: error handling, check current system, error handler */
         function checkMySystem(user){
             $log.log("check system configuration");
@@ -104,9 +132,10 @@ angular.module('webadminApp')
                 $log.log("System is in cloud! go to CloudSuccess");
                 $scope.next('cloudSuccess');
             },function(){
-                mediaserver.getSettings(true).then(function (r) {
+                mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
 
+                    checkInternet(false);
                     if(debugMode || $scope.serverInfo.serverFlags.indexOf(Config.newServerFlag)>=0) {
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
@@ -208,7 +237,8 @@ angular.module('webadminApp')
 
                 // Cloud errors:
                 'notAuthorized': 'Login or password are incorrect',
-                'accountNotActivated': 'Please, confirm your account first'
+                'accountNotActivated': 'Please, confirm your account first',
+                'unknown': 'Something went wrong'
             };
             return errorMessages[errorToShow] || errorToShow;
         }
@@ -255,6 +285,11 @@ angular.module('webadminApp')
             if(message){
                 $log.log(message);
             }
+            if(!error){
+                $log.error("Mediaserver  - empty error");
+                $scope.errorData = 'unknown';
+                return;
+            }
             if(error.data && error.data.error){
                 $log.error("Mediaserver error: \n" + JSON.stringify(error.data, null, 4));
                 $scope.errorData = JSON.stringify(error.data, null, 4);
@@ -289,7 +324,7 @@ angular.module('webadminApp')
                 $log.error("Cloud portal error: \n" + JSON.stringify(error, null, 4));
                 $scope.errorData = JSON.stringify(error, null, 4);
 
-                if(error.status === 401){
+                if(error.status === 401 || (error.data && error.data.resultCode === 'accountNotActivated')){
                     $log.log("Wrong login or password for cloud - show red message");
 
                     if(error.data.resultCode) {
@@ -303,6 +338,12 @@ angular.module('webadminApp')
                 }
 
                 $log.log("Go to cloud failure step");
+                if(error.data && error.data.resultCode) {
+                    $scope.settings.cloudError = formatError(error.data.resultCode);
+                }else{
+                    $scope.settings.cloudError = formatError('unknown');
+                }
+
                 // Do not go further here, show connection error
                 $scope.next('cloudFailure');
             }
@@ -318,6 +359,11 @@ angular.module('webadminApp')
             //1. Request auth key from cloud_db
             cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                 function(message){
+                    if(message.data.resultCode && message.data.resultCode !== 'ok'){
+                        cloudErrorHandler(message);
+                        return;
+                    }
+
                     //2. Save settings to local server
                     $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
@@ -393,6 +439,14 @@ angular.module('webadminApp')
                 window.location.reload();
             }
         };
+
+        $scope.skip = function() {
+            if ($scope.activeStep.skip) {
+                $scope.next($scope.activeStep.skip);
+            }else{
+                $scope.next();
+            }
+        };
         $scope.retry = function(){
             if($scope.activeStep.retry){
                 $scope.activeStep.retried = true;
@@ -463,16 +517,44 @@ angular.module('webadminApp')
             },
             systemName:{
                 back: 'start',
-                next: cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro',
+                skip: 'merge',
+                next: function(){
+                    if(!$scope.hasInternetOnServer){
+                        $scope.next('noInternetOnServer');
+                        return;
+                    }
+
+                    if(!$scope.hasInternetOnClient){
+                        $scope.next('noInternetOnClient');
+                        return;
+                    }
+                    $scope.next(cloudAuthorized?'cloudAuthorizedIntro':'cloudIntro');
+                },
                 valid: function(){
                     return required($scope.settings.systemName);
                 }
             },
+            noInternetOnServer:{
+                retry:function(){
+                    checkInternet(true);
+                },
+                back:'systemName',
+                skip:'localLogin'
+            },
+            noInternetOnClient:{
+                retry:function(){
+                    checkInternet(true);
+                },
+                back:'systemName',
+                skip:'localLogin'
+            },
             cloudIntro:{
-                back: 'systemName'
+                back: 'systemName',
+                skip: 'localLogin'
             },
             cloudAuthorizedIntro:{
                 back: 'systemName',
+                skip: 'localLogin',
                 next: function(){
                     connectToCloud(true)
                 }
@@ -490,7 +572,7 @@ angular.module('webadminApp')
             },
             cloudFailure:{
                 back: 'cloudLogin',
-                next: 'localLogin'
+                skip: 'localLogin'
             },
             merge:{
                 back: 'systemName',
