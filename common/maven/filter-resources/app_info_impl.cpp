@@ -177,7 +177,7 @@ QString QnAppInfo::oldAndroidClientLink() {
 }
 
 QString QnAppInfo::oldIosClientLink() {
-    return QStringLiteral("https://itunes.apple.com/ru/app/${ios.old_app_appstore_id}");
+    return QStringLiteral("https://itunes.apple.com/app/${ios.old_app_appstore_id}");
 }
 
 QString QnAppInfo::oldAndroidAppId() {
