@@ -1933,7 +1933,7 @@ QSize QnNxStyle::sizeFromContents(
     }
 
     case CT_TabBarTab:
-        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab *>(option))
+        if (qstyleoption_cast<const QStyleOptionTab*>(option))
         {
             TabShape shape = tabShape(widget);
 
