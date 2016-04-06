@@ -326,7 +326,7 @@ private:
             failed_connection_size_++;
             --connected_socket_size_;
         } else {
-            NX_ASSERT( bytes_transferred == conn->buffer.size() );
+            NX_ASSERT( bytes_transferred == (std::size_t)conn->buffer.size() );
             sleep_list_.Enqueue( conn.release() );
         }
     }

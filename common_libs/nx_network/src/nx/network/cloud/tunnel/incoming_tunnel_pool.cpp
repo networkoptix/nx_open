@@ -19,7 +19,6 @@ IncomingTunnelPool::IncomingTunnelPool(
 
 IncomingTunnelPool::~IncomingTunnelPool()
 {
-    int x = 0;
 }
 
 void IncomingTunnelPool::addNewTunnel(
