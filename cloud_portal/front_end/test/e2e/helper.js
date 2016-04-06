@@ -13,6 +13,11 @@ var Helper = function () {
         browser.waitForAngular();
     };
 
+    this.navigateBack = function (){
+        browser.navigate().back();
+        browser.waitForAngular();
+    };
+
     // Get valid email with random number between 100 and 1000
     this.getRandomEmail = function() {
         var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
