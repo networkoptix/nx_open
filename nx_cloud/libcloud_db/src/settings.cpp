@@ -68,6 +68,8 @@ namespace
     const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeoutSec");
     const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout(86400);
 
+    const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriodSec");
+    const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec(30*86400);  //a month
 
     //auth settings
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
@@ -126,6 +128,11 @@ const Notification& Settings::notification() const
 const AccountManager& Settings::accountManager() const
 {
     return m_accountManager;
+}
+
+const SystemManager& Settings::systemManager() const
+{
+    return m_systemManager;
 }
 
 const QString& Settings::cloudBackendUrl() const
@@ -217,9 +224,17 @@ void Settings::loadConfiguration()
 
     //accountManager
     m_accountManager.passwordResetCodeExpirationTimeout =
-        std::chrono::seconds(m_settings.value(
-            kPasswordResetCodeExpirationTimeout,
-            (qlonglong)kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
+        std::chrono::seconds(
+            m_settings.value(
+                kPasswordResetCodeExpirationTimeout,
+                (qlonglong)kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
+
+    //system manager
+    m_systemManager.reportRemovedSystemPeriod =
+        std::chrono::seconds(
+            m_settings.value(
+                kReportRemovedSystemPeriodSec,
+                (qlonglong)kDefaultReportRemovedSystemPeriodSec.count()).toInt());
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();

@@ -61,7 +61,7 @@ public:
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
         stree::ResourceContainer* const authProperties,
-        std::function<void(bool)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(
@@ -127,8 +127,9 @@ public:
         data::DataFilter filter);
         
 private:
-    static const int INDEX_BY_ACCOUNT_EMAIL = 1;
-    static const int INDEX_BY_SYSTEM_ID = 2;
+    constexpr static const int INDEX_BY_SHARING = 0;
+    constexpr static const int INDEX_BY_ACCOUNT_EMAIL = 1;
+    constexpr static const int INDEX_BY_SYSTEM_ID = 2;
 
     typedef boost::multi_index::multi_index_container<
         api::SystemSharing,
@@ -170,6 +171,15 @@ private:
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemSharing sytemSharing,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    nx::db::DBResult markSystemAsDeleted(
+        QSqlDatabase* const connection,
+        const std::string& systemId);
+    void systemMarkedAsDeleted(
+        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::db::DBResult dbResult,
+        std::string systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult deleteSystemFromDB(

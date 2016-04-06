@@ -218,16 +218,24 @@ private:
                     m_runningRequests.erase(requestIter);
                 }
                 if (errCode != SystemError::noError || !response)
-                    return completionHandler(api::ResultCode::networkError, OutputData()...);
+                    return completionHandler(
+                        api::ResultCode::networkError,
+                        OutputData()...);
 
                 api::ResultCode resultCode = api::ResultCode::ok;
-                const auto resultCodeStrIter = response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
+                const auto resultCodeStrIter = 
+                    response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
                 if (resultCodeStrIter != response->headers.end())
-                    resultCode = QnLexical::deserialized<api::ResultCode>(resultCodeStrIter->second);
+                {
+                    resultCode = QnLexical::deserialized<api::ResultCode>(
+                        resultCodeStrIter->second);
+                }
                 else
+                {
                     resultCode = api::httpStatusCodeToResultCode(
                         static_cast<nx_http::StatusCode::Value>(
                             response->statusLine.statusCode));
+                }
                 completionHandler(resultCode, std::move(data)...);
             });
         m_runningRequests.back() = std::move(client);

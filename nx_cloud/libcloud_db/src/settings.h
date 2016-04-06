@@ -52,6 +52,15 @@ public:
     std::chrono::seconds passwordResetCodeExpirationTimeout;
 };
 
+class SystemManager
+{
+public:
+    /** Attempt to use system credentials will result in \a credentialsRemovedPermanently
+        result code during this period after system removal
+    */
+    std::chrono::seconds reportRemovedSystemPeriod;
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -72,6 +81,7 @@ public:
     const Auth& auth() const;
     const Notification& notification() const;
     const AccountManager& accountManager() const;
+    const SystemManager& systemManager() const;
     const QString& cloudBackendUrl() const;
     const QString& changeUser() const;
 
@@ -90,6 +100,7 @@ private:
     Auth m_auth;
     Notification m_notification;
     AccountManager m_accountManager;
+    SystemManager m_systemManager;
     QString m_cloudBackendUrl;
     QString m_changeUser;
 

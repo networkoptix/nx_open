@@ -63,7 +63,7 @@ void AccountManager::authenticateByName(
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& authSearchInputData,
     stree::ResourceContainer* const authProperties,
-    std::function<void(bool)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -74,7 +74,7 @@ void AccountManager::authenticateByName(
             authProperties->put(
                 cdb::attr::authAccountEmail,
                 username);
-            completionHandler(true);
+            completionHandler(api::ResultCode::ok);
             return;
         }
     }
@@ -88,8 +88,10 @@ void AccountManager::authenticateByName(
         std::move(validateHa1Func),
         authSearchInputData,
         authProperties,
-        [username, authProperties, /*std::move*/ completionHandler, this](bool authResult) mutable {
-            if (authResult)
+        [username, authProperties, completionHandler = std::move(completionHandler), this](
+            api::ResultCode authResult) mutable
+        {
+            if (authResult == api::ResultCode::ok)
             {
                 bool authenticatedByEmailCode = false;
                 authProperties->get(

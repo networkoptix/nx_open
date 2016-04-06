@@ -20,6 +20,7 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
         case ResultCode::ok:
             return nx_http::StatusCode::ok;
         case ResultCode::notAuthorized:
+        case ResultCode::credentialsRemovedPermanently:
             return nx_http::StatusCode::unauthorized;
         case ResultCode::forbidden:
         case ResultCode::accountNotActivated:
@@ -91,6 +92,7 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
         case ResultCode::badRequest:
         case ResultCode::invalidNonce:
         case ResultCode::unknownRealm:
+        case ResultCode::credentialsRemovedPermanently:
             requestResultCode = nx_http::FusionRequestErrorClass::unauthorized;
             break;
 
@@ -144,6 +146,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::badRequest, "badRequest")
     (ResultCode::invalidNonce, "invalidNonce")
     (ResultCode::serviceUnavailable, "serviceUnavailable")
+    (ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
     (ResultCode::unknownError, "unknownError")
 );
 

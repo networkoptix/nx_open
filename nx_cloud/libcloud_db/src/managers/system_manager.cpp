@@ -46,9 +46,9 @@ void SystemManager::authenticateByName(
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& /*authSearchInputData*/,
     stree::ResourceContainer* const authProperties,
-    std::function<void(bool)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    bool result = false;
+    api::ResultCode result = api::ResultCode::notAuthorized;
     auto scopedGuard = makeScopedGuard(
         [&completionHandler, &result]() {
             completionHandler(result);
@@ -60,10 +60,17 @@ void SystemManager::authenticateByName(
     if (!systemData)
         return;
 
-    if (!validateHa1Func(nx_http::calcHa1(
-            username,
-            AuthenticationManager::realm(),
-            nx::String(systemData->authKey.c_str()))))
+    if (systemData->status == api::SystemStatus::ssDeleted)
+    {
+        result = api::ResultCode::credentialsRemovedPermanently;
+        return;
+    }
+
+    if (!validateHa1Func(
+            nx_http::calcHa1(
+                username,
+                AuthenticationManager::realm(),
+                nx::String(systemData->authKey.c_str()))))
     {
         return;
     }
@@ -85,7 +92,7 @@ void SystemManager::authenticateByName(
             m_startedAsyncCallsCounter.getScopedIncrement(),
             _1, _2, [](api::ResultCode){}));
 
-    result = true;
+    result = api::ResultCode::ok;
 }
 
 void SystemManager::bindSystemToAccount(
@@ -119,10 +126,10 @@ void SystemManager::unbindSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemID>(
-        std::bind(&SystemManager::deleteSystemFromDB, this, _1, _2),
-        std::move(systemID),
-        std::bind(&SystemManager::systemDeleted,
+    m_dbManager->executeUpdate<std::string>(
+        std::bind(&SystemManager::markSystemAsDeleted, this, _1, _2),
+        std::move(systemID.systemID),
+        std::bind(&SystemManager::systemMarkedAsDeleted,
                     this, m_startedAsyncCallsCounter.getScopedIncrement(),
                     _1, _2, std::move(completionHandler)));
 }
@@ -339,7 +346,8 @@ api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& systemID) const
 {
     QnMutexLocker lk(&m_mutex);
-    const auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
+    const auto& accountSystemPairIndex =
+        m_accountAccessRoleForSystem.get<INDEX_BY_SHARING>();
     api::SystemSharing toFind;
     toFind.accountEmail = accountEmail;
     toFind.systemID = systemID;
@@ -477,14 +485,80 @@ void SystemManager::systemSharingAdded(
         : api::ResultCode::dbError);
 }
 
+nx::db::DBResult SystemManager::markSystemAsDeleted(
+    QSqlDatabase* const connection,
+    const std::string& systemId)
+{
+    //marking system as "deleted"
+    QSqlQuery markSystemAsRemoved(*connection);
+    markSystemAsRemoved.prepare(
+        "UPDATE system "
+        "SET status_code=:statusCode "
+        "WHERE id=:id");
+    markSystemAsRemoved.bindValue(
+        ":statusCode",
+        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
+    markSystemAsRemoved.bindValue(
+        ":id",
+        QnSql::serialized_field(systemId));
+    if (!markSystemAsRemoved.exec())
+    {
+        NX_LOG(lm("Error marking system %1 as deleted. %2")
+            .arg(systemId).arg(connection->lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    //removing system-to-account
+    QSqlQuery removeSystemToAccountBinding(*connection);
+    removeSystemToAccountBinding.prepare(
+        "DELETE FROM system_to_account WHERE system_id=:systemID");
+    removeSystemToAccountBinding.bindValue(
+        ":systemID",
+        QnSql::serialized_field(systemId));
+    if (!removeSystemToAccountBinding.exec())
+    {
+        NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
+            arg(systemId).arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    //TODO #ak adding persistent timer to permanently remove system
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::systemMarkedAsDeleted(
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::db::DBResult dbResult,
+    std::string systemId,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        m_cache.atomicUpdate(
+            systemId,
+            [](data::SystemData& system)
+            {
+                system.status = api::SystemStatus::ssDeleted;
+            });
+
+        //removing system-to-account
+        QnMutexLocker lk(&m_mutex);
+        auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
+        systemIndex.erase(systemId);
+    }
+
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
+}
+
 nx::db::DBResult SystemManager::deleteSystemFromDB(
     QSqlDatabase* const connection,
     const data::SystemID& systemID)
 {
-    //TODO #ak marking system as "deleted"
-    //TODO #ak adding persistent timer to permanently remove system
-
-
     QSqlQuery removeSystemToAccountBinding(*connection);
     removeSystemToAccountBinding.prepare(
         "DELETE FROM system_to_account WHERE system_id=:systemID");
@@ -520,7 +594,7 @@ void SystemManager::systemDeleted(
     {
         m_cache.erase(systemID.systemID);
         QnMutexLocker lk(&m_mutex);
-        auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+        auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
         systemIndex.erase(systemID.systemID);
     }
     completionHandler(
@@ -576,7 +650,8 @@ void SystemManager::sharingUpdated(
     {
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
-        auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
+        auto& accountSystemPairIndex =
+            m_accountAccessRoleForSystem.get<INDEX_BY_SHARING>();
         accountSystemPairIndex.erase(sharing);
         if (sharing.accessRole != api::SystemAccessRole::none)
         {
