@@ -134,7 +134,7 @@
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
-        <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -151,6 +151,7 @@
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
         <server-external.version>3.0.0</server-external.version>
+        <help.version>${customization}-3.0.0</help.version>
 
         <qt.libs/>
         <global.libs/>

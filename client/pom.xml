@@ -84,7 +84,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf help</rdep.packages>
     </properties>
     <profiles>
         <profile>
