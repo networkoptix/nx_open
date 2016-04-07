@@ -6,6 +6,7 @@
 #include <QtCore/QMap>
 
 #include "rtsp_encoder.h"
+#include <transcoding/ffmpeg_video_transcoder.h>
 
 static const quint8 RTP_FFMPEG_GENERIC_CODE = 102;
 static const QString RTP_FFMPEG_GENERIC_STR(lit("FFMPEG"));
@@ -27,6 +28,8 @@ public:
     virtual quint8 getPayloadtype() override;
     virtual QString getName() override;
 
+    void setDstResolution(const QSize& dstVideSize, CodecID dstCodec);
+
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);
 
@@ -42,8 +45,13 @@ private:
     quint16 m_additionFlags;
     bool m_eofReached;
     bool m_isLastDataContext;
+    QSize m_dstVideSize;
+    CodecID m_dstCodec;
+
+    std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
 
     QnConstMediaContextPtr getGeneratedContext(CodecID compressionType);
+    QnConstAbstractMediaDataPtr transcodeVideoPacket(QnConstAbstractMediaDataPtr media);
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
