@@ -26,25 +26,13 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb) 
     {
+        if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile))
+            return sdb;
         QString simplifiedGUID = getLocalGuid();
         QString dbPath = storage->getUrl();
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
-        QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.nxdb");
 
-        if (storage->getCapabilities() & QnAbstractStorageResource::DBReady)
-        {
-            if (storage->isFileExists(oldFileName) && !storage->isFileExists(fileName))
-                storage->renameFile(oldFileName, fileName);
-
-            sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
-        }
-        else
-        {
-            if (QFile::exists(oldFileName) && !QFile::exists(fileName))
-                QFile::rename(oldFileName, fileName);
-            sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
-        }
-
+        sdb = QnStorageDbPtr(new QnStorageDb(storage, getStorageIndex(storage)));
         if (sdb->open(fileName)) {
             m_chunksDB[storage->getUrl()] = sdb;
         }

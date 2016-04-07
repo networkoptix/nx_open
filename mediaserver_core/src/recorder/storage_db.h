@@ -97,8 +97,8 @@ private:
     UuidToHash m_uuidToHash;
     UuidToCatalogs m_readData;
 
-    nx::media_db::Error m_lastWriteError;
     nx::media_db::Error m_lastReadError;
+    nx::media_db::Error m_lastWriteError;
 
     std::random_device m_rd;
     std::mt19937 m_gen;

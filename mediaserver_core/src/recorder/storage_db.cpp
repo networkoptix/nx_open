@@ -563,7 +563,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     auto opCatalog = mediaFileOp.getCatalog();
 
     // camera with this ID should have already been found
-    assert(cameraUuidIt != m_uuidToHash.right.end());
+    NX_ASSERT(cameraUuidIt != m_uuidToHash.right.end());
     if (cameraUuidIt == m_uuidToHash.right.end())
     {
         NX_LOG(lit("%1 Got media file with unknown camera ID. Skipping.").arg(Q_FUNC_INFO), cl_logWARNING);
@@ -622,11 +622,13 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
 void QnStorageDb::handleError(nx::media_db::Error error) 
 {
     QnMutexLocker lk(&m_errorMutex);
+    NX_LOG(lit("%1 DB error").arg(Q_FUNC_INFO), cl_logWARNING);
     m_lastReadError = error;
 }
 
 void QnStorageDb::handleRecordWrite(nx::media_db::Error error)
 {
     QnMutexLocker lk(&m_errorMutex);
+    NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
     m_lastWriteError = error;
 }

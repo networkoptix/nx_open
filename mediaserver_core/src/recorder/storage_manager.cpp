@@ -380,7 +380,7 @@ public:
                             auto cameraLowCatalog = m_owner->getFileCatalog(camera.physicalId, QnServer::LowQualityCatalog);
                             auto cameraHiCatalog = m_owner->getFileCatalog(camera.physicalId, QnServer::HiQualityCatalog);
 
-                            bool doAdd = cameraLowCatalog && !cameraLowCatalog->isEmpty() || cameraHiCatalog && !cameraHiCatalog->isEmpty();
+                            bool doAdd = (cameraLowCatalog && !cameraLowCatalog->isEmpty()) || (cameraHiCatalog && !cameraHiCatalog->isEmpty());
                             if (doAdd)
                                 camerasToAdd.push_back(camera);
                         }
@@ -586,9 +586,18 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         return;
 
     QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
+    QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     if (!QFile::exists(fileName))
-        return;
+    {
+        if (QFile::exists(oldFileName))
+        {
+            if (!QFile::rename(oldFileName, fileName))
+                return;
+        }
+        else
+            return;
+    }
 
     QSqlDatabase sqlDb = QSqlDatabase::addDatabase(lit("QSQLITE"), QString("QnStorageManager_%1").arg(fileName));
     sqlDb.setDatabaseName(fileName);
@@ -2238,7 +2247,7 @@ bool QnStorageManager::renameFileWithDuration(
     return storage->renameFile(oldName, fpath + newName);
 }
 
-bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
+bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* /*provider*/, qint64 fileSize)
 {
     int storageIndex;
     QString quality;
@@ -2246,8 +2255,6 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
     if (!storage)
         return false;
-    //if (storageIndex >= 0 && provider)
-    //    storage->releaseBitrate(provider);
     bool renameOK = renameFileWithDuration(fileName, durationMs, storage);
     if (!renameOK)
         qDebug() << lit("File %1 rename failed").arg(fileName);
@@ -2264,7 +2271,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     return true;
 }
 
-bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* /*provider*/)
 {
     int storageIndex;
     QString quality, mac;

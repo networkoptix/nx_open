@@ -5,6 +5,7 @@
 #include <limits>
 
 #define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
+#define BOOST_BIND_NO_PLACEHOLDERS
 #include <cstdint>
 
 #include <QtCore/QtGlobal>

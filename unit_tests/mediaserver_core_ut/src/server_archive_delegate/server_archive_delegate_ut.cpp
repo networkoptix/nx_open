@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <ffmpeg/libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <core/resource/storage_plugin_factory.h>
@@ -237,8 +237,8 @@ public:
                         .arg(m_fileCount)
                         .arg(m_timeLine.m_timeLine.size());
 
-        qint64 prevStartTime;
-        int prevDuration;
+        //qint64 prevStartTime;
+        //int prevDuration;
         //qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin();
@@ -251,8 +251,8 @@ public:
             //             << (it->startTimeMs - (prevStartTime + prevDuration))/1000
             //             << "s )";
             //}
-            prevStartTime = it->startTimeMs;
-            prevDuration = it->durationMs;
+            //prevStartTime = it->startTimeMs;
+            //prevDuration = it->durationMs;
         }
     }
 

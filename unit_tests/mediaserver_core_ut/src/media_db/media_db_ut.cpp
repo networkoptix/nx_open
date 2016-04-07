@@ -21,6 +21,11 @@
 #include <utils/common/util.h>
 #include <utils/db/db_helper.h>
 
+#ifdef Q_OS_LINUX
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
+
 bool recursiveClean(const QString &path);
 
 template<qint64 From, qint64 To>
@@ -818,6 +823,11 @@ TEST(MediaDb_test, StorageDB)
                                    {
                                        return !tc.isDeleted && !tc.isVisited; 
                                    });
+    if (!allVisited)
+    {
+        size_t notVisited = std::count_if(tcm.get().cbegin(), tcm.get().cend(), [] (const TestChunkManager::TestChunk &tc) { return !tc.isDeleted && !tc.isVisited; });
+        qWarning() << lit("Not visited count: %1").arg(notVisited);
+    }
     ASSERT_EQ(allVisited, true);
     recursiveClean(workDirPath);
 }
@@ -836,6 +846,9 @@ TEST(MediaDb_test, Migration_from_sqlite)
                 new QnResourceStatusDictionary);
     }
 
+#ifdef Q_OS_LINUX 
+            auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+#endif
     std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
     if (!propertyDictionary) {
         propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
@@ -888,7 +901,7 @@ TEST(MediaDb_test, Migration_from_sqlite)
         for (size_t j = 0; j < k23MaxChunks; ++j)
         {
             QSqlQuery query(sqlDb);
-            query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)");
+            ASSERT_TRUE(query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)"));
             DeviceFileCatalog::Chunk const &chunk = referenceCatalogs[i]->getChunks().at(j);
 
             query.addBindValue(referenceCatalogs[i]->cameraUniqueId()); // unique_id
