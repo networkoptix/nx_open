@@ -136,6 +136,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     layout->addWidget(d->mainMenuButton);
     layout->addWidget(newVLine());
     layout->addWidget(d->tabBar);
+    layout->addWidget(newVLine());
     layout->addWidget(newActionButton(action(QnActions::OpenNewTabAction),
                                       Qn::MainWindow_TitleBar_NewLayout_Help));
     layout->addWidget(newActionButton(action(QnActions::OpenCurrentUserLayoutMenu),

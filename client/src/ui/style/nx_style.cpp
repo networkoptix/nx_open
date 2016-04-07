@@ -215,11 +215,37 @@ void QnNxStyle::drawPrimitive(
         return;
     case PE_PanelButtonTool:
         {
+            const QTabBar *tabBar = nullptr;
+            TabShape shape = TabShape::Default;
+            if (widget)
+            {
+                tabBar = qobject_cast<const QTabBar*>(widget->parent());
+                shape = tabShape(tabBar);
+            }
+
             const bool pressed = option->state.testFlag(State_Sunken);
             const bool hovered = option->state.testFlag(State_MouseOver) ||
                                  option->state.testFlag(State_HasFocus);
 
+            QRect rect = option->rect;
+
             QnPaletteColor mainColor = findColor(option->palette.window().color());
+            if (tabBar)
+            {
+                switch (shape)
+                {
+                case TabShape::Default:
+                    mainColor = mainColor.lighter(3);
+                    rect.adjust(0, 0, 0, -1);
+                    break;
+                case TabShape::Compact:
+                    rect.adjust(0, 0, 0, -1);
+                    break;
+                case TabShape::Rectangular:
+                    mainColor = mainColor.lighter(1);
+                    break;
+                }
+            }
 
             if (option->state.testFlag(State_Enabled))
             {
@@ -233,7 +259,18 @@ void QnNxStyle::drawPrimitive(
             else if (hovered)
                 buttonColor = mainColor.lighter(1);
 
-            painter->fillRect(option->rect, buttonColor);
+            painter->fillRect(rect, buttonColor);
+
+            if (tabBar)
+            {
+                QColor lineColor = (shape == TabShape::Rectangular)
+                                   ? option->palette.shadow().color()
+                                   : mainColor.lighter(1);
+                lineColor.setAlpha(QnPaletteColor::kMaxAlpha);
+
+                QnScopedPainterPenRollback penRollback(painter, lineColor);
+                painter->drawLine(rect.topLeft(), rect.bottomLeft());
+            }
         }
         return;
 
@@ -339,27 +376,27 @@ void QnNxStyle::drawPrimitive(
     case PE_FrameTabWidget:
         {
             QRect rect;
-            bool drawBackground = true;
+            TabShape shape = TabShape::Default;
 
             if (const QTabWidget* tabWidget = qobject_cast<const QTabWidget*>(widget))
             {
+                shape = tabShape(tabWidget->tabBar());
                 rect = tabWidget->tabBar()->geometry();
-                drawBackground = (tabShape(tabWidget->tabBar()) == TabShape::Default);
             }
             else if (const QTabBar* tabBar = qobject_cast<const QTabBar*>(widget))
             {
+                shape = tabShape(tabBar);
                 rect = tabBar->rect();
-                drawBackground = (tabShape(tabBar) == TabShape::Default);
             }
 
             rect.setLeft(option->rect.left());
             rect.setRight(option->rect.right());
 
-            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(2);
+            QnPaletteColor mainColor = findColor(option->palette.window().color()).lighter(3);
 
             QnScopedPainterPenRollback penRollback(painter);
 
-            if (drawBackground)
+            if (shape == TabShape::Default)
             {
                 painter->fillRect(rect, mainColor);
 
@@ -1047,10 +1084,14 @@ void QnNxStyle::drawControl(
 
                     painter->fillRect(tab->rect, color);
 
-                    QnScopedPainterPenRollback penRollback(
-                                painter, option->palette.shadow().color());
-                    painter->drawLine(tab->rect.topRight(),
-                                      tab->rect.bottomRight());
+                    if (tab->position == QStyleOptionTab::Middle ||
+                        tab->position == QStyleOptionTab::End)
+                    {
+                        QnScopedPainterPenRollback penRollback(
+                                    painter, option->palette.shadow().color());
+                        painter->drawLine(tab->rect.topLeft(),
+                                          tab->rect.bottomLeft());
+                    }
                 }
                 return;
             }
@@ -1944,7 +1985,7 @@ int QnNxStyle::pixelMetric(
         return dp(24);
 
     case PM_TabBarScrollButtonWidth:
-        return std::min(dp(36), widget->height());
+        return std::min(dp(36), widget->height() + 1);
 
     default:
         break;
