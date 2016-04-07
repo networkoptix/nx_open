@@ -28,11 +28,6 @@
 
 #define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
 
-namespace Qn {
-    const quint64 ExcludingOwnerPermission = GlobalOwnerPermissions & ~GlobalAdminPermissions;
-    const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
-}
-
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
@@ -446,13 +441,14 @@ void QnUserSettingsDialog::updateSizeLimits() {
 void QnUserSettingsDialog::updateDependantPermissions() {
     m_inUpdateDependensies = true;
 
-    bool isOwner = isCheckboxChecked(Qn::ExcludingOwnerPermission);
-    if (isOwner){
-        setCheckboxEnabled(Qn::ExcludingAdminPermission, false);
-        setCheckboxChecked(Qn::ExcludingAdminPermission);
+    bool isOwner = isCheckboxChecked(Qn::GlobalOwnerPermission);
+    if (isOwner)
+    {
+        setCheckboxEnabled(Qn::GlobalAdminPermission, false);
+        setCheckboxChecked(Qn::GlobalAdminPermission);
     }
 
-    bool isAdmin = isCheckboxChecked(Qn::ExcludingAdminPermission);
+    bool isAdmin = isCheckboxChecked(Qn::GlobalAdminPermission);
     if (isAdmin){
         setCheckboxEnabled(Qn::GlobalEditCamerasPermission, false);
         setCheckboxChecked(Qn::GlobalEditCamerasPermission);
@@ -502,12 +498,12 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     Qn::GlobalPermissions permissions = accessController()->globalPermissions(m_user);
 
     // show only for view of owner
-    if (permissions.testFlag(Qn::GlobalEditProtectedUserPermission))
-        ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermissions);
+    if (permissions.testFlag(Qn::GlobalOwnerPermission))
+        ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermission);
 
     // show for an admin or for anyone opened by owner
-    if (permissions.testFlag(Qn::GlobalProtectedPermission) || accessController()->globalPermissions().testFlag(Qn::GlobalEditProtectedUserPermission))
-        ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermissions);
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->globalPermissions().testFlag(Qn::GlobalOwnerPermission))
+        ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermission);
 
     ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissions);
     ui->accessRightsComboBox->addItem(tr("Viewer"), Qn::GlobalViewerPermissions);
@@ -524,12 +520,14 @@ void QnUserSettingsDialog::createAccessRightsAdvanced()
     Qn::GlobalPermissions permissions = accessController()->globalPermissions(m_user);
     QWidget* previous = ui->advancedButton;
 
-    if (permissions.testFlag(Qn::GlobalEditProtectedUserPermission))
-        previous = createAccessRightCheckBox(tr("Owner"), Qn::ExcludingOwnerPermission, previous);
-    if (permissions.testFlag(Qn::GlobalProtectedPermission) || accessController()->globalPermissions().testFlag(Qn::GlobalEditProtectedUserPermission))
+    if (permissions.testFlag(Qn::GlobalOwnerPermission))
+        previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalOwnerPermission, previous);
+
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->globalPermissions().testFlag(Qn::GlobalOwnerPermission))
         previous = createAccessRightCheckBox(tr("Administrator"),
-                     Qn::ExcludingAdminPermission,
+                     Qn::GlobalAdminPermission,
                      previous);
+
     previous = createAccessRightCheckBox(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Can adjust devices settings"),
         tr("Can adjust cameras settings")

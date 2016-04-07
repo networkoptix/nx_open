@@ -62,6 +62,14 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &re
     return m_dataByResource.value(resource).permissions;
 }
 
+Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourceList &resources) const
+{
+    Qn::Permissions result = Qn::AllPermissions;
+    for (const QnResourcePtr &resource : resources)
+        result &= permissions(resource);
+    return result;
+}
+
 bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const {
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
@@ -83,8 +91,11 @@ Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions(const QnUse
 
     result = static_cast<Qn::GlobalPermissions>(static_cast<int>(user->getPermissions()));
 
-    if(user->isAdmin())
-        result |= Qn::GlobalOwnerPermissions;
+    if (user->isAdmin() || result.testFlag(Qn::GlobalOwnerPermission))
+        result |= Qn::GlobalOwnerPermissionsSet;
+
+    if (result.testFlag(Qn::GlobalAdminPermission))
+        result |= Qn::GlobalAdminPermissionsSet;
 
     return Qn::undeprecate(result);
 }
@@ -161,7 +172,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
             return result;
 
         /* Protected users can only be edited by super-user. */
-        if (m_userPermissions.testFlag(Qn::GlobalEditProtectedUserPermission) || !globalPermissions(user).testFlag(Qn::GlobalProtectedPermission))
+        if (m_userPermissions.testFlag(Qn::GlobalOwnerPermission) || !globalPermissions(user).testFlag(Qn::GlobalAdminPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
 

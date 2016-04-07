@@ -55,13 +55,7 @@ public:
      * \param resources                 List of resources to get combined permissions for.
      * \returns                         Bitwise AND combination of permissions for the provided resources.
      */
-    template<class ResourceList>
-    Qn::Permissions permissions(const ResourceList &resources, const typename ResourceList::const_iterator * = NULL /* Let SFINAE filter out non-lists. */) const {
-        Qn::Permissions result = Qn::AllPermissions;
-        foreach(const QnResourcePtr &resource, resources)
-            result &= permissions(resource);
-        return result;
-    }
+    Qn::Permissions permissions(const QnResourceList &resources) const;
 
     /**
      * \returns                         Global permissions of the current user,

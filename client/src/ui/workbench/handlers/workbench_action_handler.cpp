@@ -2198,7 +2198,7 @@ void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
 
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions().testFlag(Qn::GlobalProtectedPermission));
+        (accessController()->globalPermissions().testFlag(Qn::GlobalAdminPermission));
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
 
     //}
@@ -2208,7 +2208,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions().testFlag(Qn::GlobalProtectedPermission));
+        (accessController()->globalPermissions().testFlag(Qn::GlobalAdminPermission));
 
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)

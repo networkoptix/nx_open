@@ -203,9 +203,9 @@ public:
         return *this;
     }
 
-    QnActionBuilder requiredGlobalPermissions(Qn::GlobalPermissions permissions)
+    QnActionBuilder requiredGlobalPermission(Qn::GlobalPermission permission)
     {
-        m_action->setRequiredGlobalPermissions(permissions);
+        m_action->setRequiredGlobalPermission(permission);
 
         return *this;
     }
@@ -466,11 +466,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::PreferencesLicensesTabAction).
         flags(Qn::NoTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission);
+        requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(QnActions::PreferencesSmtpTabAction).
         flags(Qn::NoTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission);
+        requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(QnActions::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
@@ -511,7 +511,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget
             | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         icon(qnSkin->icon("events/log.png")).
         shortcut(lit("Ctrl+L")).
         text(tr("Event Log..."));
@@ -519,24 +519,24 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::OpenBusinessRulesAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Alarm/Event Rules..."));
 
     factory(QnActions::OpenFailoverPriorityAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Failover Priority..."));
 
     factory(QnActions::OpenBackupCamerasAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::NoTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Cameras to Backup..."));
 
     factory(QnActions::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Control Video Wall")).
         condition(new QnConjunctionActionCondition(
             new QnStartVideoWallControlActionCondition(this),
@@ -545,7 +545,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Push my screen")).
         condition(new QnConjunctionActionCondition(
             new QnDesktopCameraActionCondition(this),
@@ -558,7 +558,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::SelectTimeServerAction).
         flags(Qn::NoTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Select Time Server"));
 
     factory(QnActions::PtzActivatePresetAction).
@@ -621,7 +621,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(lit("Ctrl+P")).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnPanicActionCondition(this));
 
     factory().
@@ -664,7 +664,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewUserAction).
             flags(Qn::Main | Qn::Tree).
-            requiredGlobalPermissions(Qn::GlobalEditUsersPermission).
+            requiredGlobalPermission(Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User...")).
             condition(new QnConjunctionActionCondition(
@@ -676,7 +676,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewVideoWallAction).
             flags(Qn::Main).
-            requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+            requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
             condition(new QnForbiddenInSafeModeCondition(this)).
@@ -684,7 +684,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewWebPageAction).
             flags(Qn::Main | Qn::Tree).
-            requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("Web Page...")).
             pulledText(tr("New Web Page...")).
             condition(new QnConjunctionActionCondition(
@@ -733,7 +733,7 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main).
             text(tr("Web Client...")).
             autoRepeat(false).
-            requiredGlobalPermissions(Qn::GlobalProtectedPermission);
+            requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     } factory.endSubMenu();
 
@@ -835,7 +835,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Show Version Mismatch Message"));
 
     factory(QnActions::BetaVersionMessageAction).
@@ -846,7 +846,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::AllowStatisticsReportMessageAction).
         flags(Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Ask About Statistics Reporting"));
 
     factory(QnActions::BrowseUrlAction).
@@ -859,24 +859,24 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(QnActions::WebClientAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(QnActions::SystemUpdateAction).
         flags(Qn::NoTarget).
         text(tr("System Update...")).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission);
+        requiredGlobalPermission(Qn::GlobalAdminPermission);
 
     factory(QnActions::UserManagementAction).
         flags(Qn::Main | Qn::Tree).
-        requiredGlobalPermissions(Qn::GlobalEditUsersPermission).
+        requiredGlobalPermission(Qn::GlobalEditUsersPermission).
         text(tr("User Management...")).
         condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
 
@@ -889,12 +889,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenAuditLogAction).
         flags(Qn::Main).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Audit Trail..."));
 
     factory(QnActions::OpenBookmarksSearchAction).
         flags(Qn::Main | Qn::GlobalHotkey).
-        requiredGlobalPermissions(Qn::GlobalViewArchivePermission).
+        requiredGlobalPermission(Qn::GlobalViewArchivePermission).
         text(tr("Bookmark Search...")).
         shortcut(lit("Ctrl+B")).
         autoRepeat(false);
@@ -926,7 +926,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::BusinessEventsAction).
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Alarm/Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
         shortcut(lit("Ctrl+E")).
@@ -935,7 +935,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::CameraListAction).
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("Devices List"),
             tr("Cameras List")
@@ -946,7 +946,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::MergeSystems).
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
-        requiredGlobalPermissions(Qn::GlobalOwnerPermissions).
+        requiredGlobalPermission(Qn::GlobalOwnerPermission).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ServersNode, this),
             new QnForbiddenInSafeModeCondition(this),
@@ -1083,14 +1083,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::IdentifyVideoWallAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Identify")).
         autoRepeat(false).
         condition(new QnIdentifyVideoWallActionCondition(this));
 
     factory(QnActions::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
@@ -1100,7 +1100,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Switch to Video Wall mode...")).
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
@@ -1109,7 +1109,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Save Video Wall View")).
         shortcut(lit("Ctrl+S")).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
             new QnSaveVideowallReviewActionCondition(false, this),
@@ -1118,7 +1118,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Save Current Matrix")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
@@ -1128,13 +1128,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoadVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallMatrixTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         condition(new QnForbiddenInSafeModeCondition(this)).
         text(tr("Load Matrix"));
 
     factory(QnActions::DeleteVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallMatrixTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
@@ -1156,14 +1156,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::StopVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
         condition(new QnRunningVideowallActionCondition(this));
 
     factory(QnActions::DetachFromVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Detach Layout")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
@@ -1191,7 +1191,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::DeleteVideoWallItemAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
@@ -1407,7 +1407,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::RenameVideowallEntityAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallItemTarget | Qn::VideoWallMatrixTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermissions(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
         text(tr("Rename")).
         shortcut(lit("F2")).
         condition(new QnForbiddenInSafeModeCondition(this)).
@@ -1448,7 +1448,7 @@ QnActionManager::QnActionManager(QObject *parent):
                 tr("Check Camera Issues..."),       tr("Check Cameras Issues..."),
                 tr("Check I/O Module Issues..."),    tr("Check I/O Modules Issues...")
             ), this)).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
             new QnPreviewSearchModeCondition(true, this),
@@ -1463,7 +1463,7 @@ QnActionManager::QnActionManager(QObject *parent):
                 tr("Camera Rules..."),          tr("Cameras Rules..."),
                 tr("I/O Module Rules..."),       tr("I/O Modules Rules...")
             ), this)).
-        requiredGlobalPermissions(Qn::GlobalProtectedPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::ExactlyOne, this),
             new QnPreviewSearchModeCondition(true, this),
@@ -1478,7 +1478,7 @@ QnActionManager::QnActionManager(QObject *parent):
                 tr("Camera Settings..."),       tr("Cameras Settings..."),
                 tr("I/O Module Settings..."),    tr("I/O Modules Settings...")
             ), this)).
-        requiredGlobalPermissions(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
              new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
              new QnPreviewSearchModeCondition(true, this),
@@ -1551,7 +1551,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredGlobalPermissions(Qn::GlobalEditServersPermissions).
+        requiredGlobalPermission(Qn::GlobalEditServersPermissions).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
@@ -1559,7 +1559,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        requiredGlobalPermissions(Qn::GlobalOwnerPermissions).
+        requiredGlobalPermission(Qn::GlobalOwnerPermission).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
@@ -1693,7 +1693,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::EditCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Edit Bookmark...")).
-        requiredGlobalPermissions(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
@@ -1702,7 +1702,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::RemoveCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Remove Bookmark...")).
-        requiredGlobalPermissions(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
@@ -1711,7 +1711,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::RemoveBookmarksAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Remove Bookmarks...")).
-        requiredGlobalPermissions(Qn::GlobalEditCamerasPermission).
+        requiredGlobalPermission(Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnRemoveBookmarksActionCondition(this),

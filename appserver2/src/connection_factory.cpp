@@ -713,8 +713,8 @@ namespace ec2
          *     %value false
          *     %value true
          * %param permissions Combination (via "|") of the following flags:
-         *     %value GlobalEditProtectedUserPermission Root, can edit admins.
-         *     %value GlobalProtectedPermission Admin, can edit other non-admins.
+         *     %value GlobalOwnerPermission Root, can edit admins.
+         *     %value GlobalAdminPermission Admin, can edit other non-admins.
          *     %value GlobalEditLayoutsPermission Can create and edit layouts.
          *     %value GlobalEditUsersPermission Can create and edit users.
          *     %value GlobalEditServersPermissions Can edit server settings.

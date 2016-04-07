@@ -73,7 +73,7 @@ void QnLicensesProposeWidget::updateLicenseText() {
 }
 
 void QnLicensesProposeWidget::updateLicensesButtonVisible() {
-    ui->moreLicensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+    ui->moreLicensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalAdminPermission);
 }
 
 QnVirtualCameraResourceList QnLicensesProposeWidget::cameras() const {

@@ -74,7 +74,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     //TODO: #GDM #Business check if camera is visible to us
     QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
     if (userGroup == QnBusiness::AdminOnly
-            && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
+            && !(accessController()->globalPermissions() & Qn::GlobalAdminPermission)) {
         return;
     }
 
@@ -186,7 +186,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
         }
     } else {
         /* Only admins can see some system health events */
-        if (adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
+        if (adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalAdminPermission))
             canShow = false;
     }
 
@@ -255,13 +255,15 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
     bool visible = !isValid;
     if (context()->user() == user)
+    {
         setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user, visible);
-    else {
+    }
+    else
+    {
         /* Checking that we are allowed to see this message */
-        if (visible) {
-            // usual admins can not edit other admins, owner can
-            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
-                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
+        if (visible)
+        {
+            if (accessController()->permissions(user).testFlag(Qn::WriteEmailPermission))
                 visible = false;
         }
         setSystemHealthEventVisible( QnSystemHealth::UsersEmailIsEmpty, user, visible );

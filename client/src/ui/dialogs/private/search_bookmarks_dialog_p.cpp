@@ -425,7 +425,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
 
 bool QnSearchBookmarksDialogPrivate::currentUserHasAdminPrivileges()
 {
-    return accessController()->hasGlobalPermission(Qn::GlobalProtectedPermission);
+    return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 }
 
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()

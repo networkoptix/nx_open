@@ -4,18 +4,15 @@
 #include <cassert>
 #include <limits>
 
-#define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
-#include <cstdint>
-
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
+#include <common/user_permissions.h>
+
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
-
-#include <limits>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -47,7 +44,9 @@ namespace Qn
             CameraCapabilities
             PtzDataFields PtzCapabilities PtzTraits
             MotionTypes TimePeriodTypes
-            ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes)
+            ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
+            Permissions GlobalPermissions
+        )
 public:
 #else
     Q_NAMESPACE
@@ -897,7 +896,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::Permissions)(Qn::GlobalPermissions)
+    ,
     (metatype)(numeric)(lexical)
 )
 

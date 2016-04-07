@@ -45,7 +45,7 @@ QnWorkbenchLicenseNotifier::~QnWorkbenchLicenseNotifier() {
 
 void QnWorkbenchLicenseNotifier::checkLicenses()
 {
-    if (!context()->accessController()->hasGlobalPermission(Qn::GlobalProtectedPermission))
+    if (!context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
     QnLicenseWarningStateHash licenseWarningStates = qnSettings->licenseWarningStates();

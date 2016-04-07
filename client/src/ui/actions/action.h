@@ -76,7 +76,7 @@ public:
     /**
     * \param requiredPermissions       Global permissions that the current user must have.
     */
-    void setRequiredGlobalPermissions(Qn::GlobalPermissions requiredPermissions);
+    void setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissions);
 
 
     QnActionTypes::ClientModes mode() const;
@@ -191,7 +191,7 @@ private:
     Qn::ActionFlags m_flags;
     QnActionTypes::ClientModes m_mode;
     QHash<int, Qn::Permissions> m_targetPermissions;
-    Qn::GlobalPermissions m_globalPermissions;
+    Qn::GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     QPointer<QnActionCondition> m_condition;

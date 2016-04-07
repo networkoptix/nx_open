@@ -9,7 +9,7 @@
 
 namespace {
     bool userIsAdmin(const QnUserResourcePtr &user) {
-        return user->isAdmin() || (user->getPermissions() & Qn::GlobalProtectedPermission);
+        return user->isAdmin() || (user->getPermissions() & Qn::GlobalAdminPermission);
     }
 }
 

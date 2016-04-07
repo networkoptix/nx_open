@@ -34,7 +34,7 @@ QnAction::QnAction(QnActions::IDType id, QObject *parent):
     m_id(id),
     m_flags(0),
     m_mode(QnActionTypes::AnyMode),
-    m_globalPermissions(Qn::NoGlobalPermissions),
+    m_globalPermission(Qn::NoGlobalPermissions),
     m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
@@ -75,9 +75,9 @@ void QnAction::setRequiredTargetPermissions(int target, Qn::Permissions required
     m_targetPermissions[target] = requiredPermissions;
 }
 
-void QnAction::setRequiredGlobalPermissions(Qn::GlobalPermissions requiredPermissions)
+void QnAction::setRequiredGlobalPermission(Qn::GlobalPermission requiredPermission)
 {
-    m_globalPermissions = requiredPermissions;
+    m_globalPermission = requiredPermission;
 }
 
 QnActionTypes::ClientModes QnAction::mode() const

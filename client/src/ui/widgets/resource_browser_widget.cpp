@@ -799,7 +799,7 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
 
 void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel *model) const {
     /* Always accept servers for administrator users. */
-    if (accessController()->hasGlobalPermission(Qn::GlobalProtectedPermission))
+    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
     {
         model->addCriterion(QnResourceCriterion(Qn::server));
     }

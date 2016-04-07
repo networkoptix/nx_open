@@ -2,10 +2,6 @@
 
 #ifdef __cplusplus  // For safe iOS build
 #include <utils/common/model_functions_fwd.h>
-#endif
-
-// TODO: #ynikitenkov Add serialization using metaobject
-#ifndef QN_NO_NAMESPACES
 namespace Qn
 {
 #endif
@@ -50,20 +46,21 @@ namespace Qn
 #ifdef __cplusplus
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Permission)
 #endif
 
     /**
      * Flags describing global user capabilities, independently of resources. Stored in the database.
-     * QFlags uses int internally and don't have a constructor from quint64, so
-     * if we place values bigger than uint max to the user permission, we should double-check all.
+     * QFlags uses int internally and don't have a constructor from quint64, so if we place values
+     * bigger than int max to the user permission, we should double-check it.
      */
     enum GlobalPermission
     {
         /* Generic permissions. */
         NoGlobalPermissions                     = 0x00000000,   /**< No access */
 
-        GlobalEditProtectedUserPermission       = 0x00000001,   /**< Root, can edit admins. */
-        GlobalProtectedPermission               = 0x00000002,   /**< Admin, can edit other non-admins. */
+        GlobalOwnerPermission                   = 0x00000001,   /**< Root, can edit admins. */
+        GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
         GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
         GlobalEditUsersPermission               = 0x00000008,   /**< Can create and edit users. */
         GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
@@ -82,14 +79,15 @@ namespace Qn
         GlobalLiveViewerPermissions             = GlobalViewLivePermission,
         GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
         GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission |
-                                                    GlobalProtectedPermission | GlobalEditServersPermissions | GlobalEditVideoWallPermission,
-        GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
+        GlobalAdminPermissionsSet               = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission |
+                                                  GlobalAdminPermission             | GlobalEditServersPermissions | GlobalEditVideoWallPermission,
+        GlobalOwnerPermissionsSet               = GlobalAdminPermissionsSet | GlobalOwnerPermission,
     };
 
 #ifdef __cplusplus
     Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
 #endif
 
 
@@ -104,11 +102,7 @@ namespace Qn
     Qn::Permissions operator-(Qn::Permissions minuend, Qn::Permission subrahend);
     Qn::Permissions operator-(Qn::Permission minuend, Qn::Permission subrahend);
 
-#ifndef QN_NO_NAMESPACES
+#ifdef __cplusplus
 } // namespace Qn
 #endif
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::Permission)(Qn::Permissions)(Qn::GlobalPermission)(Qn::GlobalPermissions),
-    (lexical)
-    )

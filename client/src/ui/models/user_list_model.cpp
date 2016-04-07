@@ -120,12 +120,12 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex &index) const {
 QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user) const {
     QStringList permissionStrings;
 
-    qint64 permissions = model->accessController()->globalPermissions(user);
+    Qn::GlobalPermissions permissions = model->accessController()->globalPermissions(user);
 
-    if (permissions & Qn::GlobalEditProtectedUserPermission)
+    if (permissions.testFlag(Qn::GlobalOwnerPermission))
         permissionStrings.append(tr("Owner"));
 
-    if (permissions & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission))
+    if (permissions & (Qn::GlobalAdminPermission | Qn::GlobalOwnerPermission))
         permissionStrings.append(tr("Administrator"));
 
     if ((permissions & Qn::GlobalViewLivePermission) && permissionStrings.isEmpty())
@@ -166,7 +166,7 @@ Qt::CheckState QnUserListModelPrivate::checkState() const {
 
     if (checkedUsers.size() == userList.size())
         return Qt::Checked;
-    
+
     return Qt::PartiallyChecked;
 }
 
@@ -333,7 +333,7 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
 
     auto roles = QVector<int>() << Qt::CheckStateRole << Qt::BackgroundRole << Qt::ForegroundRole;
 
-    d->setCheckState(state, user);  
+    d->setCheckState(state, user);
     if (!user) {
         emit dataChanged(index(0, CheckBoxColumn), index(d->userList.size() - 1, ColumnCount - 1), roles);
     }
@@ -342,7 +342,7 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
         if (row >= 0)
             emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
     }
-        
+
 }
 
 const QnUserManagementColors QnUserListModel::colors() const {

@@ -42,7 +42,7 @@ QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
     Handlers::const_iterator i = m_handlers.upperBound(path);
     if (i == m_handlers.begin())
         return path.startsWith(i.key()) ? i.value() : QnRestRequestHandlerPtr();
-    while (i-- != m_handlers.begin()) 
+    while (i-- != m_handlers.begin())
     {
         if (path.startsWith(i.key()))
             return i.value();
@@ -103,7 +103,7 @@ void QnRestConnectionProcessor::run()
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
-    if (handler) 
+    if (handler)
     {
         if (handler->permissions() == RestPermissions::adminOnly)
         {
@@ -115,7 +115,7 @@ void QnRestConnectionProcessor::run()
             }
 
 
-            bool isAdmin = user->isAdmin() || ((user->getPermissions() & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission)) > 0);
+            bool isAdmin = user->isAdmin() || ((user->getPermissions() & (Qn::GlobalAdminPermission | Qn::GlobalOwnerPermission)) > 0);
             if (!isAdmin)
             {
                 sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
@@ -126,7 +126,7 @@ void QnRestConnectionProcessor::run()
         if (d->request.requestLine.method.toUpper() == "GET") {
             rez = handler->executeGet(url.path(), params, d->response.messageBody, contentType, this);
         }
-        else if (d->request.requestLine.method.toUpper() == "POST" || 
+        else if (d->request.requestLine.method.toUpper() == "POST" ||
                  d->request.requestLine.method.toUpper() == "PUT") {
             rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->response.messageBody, contentType, this);
         }
@@ -142,7 +142,7 @@ void QnRestConnectionProcessor::run()
     }
     QByteArray contentEncoding;
     QByteArray uncompressedResponse = d->response.messageBody;
-    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK) 
+    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty() && rez == CODE_OK)
     {
         if (!contentType.contains("image")) {
             d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
