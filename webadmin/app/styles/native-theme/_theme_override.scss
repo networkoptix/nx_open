@@ -143,17 +143,16 @@ button, select{
   }
 }
 
-.ui-select-choices{
-  background-color: $light4 !important;
-  color:$dark4 !important;;
-}
+.form-control {
+  fieldset[disabled] &,
+  &[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
 
-.ui-select-choices-row:hover {
-  background-color: $light2 !important;
-  color:$dark2 !important;
-}
-
-
-.ui-select-choices-row.active {
-  background-color: $brand_core !important;
+  &[readonly]
+  {
+    border-color: transparentize($shadow,0.6);
+    cursor: default;
+  }
 }

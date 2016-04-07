@@ -55,17 +55,26 @@
   text-align: left;
 }
 
+.ui-select-bootstrap > .btn-default-focus{
+  box-shadow: none;
+  outline:none;
+  border-color: $input-border;
+  background-color: $dark10;
+}
 .ui-select-bootstrap > .btn-default-focus > .btn,
 .ui-select-bootstrap > .ui-select-match > .btn{
   background-color: $input-bg;
   border-color: $input-border;
   color: $input-color;
   font-weight: normal;
+  padding-left:8px;
+  padding-right:8px;
 }
 .ui-select-bootstrap .ui-select-choices-row>a{
   padding-left: 7px;
   padding-right: 7px;
 }
+
 
 
 /* touched, invalid - highlight with red */
@@ -77,6 +86,25 @@
 .ui-select-container > .btn-default-focus > .btn{
   border-color: $input-border !important;
 }
+
+
+.ui-select-choices{
+  background-color: $light4 !important;
+  color:$dark4 !important;;
+}
+
+.ui-select-choices-row:hover {
+  background-color: $light2 !important;
+  color:$dark2 !important;
+}
+
+
+.ui-select-choices-row.active {
+  background-color: $brand_core !important;
+}
+
+
+
 
 .master .alert{
   padding:10px;
