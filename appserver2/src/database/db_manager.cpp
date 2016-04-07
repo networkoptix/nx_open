@@ -610,7 +610,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
         userResource.reset(new QnUserResource());
         fromApiToResource(*iter, userResource);
-        NX_ASSERT(userResource->isAdmin(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
+        NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
     }
 
     QByteArray md5Password;

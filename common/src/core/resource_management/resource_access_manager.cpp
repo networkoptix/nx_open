@@ -1,8 +1,8 @@
 #include "resource_access_manager.h"
 
 #include <api/app_server_connection.h>
-#include <nx_ec/managers/abstract_user_manager.h>
 
+#include <core/resource/user_resource.h>
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/)
 {
@@ -50,4 +50,41 @@ void QnResourceAccessManager::setAccessRights(const ec2::ApiAccessRightsData& ac
     {
         m_values.push_back(accessRights);
     }
+}
+
+Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr &user) const
+{
+    Qn::GlobalPermissions result(Qn::NoGlobalPermissions);
+
+    if (!user)
+        return result;
+
+    result = user->getPermissions();
+
+    if (user->isOwner() || result.testFlag(Qn::GlobalOwnerPermission))
+        result |= Qn::GlobalOwnerPermissionsSet;
+
+    if (result.testFlag(Qn::GlobalAdminPermission))
+        result |= Qn::GlobalAdminPermissionsSet;
+
+    return undeprecate(result);
+}
+
+Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions permissions)
+{
+    Qn::GlobalPermissions result = permissions;
+
+    if (result.testFlag(Qn::DeprecatedEditCamerasPermission))
+    {
+        result &= ~Qn::DeprecatedEditCamerasPermission;
+        result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
+    }
+
+    if (result.testFlag(Qn::DeprecatedViewExportArchivePermission))
+    {
+        result &= ~Qn::DeprecatedViewExportArchivePermission;
+        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
+    }
+
+    return result;
 }

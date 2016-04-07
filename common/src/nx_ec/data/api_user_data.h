@@ -9,8 +9,8 @@ namespace ec2
     struct ApiUserData : ApiResourceData {
         ApiUserData(): isAdmin(false), permissions(0) {}
 
-        bool isAdmin;
-        qint64 permissions;
+        bool isAdmin; /**< Really this flag must be named isOwner, but we must keep it to maintain mobile client compatibility. */
+        Qn::GlobalPermissions permissions;
         QString email;
         QnLatin1Array digest;
         QnLatin1Array hash;

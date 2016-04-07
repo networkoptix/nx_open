@@ -5,15 +5,13 @@
 
 #ifdef Q_MOC_RUN
 class QnServer
-#else
-namespace QnServer
-#endif
 {
-#ifdef Q_MOC_RUN
     Q_GADGET
-        Q_ENUMS(ChunksCatalog)
+    Q_ENUMS(ChunksCatalog)
 public:
 #else
+namespace QnServer
+{
     Q_NAMESPACE
 #endif
 
@@ -32,13 +30,13 @@ public:
         Both    = Normal | Backup
     };
 
-    inline StoragePool 
+    inline StoragePool
     operator | (StoragePool lhs, StoragePool rhs) {
         return static_cast<StoragePool>
             (static_cast<int>(lhs) | static_cast<int>(rhs));
     }
 
-    inline StoragePool 
+    inline StoragePool
     operator & (StoragePool lhs, StoragePool rhs) {
         return static_cast<StoragePool>
             (static_cast<int>(lhs) & static_cast<int>(rhs));

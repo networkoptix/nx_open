@@ -147,12 +147,12 @@ void QnUserManagementWidget::updateSelection() {
     ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
         return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
             && user->isEnabled()
-            && !user->isAdmin();
+            && !user->isOwner();
     }));
 
     ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr &user) {
         return accessController()->hasPermissions(user, Qn::RemovePermission)
-            && !user->isAdmin();
+            && !user->isOwner();
     }));
 
     update();
@@ -222,7 +222,7 @@ void QnUserManagementWidget::clearSelection() {
 
 void QnUserManagementWidget::setSelectedEnabled(bool enabled) {
     for (QnUserResourcePtr user : visibleSelectedUsers()) {
-        if (user->isAdmin())
+        if (user->isOwner())
             continue;
         if (!accessController()->hasPermissions(user, Qn::WritePermission))
             continue;
@@ -244,7 +244,7 @@ void QnUserManagementWidget::disableSelected() {
 void QnUserManagementWidget::deleteSelected() {
     QnUserResourceList usersToDelete;
     for (QnUserResourcePtr user : visibleSelectedUsers()) {
-        if (user->isAdmin())
+        if (user->isOwner())
             continue;
         if (!accessController()->hasPermissions(user, Qn::RemovePermission))
             continue;

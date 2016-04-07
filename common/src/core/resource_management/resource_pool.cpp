@@ -464,7 +464,8 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
     return result;
 }
 
-QnUserResourcePtr QnResourcePool::getAdministrator() const {
+QnUserResourcePtr QnResourcePool::getAdministrator() const
+{
     QnMutexLocker locker( &m_resourcesMtx );
     if (m_adminResource)
         return m_adminResource;
@@ -472,7 +473,7 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const {
     for(const QnResourcePtr &resource: m_resources)
     {
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (user && user->isAdmin()) {
+        if (user && user->isOwner()) {
             m_adminResource = user;
             return user;
         }

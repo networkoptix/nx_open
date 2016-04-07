@@ -26,7 +26,10 @@
 
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-#define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
+namespace
+{
+    const int kCustomRights = 0x00FFFFFF;
+}
 
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -262,10 +265,10 @@ void QnUserSettingsDialog::submitToResource() {
 
     /* User cannot change it's own rights */
     if (m_accessRightsModified && (permissions & Qn::WriteAccessRightsPermission)) {
-        quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-        if (rights == CUSTOM_RIGHTS)
+        int rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toInt();
+        if (rights == kCustomRights)
             rights = readAccessRightsAdvanced();
-        m_user->setPermissions(rights);
+        m_user->setPermissions(static_cast<Qn::GlobalPermissions>(rights));
     }
     if( m_emailModified )
         m_user->setEmail(ui->emailEdit->text());
@@ -390,8 +393,8 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Choose access rights.");
             valid = false;
         } else {
-            quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-            if (rights == CUSTOM_RIGHTS)
+            int rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toInt();
+            if (rights == kCustomRights)
                 ui->advancedButton->setChecked(true);
             else
                 fillAccessRightsAdvanced(rights);
@@ -418,7 +421,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
     setHint(element, hint);
 }
 
-void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights) {
+void QnUserSettingsDialog::loadAccessRightsToUi(int rights) {
     selectAccessRightsPreset(rights);
     fillAccessRightsAdvanced(rights);
 }
@@ -509,7 +512,7 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     ui->accessRightsComboBox->addItem(tr("Viewer"), Qn::GlobalViewerPermissions);
     ui->accessRightsComboBox->addItem(tr("Live Viewer"), Qn::GlobalLiveViewerPermissions);
 
-    ui->accessRightsComboBox->addItem(tr("Custom..."), CUSTOM_RIGHTS); // should be the last
+    ui->accessRightsComboBox->addItem(tr("Custom..."), kCustomRights); // should be the last
 }
 
 void QnUserSettingsDialog::createAccessRightsAdvanced()
@@ -540,7 +543,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced()
     updateDependantPermissions();
 }
 
-QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous)
+QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, int right, QWidget *previous)
 {
     QCheckBox *checkBox = new QCheckBox(text, this);
     ui->accessRightsGroupbox->layout()->addWidget(checkBox);
@@ -554,7 +557,7 @@ QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64
     return checkBox;
 }
 
-void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights)
+void QnUserSettingsDialog::selectAccessRightsPreset(int rights)
 {
     bool custom = true;
     for (int i = 0; i < ui->accessRightsComboBox->count(); i++)
@@ -574,14 +577,14 @@ void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights)
     }
 }
 
-void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights)
+void QnUserSettingsDialog::fillAccessRightsAdvanced(int rights)
 {
     if (m_inUpdateDependensies)
         return; //just in case
 
     m_inUpdateDependensies = true;
 
-    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+    for(auto pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
         if(pos.value())
             pos.value()->setChecked((pos.key() & rights) == pos.key());
     m_inUpdateDependensies = false;
@@ -589,10 +592,10 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights)
     updateDependantPermissions(); // TODO: #GDM #Common rename to something more sane, connect properly
 }
 
-quint64 QnUserSettingsDialog::readAccessRightsAdvanced()
+int QnUserSettingsDialog::readAccessRightsAdvanced()
 {
-    quint64 result = Qn::GlobalViewLivePermission;
-    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+    int result = Qn::GlobalViewLivePermission;
+    for(auto pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
         if(pos.value() && pos.value()->isChecked())
             result |= pos.key();
     return result;
@@ -618,17 +621,17 @@ void QnUserSettingsDialog::at_advancedButton_toggled()
 
 // Utility functions
 
-bool QnUserSettingsDialog::isCheckboxChecked(quint64 right){
+bool QnUserSettingsDialog::isCheckboxChecked(int right){
     return m_advancedRights[right] ? m_advancedRights[right]->isChecked() : false;
 }
 
-void QnUserSettingsDialog::setCheckboxChecked(quint64 right, bool checked){
+void QnUserSettingsDialog::setCheckboxChecked(int right, bool checked){
     if(QCheckBox *targetCheckBox = m_advancedRights[right]) {
         targetCheckBox->setChecked(checked);
     }
 }
 
-void QnUserSettingsDialog::setCheckboxEnabled(quint64 right, bool enabled){
+void QnUserSettingsDialog::setCheckboxEnabled(int right, bool enabled){
     if(QCheckBox *targetCheckBox = m_advancedRights[right]) {
         targetCheckBox->setEnabled(enabled);
     }

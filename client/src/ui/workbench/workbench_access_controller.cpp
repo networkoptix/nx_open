@@ -18,6 +18,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_criterion.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -84,20 +85,7 @@ Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions(const QnUse
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return Qn::GlobalViewerPermissions;
 
-    Qn::GlobalPermissions result(Qn::NoGlobalPermissions);
-
-    if(!user)
-        return result;
-
-    result = static_cast<Qn::GlobalPermissions>(static_cast<int>(user->getPermissions()));
-
-    if (user->isAdmin() || result.testFlag(Qn::GlobalOwnerPermission))
-        result |= Qn::GlobalOwnerPermissionsSet;
-
-    if (result.testFlag(Qn::GlobalAdminPermission))
-        result |= Qn::GlobalAdminPermissionsSet;
-
-    return Qn::undeprecate(result);
+    return qnResourceAccessManager->globalPermissions(user);
 }
 
 bool QnWorkbenchAccessController::hasGlobalPermission(Qn::GlobalPermission requiredPermission) const
@@ -193,19 +181,19 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     auto checkReadOnly = [this, layout](Qn::Permissions permissions) {
         if (!m_readOnlyMode)
             return permissions;
-        return permissions - (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
+        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
 
     auto checkLoggedIn = [this, layout](Qn::Permissions permissions) {
         if (context()->user())
             return permissions;
-        return permissions - (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
+        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
 
     auto checkLocked = [this, layout](Qn::Permissions permissions) {
         if (!layout->locked())
             return permissions;
-        return permissions - (Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
+        return permissions &~ (Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
     };
 
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);

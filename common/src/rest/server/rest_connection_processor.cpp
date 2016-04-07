@@ -9,8 +9,8 @@
 #include "request_handler.h"
 #include "utils/gzip/gzip_compressor.h"
 #include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
-#include "common/user_permissions.h"
 
 static const QByteArray NOT_ADMIN_UNAUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -114,8 +114,7 @@ void QnRestConnectionProcessor::run()
                 return;
             }
 
-
-            bool isAdmin = user->isAdmin() || ((user->getPermissions() & (Qn::GlobalAdminPermission | Qn::GlobalOwnerPermission)) > 0);
+            bool isAdmin = qnResourceAccessManager->globalPermissions(user).testFlag(Qn::GlobalAdminPermission);
             if (!isAdmin)
             {
                 sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);

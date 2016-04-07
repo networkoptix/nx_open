@@ -12,7 +12,7 @@ static const int MSEC_PER_SEC = 1000;
 
 QnUserResource::QnUserResource():
     m_permissions(0),
-    m_isAdmin(false),
+    m_isOwner(false),
 	m_isLdap(false),
 	m_isEnabled(true),
     m_passwordExpirationTimestamp(0)
@@ -30,7 +30,7 @@ QnUserResource::QnUserResource(const QnUserResource& right)
     m_cryptSha512Hash(right.m_cryptSha512Hash),
     m_realm(right.m_realm),
     m_permissions(right.m_permissions),
-    m_isAdmin(right.m_isAdmin),
+    m_isOwner(right.m_isOwner),
     m_isLdap(right.m_isLdap),
     m_isEnabled(right.m_isEnabled),
     m_email(right.m_email),
@@ -170,13 +170,13 @@ void QnUserResource::setRealm( const QString& realm )
     m_realm = realm;
 }
 
-quint64 QnUserResource::getPermissions() const
+Qn::GlobalPermissions QnUserResource::getPermissions() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_permissions;
 }
 
-void QnUserResource::setPermissions(quint64 permissions)
+void QnUserResource::setPermissions(Qn::GlobalPermissions permissions)
 {
     {
         QnMutexLocker locker( &m_mutex );
@@ -187,21 +187,21 @@ void QnUserResource::setPermissions(quint64 permissions)
     emit permissionsChanged(::toSharedPointer(this));
 }
 
-bool QnUserResource::isAdmin() const
+bool QnUserResource::isOwner() const
 {
     QnMutexLocker locker( &m_mutex );
-    return m_isAdmin;
+    return m_isOwner;
 }
 
-void QnUserResource::setAdmin(bool isAdmin)
+void QnUserResource::setOwner(bool isOwner)
 {
     {
         QnMutexLocker locker( &m_mutex );
-        if (m_isAdmin == isAdmin)
+        if (m_isOwner == isOwner)
             return;
-        m_isAdmin = isAdmin;
+        m_isOwner = isOwner;
     }
-    emit adminChanged(::toSharedPointer(this));
+    emit permissionsChanged(::toSharedPointer(this));
 }
 
 bool QnUserResource::isLdap() const
@@ -278,14 +278,16 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             modifiedFields << "cryptSha512HashChanged";
         }
 
-        if (m_permissions != localOther->m_permissions) {
+        if (m_permissions != localOther->m_permissions)
+        {
             m_permissions = localOther->m_permissions;
             modifiedFields << "permissionsChanged";
         }
 
-        if (m_isAdmin != localOther->m_isAdmin) {
-            m_isAdmin = localOther->m_isAdmin;
-            modifiedFields << "adminChanged";
+        if (m_isOwner != localOther->m_isOwner)
+        {
+            m_isOwner = localOther->m_isOwner;
+            modifiedFields << "permissionsChanged";
         }
 
         if (m_email != localOther->m_email) {
