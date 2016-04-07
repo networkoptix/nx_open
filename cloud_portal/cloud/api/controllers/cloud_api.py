@@ -5,6 +5,12 @@ from cloud import settings
 from api.helpers.exceptions import validate_response
 
 
+@validate_response
+def ping():
+    request = settings.CLOUD_CONNECT['url'] + "/cdb/ping"
+    return requests.get(request)
+
+
 class System(object):
     @staticmethod
     @validate_response

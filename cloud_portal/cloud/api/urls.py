@@ -1,7 +1,7 @@
 __author__ = 'noptix'
 
 from django.conf.urls import url
-from api.views import account, systems
+from api.views import account, systems, common
 
 urlpatterns = [
     url(r'^account/activate',           account.activate),
@@ -19,4 +19,7 @@ urlpatterns = [
     url(r'^systems/(?P<system_id>.+?)/users',       systems.sharing),
     url(r'^systems/(?P<system_id>.+?)/?$',          systems.system),
     url(r'^systems',                                systems.list_systems),
+
+
+    url(r'^ping',                                common.ping),
 ]
