@@ -39,7 +39,7 @@ static const std::chrono::seconds kUnconfirmedAccountExpirationSec(3*24*60*60);
 AccountManager::AccountManager(
     const conf::Settings& settings,
     TemporaryAccountPasswordManager* const tempPasswordManager,
-    nx::db::DBManager* const dbManager,
+    nx::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager) throw(std::runtime_error)
 :
     m_settings(settings),

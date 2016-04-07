@@ -323,7 +323,16 @@ TEST_F(CdbFunctionalTest, notification_of_system_removal)
                 api::ResultCode::credentialsRemovedPermanently,
                 getCdbNonce(system1.id, system1.authKey, &nonceData));
 
-            //TODO #ak checking HTTP status code
+            //checking HTTP status code
+            nx_http::HttpClient httpClient;
+            QUrl requestUrl(lit("http://127.0.0.1:%1/cdb/auth/get_nonce").arg(endpoint().port));
+            requestUrl.setUserName(QString::fromStdString(system1.id));
+            requestUrl.setPassword(QString::fromStdString(system1.authKey));
+            ASSERT_TRUE(httpClient.doGet(requestUrl));
+            ASSERT_NE(nullptr, httpClient.response());
+            ASSERT_EQ(
+                nx_http::StatusCode::unauthorized,
+                httpClient.response()->statusLine.statusCode);
 
             if (i == 0)
             {

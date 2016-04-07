@@ -13,10 +13,11 @@
 
 
 namespace {
-    const int NONCE_TRAILING_RANDOM_BYTES = 4;
-    const char MAGIC_BYTES[] = {'h', 'z'};
-    const int NONCE_TRAILER_LEN = sizeof(MAGIC_BYTES) + NONCE_TRAILING_RANDOM_BYTES;
-    const std::chrono::seconds GET_NONCE_RETRY_TIMEOUT(5);
+    constexpr const int kNonceTrailingRandomByteCount = 4;
+    constexpr const char kMagicBytes[] = {'h', 'z'};
+    constexpr const int kNonceTrailerLength =
+        sizeof(kMagicBytes) + kNonceTrailingRandomByteCount;
+    constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::seconds(5);
 }
 
 CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultGenerator)
@@ -62,10 +63,10 @@ QByteArray CdbNonceFetcher::generateNonce()
         {
             //we have valid cloud nonce
             QByteArray nonceTrailer;
-            nonceTrailer.resize(NONCE_TRAILER_LEN);
-            memcpy(nonceTrailer.data(), MAGIC_BYTES, sizeof(MAGIC_BYTES));
+            nonceTrailer.resize(kNonceTrailerLength);
+            memcpy(nonceTrailer.data(), kMagicBytes, sizeof(kMagicBytes));
             std::generate(
-                nonceTrailer.data()+sizeof(MAGIC_BYTES),
+                nonceTrailer.data()+sizeof(kMagicBytes),
                 nonceTrailer.data()+nonceTrailer.size(),
                 [&]{return m_nonceTrailerRandomGenerator(m_randomEngine);});
             const auto nonce = m_cdbNonceQueue.back().nonce + nonceTrailer;
@@ -85,17 +86,17 @@ bool CdbNonceFetcher::isNonceValid(const QByteArray& nonce) const
 
 bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
 {
-    if ((nonce.size() > NONCE_TRAILER_LEN) &&
+    if ((nonce.size() > kNonceTrailerLength) &&
         (memcmp(
-            nonce.constData() + nonce.size() - NONCE_TRAILER_LEN,
-            MAGIC_BYTES,
-            sizeof(MAGIC_BYTES)) == 0))
+            nonce.constData() + nonce.size() - kNonceTrailerLength,
+            kMagicBytes,
+            sizeof(kMagicBytes)) == 0))
     {
         QnMutexLocker lk(&m_mutex);
         removeInvalidNonce(&m_cdbNonceQueue, m_monotonicClock.elapsed());
         if (!m_cdbNonceQueue.empty())
         {
-            const auto cdbNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
+            const auto cdbNonce = nonce.mid(0, nonce.size() - kNonceTrailerLength);
             for (const auto& nonceCtx : m_cdbNonceQueue)
                 if (nonceCtx.nonce == cdbNonce)
                     return true;
@@ -109,17 +110,17 @@ bool CdbNonceFetcher::parseCloudNonce(
     nx_http::BufferType* const cloudNonce,
     nx_http::BufferType* const nonceTrailer)
 {
-    if ((nonce.size() <= NONCE_TRAILER_LEN) ||
+    if ((nonce.size() <= kNonceTrailerLength) ||
         (memcmp(
-            nonce.constData() + nonce.size() - NONCE_TRAILER_LEN,
-            MAGIC_BYTES,
-            sizeof(MAGIC_BYTES)) != 0))
+            nonce.constData() + nonce.size() - kNonceTrailerLength,
+            kMagicBytes,
+            sizeof(kMagicBytes)) != 0))
     {
         return false;
     }
 
-    *cloudNonce = nonce.mid(0, nonce.size() - NONCE_TRAILER_LEN);
-    *nonceTrailer = nonce.mid(nonce.size() - NONCE_TRAILER_LEN);
+    *cloudNonce = nonce.mid(0, nonce.size() - kNonceTrailerLength);
+    *nonceTrailer = nonce.mid(nonce.size() - kNonceTrailerLength);
     return true;
 }
 
@@ -134,7 +135,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-            GET_NONCE_RETRY_TIMEOUT);
+            kGetNonceRetryTimeout);
         return;
     }
 
@@ -153,9 +154,10 @@ void CdbNonceFetcher::gotNonce(
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
+        CloudConnectionManager::instance()->processCloudErrorCode(resCode);
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-            GET_NONCE_RETRY_TIMEOUT);
+            kGetNonceRetryTimeout);
         return;
     }
 

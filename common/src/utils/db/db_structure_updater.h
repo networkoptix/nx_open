@@ -19,7 +19,7 @@ class QSqlDatabase;
 namespace nx {
 namespace db {
 
-class DBManager;
+class AsyncSqlQueryExecutor;
 
 /*!
     \note Database is not created, it MUST already exist
@@ -28,18 +28,18 @@ class DBManager;
 class DBStructureUpdater
 {
 public:
-    DBStructureUpdater( DBManager* const );
+    DBStructureUpdater(AsyncSqlQueryExecutor* const);
 
-    void addUpdateScript( const QByteArray& updateScript );
+    void addUpdateScript(const QByteArray& updateScript);
 
     bool updateStructSync();
 
 private:
-    DBManager* const m_dbManager;
+    AsyncSqlQueryExecutor* const m_dbManager;
     std::vector<QByteArray> m_updateScripts;
     std::promise<DBResult> m_dbUpdatePromise;
 
-    DBResult updateDbInternal( QSqlDatabase* const dbConnection );
+    DBResult updateDbInternal(QSqlDatabase* const dbConnection);
 };
 
 }   //db

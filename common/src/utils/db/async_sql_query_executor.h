@@ -26,16 +26,15 @@
 namespace nx {
 namespace db {
 
-
 //!Executes DB request
 /*!
     Scales DB operations on multiple threads
  */
-class DBManager
+class AsyncSqlQueryExecutor
 {
 public:
-    DBManager( const ConnectionOptions& connectionOptions );
-    virtual ~DBManager();
+    AsyncSqlQueryExecutor( const ConnectionOptions& connectionOptions );
+    virtual ~AsyncSqlQueryExecutor();
 
     //!Have to introduce this method because we do not use exceptions
     bool init();
@@ -146,7 +145,6 @@ private:
     */
     bool openOneMoreConnectionIfNeeded();
 };
-
 
 }   //db
 }   //nx

@@ -26,7 +26,7 @@ namespace cdb {
 
 SystemManager::SystemManager(
     const AccountManager& accountManager,
-    nx::db::DBManager* const dbManager) throw(std::runtime_error)
+    nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
 :
     m_accountManager(accountManager),
     m_dbManager(dbManager)

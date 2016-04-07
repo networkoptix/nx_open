@@ -13,7 +13,7 @@
 #include <qtservice.h>
 
 #include <utils/common/stoppable.h>
-#include <utils/db/db_manager.h>
+#include <utils/db/async_sql_query_executor.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 
@@ -71,9 +71,9 @@ private:
         AccountManager* const accountManager,
         SystemManager* const systemManager,
         AuthenticationProvider* const authProvider);
-    bool initializeDB( nx::db::DBManager* const dbManager );
-    bool configureDB( nx::db::DBManager* const dbManager );
-    bool updateDB( nx::db::DBManager* const dbManager );
+    bool initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
+    bool configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
+    bool updateDB( nx::db::AsyncSqlQueryExecutor* const dbManager );
 };
 
 }   //cdb

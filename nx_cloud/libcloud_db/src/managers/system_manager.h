@@ -19,7 +19,7 @@
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <utils/db/db_manager.h>
+#include <utils/db/async_sql_query_executor.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/counter.h>
 
@@ -53,7 +53,7 @@ public:
     */
     SystemManager(
         const AccountManager& accountManager,
-        nx::db::DBManager* const dbManager) throw(std::runtime_error);
+        nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
@@ -146,7 +146,7 @@ private:
     > AccountSystemAccessRoleDict;
 
     const AccountManager& m_accountManager;
-    nx::db::DBManager* const m_dbManager;
+    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     //!map<id, system>
     Cache<std::string, data::SystemData> m_cache;
     mutable QnMutex m_mutex;
