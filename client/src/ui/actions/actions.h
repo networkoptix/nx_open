@@ -268,11 +268,6 @@ public:
         SaveCurrentLayoutAsAction,
 
         /**
-         * Opens a file dialog and opens selected layouts.
-         */
-        OpenLayoutAction,
-
-        /**
          * Opens a file dialog and adds selected files to the current layout,
          * or opens the selected layouts.
          */

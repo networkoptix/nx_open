@@ -64,7 +64,7 @@ private:
     QString m_userName;
     QString m_userPassword;
     QByteArray m_userDigest;
-    Qn::Permissions m_userPermissions;
+    Qn::GlobalPermissions m_userPermissions;
     QPointer<QnWorkbenchPermissionsNotifier> m_permissionsNotifier;
     QnUserResourcePtr m_user;
     bool m_reconnectOnPasswordChange;

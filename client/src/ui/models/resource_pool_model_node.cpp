@@ -368,10 +368,10 @@ bool QnResourcePoolModelNode::calculateBastard() const {
         return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission);
 
     case Qn::UsersNode:
-        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
+        return !m_model->accessController()->hasGlobalPermission(Qn::GlobalEditUsersPermission);
 
     case Qn::ServersNode:
-        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+        return !m_model->accessController()->hasGlobalPermission(Qn::GlobalEditServersPermissions);
 
     default:
         NX_ASSERT("Should never get here");

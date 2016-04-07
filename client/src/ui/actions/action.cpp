@@ -34,6 +34,7 @@ QnAction::QnAction(QnActions::IDType id, QObject *parent):
     m_id(id),
     m_flags(0),
     m_mode(QnActionTypes::AnyMode),
+    m_globalPermissions(Qn::NoGlobalPermissions),
     m_toolTipMarker(lit("<b></b>"))
 {
     setToolTip(m_toolTipMarker);
@@ -44,28 +45,63 @@ QnAction::QnAction(QnActions::IDType id, QObject *parent):
 QnAction::~QnAction() {
 }
 
-void QnAction::setRequiredPermissions(Qn::Permissions requiredPermissions) {
-    setRequiredPermissions(-1, requiredPermissions);
+QnActions::IDType QnAction::id() const
+{
+    return m_id;
 }
 
-void QnAction::setRequiredPermissions(int target, Qn::Permissions requiredPermissions) {
-    m_permissions[target].required = requiredPermissions;
+Qn::ActionScopes QnAction::scope() const
+{
+    return static_cast<Qn::ActionScopes>(static_cast<int>(m_flags) & Qn::ScopeMask);
 }
 
-void QnAction::setForbiddenPermissions(int target, Qn::Permissions forbiddenPermissions) {
-    m_permissions[target].forbidden = forbiddenPermissions;
+Qn::ActionParameterTypes QnAction::defaultParameterTypes() const
+{
+    return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
 }
 
-void QnAction::setForbiddenPermissions(Qn::Permissions forbiddenPermissions) {
-    setForbiddenPermissions(-1, forbiddenPermissions);
+Qn::Permissions QnAction::requiredTargetPermissions(int target /*= -1*/) const
+{
+    return m_targetPermissions.value(target);
 }
 
-void QnAction::setFlags(Qn::ActionFlags flags) {
+void QnAction::setRequiredTargetPermissions(Qn::Permissions requiredPermissions)
+{
+    setRequiredTargetPermissions(-1, requiredPermissions);
+}
+
+void QnAction::setRequiredTargetPermissions(int target, Qn::Permissions requiredPermissions)
+{
+    m_targetPermissions[target] = requiredPermissions;
+}
+
+void QnAction::setRequiredGlobalPermissions(Qn::GlobalPermissions requiredPermissions)
+{
+    m_globalPermissions = requiredPermissions;
+}
+
+QnActionTypes::ClientModes QnAction::mode() const
+{
+    return m_mode;
+}
+
+void QnAction::setFlags(Qn::ActionFlags flags)
+{
     m_flags = flags;
+}
+
+const QString & QnAction::normalText() const
+{
+    return m_normalText;
 }
 
 void QnAction::setMode(QnActionTypes::ClientModes mode) {
     m_mode = mode;
+}
+
+Qn::ActionFlags QnAction::flags() const
+{
+    return m_flags;
 }
 
 void QnAction::setNormalText(const QString &normalText) {
@@ -75,6 +111,11 @@ void QnAction::setNormalText(const QString &normalText) {
     m_normalText = normalText;
 
     updateText();
+}
+
+const QString & QnAction::toggledText() const
+{
+    return m_toggledText.isEmpty() ? m_normalText : m_toggledText;
 }
 
 void QnAction::setToggledText(const QString &toggledText) {
@@ -92,20 +133,45 @@ void QnAction::setToggledText(const QString &toggledText) {
     updateText();
 }
 
+const QString & QnAction::pulledText() const
+{
+    return m_pulledText.isEmpty() ? m_normalText : m_pulledText;
+}
+
 void QnAction::setPulledText(const QString &pulledText) {
     m_pulledText = pulledText;
+}
+
+QnActionCondition * QnAction::condition() const
+{
+    return m_condition.data();
 }
 
 void QnAction::setCondition(QnActionCondition *condition) {
     m_condition = condition;
 }
 
+QnActionFactory * QnAction::childFactory() const
+{
+    return m_childFactory.data();
+}
+
 void QnAction::setChildFactory(QnActionFactory *childFactory) {
     m_childFactory = childFactory;
 }
 
+QnActionTextFactory * QnAction::textFactory() const
+{
+    return m_textFactory.data();
+}
+
 void QnAction::setTextFactory(QnActionTextFactory *textFactory) {
     m_textFactory = textFactory;
+}
+
+const QList<QnAction *> & QnAction::children() const
+{
+    return m_children;
 }
 
 void QnAction::addChild(QnAction *action) {
@@ -171,29 +237,34 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return Qn::InvisibleAction;
 
     Qn::ActionParameterType type = parameters.type();
-    if(!(this->defaultParameterTypes() & type) && size != 0)
+    if (!(this->defaultParameterTypes() & type) && size != 0)
         return Qn::InvisibleAction;
 
-    if(!m_permissions.empty()) {
-        for(QHash<int, Permissions>::const_iterator pos = m_permissions.begin(), end = m_permissions.end(); pos != end; pos++) {
+    if (!m_targetPermissions.empty())
+    {
+        for(auto pos = m_targetPermissions.cbegin(), end = m_targetPermissions.cend(); pos != end; pos++)
+        {
             int key = pos.key();
-            Qn::Permissions required = pos->required;
-            Qn::Permissions forbidden = pos->forbidden;
+            Qn::Permissions required = *pos;
 
             QnResourceList resources;
-            if(parameters.hasArgument(key)) {
+            if(parameters.hasArgument(key))
+            {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
-            } else if(key == Qn::CurrentLayoutResourceRole) {
+            }
+            else if (key == Qn::CurrentLayoutResourceRole)
+            {
                 if (QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource())
                     resources.push_back(layout);
-            } else if(key == Qn::CurrentUserResourceRole) {
-                if (QnUserResourcePtr user = context()->user())
-                    resources.push_back(user);
-            } else if(key == Qn::CurrentMediaServerResourcesRole) {
+            }
+            else if (key == Qn::CurrentMediaServerResourcesRole)
+            {
                 resources = context()->resourcePool()->getResources<QnMediaServerResource>();
-            } else if(key == Qn::CurrentLayoutMediaItemsRole) {
+            }
+            else if (key == Qn::CurrentLayoutMediaItemsRole)
+            {
                 const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
-                foreach( QnResourcePtr res, resList )
+                for(const QnResourcePtr &res: resList )
                 {
                     if( res.dynamicCast<QnMediaResource>() )
                         resources.push_back( res );
@@ -202,15 +273,15 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
 
             if (resources.isEmpty() && required > 0)
                 return Qn::InvisibleAction;
-            if((accessController()->permissions(resources) & required) != required)
-                return Qn::InvisibleAction;
-            if((accessController()->permissions(resources) & forbidden) != 0)
+            if ((accessController()->permissions(resources) & required) != required)
                 return Qn::InvisibleAction;
         }
     }
 
-    if(m_condition) {
-        if (parameters.scope() == Qn::InvalidScope) {
+    if (m_condition)
+    {
+        if (parameters.scope() == Qn::InvalidScope)
+        {
             QnActionParameters scopedParameters(parameters);
             scopedParameters.setScope(scope);
             return m_condition->check(scopedParameters);

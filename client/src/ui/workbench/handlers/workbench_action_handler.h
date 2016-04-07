@@ -147,7 +147,6 @@ protected slots:
     void at_instantDropResourcesAction_triggered();
     void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
-    void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();

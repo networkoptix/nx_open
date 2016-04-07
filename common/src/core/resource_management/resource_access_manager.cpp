@@ -3,7 +3,6 @@
 #include <api/app_server_connection.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 
-#include <nx_ec/data/api_access_rights_data.h>
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/)
 {

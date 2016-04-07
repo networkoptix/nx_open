@@ -40,7 +40,6 @@ public:
     /**
      * \param resource                  Resource to get permissions for.
      * \returns                         Permissions for the given resource.
-     *                                  Includes global permissions if requested for the current user.
      */
     Qn::Permissions permissions(const QnResourcePtr &resource) const;
 
@@ -69,21 +68,21 @@ public:
      *                                  adjusted to take deprecation and superuser status into account.
      *                                  Same as <tt>permissions(context()->user())</tt>.
      */
-    Qn::Permissions globalPermissions() const;
+    Qn::GlobalPermissions globalPermissions() const;
 
     /**
      * \param user                      User to get global permissions for.
      * \returns                         Global permissions of the given user,
      *                                  adjusted to take deprecation and superuser status into account.
      */
-    Qn::Permissions globalPermissions(const QnUserResourcePtr &user) const;
+    Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr &user) const;
 
     /**
      * \param requiredPermissions       Global permissions to check.
      * \returns                         Whether actual global permissions
      *                                  include required permissions.
      */
-    bool hasGlobalPermissions(Qn::Permissions requiredPermissions) const;
+    bool hasGlobalPermission(Qn::GlobalPermission requiredPermissions) const;
 
     /**
      * \param resource                  Resource to get permissions change notifier for.
@@ -128,7 +127,7 @@ private:
     };
 
     QnUserResourcePtr m_user;
-    Qn::Permissions m_userPermissions;
+    Qn::GlobalPermissions m_userPermissions;
     bool m_readOnlyMode;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };

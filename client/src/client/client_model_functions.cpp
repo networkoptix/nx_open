@@ -43,6 +43,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (Qn::CreateLayoutPermission, "CreateLayoutPermission")
     (Qn::ExportPermission, "ExportPermission")
     (Qn::WritePtzPermission, "WritePtzPermission")
+    );
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    Qn::GlobalPermissions,
     (Qn::GlobalEditProtectedUserPermission, "GlobalEditProtectedUserPermission")
     (Qn::GlobalProtectedPermission, "GlobalProtectedPermission")
     (Qn::GlobalEditLayoutsPermission, "GlobalEditLayoutsPermission")
@@ -53,7 +57,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (Qn::GlobalExportPermission, "GlobalExportPermission")
     (Qn::GlobalEditCamerasPermission, "GlobalEditCamerasPermission")
     (Qn::GlobalPtzControlPermission, "GlobalPtzControlPermission")
-    (Qn::GlobalPanicPermission, "GlobalPanicPermission")
     (Qn::GlobalEditVideoWallPermission, "GlobalEditVideoWallPermission")
     (Qn::DeprecatedEditCamerasPermission, "DeprecatedEditCamerasPermission")
     (Qn::DeprecatedViewExportArchivePermission, "DeprecatedViewExportArchivePermission")
@@ -73,6 +76,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (Qn::CreateLayoutPermission, "CreateLayoutPermission")
     (Qn::ExportPermission, "ExportPermission")
     (Qn::WritePtzPermission, "WritePtzPermission")
+    );
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    Qn::GlobalPermission,
     (Qn::GlobalEditProtectedUserPermission, "GlobalEditProtectedUserPermission")
     (Qn::GlobalProtectedPermission, "GlobalProtectedPermission")
     (Qn::GlobalEditLayoutsPermission, "GlobalEditLayoutsPermission")
@@ -83,7 +90,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (Qn::GlobalExportPermission, "GlobalExportPermission")
     (Qn::GlobalEditCamerasPermission, "GlobalEditCamerasPermission")
     (Qn::GlobalPtzControlPermission, "GlobalPtzControlPermission")
-    (Qn::GlobalPanicPermission, "GlobalPanicPermission")
     (Qn::GlobalEditVideoWallPermission, "GlobalEditVideoWallPermission")
     (Qn::DeprecatedEditCamerasPermission, "DeprecatedEditCamerasPermission")
     (Qn::DeprecatedViewExportArchivePermission, "DeprecatedViewExportArchivePermission")

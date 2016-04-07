@@ -128,7 +128,7 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
     if (!m_user || user.dynamicCast<QnUserResource>() != m_user)
         return;
 
-    Qn::Permissions newPermissions = accessController()->globalPermissions(m_user);
+    Qn::GlobalPermissions newPermissions = accessController()->globalPermissions(m_user);
     /* Reconnect if some permissions were changed*/
     const bool reconnect = (newPermissions != m_userPermissions);
     m_userPermissions = newPermissions;

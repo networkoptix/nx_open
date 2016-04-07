@@ -32,7 +32,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
     , m_user()
-    , m_userPermissions(Qn::NoPermissions)
+    , m_userPermissions(Qn::NoGlobalPermissions)
     , m_readOnlyMode(false)
 
 {
@@ -49,12 +49,10 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
 QnWorkbenchAccessController::~QnWorkbenchAccessController() {
 }
 
-Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const {
-    if (resource == m_user)
-        if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-            return Qn::GlobalViewerPermissions;
-
-    if (!m_dataByResource.contains(resource)) {
+Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &resource) const
+{
+    if (!m_dataByResource.contains(resource))
+    {
         NX_ASSERT(resource);
         if (resource && !resource->resourcePool())         /* Calculated permissions should always exist for all resources in the pool. */
             qDebug() << "Requesting permissions for the non-pool resource" << resource->getName();
@@ -68,23 +66,22 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
-Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
+Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions() const
+{
     return globalPermissions(m_user);
 }
 
-Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const {
+Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const
+{
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return Qn::GlobalViewerPermissions;
 
-    Qn::Permissions result(Qn::NoPermissions);
+    Qn::GlobalPermissions result(Qn::NoGlobalPermissions);
 
     if(!user)
         return result;
 
-    // QFlags uses int internally and don't have a constructor from quint64.
-    // Also we don't place values bigger than uint max to the user permissions
-    // so we can just cast permissions to int.
-    result = static_cast<Qn::Permissions>(static_cast<int>(user->getPermissions()));
+    result = static_cast<Qn::GlobalPermissions>(user->getPermissions());
 
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;
@@ -92,13 +89,13 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
     return Qn::undeprecate(result);
 }
 
-bool QnWorkbenchAccessController::hasGlobalPermissions(Qn::Permissions requiredPermissions) const {
-    if (!m_user)
-        return false;
-    return (globalPermissions(m_user) & requiredPermissions) == requiredPermissions;
+bool QnWorkbenchAccessController::hasGlobalPermission(Qn::GlobalPermission requiredPermission) const
+{
+    return globalPermissions().testFlag(requiredPermission);
 }
 
-QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const {
+QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const
+{
     NX_ASSERT(m_dataByResource.contains(resource));
 
     if(!m_dataByResource.contains(resource))
@@ -145,9 +142,8 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     NX_ASSERT(user);
 
     Qn::Permissions result = Qn::NoPermissions;
-    if (user == m_user) {
-        result |= m_userPermissions; /* Add global permissions for current user. */
-
+    if (user == m_user)
+    {
         if (m_readOnlyMode)
             return result | Qn::ReadPermission;
 
@@ -155,20 +151,22 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
         result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
-    if (m_userPermissions & Qn::GlobalEditLayoutsPermission) /* Layout-admin can create layouts. */
+    if (m_userPermissions.testFlag(Qn::GlobalEditLayoutsPermission)) /* Layout-admin can create layouts. */
         result |= Qn::CreateLayoutPermission;
 
-    if ((user != m_user) && (m_userPermissions & Qn::GlobalEditUsersPermission)) {
+    if ((user != m_user) && m_userPermissions.testFlag(Qn::GlobalEditUsersPermission))
+    {
         result |= Qn::ReadPermission;
         if (m_readOnlyMode)
             return result;
 
         /* Protected users can only be edited by super-user. */
-        if ((m_userPermissions & Qn::GlobalEditProtectedUserPermission) || !(globalPermissions(user) & Qn::GlobalProtectedPermission))
+        if (m_userPermissions.testFlag(Qn::GlobalEditProtectedUserPermission) || !globalPermissions(user).testFlag(Qn::GlobalProtectedPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
 
-    if (user->isLdap()) {
+    if (user->isLdap())
+    {
         result &= ~Qn::WriteNamePermission;
         result &= ~Qn::WritePasswordPermission;
         result &= ~Qn::WriteEmailPermission;
@@ -248,17 +246,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     NX_ASSERT(camera);
 
     Qn::Permissions result = Qn::ReadPermission;
-    if(m_userPermissions & Qn::GlobalExportPermission)
+    if (m_userPermissions.testFlag(Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
-    //TODO: #GDM SafeMode should PTZ work in safe mode?
-    if(m_userPermissions & Qn::GlobalPtzControlPermission)
+    if (m_userPermissions.testFlag(Qn::GlobalPtzControlPermission))
         result |= Qn::WritePtzPermission;
 
     if (m_readOnlyMode)
         return result;
 
-    if(m_userPermissions & Qn::GlobalEditCamerasPermission)
+    if (m_userPermissions.testFlag(Qn::GlobalEditCamerasPermission))
         result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     return result;
@@ -276,7 +273,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     if (m_readOnlyMode)
         return Qn::ReadPermission;
 
-    if(m_userPermissions & Qn::GlobalEditServersPermissions)
+    if (m_userPermissions.testFlag(Qn::GlobalEditServersPermissions))
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     return Qn::NoPermissions;
 }
@@ -287,7 +284,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     if (m_readOnlyMode)
         return Qn::ReadPermission;
 
-    if(m_userPermissions & Qn::GlobalEditVideoWallPermission)
+    if (m_userPermissions.testFlag(Qn::GlobalEditVideoWallPermission))
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     return Qn::NoPermissions;
@@ -300,7 +297,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
         return Qn::ReadPermission;
 
     /* Web Page behaves totally like camera. */
-    if(m_userPermissions & Qn::GlobalEditCamerasPermission)
+    if (m_userPermissions.testFlag(Qn::GlobalEditCamerasPermission))
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
 
     return Qn::NoPermissions;
@@ -328,9 +325,10 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &re
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWorkbenchAccessController::recalculateAllPermissions() {
+void QnWorkbenchAccessController::recalculateAllPermissions()
+{
     m_user = context()->user();
-    m_userPermissions = globalPermissions(m_user);
+    m_userPermissions = globalPermissions();
     m_readOnlyMode = qnCommon->isReadOnly();
 
     for(const QnResourcePtr &resource: qnResPool->getResources())

@@ -540,7 +540,6 @@ public:
 
         /* Context-based. */
         CurrentLayoutResourceRole,
-        CurrentUserResourceRole,
         CurrentLayoutMediaItemsRole,
         CurrentMediaServerResourcesRole,
 

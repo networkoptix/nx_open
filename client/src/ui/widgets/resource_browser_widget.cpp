@@ -799,10 +799,12 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
 
 void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel *model) const {
     /* Always accept servers for administrator users. */
-    if (accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission)) {
+    if (accessController()->hasGlobalPermission(Qn::GlobalProtectedPermission))
+    {
         model->addCriterion(QnResourceCriterion(Qn::server));
     }
-    else {
+    else
+    {
         /* Always skip servers for common users, but always show user and layouts */
         model->addCriterion(QnResourceCriterion(Qn::server, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
         model->addCriterion(QnResourceCriterion(Qn::user));
