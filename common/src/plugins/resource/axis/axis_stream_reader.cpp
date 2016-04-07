@@ -48,7 +48,7 @@ int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
         case Qn::QualityHigh:
             return 30;
         case Qn::QualityHighest:
-            return 22; //Axis selection for the best quality is "20" so we set 25 to save some resources for the secondary stream.
+            return 22; //Axis selection for the best quality is "20" so we set 22 to save some resources for the secondary stream.
         case Qn::QualityPreSet:
             return -1;
         default:
