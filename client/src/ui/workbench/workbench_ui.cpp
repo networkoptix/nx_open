@@ -1446,7 +1446,7 @@ void QnWorkbenchUi::at_titleItem_geometryChanged()
 
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_titleItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_titleItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_titleItem->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setZValue(10.0);
