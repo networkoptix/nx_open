@@ -18,15 +18,17 @@ angular.module('cloudApp')
                 scope.$watch(scopeName + '.$valid',updateValidity);
                 scope.$watch(scopeName + '.$touched',updateValidity);
 
-                input.on('keypress',function(){
+                function setUntouched(){
                     scope[formName][fieldName].$setUntouched();
                     scope.$apply();
-                });
+                }
+                input.on('keypress',setUntouched);
+                input.on('cut',setUntouched);
+                input.on('paste',setUntouched);
                 input.on('keydown',function(){
                     var key = event.keyCode || event.charCode;
                     if( key == 8 || key == 46 ){
-                        scope[formName][fieldName].$setUntouched();
-                        scope.$apply();
+                        setUntouched();
                     }
                 });
 
