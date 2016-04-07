@@ -52,9 +52,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setFocusPolicy(Qt::ClickFocus);
     setCursor(Qt::ArrowCursor);
 
-    setAutoFillBackground(true);
-
-    setPaletteColor(this, QPalette::Window, Qt::red);
+    setFrameShape(Qn::RectangularFrame);
+    setFrameBorders(Qt::TopEdge);
+    setFrameColor(palette().color(QPalette::Midlight));
+    setFrameWidth(1.0);
 
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(QnActions::JumpToStartAction);

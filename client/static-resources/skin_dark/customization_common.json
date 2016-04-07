@@ -190,7 +190,8 @@
     
     "QnNavigationItem": {
         "palette": { "default": { 
-            "window": "dark4" 
+            "window": "dark6",
+            "midlight": "dark8"
         }}
     },
 
