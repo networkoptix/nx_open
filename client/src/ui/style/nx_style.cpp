@@ -587,11 +587,10 @@ void QnNxStyle::drawComplexControl(
         break;
 
     case CC_Slider:
-        if (const QStyleOptionSlider *slider =
-                qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
-            QRect grooveRect = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
-            QRect handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
+            QRectF grooveRect = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
+            QRectF handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
             const bool horizontal = slider->orientation == Qt::Horizontal;
             const bool hovered = slider->state.testFlag(State_MouseOver) ||
@@ -605,41 +604,50 @@ void QnNxStyle::drawComplexControl(
 
             if (slider->subControls.testFlag(SC_SliderGroove))
             {
+                QRectF grooveDrawRect = grooveRect.adjusted(0.5, 0.5, -0.5, -0.5); /* to include border, antialiased */
+                qreal radius = ((horizontal ? grooveDrawRect.height() : grooveDrawRect.width())) * 0.5 ;
+
                 painter->setPen(mainDark.darker(1));
                 painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
+                painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
-                painter->drawRect(grooveRect.adjusted(0, 0, -1, -1));
-
-                QRect rect = grooveRect.adjusted(1, 1, -1, -1);
-
-                int pos = sliderPositionFromValue(
-                              slider->minimum,
-                              slider->maximum,
-                              slider->sliderPosition,
-                              horizontal ? rect.width() : rect.height(),
-                              slider->upsideDown);
-
-                if (horizontal)
+                SliderFeatures features = option->styleObject ? qvariant_cast<unsigned int>(option->styleObject->property(Properties::kSliderFeatures), 0): 0;
+                if (features.testFlag(SliderFeature::FillingUp))
                 {
-                    if (slider->upsideDown)
-                        rect.setLeft(pos);
-                    else
-                        rect.setRight(pos);
-                }
-                else
-                {
-                    if (slider->upsideDown)
-                        rect.setTop(pos);
-                    else
-                        rect.setBottom(pos);
-                }
+                    QRectF fillDrawRect = grooveRect.adjusted(1, 1, -1, -1);
 
-                painter->fillRect(rect, mainLight);
+                    int pos = sliderPositionFromValue(
+                                  slider->minimum,
+                                  slider->maximum,
+                                  slider->sliderPosition,
+                                  horizontal ? fillDrawRect.width() : fillDrawRect.height(),
+                                  slider->upsideDown);
+
+                    if (horizontal)
+                    {
+                        if (slider->upsideDown)
+                            fillDrawRect.setLeft(pos);
+                        else
+                            fillDrawRect.setRight(pos);
+                    }
+                    else
+                    {
+                        if (slider->upsideDown)
+                            fillDrawRect.setTop(pos);
+                        else
+                            fillDrawRect.setBottom(pos);
+                    }
+
+                    radius = ((horizontal ? fillDrawRect.height() : fillDrawRect.width())) * 0.5;
+
+                    painter->setPen(Qt::NoPen);
+                    painter->setBrush(QBrush(mainLight));
+                    painter->drawRoundedRect(fillDrawRect, radius, radius);
+                }
             }
 
             if (slider->subControls.testFlag(SC_SliderTickmarks))
             {
-                bool horizontal = slider->orientation == Qt::Horizontal;
                 bool ticksAbove = slider->tickPosition & QSlider::TicksAbove;
                 bool ticksBelow = slider->tickPosition & QSlider::TicksBelow;
 
@@ -680,27 +688,21 @@ void QnNxStyle::drawComplexControl(
                     if (horizontal)
                     {
                         if (ticksAbove)
-                        {
-                            painter->drawLine(pos, slider->rect.top() + extra,
-                                              pos, slider->rect.top() + tickSize);
-                        }
+                            painter->drawLine(pos, slider->rect.top() + extra, pos, slider->rect.top() + tickSize);
+
                         if (ticksBelow)
-                        {
-                            painter->drawLine(pos, slider->rect.bottom() - extra,
-                                              pos, slider->rect.bottom() - tickSize);
-                        }
-                    } else {
-                        if (ticksAbove)
-                        {
-                            painter->drawLine(slider->rect.left() + extra, pos,
-                                              slider->rect.left() + tickSize, pos);
-                        }
-                        if (ticksBelow)
-                        {
-                            painter->drawLine(slider->rect.right() - extra, pos,
-                                              slider->rect.right() - tickSize, pos);
-                        }
+                            painter->drawLine(pos, slider->rect.bottom() - extra, pos, slider->rect.bottom() - tickSize);
+
                     }
+                    else
+                    {
+                        if (ticksAbove)
+                            painter->drawLine(slider->rect.left() + extra, pos, slider->rect.left() + tickSize, pos);
+
+                        if (ticksBelow)
+                            painter->drawLine(slider->rect.right() - extra, pos, slider->rect.right() - tickSize, pos);
+                    }
+
                     // in the case where maximum is max int
                     int nextInterval = v + interval;
                     if (nextInterval < v)

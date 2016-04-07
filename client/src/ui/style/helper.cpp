@@ -24,6 +24,7 @@ namespace style
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
     const char *Properties::kSliderLength = "_qn_sliderLength";
+    const char *Properties::kSliderFeatures = "_qn_sliderFeatures";
     const char *Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
     const char *Properties::kTabShape = "_qn_tabShape";
 
