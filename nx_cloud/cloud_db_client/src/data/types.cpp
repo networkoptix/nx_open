@@ -150,6 +150,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::unknownError, "unknownError")
 );
 
+std::string toString(ResultCode resultCode)
+{
+    return QnLexical::serialized(resultCode).toStdString();
+}
+
 
 }   //api
 }   //cdb

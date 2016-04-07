@@ -3,15 +3,15 @@
 
 #include <cdb/connection.h>
 
+#include <nx/network/http/httptypes.h>
+#include <nx/utils/log/log.h>
+
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
-
-#include <nx/network/http/httptypes.h>
-
-#include <utils/common/sync_call.h>
 #include <media_server/serverutil.h>
-
+#include <utils/common/sync_call.h>
 #include <utils/common/model_functions.h>
+
 
 int QnSaveCloudSystemCredentialsHandler::executePost(
     const QString& /*path*/,
@@ -28,42 +28,58 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     const CloudCredentialsData& data,
     QnJsonRestResult& result)
 {
+    using namespace nx::cdb;
+
+    NX_LOGX(lm("%1 cloud credentials").arg(data.reset ? "Resetting" : "Saving"),
+        cl_logDEBUG1);
+
     if (data.reset)
     {
         qnGlobalSettings->resetCloudParams();
         if (!qnGlobalSettings->synchronizeNowSync())
+        {
+            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Failed to save cloud credentials to local DB"));
+            return nx_http::StatusCode::internalServerError;
+        }
         return nx_http::StatusCode::ok;
     }
 
     if (data.cloudSystemID.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudSystemID);
-        return nx_http::StatusCode::invalidParameter;
+        NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudSystemID));
+        return nx_http::StatusCode::ok;
     }
 
     if (data.cloudAuthKey.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAuthKey);
-        return nx_http::StatusCode::invalidParameter;
+        NX_LOGX(lit("Missing required parameter CloudAuthKey"), cl_logDEBUG1);
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAuthKey));
+        return nx_http::StatusCode::ok;
     }
 
     if (data.cloudAccountName.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAccountName);
-        return nx_http::StatusCode::invalidParameter;
+        NX_LOGX(lit("Missing required parameter CloudAccountName"), cl_logDEBUG1);
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, QnGlobalSettings::kNameCloudAccountName));
+        return nx_http::StatusCode::ok;
     }
 
     const QString cloudSystemId = qnGlobalSettings->cloudSystemID();
     if (!cloudSystemId.isEmpty() &&
         !qnGlobalSettings->cloudAuthKey().isEmpty())
     {
+        NX_LOGX(lit("Attempt to bind to cloud already-bound system"), cl_logDEBUG1);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("System already bound to cloud (id %1)").arg(cloudSystemId));
-        return nx_http::StatusCode::notAcceptable;
+        return nx_http::StatusCode::ok;
     }
 
     qnGlobalSettings->setCloudSystemID(data.cloudSystemID);
@@ -71,6 +87,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
     if (!qnGlobalSettings->synchronizeNowSync())
     {
+        NX_LOGX(lit("Error saving cloud credentials to the local DB"), cl_logWARNING);
         result.setError(
              QnJsonRestResult::CantProcessRequest,
              lit("Failed to save cloud credentials to local DB"));
@@ -84,31 +101,36 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     //is some system in cloud, but system does not know its credentials
     //and there is no way to find them out
     std::unique_ptr<
-        nx::cdb::api::ConnectionFactory,
+        api::ConnectionFactory,
         decltype(&destroyConnectionFactory)
     > cloudConnectionFactory(createConnectionFactory(), &destroyConnectionFactory);
     auto cloudConnection = cloudConnectionFactory->createConnection(
         data.cloudSystemID.toStdString(),
         data.cloudAuthKey.toStdString());
-    nx::cdb::api::ResultCode cdbResultCode = nx::cdb::api::ResultCode::ok;
-    nx::cdb::api::NonceData nonceData;
+    api::ResultCode cdbResultCode = api::ResultCode::ok;
+    api::NonceData nonceData;
     std::tie(cdbResultCode, nonceData) =
-        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::NonceData>(
+        makeSyncCall<api::ResultCode, api::NonceData>(
             std::bind(
-                &nx::cdb::api::AuthProvider::getCdbNonce,
+                &api::AuthProvider::getCdbNonce,
                 cloudConnection->authProvider(),
                 std::placeholders::_1));
 
-    if (cdbResultCode != nx::cdb::api::ResultCode::ok)
+    if (cdbResultCode != api::ResultCode::ok)
     {
+        NX_LOGX(lm("Received error response from cloud: %1")
+            .arg(api::toString(cdbResultCode)), cl_logWARNING);
+
         //rolling back changes
         qnGlobalSettings->resetCloudParams();
         if (!qnGlobalSettings->synchronizeNowSync())
         {
+            NX_LOGX(lit("Error resetting failed cloud credentials in the local DB"), cl_logWARNING);
             //we saved cloud credentials to local DB but failed to connect to cloud and could not remove them!
             //let's pretend we have registered successfully:
             //hopefully, cloud will become available some time later
             result.setError(QnJsonRestResult::NoError);
+            return nx_http::StatusCode::internalServerError;
         }
         else
         {
@@ -116,8 +138,8 @@ int QnSaveCloudSystemCredentialsHandler::execute(
                 QnJsonRestResult::CantProcessRequest,
                 lit("Could not connect to cloud: %1").
                 arg(QString::fromStdString(cloudConnectionFactory->toString(cdbResultCode))));
+            return nx_http::StatusCode::ok;
         }
-        return nx_http::StatusCode::internalServerError;
     }
 
     result.setError(QnJsonRestResult::NoError);

@@ -69,26 +69,30 @@ int QnMergeSystemsRestHandler::executeGet(
 
     if (url.isEmpty()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"url\""), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::MissingParameter, lit("url"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, lit("url")));
         return nx_http::StatusCode::ok;
     }
 
     if (!url.isValid()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Received invalid parameter url %1")
             .arg(url.toString()), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::InvalidParameter, lit("url"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::InvalidParameter, lit("url")));
         return nx_http::StatusCode::ok;
     }
 
     if (password.isEmpty()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"password\""), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::MissingParameter, lit("password"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, lit("password")));
         return nx_http::StatusCode::ok;
     }
 
     if (currentPassword.isEmpty()) {
         NX_LOG(lit("QnMergeSystemsRestHandler. Request missing required parameter \"currentPassword\""), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::MissingParameter, lit("currentPassword"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, lit("currentPassword")));
         return nx_http::StatusCode::ok;
     }
 

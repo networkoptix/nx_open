@@ -7,6 +7,8 @@
 #ifndef NX_CDB_API_RESULT_CODE_H
 #define NX_CDB_API_RESULT_CODE_H
 
+#include <string>
+
 
 namespace nx {
 namespace cdb {
@@ -42,6 +44,8 @@ enum class ResultCode
 
     unknownError
 };
+
+std::string toString(ResultCode resultCode);
 
 }   //api
 }   //cdb
