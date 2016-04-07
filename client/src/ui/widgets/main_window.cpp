@@ -80,7 +80,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-#include <ui/widgets/main_window_title_controls_widget.h>
+#include <ui/widgets/main_window_title_bar_widget.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -114,11 +114,6 @@ namespace
         }
     }
 
-    void setVisibleRecursively(QLayout *layout, bool visible)
-    {
-        processWidgetsRecursively(layout, [visible](QWidget* w) {w->setVisible(visible); });
-    }
-
     int minimalWindowWidth = 800;
     int minimalWindowHeight = 600;
 
@@ -138,19 +133,18 @@ extern "C" {
 }
 #endif
 
-QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags):
+QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
 #ifdef Q_OS_MACX
-    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
+        | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
 #endif
-    ),
+        ),
     QnWorkbenchContextAware(context),
-    m_controller(0),
+    m_dwm(nullptr),
     m_currentPageHolder(new QStackedWidget()),
+    m_titleBar(new QnMainWindowTitleBarWidget(this)),
     m_welcomeScreenVisible(true),
     m_titleVisible(true),
-    m_skipDoubleClick(false),
-    m_dwm(NULL),
     m_drawCustomFrame(false),
     m_inFullscreenTransition(false)
 {
@@ -307,53 +301,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     menu()->setTargetProvider(m_ui.data());
 
-
-    /* Tab bar. */
-    m_tabBar = new QnLayoutTabBar(this);
-#ifdef Q_OS_WIN
-    // tabs are drawn in the window header on windows 7 //TODO: #Elric check on windows XP
-    m_tabBar->setAttribute(Qt::WA_TranslucentBackground);
-#endif
-    connect(m_tabBar,                       SIGNAL(closeRequested(QnWorkbenchLayout *)),    this,                                   SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
-    connect(m_tabBar,             &QnLayoutTabBar::tabCloseRequested,     this,    &QnMainWindow::skipDoubleClick);
-    connect(m_tabBar,             &QnLayoutTabBar::currentChanged,        this,    &QnMainWindow::skipDoubleClick);
-
     connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged, this
         , [this, welcomeScreen]()
     {
         setWelcomeScreenVisible(welcomeScreen->isVisible());
-    });
-
-    /* Tab bar layout. To snap tab bar to graphics view. */
-    QWidget *tabBarWidget = new QWidget(this);
-    setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
-
-    QBoxLayout *tabBarLayout = new QHBoxLayout(tabBarWidget);
-    tabBarLayout->setContentsMargins(0, 0, 0, 0);
-    tabBarLayout->setSpacing(0);
-    tabBarLayout->addWidget(m_tabBar);
-    tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::OpenNewTabAction), false, 1.0, Qn::MainWindow_TitleBar_NewLayout_Help));
-    tabBarLayout->addSpacing(6);
-    tabBarLayout->addWidget(QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::OpenCurrentUserLayoutMenu), true));
-    tabBarLayout->addStretch(0x1000);
-
-    /* Title layout. We cannot create a widget for title bar since there appears to be
-     * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = QnMainWindowTitleControlsWidget::newActionButton(action(QnActions::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
-    connect(action(QnActions::MainMenuAction), &QAction::triggered, this, &QnMainWindow::skipDoubleClick);
-
-    m_titleLayout = new QHBoxLayout();
-    m_titleLayout->setContentsMargins(0, 0, 0, 0);
-    m_titleLayout->setSpacing(0);
-    m_titleLayout->addWidget(m_mainMenuButton);
-    m_titleLayout->addWidget(tabBarWidget, 0x1000, Qt::AlignBottom);
-    m_titleLayout->addWidget(new QnMainWindowTitleControlsWidget(this));
-
-    processWidgetsRecursively(m_titleLayout, [](QWidget* w)
-    {
-        setPaletteColor(w, QPalette::Window, qApp->palette().color(QPalette::Normal, QPalette::Window));
-        w->setAutoFillBackground(true);
     });
 
     /* Layouts. */
@@ -366,7 +317,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
-    m_globalLayout->addLayout(m_titleLayout);
+    m_globalLayout->addWidget(m_titleBar);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 
@@ -418,20 +369,6 @@ bool QnMainWindow::isTitleVisible() const
 
 void QnMainWindow::updateWidgetsVisibility()
 {
-    const auto updateTitleBarVisibility = [this](bool visible)
-    {
-        if (visible)
-        {
-            m_globalLayout->insertLayout(0, m_titleLayout);
-            setVisibleRecursively(m_titleLayout, true);
-            return;
-        }
-
-        m_globalLayout->takeAt(0);
-        m_titleLayout->setParent(NULL);
-        setVisibleRecursively(m_titleLayout, false);
-    };
-
     const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
     {
@@ -442,7 +379,7 @@ void QnMainWindow::updateWidgetsVisibility()
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
-    updateTitleBarVisibility(isTitleVisible());
+    m_titleBar->setVisible(isTitleVisible());
     updateWelcomeScreenVisibility(m_welcomeScreenVisible);
     updateDwmState();
 }
@@ -525,10 +462,6 @@ void QnMainWindow::showNormal() {
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
-}
-
-void QnMainWindow::skipDoubleClick() {
-    m_skipDoubleClick = true;
 }
 
 void QnMainWindow::updateScreenInfo() {
@@ -641,7 +574,6 @@ void QnMainWindow::updateDwmState() {
         setContentsMargins(0, 0, 0, 0);
 #endif
 
-        m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     }
     else if (m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false)
@@ -659,7 +591,6 @@ void QnMainWindow::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
             isTitleVisible() ? 0 : m_frameMargins.top(),
@@ -699,8 +630,6 @@ void QnMainWindow::updateDwmState() {
 
         setContentsMargins(0, 0, 0, 0);
 
-        //m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
-        m_titleLayout->setContentsMargins(2, 0, 2, 0);
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
             isTitleVisible() ? 0 : m_frameMargins.top(),
@@ -717,14 +646,6 @@ void QnMainWindow::updateDwmState() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnEvent::WinSystemMenu) {
-        if(m_mainMenuButton->isVisible())
-            m_mainMenuButton->click();
-
-        QApplication::sendEvent(m_ui.data(), event);
-        result = true;
-    }
-
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);
 
@@ -735,37 +656,6 @@ void QnMainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
     menu()->trigger(QnActions::ExitAction);
-}
-
-void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
-    base_type::mouseReleaseEvent(event);
-
-    if(event->button() == Qt::RightButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
-        QContextMenuEvent e(QContextMenuEvent::Mouse, m_tabBar->mapFrom(this, event->pos()), event->globalPos(), event->modifiers());
-        QApplication::sendEvent(m_tabBar, &e);
-        event->accept();
-    }
-
-    m_skipDoubleClick = false;
-}
-
-void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
-    base_type::mouseDoubleClickEvent(event);
-
-#ifndef Q_OS_MACX
-    if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
-        QPoint tabBarPos = m_tabBar->mapFrom(this, event->pos());
-        if (m_tabBar->tabAt(tabBarPos) >= 0) {
-            m_skipDoubleClick = false;
-            return;
-        }
-
-        if (!m_skipDoubleClick)
-            action(QnActions::EffectiveMaximizeAction)->toggle();
-        event->accept();
-    }
-    m_skipDoubleClick = false;
-#endif
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {
@@ -859,14 +749,23 @@ bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long 
     return base_type::nativeEvent(eventType, message, result);
 }
 
-Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
-    if(isFullScreen() && !isTitleVisible())
+Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const
+{
+    if (isFullScreen() && !isTitleVisible())
         return Qt::NoSection;
 
-    Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
+    Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(
+            Qn::calculateRectangularFrameSections(
+                    rect(),
+                    QnGeometry::eroded(rect(), m_frameMargins),
+                    QRect(pos, pos)));
 
-    if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
+    if (m_options.testFlag(TitleBarDraggable) &&
+        result == Qt::NoSection &&
+        pos.y() <= m_titleBar->mapTo(this, m_titleBar->rect().bottomRight()).y())
+    {
         result = Qt::TitleBarArea;
+    }
 
     return result;
 }
@@ -878,10 +777,4 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     }
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
-}
-
-void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
-    QnWorkbenchLayoutList layouts;
-    layouts.push_back(layout);
-    menu()->trigger(QnActions::CloseLayoutAction, layouts);
 }

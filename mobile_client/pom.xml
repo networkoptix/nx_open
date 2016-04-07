@@ -26,7 +26,6 @@
         <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
 
-        <global.defines>CL_FORCE_LOGO</global.defines>
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
         <rdep.packages>openssl ffmpeg</rdep.packages>

@@ -106,6 +106,12 @@
         },
         {
             "keys": [
+                "ISD|XPM-FL72-48MP"
+            ],
+            "isDW": true
+        },
+        {
+            "keys": [
                 "vista|*"
             ],
             "showUrl": true,

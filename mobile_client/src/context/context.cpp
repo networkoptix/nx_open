@@ -11,6 +11,7 @@
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
 #include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_app_info.h>
 
 namespace {
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
@@ -100,7 +101,7 @@ bool QnContext::liteMode() const
     case LiteModeType::LiteModeEnabled:
         return true;
     case LiteModeType::LiteModeAuto:
-        return QnAppInfo::armBox() == lit("bpi");
+        return QnMobileClientAppInfo::defaultLiteMode();
     default:
         break;
     }

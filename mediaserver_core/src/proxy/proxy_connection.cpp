@@ -17,11 +17,12 @@
 #include "proxy_connection_processor_p.h"
 #include "transaction/transaction_message_bus.h"
 
+#include <nx/network/compat_poll.h>
+#include <nx/network/socket.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
-#include <nx/network/compat_poll.h>
-#include <nx/network/socket.h>
+
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
@@ -152,6 +153,8 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
         d->dstSocket = QSharedPointer<AbstractStreamSocket>(
             SocketFactory::createStreamSocket(url.scheme() == lit("https"))
             .release());
+        d->dstSocket->setRecvTimeout(d->connectTimeout.count());
+        d->dstSocket->setSendTimeout(d->connectTimeout.count());
         if (!d->dstSocket->connect(SocketAddress(url.host().toLatin1().data(), url.port()))) {
             d->socket->close();
             return QString(); // now answer from destination address

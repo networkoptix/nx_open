@@ -209,6 +209,7 @@ private:
     void writeCameraInfoFiles();
     static bool renameFileWithDuration(
         const QString               &oldName,
+        QString                     &newName,
         int64_t                     duration,
         const QnStorageResourcePtr  &storage
     );

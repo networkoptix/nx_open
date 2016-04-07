@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # SRC_DIR=../../
 
 
@@ -17,7 +19,9 @@
 #     fi
 #     echo "$h"
 # }
-TOOLCHAIN_PREFIX=/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
+
+TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-4.8.3
+TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -65,7 +69,7 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
-libudt.so.4110.0.0 \
+libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
@@ -75,14 +79,14 @@ libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
-libQt5Concurrent.so.5.2.1 \
-libQt5Core.so.5.2.1 \
-libQt5Gui.so.5.2.1 \
-libQt5Multimedia.so.5.2.1 \
-libQt5Network.so.5.2.1 \
-libQt5Sql.so.5.2.1 \
-libQt5Xml.so.5.2.1 \
-libQt5XmlPatterns.so.5.2.1 \
+libQt5Concurrent.so.${qt.version} \
+libQt5Core.so.${qt.version} \
+libQt5Gui.so.${qt.version} \
+libQt5Multimedia.so.${qt.version} \
+libQt5Network.so.${qt.version} \
+libQt5Sql.so.${qt.version} \
+libQt5Xml.so.${qt.version} \
+libQt5XmlPatterns.so.${qt.version} \
 libsigar.so \
 libsasl2.so.3.0.0 \
 liblber-2.4.so.2.10.5 \
@@ -170,7 +174,8 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" ]]; then
-    cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d

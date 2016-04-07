@@ -36,6 +36,9 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
         case attr::systemID:
             *value = QString::fromStdString(id);
             return true;
+        case attr::systemStatus:
+            *value = static_cast<int>(status);
+            return true;
         default:
             return false;
     }

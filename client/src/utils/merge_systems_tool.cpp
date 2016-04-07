@@ -34,6 +34,10 @@ namespace {
             return QnMergeSystemsTool::StarterLicenseError;
         else if (str == lit("SAFE_MODE"))
             return QnMergeSystemsTool::SafeModeError;
+        else if (str == lit("CONFIGURATION_ERROR"))
+            return QnMergeSystemsTool::ConfigurationError;
+        else if (str == lit("BOTH_SYSTEMS_BOUND_TO_CLOUD"))
+            return QnMergeSystemsTool::BothSystemsBoundToCloudError;
         else
             return QnMergeSystemsTool::InternalError;
     }

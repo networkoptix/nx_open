@@ -2,7 +2,7 @@
 
 #include <QtCore/QEvent>
 
-#include <ui/widgets/char_combo_box.h>
+#include <ui/widgets/common/char_combo_box.h>
 #include <ui/models/ptz_manage_model.h>
 #include <ui/dialogs/message_box.h>
 
@@ -48,7 +48,7 @@ QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QSty
     for(int i = 1; i <= 9; i++)
         result->addItem(QString::number(i), i);
     result->addItem(QString::number(0), 0);
-    
+
     /* Open the popup after geometry adjustments. */
     QMetaObject::invokeMethod(result, "showPopup", Qt::QueuedConnection);
 

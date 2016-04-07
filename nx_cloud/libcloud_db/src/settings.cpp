@@ -12,9 +12,8 @@
 #include <QtCore/QString>
 
 #include <utils/serialization/lexical.h>
-
-#include "version.h"
-
+#include <utils/common/app_info.h>
+#include <libcloud_db_app_info.h>
 
 namespace
 {
@@ -68,7 +67,9 @@ namespace
 
     const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeoutSec");
     const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout(86400);
-    
+
+    const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriodSec");
+    const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec(30*86400);  //a month
 
     //auth settings
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
@@ -87,11 +88,11 @@ Settings::Settings()
 #ifdef _WIN32
     m_settings(
         QSettings::SystemScope,
-        QN_ORGANIZATION_NAME,
-        QN_APPLICATION_NAME ),
+        QnAppInfo::organizationName(),
+        QnLibCloudDbAppInfo::applicationName()),
 #else
     m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg( VER_LINUX_ORGANIZATION_NAME ).arg( kModuleName ),
+                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
                 QSettings::IniFormat ),
 #endif
     m_showHelp( false )
@@ -129,6 +130,11 @@ const AccountManager& Settings::accountManager() const
     return m_accountManager;
 }
 
+const SystemManager& Settings::systemManager() const
+{
+    return m_systemManager;
+}
+
 const QString& Settings::cloudBackendUrl() const
 {
     return m_cloudBackendUrl;
@@ -162,7 +168,7 @@ QString Settings::dataDir() const
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString( "/opt/%1/%2/var" )
-            .arg( VER_LINUX_ORGANIZATION_NAME ).arg( kModuleName );
+            .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName );
     QString varDirName = m_settings.value( "varDir", defVarDirName ).toString();
     return varDirName;
 #else
@@ -218,9 +224,17 @@ void Settings::loadConfiguration()
 
     //accountManager
     m_accountManager.passwordResetCodeExpirationTimeout =
-        std::chrono::seconds(m_settings.value(
-            kPasswordResetCodeExpirationTimeout,
-            (qlonglong)kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
+        std::chrono::seconds(
+            m_settings.value(
+                kPasswordResetCodeExpirationTimeout,
+                (qlonglong)kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
+
+    //system manager
+    m_systemManager.reportRemovedSystemPeriod =
+        std::chrono::seconds(
+            m_settings.value(
+                kReportRemovedSystemPeriodSec,
+                (qlonglong)kDefaultReportRemovedSystemPeriodSec.count()).toInt());
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();

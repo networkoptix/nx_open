@@ -29,10 +29,12 @@ void PrintTo(const SocketAddress& val, ::std::ostream* os) {
 
 namespace nx {
 namespace cdb {
+namespace api {
 
-void PrintTo(api::ResultCode val, ::std::ostream* os) {
+void PrintTo(ResultCode val, ::std::ostream* os) {
     *os << QnLexical::serialized(val).toStdString();
 }
 
+}   //api
 }   //cdb
 }   //nx

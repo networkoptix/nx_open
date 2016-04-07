@@ -70,6 +70,7 @@ public:
 
     void setRequest(const QString& request);
     void setRole(Qn::ConnectionRole role);
+    void setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme);
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
 
@@ -121,6 +122,7 @@ private:
     bool m_gotData;
     QElapsedTimer m_dataTimer;
     bool m_rtpStarted;
+    nx_http::header::AuthScheme::Value m_prefferedAuthScheme;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -231,7 +231,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {
     NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout"), cl_logDEBUG2);
-        
+
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     for (const QUrl &url: m_urls) {

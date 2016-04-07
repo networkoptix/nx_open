@@ -75,6 +75,7 @@
                     </Directory>                    
 
                     <Directory Id="ClientQml" Name="qml"/>
+                    <Directory Id="ClientFontsDir" Name="fonts"/>
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
@@ -211,7 +212,6 @@
             <Component>
                 <File Id="ClientQt5WebKitWidgets$(var.suffix).dll" Name="Qt5WebKitWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKitWidgets$(var.suffix).dll" DiskId="8"  />                
             </Component>
-    
             <Component>
                 <File Id="ClientQt5MultimediaWidgets$(var.suffix).dll" Name="Qt5MultimediaWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5MultimediaWidgets$(var.suffix).dll" DiskId="8"  />                
             </Component>             
@@ -220,6 +220,12 @@
             </Component>       
             <Component>
                 <File Id="ClientQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Quick$(var.suffix).dll" DiskId="8"  />                
+            </Component>
+            <Component>
+                <File Id="ClientQt5QuickWidgets$(var.suffix).dll" Name="Qt5QuickWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5QuickWidgets$(var.suffix).dll" DiskId="8"  />                
+            </Component>
+            <Component>
+                <File Id="ClientQt5LabsTemplates$(var.suffix).dll" Name="Qt5LabsTemplates$(var.suffix).dll" Source="$(var.SourceDir)\Qt5LabsTemplates$(var.suffix).dll" DiskId="8"  />                
             </Component>             
             <Component>
                 <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll" DiskId="8"  />                
@@ -296,6 +302,7 @@
             <ComponentRef Id="ClientUriHandler"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
+            <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="Vs2015crtComponent"/>

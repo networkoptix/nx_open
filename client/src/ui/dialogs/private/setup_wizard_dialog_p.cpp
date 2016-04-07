@@ -5,7 +5,7 @@
 #include <QtGui/QDesktopServices>
 #include <QtWebKitWidgets/QWebFrame>
 
-#include <ui/widgets/web_page.h>
+#include <ui/widgets/common/web_page.h>
 
 #include <nx/utils/log/log.h>
 
@@ -40,6 +40,27 @@ QnSetupWizardDialogPrivate::QnSetupWizardDialogPrivate(
 QString QnSetupWizardDialogPrivate::getCredentials() const
 {
     return QString::fromUtf8(QJson::serialized(loginInfo));
+}
+
+void QnSetupWizardDialogPrivate::updateCredentials(const QString& login, const QString& password, bool isCloud)
+{
+    loginInfo.localLogin    = isCloud ? QString()   : login;
+    loginInfo.localPassword = isCloud ? QString()   : password;
+    loginInfo.cloudEmail    = isCloud ? login       : QString();
+    loginInfo.cloudPassword = isCloud ? password    : QString();
+}
+
+void QnSetupWizardDialogPrivate::cancel()
+{
+    Q_Q(QnSetupWizardDialog);
+
+    /* Remove 'accept' connection. */
+    disconnect(webView->page(), nullptr, q, nullptr);
+
+    /* Security fix to make sure we will never try to login further. */
+    loginInfo = LoginInfo();
+
+    q->reject();
 }
 
 void QnSetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)

@@ -12,3 +12,8 @@ QString QnMobileClientAppInfo::applicationDisplayName()
 {
     return QStringLiteral("${product.display.title}");
 }
+
+bool QnMobileClientAppInfo::defaultLiteMode()
+{
+    return ${liteMode};
+}

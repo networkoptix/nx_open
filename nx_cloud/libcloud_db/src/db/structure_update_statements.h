@@ -197,6 +197,13 @@ CREATE UNIQUE INDEX system_to_account_primary                               \
 ON system_to_account(account_id, system_id);                                \
 ";
 
+//#CLOUD-299
+static const char kAddDeletedSystemState[] =
+"                                                                           \
+INSERT INTO system_status( code, description )                              \
+                   VALUES( 3,    'deleted' );                               \
+";
+
 }   //db
 }   //cdb
 }   //nx

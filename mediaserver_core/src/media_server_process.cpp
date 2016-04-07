@@ -976,10 +976,6 @@ void MediaServerProcess::updateDisabledVendorsIfNeeded()
     static const QString DV_PROPERTY = QLatin1String("disabledVendors");
 
     QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
-        return;
-
     if (!disabledVendors.isNull())
     {
         qnGlobalSettings->setDisabledVendors(disabledVendors);
@@ -1134,9 +1130,12 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
 
             // initialize storage immediately in sync mode
-            //TODO: #rvasilenko remove this call. Need refactor
+			// todo: remove this call. Need refactor
             if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
-                qnStorage->initOrUpdate();
+            {
+                if (qnStorage->getParentId() == qnCommon->moduleGUID())
+                    qnStorage->initOrUpdate();
+            }
         }
     }
 
@@ -2370,8 +2369,10 @@ void MediaServerProcess::run()
     qnNormalStorageMan->initDone();
     qnBackupStorageMan->initDone();
 #ifndef EDGE_SERVER
+    //TODO: #GDM make this the common way with other settings
     updateDisabledVendorsIfNeeded();
     updateAllowCameraCHangesIfNeed();
+    qnGlobalSettings->synchronizeNowSync(); //TODO: #GDM double sync
 #endif
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());

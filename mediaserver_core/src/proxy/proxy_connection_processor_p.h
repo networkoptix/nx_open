@@ -1,6 +1,8 @@
 #ifndef __PROXY_CONNECTION_PROCESSOR_PRIV_H_
 #define __PROXY_CONNECTION_PROCESSOR_PRIV_H_
 
+#include <chrono>
+
 #include <nx/network/socket.h>
 
 #include "network/tcp_connection_priv.h"

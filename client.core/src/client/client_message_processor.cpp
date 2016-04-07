@@ -56,6 +56,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection) {
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
+        //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     } else if (m_connected) { // double init by null is allowed
         NX_ASSERT(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;

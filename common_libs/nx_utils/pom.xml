@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_utils</artifactId>
     <packaging>pom</packaging>
-    <name>NX Tool Library</name>
+    <name>NX Utils Library</name>
 
     <properties>
         <guid>${nx_utils.guid}</guid>

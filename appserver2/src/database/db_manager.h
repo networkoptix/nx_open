@@ -281,6 +281,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
             NX_ASSERT(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -481,6 +482,8 @@ namespace ec2
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
+        ErrorCode addAccess(const QnUuid& userId, const QnUuid& resourceId);
+        ErrorCode removeAccess(const QnUuid& userId, const QnUuid& resourceId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);

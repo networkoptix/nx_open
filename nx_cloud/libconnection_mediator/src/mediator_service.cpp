@@ -22,25 +22,26 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/guard.h>
 #include <utils/common/systemerror.h>
+#include <utils/common/app_info.h>
 
 #include "listening_peer_pool.h"
 #include "peer_registrator.h"
 #include "mediaserver_api.h"
 #include "server/hole_punching_processor.h"
 #include "settings.h"
-#include "version.h"
 
+#include <libconnection_mediator_app_info.h>
 
 namespace nx {
 namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
 :
-    QtService<QtSingleCoreApplication>(argc, argv, QN_APPLICATION_NAME),
+    QtService<QtSingleCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
     m_argc( argc ),
     m_argv( argv )
 {
-    setServiceDescription(QN_APPLICATION_NAME);
+    setServiceDescription(QnLibConnectionMediatorAppInfo::applicationDisplayName());
 }
 
 void MediatorProcess::setOnStartedEventHandler(
@@ -153,7 +154,7 @@ int MediatorProcess::executeApplication()
 
     NX_LOG(lit("STUN Server is listening on %1")
         .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-    std::cout << QN_APPLICATION_NAME << " has been started" << std::endl;
+    std::cout << QnLibConnectionMediatorAppInfo::applicationDisplayName().data() << " has been started" << std::endl;
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
@@ -201,9 +202,8 @@ void MediatorProcess::initializeLogging(const conf::Settings& settings)
 
         QnLog::initLog(settings.logging().logLevel);
         NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QN_APPLICATION_NAME), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QN_APPLICATION_VERSION), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QN_APPLICATION_REVISION), cl_logALWAYS);
+        NX_LOG(lit("%1 started").arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()), cl_logALWAYS);
+        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationFullVersion()), cl_logALWAYS);
     }
 }
 

@@ -551,7 +551,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!resyncTransactionLog())
 		    return false;
     }
-    else {
+    else
+    {
         if (m_needResyncLicenses) {
             if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
                 return false;
@@ -2655,6 +2656,49 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::addAccess(const QnUuid& userId, const QnUuid& resourceId)
+{
+    qint32 user_ptr_id = getResourceInternalId(userId);
+    qint32 resource_ptr_id = getResourceInternalId(resourceId);
+    if (user_ptr_id <= 0 || resource_ptr_id <= 0)
+        return ErrorCode::dbError;
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(R"(
+        INSERT OR REPLACE
+        INTO vms_access_rights
+        (user_ptr_id, resource_ptr_id)
+        VALUES (:user_ptr_id, :resource_ptr_id)
+    )");
+    query.bindValue(QLatin1String(":user_ptr_id"), user_ptr_id);
+    query.bindValue(QLatin1String(":resource_ptr_id"), resource_ptr_id);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeAccess(const QnUuid& userId, const QnUuid& resourceId)
+{
+    qint32 user_ptr_id = getResourceInternalId(userId);
+    qint32 resource_ptr_id = getResourceInternalId(resourceId);
+    if (user_ptr_id <= 0 || resource_ptr_id <= 0)
+        return ErrorCode::dbError;
+
+    QSqlQuery query(m_sdb);
+    query.prepare(R"(
+        DELETE
+        FROM vms_access_rights
+        WHERE user_ptr_id = :user_ptr_id
+        AND resource_ptr_id = :resource_ptr_id
+    )");
+    query.bindValue(QLatin1String(":user_ptr_id"), user_ptr_id);
+    query.bindValue(QLatin1String(":resource_ptr_id"), resource_ptr_id);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
     /*
@@ -2669,6 +2713,21 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
         return result;
 
     return insertOrReplaceUser(tran.params, internalId);
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
+{
+    switch (tran.command)
+    {
+    case ApiCommand::addAccess:
+        return addAccess(tran.params.userId, tran.params.resourceId);
+    case ApiCommand::removeAccess:
+        return removeAccess(tran.params.userId, tran.params.resourceId);
+    default:
+        break;
+    }
+    NX_ASSERT(false, Q_FUNC_INFO, "Unsupported transaction");
+    return ec2::ErrorCode::serverError;
 }
 
 ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)

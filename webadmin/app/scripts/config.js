@@ -12,6 +12,7 @@ var Config = {
     globalViewLivePermission:0x00000080,
 
     cloud:{
+        portalShortLink:'cloud-demo.hdw.mx',
         apiUrl: 'http://cloud-demo.hdw.mx/api',
         portalWhiteList:'http://cloud-demo.hdw.mx/**',
         portalUrl: 'http://cloud-demo.hdw.mx',

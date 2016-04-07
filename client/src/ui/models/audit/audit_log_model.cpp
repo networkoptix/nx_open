@@ -564,51 +564,16 @@ int QnAuditLogModel::columnCount(const QModelIndex &parent /* = QModelIndex()*/)
     return 0;
 }
 
-int QnAuditLogModel::minWidthForColumn(const Column &column) const
-{
-    switch (column) {
-    case SelectRowColumn:
-        return 8;
-    case TimestampColumn:
-    case EndTimestampColumn:
-    case DurationColumn:
-        return 80;
-    case UserNameColumn:
-    case UserHostColumn:
-        return 48;
-    case UserActivityColumn:
-        return 80;
-    case EventTypeColumn:
-    case DateColumn:
-    case TimeColumn:
-        return 64;
-    case DescriptionColumn:
-        return 128;
-    case PlayButtonColumn:
-        return 64;
-    case CameraNameColumn:
-        return 200;
-    default:
-        return 64;
-    }
-}
-
 QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (section >= m_columns.size())
-        return QVariant();
-
-    const Column &column = m_columns[section];
-    if (orientation != Qt::Horizontal)
-        return base_type::headerData(section, orientation, role);
-
-    if (role == Qt::SizeHintRole)
+    if (role == Qt::DisplayRole)
     {
-        return QSize(minWidthForColumn(column), m_headerHeight);
-    }
-    else if (role == Qt::DisplayRole)
-    {
-        switch (column) {
+        if (section >= m_columns.size())
+            return QVariant();
+
+        const Column &column = m_columns[section];
+        switch (column)
+        {
         case SelectRowColumn:
             return QVariant();
         case TimestampColumn:
@@ -626,10 +591,7 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
         case EventTypeColumn:
             return tr("Activity");
         case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("Device name"),
-                tr("Camera name")
-                );
+            return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device name"), tr("Camera name"));
         case CameraIpColumn:
             return tr("IP");
         case DateColumn:

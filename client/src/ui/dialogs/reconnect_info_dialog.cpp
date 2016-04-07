@@ -8,7 +8,7 @@
 
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
-#include <ui/widgets/progress_widget.h>
+#include <ui/widgets/common/progress_widget.h>
 
 namespace {
     const int maxLabelWidth = 400;

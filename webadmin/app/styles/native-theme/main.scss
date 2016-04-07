@@ -15,16 +15,35 @@ body {
 }
 
 /* add beta-symbol after product name everywhere */
-.product-name:after{
-  content: "(\03B2)";
+.product-name.add-version:after{
+  content: "\03B2";
   font-style: italic;
   opacity: 0.5;
   font-size: 90%;
 }
-a.product-name:after{
-  opacity: 1;
-}
+
 
 .inline-block{
   display: inline-block;
+}
+
+@mixin kill-glyphicon{
+  &:before{
+    content:none;
+  }
+}
+.master-success .glyphicon.glyphicon-cloud{
+  @include kill-glyphicon;
+  width: 64px;
+  height: 64px;
+  background-size: 64px 64px;
+  background-image:url('../images/native-theme/cloud.png')
+}
+
+.master-success .glyphicon.glyphicon-ok{
+  @include kill-glyphicon;
+  width:88px;
+  height: 88px;
+  background-size: 88px 88px;
+  background-image:url('../images/native-theme/success.png')
 }

@@ -12,7 +12,6 @@
 #include "nx_ec/data/api_camera_attributes_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_tran_state_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_videowall_data.h"
@@ -156,6 +155,7 @@ namespace ec2
         QnUuid transactionHash(const ApiStorageData& params) const                { return params.id; }
 		QnUuid transactionHash(const ApiMediaServerUserAttributesData& params) const    { return makeHash(params.serverID.toRfc4122(), "server_attributes"); }
         QnUuid transactionHash(const ApiUserData& params) const                   { return params.id; }
+        QnUuid transactionHash(const ApiAccessRightsData& params) const           { return makeHash(params.userId.toByteArray(), params.resourceId.toByteArray()); }
         QnUuid transactionHash(const ApiLayoutData& params) const                 { return params.id; }
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
         QnUuid transactionHash(const ApiWebPageData &params) const                { return params.id; }

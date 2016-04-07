@@ -56,7 +56,7 @@ public:
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
         stree::ResourceContainer* const authProperties,
-        std::function<void(bool)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(

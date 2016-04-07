@@ -47,13 +47,14 @@ void TemporaryAccountPasswordManager::authenticateByName(
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& authSearchInputData,
     stree::ResourceContainer* const authProperties,
-    std::function<void(bool)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    bool result = false;
+    api::ResultCode result = api::ResultCode::notAuthorized;
     auto scopedGuard = makeScopedGuard(
-        [/*std::move*/ &completionHandler, &result]() {
-        completionHandler(result);
-    });
+        [/*std::move*/ &completionHandler, &result]()
+        {
+            completionHandler(result);
+        });
 
     QnMutexLocker lk(&m_mutex);
 
@@ -79,7 +80,7 @@ void TemporaryAccountPasswordManager::authenticateByName(
                     cdb::attr::authenticatedByEmailCode,
                     true);
 
-            result = true;
+            result = api::ResultCode::ok;
 
             ++curIt->second.useCount;
             checkTemporaryPasswordForExpiration(&lk, curIt);
