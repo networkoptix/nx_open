@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log, $timeout) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
 
         if( $location.search().retry) {
@@ -90,6 +90,7 @@ angular.module('webadminApp')
 
         function checkInternet(reload){
 
+            $log.log("check internet connection");
             if(debugMode){
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
@@ -98,19 +99,25 @@ angular.module('webadminApp')
             mediaserver.getModuleInformation(reload).then(function(r){
                 $scope.serverInfo = r.data.reply;
                 $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
-            },function(){
+
+                $log.log("internet on server: " + $scope.hasInternetOnServer + ", flags: " + $scope.serverInfo.serverFlags);
+            },function(error){
                 $scope.hasInternetOnServer = false ;
+                logMediaserverError(error, "Failed to check internet on server:");
             });
 
             cloudAPI.ping().then(function(message){
                 if(message.data.resultCode && message.data.resultCode !== 'ok'){
                     $scope.settings.internetError = formatError(error.data.resultCode);
                     $scope.hasInternetOnClient = false;
+                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
                     return;
                 }
                 $scope.hasInternetOnClient = true;
-            },function(){
+                $log.log("internet on client: " + $scope.hasInternetOnClient);
+            },function(error){
                 $scope.hasInternetOnClient = false;
+                logMediaserverError(error, "Failed to check internet on client:");
             });
 
         }
@@ -178,11 +185,8 @@ angular.module('webadminApp')
                     return system;
                 });
 
-                systems = _.sortBy(systems,function(system){
+                $scope.discoveredUrls = _.sortBy(systems,function(system){
                     return system.visibleName;
-                });
-                $scope.discoveredUrls = _.filter(systems, function(module){
-                    return module.systemName !== $scope.serverInfo.systemName;
                 });
             });
         }
@@ -224,16 +228,43 @@ angular.module('webadminApp')
             return lastList;
         };
 
+        function classifyError(error){
+            var errorClasses = {
+
+                // Auth errors:
+                'UNAUTHORIZED':'auth',
+                'password':'auth',
+
+                // Wrong system:
+                'FAIL':'system',
+                'url':'system',
+
+                // Merge fail:
+                'INCOMPATIBLE':'fail',
+                'SAFE_MODE':'fail',
+                'CONFIGURATION_ERROR':'fail',
+            };
+            return errorClasses[error] || 'fail';
+        }
         function formatError(errorToShow){
             var errorMessages = {
-                'FAIL':'System is unreachable or doesn\'t exist.',
-                'currentPassword':'Incorrect current password',
+
+                // Auth errors:
                 'UNAUTHORIZED':'Wrong password.',
                 'password':'Wrong password.',
-                'INCOMPATIBLE':'Remote system has incompatible version.',
-                'url':'Wrong url.',
+
+                // Wrong system:
+                'FAIL':'System is unreachable or doesn\'t exist.',
+                'url':'Unable to connect to specified server.',
+                'INCOMPATIBLE':'Selected system has incompatible version.',
+
+                // Merge fail:
                 'SAFE_MODE':'Can\'t connect to a system. Remote system is in safe mode.',
                 'CONFIGURATION_ERROR':'Can\'t connect to a system. Maybe one of the systems is in safe mode.',
+
+
+
+                'currentPassword':'Incorrect current password',
 
                 // Cloud errors:
                 'notAuthorized': 'Login or password are incorrect',
@@ -242,6 +273,19 @@ angular.module('webadminApp')
             };
             return errorMessages[errorToShow] || errorToShow;
         }
+        $scope.clearRemoteError = function(onlyAuth){
+
+            if(onlyAuth && !$scope.settings.remoteAuthError){
+                return;
+            }
+            $scope.settings.remoteAuthError = false;
+            $scope.remoteSystemForm.remoteLogin.$setValidity('system',true);
+            $scope.remoteSystemForm.remotePassword.$setValidity('system',true);
+
+            $scope.settings.remoteError = null;
+            $scope.settings.remoteSystemError = false;
+            $scope.remoteSystemForm.remoteSystemName.$setValidity('system',true);
+        };
         function remoteErrorHandler(error){
             logMediaserverError(error);
 
@@ -250,16 +294,46 @@ angular.module('webadminApp')
                 errorMessage = formatError(error.data.errorString);
             }
             $scope.settings.remoteError = errorMessage;
+
+            switch(classifyError(error.data.errorString)){
+                case 'auth':
+                    $scope.settings.remoteAuthError = true;
+                    $scope.remoteSystemForm.remoteLogin.$setValidity('system',false);
+                    $scope.remoteSystemForm.remotePassword.$setValidity('system',false);
+                    $scope.next('merge');
+                    break;
+
+                case 'system':
+                    $scope.settings.remoteSystemError = true;
+                    $scope.remoteSystemForm.remoteSystemName.$setValidity('system',false);
+                    $scope.next('merge');
+                    break;
+
+                default:
+                    $scope.next('mergeFailure');
+                    break;
+            }
         }
 
         function connectToAnotherSystem(){
-            $scope.next('mergeProcess');
             $log.log("Connect to another system");
             $scope.settings.remoteError = false;
             if(debugMode){
-                $scope.next('localSuccess');
+                $log.log("Debug mode - only ping remote system: " + $scope.settings.remoteSystem.url);
+
+                mediaserver.pingSystem(
+                    $scope.settings.remoteSystem.url,
+                    $scope.settings.remoteLogin,
+                    $scope.settings.remotePassword).then(function(r){
+                        if(r.data.error !== 0 && r.data.error !=='0') {
+                            remoteErrorHandler(r);
+                            return;
+                        }
+                        updateCredentials( Config.defaultLogin, Config.defaultPassword).catch(remoteErrorHandler);
+                    },remoteErrorHandler);
                 return;
             }
+
 
             $log.log("Request /api/mergeSystems ...");
             mediaserver.mergeSystems(
@@ -572,12 +646,15 @@ angular.module('webadminApp')
             },
             cloudFailure:{
                 back: 'cloudLogin',
-                skip: 'localLogin'
+                skip: 'localLogin',
+                retry: function(){
+                    $scope.next('cloudLogin');
+                }
             },
             merge:{
                 back: 'systemName',
-                onShow: discoverSystems,
-                next: connectToAnotherSystem,
+                // onShow: discoverSystems,
+                next: 'mergeProcess',
                 valid: function(){
                     return required($scope.settings.remoteSystem) &&
                         required($scope.settings.remoteLogin) &&
@@ -585,10 +662,14 @@ angular.module('webadminApp')
                 }
             },
             mergeProcess:{
-
+                onShow: connectToAnotherSystem
             },
-            mergeSuccess:{
-                finish: true
+            mergeFailure:{
+                back: 'merge',
+                skip: 'systemName',
+                retry: function(){
+                    $scope.next('merge');
+                }
             },
 
             localLogin:{
@@ -605,7 +686,11 @@ angular.module('webadminApp')
                 finish:true
             },
             localFailure:{
-                back:'systemName'
+                back:'systemName',
+                finish:true,
+                retry:function(){
+                    $scope.next('start');
+                }
             },
             initFailure:{
                 cancel: !!nativeClientObject || debugMode,
@@ -621,7 +706,9 @@ angular.module('webadminApp')
 
         function initWizard(){
             $scope.next(0);
-            updateCredentials(Config.defaultLogin, Config.defaultPassword, false).catch(function(){
+            updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
+                discoverSystems();
+            },function(){
                 $log.log("Couldn't run setup wizard: auth failed");
                 if( $location.search().retry) {
                     $log.log("Second try: show error to user");

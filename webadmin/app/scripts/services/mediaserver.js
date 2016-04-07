@@ -330,6 +330,9 @@ angular.module('webadminApp')
 
 
             mergeSystems: function(url, remoteLogin, remotePassword, currentPassword, keepMySystem){
+                if(url.indexOf('http')!=0){
+                    url = 'http://' + url;
+                }
                 return wrapPost(proxy + '/api/mergeSystems?' + $.param({
                     login: remoteLogin,
                     password: remotePassword,
@@ -338,9 +341,13 @@ angular.module('webadminApp')
                     takeRemoteSettings: !keepMySystem
                 }));
             },
-            pingSystem: function(url,password){
+            pingSystem: function(url,login,password){
+                if(url.indexOf('http')!=0){
+                    url = 'http://' + url;
+                }
                 return wrapPost(proxy + '/api/pingSystem?' + $.param({
                     password:password,
+                    login:login,
                     url:url
                 }));
             },

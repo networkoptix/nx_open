@@ -70,6 +70,7 @@ button, select{
   &[disabled] {
     outline: none !important;
     -webkit-appearance: none !important;
+    -moz-appearance: none !important;
     appearance: none !important;
   }
 }
@@ -140,4 +141,19 @@ button, select{
       opacity: 0.2;
     }
   }
+}
+
+.ui-select-choices{
+  background-color: $light4 !important;
+  color:$dark4 !important;;
+}
+
+.ui-select-choices-row:hover {
+  background-color: $light2 !important;
+  color:$dark2 !important;
+}
+
+
+.ui-select-choices-row.active {
+  background-color: $brand_core !important;
 }

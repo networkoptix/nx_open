@@ -101,3 +101,13 @@ a.external,
 a.external:hover{
   text-decoration: underline;
 }
+
+
+@keyframes rotation {
+  from {transform: rotate(0deg);}
+  to   {transform: rotate(359deg);}
+}
+
+.master-success .glyphicon.glyphicon-refresh{
+  animation: rotation 5s linear infinite;
+}

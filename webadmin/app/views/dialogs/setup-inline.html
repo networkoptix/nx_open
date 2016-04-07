@@ -72,7 +72,7 @@
     </div>
 </div>
 
-<div class="panel-body text-center" ng-hide="!stepIs('cloudLogin')">
+<div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
 
     <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
     <p class="master-description">
@@ -113,12 +113,13 @@
     </form>
 </div>
 
-<div class="panel-body text-center" ng-if="stepIs('merge')">
+<div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
     <form class="master-controls" name="remoteSystemForm" novalidate disable-autocomplete>
-        <div class="form-group">
-            <ui-select ng-model="settings.remoteSystem" reset-search-input="false" required autofocus>
-                <ui-select-match placeholder="Systems..."
+        <div class="form-group" validate-field>
+            <ui-select ng-model="settings.remoteSystem" name="remoteSystemName" reset-search-input="false"
+                       ng-change="clearRemoteError()" required autofocus>
+                <ui-select-match placeholder="System address"
                                  name="remoteSystem">{{$select.selected.systemName}}</ui-select-match>
                 <ui-select-choices
                         repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search}">
@@ -130,20 +131,24 @@
                 {{settings.remoteSystem.hint}}
             </p>
         </div>
-        <div class="form-group" validate-field>
+        <div class="form-group">
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
-                   placeholder="Login" required>
+                   ng-change="clearRemoteError(true)"
+                   placeholder="Login" required readonly>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
+                   ng-change="clearRemoteError(true)"
                    placeholder="Password" required>
+        </div>
+        <div class="form-group has-error"  ng-if="settings.remoteError">
+            <div class="help-block">
+                {{settings.remoteError}}
+            </div>
         </div>
     </form>
 
-    <div class="alert alert-danger" ng-if="settings.remoteError">
-        Something went wrong: {{settings.remoteError}}
-    </div>
 
 </div>
 
@@ -154,6 +159,18 @@
     <p class="master-description">It may take several minutes</p>
 </div>
 
+
+<div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <h2>Couldn't merge systems</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Set up separate system</button>
+    </p>
+</div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
@@ -179,7 +196,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>Connect your server to internet</h2>
     <p class="master-description">
-        Set up internet connection on your server to be able <br> to connect to it anywhere using Nx Cloud.
+        Set up internet connection and firewall settings on your server to be able <br> to connect to it anywhere using Nx Cloud.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
@@ -191,8 +208,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
     <h2>Connect to internet</h2>
     <p class="master-description">
-        Connect to internet on your device to connect your system to Nx Cloud.<br>
-        {{internetError}}
+        Connect to internet and configure firewall on your device to connect your system to Nx Cloud.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
@@ -215,8 +231,11 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
     <h2>Couldn't setup your system</h2>
-    <p class="master-description">Something went totally wrong. It seems you can't use your server. I'm sorry.<br>
+    <p class="master-description">Something went totally wrong. <br>
         Error description: {{settings.localError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
