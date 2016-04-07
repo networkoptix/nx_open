@@ -654,7 +654,6 @@ QString QnGlobalSettings::cloudAccountName() const
 
 void QnGlobalSettings::setCloudAccountName(const QString& value)
 {
-
     m_cloudAccountNameAdaptor->setValue(value);
 }
 
