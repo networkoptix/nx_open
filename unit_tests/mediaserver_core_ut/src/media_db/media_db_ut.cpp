@@ -410,7 +410,7 @@ void initDbFile(QFile *dbFile)
     dbFile->open(QIODevice::ReadWrite);
 }
 
-TEST(MediaDb_test, BitsTwiddling)
+TEST(MediaDbTest, BitsTwiddling)
 {
     const size_t kTestBufSize = 10000;
     std::vector<TestFileHeader> fhVector;
@@ -474,7 +474,7 @@ TEST(MediaDb_test, BitsTwiddling)
     }
 }
 
-TEST(MediaDb_test, ReadWrite_Simple)
+TEST(MediaDbTest, ReadWrite_Simple)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QFile dbFile;
@@ -522,7 +522,7 @@ TEST(MediaDb_test, ReadWrite_Simple)
     ASSERT_TRUE(readRecords == tdm.dataVector.size());
 }
 
-TEST(MediaDb_test, DbFileTruncate)
+TEST(MediaDbTest, DbFileTruncate)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     int truncateCount = 1000;
@@ -580,7 +580,7 @@ TEST(MediaDb_test, DbFileTruncate)
     recursiveClean(workDirPath);
 }
 
-TEST(MediaDb_test, ReadWrite_MT)
+TEST(MediaDbTest, ReadWrite_MT)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QFile dbFile;
@@ -687,7 +687,7 @@ TEST(MediaDb_test, ReadWrite_MT)
     recursiveClean(workDirPath);
 }
 
-TEST(MediaDb_test, StorageDB)
+TEST(MediaDbTest, StorageDB)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     QDir().mkpath(workDirPath);
@@ -832,7 +832,7 @@ TEST(MediaDb_test, StorageDB)
     recursiveClean(workDirPath);
 }
 
-TEST(MediaDb_test, Migration_from_sqlite)
+TEST(MediaDbTest, Migration_from_sqlite)
 {
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
@@ -952,7 +952,7 @@ TEST(MediaDb_test, Migration_from_sqlite)
     }
 }
 
-TEST(MediaDb_test, Cleanup)
+TEST(MediaDbTest, Cleanup)
 {
     const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
     recursiveClean(workDirPath);
