@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "db_manager.h"
+#include "async_sql_query_executor.h"
 
 #include <thread>
 
@@ -13,26 +13,25 @@
 namespace nx {
 namespace db {
 
-
 static const size_t WAITING_TASKS_COEFF = 5;
 
-DBManager::DBManager( const ConnectionOptions& connectionOptions )
+AsyncSqlQueryExecutor::AsyncSqlQueryExecutor( const ConnectionOptions& connectionOptions )
 :
     m_connectionOptions( connectionOptions ),
     m_connectionsBeingAdded( 0 )
 {
 }
 
-DBManager::~DBManager()
+AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
 {
 }
 
-bool DBManager::init()
+bool AsyncSqlQueryExecutor::init()
 {
     return openOneMoreConnectionIfNeeded();
 }
 
-bool DBManager::openOneMoreConnectionIfNeeded()
+bool AsyncSqlQueryExecutor::openOneMoreConnectionIfNeeded()
 {
     {
         QnMutexLocker lk( &m_mutex );   
@@ -66,7 +65,6 @@ bool DBManager::openOneMoreConnectionIfNeeded()
     --m_connectionsBeingAdded;
     return true;
 }
-
 
 }   //db
 }   //nx

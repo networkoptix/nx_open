@@ -27,7 +27,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const conf::Settings& settings,
-    nx::db::DBManager* const dbManager) throw(std::runtime_error)
+    nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
 :
     m_settings(settings),
     m_dbManager(dbManager)

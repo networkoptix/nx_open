@@ -123,7 +123,7 @@ int CloudDBProcess::executeApplication()
             return 1;
         }
 
-        nx::db::DBManager dbManager(settings.dbConnectionOptions());
+        nx::db::AsyncSqlQueryExecutor dbManager(settings.dbConnectionOptions());
         if( !initializeDB(&dbManager) )
         {
             NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
@@ -378,7 +378,7 @@ void CloudDBProcess::registerApiHandlers(
         } );
 }
 
-bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
+bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
 {
     for (;;)
     {
@@ -404,7 +404,7 @@ bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
     return true;
 }
 
-bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
+bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
 {
     if( dbManager->connectionOptions().driverName != lit("QSQLITE") )
         return true;
@@ -445,7 +445,7 @@ bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
     return future.get() == nx::db::DBResult::ok;
 }
 
-bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
+bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
 {
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
