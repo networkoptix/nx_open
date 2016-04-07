@@ -235,6 +235,12 @@ void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
     event->accept();
 }
 
+void QnLayoutTabBar::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    updateGeometry();
+}
+
 void QnLayoutTabBar::at_workbench_layoutsChanged() {
     if(!m_update)
         return;
