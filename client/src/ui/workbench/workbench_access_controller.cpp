@@ -81,7 +81,7 @@ Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions(const QnUse
     if(!user)
         return result;
 
-    result = static_cast<Qn::GlobalPermissions>(user->getPermissions());
+    result = static_cast<Qn::GlobalPermissions>(static_cast<int>(user->getPermissions()));
 
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermissions;

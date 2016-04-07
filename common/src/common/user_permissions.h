@@ -43,6 +43,8 @@ namespace Qn
 
         /* Camera-specific permissions. */
         WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
+
+        AllPermissions                  = 0xFFFFFFFF
     };
 
 #ifdef __cplusplus
@@ -83,8 +85,6 @@ namespace Qn
         GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission |
                                                     GlobalProtectedPermission | GlobalEditServersPermissions | GlobalEditVideoWallPermission,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
-
-        AllPermissions                          = 0xFFFFFFFF
     };
 
 #ifdef __cplusplus
