@@ -187,17 +187,12 @@ footer {
     display: none;
 }
 
-.system-owner{
-  font-size: $font-size-h6;
-  line-height:16px;
-  font-weight: bold;
-  display: block;
-  margin-bottom:12px;
-}
+
 
 .system-button {
   user-select: none;
   cursor: pointer;
+  overflow: hidden;
 
   h2 {
     line-height: 24px;
@@ -208,6 +203,18 @@ footer {
     text-overflow: ellipsis;
     overflow: hidden;
   }
+  .system-owner{
+    font-size: $font-size-h6;
+    line-height:16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom:12px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+
   .label {
     display: inline-block;
     vertical-align: bottom;
