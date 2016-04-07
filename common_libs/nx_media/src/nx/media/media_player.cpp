@@ -129,6 +129,9 @@ public:
     
     // Video quality
     Player::VideoQuality videoQuality;
+    
+    // User-defined video resolution for custom quality
+    QSize videoResolution;
 
     void updateVideoQuality();
 private:
@@ -448,6 +451,8 @@ void PlayerPrivate::updateVideoQuality()
         archiveReader->setQuality(MEDIA_Quality_High, true);
     else if (videoQuality == Player::VideoQuality::Low)
         archiveReader->setQuality(MEDIA_Quality_Low, true);
+    else if (videoQuality == Player::VideoQuality::Custom)
+        archiveReader->setQuality(MEDIA_Quality_CustomResolution, true, videoResolution);
 }
 
 bool PlayerPrivate::initDataProvider()
@@ -668,6 +673,20 @@ void Player::setVideoQuality(const VideoQuality& value)
     d->videoQuality = value;
     d->updateVideoQuality();
 }
+
+QSize Player::videoResolution() const
+{
+    Q_D(const Player);
+    return d->videoResolution;
+}
+
+void Player::setVideoResolution(const QSize& value)
+{
+    Q_D(Player);
+    d->videoResolution = value;;
+    d->updateVideoQuality();
+}
+
 
 } // namespace media
 } // namespace nx

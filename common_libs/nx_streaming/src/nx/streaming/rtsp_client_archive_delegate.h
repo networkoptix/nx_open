@@ -51,7 +51,7 @@ public:
     // Send motion data to client
     virtual void setSendMotion(bool value) override;
 
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
 
     virtual void beforeSeek(qint64 time) override;
     virtual void beforeChangeReverseMode(bool reverseMode) override;
@@ -104,6 +104,7 @@ private:
     bool m_blockReopening;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
+    QSize m_resolution;
     qint64 m_lastMinTimeTime;
 
     QnTimePeriod m_serverTimePeriod;
