@@ -12,10 +12,18 @@ var Helper = function () {
         browser.get(url);
         browser.waitForAngular();
     };
-
+    this.urls = {
+        homepage: '/',
+        account: '/#/account',
+        password_change: '/#/account/password'
+    };
     this.navigateBack = function (){
         browser.navigate().back();
         browser.waitForAngular();
+    };
+
+    this.getParentOf = function(field) {
+        return field.element(by.xpath('../..'));
     };
 
     // Get valid email with random number between 100 and 1000
@@ -66,12 +74,7 @@ var Helper = function () {
     };
 
     this.login = function(email, password) {
-
         var loginButton = element(by.linkText('Login'));
-        var loginDialog = element(by.css('.modal-dialog'));
-        var emailInput = loginDialog.element(by.model('auth.email'));
-        var passwordInput = loginDialog.element(by.model('auth.password'));
-        var dialogLoginButton = loginDialog.element(by.buttonText('Login'));
 
         browser.get('/');
         browser.waitForAngular();
@@ -79,14 +82,25 @@ var Helper = function () {
 
         loginButton.click();
 
-        emailInput.sendKeys(email);
-        passwordInput.sendKeys(password);
-
-        dialogLoginButton.click();
-        browser.sleep(2000); // such a shame, but I can't solve it right now
+        this.loginFromCurrPage(email, password);
 
         // Check that element that is visible only for authorized user is displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(true);
+    };
+
+    this.loginFromCurrPage = function(email, password) {
+        var usrEmail = email || this.userEmail;
+        var usrPassword = password || this.userPassword;
+
+        var loginDialog = element(by.css('.modal-dialog'));
+        var emailInput = loginDialog.element(by.model('auth.email'));
+        var passwordInput = loginDialog.element(by.model('auth.password'));
+        var dialogLoginButton = loginDialog.element(by.buttonText('Login'));
+
+        emailInput.sendKeys(usrEmail);
+        passwordInput.sendKeys(usrPassword);
+        dialogLoginButton.click();
+        browser.sleep(2000); // such a shame, but I can't solve it right now
     };
 
     this.logout = function() {
@@ -105,7 +119,7 @@ var Helper = function () {
         expect(this.loginSuccessElement.isDisplayed()).toBe(false);
     };
 
-    this.register = function() {
+    this.register = function(firstName, lastName, email, password) {
         var firstNameInput = element(by.model('account.firstName'));
         var lastNameInput = element(by.model('account.lastName'));
         var emailInput = element(by.model('account.email'));
@@ -113,19 +127,49 @@ var Helper = function () {
         var passwordInput = passwordGroup.element(by.css('input[type=password]'));
         var submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
 
-        var userEmail = this.getRandomEmail();
+        var userFistName = firstName || this.userFirstName;
+        var userLastName = lastName || this.userLastName;
+        var userEmail = email || this.getRandomEmail();
+        var userPassword = password || this.userPassword;
 
         browser.get('/#/register');
 
-        firstNameInput.sendKeys(this.userFirstName);
-        lastNameInput.sendKeys(this.userLastName);
+        firstNameInput.sendKeys(userFistName);
+        lastNameInput.sendKeys(userLastName);
         emailInput.sendKeys(userEmail);
-        passwordInput.sendKeys(this.userPassword);
+        passwordInput.sendKeys(userPassword);
 
         submitButton.click();
         expect(this.htmlBody.getText()).toContain(this.alert.alertMessages.registerSuccess);
 
         return userEmail;
+    };
+
+    this.getActivationPage = function(userEmail) {
+        var deferred = protractor.promise.defer();
+
+        browser.controlFlow().wait(this.getEmailTo(userEmail, this.emailSubjects.register).then(function (email) {
+            // extract registration token from the link in the email message
+            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
+            var regCode = pattern.exec(email.html)[1];
+            console.log(regCode);
+            browser.get('/#/activate/' + regCode);
+
+            deferred.fulfill(userEmail);
+        }));
+
+        return deferred.promise;
+    };
+
+    this.createUser = function(firstName, lastName, password, email) {
+        var userEmail = this.register(firstName, lastName, password, email);
+        var deferred = protractor.promise.defer();
+
+        this.getActivationPage(userEmail).then( function(userEmail) {
+            expect(self.htmlBody.getText()).toContain(self.alert.alertMessages.registerConfirmSuccess);
+            deferred.fulfill(userEmail);
+        });
+        return deferred.promise;
     };
 
     this.changeAccountNames = function(firstName, lastName) {
