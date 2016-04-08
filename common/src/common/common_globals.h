@@ -12,35 +12,24 @@
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
 
-#ifdef Q_MOC_RUN
-class Qn
-#else
-namespace Qn
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
 #endif
-{
-#ifdef Q_MOC_RUN
-    Q_GADGET
-        Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
-            ConnectionRole ResourceStatus BitratePerGopType
-            StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-            RebuildAction BackupAction
-            FailoverPriority
-            Permission GlobalPermission
-            )
-        Q_FLAGS(Borders Corners
-            ResourceFlags
-            CameraCapabilities
-            PtzDataFields PtzCapabilities PtzTraits
-            MotionTypes TimePeriodTypes
-            ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
-            Permissions GlobalPermissions
-            )
-public:
-#else
-    Q_NAMESPACE
-#endif
+QN_DECLARE_METAOBJECT_HEADER(Qn,
+    Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
+    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
+    ConnectionRole ResourceStatus BitratePerGopType
+    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+    ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+    RebuildAction BackupAction FailoverPriority
+    Permission GlobalPermission
+    ,
+    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
+    MotionTypes TimePeriodTypes
+    ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
+    Permissions GlobalPermissions
+    )
+
 
     // TODO: #Elric #5.0 use Qt::Edge ?
     /**

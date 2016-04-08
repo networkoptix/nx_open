@@ -29,16 +29,6 @@ Q_DECLARE_METATYPE(TYPE)
 * The only sane use case is for generating metainformation for enums in
 * namespaces (e.g. for use with <tt>QnEnumNameMapper</tt>).
 */
-#define Q_NAMESPACE                                                             \
-    extern const QMetaObject staticMetaObject;                                  \
-    extern const QMetaObject &getStaticMetaObject();                            \
-
-
-/**
-* Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
-* The only sane use case is for generating metainformation for enums in
-* namespaces (e.g. for use with <tt>QnEnumNameMapper</tt>).
-*/
 #ifdef Q_MOC_RUN
 #define QN_DECLARE_METAOBJECT_HEADER(TYPE, ENUMS, FLAGS)    \
 class TYPE                                                  \
@@ -52,7 +42,7 @@ public:
     namespace TYPE                                          \
 {                                                           \
     extern const QMetaObject staticMetaObject;              \
-    extern const QMetaObject &getStaticMetaObject();        \
+
 
 #endif
 

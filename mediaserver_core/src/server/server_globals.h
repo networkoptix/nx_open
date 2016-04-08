@@ -1,19 +1,11 @@
-#ifndef QN_SERVER_GLOBALS_H
-#define QN_SERVER_GLOBALS_H
+#pragma once
 
 #include <utils/common/model_functions_fwd.h>
 
-#ifdef Q_MOC_RUN
-class QnServer
-{
-    Q_GADGET
-    Q_ENUMS(ChunksCatalog)
-public:
-#else
-namespace QnServer
-{
-    Q_NAMESPACE
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+    Q_OBJECT
 #endif
+QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
 
     enum ChunksCatalog {
         LowQualityCatalog,
@@ -45,4 +37,3 @@ namespace QnServer
 } // namespace QnServer
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
 
-#endif // QN_SERVER_GLOBALS_H
