@@ -90,9 +90,10 @@ SocketAddress CloudServerSocket::getLocalAddress() const
     return SocketAddress();
 }
 
-void CloudServerSocket::close()
+bool CloudServerSocket::close()
 {
     //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    return true;
 }
 
 bool CloudServerSocket::isClosed() const
@@ -101,9 +102,10 @@ bool CloudServerSocket::isClosed() const
     return false;
 }
 
-void CloudServerSocket::shutdown()
+bool CloudServerSocket::shutdown()
 {
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    return true;
 }
 
 bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const

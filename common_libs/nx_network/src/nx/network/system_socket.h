@@ -85,9 +85,9 @@ public:
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override;
     //!Implementation of AbstractSocket::close
-    virtual void close() override;
+    virtual bool close() override;
     //!Implementation of AbstractSocket::shutdown
-    virtual void shutdown() override;
+    virtual bool shutdown() override;
 
     //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override;
@@ -225,8 +225,8 @@ public:
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
-    virtual void close() override;
-    virtual void shutdown() override;
+    virtual bool close() override;
+    virtual bool shutdown() override;
 
 private:
     aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;

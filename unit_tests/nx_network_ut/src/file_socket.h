@@ -22,7 +22,7 @@ class FileSocket
 public:
     FileSocket( const std::string& filePath );
 
-    virtual void close() override;
+    virtual bool close() override;
     virtual bool isClosed() const override;
 
     virtual bool connect(

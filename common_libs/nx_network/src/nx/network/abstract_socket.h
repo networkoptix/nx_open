@@ -73,12 +73,12 @@ public:
     //!Get local address, socket is bound to
     virtual SocketAddress getLocalAddress() const = 0;
     //!Close socket
-    virtual void close() = 0;
+    virtual bool close() = 0;
     //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
     virtual bool isClosed() const = 0;
 
     //!Shutdown socket
-    virtual void shutdown() = 0;
+    virtual bool shutdown() = 0;
 
     //!Allows mutiple sockets to bind to same address and port
     /*!

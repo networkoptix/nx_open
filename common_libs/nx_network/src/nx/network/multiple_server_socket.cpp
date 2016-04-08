@@ -77,16 +77,20 @@ SocketAddress MultipleServerSocket::getLocalAddress() const
     return *first;
 }
 
-void MultipleServerSocket::close()
+bool MultipleServerSocket::close()
 {
+    bool result = true;
     for (auto& socket : m_serverSockets)
-        socket->close();
+        result &= socket->close();
+    return result;
 }
 
-void MultipleServerSocket::shutdown()
+bool MultipleServerSocket::shutdown()
 {
+    bool result = true;
     for (auto& socket : m_serverSockets)
-        socket->shutdown();
+        result &= socket->shutdown();
+    return result;
 }
 
 bool MultipleServerSocket::isClosed() const
