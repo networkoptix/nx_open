@@ -146,10 +146,10 @@ namespace ite
         }
         bool isLocked() const;
 
-        void pleaseStop()
-        {
-            m_needStop = true;
-        }
+        void pleaseStop() { m_needStop = true; }
+
+        bool needStop() const { return m_needStop; }
+        bool running() const { return m_running; }
 
     private:
         std::atomic_bool 	m_deviceReady;
@@ -161,6 +161,7 @@ namespace ite
         mutable std::mutex m_cvMutex;
         std::condition_variable m_cvConfig;
         std::atomic<bool> m_needStop;
+        std::atomic<bool> m_running;
         std::thread m_watchDogThread;
         bool m_configuring;
 

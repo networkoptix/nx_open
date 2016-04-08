@@ -450,6 +450,15 @@ namespace ite
                 ITE_LOG() << FMT("Rx %d watchdog started", rxID);
                 m_rxDevices.emplace(rxID, newRxDevice);
             }
+            else
+            {    
+                RxDevicePtr rx = rxIt->second;
+                if (!rx->running() && !rx->needStop())
+                {   // Rx open failed at the last attempt. Retrying.
+                    ITE_LOG() << FMT("Retrying open Rx %d", rxID);
+                    rx->startWatchDog();
+                }
+            }
         }
     }
 }

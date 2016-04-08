@@ -50,6 +50,7 @@ namespace ite
     RxDevice::RxDevice(unsigned id)
       : m_deviceReady(false),
         m_needStop(false),
+        m_running(false),
         m_configuring(false),
         m_devReader(new DevReader),
         m_rxID(id),
@@ -95,7 +96,10 @@ namespace ite
             [this]
             {
                 if(open())
+                {
+                    m_running = true;
                     ITE_LOG() << FMT("Open rx %d successfull", m_rxID);
+                }
                 else
                 {
                     ITE_LOG() << FMT("Open rx %d failed, device is not operational", m_rxID);
@@ -106,10 +110,11 @@ namespace ite
                 while (true)
                 {
                     if (m_needStop)
-                        return;
+                        break;
 
                     stats();
-                    ITE_LOG() << FMT("[Rx watchdog] Rx %d getting stats DONE; stats: %d; m_deviceReady: %d; m_needStop: %d",
+                    ITE_LOG() << FMT("[Rx watchdog] Rx %d getting stats DONE; " \
+                                     "stats: %d; m_deviceReady: %d; m_needStop: %d",
                                      m_rxID, (int)good(), (int)m_deviceReady.load(), (int)m_needStop);
 
                     if (!good() || !m_deviceReady)
@@ -207,6 +212,7 @@ namespace ite
 
                     std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
                 }
+                m_running = false;
             }
         );
     }
