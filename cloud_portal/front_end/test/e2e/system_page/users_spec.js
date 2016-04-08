@@ -1,0 +1,149 @@
+'use strict';
+var SystemPage = require('./po.js');
+describe('User list suite', function () {
+
+    var p = new SystemPage();
+
+    beforeAll(function() {
+        console.log("\nUser list start\n");
+    });
+
+    afterAll(function() {
+        console.log("\nUser list finish\n");
+    });
+
+    beforeEach(function(){
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+    });
+
+    afterEach(function(){
+        p.helper.logout();
+    });
+
+    it("Shares system with other users", function() {
+        p.helper.shareSystemWith(p.helper.userEmailAdmin, p.helper.roles.admin);
+        p.helper.shareSystemWith(p.helper.userEmailViewer, p.helper.roles.viewer);
+        p.helper.shareSystemWith(p.helper.userEmailAdvViewer, p.helper.roles.advViewer);
+        p.helper.shareSystemWith(p.helper.userEmailLiveViewer, p.helper.roles.liveViewer);
+
+    });
+
+    it ("Users list is visible for owner and admin", function() {
+        p.ownedSystem.click();
+        expect(p.userList.isDisplayed()).toBe(true);
+    
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
+        p.ownedSystem.click();
+        expect(p.userList.isDisplayed()).toBe(true);
+    });
+    
+    it ("Users list is not visible for other users?", function() {
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
+        p.ownedSystem.click();
+        expect(p.users.count()).toBe(0);
+    
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailLiveViewer, p.helper.userPassword);
+        p.ownedSystem.click();
+        expect(p.users.count()).toBe(0);
+    
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailAdvViewer, p.helper.userPassword);
+        p.ownedSystem.click();
+        expect(p.users.count()).toBe(0);
+    });
+    
+    it ("User emails and names are visible in this list", function() {
+        p.ownedSystem.click();
+        expect(p.userList.getText()).toContain(p.helper.userEmailAdmin, p.helper.userFirstName);
+    });
+    
+    it ("Owner is always on top of the table", function() {
+        p.ownedSystem.click();
+        expect(p.users.first().getText()).toContain(p.helper.userEmailOwner);
+    });
+    
+    it ("Pencil and cross links for each user are visible only on hover", function() {
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailAdmin);
+        p.ownedSystem.click();
+        p.users.filter(function(elem, index) {
+            // Except owner and current user
+            return elem.getText().then(function(text) {
+                return (index > 0) && (!p.helper.isSubstr(text, p.helper.userEmailAdmin));
+            });
+        }).each(function(elem){
+            expect(elem.element(by.css('.glyphicon-pencil')).isDisplayed()).toBe(false);
+            expect(elem.element(by.css('.glyphicon-remove')).isDisplayed()).toBe(false);
+            elem.click(); // TODO: replace with hover
+            expect(elem.element(by.css('.glyphicon-pencil')).isDisplayed()).toBe(true);
+            expect(elem.element(by.css('.glyphicon-remove')).isDisplayed()).toBe(true);
+        });
+    });
+    
+    it ("Edit and remove is not accessible for owner row", function() {
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailAdmin);
+        p.ownedSystem.click();
+        p.users.first().click(); // TODO: replace with hover
+        expect(p.users.first().element(by.css('.glyphicon-pencil')).isPresent()).toBe(false);
+        expect(p.users.first().element(by.css('.glyphicon-remove')).isPresent()).toBe(false);
+    });
+    
+    it ("Remove user works with confirmation, after deleting another user - message appears, user list is updated", function() {
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailAdmin);
+        p.ownedSystem.click();
+        var firstDeletableUser =  p.users.filter(function(elem, index) {
+            // Except owner and current user
+            return elem.getText().then(function(text) {
+                return (index > 0) && (!p.helper.isSubstr(text, p.helper.userEmailAdmin));
+            });
+        }).first();
+    
+        firstDeletableUser.getText().then(function(text) {
+            firstDeletableUser.click(); // TODO: replace with hover
+            expect(firstDeletableUser.element(by.css('.glyphicon-remove')).isDisplayed()).toBe(true);
+            firstDeletableUser.element(by.css('.glyphicon-remove')).click();
+            expect(p.modalDialog.getText()).toContain(p.deleteConfirmations.other);
+            p.deleteUserButton.click();
+            p.alert.catchAlert(p.alert.alertMessages.permissionDeleteSuccess, p.alert.alertTypes.success);
+            expect(p.userList.getText()).not.toContain(text);
+        });
+    });
+    
+    it ("If user deletes himself from the table - portal asks for confirmation", function() {
+        p.helper.logout();
+        p.helper.login(p.helper.userEmailAdmin);
+        p.ownedSystem.click();
+        var currentUsrRow = p.usrDataRow(p.helper.userEmailAdmin); // row with current user
+        currentUsrRow.click(); // TODO: replace with hover
+        currentUsrRow.element(by.css('.glyphicon-remove')).click();
+        expect(p.modalDialog.getText()).toContain(p.deleteConfirmations.self);
+        p.cancelDelUserButton.click();
+    });
+    
+    //xit ("If user deletes himself - he jumps to systems list", function() {
+    //
+    //});
+    
+    it ("User list updates after sharing", function() {
+        p.helper.logout();
+        p.helper.createUser(p.helper.userNameCyrillic, p.helper.userNameCyrillic).then( function(userEmail) {
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+    
+            p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+            p.helper.getSysPage(p.systemLink);
+            p.shareButton.click();
+            p.emailField.sendKeys(userEmail);
+            p.roleField.click();
+            p.roleOptionAdmin.click();
+            p.submitShareButton.click();
+            p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
+    
+            expect(p.usrDataRow(userEmail).isPresent()).toBe(true);
+        });
+    });
+});
