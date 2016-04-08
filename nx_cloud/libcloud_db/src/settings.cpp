@@ -63,13 +63,22 @@ namespace
 
     //notification settings
     const QLatin1String kNotificationEnabled("notification/enabled");
-    const QLatin1String kDefaultNotificationEnabled("true");
+    const bool kDefaultNotificationEnabled = true;
 
     const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeoutSec");
-    const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout(86400);
+    const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout(std::chrono::hours(24));
 
     const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriodSec");
     const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec(30*86400);  //a month
+
+    const QLatin1String kNotActivatedSystemLivePeriodSec("systemManager/notActivatedSystemLivePeriodSec");
+    const std::chrono::seconds kDefaultNotActivatedSystemLivePeriodSec(30 * 86400);  //a month
+
+    const QLatin1String kDropExpiredSystemsPeriodSec("systemManager/dropExpiredSystemsPeriodSec");
+    const std::chrono::seconds kDefaultDropExpiredSystemsPeriodSec = std::chrono::hours(12);
+
+    const QLatin1String kControlSystemStatusByDb("systemManager/controlSystemStatusByDb");
+    const bool kDefaultControlSystemStatusByDb = false;
 
     //auth settings
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
@@ -81,6 +90,18 @@ namespace
 namespace nx {
 namespace cdb {
 namespace conf {
+
+Notification::Notification()
+:
+    enabled(kDefaultNotificationEnabled)
+{
+}
+
+SystemManager::SystemManager()
+:
+    controlSystemStatusByDb(kDefaultControlSystemStatusByDb)
+{
+}
 
 
 Settings::Settings()
@@ -218,9 +239,10 @@ void Settings::loadConfiguration()
     m_changeUser = m_settings.value( kChangeUser ).toString();
 
     //email
-    m_notification.enabled = m_settings.value(
-        kNotificationEnabled,
-        kDefaultNotificationEnabled).toString() == "true";
+    m_notification.enabled =
+        m_settings.value(
+            kNotificationEnabled,
+            kDefaultNotificationEnabled ? "true" : "false").toString() == "true";
 
     //accountManager
     m_accountManager.passwordResetCodeExpirationTimeout =
@@ -235,6 +257,23 @@ void Settings::loadConfiguration()
             m_settings.value(
                 kReportRemovedSystemPeriodSec,
                 (qlonglong)kDefaultReportRemovedSystemPeriodSec.count()).toInt());
+
+    m_systemManager.notActivatedSystemLivePeriod =
+        std::chrono::seconds(
+            m_settings.value(
+                kNotActivatedSystemLivePeriodSec,
+                (qlonglong)kDefaultNotActivatedSystemLivePeriodSec.count()).toInt());
+
+    m_systemManager.dropExpiredSystemsPeriod =
+        std::chrono::seconds(
+            m_settings.value(
+                kDropExpiredSystemsPeriodSec,
+                (qlonglong)kDefaultDropExpiredSystemsPeriodSec.count()).toInt());
+
+    m_systemManager.controlSystemStatusByDb =
+        m_settings.value(
+            kControlSystemStatusByDb,
+            kDefaultControlSystemStatusByDb ? "true" : "false").toString() == "true";
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();

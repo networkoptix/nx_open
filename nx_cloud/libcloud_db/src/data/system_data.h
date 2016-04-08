@@ -8,6 +8,7 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -61,9 +62,16 @@ class SystemData
     public stree::AbstractResourceReader
 {
 public:
+    /** seconds since epoch (1970-01-01) */
+    int expirationTimeUtc;
+
+    SystemData();
+
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
+
+#define SystemData_FieldsEx SystemData_Fields (expirationTimeUtc)
 
 
 class SystemDataList
@@ -93,6 +101,10 @@ public:
     //!Implementation of \a stree::AbstractResourceReader::getAsVariant
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (sql_record));
 
 }   //data
 }   //cdb
