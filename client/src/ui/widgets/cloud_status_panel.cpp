@@ -65,6 +65,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
     Q_Q(QnCloudStatusPanel);
 
     cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
+    cloudMenu->setWindowFlags(cloudMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
     systemsMenu = cloudMenu->addMenu(tr("Connect to System..."));
     cloudMenu->addSeparator();
     cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
