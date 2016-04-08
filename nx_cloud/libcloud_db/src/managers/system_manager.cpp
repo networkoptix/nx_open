@@ -539,9 +539,9 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
         QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
     markSystemAsRemoved.bindValue(
         ":expiration_utc_timestamp",
-        ::time(NULL) +
+        (int)(::time(NULL) +
             std::chrono::duration_cast<std::chrono::seconds>(
-                m_settings.systemManager().reportRemovedSystemPeriod).count());
+                m_settings.systemManager().reportRemovedSystemPeriod).count()));
     markSystemAsRemoved.bindValue(
         ":id",
         QnSql::serialized_field(systemId));
@@ -749,7 +749,7 @@ nx::db::DBResult SystemManager::activateSystem(
 }
 
 void SystemManager::systemActivated(
-    QnCounter::ScopedIncrement asyncCallLocker,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
@@ -944,7 +944,7 @@ nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connect
         static_cast<int>(api::SystemStatus::ssDeleted));
     dropExpiredSystems.bindValue(
         ":currentTime",
-        ::time(NULL));
+        (int)::time(NULL));
     if (!dropExpiredSystems.exec())
     {
         NX_LOGX(lit("Error deleting expired systems from DB. %1").
@@ -968,7 +968,6 @@ void SystemManager::expiredSystemsDeletedFromDb(
              systemIter != systemsByExpirationTime.end();
              )
         {
-            const auto& system = *systemIter;
             NX_ASSERT(systemIter->status != api::SystemStatus::ssActivated);
 
             auto& sharingBySystemId = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();

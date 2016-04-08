@@ -324,7 +324,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     }
 }
 
-void CloudUserAuthenticator::cloudBindingStatusChanged(bool bindedToCloud)
+void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*bindedToCloud*/)
 {
     clear();
 }

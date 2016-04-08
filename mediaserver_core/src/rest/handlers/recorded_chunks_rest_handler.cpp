@@ -21,8 +21,6 @@
 
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
-    static const qint64 USEC_PER_MS = 1000;
-
     Q_UNUSED(path)
     
     QByteArray errStr;
