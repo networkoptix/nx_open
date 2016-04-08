@@ -11,6 +11,7 @@ class AbstractResourceAllocator
 {
 public:
     virtual void execAtGlThread(std::function<void (void*)> lambda, void* opaque) = 0;
+    virtual void execAtGlThreadAsync(std::function<void()> lambda) = 0;
     virtual ~AbstractResourceAllocator() {}
 };
 

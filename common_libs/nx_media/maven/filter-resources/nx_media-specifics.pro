@@ -14,6 +14,9 @@ INCLUDEPATH += ${root.dir}/common/src/ \
                ${qt.dir}/include/QtOpenGL/ \
                ${qt.dir}/include/QtOpenGL/$$QT_VERSION/ \
                ${qt.dir}/include/QtOpenGL/$$QT_VERSION/QtOpenGL/ \
+               ${root.dir}/common_libs/nx_media/proxy_decoder/ \
+
+LIBS += -L${root.dir}/common_libs/nx_media/proxy_decoder -lproxydecoder
 
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug

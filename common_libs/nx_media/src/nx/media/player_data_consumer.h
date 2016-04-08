@@ -32,7 +32,7 @@ public:
 
     QVideoFramePtr dequeueVideoFrame();
     qint64 queueVideoDurationUsec() const;
-    
+
     const AudioOutput* audioOutput() const;
 
 signals:
@@ -54,9 +54,11 @@ protected:
     virtual bool canAcceptData() const override;
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
-    
+
     /** Ask thread to stop. It's a non-blocking call. Thread will be stopped later. */
     virtual void pleaseStop() override;
+
+    virtual void endOfRun() override;
 
 private:
     bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
@@ -71,7 +73,7 @@ private:
     std::unique_ptr<SeamlessVideoDecoder> m_videoDecoder;
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
     std::unique_ptr<AudioOutput> m_audioOutput;
-            
+
     std::deque<QVideoFramePtr> m_decodedVideo;
     QnWaitCondition m_queueWaitCond;
     QnMutex m_queueMutex; //< sync with player thread
@@ -84,7 +86,7 @@ private:
 
     // Delay video decoding. Used for AV sync.
     std::deque<QnCompressedVideoDataPtr> m_predecodeQueue;
-            
+
     enum class NoDelayState
     {
         Disabled, //< noDelay state isn't used

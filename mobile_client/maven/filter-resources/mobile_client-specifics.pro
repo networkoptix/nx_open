@@ -12,7 +12,8 @@ INCLUDEPATH += \
     ${qt.dir}/include/QtGui/$$QT_VERSION/ \
     ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
 
-
+# Needed to ignore possibly missing libproxydecoder.so
+LIBS += -Wl,--allow-shlib-undefined
 
 unix: !ios {
     LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"

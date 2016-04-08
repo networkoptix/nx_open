@@ -33,6 +33,7 @@
 #include <nx/media/audio_decoder_registry.h>
 #include <nx/media/ffmpeg_video_decoder.h>
 #include <nx/media/ffmpeg_audio_decoder.h>
+#include <nx/media/proxy_video_decoder.h>
 #include <nx/media/jpeg_decoder.h>
 
 
@@ -48,12 +49,13 @@
 void initDecoders(QQuickWindow *window)
 {
     using namespace nx::media;
-#if defined(Q_OS_ANDROID)
     std::shared_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
+#if defined(Q_OS_ANDROID)
     static const int kHardwareDecodersCount = 1;
-    VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(std::move(allocator), kHardwareDecodersCount);
+    VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(allocator, kHardwareDecodersCount);
     AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
 #endif
+    VideoDecoderRegistry::instance()->addPlugin<ProxyVideoDecoder>(allocator, 1);
 #ifndef DISABLE_FFMPEG
     VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
     AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();

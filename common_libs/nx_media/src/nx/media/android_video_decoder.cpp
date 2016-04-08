@@ -199,7 +199,7 @@ public:
     }
 
     FboPtr renderFrameToFbo();
-    void createGLResources();
+    void createGlResources();
 private:
     qint64 frameNumber;
     bool initialized;
@@ -224,7 +224,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
-    createGLResources();
+    createGlResources();
     FboPtr fbo = fboManager->getFbo();
 
     if (funcs->glGetError())
@@ -322,7 +322,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     return fbo;
 }
 
-void AndroidVideoDecoderPrivate::createGLResources()
+void AndroidVideoDecoderPrivate::createGlResources()
 {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOpenGLFunctions *funcs = ctx->functions();
