@@ -13,7 +13,7 @@ describe('System suite', function () {
     });
 
     it("has system name, owner and OpenInNx button visible on every system page", function() {
-        p.helper.login(p.userEmailOwner, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
 
         p.systemsList.map(function (elem, index) {
             return {
@@ -39,7 +39,7 @@ describe('System suite', function () {
     xit("has system status visible if system is not online", function() {
     });
     it("has OpenInNx button disabled if system is not online", function() {
-        p.helper.login(p.userEmailOwner, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
         var offlineSystems = p.systemsList.filter(function(elem) {
             // First filter systems that are not activated or offline
             return elem.getInnerHtml().then(function(content) {
@@ -69,7 +69,7 @@ describe('System suite', function () {
         expect(p.shareButton.isDisplayed()).toBe(true);
 
         p.helper.logout();
-        p.helper.login(p.userEmailOwner, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isDisplayed()).toBe(true);
 
@@ -77,17 +77,17 @@ describe('System suite', function () {
     });
 
     it("does not show Share button to viewer, advanced viewer, live viewer", function() {
-        p.helper.login(p.userEmailViewer, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
 
         p.helper.logout();
-        p.helper.login(p.userEmailAdvViewer, p.helper.userPassword);
+        p.helper.login(p.p.helper.userEmailAdvViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
 
         p.helper.logout();
-        p.helper.login(p.userEmailLiveViewer, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailLiveViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
 
@@ -114,7 +114,7 @@ describe('System suite', function () {
         expect(p.systemNameElem.getText()).not.toContain(p.systemName);
         expect(p.loginButton.isPresent()).toBe(true);
         // Fill data into login page
-        p.helper.loginFromCurrPage(p.userEmailOwner, p.helper.userPassword);
+        p.helper.loginFromCurrPage(p.helper.userEmailOwner, p.helper.userPassword);
         expect(p.systemNameElem.getText()).toContain(p.systemName);
 
         p.helper.logout();
@@ -123,7 +123,7 @@ describe('System suite', function () {
     it("should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)", function() {
         p.helper.login(p.userEmailNoPerm, p.helper.userPassword);
 
-        //p.getSysPage(p.systemLink);
+        //p.helper.getSysPage(p.systemLink);
         browser.get(p.url + p.systemLink);
         p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
         expect(p.systemNameElem.isPresent()).toBe(false);
@@ -149,8 +149,8 @@ describe('System suite', function () {
         p.helper.createUser(p.helper.userNameCyrillic, p.helper.userNameCyrillic).then( function(userEmail) {
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
 
-            p.helper.login(p.userEmailOwner, p.helper.userPassword);
-            p.getSysPage(p.systemLink);
+            p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+            p.helper.getSysPage(p.systemLink);
             p.shareButton.click();
             p.emailField.sendKeys(userEmail);
             p.roleField.click();
@@ -159,7 +159,7 @@ describe('System suite', function () {
 
             p.helper.logout();
             p.helper.login(userEmail, p.helper.userPassword);
-            p.getSysPage(p.systemLink);
+            p.helper.getSysPage(p.systemLink);
             expect(p.usrDataRow(userEmail).getText()).toContain(p.helper.userNameCyrillic + ' ' + p.helper.userNameCyrillic);
 
             p.helper.logout();
@@ -171,7 +171,7 @@ describe('System suite', function () {
         p.helper.get(p.helper.urls.account);
 
         p.helper.changeAccountNames(p.helper.userNameCyrillic, p.helper.userNameCyrillic);
-        p.getSysPage(p.systemLink);
+        p.helper.getSysPage(p.systemLink);
         expect(p.usrDataRow(p.userEmailAdmin).getText()).toContain(p.helper.userNameCyrillic + ' ' + p.helper.userNameCyrillic);
     });
 });

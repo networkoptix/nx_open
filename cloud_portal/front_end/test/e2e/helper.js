@@ -15,15 +15,20 @@ var Helper = function () {
     this.urls = {
         homepage: '/',
         account: '/#/account',
-        password_change: '/#/account/password'
+        password_change: '/#/account/password',
+        systems: '/#/systems'
     };
     this.navigateBack = function (){
         browser.navigate().back();
         browser.waitForAngular();
     };
 
+    this.getSysPage = function(systemLink) {
+        this.get(this.urls.systems + systemLink);
+    };
+
     this.getParentOf = function(field) {
-        return field.element(by.xpath('../..'));
+        return field.element(by.xpath('..'));
     };
 
     // Get valid email with random number between 100 and 1000
@@ -39,6 +44,20 @@ var Helper = function () {
     this.userEmail = 'noptixqa+1@gmail.com'; // valid existing email
     this.userEmail2 = 'noptixqa+2@gmail.com';
     this.userEmailWrong = 'nonexistingperson@gmail.com';
+
+    this.userEmailOwner = 'noptixqa+owner@gmail.com';
+    this.userEmailAdmin = 'noptixqa+admin@gmail.com';
+    this.userEmailViewer = 'noptixqa+viewer@gmail.com';
+    this.userEmailAdvViewer = 'noptixqa+advviewer@gmail.com';
+    this.userEmailLiveViewer = 'noptixqa+liveviewer@gmail.com';
+    this.userEmailNoPerm = 'noptixqa+noperm@gmail.com';
+
+    this.roles = {
+        admin: 'option[label=admin]',
+        viewer: 'option[label=viewer]',
+        advViewer: 'option[label~=advanced]',
+        liveViewer: 'option[label~=live]'
+    };
 
     this.userFirstName = 'TestFirstName';
     this.userLastName = 'TestLastName';
@@ -183,6 +202,25 @@ var Helper = function () {
         saveButton.click();
 
         this.alert.catchAlert( this.alert.alertMessages.accountSuccess, this.alert.alertTypes.success);
+    };
+
+    this.shareSystemWith = function(email, role, systemLink) {
+        var sharedRole = role || 'admin';
+        var systemLinkCode = systemLink || '/a74840da-f135-4522-abd9-5a8c6fb8591f';
+        var shareButton = element(by.partialButtonText('Share'));
+        var emailField = element(by.model('share.accountEmail'));
+        var roleField = element(by.model('share.accessRole'));
+        var roleOption = roleField.element(by.css(sharedRole));
+        var submitShareButton = element(by.css('process-button')).element(by.buttonText('Share'));
+
+        this.getSysPage(systemLinkCode);
+
+        shareButton.click();
+        emailField.sendKeys(email);
+        roleField.click();
+        roleOption.click();
+        submitShareButton.click();
+        expect(element(by.cssContainingText('td', email)).isPresent()).toBe(true);
     };
 
     this.emailSubjects = {

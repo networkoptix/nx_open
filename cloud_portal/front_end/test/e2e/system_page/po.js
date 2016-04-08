@@ -9,12 +9,12 @@ var SystemPage = function () {
     this.url = '/#/systems';
     this.systemLink = '/a74840da-f135-4522-abd9-5a8c6fb8591f';
     this.systemName = 'test-korneeva';
-    this.userEmailOwner = 'noptixqa+owner@gmail.com';
-    this.userEmailAdmin = 'noptixqa+admin@gmail.com';
-    this.userEmailViewer = 'noptixqa+viewer@gmail.com';
-    this.userEmailAdvViewer = 'noptixqa+advviewer@gmail.com';
-    this.userEmailLiveViewer = 'noptixqa+liveviewer@gmail.com';
-    this.userEmailNoPerm = 'noptixqa+noperm@gmail.com';
+
+    this.deleteConfirmations = {
+        self: 'You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?',
+        other: ''
+    };
+
     this.systemsList = element.all(by.repeater('system in systems'));
     this.ownedSystem = element.all(by.cssContainingText('h2', this.systemName)).first();
 
@@ -27,6 +27,13 @@ var SystemPage = function () {
     this.roleOptionAdmin = this.roleField.element(by.css('option[label=admin]'));
     this.submitShareButton = element(by.css('process-button')).element(by.buttonText('Share'));
 
+    this.users = element.all(by.repeater('user in system.users'));
+    this.userList = this.helper.getParentOf(this.users.first());
+
+    this.modalDialog = element(by.css('.modal-dialog'));
+    this.deleteUserButton = this.modalDialog.element(by.buttonText('Delete'));
+    this.cancelDelUserButton = this.modalDialog.element(by.buttonText('Cancel'));
+
     this.usrDataRow = function(email) {
         return this.helper.getParentOf(element(by.cssContainingText('td', email)));
     };
@@ -34,9 +41,7 @@ var SystemPage = function () {
     this.loginButton = element(by.css('.modal-dialog')).element(by.buttonText('Login'));
     this.loginCloseButton = element(by.css('.modal-dialog')).all(by.css('button.close')).first();
 
-    this.getSysPage = function(systemLink) {
-        this.helper.get(this.url + systemLink);
-    }
+
 
 };
 

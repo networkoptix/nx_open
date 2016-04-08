@@ -18,7 +18,9 @@ var AlertSuite = function () {
         changePassWrongCurrent: 'Couldn\'t change your password: Current password doesn\'t match',
         changePassSuccess: 'Your password was successfully changed.',
         systemAccessError: 'System info is unavailable: Some unexpected error has happened',
-        systemAccessRestricted: 'System info is unavailable: You have no access to this system'
+        systemAccessRestricted: 'System info is unavailable: You have no access to this system',
+        permissionDeleteSuccess: 'Permissions were removed from ',
+        permissionAddSuccess: 'New permissions saved'
     };
 
     this.submitButton = element(by.css('process-button')).element(by.css('button'));
