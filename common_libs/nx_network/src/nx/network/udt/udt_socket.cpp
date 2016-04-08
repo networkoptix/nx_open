@@ -507,6 +507,9 @@ bool UdtSocket<InterfaceToImplement>::open()
     return true;
 }
 
+template class UdtSocket<AbstractStreamSocket>;
+template class UdtSocket<AbstractStreamServerSocket>;
+
 
 // =====================================================================
 // UdtStreamSocket implementation
