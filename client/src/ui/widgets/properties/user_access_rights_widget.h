@@ -22,13 +22,13 @@ public:
     QnUserAccessRightsWidget(QWidget* parent = 0);
     virtual ~QnUserAccessRightsWidget();
 
-    ec2::ApiAccessRightsData accessRights() const;
-    void setAccessRights(const ec2::ApiAccessRightsData& value);
+    QSet<QnUuid> accessibleResources() const;
+    void setAccessibleResources(const QSet<QnUuid>& value);
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 private:
     QScopedPointer<Ui::UserAccessRightsWidget> ui;
-    ec2::ApiAccessRightsData m_data;
+    QSet<QnUuid> m_data;
 };

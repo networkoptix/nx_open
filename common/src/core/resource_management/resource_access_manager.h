@@ -10,17 +10,21 @@
 
 #include <nx/utils/singleton.h>
 
-class QnResourceAccessManager : public QObject, public Singleton<QnResourceAccessManager> {
+#include <utils/common/connective.h>
+
+class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
+{
     Q_OBJECT
 
+    typedef Connective<QObject> base_type;
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
     void reset(const ec2::ApiAccessRightsDataList& accessRights);
-    ec2::ApiAccessRightsDataList allAccessRights() const;
 
-    ec2::ApiAccessRightsData accessRights(const QnUuid& userId) const;
-    void setAccessRights(const ec2::ApiAccessRightsData& accessRights);
+    /** List of resources ids, the given user has access to. */
+    QSet<QnUuid> accessibleResources(const QnUuid& userId) const;
+    void setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources);
 
     /**
     * \param user                      User to get global permissions for.
@@ -29,6 +33,12 @@ public:
     */
     Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr &user) const;
 
+    /**
+    * \param user                      User to get global permissions for.
+    * \param requiredPermissions       Global permissions to check.
+    * \returns                         Whether actual global permissions include required permission.
+    */
+    bool hasGlobalPermission(const QnUserResourcePtr &user, Qn::GlobalPermission requiredPermission) const;
 
 private:
     /**
@@ -37,8 +47,15 @@ private:
     */
     static Qn::GlobalPermissions undeprecate(Qn::GlobalPermissions permissions);
 
+    /** Clear all cache values, bound to the given resource id. */
+    void clearCache(const QnUuid& id);
+
+    /** Fully clear all caches. */
+    void clearCache();
+
 private:
-    ec2::ApiAccessRightsDataList m_values;
+    QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
+    mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 };
 
 #define qnResourceAccessManager QnResourceAccessManager::instance()

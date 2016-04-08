@@ -114,7 +114,7 @@ void QnRestConnectionProcessor::run()
                 return;
             }
 
-            bool isAdmin = qnResourceAccessManager->globalPermissions(user).testFlag(Qn::GlobalAdminPermission);
+            bool isAdmin = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
             if (!isAdmin)
             {
                 sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);

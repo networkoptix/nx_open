@@ -258,7 +258,10 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 
 void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights)
 {
-    qnResourceAccessManager->setAccessRights(accessRights);
+    QSet<QnUuid> accessibleResources;
+    for (const QnUuid& id : accessRights.resourceIds)
+        accessibleResources << id;
+    qnResourceAccessManager->setAccessibleResources(accessRights.userId, accessibleResources);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)

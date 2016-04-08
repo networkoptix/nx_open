@@ -728,8 +728,9 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     ui->licensesUsageWidget->loadData(&helper);
 }
 
-void QnCameraScheduleWidget::updateLicensesButtonVisible() {
-    ui->licensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalAdminPermission);
+void QnCameraScheduleWidget::updateLicensesButtonVisible()
+{
+    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
 }
 
 void QnCameraScheduleWidget::updateRecordSpinboxes(){

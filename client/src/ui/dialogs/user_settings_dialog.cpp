@@ -204,11 +204,8 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
     else
         m_mode = Mode::OtherUser;
 
-    if (accessController()->globalPermissions()) {
-        createAccessRightsPresets();
-        createAccessRightsAdvanced();
-    }
-
+    createAccessRightsPresets();
+    createAccessRightsAdvanced();
     updateFromResource();
 }
 
@@ -237,13 +234,13 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->emailEdit->setText(m_user->getEmail());
         ui->enabledCheckBox->setChecked(m_user->isEnabled());
 
-        loadAccessRightsToUi(accessController()->globalPermissions(m_user));
+        loadAccessRightsToUi(qnResourceAccessManager->globalPermissions(m_user));
     }
     updateLogin();
     updatePassword();
 
-    ec2::ApiAccessRightsData accessRights = qnResourceAccessManager->accessRights(m_user->getId());
-    ui->accessRightsWidget->setAccessRights(accessRights);
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_user->getId());
+    ui->accessRightsWidget->setAccessibleResources(accessibleResources);
     ui->accessRightsWidget->loadDataToUi();
 
     setHasChanges(false);
@@ -277,9 +274,8 @@ void QnUserSettingsDialog::submitToResource() {
         m_user->setEnabled(ui->enabledCheckBox->isChecked());
 
     ui->accessRightsWidget->applyChanges();
-    ec2::ApiAccessRightsData userAccessRights = ui->accessRightsWidget->accessRights();
-    userAccessRights.userId = m_user->getId();
-    qnResourceAccessManager->setAccessRights(userAccessRights);
+    auto accessibleResources = ui->accessRightsWidget->accessibleResources();
+    qnResourceAccessManager->setAccessibleResources(m_user->getId(), accessibleResources);
 
     setHasChanges(false);
 }
@@ -498,14 +494,14 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
-    Qn::GlobalPermissions permissions = accessController()->globalPermissions(m_user);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
 
     // show only for view of owner
     if (permissions.testFlag(Qn::GlobalOwnerPermission))
         ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermission);
 
     // show for an admin or for anyone opened by owner
-    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->globalPermissions().testFlag(Qn::GlobalOwnerPermission))
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
         ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermission);
 
     ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissions);
@@ -520,13 +516,13 @@ void QnUserSettingsDialog::createAccessRightsAdvanced()
     if (!m_user)
         return;
 
-    Qn::GlobalPermissions permissions = accessController()->globalPermissions(m_user);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
     QWidget* previous = ui->advancedButton;
 
     if (permissions.testFlag(Qn::GlobalOwnerPermission))
         previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalOwnerPermission, previous);
 
-    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->globalPermissions().testFlag(Qn::GlobalOwnerPermission))
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::GlobalAdminPermission,
                      previous);

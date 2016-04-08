@@ -558,20 +558,27 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
         return;
     }
 
-    const auto resourceIsWebPage = [this]()
+    const auto calculateSliderVisible = [this]()
     {
+        if (action(QnActions::ToggleTourModeAction)->isChecked())
+            return false;
+
         if (!navigator()->currentWidget())
             return false;
 
         const auto resource = navigator()->currentWidget()->resource();
-        return (resource && resource->flags().testFlag(Qn::web_page));
+        if (!resource)
+            return false;
+
+        const auto flags = resource->flags();
+        if (flags & (Qn::web_page | Qn::still_image | Qn::server | Qn::videowall))  /* Any of the flags is sufficient. */
+            return false;
+
+        return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+            || !navigator()->currentWidget()->resource()->flags().testFlag(Qn::live);   /* Show slider for local files. */
     };
 
-    bool sliderVisible =
-        navigator()->currentWidget() != nullptr &&
-        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) && !resourceIsWebPage() &&
-        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & Qn::live)) &&
-        !action(QnActions::ToggleTourModeAction)->isChecked();
+    bool sliderVisible = calculateSliderVisible();
 
     if (m_inactive)
     {

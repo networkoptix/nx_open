@@ -70,7 +70,7 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr &user)
         connect(d->user, &QnUserResource::permissionsChanged, this, [this](){
             Q_D(QnAvailableCamerasWatcher);
 
-            bool acceptAllCameras = qnResourceAccessManager->globalPermissions(d->user).testFlag(Qn::GlobalAdminPermission);
+            bool acceptAllCameras = qnResourceAccessManager->hasGlobalPermission(d->user, Qn::GlobalAdminPermission);
             if (d->acceptAllCameras != acceptAllCameras)
                 d->initialize();
         });
@@ -178,7 +178,7 @@ void QnAvailableCamerasWatcherPrivate::initialize() {
     if (!user)
         return;
 
-    acceptAllCameras = qnResourceAccessManager->globalPermissions(user).testFlag(Qn::GlobalAdminPermission);
+    acceptAllCameras = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
     if (acceptAllCameras) {
         for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true))

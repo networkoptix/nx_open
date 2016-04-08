@@ -65,13 +65,6 @@ public:
     Qn::GlobalPermissions globalPermissions() const;
 
     /**
-     * \param user                      User to get global permissions for.
-     * \returns                         Global permissions of the given user,
-     *                                  adjusted to take deprecation and superuser status into account.
-     */
-    Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr &user) const;
-
-    /**
      * \param requiredPermissions       Global permissions to check.
      * \returns                         Whether actual global permissions
      *                                  include required permissions.

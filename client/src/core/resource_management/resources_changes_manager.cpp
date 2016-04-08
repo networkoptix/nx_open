@@ -300,7 +300,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
 
     QnUuid userId = user->getId();
 
-    ec2::ApiAccessRightsData accessRightsBackup = qnResourceAccessManager->accessRights(userId);
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(userId);
 
     applyChanges(user);
 
@@ -331,8 +331,13 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         emit saveChangesFailed(QnResourceList() << user);
     } );
 
-    connection->getUserManager()->setAccessRights(qnResourceAccessManager->accessRights(userId), this,
-        [this, user, sessionGuid, accessRightsBackup](int reqID, ec2::ErrorCode errorCode)
+    ec2::ApiAccessRightsData accessRights;
+    accessRights.userId = userId;
+    for (const auto &id : accessibleResources)
+        accessRights.resourceIds.push_back(id);
+
+    connection->getUserManager()->setAccessRights(accessRights, this,
+        [this, user, sessionGuid, accessibleResources](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -344,7 +349,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->setAccessRights(accessRightsBackup);
+        qnResourceAccessManager->setAccessibleResources(user->getId(), accessibleResources);
 
         emit saveChangesFailed(QnResourceList() << user);
     });

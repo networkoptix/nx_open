@@ -4,10 +4,10 @@
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject> {
@@ -119,7 +119,7 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex &index) const {
 QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user) const {
     QStringList permissionStrings;
 
-    Qn::GlobalPermissions permissions = model->accessController()->globalPermissions(user);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
 
     if (permissions.testFlag(Qn::GlobalOwnerPermission))
         permissionStrings.append(tr("Owner"));
@@ -185,7 +185,6 @@ void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserRes
 
 QnUserListModel::QnUserListModel(QObject *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
     , d(new QnUserListModelPrivate(this))
 {
 }
@@ -356,7 +355,6 @@ void QnUserListModel::setColors(const QnUserManagementColors &colors) {
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
 {
 }
 
@@ -375,8 +373,8 @@ bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex 
 
     switch (sortColumn()) {
     case QnUserListModel::PermissionsColumn: {
-        qint64 leftPermissions = accessController()->globalPermissions(leftUser);
-        qint64 rightPermissions = accessController()->globalPermissions(rightUser);
+        qint64 leftPermissions = qnResourceAccessManager->globalPermissions(leftUser);
+        qint64 rightPermissions = qnResourceAccessManager->globalPermissions(rightUser);
         if (leftPermissions == rightPermissions)
             break;
         return leftPermissions > rightPermissions; // Use ">" to make the owner higher than others

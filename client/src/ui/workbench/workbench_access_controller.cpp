@@ -77,15 +77,13 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
 
 Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions() const
 {
-    return globalPermissions(m_user);
-}
+    if (qnRuntime->isVideoWallMode())
+        return Qn::GlobalVideoWallModePermissionSet;
 
-Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions(const QnUserResourcePtr &user) const
-{
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
-        return Qn::GlobalViewerPermissions;
+    if (qnRuntime->isActiveXMode())
+        return Qn::GlobalActiveXModePermissionSet;
 
-    return qnResourceAccessManager->globalPermissions(user);
+    return qnResourceAccessManager->globalPermissions(m_user);
 }
 
 bool QnWorkbenchAccessController::hasGlobalPermission(Qn::GlobalPermission requiredPermission) const
@@ -160,7 +158,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
             return result;
 
         /* Protected users can only be edited by super-user. */
-        if (m_userPermissions.testFlag(Qn::GlobalOwnerPermission) || !globalPermissions(user).testFlag(Qn::GlobalAdminPermission))
+        if (m_userPermissions.testFlag(Qn::GlobalOwnerPermission) || !qnResourceAccessManager->globalPermissions(user).testFlag(Qn::GlobalAdminPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
 
@@ -336,7 +334,6 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
 
 void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     connect(resource, &QnResource::parentIdChanged,    this, &QnWorkbenchAccessController::updatePermissions);
-    connect(resource, &QnResource::statusChanged,      this, &QnWorkbenchAccessController::updatePermissions);
 
     if (const QnLayoutResourcePtr &layout = resource.dynamicCast<QnLayoutResource>()) {
         connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnWorkbenchAccessController::updatePermissions);

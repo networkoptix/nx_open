@@ -614,7 +614,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
     if(resources.size() != 1)
         return Qn::InvisibleAction;
 
-    bool watchable = !(resources[0]->flags() & Qn::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
+    bool watchable = !(resources[0]->flags() & Qn::live) || accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
     return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
 
     // TODO: #Elric this will fail (?) if we have sync with some UTC resource on the scene.
@@ -625,7 +625,7 @@ Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParame
 }
 
 Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
-    return (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
+    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources) {
@@ -983,7 +983,7 @@ Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnAction
     if (snapshotManager()->isFile(layout))
         return Qn::InvisibleAction;
 
-    if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)
+    if (accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission))
         return Qn::EnabledAction;
 
     return Qn::InvisibleAction;

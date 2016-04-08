@@ -54,9 +54,9 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     instance<QnResourcePropertyDictionary>();
     instance<QnResourceStatusDictionary>();
     instance<QnServerAdditionalAddressesDictionary>();
-    instance<QnResourceAccessManager>();
 
     instance<QnResourcePool>();
+    instance<QnResourceAccessManager>();
 
     instance<QnGlobalSettings>();
 

@@ -2194,21 +2194,19 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(QnActions::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
-    //if (!action(QnActions::TogglePanicModeAction)->isChecked()) {
 
+    // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions().testFlag(Qn::GlobalAdminPermission));
+        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
-
-    //}
 }
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions().testFlag(Qn::GlobalAdminPermission));
+        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)

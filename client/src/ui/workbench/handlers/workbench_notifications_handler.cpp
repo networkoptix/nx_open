@@ -73,10 +73,9 @@ void QnWorkbenchNotificationsHandler::clear() {
 void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessActionPtr &businessAction) {
     //TODO: #GDM #Business check if camera is visible to us
     QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
-    if (userGroup == QnBusiness::AdminOnly
-            && !(accessController()->globalPermissions() & Qn::GlobalAdminPermission)) {
+    if (userGroup == QnBusiness::AdminOnly && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
-    }
+
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
         QnUserResourceList users = qnResPool->getResources<QnUserResource>(businessAction->getParams().additionalResources);
@@ -176,17 +175,21 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSys
 
     bool connected = !qnCommon->remoteGUID().isNull();
 
-    if (!connected) {
+    if (!connected)
+    {
         canShow = (message == QnSystemHealth::ConnectionLost);
-        if (visible) {
+        if (visible)
+        {
             /* In unit tests there can be users when we are disconnected. */
             QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
             if (guiApp)
                 NX_ASSERT(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
         }
-    } else {
+    }
+    else
+    {
         /* Only admins can see some system health events */
-        if (adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalAdminPermission))
+        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             canShow = false;
     }
 

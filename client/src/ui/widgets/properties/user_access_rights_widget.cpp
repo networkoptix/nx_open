@@ -17,12 +17,12 @@ QnUserAccessRightsWidget::~QnUserAccessRightsWidget()
 
 }
 
-ec2::ApiAccessRightsData QnUserAccessRightsWidget::accessRights() const
+QSet<QnUuid> QnUserAccessRightsWidget::accessibleResources() const
 {
     return m_data;
 }
 
-void QnUserAccessRightsWidget::setAccessRights(const ec2::ApiAccessRightsData& value)
+void QnUserAccessRightsWidget::setAccessibleResources(const QSet<QnUuid>& value)
 {
     m_data = value;
 }
@@ -34,18 +34,12 @@ bool QnUserAccessRightsWidget::hasChanges() const
 
 void QnUserAccessRightsWidget::loadDataToUi()
 {
-    QSet<QnUuid> accessible;
-    for (const QnUuid& id : m_data.resourceIds)
-        accessible << id;
-    ui->camerasTab->setCheckedResources(accessible); //TODO: #GDM filter by cameras, otherwise we will have problems on saving
+    ui->camerasTab->setCheckedResources(m_data); //TODO: #GDM filter by cameras, otherwise we will have problems on saving
     ui->camerasTab->loadDataToUi();
 }
 
 void QnUserAccessRightsWidget::applyChanges()
 {
     ui->camerasTab->applyChanges();
-
-    m_data.resourceIds.clear();
-    for (const QnUuid& id : ui->camerasTab->checkedResources()) //TODO: #GDM filter by cameras, otherwise we will have problems on saving
-        m_data.resourceIds.push_back(id);
+    m_data = ui->camerasTab->checkedResources(); //TODO: #GDM filter by cameras, otherwise we will have problems on saving
 }
