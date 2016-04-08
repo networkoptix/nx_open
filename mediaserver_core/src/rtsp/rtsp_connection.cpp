@@ -1096,7 +1096,7 @@ QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isV
     Q_D(const QnRtspConnectionProcessor);
 
     QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
-    if (isVideo && !d->transcodedVideoSize.isEmpty())
+    if (isVideo && !d->transcodedVideoSize.isEmpty() && d->codecId != CODEC_ID_NONE)
         result->setDstResolution(d->transcodedVideoSize, d->codecId);
     return result;
 }
