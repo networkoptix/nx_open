@@ -1,3 +1,11 @@
+// Configuration
+#define xENABLE_GL_LOG
+#define ENABLE_GL_FATAL_ERRORS
+static const bool USE_GUI_RENDERING = false;
+static const bool USE_SHARED_CTX = true;
+
+#include "proxy_video_decoder_gl_utils.cxx"
+
 class ProxyVideoDecoderPrivate
 {
 private:
@@ -5,7 +13,7 @@ private:
 
 public:
     ProxyVideoDecoderPrivate(ProxyVideoDecoder* owner)
-        :
+    :
         q(owner),
         m_allocator(nullptr),
         m_initialized(false),
@@ -15,13 +23,11 @@ public:
         m_uTex(QOpenGLTexture::Target2D),
         m_vTex(QOpenGLTexture::Target2D)
     {
-        static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
-            "ProxyVideoDecoder: Insufficient padding size");
     }
 
     ~ProxyVideoDecoderPrivate()
     {
-        QLOG("ProxyVideoDecoderPrivate::~ProxyVideoDecoderPrivate() BEGIN");
+        QLOG("ProxyVideoDecoderPrivate<gl>::~ProxyVideoDecoderPrivate() BEGIN");
         if (m_threadGlCtx)
         {
             GL_GET_FUNCS(m_threadGlCtx.get());
@@ -42,12 +48,12 @@ public:
         }
         m_offscreenSurface.reset(nullptr);
 
-        QLOG("ProxyVideoDecoderPrivate::~ProxyVideoDecoderPrivate() END");
+        QLOG("ProxyVideoDecoderPrivate<gl>::~ProxyVideoDecoderPrivate() END");
     }
 
     /**
-    * Should be called exactly once before initialize().
-    */
+     * Should be called exactly once before initialize().
+     */
     void setAllocator(AbstractResourceAllocator* allocator)
     {
         NX_ASSERT(allocator);
@@ -61,14 +67,14 @@ public:
     }
 
     /**
-    * If initialization fails, fail with 'assert'.
-    */
+     * If initialization fails, fail with 'assert'.
+     */
     void initialize(const QnConstCompressedVideoDataPtr& compressedVideoData);
 
     /**
-    * @param compressedVideoData Has non-null data().
-    * @return Value with the same semantics as AbstractVideoDecoder::decode().
-    */
+     * @param compressedVideoData Has non-null data().
+     * @return Value with the same semantics as AbstractVideoDecoder::decode().
+     */
     int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
         QVideoFramePtr* outDecodedFrame);
@@ -107,7 +113,7 @@ private:
 };
 
 class ProxyVideoDecoderPrivate::TextureBuffer
-    :
+:
     public QAbstractVideoBuffer
 {
 public:
@@ -115,7 +121,7 @@ public:
         const FboPtr& fbo,
         const std::shared_ptr<ProxyVideoDecoderPrivate>& owner,
         const ConstYuvBufferPtr& yuvBuffer)
-        :
+    :
         QAbstractVideoBuffer(GLTextureHandle),
         m_fbo(fbo),
         m_owner(owner),
@@ -168,7 +174,7 @@ private:
 
 void ProxyVideoDecoderPrivate::initialize(const QnConstCompressedVideoDataPtr& compressedVideoData)
 {
-    QLOG("ProxyVideoDecoderPrivate::initialize() BEGIN");
+    QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() BEGIN");
     NX_ASSERT(!m_initialized);
     NX_CRITICAL(m_allocator);
     NX_CRITICAL(compressedVideoData);
@@ -183,7 +189,7 @@ void ProxyVideoDecoderPrivate::initialize(const QnConstCompressedVideoDataPtr& c
 
     m_proxyDecoder.reset(new ProxyDecoder(m_frameSize.width(), m_frameSize.height()));
 
-    QLOG("ProxyVideoDecoderPrivate::initialize() END");
+    QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() END");
 }
 
 void ProxyVideoDecoderPrivate::createGlResources()

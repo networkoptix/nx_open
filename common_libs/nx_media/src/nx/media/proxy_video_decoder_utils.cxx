@@ -16,7 +16,7 @@
 // #define TIME_PUSH(TAG) ...
 // #define TIME_FINISH(TAG) ...
 
-void showFps();
+static void showFps();
 
 static uint8_t* alignPtr(void* data);
 
@@ -43,6 +43,8 @@ typedef std::shared_ptr<const YuvBuffer> ConstYuvBufferPtr;
 
 std::chrono::milliseconds getCurrentTime()
 {
+    Q_UNUSED(getCurrentTime);
+
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
 }
@@ -111,8 +113,10 @@ std::chrono::milliseconds getCurrentTime()
     #define TIME_FINISH(TAG)
 #endif // ENABLE_TIME
 
-void showFps()
+static void showFps()
 {
+    Q_UNUSED(showFps);
+
     static const int kFpsCount = 30;
     static std::deque<double> fpsList;
     static std::chrono::milliseconds prevT(0);
@@ -150,12 +154,16 @@ static const int kAlignment = 32;
 
 static uint8_t* alignPtr(void* data)
 {
+    Q_UNUSED(alignPtr);
+
     return (uint8_t*) (
         (((uintptr_t) data) + kAlignment - 1) / kAlignment * kAlignment);
 }
 
 static uint8_t* unalignPtr(void* data)
 {
+    Q_UNUSED(unalignPtr);
+
     return (uint8_t*) (
         (17 + ((uintptr_t) data) + kAlignment - 1) / kAlignment * kAlignment);
 }

@@ -4,11 +4,14 @@
 #define xENABLE_LOG
 #define xENABLE_LOG_VDPAU
 #define xENABLE_STUB //< Draw a checkerboard with pure C++ code.
-#define ENABLE_GET_BITS //< If disabled, ...get_bits... will NOT be called (thus no picture).
+static const bool ENABLE_GET_BITS = true; //< If 0, ...get_bits... will NOT be called (thus no picture).
 #define xENABLE_TIME
-#define xENABLE_RGB_VDPAU //< Use VDPAU Mixer for YUV->RGB instead of pure C++ code.
+static const bool ENABLE_RGB_VDPAU = false; //< Use VDPAU Mixer for YUV->RGB instead of pure C++ code.
 #define ENABLE_RGB_Y_ONLY //< Convert only Y to Blue, setting Red and Green to 0.
 #define ENABLE_RGB_PART_ONLY //< Convert to RGB only a part of the frame.
+#define xENABLE_X11
+static const bool ENABLE_YUV_DUMP = false; //< Dump frames in both Native and Planar YUV to files.
+#define DEBUG_FRAME_PATH "/tmp"
 
 #ifdef ENABLE_STUB
 #include "proxy_decoder_stub.cxx"
@@ -24,16 +27,14 @@ extern "C" {
 #include <libavformat/avformat.h>
 } // extern "C"
 
-#include <vdpau/vdpau.h>
-#include <vdpau/vdpau_x11.h>
 #include <libavcodec/vdpau.h>
 
 #define PRINT(...) do { std::cerr << __VA_ARGS__ << "\n"; } while(0)
 
+#include "vdpau_helper.cxx"
+
 #define LOG_PREFIX "ProxyDecoder"
 #include "proxy_decoder_debug.cxx"
-
-#include "vdpau_helper.cxx"
 
 //-------------------------------------------------------------------------------------------------
 // ProxyDecoderPrivate
@@ -52,6 +53,9 @@ public:
 
     int decodeToRgb(const ProxyDecoder::CompressedFrame* compressedFrame, int64_t* outPts,
         uint8_t* argbBuffer, int argbLineSize);
+
+    int decodeToYuvNative(const ProxyDecoder::CompressedFrame* compressedFrame, int64_t* outPts,
+        uint8_t** outBuffer, int* outBufferSize);
 
 private:
     struct InitOnce
@@ -98,6 +102,7 @@ private:
 
     std::vector<vdpau_render_state*> m_renderStates;
 
+    VdpDevice m_vdpDevice = VDP_INVALID_HANDLE;
     VdpDecoder m_vdpDecoder = VDP_INVALID_HANDLE;
     VdpVideoMixer m_vdpMixer = VDP_INVALID_HANDLE;
     AVCodecContext* m_codecContext = nullptr;
@@ -148,16 +153,18 @@ void ProxyDecoderPrivate::initializeVdpau()
 
     const VdpDecoderProfile profile = VDP_DECODER_PROFILE_H264_HIGH;
 
-    if (getVdpDevice() == 0)
+    m_vdpDevice = createVdpDevice();
+    if (m_vdpDevice == VDP_INVALID_HANDLE)
     {
-        PRINT("ERROR: Unable to get VDPAU device");
+        PRINT("ERROR: Unable to create VDPAU device");
         assert(false);
     }
 
-    VDP(vdp_decoder_create(getVdpDevice(),
+    VDP(vdp_decoder_create(m_vdpDevice,
         profile, m_frameWidth, m_frameHeight, 16, &m_vdpDecoder));
 
-    #ifdef ENABLE_RGB_VDPAU
+    if (ENABLE_RGB_VDPAU)
+    {
         const VdpVideoMixerFeature features[] =
         {
             VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
@@ -174,9 +181,9 @@ void ProxyDecoderPrivate::initializeVdpau()
         int numLayers = 0;
         const void* const paramValues[] = {&m_frameWidth, &m_frameHeight, &chroma, &numLayers};
 
-        VDP(vdp_video_mixer_create(getVdpDevice(),
+        VDP(vdp_video_mixer_create(m_vdpDevice,
             2, features, 4, params, paramValues, &m_vdpMixer));
-    #endif // ENABLE_RGB_VDPAU
+    }
 
     PRINT("VDPAU Initialized OK");
 }
@@ -184,16 +191,19 @@ void ProxyDecoderPrivate::initializeVdpau()
 void ProxyDecoderPrivate::deinitializeVdpau()
 {
     if (m_vdpMixer != VDP_INVALID_HANDLE)
-        vdp_video_mixer_destroy(m_vdpMixer);
+        VDP(vdp_video_mixer_destroy(m_vdpMixer));
 
     if (m_vdpDecoder != VDP_INVALID_HANDLE)
-        vdp_decoder_destroy(m_vdpDecoder);
+        VDP(vdp_decoder_destroy(m_vdpDecoder));
 
     for (int i = 0; i < m_renderStates.size(); ++i)
     {
-        vdp_video_surface_destroy(m_renderStates[i]->surface);
+        VDP(vdp_video_surface_destroy(m_renderStates[i]->surface));
         delete m_renderStates[i];
     }
+
+    if (m_vdpDevice != VDP_INVALID_HANDLE)
+        VDP(vdp_device_destroy(m_vdpDevice));
 }
 
 void ProxyDecoderPrivate::initializeFfmpeg()
@@ -301,7 +311,7 @@ int ProxyDecoderPrivate::doGetBuffer2(
         memset(renderState, 0, sizeof(vdpau_render_state));
         renderState->surface = VDP_INVALID_HANDLE;
 
-        VDP(vdp_video_surface_create(getVdpDevice(),
+        VDP(vdp_video_surface_create(m_vdpDevice,
             VDP_CHROMA_TYPE_420, m_frameWidth, m_frameHeight, &renderState->surface));
     }
 
@@ -485,11 +495,11 @@ int ProxyDecoderPrivate::decodeToRgb(
     LOG("===========================================================================");
     LOG(":decodeToRgb(argbLineSize: " << argbLineSize << ") BEGIN");
 
-    #ifdef ENABLE_RGB_VDPAU
-        int result = decodeToRgbVdpau(compressedFrame, outPts, argbBuffer, argbLineSize);
-    #else // ENABLE_RGB_VDPAU
-        int result = decodeToRgbSoftware(compressedFrame, outPts, argbBuffer, argbLineSize);
-    #endif // ENABLE_RGB_VDPAU
+    int result;
+    if (ENABLE_RGB_VDPAU)
+        result = decodeToRgbVdpau(compressedFrame, outPts, argbBuffer, argbLineSize);
+    else
+        result = decodeToRgbSoftware(compressedFrame, outPts, argbBuffer, argbLineSize);
 
     LOG(":decodeToRgb() END -> " << result);
     return result;
@@ -537,7 +547,7 @@ int ProxyDecoderPrivate::decodeToRgbVdpau(
         return result;
 
     VdpOutputSurface outputSurface;
-    VDP(vdp_output_surface_create(getVdpDevice(),
+    VDP(vdp_output_surface_create(m_vdpDevice,
         VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
 
     VDP(vdp_video_mixer_render(m_vdpMixer,
@@ -594,16 +604,49 @@ int ProxyDecoderPrivate::decodeToYuvPlanar(
     const uint32_t pitches[3] = {
         (uint32_t) yLineSize, (uint32_t) uVLineSize, (uint32_t) uVLineSize};
 
-#ifdef ENABLE_GET_BITS
-    TIME_BEGIN("vdp_video_surface_get_bits_y_cb_cr")
-    VDP(vdp_video_surface_get_bits_y_cb_cr(renderState->surface,
-        VDP_YCBCR_FORMAT_YV12, dest, pitches));
-    TIME_END
-#endif // ENABLE_GET_BITS
+    if (ENABLE_GET_BITS)
+    {
+        TIME_BEGIN("vdp_video_surface_get_bits_y_cb_cr")
+        VDP(vdp_video_surface_get_bits_y_cb_cr(renderState->surface,
+            VDP_YCBCR_FORMAT_YV12, dest, pitches));
+        TIME_END
+
+        if (ENABLE_YUV_DUMP)
+            debugDumpToFiles(renderState->surface, yBuffer, yLineSize, uBuffer, vBuffer, uVLineSize);
+    }
 
     renderState->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE;
 
     LOG(":decodeToYuvPlanar() END -> " << result);
+    return result;
+}
+
+int ProxyDecoderPrivate::decodeToYuvNative(
+    const ProxyDecoder::CompressedFrame* compressedFrame, int64_t* outPts,
+    uint8_t** outBuffer, int* outBufferSize)
+{
+    LOG("===========================================================================");
+    LOG(":decodeToYuvNative() BEGIN");
+  
+    vdpau_render_state* renderState;
+    int result = decodeFrame(compressedFrame, outPts, &renderState);
+  
+    if (result <= 0)
+        return result;
+  
+    assert(outBuffer);
+    assert(outBufferSize);
+
+    YuvNative yuvNative;
+    getVideoSurfaceYuvNative(renderState->surface, &yuvNative);
+    LOG_YUV_NATIVE(yuvNative);
+  
+    *outBuffer = (uint8_t*) yuvNative.virt;
+    *outBufferSize = yuvNative.size;
+
+    renderState->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE;
+
+    LOG(":decodeToYuvNative() END -> " << result);
     return result;
 }
 
@@ -636,8 +679,7 @@ int ProxyDecoder::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int6
 int ProxyDecoder::decodeToYuvNative(const CompressedFrame* compressedFrame, int64_t* outPts,
     uint8_t** outBuffer, int* outBufferSize)
 {
-    // TODO mike: STUB
-    return -113;
+    return d->decodeToYuvNative(compressedFrame, outPts, outBuffer, outBufferSize);
 }
 
 #endif // ENABLE_STUB

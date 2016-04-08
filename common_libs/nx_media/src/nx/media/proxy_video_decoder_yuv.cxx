@@ -1,3 +1,6 @@
+// Configuration
+static const bool ENABLE_YUV_NATIVE = false; //< Use ProxyDecoder::decodeToYuvNative().
+
 class ProxyVideoDecoderPrivate
 {
 private:
@@ -48,7 +51,7 @@ private:
 
 void ProxyVideoDecoderPrivate::initialize(const QnConstCompressedVideoDataPtr& compressedVideoData)
 {
-    QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() BEGIN");
+    QLOG("ProxyVideoDecoderPrivate<yuv>::initialize() BEGIN");
     NX_ASSERT(!m_initialized);
     NX_CRITICAL(compressedVideoData);
     NX_CRITICAL(compressedVideoData->data());
@@ -60,7 +63,7 @@ void ProxyVideoDecoderPrivate::initialize(const QnConstCompressedVideoDataPtr& c
 
     m_proxyDecoder.reset(new ProxyDecoder(m_frameSize.width(), m_frameSize.height()));
 
-    QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() END");
+    QLOG("ProxyVideoDecoderPrivate<yuv>::initialize() END");
 }
 
 int ProxyVideoDecoderPrivate::decode(
@@ -71,16 +74,17 @@ int ProxyVideoDecoderPrivate::decode(
     NX_CRITICAL(outDecodedFrame);
 
     const int alignedWidth = qPower2Ceil((unsigned) m_frameSize.width(), (unsigned) kMediaAlignment);
-    const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, m_frameSize.height());
-    const int argbLineSize = alignedWidth * 4;
+    const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, m_frameSize.height());
+    const int lineSize = alignedWidth;
 
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
+    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
 
-    outDecodedFrame->reset(new QVideoFrame(alignedBuffer, m_frameSize, QVideoFrame::Format_RGB32));
+    outDecodedFrame->reset(new QVideoFrame(
+        alignedBuffer, m_frameSize, QVideoFrame::Format_YUV420P));
     QVideoFrame* const decodedFrame = outDecodedFrame->get();
 
     decodedFrame->map(QAbstractVideoBuffer::WriteOnly);
-    uchar* argbBuffer = decodedFrame->bits();
+    uchar* const buffer = decodedFrame->bits();
 
     std::unique_ptr<ProxyDecoder::CompressedFrame> compressedFrame;
     if (compressedVideoData)
@@ -95,14 +99,35 @@ int ProxyVideoDecoderPrivate::decode(
             (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey) != 0;
     }
 
-    int64_t outPts;
+    uint8_t* const yBuffer = buffer;
+    uint8_t* const uBuffer = buffer + lineSize * m_frameSize.height();
+    uint8_t* const vBuffer = uBuffer + lineSize * m_frameSize.height() / 4;
 
-    int result;
+    int64_t outPts = 0;
+    int result = -1;
 
-    TIME_BEGIN("decodeToRgb")
-    // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
-    result = m_proxyDecoder->decodeToRgb(compressedFrame.get(), &outPts, argbBuffer, argbLineSize);
-    TIME_END
+    if (ENABLE_YUV_NATIVE)
+    {
+        // No complete impl yet exists for native YUV.
+        uint8_t* nativeBuffer = nullptr;
+        int nativeBufferSize = 0;
+        TIME_BEGIN("decodeToYuvNative")
+        // Perform actual decoding from QnCompressedVideoData to memory.
+        result = m_proxyDecoder->decodeToYuvNative(compressedFrame.get(), &outPts,
+            &nativeBuffer, &nativeBufferSize);
+        TIME_END
+
+        //if (result > 0)
+        //    memcpy(buffer, nativeBuffer, m_frameSize.width() * m_frameSize.height());
+    }
+    else
+    {
+        TIME_BEGIN("decodeToYuvPlanar")
+        // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
+        result = m_proxyDecoder->decodeToYuvPlanar(compressedFrame.get(), &outPts,
+            yBuffer, lineSize, uBuffer, vBuffer, lineSize / 2);
+        TIME_END
+    }
 
     decodedFrame->unmap();
 

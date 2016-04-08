@@ -1,13 +1,10 @@
 #include "proxy_video_decoder.h"
 
 // Configuration
-#define xENABLE_RGB //< Use ProxyDecoder::decodeToRgb(), without OpenGL.
+#define xENABLE_RGB //< Use ProxyDecoder::decodeToRgb() to AlignedMemVideoBuffer, without OpenGL.
+#define ENABLE_YUV //< Use ProxyDecoder::decodeToYuvPlanar() to AlignedMemVideoBuffer, without OpenGL.
 #define xENABLE_LOG
 #define ENABLE_TIME
-#define xENABLE_GL_LOG
-#define ENABLE_GL_FATAL_ERRORS
-static const bool USE_GUI_RENDERING = false;
-static const bool USE_SHARED_CTX = true;
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
@@ -42,16 +39,19 @@ static const bool USE_SHARED_CTX = true;
 namespace nx {
 namespace media {
 
-#ifdef ENABLE_RGB
+#if defined(ENABLE_RGB)
 
-#include "proxy_video_decoder_rgb.cxx"
+    #include "proxy_video_decoder_rgb.cxx"
 
-#else // ENABLE_RGB
+#elif defined(ENABLE_YUV)
 
-#include "proxy_video_decoder_gl_utils.cxx"
-#include "proxy_video_decoder_gl.cxx"
+    #include "proxy_video_decoder_yuv.cxx"
 
-#endif // ENABLE_RGB
+#else // ENABLE_RGB || ENABLE_YUV
+
+    #include "proxy_video_decoder_gl.cxx"
+
+#endif // ENABLE_RGB || ENABLE_YUV
 
 //-------------------------------------------------------------------------------------------------
 // ProxyVideoDecoder
@@ -60,6 +60,8 @@ ProxyVideoDecoder::ProxyVideoDecoder()
 :
     d(new ProxyVideoDecoderPrivate(this))
 {
+    static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
+        "ProxyVideoDecoder: Insufficient padding size");
 }
 
 ProxyVideoDecoder::~ProxyVideoDecoder()

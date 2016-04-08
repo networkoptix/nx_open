@@ -32,6 +32,17 @@ namespace {
     #define TIME_END
 #endif // ENABLE_TIME
 
+#define LOG_YUV_NATIVE(YUV_NATIVE) do \
+{ \
+    LOG("YuvNative: " \
+        << "width: " << (YUV_NATIVE).width \
+        << ", height: " << (YUV_NATIVE).height \
+        << ", chroma_type: " << (YUV_NATIVE).chroma_type \
+        << ", source_format: " << (YUV_NATIVE).source_format \
+        << ", luma_size: " << (YUV_NATIVE).luma_size \
+        << ", chroma_size: " << (YUV_NATIVE).chroma_size); \
+} while (0)
+
 /**
  * Debug: Draw a colored checkerboard in RGB.
  */
@@ -42,6 +53,10 @@ static void debugDrawCheckerboardArgb(
  * Draw a moving checkerboard in Y channel.
  */
 static void debugDrawCheckerboardY(uint8_t* yBuffer, int lineLen, int frameWidth, int frameHeight);
+
+static void debugDumpToFiles(
+    VdpVideoSurface surface,
+    uint8_t* yBuffer, int yLineSize, uint8_t* uBuffer, uint8_t* vBuffer, int uVLineSize);
 
 //-------------------------------------------------------------------------------------------------
 // Implementation
@@ -114,6 +129,78 @@ static void debugDrawCheckerboardY(uint8_t* yBuffer, int lineLen, int frameWidth
         x0 = 0;
     if (++line0 >= frameHeight - kBoardSize)
         line0 = 0;
+}
+
+FILE* debugCreateFrameDumpFile(int w, int h, int n, const char *suffix, const char *mode)
+{
+    char filename[100];
+    snprintf(filename, sizeof(filename),
+        "%s/frame_%dx%d_%d%s", DEBUG_FRAME_PATH, w, h, n, suffix);
+    FILE* fp = fopen(filename, mode);
+    if (fp == NULL)
+    {
+        fprintf(stderr, "ERROR: Unable to create file: %s\n", filename);
+        assert(false);
+    }
+    return fp;
+}
+
+static void debugDumpFrameToFile(
+    void* buffer, int bufferSize, int w, int h, int n, const char* suffix)
+{
+    FILE* fp = debugCreateFrameDumpFile(w, h, n, suffix, "wb");
+    if (fwrite(buffer, 1, bufferSize, fp) != bufferSize)
+    {
+        fprintf(stderr, "ERROR: Unable to write to a file.\n");
+        assert(false);
+    }
+    fclose(fp);
+}
+
+static void debugDumpToFiles(
+    VdpVideoSurface surface,
+    uint8_t* yBuffer, int yLineSize, uint8_t* uBuffer, uint8_t* vBuffer, int uVLineSize)
+{
+    static int n = 0;
+    ++n;
+
+    YuvNative yuvNative;
+    getVideoSurfaceYuvNative(surface, &yuvNative);
+
+    const int w = yuvNative.width;
+    const int h = yuvNative.height;
+        
+    FILE* fp = debugCreateFrameDumpFile(w, h, n, ".txt", "w");
+    
+    fprintf(fp, "n=%d\n", n);
+    fprintf(fp, "yLineSize=%d\n", yLineSize);
+    fprintf(fp, "uVLineSize=%d\n", uVLineSize);
+    fprintf(fp, "YuvNative.width=%d\n", yuvNative.width);
+    fprintf(fp, "YuvNative.height=%d\n", yuvNative.height);
+
+    const char* chromaTypeS = vdpChromaTypeToStr(yuvNative.chroma_type);
+    if (chromaTypeS)
+        fprintf(fp, "YuvNative.chroma_type=%s\n", chromaTypeS);
+    else
+        fprintf(fp, "YuvNative.chroma_type=%d\n", yuvNative.chroma_type);
+    
+    const char *sourceFormatS = vdpYCbCrFormatToStr(yuvNative.source_format);
+    if (sourceFormatS)
+        fprintf(fp, "YuvNative.source_format=%s\n", sourceFormatS);
+    else
+        fprintf(fp, "YuvNative.source_format=%d\n", yuvNative.source_format);
+    
+    fprintf(fp, "YuvNative.luma_size=%d\n", yuvNative.luma_size);
+    fprintf(fp, "YuvNative.chroma_size=%d\n", yuvNative.chroma_size);
+    
+    fclose(fp);
+
+    debugDumpFrameToFile(yBuffer, yLineSize * h, w, h, n, "_y.dat");
+    debugDumpFrameToFile(uBuffer, uVLineSize * h / 2, w, h, n, "_u.dat");
+    debugDumpFrameToFile(vBuffer, uVLineSize * h / 2, w, h, n, "_v.dat");
+    debugDumpFrameToFile(yuvNative.virt, yuvNative.size, w, h, n, "_native.dat");
+
+    fprintf(stderr, "DUMP: Frame %d dumped to %s\n", n, DEBUG_FRAME_PATH);
 }
 
 } // namespace
