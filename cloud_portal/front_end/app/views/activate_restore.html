@@ -14,6 +14,12 @@
         </h1>
     </div>
 
+    <div ng-if="reactivatingSuccess">
+        <h1 class="process-success">
+            Confirmation link was sent to your email. Check it to continue.
+        </h1>
+    </div>
+    
     <div ng-if="reactivating">
         <h1>Confirm your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -39,6 +45,12 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <div ng-if="restoringSuccess">
+        <h1 class="process-success">
+            Confirmation link was sent to your email. Check it for creating a new password
+        </h1>
     </div>
 
     <div ng-if="restoring">

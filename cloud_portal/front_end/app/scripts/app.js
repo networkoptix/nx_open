@@ -83,6 +83,13 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
+        .when('/activate/sent', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
+            }
+        })
         .when('/activate/success',{
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
@@ -99,6 +106,13 @@ angular.module('cloudApp', [
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoring = true; }]
+            }
+        })
+        .when('/restore_password/sent', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.restoringSuccess = true; }]
             }
         })
         .when('/restore_password/success', {

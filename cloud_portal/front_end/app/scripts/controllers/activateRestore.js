@@ -15,8 +15,10 @@ angular.module('cloudApp')
         };
 
         $scope.reactivating = $routeParams.reactivating;
+        $scope.reactivatingSuccess = $routeParams.reactivatingSuccess;
         $scope.activationSuccess = $routeParams.activationSuccess;
         $scope.changeSuccess = $routeParams.changeSuccess;
+        $scope.restoringSuccess = $routeParams.changeSuccess;
         $scope.restoring = $routeParams.restoring;
 
         if($scope.reactivating){
@@ -51,9 +53,11 @@ angular.module('cloudApp')
                 notFound: L.errorCodes.emailNotFound
             },
             holdAlerts:true,
-            successMessage: 'Confirmation link was sent to your email. Check it for creating a new password',
             errorPrefix:'Couldn\'t send confirmation email:'
-
+        }).then(function(){
+            $scope.restoring = false;
+            $scope.restoringSuccess = true;
+            $location.path("/restore_password/sent", false); // Change url, do not reload
         });
 
         $scope.openClient = function(){
@@ -85,8 +89,11 @@ angular.module('cloudApp')
                 notFound: L.errorCodes.emailNotFound
             },
             holdAlerts:true,
-            successMessage:'Confirmation link was sent to your email. Check it to continue.',
             errorPrefix:'Couldn\'t send confirmation email:'
+        }).then(function(){
+            $location.path("/activate/send", false); // Change url, do not reload
+            $scope.reactivating = false;
+            $scope.reactivatingSuccess = true;
         });
 
         if($scope.data.activateCode){
