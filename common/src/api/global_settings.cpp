@@ -70,6 +70,8 @@ namespace {
 
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
+    const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
+    const int kProxyConnectTimeoutDefault = 5;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
@@ -191,6 +193,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         true,
         this);
     ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
+    m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kProxyConnectTimeout,
+        kProxyConnectTimeoutDefault,
+        this);
+    ec2Adaptors << m_proxyConnectTimeoutAdaptor;
 
     for(auto adaptor: ec2Adaptors)
         connect(
@@ -446,7 +453,8 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
 }
 
-bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const
+{
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
@@ -458,6 +466,11 @@ bool QnGlobalSettings::arecontRtspEnabled() const
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
     m_arecontRtspEnabled->setValue(newVal);
+}
+
+std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
+{
+    return std::chrono::seconds(m_proxyConnectTimeoutAdaptor->value());
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

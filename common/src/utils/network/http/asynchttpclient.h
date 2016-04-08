@@ -79,6 +79,7 @@ namespace nx_http
         State state() const;
         //!Returns true if no response has been recevied due to transport error
         bool failed() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
         //!Start GET request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
@@ -242,6 +243,7 @@ namespace nx_http
         int m_awaitedMessageNumber;
         SocketAddress m_remoteEndpoint;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
+        SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
 
         AsyncHttpClient();
