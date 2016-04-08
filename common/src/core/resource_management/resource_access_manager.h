@@ -40,6 +40,13 @@ public:
     */
     bool hasGlobalPermission(const QnUserResourcePtr &user, Qn::GlobalPermission requiredPermission) const;
 
+    /**
+    * \param user                      User that should have permissions.
+    * \param resource                  Resource to get permissions for.
+    * \returns                         Permissions that user have for the given resource.
+    */
+    Qn::Permissions permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource);
+
 private:
     /**
     * \param permissions               Permission flags containing some deprecated values.
@@ -53,9 +60,41 @@ private:
     /** Fully clear all caches. */
     void clearCache();
 
+    Qn::Permissions calculatePermissions(const QnUserResourcePtr &user, const QnResourcePtr &target) const;
+
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnVirtualCameraResourcePtr &camera)   const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnMediaServerResourcePtr &server)     const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnVideoWallResourcePtr &videoWall)    const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnWebPageResourcePtr &webPage)        const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout)          const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnUserResourcePtr &targetUser)        const;
+
 private:
+    /* Cached value of read-only system state. */
+    bool m_readOnlyMode;
+
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
+
+    struct PermissionKey
+    {
+        QnUuid userId;
+        QnUuid resourceId;
+        PermissionKey() {}
+        PermissionKey(const QnUuid& userId, const QnUuid& resourceId) :
+            userId(userId), resourceId(resourceId) {}
+
+        bool operator==(const PermissionKey& other) const
+        {
+            return userId == other.userId && resourceId == other.resourceId;
+        }
+
+        friend uint qHash(const PermissionKey& key)
+        {
+            return qHash(key.userId) ^ qHash(key.resourceId);
+        }
+    };
+    mutable QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
 };
 
 #define qnResourceAccessManager QnResourceAccessManager::instance()

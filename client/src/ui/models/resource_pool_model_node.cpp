@@ -326,7 +326,7 @@ bool QnResourcePoolModelNode::calculateBastard() const {
 
         if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
             /* Hide local layouts that are not file-based. */
-            if (m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout))
+            if (m_model->snapshotManager()->isLocal(layout) && !layout->isFile())
                 return true;
 
             /* Hide "Preview Search" layouts */
@@ -552,12 +552,13 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::Videowall_Display_Help;
         } else if(m_type == Qn::VideoWallMatrixNode) {
             return Qn::Videowall_Matrix_Help;
-        } else if(m_flags & Qn::layout) {
-            if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
-                return Qn::MainWindow_Tree_MultiVideo_Help;
-            } else {
-                return Qn::MainWindow_Tree_Layouts_Help;
-            }
+        }
+        else if(m_flags & Qn::layout)
+        {
+            if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
+                if (layout->isFile())
+                    return Qn::MainWindow_Tree_MultiVideo_Help;
+            return Qn::MainWindow_Tree_Layouts_Help;
         } else if(m_flags & Qn::user) {
             return Qn::MainWindow_Tree_Users_Help;
         } else if(m_flags & Qn::local) {

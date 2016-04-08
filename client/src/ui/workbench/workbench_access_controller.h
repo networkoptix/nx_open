@@ -96,17 +96,11 @@ private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource) const;
-
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user) const;
     Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr &layout) const;
-    Qn::Permissions calculatePermissionsInternal(const QnVirtualCameraResourcePtr &camera) const;
-    Qn::Permissions calculatePermissionsInternal(const QnAbstractArchiveResourcePtr &archive) const;
-    Qn::Permissions calculatePermissionsInternal(const QnMediaServerResourcePtr &server) const;
-    Qn::Permissions calculatePermissionsInternal(const QnVideoWallResourcePtr &videoWall) const;
-    Qn::Permissions calculatePermissionsInternal(const QnWebPageResourcePtr &webPage) const;
-
+    Qn::GlobalPermissions calculateGlobalPermissions() const;
 private:
-    struct PermissionsData {
+    struct PermissionsData
+    {
         PermissionsData(): permissions(0), notifier(NULL) {}
 
         Qn::Permissions permissions;
@@ -114,7 +108,7 @@ private:
     };
 
     QnUserResourcePtr m_user;
-    Qn::GlobalPermissions m_userPermissions;
+    Qn::GlobalPermissions m_globalPermissions;
     bool m_readOnlyMode;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };

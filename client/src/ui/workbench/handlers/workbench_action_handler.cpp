@@ -337,7 +337,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool isExportedLayout = snapshotManager()->isFile(layout);
+        bool isExportedLayout = layout->isFile();
 
         bool allowed = nonVideo || isMediaResource;
         bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
@@ -554,7 +554,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 
         /* Delete orphaned layouts. */
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            if(snapshotManager()->isLocal(layout) && !layout->isFile())
                 resourcePool()->removeResource(layout);
     }
 
@@ -564,7 +564,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode()) {
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            if(snapshotManager()->isLocal(layout) && !layout->isFile())
                 resourcePool()->removeResource(layout);
         }
     }
@@ -912,7 +912,8 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             menu()->trigger(QnActions::OpenInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-            if (snapshotManager()->isFile(layout)) {
+            if (layout->isFile())
+            {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
                     //TODO: #GDM #Common refactor duplicated code VMS-1725

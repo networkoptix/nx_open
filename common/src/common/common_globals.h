@@ -814,32 +814,32 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum Permission
     {
         /* Generic permissions. */
-        NoPermissions = 0x0000,   /**< No access */
+        NoPermissions                   = 0x0000,   /**< No access */
 
-        ReadPermission = 0x0001,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        WritePermission = 0x0002,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
-        SavePermission = 0x0004,   /**< Generic save access. Entity can be saved to the server. */
-        RemovePermission = 0x0008,   /**< Generic delete permission. */
+        ReadPermission                  = 0x0001,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
+        WritePermission                 = 0x0002,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
+        SavePermission                  = 0x0004,   /**< Generic save access. Entity can be saved to the server. */
+        RemovePermission                = 0x0008,   /**< Generic delete permission. */
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
-        WriteNamePermission = 0x0010,   /**< Permission to edit resource's name. */
+        WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
 
-                                        /* Layout-specific permissions. */
-        AddRemoveItemsPermission = 0x0020,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission = 0x0040,   /**< Permission to setup layout background or set locked flag. */
-        FullLayoutPermissions = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
+        /* Layout-specific permissions. */
+        AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
+        EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
+        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
-        WritePasswordPermission = 0x0200,   /**< Permission to edit associated password. */
-        WriteAccessRightsPermission = 0x0400,   /**< Permission to edit access rights. */
-        CreateLayoutPermission = 0x0800,   /**< Permission to create layouts for the user. */
-        ReadEmailPermission = ReadPermission,
-        WriteEmailPermission = WritePasswordPermission,
+        WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
+        WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
+        CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
+        ReadEmailPermission             = ReadPermission,
+        WriteEmailPermission            = WritePasswordPermission,
 
         /* Media-specific permissions. */
-        ExportPermission = 0x2000,   /**< Permission to export video parts. */
+        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
 
-                                     /* Camera-specific permissions. */
-        WritePtzPermission = 0x1000,   /**< Permission to use camera's PTZ controls. */
+        /* Camera-specific permissions. */
+        WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
 
         AllPermissions = 0xFFFFFFFF
     };
