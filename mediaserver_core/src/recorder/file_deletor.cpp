@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "file_deletor.h"
 #include <nx/utils/log/log.h>
 #include "utils/common/util.h"
@@ -61,8 +62,8 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    bool rez = QFile::remove(fileName);
-    if (rez)
+    int rez = std::remove(fileName.toLatin1().constData());
+    if (rez == 0)
         return true;
     auto lastErr = SystemError::getLastOSErrorCode();
     return lastErr == SystemError::fileNotFound || lastErr == SystemError::pathNotFound;
