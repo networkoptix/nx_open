@@ -865,10 +865,15 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             m_mediaProvider
         );
         
-        std::uniform_int_distribution<qint64> dis(1, m_truncateInterval / 4);
+        if (m_truncateInterval > 0)
+        {
+            std::uniform_int_distribution<qint64> dis(1, m_truncateInterval / 4);
 
-        if (m_truncateInterval > 4000000ll)
-            m_truncateIntervalEps = dis(m_gen);
+            if (m_truncateInterval > 4000000ll)
+                m_truncateIntervalEps = dis(m_gen);
+        }
+        else
+            m_truncateIntervalEps = 0;
 
     } // for each storage
 
