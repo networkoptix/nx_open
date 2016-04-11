@@ -33,11 +33,13 @@ public:
     //!Empty filter means data should not be filtered
     bool empty() const;
 
-    //TODO #ak do something with this class
+    /** TODO #ak do something with this class. 
+        This variable is required by QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES
+    */
     int dummy;
 
-    stree::ResourceContainer& rc();
-    const stree::ResourceContainer& rc() const;
+    stree::ResourceContainer& resources();
+    const stree::ResourceContainer& resources() const;
 
 private:
     stree::ResourceContainer m_rc;

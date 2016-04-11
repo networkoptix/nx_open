@@ -26,8 +26,8 @@ namespace api {
 
 void PrintTo(ResultCode val, ::std::ostream* os);
 
-}   //api
-}   //cdb
-}   //nx
+}   //namespace api
+}   //namespace cdb
+}   //namespace nx
 
 #endif  //COMMON_PRINTERS_H
