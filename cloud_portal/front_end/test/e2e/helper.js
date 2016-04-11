@@ -225,7 +225,9 @@ var Helper = function () {
 
     this.emailSubjects = {
         register: "Confirm your account",
-        restorePass: "Restore your password"};
+        restorePass: "Restore your password",
+        share: ""
+    };
 
     this.getEmailTo = function(emailAddress, emailSubject) {
         var deferred = protractor.promise.defer();
