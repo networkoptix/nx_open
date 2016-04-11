@@ -152,9 +152,6 @@ public:
     // unknownResource - tels if we need that additional information
     virtual bool unknownResource() const;
 
-    // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
-    virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
-
 #ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 #endif

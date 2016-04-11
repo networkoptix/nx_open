@@ -296,20 +296,18 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
     for (auto& connector: m_connectors)
     {
         auto connectorType = connector.first;
+        connector.second->bindToAioThread(m_timer.getAioThread());
         connector.second->connect(
             kCloudConnectorTimeout,
             [connectorType, this](
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
             {
-                m_timer.post(
-                    [this, connectorType, errorCode, connection = move(connection)]() mutable
-                    {
-                        onConnectorFinished(
-                            connectorType,
-                            errorCode,
-                            std::move(connection));
-                    });
+                //m_timer.post(
+                onConnectorFinished(
+                    connectorType,
+                    errorCode,
+                    std::move(connection));
             });
     }
 }

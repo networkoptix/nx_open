@@ -212,7 +212,8 @@ protected:
     void setDelegate(ParentType* _delegate)
     {
         m_delegate = _delegate;
-        m_socketAttributes.applyTo(m_delegate);
+        if (m_delegate)
+            m_socketAttributes.applyTo(m_delegate);
     }
 
     SocketAttributesHolderType getSocketAttributes() const

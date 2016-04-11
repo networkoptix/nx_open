@@ -202,11 +202,18 @@ public:
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
     void addChunks(const std::deque<Chunk>& chunk);
+
+    template<typename It>
+    void assignChunksUnsafe(It begin, It end) { m_chunks.assign(begin, end); }
+
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
+
+    // only for unit tests, don't use in production.
+    std::deque<Chunk> &getChunks() { return m_chunks; }
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -258,6 +265,7 @@ typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;
 bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other);
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other);
 bool operator < (const DeviceFileCatalog::Chunk& other, qint64 first);
+bool operator == (const DeviceFileCatalog::Chunk &lhs, const DeviceFileCatalog::Chunk &rhs);
 
 inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs, 
                          const DeviceFileCatalog::UniqueChunk    &rhs)

@@ -4,6 +4,9 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
+extern "C" {
+#include <libavformat/avformat.h>
+}
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -234,22 +237,22 @@ public:
                         .arg(m_fileCount)
                         .arg(m_timeLine.m_timeLine.size());
 
-        qint64 prevStartTime;
-        int prevDuration;
-        qDebug() << "Time periods details: ";
+        //qint64 prevStartTime;
+        //int prevDuration;
+        //qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin();
              it != m_timeLine.m_timeLine.cend();
              ++it) {
-            qDebug() << it->startTimeMs << " " << it->durationMs;
-            if (it != m_timeLine.m_timeLine.cbegin()) {
-                qDebug() << "\tGap from previous: "
-                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
-                         << (it->startTimeMs - (prevStartTime + prevDuration))/1000
-                         << "s )";
-            }
-            prevStartTime = it->startTimeMs;
-            prevDuration = it->durationMs;
+            //qDebug() << it->startTimeMs << " " << it->durationMs;
+            //if (it != m_timeLine.m_timeLine.cbegin()) {
+            //    qDebug() << "\tGap from previous: "
+            //             << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
+            //             << (it->startTimeMs - (prevStartTime + prevDuration))/1000
+            //             << "s )";
+            //}
+            //prevStartTime = it->startTimeMs;
+            //prevDuration = it->durationMs;
         }
     }
 
@@ -350,21 +353,16 @@ private:
 
     void loadMedia()
     {
-        for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan :
-                                                     qnBackupStorageMan;
-            manager->getFileCatalog(lit("%1").arg(cameraFolder),
-                                    QnServer::LowQualityCatalog);
-
-            manager->getFileCatalog(lit("%1").arg(cameraFolder),
-                                    QnServer::HiQualityCatalog);
+        ec2::ApiCameraDataList archiveCameras;
+        for (int i = 0; i < m_storageUrls.size(); ++i) 
+        {
+            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::HiQualityCatalog);
             manager->m_rebuildCancelled = false;
 
-            manager->loadFullFileCatalogFromMedia(m_storages[i],
-                                                  QnServer::LowQualityCatalog);
-
-            manager->loadFullFileCatalogFromMedia(m_storages[i],
-                                                  QnServer::HiQualityCatalog);
+            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::LowQualityCatalog, archiveCameras);
+            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::HiQualityCatalog, archiveCameras);
         }
     }
 

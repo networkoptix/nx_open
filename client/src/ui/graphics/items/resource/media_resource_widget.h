@@ -23,6 +23,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <camera/resource_display.h> //< TODO: #Elric FWD!
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
+#include <utils/media/sse_helper.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -253,7 +254,7 @@ private:
     mutable bool m_motionSensitivityValid;
 
     /** Binary mask for the current motion region. */
-    mutable QList<__m128i *> m_binaryMotionMask;
+    mutable QList<simd128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;

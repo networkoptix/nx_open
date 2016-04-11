@@ -142,6 +142,32 @@ _mm_hadd_epi16 (__m128i __X, __m128i __Y)
 //TODO/ARM: sse analog
 
 #ifdef __arm__
+
+static inline bool useSSE2()
+{
+    return false;
+}
+
+static inline bool useSSE3()
+{
+    return false;
+}
+
+static inline bool useSSSE3()
+{
+    return false;
+}
+
+static inline bool useSSE41()
+{
+    return false;
+}
+
+static inline bool useSSE42()
+{
+    return false;
+}
+
 #else
 
 static inline bool useSSE2()

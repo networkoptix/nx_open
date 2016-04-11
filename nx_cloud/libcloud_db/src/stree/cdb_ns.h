@@ -55,7 +55,7 @@ enum Value
 
     requestPath
 };
-}   //attr
+}   //namespace attr
 
 //!Contains description of stree attributes used by cloud_db
 class CdbAttrNameSet
@@ -66,7 +66,7 @@ public:
     CdbAttrNameSet();
 };
 
-}   //cdb
-}   //nx
+}   //namespace cdb
+}   //namespace nx
 
 #endif  //NX_CDB_ATTR_NS_H

@@ -340,7 +340,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     //TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
+#ifndef __arm__
     QnPerformanceTest::detectLightMode();
+#else
+    // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
+    //       constructor call. Need to find the way to work it around.
+#endif
 
 #ifdef Q_OS_MACX
     if (mac_isSandboxed())

@@ -38,6 +38,7 @@ public:
     virtual qint64 size() const = 0;
     virtual bool seek( qint64 offset) = 0;
     virtual bool truncate( qint64 newFileSize) = 0;
+    virtual bool eof() const { return true; }
 
     virtual ~IQnFile() {}
 };
@@ -86,6 +87,7 @@ public:
     virtual bool open(const QIODevice::OpenMode& mode, unsigned int systemDependentFlags = 0);
     virtual void close();
     virtual qint64 read(char* buffer, qint64 count);
+    virtual bool eof() const override;
 
     /*!
         \return Bytes written or -1 in case of error (use \a SystemError::getLastOSErrorCode() to get error code)
@@ -131,6 +133,7 @@ protected:
 
 private:
     void* m_impl;
+    bool m_eof;
 };
 
 #endif	//_FS_FILE_H_

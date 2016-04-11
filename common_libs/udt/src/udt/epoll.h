@@ -43,24 +43,12 @@ written by
 
 
 #include <map>
+#include <memory>
 #include <set>
 #include "udt.h"
 
 
-struct CEPollDesc
-{
-   int m_iID;                                // epoll ID
-   std::set<UDTSOCKET> m_sUDTSocksOut;       // set of UDT sockets waiting for write events
-   std::set<UDTSOCKET> m_sUDTSocksIn;        // set of UDT sockets waiting for read events
-   std::set<UDTSOCKET> m_sUDTSocksEx;        // set of UDT sockets waiting for exceptions
-
-   int m_iLocalID;                           // local system epoll ID
-   std::map<SYSSOCKET, int> m_sLocals;       // map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>
-
-   std::set<UDTSOCKET> m_sUDTWrites;         // UDT sockets ready for write
-   std::set<UDTSOCKET> m_sUDTReads;          // UDT sockets ready for read
-   std::set<UDTSOCKET> m_sUDTExcepts;        // UDT sockets with exceptions (connection broken, etc.)
-};
+class CEPollDesc;
 
 class CEPoll
 {
@@ -167,12 +155,21 @@ public: // for CUDT to acknowledge IO status
    int update_events(const UDTSOCKET& uid, const std::set<int>& eids, int events, bool enable);
 
 private:
+   typedef std::map<int, std::unique_ptr<CEPollDesc>> CEPollDescMap;
+
    int m_iIDSeed;                            // seed to generate a new ID
    pthread_mutex_t m_SeedLock;
 
-   std::map<int, CEPollDesc> m_mPolls;       // all epolls
+   CEPollDescMap m_mPolls;       // all epolls
    pthread_mutex_t m_EPollLock;
-};
 
+   /**
+        @return number of events triggered. -1 in case of error
+   */
+   int doSystemPoll(
+       CEPollDesc* epollContext,
+       std::map<SYSSOCKET, int>* lrfds,
+       std::map<SYSSOCKET, int>* lwfds);
+};
 
 #endif

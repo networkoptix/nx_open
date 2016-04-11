@@ -133,51 +133,6 @@ void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
     QnNetworkResource::setHostAddress(hostAddr);
 }
 
-bool QnPlAreconVisionResource::unknownResource() const
-{
-    return isAbstractResource();
-}
-
-QnResourcePtr QnPlAreconVisionResource::updateResource()
-{
-    QString model;
-    QString model_release;
-
-    if (!getParamPhysical(lit("model"), model))
-        return QnNetworkResourcePtr(0);
-
-    if (!getParamPhysical(lit("model=releasename"), model_release))
-        return QnNetworkResourcePtr(0);
-
-    if (model_release != model) {
-        //this camera supports release name
-        model = model_release;
-    }
-    else
-    {
-        //old camera; does not support release name; but must support fullname
-        if (getParamPhysical(lit("model=fullname"), model_release))
-            model = model_release;
-    }
-
-    QnNetworkResourcePtr result(createResourceByName(model));
-    if (result)
-    {
-        result->setName(model);
-        result->setHostAddress(getHostAddress());
-        (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
-        result->setMAC(getMAC());
-        result->setId(getId());
-        result->setFlags(flags());
-    }
-    else
-    {
-        NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
-    }
-
-    return result;
-}
-
 bool QnPlAreconVisionResource::ping()
 {
     QnConcurrent::QnFuture<bool> result(1);
@@ -783,12 +738,6 @@ bool QnPlAreconVisionResource::isRTSPSupported() const
            QnGlobalSettings::instance()->arecontRtspEnabled() &&
            qnCommon->dataPool()->data(toSharedPointer(this)).
                value<bool>(lit("isRTSPSupported"), true);
-}
-
-bool QnPlAreconVisionResource::isAbstractResource() const
-{
-    QnUuid baseTypeId = qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract"));
-    return getTypeId() == baseTypeId;
 }
 
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)

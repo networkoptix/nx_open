@@ -86,4 +86,25 @@
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>           
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- cut off festival -->
+                <rdep.packages>openssl ffmpeg quazip</rdep.packages>
+            </properties>
+        </profile>
+    </profiles>
 </project>

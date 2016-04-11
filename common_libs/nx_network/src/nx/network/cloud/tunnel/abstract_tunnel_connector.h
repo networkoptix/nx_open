@@ -12,6 +12,7 @@
 #include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
 
+#include "nx/network/aio/abstract_pollable.h"
 #include "abstract_outgoing_tunnel_connection.h"
 #include "tunnel.h"
 
@@ -25,7 +26,7 @@ namespace cloud {
  */
 class NX_NETWORK_API AbstractTunnelConnector
 :
-    public QnStoppableAsync
+    public aio::AbstractPollable
 {
 public:
     /** Helps to decide which method shall be used first */

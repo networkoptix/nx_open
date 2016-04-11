@@ -15,12 +15,14 @@
 #include <sys/stat.h>
 
 
-QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE)
+QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE), m_eof(false)
 {
 
 }
 
-QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(INVALID_HANDLE_VALUE)
+QnFile::QnFile(const QString& fName): m_fileName(fName), 
+                                      m_impl(INVALID_HANDLE_VALUE),
+                                      m_eof(false)
 {
 
 }
@@ -90,6 +92,11 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
     return true;
 }
 
+bool QnFile::eof() const 
+{
+    return m_eof;
+}
+
 void QnFile::close()
 {
     //sync();
@@ -104,6 +111,7 @@ qint64 QnFile::read(char* buffer, qint64 count )
 
     DWORD bytesRead = 0;
     BOOL res = ReadFile( m_impl, buffer, count, &bytesRead, NULL );
+    m_eof = res && !bytesRead;
     if( !res )
         return -1;
     return bytesRead;

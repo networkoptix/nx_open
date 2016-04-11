@@ -60,6 +60,27 @@ void UdpHolePunchingTunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> 
         });
 }
 
+aio::AbstractAioThread* UdpHolePunchingTunnelConnector::getAioThread()
+{
+    return m_timer.getAioThread();
+}
+
+void UdpHolePunchingTunnelConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_timer.bindToAioThread(aioThread);
+    m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+}
+
+void UdpHolePunchingTunnelConnector::post(nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_timer.post(std::move(func));
+}
+
+void UdpHolePunchingTunnelConnector::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_timer.dispatch(std::move(func));
+}
+
 int UdpHolePunchingTunnelConnector::getPriority() const
 {
     //TODO #ak

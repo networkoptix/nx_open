@@ -56,7 +56,7 @@ bool QnMediaContextSerializableData::deserialize(const QByteArray& data)
     {
         static const char* const kWarning =
             "QnMediaContext deserialization error: Fusion has failed.";
-//        NX_ASSERT(false, Q_FUNC_INFO, kWarning);
+        //NX_ASSERT(false, Q_FUNC_INFO, kWarning);
         qWarning() << kWarning;
         return false;
     }
