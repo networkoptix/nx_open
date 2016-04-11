@@ -15,7 +15,7 @@ angular.module('webadminApp')
         };
 
 
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             $scope.systems.systemName =  r.data.reply.systemName;
 
             /*$scope.systems.discoveredUrls = _.filter($scope.systems.discoveredUrls, function(module){
@@ -79,7 +79,7 @@ angular.module('webadminApp')
                 return;
             }*/
 
-            mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
+            mediaserver.pingSystem($scope.settings.url, Config.defaultLogin, $scope.settings.password).then(function(r){
                 if(r.data.error!=='0'){
                     var errorToShow = errorHandler(r.data.errorString);
                     if(errorToShow){

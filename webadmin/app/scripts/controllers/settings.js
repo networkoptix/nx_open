@@ -12,7 +12,7 @@ angular.module('webadminApp')
             $scope.canMerge = user.isOwner;
         });
 
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
                 systemName: r.data.reply.systemName,
                 port: r.data.reply.port,
@@ -153,7 +153,7 @@ angular.module('webadminApp')
 
             var url = window.location.protocol + '//' + ips[i] + port;
 
-            mediaserver.getSettings(url).then(function(){
+            mediaserver.getModuleInformation(url).then(function(){
                 server.apiUrl = url;
             },function(error){
                 if(i < ips.length-1) {

@@ -9,7 +9,7 @@ angular.module('webadminApp')
                 $location.path('/info'); //no admin rights - redirect
             }
         });
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             if(r.data.reply.ecDbReadOnly){
                 $location.path('/info'); //readonly - redirect
                 return;
@@ -170,7 +170,7 @@ angular.module('webadminApp')
             }
 
             function doSave(){
-                mediaserver.getSettings().then(function(settingsReply){
+                mediaserver.getModuleInformation().then(function(settingsReply){
                     mediaserver.getMediaServer(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
                         var info = mediaServerReply.data[0];
                         // Вот тут проапдейтить флаги в стореджах

@@ -22,6 +22,9 @@ angular.module('webadminApp')
                     email: email,
                     password: password
                 });
+            },
+            ping:function(){
+                return $http.get(Config.cloud.apiUrl + '/ping');
             }
         };
     });
