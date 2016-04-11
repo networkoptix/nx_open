@@ -56,12 +56,12 @@ void makeUnixOpenFlags(
 	*unixOflag = sysFlags;
 }
 
-QnFile::QnFile(): m_impl(0)
+QnFile::QnFile(): m_impl(0), m_eof(false)
 {
 
 }
 
-QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(0)
+QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(0), m_eof(false)
 {
 
 }
@@ -102,11 +102,16 @@ void QnFile::close()
     m_impl = 0;
 }
 
+bool QnFile::eof() const { return m_eof; }
+
 qint64 QnFile::read( char* buffer, qint64 count )
 {
 	if( !isOpen() )
 		return -1;
-	return ::read( (long)m_impl, buffer, count );
+    ssize_t bytesRead = ::read((long)m_impl, buffer, count);
+    if (count > 0 && bytesRead == 0)
+        m_eof = true;
+	return bytesRead;
 }
 
 qint64 QnFile::write( const char* buffer, qint64 count )

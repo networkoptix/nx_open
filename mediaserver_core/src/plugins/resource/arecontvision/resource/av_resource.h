@@ -18,7 +18,7 @@ class QDomElement;
 class QnPlAreconVisionResource : public QnPhysicalCameraResource
 {
     Q_OBJECT
-
+    friend class QnPlArecontResourceSearcher;
 public:
     static const QString MANUFACTURE;
 
@@ -30,16 +30,10 @@ public:
 
     bool isPanoramic() const;
     bool isDualSensor() const;
-    virtual bool isAbstractResource() const override;
 
     virtual void setHostAddress(const QString& ip) override;
 
     virtual bool getDescription() {return true;};
-
-    // ========
-    bool unknownResource() const;
-    virtual QnResourcePtr updateResource();
-    // ========
 
     //!Implementation of QnNetworkResource::ping
     virtual bool ping() override;

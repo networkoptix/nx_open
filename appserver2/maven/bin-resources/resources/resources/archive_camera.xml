@@ -1,0 +1,6 @@
+<resources>
+    <oem name = "">
+    <resource name = "ARCHIVE_CAMERA" public="Camera">
+    </resource>
+    </oem>
+</resources>

@@ -100,7 +100,6 @@ public:
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
     static QnUuid uniqueIdToId(const QString& uniqId);
-    virtual bool isAbstractResource() const { return false; }
     virtual void initializationDone() override;
 
 private:
