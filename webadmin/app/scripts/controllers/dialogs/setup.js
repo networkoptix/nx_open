@@ -60,8 +60,8 @@ angular.module('webadminApp')
 
         if(debugMode){
             $log.log("Wizard works in debug mode: no changes on server or portal will be made.");
-            // cloudAuthorized = true;
-            // $scope.settings.presetCloudEmail = "debug@hdw.mx";
+            cloudAuthorized = true;
+            $scope.settings.presetCloudEmail = "debug@hdw.mx";
         }
 
         /* Funсtions for external calls (open links) */
@@ -94,6 +94,7 @@ angular.module('webadminApp')
             if(debugMode){
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
+                return;
             }
 
             mediaserver.getModuleInformation(reload).then(function(r){
@@ -129,6 +130,7 @@ angular.module('webadminApp')
             $scope.settings.localLogin = user.name || Config.defaultLogin;
 
             if(debugMode) {
+                checkInternet(false);
                 $scope.next('start');// go to start
                 return;
             }

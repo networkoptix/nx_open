@@ -2,6 +2,18 @@ $icon-font-path: "../fonts/";
 
 @import '../bower_components/sass-bootstrap/lib/_variables.scss';
 
+@mixin kill-glyphicon{
+  background-size: 176px 152px;
+  background-image: url('../images/icons/wizard_sprite.png');
+  &:before{
+    content:none;
+  }
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/wizard_sprite@2x.png');
+  }
+}
+
 @import 'master';
 
 *{

@@ -55,55 +55,6 @@
   text-align: left;
 }
 
-.ui-select-bootstrap > .btn-default-focus{
-  box-shadow: none;
-  outline:none;
-  border-color: $input-border;
-  background-color: $dark10;
-}
-.ui-select-bootstrap > .btn-default-focus > .btn,
-.ui-select-bootstrap > .ui-select-match > .btn{
-  background-color: $input-bg;
-  border-color: $input-border;
-  color: $input-color;
-  font-weight: normal;
-  padding-left:8px;
-  padding-right:8px;
-}
-.ui-select-bootstrap .ui-select-choices-row>a{
-  padding-left: 7px;
-  padding-right: 7px;
-}
-
-
-
-/* touched, invalid - highlight with red */
-.ui-select-container.ng-invalid.ng-touched .btn{
-  border-color: $state-danger-text;
-}
-
-/* touched, but focused - not highlight with red */
-.ui-select-container > .btn-default-focus > .btn{
-  border-color: $input-border !important;
-}
-
-
-.ui-select-choices{
-  background-color: $light4 !important;
-  color:$dark4 !important;;
-}
-
-.ui-select-choices-row:hover {
-  background-color: $light2 !important;
-  color:$dark2 !important;
-}
-
-
-.ui-select-choices-row.active {
-  background-color: $brand_core !important;
-}
-
-
 
 
 .master .alert{
@@ -131,6 +82,28 @@ a.external:hover{
 }
 
 
+.master-success .glyphicon.glyphicon-cloud{
+  @include kill-glyphicon;
+  width: 64px;
+  height: 64px;
+  background-position: 0px -90px;
+}
+
+.master-success .glyphicon.glyphicon-ok{
+  @include kill-glyphicon;
+  width:88px;
+  height: 88px;
+  background-position: 0px 0px;
+}
+
+.master-success .glyphicon.glyphicon-remove-circle{
+  @include kill-glyphicon;
+  width:88px;
+  height: 88px;
+  background-position: -88px 0px;
+}
+
+
 @keyframes rotation {
   from {transform: rotate(0deg);}
   to   {transform: rotate(359deg);}
@@ -139,3 +112,4 @@ a.external:hover{
 .master-success .glyphicon.glyphicon-refresh{
   animation: rotation 5s linear infinite;
 }
+
