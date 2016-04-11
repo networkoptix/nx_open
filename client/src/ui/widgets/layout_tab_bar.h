@@ -34,6 +34,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
 
+    virtual void showEvent(QShowEvent* event) override;
+
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 

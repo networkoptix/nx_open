@@ -27,8 +27,7 @@ namespace ec2
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
         virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) override;
-        virtual int addAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler) override;
-        virtual int removeAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler) override;
+        virtual int setAccessRights(const ec2::ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) override;
     private:
         QueryProcessorType* const m_queryProcessor;
     };

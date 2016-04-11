@@ -70,6 +70,7 @@ button, select{
   &[disabled] {
     outline: none !important;
     -webkit-appearance: none !important;
+    -moz-appearance: none !important;
     appearance: none !important;
   }
 }
@@ -139,5 +140,19 @@ button, select{
     &.active {
       opacity: 0.2;
     }
+  }
+}
+
+.form-control {
+  fieldset[disabled] &,
+  &[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  &[readonly]
+  {
+    border-color: transparentize($shadow,0.6);
+    cursor: default;
   }
 }

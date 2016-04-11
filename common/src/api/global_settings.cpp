@@ -368,7 +368,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user)
         return;
 
-    if(!user->isAdmin())
+    if(!user->isOwner())
         return;
 
     {

@@ -112,6 +112,8 @@ private slots:
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );
 
+    void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
+
     void on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
     void on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory);

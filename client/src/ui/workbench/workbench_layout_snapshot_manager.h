@@ -66,7 +66,6 @@ public:
     }
 
     // TODO: #Elric move out?
-    static bool isFile(const QnLayoutResourcePtr &resource);
 
 signals:
     void flagsChanged(const QnLayoutResourcePtr &resource);

@@ -6,6 +6,7 @@
 #include <ui/style/noptix_style.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
+#include <ui/widgets/common/tool_button.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
@@ -22,22 +23,20 @@ namespace
             bool popup = false,
             const QSize& fixedSize = QSize())
     {
-        QToolButton* button = new QToolButton();
+        QnToolButton* button = new QnToolButton();
+
         button->setDefaultAction(action);
         button->setFocusPolicy(Qt::NoFocus);
-        button->setIconSize(button->icon().actualSize(QSize(1024, 1024)));
+        button->adjustIconSize();
         button->setFixedSize(fixedSize.isEmpty() ? button->iconSize() : fixedSize);
 
         if (popup)
         {
-            /* We want the button to activate the corresponding action so that menu is updated.
-            * However, menu buttons do not activate their corresponding actions as they do not receive release events.
-            * We work this around by making some hacky connections. */
             button->setPopupMode(QToolButton::InstantPopup);
-
-            QObject::disconnect(button, SIGNAL(pressed()), button, SLOT(_q_buttonPressed()));
-            QObject::connect(button, SIGNAL(pressed()), button->defaultAction(), SLOT(trigger()));
-            QObject::connect(button, SIGNAL(pressed()), button, SLOT(_q_buttonPressed()));
+            QObject::connect(button, &QnToolButton::justPressed, [action]()
+            {
+                action->trigger();
+            });
         }
 
         if (helpTopicId != Qn::Empty_Help)

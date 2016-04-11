@@ -26,3 +26,8 @@ void setAccentStyle(QAbstractButton *button, bool accent)
 {
     button->setProperty(style::Properties::kAccentStyleProperty, accent);
 }
+
+void setTabShape(QTabBar* tabBar, style::TabShape tabShape)
+{
+    tabBar->setProperty(style::Properties::kTabShape, QVariant::fromValue(tabShape));
+}

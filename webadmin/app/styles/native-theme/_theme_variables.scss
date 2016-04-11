@@ -60,6 +60,7 @@ $headings-font-weight:    lighter;
 $input-color:   $text;
 $input-bg:      $shadow;
 $input-border:  $shadow_d1;
+$input-bg-disabled: transparentize($shadow,0.8);
 
 /* Common parameters */
 $font-size-base:          13px;

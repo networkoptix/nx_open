@@ -20,7 +20,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench.h>
 #include <ui/style/globals.h>
@@ -36,7 +35,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
 
     QList<QAction *> result;
     foreach(const QnLayoutResourcePtr &layout, layouts) {
-        if(snapshotManager()->isFile(layout))
+        if(layout->isFile())
             if(!QnWorkbenchLayout::instance(layout))
                 continue; /* Not opened. */
 

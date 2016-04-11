@@ -59,7 +59,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include "ui/workbench/workbench_item.h"
@@ -1177,7 +1176,8 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
     bool isExportedLayout = item()
         && item()->layout()
-        && snapshotManager()->isFile(item()->layout()->resource());
+        && item()->layout()->resource()
+        && item()->layout()->resource()->isFile();
 
     bool isPreviewSearchLayout = item()
         && item()->layout()

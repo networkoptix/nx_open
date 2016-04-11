@@ -35,12 +35,12 @@ public:
     void setRealm( const QString& realm );
 
     // Do not use this method directly.
-    // Use QnWorkbenchAccessController::globalPermissions(user) instead
-    quint64 getPermissions() const;
-    void setPermissions(quint64 permissions);
+    // Use qnResourceAccessManager::globalPermissions(user) instead
+    Qn::GlobalPermissions getPermissions() const;
+    void setPermissions(Qn::GlobalPermissions permissions);
 
-    bool isAdmin() const;
-    void setAdmin(bool isAdmin);
+    bool isOwner() const;
+    void setOwner(bool isOwner);
 
     bool isLdap() const;
     void setLdap(bool isLdap);
@@ -65,7 +65,6 @@ signals:
     void digestChanged(const QnResourcePtr &resource);
     void cryptSha512HashChanged(const QnResourcePtr &resource);
     void permissionsChanged(const QnResourcePtr &user);
-    void adminChanged(const QnResourcePtr &resource);
     void emailChanged(const QnResourcePtr &user);
 	void realmChanged(const QnResourcePtr &user);
     void enabledChanged(const QnResourcePtr &user);
@@ -80,10 +79,10 @@ private:
     QByteArray m_digest;
     QByteArray m_cryptSha512Hash;
     QString m_realm;
-    quint64 m_permissions;
-    bool m_isAdmin;
-	bool m_isLdap;
-	bool m_isEnabled;
+    Qn::GlobalPermissions m_permissions;
+    bool m_isOwner;
+    bool m_isLdap;
+    bool m_isEnabled;
     QString m_email;
     qint64 m_passwordExpirationTimestamp;
 };

@@ -1718,7 +1718,7 @@ void QnStorageManager::updateStorageStatistics()
             qSharedPointerDynamicCast<QnStorageResource> (*itr);
 
         int64_t storageSpace = std::max(int64_t(1),
-                                        static_cast<int64_t>(fileStorage->getTotalSpace() - 
+                                        static_cast<int64_t>(fileStorage->getTotalSpace() -
                                                              fileStorage->getSpaceLimit()));
         totalSpace += storageSpace;
     }
@@ -1755,7 +1755,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     updateStorageStatistics();
 
     QSet<QnStorageResourcePtr> storages;
-    for (const auto& storage: getWritableStorages()) 
+    for (const auto& storage: getWritableStorages())
     {
         if (pred(storage))
         {
@@ -1768,7 +1768,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         }
     }
 
-    if (!storages.empty()) 
+    if (!storages.empty())
     {
         double writedCoeffSum = 0.0;
         for (const auto &storage : storages)

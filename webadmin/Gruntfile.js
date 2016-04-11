@@ -165,7 +165,7 @@ module.exports = function (grunt) {
                  {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
 
                 //Vitaly Kutin
-                {context: '/api/',      host: '10.0.3.197', port: 7001},
+                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
                 {context: '/ec2/',      host: '10.0.3.197', port: 7001},
                 {context: '/hls/',      host: '10.0.3.197', port: 7001},
                 {context: '/media/',    host: '10.0.3.197', port: 7001},
@@ -215,7 +215,7 @@ module.exports = function (grunt) {
 
 
                 //Surface
-                /*{context: '/api/',      host: '10.0.3.203', port: 7001},
+                {context: '/api/',      host: '10.0.3.203', port: 7001},
                  {context: '/ec2/',      host: '10.0.3.203', port: 7001},
                  {context: '/hls/',      host: '10.0.3.203', port: 7001},
                  {context: '/media/',    host: '10.0.3.203', port: 7001},
@@ -598,10 +598,16 @@ module.exports = function (grunt) {
         },
         shell: {
             deploy: {
-                command: 'cd ~/develop/' + package_dir + '; rm .DS_Store; rm ../.DS_Store; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+                command: 'cd ~/develop/' + package_dir + '; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
+            },
+            version: {
+                command: 'hg parent > static/version.txt'
+            },
+            print_version:{
+                command: 'hg parent'
             }
         },
 
@@ -692,6 +698,7 @@ module.exports = function (grunt) {
         'autoprefixer',
         'connect:test',
         'protractor_webdriver',
+        'shell:print_version',
         'protractor:all',
         'newer:jshint'
         //'karma'
@@ -714,7 +721,8 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'shell:version'
     ]);
 
     grunt.registerTask('default', [

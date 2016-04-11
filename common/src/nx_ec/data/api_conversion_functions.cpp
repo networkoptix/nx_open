@@ -689,7 +689,7 @@ void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeLis
 void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
 
-    dst->setAdmin(src.isAdmin);
+    dst->setOwner(src.isAdmin);
 	dst->setLdap(src.isLdap);
 	dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
@@ -705,7 +705,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
     dst.hash = src->getHash();
     dst.digest = src->getDigest();
-    dst.isAdmin = src->isAdmin();
+    dst.isAdmin = src->isOwner();
 	dst.isLdap = src->isLdap();
 	dst.isEnabled = src->isEnabled();
     dst.permissions = src->getPermissions();

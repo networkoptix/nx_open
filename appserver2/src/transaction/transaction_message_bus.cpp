@@ -158,6 +158,7 @@ namespace ec2
         case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::setAccessRights:       return handleTransactionParams<ApiAccessRightsData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveLayout:            return handleTransactionParams<ApiLayoutData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);

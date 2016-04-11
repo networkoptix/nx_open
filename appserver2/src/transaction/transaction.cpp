@@ -78,6 +78,7 @@ namespace ec2
             REGISTER_COMMAND(getUsers),
             REGISTER_COMMAND(removeUser),
             REGISTER_COMMAND(getAccessRights),
+            REGISTER_COMMAND(setAccessRights),
 
             REGISTER_COMMAND(saveBusinessRule),
             REGISTER_COMMAND(removeBusinessRule),
@@ -217,6 +218,7 @@ namespace ec2
                 val == removeMediaServer ||
                 val == saveUser ||
                 val == removeUser ||
+                val == setAccessRights ||
                 val == saveLayout ||
                 val == saveLayouts ||
                 val == removeLayout ||

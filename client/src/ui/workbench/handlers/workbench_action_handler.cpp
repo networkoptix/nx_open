@@ -189,7 +189,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
      * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
      * To make dialogs work we're using queued connection here. */
     connect(action(QnActions::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
-    connect(action(QnActions::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(QnActions::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
 
     connect(action(QnActions::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
@@ -338,7 +337,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool isExportedLayout = snapshotManager()->isFile(layout);
+        bool isExportedLayout = layout->isFile();
 
         bool allowed = nonVideo || isMediaResource;
         bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
@@ -555,7 +554,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 
         /* Delete orphaned layouts. */
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            if(snapshotManager()->isLocal(layout) && !layout->isFile())
                 resourcePool()->removeResource(layout);
     }
 
@@ -565,7 +564,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode()) {
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            if(snapshotManager()->isLocal(layout) && !layout->isFile())
                 resourcePool()->removeResource(layout);
         }
     }
@@ -913,7 +912,8 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             menu()->trigger(QnActions::OpenInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-            if (snapshotManager()->isFile(layout)) {
+            if (layout->isFile())
+            {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
                     //TODO: #GDM #Common refactor duplicated code VMS-1725
@@ -980,11 +980,9 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered()
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     QStringList filters;
-    //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
 
     QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
@@ -996,23 +994,6 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
 
     if (!files.isEmpty())
         menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(files));
-}
-
-void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QStringList filters;
-    filters << tr("All Supported (*.layout)");
-    filters << tr("Layouts (*.layout)");
-    filters << tr("All files (*.*)");
-
-    QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
-                                                     tr("Open File"),
-                                                     QString(),
-                                                     filters.join(lit(";;")),
-                                                     0,
-                                                     QnCustomFileDialog::fileDialogOptions());
-
-    if(!fileName.isEmpty())
-        menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -2214,21 +2195,19 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(QnActions::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
-    //if (!action(QnActions::TogglePanicModeAction)->isChecked()) {
 
+    // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
+        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
-
-    //}
 }
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
+        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)

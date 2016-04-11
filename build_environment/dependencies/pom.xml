@@ -3,12 +3,12 @@
     <parent>
         <artifactId>build_environment</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.6.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dependencies</artifactId>
 	<packaging>pom</packaging>
