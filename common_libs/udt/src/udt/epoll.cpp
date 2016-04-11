@@ -219,9 +219,9 @@ int CEPoll::create()
         m_iIDSeed = 0;
 
 #ifdef _WIN32
-    auto desc = std::make_unique<CEPollDescWin32>();
+    std::unique_ptr<CEPollDescWin32> desc(new CEPollDescWin32());
 #else
-    auto desc = std::make_unique<CEPollDesc>();
+    std::unique_ptr<CEPollDesc> desc(new CEPollDesc());
 #endif
     desc->m_iID = m_iIDSeed;
     desc->m_iLocalID = localid;
@@ -455,7 +455,7 @@ int CEPoll::release(const int eid)
 
 #if __linux__ || __APPLE__ 
     // release local/system epoll descriptor
-    ::close(i->second.m_iLocalID);
+    ::close(i->second->m_iLocalID);
 #elif _WIN32
 #endif
 
