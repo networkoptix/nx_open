@@ -39,6 +39,14 @@ body {
   }
 }
 
+.master-success .preloader{
+
+  background-image: url('../images/native-theme/preloader.gif');
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/native-theme/preloader@2x.png');
+  }
+}
 
 
 

@@ -103,13 +103,13 @@ a.external:hover{
   background-position: -88px 0px;
 }
 
+.master-success .preloader{
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 66px 14px;
 
-@keyframes rotation {
-  from {transform: rotate(0deg);}
-  to   {transform: rotate(359deg);}
-}
-
-.master-success .glyphicon.glyphicon-refresh{
-  animation: rotation 5s linear infinite;
+  margin-bottom: 20px;
+  width: 66px;
+  height: 14px;
 }
 

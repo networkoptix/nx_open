@@ -14,6 +14,17 @@ $icon-font-path: "../fonts/";
   }
 }
 
+
+.master-success .preloader{
+  background-image: url('../images/icons/preloader.gif');
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/preloader@2x.png');
+  }
+}
+
+
+
 @import 'master';
 
 *{
