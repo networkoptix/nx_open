@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('cloudApi', function ($http, $q) {
+    .factory('cloudApi', ['$http', '$q', function ($http, $q) {
 
         var apiBase = Config.apiBase;
 
@@ -187,4 +187,4 @@ angular.module('cloudApp')
             }
         }
 
-    });
+    }]);

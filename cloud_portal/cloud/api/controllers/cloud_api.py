@@ -146,17 +146,15 @@ class Account(object):
     @staticmethod
     @validate_response
     def update(email, password, first_name, last_name):
-
         params = {
             'fullName': ' '.join((first_name, last_name))
         }
         request = settings.CLOUD_CONNECT['url'] + '/account/update'
-
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response
     def get(email=None, password=None):
         # TODO: create wrappers
-        request = settings.CLOUD_CONNECT['url'] + "/account/get"
+        request = settings.CLOUD_CONNECT['url'] + '/account/get'
         return requests.get(request, auth=HTTPDigestAuth(email, password))

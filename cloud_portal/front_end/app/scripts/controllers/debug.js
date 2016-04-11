@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DebugCtrl', function ($scope, cloudApi, account, process, $q, $timeout,dialogs) {
+    .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout','dialogs',
+        function ($scope, cloudApi, account, process, $q, $timeout,dialogs) {
 
         account.requireLogin();
 
@@ -62,4 +63,4 @@ angular.module('cloudApp')
         }
 
 
-    });
+    }]);

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header', function (dialogs, cloudApi, $localStorage, account, $location) {
+    .directive('header',['dialogs', 'cloudApi', '$localStorage', 'account', '$location',function (dialogs, cloudApi, $localStorage, account, $location) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/header.html',
@@ -40,4 +40,4 @@ angular.module('cloudApp')
                 });
             }
         };
-    });
+    }]);

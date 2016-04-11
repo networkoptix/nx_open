@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', function ($scope, cloudApi, $location, urlProtocol, process, account) {
+    .controller('SystemsCtrl', ['$scope', 'cloudApi', '$location', 'urlProtocol', 'process', 'account', function ($scope, cloudApi, $location, urlProtocol, process, account) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -59,4 +59,4 @@ angular.module('cloudApp')
             return system.ownerAccountEmail;
         }
 
-    });
+    }]);

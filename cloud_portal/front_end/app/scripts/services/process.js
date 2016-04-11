@@ -2,7 +2,7 @@
 
 
 angular.module('cloudApp')
-    .factory('process', function ($q, dialogs) {
+    .factory('process', ['$q', 'dialogs', function ($q, dialogs) {
 
         function formatError(error,errorCodes){
             if(!error || !error.resultCode){
@@ -103,4 +103,4 @@ angular.module('cloudApp')
                 }
             }
         }
-    });
+    }]);

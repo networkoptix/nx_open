@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ShareCtrl', function ($scope, cloudApi, process, dialogs, $q, account) {
+    .controller('ShareCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account', function ($scope, cloudApi, process, dialogs, $q, account) {
 
         $scope.Config = Config;
         $scope.L = L;
@@ -86,4 +86,4 @@ angular.module('cloudApp')
         $scope.close = function(){
             dialogs.closeMe($scope);
         }
-    });
+    }]);

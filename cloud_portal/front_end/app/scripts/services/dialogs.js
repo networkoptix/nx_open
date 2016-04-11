@@ -1,13 +1,13 @@
 'use strict';
 
 
-angular.module('cloudApp').run(function($http,$templateCache) {
+angular.module('cloudApp').run(['$http','$templateCache', function($http,$templateCache) {
         $http.get('views/login.html', {cache: $templateCache});
         $http.get('views/share.html', {cache: $templateCache});
         $http.get('views/components/notifications.html', {cache: $templateCache});
         $http.get('views/components/dialog.html', {cache: $templateCache});
-    })
-    .factory('dialogs', function ($http, $uibModal, $q, $location, ngToast) {
+    }])
+    .factory('dialogs', ['$http', '$uibModal', '$q', '$location', 'ngToast', function ($http, $uibModal, $q, $location, ngToast) {
 
         function openDialog(settings ){
 
@@ -165,7 +165,7 @@ angular.module('cloudApp').run(function($http,$templateCache) {
                 return $scope.settings || $scope.$parent && this.getSettings($scope.$parent) || null;
             }
         };
-    }).controller("DialogCtrl",function($scope, $uibModalInstance,settings){
+    }]).controller("DialogCtrl",['$scope', '$uibModalInstance','settingsfunction', function($scope, $uibModalInstance,settings){
         $scope.settings = settings;
 
         $scope.close = function(){
@@ -183,4 +183,4 @@ angular.module('cloudApp').run(function($http,$templateCache) {
         $scope.$on('$routeChangeStart', function(){
             $uibModalInstance.close();
         });
-    });
+    }]);

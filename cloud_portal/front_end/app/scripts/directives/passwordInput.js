@@ -2,7 +2,7 @@
 
 //http://stackoverflow.com/questions/28045427/angularjs-custom-directive-with-input-element-pass-validator-from-outside
 angular.module('cloudApp')
-    .directive('passwordInput', function (cloudApi) {
+    .directive('passwordInput', ['cloudApi',function (cloudApi) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/password-input.html',
@@ -58,4 +58,4 @@ angular.module('cloudApp')
 
             }
         };
-    });
+    }]);

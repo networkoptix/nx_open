@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $localStorage, account, $location, urlProtocol) {
+    .controller('ActivateRestoreCtrl',['$scope', 'cloudApi', '$routeParams', 'process', '$localStorage', 'account', '$location', 'urlProtocol', function ($scope, cloudApi, $routeParams, process, $localStorage, account, $location, urlProtocol) {
 
         $scope.session = $localStorage;
 
@@ -100,4 +100,4 @@ angular.module('cloudApp')
             $scope.activate.run();
         }
 
-    });
+    }]);

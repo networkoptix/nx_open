@@ -1,11 +1,12 @@
 'use strict';
 
 angular.module('cloudApp')
-    .run(function($http,$templateCache) {
+    .run(['$http','$templateCache', function($http,$templateCache) {
         // Preload content into cache
         $http.get('views/static/register-intro.html', {cache: $templateCache});
-    })
-    .controller('RegisterCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, urlProtocol) {
+    }])
+    .controller('RegisterCtrl', ['$scope', 'cloudApi', 'process', '$location', '$localStorage', '$routeParams',
+        'account', 'urlProtocol', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, urlProtocol) {
 
         account.logoutAuthorised();
         $scope.Config = Config;
@@ -52,4 +53,4 @@ angular.module('cloudApp')
         }).then(function(){
             $location.path('/register/success',false);
         });
-    });
+    }]);

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('account', function (cloudApi, dialogs, $q, $location, $localStorage) {
+    .factory('account', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage', function (cloudApi, dialogs, $q, $location, $localStorage) {
         return {
             get:function(){
                 var defer = $q.defer();
@@ -44,4 +44,4 @@ angular.module('cloudApp')
                 });
             }
         }
-    });
+    }]);

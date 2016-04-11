@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemCtrl', function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account) {
+    .controller('SystemCtrl', ['$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process', 'account', function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process, account) {
 
 
         $scope.Config = Config;
@@ -151,4 +151,4 @@ angular.module('cloudApp')
                 });
         };
 
-    });
+    }]);

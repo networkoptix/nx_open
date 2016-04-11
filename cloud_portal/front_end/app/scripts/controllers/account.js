@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', function ($scope, cloudApi, process, $localStorage, $routeParams, account) {
+    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$localStorage', '$routeParams', 'account', function ($scope, cloudApi, process, $localStorage, $routeParams, account) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -35,4 +35,4 @@ angular.module('cloudApp')
             $scope.session.password = $scope.newPassword;
         });
 
-    });
+    }]);

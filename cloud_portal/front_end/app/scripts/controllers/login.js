@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, dialogs) {
+    .controller('LoginCtrl', ['$scope', 'cloudApi', 'process', '$location', '$localStorage', '$routeParams', 'account',
+        'dialogs', function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, dialogs) {
 
         $scope.Config = Config;
         $scope.session = $localStorage;
@@ -33,4 +34,4 @@ angular.module('cloudApp')
                 document.location.reload();
             });
         });
-    });
+    }]);

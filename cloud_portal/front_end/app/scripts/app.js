@@ -19,7 +19,7 @@ angular.module('cloudApp', [
         combineDuplications: true,
         newestOnTop: false
     });
-}]).config(function ($routeProvider) {
+}]).config(['$routeProvider',function ($routeProvider) {
     $routeProvider
         .when('/register/success', {
             templateUrl: 'views/register.html',
@@ -147,11 +147,7 @@ angular.module('cloudApp', [
             templateUrl: 'views/startPage.html',
             controller: 'StartPageCtrl'
         });
-});
-
-
-
-angular.module('cloudApp').run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}]).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
     var original = $location.path;
     $location.path = function (path, reload) {
         if (reload === false) {
