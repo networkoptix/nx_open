@@ -2374,11 +2374,11 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
     QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget(lit("slider_zoom_in"));
     sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
-    sliderZoomOutButton->setPreferredSize(16, 16);
+    sliderZoomOutButton->setPreferredSize(19, 16);
 
     QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget(lit("slider_zoom_out"));
     sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
-    sliderZoomInButton->setPreferredSize(16, 16);
+    sliderZoomInButton->setPreferredSize(19, 16);
 
     QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     sliderZoomButtonsLayout->setSpacing(0.0);
