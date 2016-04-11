@@ -119,9 +119,13 @@ bool CloudStreamSocket::reopen()
 
 bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int /*timeoutMillis*/)
+    unsigned int timeoutMillis)
 {
-    //TODO #ak handle timeoutMillis (currently, send timeout is used)
+    unsigned int sendTimeoutBak = 0;
+    if (!getSendTimeout(&sendTimeoutBak))
+        return false;
+    if (!setSendTimeout(timeoutMillis))
+        return false;
 
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
@@ -154,6 +158,9 @@ bool CloudStreamSocket::connect(
         SystemError::setLastErrorCode(result);
         return false;
     }
+
+    if (!setSendTimeout(sendTimeoutBak))
+        return false;
 
     return true;
 }
