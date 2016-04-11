@@ -75,7 +75,9 @@ protected:
         {
             api::ResultCode resultCode = api::ResultCode::forbidden;
             if (auto resultCodeStr = authzInfo->get<QString>(attr::resultCode))
-                resultCode = QnLexical::deserialized<api::ResultCode>(*resultCodeStr);
+                resultCode = QnLexical::deserialized<api::ResultCode>(
+                    *resultCodeStr,
+                    api::ResultCode::unknownError);
 
             nx_http::FusionRequestResult result(
                 nx_http::FusionRequestErrorClass::unauthorized,
@@ -92,7 +94,7 @@ protected:
     }
 };
 
-}   //detail
+}   //namespace detail
 
 
 //!Contains logic common for all cloud_db HTTP request handlers
@@ -329,7 +331,7 @@ private:
     ExecuteRequestFunc m_requestFunc;
 };
 
-}   //cdb
-}   //nx
+}   //namespace cdb
+}   //namespace nx
 
 #endif  //cloud_db_base_http_handler_h
