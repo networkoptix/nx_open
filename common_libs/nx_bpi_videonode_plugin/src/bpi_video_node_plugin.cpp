@@ -6,8 +6,8 @@ QList<QVideoFrame::PixelFormat> QnBpiSGVideoNodeFactoryPlugin::supportedPixelFor
 {
     QList<QVideoFrame::PixelFormat> pixelFormats;
 
-    if (handleType == QAbstractVideoBuffer::GLTextureHandle)
-        pixelFormats.append(QVideoFrame::Format_BGR32);
+    if (handleType == QAbstractVideoBuffer::NoHandle)
+        pixelFormats.append(QVideoFrame::Format_YUV420P);
 
     return pixelFormats;
 }
@@ -15,7 +15,7 @@ QList<QVideoFrame::PixelFormat> QnBpiSGVideoNodeFactoryPlugin::supportedPixelFor
 QSGVideoNode *QnBpiSGVideoNodeFactoryPlugin::createNode(const QVideoSurfaceFormat &format)
 {
     if (supportedPixelFormats(format.handleType()).contains(format.pixelFormat()))
-        return new QnBpiSGVideoNode(format);
+        return new QSGVideoNode_YUV(format);
 
     return 0;
 }

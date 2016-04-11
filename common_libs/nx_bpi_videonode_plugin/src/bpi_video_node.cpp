@@ -1,14 +1,46 @@
 #include "bpi_video_node.h"
+#include <QtCore/qmutex.h>
+#include <QtQuick/qsgtexturematerial.h>
+#include <QtQuick/qsgmaterial.h>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLShaderProgram>
 
-#include <qsgmaterial.h>
-#include <qmutex.h>
+QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_YUV::supportedPixelFormats(
+    QAbstractVideoBuffer::HandleType handleType) const
+{
+    QList<QVideoFrame::PixelFormat> formats;
 
-class QBpiSGVideoNodeMaterialShader : public QSGMaterialShader
+    if (handleType == QAbstractVideoBuffer::NoHandle) {
+        formats << QVideoFrame::Format_YUV420P << QVideoFrame::Format_YV12
+            << QVideoFrame::Format_NV12 << QVideoFrame::Format_NV21;
+    }
+
+    return formats;
+}
+
+QSGVideoNode *QSGVideoNodeFactory_YUV::createNode(const QVideoSurfaceFormat &format)
+{
+    if (supportedPixelFormats(format.handleType()).contains(format.pixelFormat()))
+        return new QSGVideoNode_YUV(format);
+
+    return 0;
+}
+
+
+class QSGVideoMaterialShader_YUV_BiPlanar : public QSGMaterialShader
 {
 public:
-    void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial);
+    QSGVideoMaterialShader_YUV_BiPlanar()
+        : QSGMaterialShader()
+    {
+        setShaderSourceFile(QOpenGLShader::Vertex, QStringLiteral(":/qtmultimediaquicktools/shaders/biplanaryuvvideo.vert"));
+        setShaderSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/qtmultimediaquicktools/shaders/biplanaryuvvideo.frag"));
+    }
 
-    char const *const *attributeNames() const {
+    virtual void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial);
+
+    virtual char const *const *attributeNames() const {
         static const char *names[] = {
             "qt_VertexPosition",
             "qt_VertexTexCoord",
@@ -18,152 +50,313 @@ public:
     }
 
 protected:
-
-    const char *vertexShader() const {
-        const char *shader =
-        "uniform highp mat4 qt_Matrix;                      \n"
-        "attribute highp vec4 qt_VertexPosition;            \n"
-        "attribute highp vec2 qt_VertexTexCoord;            \n"
-        "varying highp vec2 qt_TexCoord;                    \n"
-        "void main() {                                      \n"
-        "    qt_TexCoord = qt_VertexTexCoord;               \n"
-        "    gl_Position = qt_Matrix * qt_VertexPosition;   \n"
-        "}";
-        return shader;
-    }
-
-    const char *fragmentShader() const {
-        static const char *shader =
-        "uniform sampler2D rgbTexture;"
-        "uniform lowp float opacity;"
-        ""
-        "varying highp vec2 qt_TexCoord;"
-        ""
-        "void main()"
-        "{"
-        "    gl_FragColor = texture2D(rgbTexture, qt_TexCoord) * opacity;"
-        "}";
-        return shader;
-    }
-
-    void initialize() {
+    virtual void initialize() {
         m_id_matrix = program()->uniformLocation("qt_Matrix");
-        m_id_Texture = program()->uniformLocation("rgbTexture");
+        m_id_plane1Width = program()->uniformLocation("plane1Width");
+        m_id_plane2Width = program()->uniformLocation("plane2Width");
+        m_id_plane1Texture = program()->uniformLocation("plane1Texture");
+        m_id_plane2Texture = program()->uniformLocation("plane2Texture");
+        m_id_colorMatrix = program()->uniformLocation("colorMatrix");
         m_id_opacity = program()->uniformLocation("opacity");
     }
 
     int m_id_matrix;
-    int m_id_Texture;
+    int m_id_plane1Width;
+    int m_id_plane2Width;
+    int m_id_plane1Texture;
+    int m_id_plane2Texture;
+    int m_id_colorMatrix;
     int m_id_opacity;
 };
 
-class QBpiSGVideoNodeMaterial : public QSGMaterial
+
+class QSGVideoMaterialShader_YUV_BiPlanar_swizzle : public QSGVideoMaterialShader_YUV_BiPlanar
 {
 public:
-    QBpiSGVideoNodeMaterial()
-        : m_textureId(0)
-        , m_textureUpdated(false)
-        , m_opacity(1.0)
+    QSGVideoMaterialShader_YUV_BiPlanar_swizzle()
+        : QSGVideoMaterialShader_YUV_BiPlanar()
     {
-        setFlag(Blending, false);
+        setShaderSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/qtmultimediaquicktools/shaders/biplanaryuvvideo_swizzle.frag"));
+    }
+};
+
+
+class QSGVideoMaterialShader_YUV_TriPlanar : public QSGVideoMaterialShader_YUV_BiPlanar
+{
+public:
+    QSGVideoMaterialShader_YUV_TriPlanar()
+        : QSGVideoMaterialShader_YUV_BiPlanar()
+    {
+        setShaderSourceFile(QOpenGLShader::Vertex, QStringLiteral(":/qtmultimediaquicktools/shaders/triplanaryuvvideo.vert"));
+        setShaderSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/qtmultimediaquicktools/shaders/triplanaryuvvideo.frag"));
     }
 
-    QSGMaterialType *type() const {
-        static QSGMaterialType theType;
-        return &theType;
+    virtual void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial);
+
+protected:
+    virtual void initialize() {
+        m_id_plane3Width = program()->uniformLocation("plane3Width");
+        m_id_plane3Texture = program()->uniformLocation("plane3Texture");
+        QSGVideoMaterialShader_YUV_BiPlanar::initialize();
     }
 
-    QSGMaterialShader *createShader() const {
-        return new QBpiSGVideoNodeMaterialShader;
+    int m_id_plane3Width;
+    int m_id_plane3Texture;
+};
+
+
+class QnBpiSGVideoMaterial_YUV : public QSGMaterial
+{
+public:
+    QnBpiSGVideoMaterial_YUV(const QVideoSurfaceFormat &format);
+    ~QnBpiSGVideoMaterial_YUV();
+
+    virtual QSGMaterialType *type() const {
+        static QSGMaterialType biPlanarType, biPlanarSwizzleType, triPlanarType;
+
+        switch (m_format.pixelFormat()) {
+        case QVideoFrame::Format_NV12:
+            return &biPlanarType;
+        case QVideoFrame::Format_NV21:
+            return &biPlanarSwizzleType;
+        default: // Currently: YUV420P and YV12
+            return &triPlanarType;
+        }
     }
 
-    int compare(const QSGMaterial *other) const {
-        const QBpiSGVideoNodeMaterial *m = static_cast<const QBpiSGVideoNodeMaterial *>(other);
-        int diff = m_textureId - m->m_textureId;
-        if (diff)
-            return diff;
+    virtual QSGMaterialShader *createShader() const {
+        switch (m_format.pixelFormat()) {
+        case QVideoFrame::Format_NV12:
+            return new QSGVideoMaterialShader_YUV_BiPlanar;
+        case QVideoFrame::Format_NV21:
+            return new QSGVideoMaterialShader_YUV_BiPlanar_swizzle;
+        default: // Currently: YUV420P and YV12
+            return new QSGVideoMaterialShader_YUV_TriPlanar;
+        }
+    }
 
-        return (m_opacity > m->m_opacity) ? 1 : -1;
+    virtual int compare(const QSGMaterial *other) const {
+        const QnBpiSGVideoMaterial_YUV *m = static_cast<const QnBpiSGVideoMaterial_YUV *>(other);
+        if (!m_textureIds[0])
+            return 1;
+
+        int d = m_textureIds[0] - m->m_textureIds[0];
+        if (d)
+            return d;
+        else if ((d = m_textureIds[1] - m->m_textureIds[1]) != 0)
+            return d;
+        else
+            return m_textureIds[2] - m->m_textureIds[2];
     }
 
     void updateBlending() {
         setFlag(Blending, qFuzzyCompare(m_opacity, qreal(1.0)) ? false : true);
     }
 
-    void updateTexture(GLuint id, const QSize &size) {
-        if (m_textureId != id || m_textureSize != size) {
-            m_textureId = id;
-            m_textureSize = size;
-            m_textureUpdated = true;
-        }
+    void setCurrentFrame(const QVideoFrame &frame) {
+        QMutexLocker lock(&m_frameMutex);
+        m_frame = frame;
     }
 
-    void bind()
-    {
-        glBindTexture(GL_TEXTURE_2D, m_textureId);
-        if (m_textureUpdated) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            m_textureUpdated = false;
-        }
-    }
+    void bind();
+    void bindTexture(int id, int w, int h, const uchar *bits, GLenum format);
 
+    QVideoSurfaceFormat m_format;
     QSize m_textureSize;
-    GLuint m_textureId;
-    bool m_textureUpdated;
+    int m_planeCount;
+
+    GLuint m_textureIds[3];
+    GLfloat m_planeWidth[3];
+
     qreal m_opacity;
+    QMatrix4x4 m_colorMatrix;
+
+    QVideoFrame m_frame;
+    QMutex m_frameMutex;
 };
 
-
-QBpiSGVideoNode::QBpiSGVideoNode(const QVideoSurfaceFormat &format)
-    : m_format(format)
+QnBpiSGVideoMaterial_YUV::QnBpiSGVideoMaterial_YUV(const QVideoSurfaceFormat &format) :
+    m_format(format),
+    m_opacity(1.0)
 {
-    setFlags(OwnsMaterial | UsePreprocess);
-    m_material = new QBpiSGVideoNodeMaterial;
+    memset(m_textureIds, 0, sizeof(m_textureIds));
+
+    switch (format.pixelFormat()) {
+    case QVideoFrame::Format_NV12:
+    case QVideoFrame::Format_NV21:
+        m_planeCount = 2;
+        break;
+    case QVideoFrame::Format_YUV420P:
+    case QVideoFrame::Format_YV12:
+        m_planeCount = 3;
+        break;
+    default:
+        m_planeCount = 1;
+        break;
+    }
+
+    switch (format.yCbCrColorSpace()) {
+    case QVideoSurfaceFormat::YCbCr_JPEG:
+        m_colorMatrix = QMatrix4x4(
+            1.0f, 0.000f, 1.402f, -0.701f,
+            1.0f, -0.344f, -0.714f, 0.529f,
+            1.0f, 1.772f, 0.000f, -0.886f,
+            0.0f, 0.000f, 0.000f, 1.0000f);
+        break;
+    case QVideoSurfaceFormat::YCbCr_BT709:
+    case QVideoSurfaceFormat::YCbCr_xvYCC709:
+        m_colorMatrix = QMatrix4x4(
+            1.164f, 0.000f, 1.793f, -0.5727f,
+            1.164f, -0.534f, -0.213f, 0.3007f,
+            1.164f, 2.115f, 0.000f, -1.1302f,
+            0.0f, 0.000f, 0.000f, 1.0000f);
+        break;
+    default: //BT 601:
+        m_colorMatrix = QMatrix4x4(
+            1.164f, 0.000f, 1.596f, -0.8708f,
+            1.164f, -0.392f, -0.813f, 0.5296f,
+            1.164f, 2.017f, 0.000f, -1.081f,
+            0.0f, 0.000f, 0.000f, 1.0000f);
+    }
+
+    setFlag(Blending, false);
+}
+
+QnBpiSGVideoMaterial_YUV::~QnBpiSGVideoMaterial_YUV()
+{
+    if (!m_textureSize.isEmpty()) {
+        if (QOpenGLContext *current = QOpenGLContext::currentContext())
+            current->functions()->glDeleteTextures(m_planeCount, m_textureIds);
+        else
+            qWarning() << "QnBpiSGVideoMaterial_YUV: Cannot obtain GL context, unable to delete textures";
+    }
+}
+
+void QnBpiSGVideoMaterial_YUV::bind()
+{
+    QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+    QMutexLocker lock(&m_frameMutex);
+    if (m_frame.isValid()) {
+        if (m_frame.map(QAbstractVideoBuffer::ReadOnly)) {
+            int fw = m_frame.width();
+            int fh = m_frame.height();
+
+            // Frame has changed size, recreate textures...
+            if (m_textureSize != m_frame.size()) {
+                if (!m_textureSize.isEmpty())
+                    functions->glDeleteTextures(m_planeCount, m_textureIds);
+                functions->glGenTextures(m_planeCount, m_textureIds);
+                m_textureSize = m_frame.size();
+            }
+
+            GLint previousAlignment;
+            functions->glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousAlignment);
+            functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+            if (m_format.pixelFormat() == QVideoFrame::Format_NV12
+                || m_format.pixelFormat() == QVideoFrame::Format_NV21) {
+                const int y = 0;
+                const int uv = 1;
+
+                m_planeWidth[0] = m_planeWidth[1] = qreal(fw) / m_frame.bytesPerLine(y);
+
+                functions->glActiveTexture(GL_TEXTURE1);
+                bindTexture(m_textureIds[1], m_frame.bytesPerLine(uv) / 2, fh / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
+                functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
+                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
+
+            }
+            else { // YUV420P || YV12
+                const int y = 0;
+                const int u = m_frame.pixelFormat() == QVideoFrame::Format_YUV420P ? 1 : 2;
+                const int v = m_frame.pixelFormat() == QVideoFrame::Format_YUV420P ? 2 : 1;
+
+                m_planeWidth[0] = qreal(fw) / m_frame.bytesPerLine(y);
+                m_planeWidth[1] = m_planeWidth[2] = qreal(fw) / (2 * m_frame.bytesPerLine(u));
+
+                functions->glActiveTexture(GL_TEXTURE1);
+                bindTexture(m_textureIds[1], m_frame.bytesPerLine(u), fh / 2, m_frame.bits(u), GL_LUMINANCE);
+                functions->glActiveTexture(GL_TEXTURE2);
+                bindTexture(m_textureIds[2], m_frame.bytesPerLine(v), fh / 2, m_frame.bits(v), GL_LUMINANCE);
+                functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
+                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
+            }
+
+            functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
+            m_frame.unmap();
+        }
+
+        m_frame = QVideoFrame();
+    }
+    else {
+        // Go backwards to finish with GL_TEXTURE0
+        for (int i = m_planeCount - 1; i >= 0; --i) {
+            functions->glActiveTexture(GL_TEXTURE0 + i);
+            functions->glBindTexture(GL_TEXTURE_2D, m_textureIds[i]);
+        }
+    }
+}
+
+void QnBpiSGVideoMaterial_YUV::bindTexture(int id, int w, int h, const uchar *bits, GLenum format)
+{
+    QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+
+    functions->glBindTexture(GL_TEXTURE_2D, id);
+    functions->glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, bits);
+    functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+QSGVideoNode_YUV::QSGVideoNode_YUV(const QVideoSurfaceFormat &format) :
+    m_format(format)
+{
+    setFlag(QSGNode::OwnsMaterial);
+    m_material = new QnBpiSGVideoMaterial_YUV(format);
     setMaterial(m_material);
 }
 
-QBpiSGVideoNode::~QBpiSGVideoNode()
+QSGVideoNode_YUV::~QSGVideoNode_YUV()
 {
-    m_frame = QVideoFrame();
 }
 
-void QBpiSGVideoNode::setCurrentFrame(const QVideoFrame &frame, FrameFlags)
+void QSGVideoNode_YUV::setCurrentFrame(const QVideoFrame &frame, FrameFlags)
 {
-    QMutexLocker lock(&m_frameMutex);
-    m_frame = frame;
+    m_material->setCurrentFrame(frame);
     markDirty(DirtyMaterial);
 }
 
-void QBpiSGVideoNodeMaterialShader::updateState(const RenderState &state,
-                                                    QSGMaterial *newMaterial,
-                                                    QSGMaterial *oldMaterial)
+void QSGVideoMaterialShader_YUV_BiPlanar::updateState(const RenderState &state,
+    QSGMaterial *newMaterial,
+    QSGMaterial *oldMaterial)
 {
     Q_UNUSED(oldMaterial);
-    QBpiSGVideoNodeMaterial *mat = static_cast<QBpiSGVideoNodeMaterial *>(newMaterial);
-    program()->setUniformValue(m_id_Texture, 0);
+
+    QnBpiSGVideoMaterial_YUV *mat = static_cast<QnBpiSGVideoMaterial_YUV *>(newMaterial);
+    program()->setUniformValue(m_id_plane1Texture, 0);
+    program()->setUniformValue(m_id_plane2Texture, 1);
 
     mat->bind();
 
+    program()->setUniformValue(m_id_colorMatrix, mat->m_colorMatrix);
+    program()->setUniformValue(m_id_plane1Width, mat->m_planeWidth[0]);
+    program()->setUniformValue(m_id_plane2Width, mat->m_planeWidth[1]);
     if (state.isOpacityDirty()) {
         mat->m_opacity = state.opacity();
-        mat->updateBlending();
         program()->setUniformValue(m_id_opacity, GLfloat(mat->m_opacity));
     }
-
     if (state.isMatrixDirty())
         program()->setUniformValue(m_id_matrix, state.combinedMatrix());
 }
 
-void QBpiSGVideoNode::preprocess()
+void QSGVideoMaterialShader_YUV_TriPlanar::updateState(const RenderState &state,
+    QSGMaterial *newMaterial,
+    QSGMaterial *oldMaterial)
 {
-    QMutexLocker lock(&m_frameMutex);
+    QSGVideoMaterialShader_YUV_BiPlanar::updateState(state, newMaterial, oldMaterial);
 
-    GLuint texId = 0;
-    if (m_frame.isValid())
-        texId = m_frame.handle().toUInt();
-
-    m_material->updateTexture(texId, m_frame.size());
+    QnBpiSGVideoMaterial_YUV *mat = static_cast<QnBpiSGVideoMaterial_YUV *>(newMaterial);
+    program()->setUniformValue(m_id_plane3Texture, 2);
+    program()->setUniformValue(m_id_plane3Width, mat->m_planeWidth[2]);
 }
