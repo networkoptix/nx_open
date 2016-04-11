@@ -138,11 +138,12 @@ TEST( Socket, AsyncOperationCancellation )
                     connectionsGenerator.start();
 
                     std::this_thread::sleep_for(TEST_DURATION);
-                    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
-                    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
 
                     connectionsGenerator.pleaseStopSync();
                     server.pleaseStopSync();
+
+                    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
+                    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
                 }
             });
     }
