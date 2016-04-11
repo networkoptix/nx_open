@@ -1423,7 +1423,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
         return removeEmptyLayoutsFromTransactionLog();
     }
-    else if (updateName == lit(":/updates/41_resync_tran_log.sql")) {
+    else if (updateName == lit(":/updates/41_resync_tran_log.sql"))
+    {
         if (!m_dbJustCreated) {
             m_needResyncUsers = true;
             m_needResyncStorages = true;
@@ -1464,6 +1465,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         QMap<int, QnUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'WebPage'", CM_MakeHash);
         if (!updateTableGuids("vms_resourcetype", "guid", guids))
             return false;
+    }
+    else if (updateName == lit(":/updates/50_add_access_rights.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needResyncUsers = true;
+        }
     }
     return true;
 }
