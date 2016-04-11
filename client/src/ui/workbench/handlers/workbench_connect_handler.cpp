@@ -68,8 +68,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "compatibility.h"
-
 namespace
 {
     const int videowallReconnectTimeoutMSec = 5000;

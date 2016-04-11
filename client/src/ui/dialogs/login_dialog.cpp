@@ -47,7 +47,6 @@
 
 #include <utils/connection_diagnostics_helper.h>
 
-#include "compatibility.h"
 #include <utils/common/app_info.h>
 #include <ui/style/custom_style.h>
 
@@ -315,17 +314,22 @@ void QnLoginDialog::resetSavedSessionsModel() {
     }
 }
 
-void QnLoginDialog::resetAutoFoundConnectionsModel() {
+void QnLoginDialog::resetAutoFoundConnectionsModel()
+{
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
-    if (m_foundEcs.size() == 0) {
+    if (m_foundEcs.size() == 0)
+    {
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
-    } else {
-        foreach (const QnEcData& data, m_foundEcs) {
+    }
+    else
+    {
+        foreach (const QnEcData& data, m_foundEcs)
+        {
             QUrl url = data.url;
 
-            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(QString(), data.version, data.protoVersion);
+            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(QString(), data.protoVersion);
 
             bool isCompatible = (compatibilityCode == QnConnectionDiagnosticsHelper::Result::Success);
 
