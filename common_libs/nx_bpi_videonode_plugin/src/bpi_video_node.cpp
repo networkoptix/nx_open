@@ -87,8 +87,8 @@ public:
     QSGVideoMaterialShader_YUV_TriPlanar()
         : QSGVideoMaterialShader_YUV_BiPlanar()
     {
-        setShaderSourceFile(QOpenGLShader::Vertex, QStringLiteral(":/qtmultimediaquicktools/shaders/triplanaryuvvideo.vert"));
-        setShaderSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/qtmultimediaquicktools/shaders/triplanaryuvvideo.frag"));
+        setShaderSourceFile(QOpenGLShader::Vertex, QStringLiteral(":/shaders/triplanaryuvvideo.vert"));
+        setShaderSourceFile(QOpenGLShader::Fragment, QStringLiteral(":/shaders/triplanaryuvvideo.frag"));
     }
 
     virtual void updateState(const RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial);
