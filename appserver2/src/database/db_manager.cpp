@@ -275,6 +275,7 @@ QnDbManager::QnDbManager()
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
     m_needResyncCameraUserAttributes(false),
+    m_needResyncServerUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_needResyncLayout(false),
@@ -563,6 +564,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         }
         if (m_needResyncCameraUserAttributes) {
             if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                return false;
+        }
+        if (m_needResyncServerUserAttributes) {
+            if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
                 return false;
         }
         if (m_needResyncLayout) {
@@ -1416,6 +1421,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/44_upd_brule_format.sql")) {
         if (!m_dbJustCreated)
             m_needResyncbRules = true;
+    }
+    else if (updateName == lit(":/updates/49_fix_migration.sql")) {
+        if (!m_dbJustCreated)
+        {
+            m_needResyncCameraUserAttributes = true;
+            m_needResyncServerUserAttributes = true;
+        }
     }
 
     return true;
