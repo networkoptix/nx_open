@@ -15,6 +15,13 @@ var SystemPage = function () {
         other: ''
     };
 
+    this.roleHints = {
+        admin: 'Can configure system and share it',
+        viewer: 'Can view live video from cameras and archive',
+        advViewer: 'Can view live video from cameras and archive, configure cameras',
+        liveViewer: 'Can view only live video from cameras'
+    };
+
     this.systemsList = element.all(by.repeater('system in systems'));
     this.ownedSystem = element.all(by.cssContainingText('h2', this.systemName)).first();
 
@@ -25,7 +32,12 @@ var SystemPage = function () {
     this.emailField = element(by.model('share.accountEmail'));
     this.roleField = element(by.model('share.accessRole'));
     this.roleOptionAdmin = this.roleField.element(by.css('option[label=admin]'));
+    this.roleHintBlock = element(by.css('span.help-block'));
     this.submitShareButton = element(by.css('process-button')).element(by.buttonText('Share'));
+
+    this.selectRoleOption = function(role) {
+        return this.roleField.element(by.css(role));
+    };
 
     this.users = element.all(by.repeater('user in system.users'));
     this.userList = this.helper.getParentOf(this.users.first());
@@ -41,7 +53,13 @@ var SystemPage = function () {
     this.loginButton = element(by.css('.modal-dialog')).element(by.buttonText('Login'));
     this.loginCloseButton = element(by.css('.modal-dialog')).all(by.css('button.close')).first();
 
-
+    this.permDialog = element(by.css('.modal-dialog'));
+    this.permEmailFieldDisabled = this.permDialog.element(by.css('[name=email][readonly]'));
+    this.permEmailFieldEnabled = this.permDialog.element(by.css('[name=email]'));
+    this.permRoleField = this.permDialog.element(by.model('share.accessRole'));
+    this.permDialogSubmit = this.permDialog.element(by.buttonText('Save'));
+    this.permDialogCancel = this.permDialog.element(by.buttonText('Cancel'));
+    this.permDialogClose = this.permDialog.element(by.css('.close'));
 
 };
 
