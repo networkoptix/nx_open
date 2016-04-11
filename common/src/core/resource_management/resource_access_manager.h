@@ -69,6 +69,8 @@ private:
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout)          const;
     Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnUserResourcePtr &targetUser)        const;
 
+    bool isAccessibleResource(const QnUserResourcePtr &user, const QnResourcePtr &resource) const;
+
 private:
     /* Cached value of read-only system state. */
     bool m_readOnlyMode;

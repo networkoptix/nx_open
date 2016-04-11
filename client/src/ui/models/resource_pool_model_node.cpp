@@ -4,6 +4,7 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -294,9 +295,13 @@ void QnResourcePoolModelNode::setState(State state) {
 }
 
 bool QnResourcePoolModelNode::calculateBastard() const {
-    switch(m_type) {
+    switch(m_type)
+    {
     case Qn::ItemNode:
-        return m_resource.isNull();
+    {
+        /* Hide non-readable resources. */
+        return !m_resource || !m_model->accessController()->permissions(m_resource).testFlag(Qn::ReadPermission);
+    }
 
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
@@ -321,7 +326,7 @@ bool QnResourcePoolModelNode::calculateBastard() const {
             return true;
 
         /* Hide non-readable resources. */
-        if (!(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission))
+        if (!m_model->accessController()->permissions(m_resource).testFlag(Qn::ReadPermission))
             return true;
 
         if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {

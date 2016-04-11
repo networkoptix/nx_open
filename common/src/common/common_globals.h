@@ -863,20 +863,29 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
         GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
         GlobalEditUsersPermission               = 0x00000008,   /**< Can create and edit users. */
+        /*DeprecatedEditCamerasPermission       = 0x00000010 */
         GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
+        /*DeprecatedViewExportArchivePermission = 0x00000040 */
         GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
         GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
         GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
+        /*DeprecatedPanicPermission             = 0x00001000 */
         GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
 
-        /* Deprecated permissions. */
-        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
-        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Can view and export archives of available cameras. */
+        /* Resources access permissions */
+        GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
+        GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
+        GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
+
+        /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
+        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */
+        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Deprecated. Can view and export archives of available cameras. */
+        DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
 
         /* Shortcuts. */
-        GlobalLiveViewerPermissions = GlobalViewLivePermission,
+        GlobalLiveViewerPermissions         = GlobalViewLivePermission,
 
         GlobalViewerPermissions             = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission,
 
@@ -887,8 +896,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalActiveXModePermissionSet      = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission | GlobalPtzControlPermission,
 
         GlobalAdvancedViewerPermissions     = GlobalViewerPermissions | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissions | GlobalEditLayoutsPermission | GlobalEditUsersPermission |
-                                                GlobalAdminPermission | GlobalEditServersPermissions | GlobalEditVideoWallPermission,
+        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission       | GlobalEditUsersPermission         |
+                                              GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
+                                              GlobalAccessAllCamerasPermission  | GlobalAccessAllLayoutsPermission  | GlobalAccessAllServersPermission  ,
         GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
     };
 

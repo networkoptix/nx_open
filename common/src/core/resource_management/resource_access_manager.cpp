@@ -184,6 +184,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResour
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr &user, const QnVirtualCameraResourcePtr &camera) const
 {
     NX_ASSERT(camera);
+
+    if (!isAccessibleResource(user, camera))
+        return Qn::NoPermissions;
+
     Qn::Permissions result = Qn::ReadPermission;
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
@@ -203,18 +207,26 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr &user, const QnMediaServerResourcePtr &server) const
 {
     NX_ASSERT(server);
+
+    if (!isAccessibleResource(user, server))
+        return Qn::NoPermissions;
+
     if (hasGlobalPermission(user, Qn::GlobalEditServersPermissions))
     {
         if (m_readOnlyMode)
             return Qn::ReadPermission;
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     }
-    return Qn::NoPermissions;
+    return Qn::ReadPermission;
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr &user, const QnVideoWallResourcePtr &videoWall) const
 {
     NX_ASSERT(videoWall);
+
+    if (!isAccessibleResource(user, videoWall))
+        return Qn::NoPermissions;
+
     if (hasGlobalPermission(user, Qn::GlobalEditVideoWallPermission))
     {
         if (m_readOnlyMode)
@@ -227,6 +239,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr &user, const QnWebPageResourcePtr &webPage) const
 {
     NX_ASSERT(webPage);
+
+    if (!isAccessibleResource(user, webPage))
+        return Qn::NoPermissions;
+
     Qn::Permissions result = Qn::ReadPermission;
     if (m_readOnlyMode)
         return result;
@@ -241,7 +257,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout) const
 {
     NX_ASSERT(layout);
-    if (!user)
+    if (!user || !layout)
         return Qn::NoPermissions;
 
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
@@ -282,6 +298,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         if (hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission))
             return Qn::FullLayoutPermissions;
 
+        /* Access to global layouts. */
+        if (layout->getParentId().isNull())
+            return isAccessibleResource(user, layout)
+                ? Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission
+                : Qn::NoPermissions;
+
         /* Viewer cannot view other user's layouts. */
         if (layout->getParentId() != user->getId())
             return Qn::NoPermissions;
@@ -311,15 +333,15 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
-    /* Layout-admin can create layouts. */ //TODO: #GDM Should we refactor it in 3.0?
-    if (hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission))
-        result |= Qn::CreateLayoutPermission;
-
     if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalEditUsersPermission))
     {
         result |= Qn::ReadPermission;
         if (m_readOnlyMode)
             return result;
+
+        /* Layout-admin can create layouts. */ //TODO: #GDM Should we refactor it in 3.0?
+        if (hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission))
+            result |= Qn::CreateLayoutPermission;
 
         /* Admins can only be edited by owner, other users - by all admins. */
         if (hasGlobalPermission(user, Qn::GlobalOwnerPermission) || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
@@ -335,4 +357,42 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     }
 
     return result;
+}
+
+bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr &user, const QnResourcePtr &resource) const
+{
+    NX_ASSERT(resource);
+
+    if (!user || !resource)
+        return false;
+
+    if (m_accessibleResources[user->getId()].contains(resource->getId()))
+        return true;
+
+    auto requiredPermission = [this, resource]()
+    {
+        if (resource.dynamicCast<QnLayoutResource>())
+            return Qn::GlobalAccessAllLayoutsPermission;
+
+        if (resource.dynamicCast<QnVirtualCameraResource>())
+            return Qn::GlobalAccessAllCamerasPermission;
+
+        if (resource.dynamicCast<QnMediaServerResource>())
+            return Qn::GlobalAccessAllServersPermission;
+
+        if (resource.dynamicCast<QnVideoWallResource>())
+            return Qn::GlobalEditVideoWallPermission;
+
+        /* Web Pages behave totally like cameras. */
+        if (resource.dynamicCast<QnWebPageResource>())
+            return Qn::GlobalAccessAllCamerasPermission;
+
+        if (resource.dynamicCast<QnUserResource>())
+            return Qn::GlobalEditUsersPermission;
+
+        /* Default value. */
+        return Qn::GlobalAdminPermission;
+    };
+
+    return hasGlobalPermission(user, requiredPermission());
 }

@@ -571,7 +571,11 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
             return false;
 
         const auto flags = resource->flags();
-        if (flags & (Qn::web_page | Qn::still_image | Qn::server | Qn::videowall))  /* Any of the flags is sufficient. */
+
+        if (flags & (Qn::still_image | Qn::server | Qn::videowall))  /* Any of the flags is sufficient. */
+            return false;
+
+        if ((flags & Qn::web_page) == Qn::web_page)                  /* Qn::web_page is as flag combination. */
             return false;
 
         return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
