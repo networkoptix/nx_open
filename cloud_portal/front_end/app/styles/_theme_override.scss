@@ -344,3 +344,28 @@ label {
   padding:15px;
   @include box-shadow(0 2px 4px transparentize($dark15,0.7));
 }
+
+
+@mixin kill-glyphicon{
+  background-size: 112px 32px;
+  background-image: url('../images/portal_icons.png') !important;
+  &:before{
+    content:none;
+  }
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/portal_icons@2x.png');
+  }
+}
+
+select {
+  position: relative;
+  background-image: url('../images/arrow_down.png') !important;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  background-position: right 8px center;
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/arrow_down@2x.png') !important;
+  }
+}
