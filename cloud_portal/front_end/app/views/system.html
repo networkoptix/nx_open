@@ -37,7 +37,7 @@
             <div class="panel panel-default" ng-if="!isOwner">
                 <div class="panel-body">
                     <h2>Owner</h2>
-                    <h3>{{system.info.ownerFullName}}</h3>
+                    <h3 class="user-name">{{system.info.ownerFullName}}</h3>
                     <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
                     <hr>
                     <p>
@@ -74,7 +74,7 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="user in system.users" class="hoverable">
-                            <td>{{user.fullName}}</td>
+                            <td class="user-name">{{user.fullName}}</td>
                             <td>{{user.accountEmail}}</td>
                             <td>{{L.accessRoles[user.accessRole].label || user.accessRole}}</td>
                             <td><a href='' class="hover-visible image-link" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"

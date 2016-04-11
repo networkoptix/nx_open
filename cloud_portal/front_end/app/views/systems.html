@@ -11,7 +11,7 @@
             <div class="panel panel-default hoverable">
                 <div class="panel-body" ng-click="openSystem(system)">
                     <h2>{{system.name}}</h2>
-                    <span class="system-owner">{{getSystemOwnerName(system)}}</span>
+                    <span class="user-name">{{getSystemOwnerName(system)}}</span>
 
                     <span ng-if="system.status!=Config.systemStatuses.onlineStatus" class="label"
                           ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">

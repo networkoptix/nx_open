@@ -188,7 +188,15 @@ footer {
 }
 
 
-
+.user-name{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  max-width: 100%;
+}
+td.user-name{
+  max-width: 200px;
+}
 .system-button {
   user-select: none;
   cursor: pointer;
@@ -203,16 +211,12 @@ footer {
     text-overflow: ellipsis;
     overflow: hidden;
   }
-  .system-owner{
+  .user-name{
     font-size: $font-size-h6;
     line-height:16px;
     font-weight: bold;
     display: block;
     margin-bottom:12px;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal;
   }
 
   .label {
