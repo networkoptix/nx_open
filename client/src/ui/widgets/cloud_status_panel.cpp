@@ -89,7 +89,7 @@ void QnCloudStatusPanelPrivate::updateUi()
         q->setText(tr("Login to cloud..."));
         q->setIcon(offlineIcon);
         q->setMenu(nullptr);
-        connect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCLoud), &QAction::trigger);
+        connect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
         return;
     }
 
@@ -102,7 +102,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     q->setText(cloudStatusWatcher->cloudLogin());
     q->setIcon(onlineIcon);
     q->setMenu(cloudMenu);
-    disconnect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCLoud), &QAction::trigger);
+    disconnect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
 }
 
 void QnCloudStatusPanelPrivate::updateSystems()

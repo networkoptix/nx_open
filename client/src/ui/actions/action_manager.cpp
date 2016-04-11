@@ -899,7 +899,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+B")).
         autoRepeat(false);
 
-    factory(QnActions::LoginToCLoud).
+    factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
         text(tr("Login to Cloud..."));
 

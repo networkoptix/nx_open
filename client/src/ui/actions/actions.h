@@ -1057,7 +1057,7 @@ public:
         /**
          * Opens Login to Cloud dialog.
          */
-        LoginToCLoud,
+        LoginToCloud,
 
         /**
          * Logs out the user from cloud clearing the stored password.
