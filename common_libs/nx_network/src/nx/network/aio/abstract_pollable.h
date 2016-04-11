@@ -36,6 +36,6 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) = 0;
 };
 
-}   //aio
+}   //namespace aio
 }   //namespace network
 }   //namespace nx
