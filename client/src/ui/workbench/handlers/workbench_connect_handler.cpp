@@ -325,12 +325,6 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     QnEc2ConnectionRequestResult result;
     ec2::ErrorCode errCode = ec2::ErrorCode::ok;
 
-#ifdef QN_DEMO_SHOW
-    /* We surely must not compile client without this define for now */
-    int retryCount = appServerUrl.port() > 0 ? 1 : 50;
-#endif
-
-    for (int i = 0; i < retryCount; ++i)
     {
         m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
             appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply);
@@ -341,17 +335,12 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         errCode = static_cast<ec2::ErrorCode>(result.exec());
         NX_LOG(lit("Connection error %1").arg((int)errCode), cl_logDEBUG2);
 
+        /* Hiding message box from current connect. */
+        hideMessageBox();
+
         /* Check if we have entered 'connect' method again while were in 'connecting...' state */
         if (m_connectingHandle != result.handle())
             return ec2::ErrorCode::ok;
-
-        if (errCode == ec2::ErrorCode::ok)
-            break;
-
-        QThread::msleep(500);
-
-        /* Hiding message box from current connect. */
-        hideMessageBox();
     }
     m_connectingHandle = 0;
 

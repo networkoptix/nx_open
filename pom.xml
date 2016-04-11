@@ -162,7 +162,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines>QN_DEMO_SHOW</global.defines>
+        <global.defines></global.defines>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>

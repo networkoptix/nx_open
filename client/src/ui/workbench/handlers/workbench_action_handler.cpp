@@ -2414,14 +2414,12 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-#ifndef QN_DEMO_SHOW
     QnMessageBox::information(
         mainWindow(),
         tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
            "If you would like to disable this feature you can do so in the System Settings dialog.")
            );
-#endif
 
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();
