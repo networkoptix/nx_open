@@ -197,7 +197,8 @@ class NX_NETWORK_API AbstractCommunicatingSocket
     public AbstractSocket
 {
 public:
-    static const int DEFAULT_TIMEOUT_MILLIS = 3000;
+    constexpr static const int kDefaultTimeoutMillis = 3000;
+    constexpr static const int kNoTimeout = 0;
 
     //!Establish connection to specified foreign address
     /*!
@@ -207,11 +208,11 @@ public:
     */
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS );
+        unsigned int timeoutMillis = kDefaultTimeoutMillis);
     bool connect(
         const SocketAddress& remoteSocketAddress,
         std::chrono::milliseconds timeoutMillis);
@@ -416,7 +417,7 @@ public:
     virtual bool connectWithoutEncryption(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
     //!Do SSL handshake and use encryption on succeeding data exchange
     virtual bool enableClientEncryption() = 0;
 };
