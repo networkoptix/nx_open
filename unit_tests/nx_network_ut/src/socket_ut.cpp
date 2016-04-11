@@ -271,11 +271,11 @@ TEST( Socket, HostNameResolve3 )
 
     {
         HostAddress resolvedAddress;
-        ASSERT_TRUE(
+        EXPECT_TRUE(
             dnsResolver.resolveAddressSync(
                 QLatin1String("ya.ru"),
                 &resolvedAddress) );
-        ASSERT_TRUE(resolvedAddress.ipv4() != 0);
+        EXPECT_TRUE(resolvedAddress.ipv4() != 0);
     }
 
     {
@@ -302,13 +302,15 @@ TEST( Socket, HostNameResolveCancellation )
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
         connection->connectAsync(
             SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
-            [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
+            [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](
+                SystemError::ErrorCode errorCode) mutable
+            {
                 std::unique_lock<std::mutex> lk( mutex );
                 connectErrorCode = errorCode;
                 cond.notify_all();
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
-            } );
+            });
         connection->pleaseStopSync();
     }
 }
@@ -324,10 +326,10 @@ TEST( Socket, BadHostNameResolve )
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
         connection->connectAsync(
             SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
-            [&i, iBak]
-            ( SystemError::ErrorCode /*errorCode*/ ) mutable {
+            [&i, iBak](SystemError::ErrorCode /*errorCode*/) mutable
+            {
                 ASSERT_EQ( i, iBak );
-            } );
+            });
         connection->pleaseStopSync();
     }
 }

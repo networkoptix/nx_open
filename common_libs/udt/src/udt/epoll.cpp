@@ -60,7 +60,131 @@ using namespace std;
 static const int MILLIS_IN_SEC = 1000;
 static const int NSEC_IN_MS = 1000;
 
-CEPoll::CEPoll():
+#ifdef _WIN32
+namespace {
+
+constexpr static const size_t kInitialFdSetSize = 1024;
+constexpr static const size_t kFdSetIncreaseStep = 1024;
+
+typedef struct CustomFdSet
+{
+    u_int fd_count;               /* how many are SET? */
+                                  //!an array of SOCKETs. Actually, this array has size \a PollSetImpl::fdSetSize
+    SOCKET fd_array[kInitialFdSetSize];
+} CustomFdSet;
+
+CustomFdSet* allocFDSet(size_t setSize)
+{
+    //NOTE: SOCKET is a pointer
+    return (CustomFdSet*)malloc(sizeof(CustomFdSet) +
+        sizeof(SOCKET)*(setSize - kInitialFdSetSize));
+}
+
+void freeFDSet(CustomFdSet* fdSet)
+{
+    ::free(fdSet);
+}
+
+/** Reallocs \a fdSet to be of size \a newSize while preseving existing data.
+In case of allocation error \a *fdSet is freed and set to NULL
+*/
+void reallocFDSet(CustomFdSet** fdSet, size_t newSize)
+{
+    CustomFdSet* newSet = allocFDSet(newSize);
+
+    //copying existing data
+    if (*fdSet && newSet)
+    {
+        newSet->fd_count = (*fdSet)->fd_count;
+        memcpy(newSet->fd_array, (*fdSet)->fd_array, (*fdSet)->fd_count*sizeof(*((*fdSet)->fd_array)));
+    }
+
+    freeFDSet(*fdSet);
+    *fdSet = newSet;
+}
+
+void reallocFdSetIfNeeded(
+    size_t desiredSize,
+    size_t* currentCapacity,
+    CustomFdSet** fdSet)
+{
+    if (*currentCapacity < desiredSize)
+    {
+        *currentCapacity = desiredSize + kFdSetIncreaseStep;
+        reallocFDSet(fdSet, *currentCapacity);
+    }
+}
+
+}
+#endif  //_WIN32
+
+
+class CEPollDesc
+{
+public:
+    int m_iID;                                // epoll ID
+    std::set<UDTSOCKET> m_sUDTSocksOut;       // set of UDT sockets waiting for write events
+    std::set<UDTSOCKET> m_sUDTSocksIn;        // set of UDT sockets waiting for read events
+    std::set<UDTSOCKET> m_sUDTSocksEx;        // set of UDT sockets waiting for exceptions
+
+    int m_iLocalID;                           // local system epoll ID
+    std::map<SYSSOCKET, int> m_sLocals;       // map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>
+
+    std::set<UDTSOCKET> m_sUDTWrites;         // UDT sockets ready for write
+    std::set<UDTSOCKET> m_sUDTReads;          // UDT sockets ready for read
+    std::set<UDTSOCKET> m_sUDTExcepts;        // UDT sockets with exceptions (connection broken, etc.)
+
+    CEPollDesc()
+    :
+        m_iID(0),
+        m_iLocalID(0)
+    {
+    }
+};
+
+#ifdef _WIN32
+class CEPollDescWin32
+:
+    public CEPollDesc
+{
+public:
+    CustomFdSet* readfds;
+    size_t readfdsCapacity;
+    CustomFdSet* writefds;
+    size_t writefdsCapacity;
+    CustomFdSet* exceptfds;
+    size_t exceptfdsCapacity;
+
+    CEPollDescWin32()
+    :
+        readfds(allocFDSet(kInitialFdSetSize)),
+        readfdsCapacity(kInitialFdSetSize),
+        writefds(allocFDSet(kInitialFdSetSize)),
+        writefdsCapacity(kInitialFdSetSize),
+        exceptfds(allocFDSet(kInitialFdSetSize)),
+        exceptfdsCapacity(kInitialFdSetSize)
+    {
+    }
+
+    ~CEPollDescWin32()
+    {
+        freeFDSet(readfds);
+        readfds = NULL;
+        freeFDSet(writefds);
+        writefds = NULL;
+        freeFDSet(exceptfds);
+        exceptfds = NULL;
+    }
+
+private:
+    CEPollDescWin32(const CEPollDescWin32&);
+    CEPollDescWin32& operator=(const CEPollDescWin32&);
+};
+#endif
+
+
+CEPoll::CEPoll()
+:
     m_iIDSeed(0)
 {
     CGuard::createMutex(m_EPollLock);
@@ -94,26 +218,30 @@ int CEPoll::create()
     if (++m_iIDSeed >= 0x7FFFFFFF)
         m_iIDSeed = 0;
 
-    CEPollDesc desc;
-    desc.m_iID = m_iIDSeed;
-    desc.m_iLocalID = localid;
-    m_mPolls[desc.m_iID] = desc;
+#ifdef _WIN32
+    auto desc = std::make_unique<CEPollDescWin32>();
+#else
+    auto desc = std::make_unique<CEPollDesc>();
+#endif
+    desc->m_iID = m_iIDSeed;
+    desc->m_iLocalID = localid;
+    m_mPolls[m_iIDSeed] = std::move(desc);
 
-    return desc.m_iID;
+    return m_iIDSeed;
 }
 
 int CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
 {
     CGuard pg(m_EPollLock);
 
-    map<int, CEPollDesc>::iterator p = m_mPolls.find(eid);
+    CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
         throw CUDTException(5, 13);
 
     if (!events || (*events & UDT_EPOLL_IN))
-        p->second.m_sUDTSocksIn.insert(u);
+        p->second->m_sUDTSocksIn.insert(u);
     if (!events || (*events & UDT_EPOLL_OUT))
-        p->second.m_sUDTSocksOut.insert(u);
+        p->second->m_sUDTSocksOut.insert(u);
 
     return 0;
 }
@@ -122,7 +250,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 {
     CGuard pg(m_EPollLock);
 
-    map<int, CEPollDesc>::iterator p = m_mPolls.find(eid);
+    CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
         throw CUDTException(5, 13);
 
@@ -142,7 +270,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
     }
 
     ev.data.fd = s;
-    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
+    if (::epoll_ctl(p->second->m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
         throw CUDTException();
 #elif __APPLE__
     struct kevent ev[2];
@@ -161,12 +289,12 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
     }
 
     //adding new fd to set
-    if (kevent(p->second.m_iLocalID, ev, evCount, NULL, 0, NULL) != 0)
+    if (kevent(p->second->m_iLocalID, ev, evCount, NULL, 0, NULL) != 0)
         throw CUDTException();
 #elif _WIN32
 #endif
 
-    int& eventMask = p->second.m_sLocals[s];
+    int& eventMask = p->second->m_sLocals[s];
     eventMask |= *events;
 
     return 0;
@@ -176,13 +304,13 @@ int CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
 {
     CGuard pg(m_EPollLock);
 
-    map<int, CEPollDesc>::iterator p = m_mPolls.find(eid);
+    CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
         throw CUDTException(5, 13);
 
-    p->second.m_sUDTSocksIn.erase(u);
-    p->second.m_sUDTSocksOut.erase(u);
-    p->second.m_sUDTSocksEx.erase(u);
+    p->second->m_sUDTSocksIn.erase(u);
+    p->second->m_sUDTSocksOut.erase(u);
+    p->second->m_sUDTSocksEx.erase(u);
 
     return 0;
 }
@@ -191,23 +319,23 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 {
     CGuard pg(m_EPollLock);
 
-    map<int, CEPollDesc>::iterator p = m_mPolls.find(eid);
+    CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
         throw CUDTException(5, 13);
 
 #if __linux__
     epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
-    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
+    if (::epoll_ctl(p->second->m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
         throw CUDTException();
 #elif __APPLE__
     struct kevent ev[2];
     EV_SET(&(ev[0]), s, EVFILT_READ, EV_DELETE, 0, 0, NULL);
     EV_SET(&(ev[1]), s, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-    kevent(p->second.m_iLocalID, ev, 2, NULL, 0, NULL);  //ignoring return code, since event is removed in any case
+    kevent(p->second->m_iLocalID, ev, 2, NULL, 0, NULL);  //ignoring return code, since event is removed in any case
 #elif _WIN32
 #endif
 
-    p->second.m_sLocals.erase(s);
+    p->second->m_sLocals.erase(s);
 
     return 0;
 }
@@ -223,10 +351,10 @@ int CEPoll::wait(
         //That is, while we are in this method no calls with same eid are possible
         CGuard lk(m_EPollLock);
 
-        map<int, CEPollDesc>::iterator it = m_mPolls.find(eid);
+        CEPollDescMap::iterator it = m_mPolls.find(eid);
         if (it == m_mPolls.end())
             throw CUDTException(5, 13);
-        epollContext = &it->second;
+        epollContext = it->second.get();
     }
 
 
@@ -298,158 +426,10 @@ int CEPoll::wait(
 
         if (lrfds || lwfds)
         {
-#if __linux__ 
-#   ifndef EPOLLRDHUP
-#       define EPOLLRDHUP 0x2000 /* Android doesn't define EPOLLRDHUP, but it still works if defined properly. */
-#   endif
-
-            const int max_events = 1024;
-            epoll_event ev[max_events];
-            int nfds = ::epoll_wait(epollContext->m_iLocalID, ev, max_events, 0);
-
-            {
-                CGuard lk(m_EPollLock);
-                for (int i = 0; i < nfds; ++i)
-                {
-                    const bool hangup = (ev[i].events & (EPOLLHUP | EPOLLRDHUP)) > 0;
-
-                    if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
-                    {
-                        lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
-                        ++total;
-                    }
-                    if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
-                    {
-                        //hangup - is an error when connecting, so adding error flag just for case
-                        lwfds->emplace(
-                            (SYSSOCKET)ev[i].data.fd,
-                            int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
-                        ++total;
-                    }
-
-                    if (ev[i].events & (EPOLLIN | EPOLLOUT))
-                        continue;
-
-                    //event has not been returned yet
-                    if (lrfds != NULL &&
-                        epollContext->m_sUDTSocksIn.find(ev[i].data.fd) != epollContext->m_sUDTSocksIn.end())
-                    {
-                        lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
-                        ++total;
-                    }
-
-                    if (lwfds != NULL &&
-                        epollContext->m_sUDTSocksOut.find(ev[i].data.fd) != epollContext->m_sUDTSocksOut.end())
-                    {
-                        //hangup - is an error when connecting, so adding error flag just for case
-                        lwfds->emplace(
-                            (SYSSOCKET)ev[i].data.fd,
-                            int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
-                        ++total;
-                    }
-                }
-            }
-#elif __APPLE__
-            static const size_t MAX_EVENTS_TO_READ = 128;
-            struct kevent ev[MAX_EVENTS_TO_READ];
-
-            memset(ev, 0, sizeof(ev));
-            struct timespec timeout;
-            if (msTimeOut >= 0)
-            {
-                memset(&timeout, 0, sizeof(timeout));
-                timeout.tv_sec = msTimeOut / MILLIS_IN_SEC;
-                timeout.tv_nsec = (msTimeOut % MILLIS_IN_SEC) * NSEC_IN_MS;
-            }
-            int nfds = kevent(
-                epollContext->m_iLocalID,
-                NULL,
-                0,
-                ev,
-                MAX_EVENTS_TO_READ,
-                msTimeOut >= 0 ? &timeout : NULL);
-
-            for (int i = 0; i < nfds; ++i)
-            {
-                const bool failure = (ev[i].flags & EV_ERROR) > 0;
-                if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
-                {
-                    lrfds->emplace(
-                        ev[i].ident,
-                        UDT_EPOLL_IN | (failure ? UDT_EPOLL_ERR : 0));
-                    ++total;
-                }
-                if ((NULL != lwfds) && (ev[i].filter == EVFILT_WRITE))
-                {
-                    lwfds->emplace(
-                        ev[i].ident,
-                        UDT_EPOLL_OUT | (failure ? UDT_EPOLL_ERR : 0));
-                    ++total;
-                }
-            }
-#elif _WIN32
-            //currently "select" is used for all non-Linux platforms.
-            //faster approaches can be applied for specific systems in the future.
-
-            //"select" has a limitation on the number of sockets
-
-            //TODO #ak remove limitation on select set size
-            fd_set readfds;
-            fd_set writefds;
-            fd_set exceptfds;
-            FD_ZERO(&readfds);
-            FD_ZERO(&writefds);
-            FD_ZERO(&exceptfds);
-
-            for (map<SYSSOCKET, int>::const_iterator i = epollContext->m_sLocals.begin(); i != epollContext->m_sLocals.end(); ++i)
-            {
-                if (lrfds && (i->second & UDT_EPOLL_IN) > 0)
-                    FD_SET(i->first, &readfds);
-                if (lwfds && (i->second & UDT_EPOLL_OUT) > 0)
-                    FD_SET(i->first, &writefds);
-                FD_SET(i->first, &exceptfds);
-            }
-
-            timeval tv;
-            memset(&tv, 0, sizeof(tv));
-
-            const int eventCount = ::select(
-                0,
-                readfds.fd_count > 0 ? &readfds : NULL,
-                writefds.fd_count > 0 ? &writefds : NULL,
-                exceptfds.fd_count > 0 ? &exceptfds : NULL,
-                &tv);
+            const int eventCount = doSystemPoll(epollContext, lrfds, lwfds);
             if (eventCount < 0)
                 return -1;
-            if (eventCount > 0)
-            {
-                //TODO #ak use win32-specific select features to get O(1) here
-                for (map<SYSSOCKET, int>::const_iterator
-                    i = epollContext->m_sLocals.begin();
-                    i != epollContext->m_sLocals.end();
-                    ++i)
-                {
-                    if (FD_ISSET(i->first, &exceptfds))
-                    {
-                        if (lrfds)
-                            (*lrfds)[i->first] = UDT_EPOLL_ERR;
-                        if (lwfds)
-                            (*lwfds)[i->first] = UDT_EPOLL_ERR;
-                    }
-
-                    if (lrfds && FD_ISSET(i->first, &readfds))
-                    {
-                        (*lrfds)[i->first] |= UDT_EPOLL_IN;
-                        ++total;
-                    }
-                    if (lwfds && FD_ISSET(i->first, &writefds))
-                    {
-                        (*lwfds)[i->first] |= UDT_EPOLL_OUT;
-                        ++total;
-                    }
-                }
-            }
-#endif
+            total += eventCount;
         }
 
         if (total > 0)
@@ -469,7 +449,7 @@ int CEPoll::release(const int eid)
 {
     CGuard pg(m_EPollLock);
 
-    map<int, CEPollDesc>::iterator i = m_mPolls.find(eid);
+    CEPollDescMap::iterator i = m_mPolls.find(eid);
     if (i == m_mPolls.end())
         throw CUDTException(5, 13);
 
@@ -515,11 +495,11 @@ int CEPoll::update_events(const UDTSOCKET& uid, const std::set<int>& eids, int e
         else
         {
             if ((events & UDT_EPOLL_IN) != 0)
-                update_epoll_sets(uid, p->second.m_sUDTSocksIn, p->second.m_sUDTReads, enable);
+                update_epoll_sets(uid, p->second->m_sUDTSocksIn, p->second->m_sUDTReads, enable);
             if ((events & UDT_EPOLL_OUT) != 0)
-                update_epoll_sets(uid, p->second.m_sUDTSocksOut, p->second.m_sUDTWrites, enable);
+                update_epoll_sets(uid, p->second->m_sUDTSocksOut, p->second->m_sUDTWrites, enable);
             if ((events & UDT_EPOLL_ERR) != 0)
-                update_epoll_sets(uid, p->second.m_sUDTSocksEx, p->second.m_sUDTExcepts, enable);
+                update_epoll_sets(uid, p->second->m_sUDTSocksEx, p->second->m_sUDTExcepts, enable);
         }
     }
     lk.unlock();
@@ -532,11 +512,201 @@ int CEPoll::update_events(const UDTSOCKET& uid, const std::set<int>& eids, int e
 void CEPoll::RemoveEPollEvent(UDTSOCKET socket)
 {
     CGuard pg(m_EPollLock);
-    map<int, CEPollDesc>::iterator p;
+    CEPollDescMap::iterator p;
     for (p = m_mPolls.begin(); p != m_mPolls.end(); ++p)
     {
-        p->second.m_sUDTReads.erase(socket);
-        p->second.m_sUDTWrites.erase(socket);
-        p->second.m_sUDTExcepts.erase(socket);
+        p->second->m_sUDTReads.erase(socket);
+        p->second->m_sUDTWrites.erase(socket);
+        p->second->m_sUDTExcepts.erase(socket);
     }
 }
+
+#if __linux__ 
+#   ifndef EPOLLRDHUP
+#       define EPOLLRDHUP 0x2000 /* Android doesn't define EPOLLRDHUP, but it still works if defined properly. */
+#   endif
+
+int CEPoll::doSystemPoll(
+    CEPollDesc* epollContext,
+    std::map<SYSSOCKET, int>* lrfds,
+    std::map<SYSSOCKET, int>* lwfds)
+{
+    const int max_events = 1024;
+    epoll_event ev[max_events];
+    int nfds = ::epoll_wait(epollContext->m_iLocalID, ev, max_events, 0);
+
+    CGuard lk(m_EPollLock);
+    int total = 0;
+    for (int i = 0; i < nfds; ++i)
+    {
+        const bool hangup = (ev[i].events & (EPOLLHUP | EPOLLRDHUP)) > 0;
+
+        if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
+        {
+            lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
+            ++total;
+        }
+        if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
+        {
+            //hangup - is an error when connecting, so adding error flag just for case
+            lwfds->emplace(
+                (SYSSOCKET)ev[i].data.fd,
+                int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
+            ++total;
+        }
+
+        if (ev[i].events & (EPOLLIN | EPOLLOUT))
+            continue;
+
+        //event has not been returned yet
+        if (lrfds != NULL &&
+            epollContext->m_sUDTSocksIn.find(ev[i].data.fd) != epollContext->m_sUDTSocksIn.end())
+        {
+            lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
+            ++total;
+        }
+
+        if (lwfds != NULL &&
+            epollContext->m_sUDTSocksOut.find(ev[i].data.fd) != epollContext->m_sUDTSocksOut.end())
+        {
+            //hangup - is an error when connecting, so adding error flag just for case
+            lwfds->emplace(
+                (SYSSOCKET)ev[i].data.fd,
+                int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
+            ++total;
+        }
+    }
+
+    return total;
+}
+
+#elif __APPLE__
+
+int CEPoll::doSystemPoll(
+    CEPollDesc* epollContext,
+    std::map<SYSSOCKET, int>* lrfds,
+    std::map<SYSSOCKET, int>* lwfds)
+{
+    static const size_t MAX_EVENTS_TO_READ = 128;
+    struct kevent ev[MAX_EVENTS_TO_READ];
+
+    memset(ev, 0, sizeof(ev));
+    struct timespec timeout;
+    if (msTimeOut >= 0)
+    {
+        memset(&timeout, 0, sizeof(timeout));
+        timeout.tv_sec = msTimeOut / MILLIS_IN_SEC;
+        timeout.tv_nsec = (msTimeOut % MILLIS_IN_SEC) * NSEC_IN_MS;
+    }
+    int nfds = kevent(
+        epollContext->m_iLocalID,
+        NULL,
+        0,
+        ev,
+        MAX_EVENTS_TO_READ,
+        msTimeOut >= 0 ? &timeout : NULL);
+
+    for (int i = 0; i < nfds; ++i)
+    {
+        const bool failure = (ev[i].flags & EV_ERROR) > 0;
+        if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
+        {
+            lrfds->emplace(
+                ev[i].ident,
+                UDT_EPOLL_IN | (failure ? UDT_EPOLL_ERR : 0));
+        }
+        if ((NULL != lwfds) && (ev[i].filter == EVFILT_WRITE))
+        {
+            lwfds->emplace(
+                ev[i].ident,
+                UDT_EPOLL_OUT | (failure ? UDT_EPOLL_ERR : 0));
+        }
+    }
+    return nfds;
+}
+
+#elif _WIN32
+
+int CEPoll::doSystemPoll(
+    CEPollDesc* epollContextOriginal,
+    std::map<SYSSOCKET, int>* lrfds,
+    std::map<SYSSOCKET, int>* lwfds)
+{
+    CEPollDescWin32* epollContext = static_cast<CEPollDescWin32*>(epollContextOriginal);
+
+    epollContext->readfds->fd_count = 0;
+    epollContext->writefds->fd_count = 0;
+    epollContext->exceptfds->fd_count = 0;
+
+    reallocFdSetIfNeeded(
+        epollContext->m_sLocals.size(),
+        &epollContext->readfdsCapacity,
+        &epollContext->readfds);
+    reallocFdSetIfNeeded(
+        epollContext->m_sLocals.size(),
+        &epollContext->writefdsCapacity,
+        &epollContext->writefds);
+    reallocFdSetIfNeeded(
+        epollContext->m_sLocals.size(),
+        &epollContext->exceptfdsCapacity,
+        &epollContext->exceptfds);
+
+    for (const std::pair<SYSSOCKET, int>& fdAndEventMask: epollContext->m_sLocals)
+    {
+        if (lrfds && (fdAndEventMask.second & UDT_EPOLL_IN) > 0)
+        {
+            epollContext->readfds->fd_array[epollContext->readfds->fd_count++]
+                = fdAndEventMask.first;
+        }
+        if (lwfds && (fdAndEventMask.second & UDT_EPOLL_OUT) > 0)
+        {
+            epollContext->writefds->fd_array[epollContext->writefds->fd_count++]
+                = fdAndEventMask.first;
+        }
+        epollContext->exceptfds->fd_array[epollContext->exceptfds->fd_count++]
+            = fdAndEventMask.first;
+    }
+
+    timeval tv;
+    memset(&tv, 0, sizeof(tv));
+
+    const int eventCount = ::select(
+        0,
+        epollContext->readfds->fd_count > 0
+            ? reinterpret_cast<fd_set*>(epollContext->readfds)
+            : NULL,
+        epollContext->writefds->fd_count > 0
+            ? reinterpret_cast<fd_set*>(epollContext->writefds)
+            : NULL,
+        epollContext->exceptfds->fd_count > 0
+            ? reinterpret_cast<fd_set*>(epollContext->exceptfds)
+            : NULL,
+        &tv);
+    if (eventCount < 0)
+        return -1;
+    //select sets fd_count to number of sockets triggered and 
+        //moves those descriptors to the beginning of fd_array
+    if (eventCount == 0)
+        return eventCount;
+
+    //using win32-specific select features to get O(1) here
+    for (size_t i = 0; i < epollContext->readfds->fd_count; ++i)
+        (*lrfds)[epollContext->readfds->fd_array[i]] = UDT_EPOLL_IN;
+    for (size_t i = 0; i < epollContext->writefds->fd_count; ++i)
+        (*lwfds)[epollContext->writefds->fd_array[i]] = UDT_EPOLL_OUT;
+    for (size_t i = 0; i < epollContext->exceptfds->fd_count; ++i)
+    {
+        if (lrfds)
+            (*lrfds)[epollContext->exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+        if (lwfds)
+            (*lwfds)[epollContext->exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+    }
+
+    return eventCount;
+}
+
+#else
+
+#error "Missing CEPoll::doSystemPoll() implementation for the current platform"
+
+#endif
