@@ -44,6 +44,11 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
+
     virtual int getPriority() const override;
     /** Only one connect can be running at a time. */
     virtual void connect(
