@@ -15,6 +15,12 @@
 #include <nx/network/http/http_parser.h>
 #include <nx/network/http/http_serializer.h>
 
+
+namespace stree
+{
+    class ResourceContainer;
+}   //stree
+
 namespace nx_http
 {
     class AbstractAuthenticationManager;
@@ -52,6 +58,9 @@ namespace nx_http
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;
 
+        bool authenticateRequest(
+            const nx_http::Request& request,
+            stree::ResourceContainer* const authInfo);
         void prepareAndSendResponse(
             nx_http::MimeProtoVersion version,
             nx_http::Message&& response,
@@ -67,6 +76,6 @@ namespace nx_http
     };
 
     typedef std::weak_ptr<HttpServerConnection> HttpServerConnectionPtr;
-}
+}   //nx_http
 
 #endif  //HTTP_SERVER_CONNECTION_H

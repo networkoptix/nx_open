@@ -2000,14 +2000,41 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     }
 }
 
-void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction) {
+void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction)
+{
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
     if (workbench()->currentLayout()->isSearchLayout())
         return;
 
-    if (QnResourcePtr resource = qnResPool->getResourceById(businessAction->getParams().actionResourceId)) {
+    /*
+     * We are displaying notifications in the two use cases:
+     * on ShowOnAlarmLayoutAction and on ShowPopupAction (including prolonged PlaySoundAction as its subtype).
+     * In first case we got at_notificationsHandler_businessActionAdded called once for each camera, that
+     * should be displayed on the alarm layout (including source cameras and custom cameras if required).
+     * In second case we should manually collect resources from event sources.
+     */
+    QSet<QnResourcePtr> targetResources;
+    QnBusiness::ActionType actionType = businessAction->actionType();
+    if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
+    {
+        if (QnResourcePtr resource = qnResPool->getResourceById(businessAction->getParams().actionResourceId))
+            targetResources.insert(resource);
+    }
+    else
+    {
+        Q_ASSERT_X(actionType == QnBusiness::ShowPopupAction || actionType == QnBusiness::PlaySoundAction,
+            Q_FUNC_INFO, "Invalid action type");
+        QnBusinessEventParameters eventParams = businessAction->getRuntimeParams();
+        if (QnResourcePtr resource = qnResPool->getResourceById(eventParams.eventResourceId))
+            targetResources.insert(resource);
+        if (eventParams.eventType >= QnBusiness::UserDefinedEvent)
+            targetResources.unite(qnResPool->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
+    }
+
+    for (const QnResourcePtr &resource: targetResources)
+    {
         for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
             executeDelayed([this, resource, businessAction]{
                 showSplashOnResource(resource, businessAction);

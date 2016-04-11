@@ -4,6 +4,7 @@
 #include <QtGui/QRegion>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
+#include <QtCore/QSize>
 
 #include <core/resource/resource_fwd.h>
 #include "core/resource/resource_media_layout.h"
@@ -74,7 +75,7 @@ public:
     /*!
         \param fastSwitch Do not wait for next I-frame of new stream, but give data starting with previous I-frame
     */
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch) { Q_UNUSED(quality); Q_UNUSED(fastSwitch); return false; }
+    virtual bool setQuality(MediaQuality /*quality*/, bool /*fastSwitch*/, const QSize& /*resolution*/ ) {  return false; }
 
     Flags getFlags() const { return m_flags; }
     virtual bool isRealTimeSource() const { return false; }

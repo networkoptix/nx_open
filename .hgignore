@@ -1,6 +1,7 @@
 syntax: glob
 ecs.db-shm
 ecs.db-wal
+*.swp
 *.cache
 *make.cache
 *-build*

@@ -135,6 +135,8 @@ public:
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
+    std::chrono::seconds proxyConnectTimeout() const;
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -215,6 +217,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeoutAdaptor;
+    /** seconds */
+    QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor;
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;

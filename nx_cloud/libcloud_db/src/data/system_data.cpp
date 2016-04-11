@@ -28,6 +28,11 @@ bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*valu
 ////////////////////////////////////////////////////////////
 //// class SystemData
 ////////////////////////////////////////////////////////////
+SystemData::SystemData()
+:
+    expirationTimeUtc(0)
+{
+}
 
 bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
@@ -35,6 +40,9 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
     {
         case attr::systemID:
             *value = QString::fromStdString(id);
+            return true;
+        case attr::systemStatus:
+            *value = static_cast<int>(status);
             return true;
         default:
             return false;
@@ -80,6 +88,16 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
             return false;
     }
 }
+
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemRegistrationData)(SystemSharing)(SystemID),
+    (sql_record),
+    _Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemData),
+    (sql_record),
+    _FieldsEx);
 
 }   //data
 }   //cdb

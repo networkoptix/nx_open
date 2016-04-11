@@ -18,6 +18,7 @@ class NX_NETWORK_API IncomingTunnelPool
 {
 public:
     IncomingTunnelPool(aio::AbstractAioThread* ioThread, size_t acceptLimit);
+    ~IncomingTunnelPool();
 
     /** Saves and accepts \param connection until it's exhausted */
     void addNewTunnel(std::unique_ptr<AbstractIncomingTunnelConnection> connection);

@@ -264,6 +264,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             rtspStreamReader->setUserAgent(QnAppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
+            rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
         else if( mediaUrl.scheme().toLower() == lit("http") )

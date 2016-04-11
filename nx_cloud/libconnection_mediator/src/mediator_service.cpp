@@ -154,7 +154,8 @@ int MediatorProcess::executeApplication()
 
     NX_LOG(lit("STUN Server is listening on %1")
         .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-    std::cout << QnLibConnectionMediatorAppInfo::applicationDisplayName().data() << " has been started" << std::endl;
+    std::cout << QnLibConnectionMediatorAppInfo::applicationDisplayName().toStdString()
+        << " has been started" << std::endl;
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();

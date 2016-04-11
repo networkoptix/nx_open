@@ -21,12 +21,14 @@ enum Value
     //source data attributes
     accountID,
     accountEmail,
-    systemID,
     ha1,
     userName,
     userPassword,
     accountStatus,
     systemAccessRole,
+
+    systemID,
+    systemStatus,   /** int */
 
     dataAccountRightsOnSystem,
 
@@ -36,11 +38,11 @@ enum Value
     authAccountRightsOnSystem,
     authAccountEmail,
     authSystemID,
-    //!Operation data contains accountID equal to the one been authenticated
+    /** Operation data contains accountID equal to the one been authenticated */
     authSelfAccountAccessRequested,
-    //!Operation data contains systemID equal to the one been authenticated
+    /** Operation data contains systemID equal to the one been authenticated */
     authSelfSystemAccessRequested,
-    //!request has been authenticated by code sent to account email
+    /** request has been authenticated by code sent to account email */
     authenticatedByEmailCode,
     resultCode,
 
@@ -53,7 +55,7 @@ enum Value
 
     requestPath
 };
-}
+}   //attr
 
 //!Contains description of stree attributes used by cloud_db
 class CdbAttrNameSet

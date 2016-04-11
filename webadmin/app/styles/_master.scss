@@ -35,7 +35,7 @@
 }
 
 .master .master-controls{
-  margin-top:50px;
+  margin-top:24px;
 }
 .master form{
   width: 240px;
@@ -55,28 +55,7 @@
   text-align: left;
 }
 
-.ui-select-bootstrap > .btn-default-focus > .btn,
-.ui-select-bootstrap > .ui-select-match > .btn{
-  background-color: $input-bg;
-  border-color: $input-border;
-  color: $input-color;
-  font-weight: normal;
-}
-.ui-select-bootstrap .ui-select-choices-row>a{
-  padding-left: 7px;
-  padding-right: 7px;
-}
 
-
-/* touched, invalid - highlight with red */
-.ui-select-container.ng-invalid.ng-touched .btn{
-  border-color: $state-danger-text;
-}
-
-/* touched, but focused - not highlight with red */
-.ui-select-container > .btn-default-focus > .btn{
-  border-color: $input-border !important;
-}
 
 .master .alert{
   padding:10px;
@@ -101,3 +80,53 @@ a.external,
 a.external:hover{
   text-decoration: underline;
 }
+
+
+.master-success .glyphicon.glyphicon-cloud{
+  @include kill-glyphicon;
+  width: 64px;
+  height: 64px;
+  background-position: 0px -90px;
+}
+
+.master-success .glyphicon.glyphicon-ok{
+  @include kill-glyphicon;
+  width:88px;
+  height: 88px;
+  background-position: 0px 0px;
+}
+
+.master-success .glyphicon.glyphicon-remove-circle{
+  @include kill-glyphicon;
+  width:16px;
+  height: 16px;
+  background-position: -88px 0px;
+}
+
+
+.master .glyphicon.glyphicon-arrow-left{
+  @include kill-glyphicon;
+  width: 20px;
+  height: 12px;
+  background-position: -64px -88px;
+
+}
+
+.master .glyphicon.glyphicon-arrow-right{
+  @include kill-glyphicon;
+  width:20px;
+  height: 12px;
+  background-position: -64px -100px;
+
+}
+
+.master-success .preloader{
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-size: 66px 14px;
+
+  margin-bottom: 20px;
+  width: 66px;
+  height: 14px;
+}
+

@@ -291,6 +291,12 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         case QnMergeSystemsTool::SafeModeError:
             message = tr("System is in safe mode.");
             break;
+        case QnMergeSystemsTool::ConfigurationError:
+            message = tr("Cloud not configure remote system");
+            break;
+        case QnMergeSystemsTool::BothSystemsBoundToCloudError:
+            message = tr("Both systems are bound to the cloud");
+            break;
         default:
             break;
         }

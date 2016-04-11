@@ -383,7 +383,7 @@ QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
     m_userAgent(nx_http::userAgentString()),
-    m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
+    m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -607,6 +607,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
+
     m_SessionId.clear();
     m_responseCode = CODE_OK;
     m_url = url;
@@ -663,6 +664,10 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
+
+    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
+    if (!tmp.isEmpty())
+        m_contentBase = tmp;
 
     tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
     if (!tmp.isEmpty())
@@ -760,10 +765,18 @@ QByteArray QnRtspClient::calcDefaultNonce() const
 #if 1
 void QnRtspClient::addAuth( nx_http::Request* const request )
 {
-    QnClientAuthHelper::addAuthorizationToRequest(
-        m_auth,
-        request,
-        &m_rtspAuthCtx );   //ignoring result
+    if(m_defaultAuthScheme != nx_http::header::AuthScheme::automatic)
+    {
+        QnClientAuthHelper::addAuthorizationToRequest(
+            m_auth,
+            request,
+            &m_rtspAuthCtx );   //ignoring result
+    }
+    else
+    {
+        m_defaultAuthScheme = nx_http::header::AuthScheme::basic;
+        m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
+    }
 }
 #else
 void QnRtspClient::addAuth(QByteArray& request)
@@ -992,18 +1005,23 @@ bool QnRtspClient::sendSetup()
 #else
 
         nx_http::Request request;
+        auto setupUrl = trackInfo->setupURL == "*" ?
+            QUrl() : QUrl(QString::fromLatin1(trackInfo->setupURL));
+
         request.requestLine.method = "SETUP";
-        if( trackInfo->setupURL.startsWith("rtsp://") )
+        if( setupUrl.isRelative() )
         {
-            // full track url in a prefix
-            request.requestLine.url = QString::fromLatin1(trackInfo->setupURL);
+            // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
+            request.requestLine.url = m_contentBase
+                    + ((m_contentBase.endsWith(lit("/")) || setupUrl.isEmpty()) ? lit("") : lit("/"))
+                    + setupUrl.toString();
         }
         else
         {
-            request.requestLine.url = m_url;
-            // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
-            request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
+            // full track url in a prefix
+            request.requestLine.url = setupUrl;//QString::fromLatin1(trackInfo->setupURL);
         }
+
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         addCommonHeaders(request.headers);
 
@@ -1855,7 +1873,6 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
 {
     int prevStatusCode = nx_http::StatusCode::ok;
-
     if (m_rtspAuthCtx.authenticateHeader)
         addAuth( &request );
     addAdditionAttrs( &request );

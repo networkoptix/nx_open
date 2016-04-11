@@ -21,6 +21,12 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     // Do nothing.
 }    
 
+void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, CodecID dstCodec)
+{
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(dstCodec));
+    m_videoTranscoder->setResolution(dstVideSize);
+}
+
 void QnRtspFfmpegEncoder::init()
 { 
     m_contextSent.reset();
@@ -46,8 +52,25 @@ QnConstMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compress
     return result;
 }
 
+QnConstAbstractMediaDataPtr QnRtspFfmpegEncoder::transcodeVideoPacket(QnConstAbstractMediaDataPtr media)
+{
+    QnAbstractMediaDataPtr transcodedMedia;
+    m_videoTranscoder->transcodePacket(media, &transcodedMedia);
+    if (!transcodedMedia)
+        return QnConstAbstractMediaDataPtr();
+    transcodedMedia->opaque = media->opaque;
+    if (media->flags & QnAbstractMediaData::MediaFlags_LIVE)
+        transcodedMedia->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+    return transcodedMedia;
+}
+
 void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
+    if (m_videoTranscoder && media->dataType == QnAbstractMediaData::VIDEO)
+        media = transcodeVideoPacket(media);
+    if (!media)
+        return;
+
     m_media = media;
     m_curDataBuffer = media->data();
     m_codecCtxData.clear();

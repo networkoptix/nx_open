@@ -61,7 +61,7 @@ public:
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) override;
     virtual QnTimePeriod getPlaybackRange() const override;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
-    virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) override;
     virtual MediaQuality getQuality() const override;
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
@@ -127,7 +127,6 @@ private:
     void setReverseMode(bool value, qint64 currentTimeHint = AV_NOPTS_VALUE);
     bool isCompatiblePacketForMask(const QnAbstractMediaDataPtr& mediaData) const;
 private slots:
-    void onDelegateChangeQuality(MediaQuality quality);
 private:
     int m_selectedAudioChannel;
     bool m_eof;
@@ -168,8 +167,10 @@ private:
     QnPlaybackMaskHelper m_playbackMaskHelper;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
+    QSize m_customResolution;
     MediaQuality m_oldQuality;
     bool m_oldQualityFastSwitch;
+    QSize m_oldResolution;
     bool m_isStillImage;
     double m_speed;
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];

@@ -79,6 +79,24 @@ const int CUDT::m_iSYNInterval = 10000;
 const int CUDT::m_iSelfClockInterval = 64;
 
 
+// Mimimum recv flight flag size is 32 packets
+constexpr const int kMinRecvWindowSize = 32;
+constexpr const int kDefaultRecvWindowSize = 25600;
+
+// Mimimum recv buffer size is 32 packets
+constexpr const int kMinRecvBufferSize = 32;
+//Rcv buffer MUST NOT be bigger than Flight Flag size
+constexpr const int kDefaultRecvBufferSize = 
+    kDefaultRecvWindowSize < 8192
+    ? kDefaultRecvWindowSize
+    : 8192;
+
+constexpr const int kDefaultSendBufferSize =
+    kDefaultRecvWindowSize < 8192
+    ? kDefaultRecvWindowSize
+    : 8192;
+
+
 CUDT::CUDT()
 {
    m_pSndBuffer = NULL;
@@ -102,12 +120,12 @@ CUDT::CUDT()
    m_iMSS = kDefaultMtuSize;
    m_bSynSending = true;
    m_bSynRecving = true;
-   m_iFlightFlagSize = 25600;
-   m_iSndBufSize = 8192;
-   m_iRcvBufSize = 8192; //Rcv buffer MUST NOT be bigger than Flight Flag size
+   m_iFlightFlagSize = kDefaultRecvWindowSize;
+   m_iSndBufSize = kDefaultSendBufferSize;
+   m_iRcvBufSize = kDefaultRecvBufferSize;
    m_Linger.l_onoff = 1;
    m_Linger.l_linger = 180;
-   m_iUDPSndBufSize = 65536;
+   m_iUDPSndBufSize = 65536;    //TODO #ak why it is not calculated somehow?
    m_iUDPRcvBufSize = m_iRcvBufSize * m_iMSS;
    m_iSockType = UDT_STREAM;
    m_iIPversion = AF_INET;
@@ -259,11 +277,10 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
       if (*(int*)optval < 1)
          throw CUDTException(5, 3);
 
-      // Mimimum recv flight flag size is 32 packets
-      if (*(int*)optval > 32)
+      if (*(int*)optval > kDefaultRecvWindowSize)
          m_iFlightFlagSize = *(int*)optval;
       else
-         m_iFlightFlagSize = 32;
+         m_iFlightFlagSize = kDefaultRecvWindowSize;
 
       break;
 
@@ -275,7 +292,6 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
          throw CUDTException(5, 3, 0);
 
       m_iSndBufSize = *(int*)optval / (m_iMSS - 28);
-
       break;
 
    case UDT_RCVBUF:
@@ -285,11 +301,10 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
       if (*(int*)optval <= 0)
          throw CUDTException(5, 3, 0);
 
-      // Mimimum recv buffer size is 32 packets
-      if (*(int*)optval > (m_iMSS - 28) * 32)
+      if (*(int*)optval > (m_iMSS - 28) * kMinRecvBufferSize)
          m_iRcvBufSize = *(int*)optval / (m_iMSS - 28);
       else
-         m_iRcvBufSize = 32;
+         m_iRcvBufSize = kMinRecvBufferSize;
 
       // recv buffer MUST not be greater than FC size
       if (m_iRcvBufSize > m_iFlightFlagSize)

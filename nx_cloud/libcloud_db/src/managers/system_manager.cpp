@@ -5,6 +5,8 @@
 
 #include "system_manager.h"
 
+#include <limits>
+
 #include <QtSql/QSqlQuery>
 
 #include <nx/network/http/auth_tools.h>
@@ -15,9 +17,10 @@
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
-#include "account_manager.h"
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
+#include "account_manager.h"
+#include "settings.h"
 #include "stree/cdb_ns.h"
 
 
@@ -25,19 +28,34 @@ namespace nx {
 namespace cdb {
 
 SystemManager::SystemManager(
+    const conf::Settings& settings,
+    TimerManager* const timerManager,
     const AccountManager& accountManager,
-    nx::db::DBManager* const dbManager) throw(std::runtime_error)
+    nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
 :
+    m_settings(settings),
+    m_timerManager(timerManager),
     m_accountManager(accountManager),
-    m_dbManager(dbManager)
+    m_dbManager(dbManager),
+    m_dropSystemsTimerId(0),
+    m_dropExpiredSystemsTaskStillRunning(false)
 {
     //pre-filling cache
     if (fillCache() != db::DBResult::ok)
         throw std::runtime_error("Failed to pre-load systems cache");
+
+    using namespace std::placeholders;
+    m_dropSystemsTimerId =
+        m_timerManager->addNonStopTimer(
+            std::bind(&SystemManager::dropExpiredSystems, this, _1),
+            m_settings.systemManager().dropExpiredSystemsPeriod,
+            std::chrono::seconds::zero());
 }
 
 SystemManager::~SystemManager()
 {
+    m_timerManager->joinAndDeleteTimer(m_dropSystemsTimerId);
+
     m_startedAsyncCallsCounter.wait();
 }
 
@@ -46,9 +64,9 @@ void SystemManager::authenticateByName(
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& /*authSearchInputData*/,
     stree::ResourceContainer* const authProperties,
-    std::function<void(bool)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
-    bool result = false;
+    api::ResultCode result = api::ResultCode::notAuthorized;
     auto scopedGuard = makeScopedGuard(
         [&completionHandler, &result]() {
             completionHandler(result);
@@ -56,36 +74,49 @@ void SystemManager::authenticateByName(
 
     QnMutexLocker lk(&m_mutex);
 
-    auto systemData = m_cache.find(std::string(username.constData(), username.size()));
-    if (!systemData)
+    auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+    const auto systemIter = systemByIdIndex.find(
+        std::string(username.constData(), username.size()));
+    if (systemIter == systemByIdIndex.end())
         return;
 
-    if (!validateHa1Func(nx_http::calcHa1(
-            username,
-            AuthenticationManager::realm(),
-            nx::String(systemData->authKey.c_str()))))
+    if (systemIter->status == api::SystemStatus::ssDeleted)
+    {
+        if (systemIter->expirationTimeUtc > ::time(NULL) ||
+            m_settings.systemManager().controlSystemStatusByDb) //system not expired yet
+        {
+            result = api::ResultCode::credentialsRemovedPermanently;
+        }
+        return;
+    }
+
+    if (!validateHa1Func(
+            nx_http::calcHa1(
+                username,
+                AuthenticationManager::realm(),
+                nx::String(systemIter->authKey.c_str()))))
     {
         return;
     }
 
     authProperties->put(
         cdb::attr::authSystemID,
-        QString::fromStdString(systemData->id));
+        QString::fromStdString(systemIter->id));
 
-    m_cache.atomicUpdate(
-        systemData->id,
+    systemByIdIndex.modify(
+        systemIter,
         [](data::SystemData& system){ system.status = api::SystemStatus::ssActivated; });
 
     using namespace std::placeholders;
 
     m_dbManager->executeUpdate<std::string>(
         std::bind(&SystemManager::activateSystem, this, _1, _2),
-        std::move(systemData->id),
+        systemIter->id,
         std::bind(&SystemManager::systemActivated, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             _1, _2, [](api::ResultCode){}));
 
-    result = true;
+    result = api::ResultCode::ok;
 }
 
 void SystemManager::bindSystemToAccount(
@@ -119,10 +150,10 @@ void SystemManager::unbindSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemID>(
-        std::bind(&SystemManager::deleteSystemFromDB, this, _1, _2),
-        std::move(systemID),
-        std::bind(&SystemManager::systemDeleted,
+    m_dbManager->executeUpdate<std::string>(
+        std::bind(&SystemManager::markSystemAsDeleted, this, _1, _2),
+        std::move(systemID.systemID),
+        std::bind(&SystemManager::systemMarkedAsDeleted,
                     this, m_startedAsyncCallsCounter.getScopedIncrement(),
                     _1, _2, std::move(completionHandler)));
 }
@@ -150,6 +181,9 @@ void SystemManager::getSystems(
     data::DataFilter filter,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
 {
+    //always providing only activated systems
+    filter.rc().put(attr::systemStatus, api::SystemStatus::ssActivated);
+
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
@@ -158,38 +192,49 @@ void SystemManager::getSystems(
     auto systemID = wholeFilterMap.get<std::string>(cdb::attr::authSystemID);
     if (!systemID)
         systemID = wholeFilterMap.get<std::string>(cdb::attr::systemID);
+
+    QnMutexLocker lk(&m_mutex);
+    const auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
     if (systemID)
     {
         //selecting system by id
-        auto system = m_cache.find(systemID.get());
-        if (!system || !applyFilter(system.get(), filter))
+        auto systemIter = systemByIdIndex.find(systemID.get());
+        if ((systemIter == systemByIdIndex.end()) ||
+            !applyFilter(*systemIter, filter))
+        {
+            lk.unlock();
             return completionHandler(api::ResultCode::notFound, resultData);
-        resultData.systems.emplace_back(std::move(system.get()));
+        }
+        resultData.systems.emplace_back(*systemIter);
     }
     else if (accountEmail)
     {
-        QnMutexLocker lk(&m_mutex);
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<INDEX_BY_ACCOUNT_EMAIL>();
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<SHARING_BY_ACCOUNT_EMAIL>();
         const auto accountSystemsRange = accountIndex.equal_range(accountEmail.get());
         for (auto it = accountSystemsRange.first; it != accountSystemsRange.second; ++it)
         {
-            auto system = m_cache.find(it->systemID);
-            if (system)
-                resultData.systems.push_back(system.get());
+            auto systemIter = systemByIdIndex.find(it->systemID);
+            if ((systemIter != systemByIdIndex.end()) &&
+                applyFilter(*systemIter, filter))
+            {
+                resultData.systems.push_back(*systemIter);
+            }
         }
     }
     else
     {
         //filtering full system list
-        m_cache.forEach(
-            [&](const std::pair<const std::string, data::SystemData>& data) {
-                if (applyFilter(data.second, filter))
-                    resultData.systems.push_back(data.second);
-            });
+        for (const auto& system: systemByIdIndex)
+        {
+            if (applyFilter(system, filter))
+                resultData.systems.push_back(system);
+        }
     }
+    lk.unlock();
 
     if (accountEmail)
     {
+        //returning rights account has for each system
         for (auto& systemDataEx: resultData.systems)
         {
             const auto accountData = 
@@ -242,7 +287,7 @@ void SystemManager::getCloudUsersOfSystem(
     if (systemID)
     {
         //selecting all sharings of system id
-        const auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
+        const auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
         const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
         for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
         {
@@ -254,7 +299,7 @@ void SystemManager::getCloudUsersOfSystem(
     else
     {
         //selecting sharings for every system account has access to
-        const auto& accountIndex = m_accountAccessRoleForSystem.get<INDEX_BY_ACCOUNT_EMAIL>();
+        const auto& accountIndex = m_accountAccessRoleForSystem.get<SHARING_BY_ACCOUNT_EMAIL>();
         const auto accountsSystemsRange = accountIndex.equal_range(accountEmail);
         for (auto accountIter = accountsSystemsRange.first;
              accountIter != accountsSystemsRange.second;
@@ -268,7 +313,7 @@ void SystemManager::getCloudUsersOfSystem(
                 //no access to system's sharing list is allowed for this account
                 continue;
             }
-            const auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
+            const auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
             const auto systemSharingRange = systemIndex.equal_range(accountIter->systemID);
             for (auto sharingIter = systemSharingRange.first;
                  sharingIter != systemSharingRange.second;
@@ -324,18 +369,13 @@ void SystemManager::getAccessRoleList(
         std::move(resultData));
 }
 
-boost::optional<data::SystemData> 
-    SystemManager::findSystemByID(const std::string& id) const
-{
-    return m_cache.find(id);
-}
-
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
     const std::string& systemID) const
 {
     QnMutexLocker lk(&m_mutex);
-    const auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
+    const auto& accountSystemPairIndex =
+        m_accountAccessRoleForSystem.get<SHARING_UNIQUE_INDEX>();
     api::SystemSharing toFind;
     toFind.accountEmail = accountEmail;
     toFind.systemID = systemID;
@@ -360,18 +400,27 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 
     QSqlQuery insertSystemQuery(*connection);
     insertSystemQuery.prepare(
-        "INSERT INTO system( id, name, customization, auth_key, owner_account_id, status_code ) "
-        " VALUES( :id, :name, :customization, :authKey, :ownerAccountID, :status )");
+        "INSERT INTO system(id, name, customization, auth_key, owner_account_id, "
+                           "status_code, expiration_utc_timestamp) "
+        " VALUES(:id, :name, :customization, :authKey, :ownerAccountID, "
+                ":status, :expiration_utc_timestamp)");
     systemData->id = QnUuid::createUuid().toSimpleString().toStdString();   //guid without {}
     systemData->name = newSystem.name;
     systemData->customization = newSystem.customization;
     systemData->authKey = QnUuid::createUuid().toSimpleString().toStdString();
     systemData->ownerAccountEmail = account->email;
     systemData->status = api::SystemStatus::ssNotActivated;
+    systemData->expirationTimeUtc = 
+        ::time(NULL) +
+        std::chrono::duration_cast<std::chrono::seconds>(
+            m_settings.systemManager().notActivatedSystemLivePeriod).count();
     QnSql::bind(*systemData, &insertSystemQuery);
     insertSystemQuery.bindValue(
         ":ownerAccountID",
         QnSql::serialized_field(account->id));
+    insertSystemQuery.bindValue(
+        ":expiration_utc_timestamp",
+        systemData->expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
         NX_LOG(lm("Could not insert system %1 into DB. %2").
@@ -404,10 +453,11 @@ void SystemManager::systemAdded(
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        //updating cache
-        m_cache.insert(systemData.id, systemData);
-        //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
+        //updating cache
+        m_systems.insert(systemData);
+
+        //updating "systems by account id" index
         api::SystemSharing sharing;
         sharing.accountEmail = systemRegistrationData.accountEmail;
         sharing.systemID = systemData.id;
@@ -473,6 +523,89 @@ void SystemManager::systemSharingAdded(
         : api::ResultCode::dbError);
 }
 
+nx::db::DBResult SystemManager::markSystemAsDeleted(
+    QSqlDatabase* const connection,
+    const std::string& systemId)
+{
+    //marking system as "deleted"
+    QSqlQuery markSystemAsRemoved(*connection);
+    markSystemAsRemoved.prepare(
+        "UPDATE system "
+        "SET status_code=:statusCode, "
+            "expiration_utc_timestamp=:expiration_utc_timestamp "
+        "WHERE id=:id");
+    markSystemAsRemoved.bindValue(
+        ":statusCode",
+        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssDeleted)));
+    markSystemAsRemoved.bindValue(
+        ":expiration_utc_timestamp",
+        (int)(::time(NULL) +
+            std::chrono::duration_cast<std::chrono::seconds>(
+                m_settings.systemManager().reportRemovedSystemPeriod).count()));
+    markSystemAsRemoved.bindValue(
+        ":id",
+        QnSql::serialized_field(systemId));
+    if (!markSystemAsRemoved.exec())
+    {
+        NX_LOG(lm("Error marking system %1 as deleted. %2")
+            .arg(systemId).arg(connection->lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    //removing system-to-account
+    QSqlQuery removeSystemToAccountBinding(*connection);
+    removeSystemToAccountBinding.prepare(
+        "DELETE FROM system_to_account WHERE system_id=:systemID");
+    removeSystemToAccountBinding.bindValue(
+        ":systemID",
+        QnSql::serialized_field(systemId));
+    if (!removeSystemToAccountBinding.exec())
+    {
+        NX_LOG(lm("Could not delete system %1 from system_to_account. %2").
+            arg(systemId).arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+void SystemManager::systemMarkedAsDeleted(
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::db::DBResult dbResult,
+    std::string systemId,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto systemIter = systemByIdIndex.find(systemId);
+        if (systemIter != systemByIdIndex.end())
+        {
+            systemByIdIndex.modify(
+                systemIter,
+                [this](data::SystemData& system)
+                { 
+                    system.status = api::SystemStatus::ssDeleted;
+                    system.expirationTimeUtc =
+                        ::time(NULL) +
+                        std::chrono::duration_cast<std::chrono::seconds>(
+                            m_settings.systemManager().reportRemovedSystemPeriod).count();
+                });
+        }
+
+        //removing system-to-account
+        auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+        systemIndex.erase(systemId);
+    }
+
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
+}
+
 nx::db::DBResult SystemManager::deleteSystemFromDB(
     QSqlDatabase* const connection,
     const data::SystemID& systemID)
@@ -510,9 +643,10 @@ void SystemManager::systemDeleted(
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        m_cache.erase(systemID.systemID);
         QnMutexLocker lk(&m_mutex);
-        auto& systemIndex = m_accountAccessRoleForSystem.get<2>();
+        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        systemByIdIndex.erase(systemID.systemID);
+        auto& systemIndex = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
         systemIndex.erase(systemID.systemID);
     }
     completionHandler(
@@ -568,7 +702,8 @@ void SystemManager::sharingUpdated(
     {
         //updating "systems by account id" index
         QnMutexLocker lk(&m_mutex);
-        auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
+        auto& accountSystemPairIndex =
+            m_accountAccessRoleForSystem.get<SHARING_UNIQUE_INDEX>();
         accountSystemPairIndex.erase(sharing);
         if (sharing.accessRole != api::SystemAccessRole::none)
         {
@@ -592,7 +727,7 @@ nx::db::DBResult SystemManager::activateSystem(
     QSqlQuery updateSystemStatusQuery(*connection);
     updateSystemStatusQuery.prepare(
         "UPDATE system "
-        "SET status_code=:statusCode "
+        "SET status_code=:statusCode, expiration_utc_timestamp=:expirationTimeUtc "
         "WHERE id=:id");
     updateSystemStatusQuery.bindValue(
         ":statusCode",
@@ -600,6 +735,9 @@ nx::db::DBResult SystemManager::activateSystem(
     updateSystemStatusQuery.bindValue(
         ":id",
         QnSql::serialized_field(systemID));
+    updateSystemStatusQuery.bindValue(
+        ":expirationTimeUtc",
+        std::numeric_limits<int>::max());
     if (!updateSystemStatusQuery.exec())
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
@@ -611,16 +749,26 @@ nx::db::DBResult SystemManager::activateSystem(
 }
 
 void SystemManager::systemActivated(
-    QnCounter::ScopedIncrement asyncCallLocker,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
-    std::string systemID,
+    std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
     {
-        m_cache.atomicUpdate(
-            systemID,
-            [](data::SystemData& system) { system.status = api::SystemStatus::ssActivated; });
+        QnMutexLocker lk(&m_mutex);
+
+        auto& systemByIdIndex = m_systems.get<SYSTEM_BY_ID_INDEX>();
+        auto systemIter = systemByIdIndex.find(systemId);
+        if (systemIter != systemByIdIndex.end())
+        {
+            systemByIdIndex.modify(
+                systemIter,
+                [](data::SystemData& system) {
+                    system.status = api::SystemStatus::ssActivated;
+                    system.expirationTimeUtc = std::numeric_limits<int>::max();
+                });
+        }
     }
 
     completionHandler(
@@ -710,7 +858,8 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
     QSqlQuery readSystemsQuery(*connection);
     readSystemsQuery.prepare(
         "SELECT s.id, s.name, s.customization, s.auth_key as authKey, "
-        "       a.email as ownerAccountEmail, s.status_code as status "
+        "       a.email as ownerAccountEmail, s.status_code as status, "
+        "       s.expiration_utc_timestamp as expirationTimeUtc "
         "FROM system s, account a "
         "WHERE s.owner_account_id = a.id");
     if (!readSystemsQuery.exec())
@@ -726,7 +875,7 @@ nx::db::DBResult SystemManager::fetchSystems(QSqlDatabase* connection, int* cons
     for (auto& system : systems)
     {
         auto idCopy = system.id;
-        if (!m_cache.insert(std::move(idCopy), std::move(system)))
+        if (!m_systems.insert(std::move(system)).second)
         {
             NX_ASSERT(false);
         }
@@ -759,6 +908,76 @@ nx::db::DBResult SystemManager::fetchSystemToAccountBinder(QSqlDatabase* connect
         m_accountAccessRoleForSystem.emplace(std::move(sharing));
 
     return db::DBResult::ok;
+}
+
+void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
+{
+    bool expected = false;
+    if (!m_dropExpiredSystemsTaskStillRunning.compare_exchange_strong(expected, true))
+    {
+        NX_LOGX(lit("Previous 'drop expired systems' task is still running..."),
+            cl_logWARNING);
+        return; //previous task is still running
+    }
+
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate(
+        std::bind(&SystemManager::deleteExpiredSystemsFromDb, this, _1),
+        std::bind(&SystemManager::expiredSystemsDeletedFromDb, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1));
+}
+
+nx::db::DBResult SystemManager::deleteExpiredSystemsFromDb(QSqlDatabase* connection)
+{
+    //dropping expired not-activated systems and expired marked-for-removal systems
+    QSqlQuery dropExpiredSystems(*connection);
+    dropExpiredSystems.prepare(
+        "DELETE FROM system "
+        "WHERE (status_code=:notActivatedStatusCode OR status_code=:deletedStatusCode) "
+            "AND expiration_utc_timestamp < :currentTime");
+    dropExpiredSystems.bindValue(
+        ":notActivatedStatusCode",
+        static_cast<int>(api::SystemStatus::ssNotActivated));
+    dropExpiredSystems.bindValue(
+        ":deletedStatusCode",
+        static_cast<int>(api::SystemStatus::ssDeleted));
+    dropExpiredSystems.bindValue(
+        ":currentTime",
+        (int)::time(NULL));
+    if (!dropExpiredSystems.exec())
+    {
+        NX_LOGX(lit("Error deleting expired systems from DB. %1").
+            arg(connection->lastError().text()), cl_logWARNING);
+        return db::DBResult::ioError;
+    }
+
+    return db::DBResult::ok;
+}
+
+void SystemManager::expiredSystemsDeletedFromDb(
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::db::DBResult dbResult)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        //cleaning up systems cache
+        QnMutexLocker lk(&m_mutex);
+        auto& systemsByExpirationTime = m_systems.get<SYSTEM_BY_EXPIRATION_TIME_INDEX>();
+        for (auto systemIter = systemsByExpirationTime.lower_bound(::time(NULL));
+             systemIter != systemsByExpirationTime.end();
+             )
+        {
+            NX_ASSERT(systemIter->status != api::SystemStatus::ssActivated);
+
+            auto& sharingBySystemId = m_accountAccessRoleForSystem.get<SHARING_BY_SYSTEM_ID>();
+            sharingBySystemId.erase(systemIter->id);
+
+            systemIter = systemsByExpirationTime.erase(systemIter);
+        }
+    }
+
+    m_dropExpiredSystemsTaskStillRunning = false;
 }
 
 }   //cdb

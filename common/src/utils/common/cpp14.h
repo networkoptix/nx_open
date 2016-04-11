@@ -32,8 +32,6 @@ namespace std
 #   endif
 #endif
 
-#define USE_OWN_MAKE_UNIQUE
-
 #ifdef USE_OWN_MAKE_UNIQUE
 template<
     typename T>

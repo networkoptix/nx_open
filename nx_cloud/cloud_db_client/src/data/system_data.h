@@ -78,7 +78,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
-    (json)(sql_record));
+    (json));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \

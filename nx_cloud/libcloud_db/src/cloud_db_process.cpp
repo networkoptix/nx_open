@@ -123,12 +123,15 @@ int CloudDBProcess::executeApplication()
             return 1;
         }
 
-        nx::db::DBManager dbManager(settings.dbConnectionOptions());
+        nx::db::AsyncSqlQueryExecutor dbManager(settings.dbConnectionOptions());
         if( !initializeDB(&dbManager) )
         {
             NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
             return 2;
         }
+
+        TimerManager timerManager;
+        timerManager.start();
 
         std::unique_ptr<AbstractEmailManager> emailManager(
             EMailManagerFactory::create(settings));
@@ -146,6 +149,8 @@ int CloudDBProcess::executeApplication()
             emailManager.get());
 
         SystemManager systemManager(
+            settings,
+            &timerManager,
             accountManager,
             &dbManager);
 
@@ -201,8 +206,11 @@ int CloudDBProcess::executeApplication()
         if (m_terminated)
             return 0;
 
-        NX_LOG( lit( "%1 has been started" ).arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS );
-        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().data() <<" has been started" << std::endl;
+        NX_LOG(lit("%1 has been started")
+                .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
+               cl_logALWAYS);
+        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().toStdString()
+            << " has been started" << std::endl;
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
@@ -375,7 +383,7 @@ void CloudDBProcess::registerApiHandlers(
         } );
 }
 
-bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
+bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
 {
     for (;;)
     {
@@ -401,7 +409,7 @@ bool CloudDBProcess::initializeDB( nx::db::DBManager* const dbManager )
     return true;
 }
 
-bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
+bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
 {
     if( dbManager->connectionOptions().driverName != lit("QSQLITE") )
         return true;
@@ -442,7 +450,7 @@ bool CloudDBProcess::configureDB( nx::db::DBManager* const dbManager )
     return future.get() == nx::db::DBResult::ok;
 }
 
-bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
+bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
 {
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
@@ -455,6 +463,8 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddIsEmailCodeToTemporaryAccountPassword);
     dbStructureUpdater.addUpdateScript(db::kRenameSystemAccessRoles);
     dbStructureUpdater.addUpdateScript(db::kChangeSystemIdTypeToString);
+    dbStructureUpdater.addUpdateScript(db::kAddDeletedSystemState);
+    dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
     return dbStructureUpdater.updateStructSync();
 }
 

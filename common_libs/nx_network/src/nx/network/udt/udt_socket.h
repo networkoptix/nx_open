@@ -12,8 +12,6 @@
 namespace nx {
 namespace network {
 
-class UdtSocket;
-
 namespace aio {
 
 template<class SocketType> class AsyncSocketImplHelper;
@@ -21,21 +19,26 @@ template<class SocketType> class AsyncServerSocketHelper;
 
 }   //aio
 
-class UdtPollSet;
-class UdtStreamSocket;
-class UdtStreamServerSocket;
 // I put the implementator inside of detail namespace to avoid namespace pollution.
 // The reason is that I see many of the class prefer using Implementator , maybe 
 // we want binary compatible of our source code. Anyway, this is not a bad thing
 // but some sacrifice on inline function.
 namespace detail {
 class UdtSocketImpl;
+enum class SocketState
+{
+    closed,
+    open,
+    connected
+};
 }// namespace detail
 
 // Adding a level indirection to make C++ type system happy.
-class NX_NETWORK_API UdtSocket
+template<class InterfaceToImplement>
+class UdtSocket
 :
-    public Pollable
+    public Pollable,
+    public InterfaceToImplement
 {
 public:
     UdtSocket();
@@ -47,20 +50,43 @@ public:
     */
     bool bindToUdpSocket(UDPSocket&& udpSocket);
 
-    bool getLastError(SystemError::ErrorCode* errorCode);
-    bool getRecvTimeout(unsigned int* millis);
-    bool getSendTimeout(unsigned int* millis);
+    // AbstractSocket --------------- interface
+    virtual bool bind(const SocketAddress& localAddress) override;
+    virtual SocketAddress getLocalAddress() const override;
+    virtual bool close() override;
+    virtual bool shutdown() override;
+    virtual bool isClosed() const override;
+    virtual bool setReuseAddrFlag(bool reuseAddr) override;
+    virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setNonBlockingMode(bool val) override;
+    virtual bool getNonBlockingMode(bool* val) const override;
+    virtual bool getMtu(unsigned int* mtuValue) const override;
+    virtual bool setSendBufferSize(unsigned int buffSize) override;
+    virtual bool getSendBufferSize(unsigned int* buffSize) const override;
+    virtual bool setRecvBufferSize(unsigned int buffSize) override;
+    virtual bool getRecvBufferSize(unsigned int* buffSize) const override;
+    virtual bool setRecvTimeout(unsigned int millis) override;
+    virtual bool getRecvTimeout(unsigned int* millis) const override;
+    virtual bool setSendTimeout(unsigned int ms) override;
+    virtual bool getSendTimeout(unsigned int* millis) const override;
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
 
-    //CommonSocketImpl<UdtSocket>* impl();
-    //const CommonSocketImpl<UdtSocket>* impl() const;
-
-    //nx::network::aio::AbstractAioThread* getAioThread();
-    //void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    //!Implementation of AbstractSocket::post
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
+    //!Implementation of AbstractSocket::dispatch
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
-    UdtSocket( detail::UdtSocketImpl* impl );
+    detail::SocketState m_state;
     detail::UdtSocketImpl* m_impl;
     friend class UdtPollSet;
+
+    UdtSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
+
+    bool open();
 
     UdtSocket(const UdtSocket&);
     UdtSocket& operator=(const UdtSocket&);
@@ -69,47 +95,23 @@ protected:
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??
 
 class NX_NETWORK_API UdtStreamSocket
-        : public UdtSocket
-        , public AbstractStreamSocket
+:
+    public UdtSocket<AbstractStreamSocket>
 {
 public:
     UdtStreamSocket();
-    UdtStreamSocket(detail::UdtSocketImpl* impl);
+    UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
     // partial, forward declaration of class UdtSocketImp;
     virtual ~UdtStreamSocket();
 
-    // AbstractSocket --------------- interface
-    virtual bool bind( const SocketAddress& localAddress ) override;
-    virtual SocketAddress getLocalAddress() const override;
-    virtual void close() override;
-    virtual void shutdown() override;
-    virtual bool isClosed() const override;
-    virtual bool setReuseAddrFlag( bool reuseAddr ) override;
-    virtual bool getReuseAddrFlag( bool* val ) const override;
-    virtual bool setNonBlockingMode( bool val ) override;
-    virtual bool getNonBlockingMode( bool* val ) const override;
-    virtual bool getMtu( unsigned int* mtuValue ) const override;
-    virtual bool setSendBufferSize( unsigned int buffSize ) override;
-    virtual bool getSendBufferSize( unsigned int* buffSize ) const override;
-    virtual bool setRecvBufferSize( unsigned int buffSize ) override;
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) const override;
-    virtual bool setRecvTimeout( unsigned int millis ) override;
-    virtual bool getRecvTimeout( unsigned int* millis ) const override;
-    virtual bool setSendTimeout( unsigned int ms ) override;
-    virtual bool getSendTimeout( unsigned int* millis ) const override;
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
     bool setRendezvous(bool val);
-
-    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //  What's difference between foreign address with peer address 
@@ -143,11 +145,6 @@ public:
         std::chrono::milliseconds timeoutMillis,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
-    //!Implementation of AbstractSocket::post
-    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
-    //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
-
 private:
     std::unique_ptr<aio::AsyncSocketImplHelper<Pollable>> m_aioHelper;
     bool m_noDelay;
@@ -158,42 +155,13 @@ private:
 
 class NX_NETWORK_API UdtStreamServerSocket
 :
-    public UdtSocket,
-    public AbstractStreamServerSocket
+    public UdtSocket<AbstractStreamServerSocket>
 {
 public:
     UdtStreamServerSocket();
     virtual ~UdtStreamServerSocket();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
-
-    virtual bool bind(const SocketAddress& localAddress);
-    virtual SocketAddress getLocalAddress() const;
-    virtual void close();
-    virtual void shutdown();
-    virtual bool isClosed() const;
-    virtual bool setReuseAddrFlag( bool reuseAddr );
-    virtual bool getReuseAddrFlag( bool* val ) const;
-    virtual bool setNonBlockingMode( bool val );
-    virtual bool getNonBlockingMode( bool* val ) const;
-    virtual bool getMtu( unsigned int* mtuValue ) const;
-    virtual bool setSendBufferSize( unsigned int buffSize );
-    virtual bool getSendBufferSize( unsigned int* buffSize ) const;
-    virtual bool setRecvBufferSize( unsigned int buffSize );
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) const;
-    virtual bool setRecvTimeout( unsigned int millis );
-    virtual bool getRecvTimeout( unsigned int* millis ) const;
-    virtual bool setSendTimeout( unsigned int ms ) ;
-    virtual bool getSendTimeout( unsigned int* millis ) const;
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
-    virtual AbstractSocket::SOCKET_HANDLE handle() const;
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-
-    //!Implementation of AbstractSocket::post
-    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
-    //!Implementation of AbstractSocket::dispatch
-    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);

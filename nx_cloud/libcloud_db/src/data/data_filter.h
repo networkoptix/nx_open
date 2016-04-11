@@ -36,6 +36,9 @@ public:
     //TODO #ak do something with this class
     int dummy;
 
+    stree::ResourceContainer& rc();
+    const stree::ResourceContainer& rc() const;
+
 private:
     stree::ResourceContainer m_rc;
 };

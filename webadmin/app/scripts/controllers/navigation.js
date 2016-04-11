@@ -6,7 +6,7 @@ angular.module('webadminApp')
             isAdmin: true
         };
 
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
             $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
 
@@ -24,6 +24,10 @@ angular.module('webadminApp')
 
         });
         $scope.isActive = function (path) {
+            var path = $location.path();
+            if(!path){
+                return false;
+            }
             var currentPath = $location.path().split('/')[1];
             return currentPath.split('?')[0] === path.split('/')[1].split('?')[0];
         };

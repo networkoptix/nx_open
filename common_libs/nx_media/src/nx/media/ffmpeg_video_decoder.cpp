@@ -4,7 +4,6 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
 } // extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
@@ -14,6 +13,21 @@ extern "C" {
 
 namespace nx {
 namespace media {
+
+namespace {
+
+    void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height)
+    {
+        for (int i = 0; i < height; ++i)
+        {
+            memcpy(dst, src, width);
+            dst += dst_stride;
+            src += src_stride;
+        }
+    }
+
+}
+
 
 class InitFfmpegLib
 {
@@ -62,7 +76,6 @@ public:
     :
         codecContext(nullptr),
         frame(avcodec_alloc_frame()),
-        scaleContext(nullptr),
         lastPts(AV_NOPTS_VALUE)
     {
     }
@@ -71,7 +84,6 @@ public:
     {
         closeCodecContext();
         av_free(frame);
-        sws_freeContext(scaleContext);
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame);
@@ -79,9 +91,7 @@ public:
 
     AVCodecContext* codecContext;
     AVFrame* frame;
-    SwsContext* scaleContext;
     qint64 lastPts;
-    QSize scaleContextSize;
 };
 
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -181,40 +191,36 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 
-    QSize size(d->frame->width, d->frame->height);
-    if (size != d->scaleContextSize)
-    {
-        d->scaleContextSize = size;
-        sws_freeContext(d->scaleContext);
-        d->scaleContext = sws_getContext(
-            d->frame->width, d->frame->height, (PixelFormat) d->frame->format,
-            d->frame->width, d->frame->height, PIX_FMT_BGRA,
-            SWS_BICUBIC, NULL, NULL, NULL);
-    }
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
-    const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, d->frame->height);
-    const int argbLineSize = alignedWidth * 4;
+    const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, d->frame->height);
+    const int lineSize = alignedWidth;
 
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
+    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
     auto videoFrame = new QVideoFrame(
-        alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_RGB32);
+        alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_YUV420P);
     // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
     videoFrame->setStartTime(d->frame->pkt_dts / 1000);
 
     videoFrame->map(QAbstractVideoBuffer::WriteOnly);
     uchar* buffer = videoFrame->bits();
 
-    quint8* dstData[4];
-    memset(dstData, 0, sizeof(dstData));
-    dstData[0] = (quint8*)buffer;
-
-    int dstLinesize[4];
-    memset(dstLinesize, 0, sizeof(dstLinesize));
-    dstLinesize[0] = argbLineSize;
-
-    // Perform yuv2rgb transformation here.
-    sws_scale(d->scaleContext, d->frame->data, d->frame->linesize, 0, d->frame->height, dstData,
-        dstLinesize);
+    quint8* dstData[3];
+    dstData[0] = buffer;
+    dstData[1] = buffer + lineSize * d->frame->height;
+    dstData[2] = dstData[1] + lineSize * d->frame->height / 4;
+    
+    for (int i = 0; i < 3; ++i)
+    {
+        const int k = (i == 0 ? 0 : 1);
+        copyPlane(
+            dstData[i], 
+            d->frame->data[i], 
+            d->frame->width >> k, 
+            lineSize >> k, 
+            d->frame->linesize[i], 
+            d->frame->height >> k);
+    }
+    
     videoFrame->unmap();
 
     result->reset(videoFrame);

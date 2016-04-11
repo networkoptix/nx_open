@@ -307,7 +307,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setMAC(QnMacAddress(QString::fromUtf8(report.value("mac address"))));
     m_platform = report.value("platform").trimmed().toUpper();
 
-    bool dualStreaming = report.value("channels").toInt() > 1 || !report.value("video2_resolution_cap").isEmpty();
+    bool dualStreaming = report.value("channels").toInt() > 1 ||
+            !report.value("video2_resolution_cap").isEmpty() ||
+            report.value("streaming_mode_cap").toLower() == "dual";
 
     QList<QSize> availResolutions = parseResolutionStr(resolutions);
     if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
@@ -845,7 +847,7 @@ QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, con
     auto templateValues = unresolvedTemplate.split(",");
     auto cameraValues = valueFromCamera.split(",");
 
-    for(size_t i = 0; i < templateValues.size(); i++)
+    for (int i = 0; i < templateValues.size(); i++)
     {
         if(i >= cameraValues.size())
             break;
@@ -1017,7 +1019,7 @@ void QnActiResource::extractParamValues(const QString &paramValue, const QString
     const auto paramValues = paramValue.split(',');
     const auto paramCount = paramNames.size();
 
-    for(size_t i = 0; i < paramCount; i++)
+    for (int i = 0; i < paramCount; i++)
     {
         auto name = paramNames.at(i).mid(1);
         if(i < paramCount - 1)

@@ -27,14 +27,14 @@ QnThumbnailsStreamReader::QnThumbnailsStreamReader(const QnResourcePtr& dev )
     if (!m_archiveDelegate)
         m_archiveDelegate = new QnServerArchiveDelegate(); // default value
 
-    m_archiveDelegate->setQuality(MEDIA_Quality_Low, true);
+    m_archiveDelegate->setQuality(MEDIA_Quality_Low, true, QSize());
     m_delegate = new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(m_archiveDelegate));
     m_cseq = 0;
 }
 
 void QnThumbnailsStreamReader::setQuality(MediaQuality q)
 {
-    m_archiveDelegate->setQuality(q, true);
+    m_archiveDelegate->setQuality(q, true, QSize());
 }
 
 

@@ -36,7 +36,7 @@ public:
     //virtual void setSendMotion(bool value);
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& size) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
     virtual void setSendMotion(bool value) override;
 

@@ -26,16 +26,15 @@
 namespace nx {
 namespace db {
 
-
 //!Executes DB request
 /*!
     Scales DB operations on multiple threads
  */
-class DBManager
+class AsyncSqlQueryExecutor
 {
 public:
-    DBManager( const ConnectionOptions& connectionOptions );
-    virtual ~DBManager();
+    AsyncSqlQueryExecutor( const ConnectionOptions& connectionOptions );
+    virtual ~AsyncSqlQueryExecutor();
 
     //!Have to introduce this method because we do not use exceptions
     bool init();
@@ -52,7 +51,7 @@ public:
     template<typename InputData, typename OutputData>
     void executeUpdate(
         std::function<DBResult(QSqlDatabase*, const InputData&, OutputData* const)> dbUpdateFunc,
-        InputData&& input,
+        InputData input,
         std::function<void(DBResult, InputData, OutputData&&)> completionHandler ) 
     {
         openOneMoreConnectionIfNeeded();
@@ -70,7 +69,7 @@ public:
     template<typename InputData>
     void executeUpdate(
         std::function<DBResult(QSqlDatabase*, const InputData&)> dbUpdateFunc,
-        InputData&& input,
+        InputData input,
         std::function<void(DBResult, InputData)> completionHandler )
     {
         openOneMoreConnectionIfNeeded();
@@ -146,7 +145,6 @@ private:
     */
     bool openOneMoreConnectionIfNeeded();
 };
-
 
 }   //db
 }   //nx

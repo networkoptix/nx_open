@@ -89,7 +89,7 @@ public:
     QString mNonce; // TODO: #Elric wtf? total incapsulation failure.
     QString mQop;
 
-    const QHostAddress host() const { return m_host; }
+    QString host() const { return m_host; }
     int port() const { return m_port; }
     int timeout() const { return m_timeout; }
     QAuthenticator auth() const { return m_auth; }
@@ -106,9 +106,7 @@ private:
     void addExtraHeaders(QByteArray& request);
 
 private:
-
-    QString m_hostString;
-    QHostAddress m_host;
+    const QString m_host;
     int m_port;
 
     QHash<QByteArray, QByteArray> m_header;

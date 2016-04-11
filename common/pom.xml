@@ -49,8 +49,6 @@
     </dependencies>
 
     <build>
-    <directory>${arch}</directory>
-        <outputDirectory>${arch}</outputDirectory>
         <sourceDirectory>${basedir}/src</sourceDirectory>
         <plugins>
             <plugin>

@@ -77,14 +77,18 @@ void syncSocketServerMainFunc(
                 std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
             > acceptedPromise;
             server->acceptAsync(
-                [&acceptedPromise](
+                [&server, &acceptedPromise](
                     SystemError::ErrorCode errorCode,
                     AbstractStreamSocket* socket)
                 {
-                    acceptedPromise.set_value(
-                        std::make_pair(
-                            errorCode,
-                            std::unique_ptr<AbstractStreamSocket>(socket)));
+                    server->post(
+                        [&acceptedPromise, errorCode, socket]()
+                        {
+                            acceptedPromise.set_value(
+                                std::make_pair(
+                                    errorCode,
+                                    std::unique_ptr<AbstractStreamSocket>(socket)));
+                        });
                 });
 
             startedPromise->set_value();
@@ -496,6 +500,10 @@ void socketSimpleAcceptMixed(
         std::future_status::ready,
         connectionEstablishedFuture.wait_for(std::chrono::seconds(7)));
     ASSERT_EQ(SystemError::noError, connectionEstablishedFuture.get());
+
+    //if connect returned, it does not mean that accept has actually returned,
+        //so giving internal socket implementation some time...
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
     ASSERT_NE(server->accept(), nullptr)
         << SystemError::getLastOSErrorText().toStdString();

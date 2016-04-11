@@ -10,16 +10,18 @@
 
 #include <boost/optional.hpp>
 
-#include <utils/common/app_info.h>
-#include <utils/common/guard.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <cloud_db_client/src/data/types.h>
+
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
 
-#include <cloud_db_client/src/data/types.h>
+#include <http/custom_headers.h>
+#include <utils/common/app_info.h>
+#include <utils/common/guard.h>
+#include <utils/serialization/json.h>
+#include <utils/serialization/lexical.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -29,6 +31,7 @@
 #include "stree/http_request_attr_reader.h"
 #include "stree/socket_attr_reader.h"
 #include "stree/stree_manager.h"
+
 
 namespace nx {
 namespace cdb {
@@ -52,29 +55,41 @@ bool AuthenticationManager::authenticate(
     const nx_http::Request& request,
     boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
     stree::ResourceContainer* authProperties,
+    nx_http::HttpHeaders* const responseHeaders,
     std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody)
 {
-    bool authResult = false;
-    auto guard = makeScopedGuard([&msgBody, &authResult](){
-        if (authResult)
-            return;
-        nx_http::FusionRequestResult result(
-            nx_http::FusionRequestErrorClass::unauthorized,
-            QnLexical::serialized(api::ResultCode::notAuthorized),
-            static_cast<int>(api::ResultCode::notAuthorized),
-            "unauthorized");
-        *msgBody = std::make_unique<nx_http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-            QJson::serialized(result));
-    });
+    api::ResultCode authResult = api::ResultCode::notAuthorized;
+    auto guard = makeScopedGuard(
+        [&msgBody, &authResult, responseHeaders]()
+        {
+            if (authResult == api::ResultCode::ok)
+                return;
+            nx_http::FusionRequestResult result(
+                nx_http::FusionRequestErrorClass::unauthorized,
+                QnLexical::serialized(authResult),
+                static_cast<int>(authResult),
+                "unauthorized");
+            responseHeaders->emplace(
+                Qn::API_RESULT_CODE_HEADER_NAME,
+                QnLexical::serialized(authResult).toLatin1());
+            *msgBody = std::make_unique<nx_http::BufferSource>(
+                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                QJson::serialized(result));
+        });
 
-    //TODO #ak use QnAuthHelper class to support all that authentication types
+    //TODO #ak use QnAuthHelper class to enable all that authentication types
 
     const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods & AuthMethod::noAuth)
-        return (authResult = true);
+    {
+        authResult = api::ResultCode::ok;
+        return true;
+    }
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
-        return (authResult = false);
+    {
+        authResult = api::ResultCode::notAuthorized;
+        return false;
+    }
 
     const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
 
@@ -105,7 +120,10 @@ bool AuthenticationManager::authenticate(
     if (auto authenticated = authTraversalResult.get(attr::authenticated))
     {
         if (authenticated.get().toBool())
-            return (authResult = true);
+        {
+            authResult = api::ResultCode::ok;
+            return true;
+        }
     }
 
     if (!authzHeader ||
@@ -113,13 +131,15 @@ bool AuthenticationManager::authenticate(
         (authzHeader->userid().isEmpty()))
     {
         addWWWAuthenticateHeader(wwwAuthenticate);
-        return (authResult = false);
+        authResult = api::ResultCode::notAuthorized;
+        return false;
     }
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
     {
         addWWWAuthenticateHeader(wwwAuthenticate);
-        return (authResult = false);
+        authResult = api::ResultCode::notAuthorized;
+        return false;
     }
 
     const auto userID = authzHeader->userid();
@@ -135,7 +155,10 @@ bool AuthenticationManager::authenticate(
     if (auto foundHa1 = authTraversalResult.get(attr::ha1))
     {
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
-            return (authResult = true);
+        {
+            authResult = api::ResultCode::ok;
+            return true;
+        }
     }
     if (auto password = authTraversalResult.get(attr::userPassword))
     {
@@ -144,20 +167,17 @@ bool AuthenticationManager::authenticate(
                 realm(),
                 password.get().toString())))
         {
-            return (authResult = true);
+            authResult = api::ResultCode::ok;
+            return true;
         }
     }
 
-    if (!authenticateInDataManagers(
-            userID,
-            std::move(validateHa1Func),
-            authSearchInputData,
-            authProperties))
-    {
-        return (authResult = false);
-    }
-
-    return (authResult = true);
+    authResult = authenticateInDataManagers(
+        userID,
+        std::move(validateHa1Func),
+        authSearchInputData,
+        authProperties);
+    return authResult == api::ResultCode::ok;
 }
 
 nx::String AuthenticationManager::realm()
@@ -172,30 +192,33 @@ bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
     return nonce.size() < 31;
 }
 
-bool AuthenticationManager::authenticateInDataManagers(
+api::ResultCode AuthenticationManager::authenticateInDataManagers(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& authSearchInputData,
     stree::ResourceContainer* const authProperties)
 {
-    //TODO #ak AuthenticationManager has to become async sometimes...
+    //TODO #ak AuthenticationManager has to become async some time...
 
     for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
     {
-        std::promise<bool> authPromise;
+        std::promise<api::ResultCode> authPromise;
         auto authFuture = authPromise.get_future();
         authDataProvider->authenticateByName(
             username,
             validateHa1Func,
             authSearchInputData,
             authProperties,
-            [&authPromise](bool authResult) { authPromise.set_value(authResult); });
+            [&authPromise](api::ResultCode authResult) {
+                authPromise.set_value(authResult);
+            });
         authFuture.wait();
-        if (authFuture.get())
-            return true;
+        const auto result = authFuture.get();
+        if (result != api::ResultCode::notAuthorized)
+            return result;  //"ok" or "credentialsRemovedPermanently"
     }
 
-    return false;
+    return api::ResultCode::notAuthorized;
 }
 
 void AuthenticationManager::addWWWAuthenticateHeader(

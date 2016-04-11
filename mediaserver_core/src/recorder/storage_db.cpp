@@ -125,6 +125,7 @@ bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::Chu
 
 bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
+    QnMutexLocker lk(&m_syncMutex);
     QnDbTransactionLocker tran(getTransaction());
 
     QSqlQuery query(m_sdb);

@@ -40,7 +40,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     virtual SocketAddress getForeignAddress() const override;
     virtual void cancelIOAsync(
         aio::EventType eventType,
@@ -90,13 +90,13 @@ class BufferSocket
 public:
     BufferSocket( const std::string& data );
 
-    virtual void close() override;
-    virtual void shutdown() override;
+    virtual bool close() override;
+    virtual bool shutdown() override;
     virtual bool isClosed() const override;
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     virtual bool isConnected() const override;

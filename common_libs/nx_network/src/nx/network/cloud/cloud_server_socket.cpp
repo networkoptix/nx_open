@@ -90,9 +90,10 @@ SocketAddress CloudServerSocket::getLocalAddress() const
     return SocketAddress();
 }
 
-void CloudServerSocket::close()
+bool CloudServerSocket::close()
 {
     //NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    return true;
 }
 
 bool CloudServerSocket::isClosed() const
@@ -101,9 +102,10 @@ bool CloudServerSocket::isClosed() const
     return false;
 }
 
-void CloudServerSocket::shutdown()
+bool CloudServerSocket::shutdown()
 {
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented...");
+    return true;
 }
 
 bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
@@ -322,6 +324,18 @@ bool CloudServerSocket::registerOnMediatorSync()
     SystemError::setLastErrorCode(SystemError::invalidData);
     m_state = State::readyToListen;
     return false;
+}
+
+void CloudServerSocket::moveToListeningState()
+{
+    if (!m_tunnelPool)
+        initTunnelPool(m_acceptQueueLen);
+    m_mediatorConnection->setOnConnectionRequestedHandler(
+        std::bind(
+            &CloudServerSocket::onConnectionRequested,
+            this,
+            std::placeholders::_1));
+    m_state = State::listening;
 }
 
 void CloudServerSocket::initTunnelPool(int queueLen)
