@@ -118,4 +118,14 @@ QByteArray generateRandomName(int length);
 
 QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
 
+/** Converts \a bytes to human-readable string like 10M or 67K.
+    Rounds value to floor
+*/
+QString bytesToString(uint64_t bytes);
+/** Converts bytes number string (e.g., 64K) to integer.
+    K, M, G suffix are supported.
+    @return On failure returns 0 and (if not null) sets \a *ok to \a false
+*/
+uint64_t stringToBytes(const QString& str, bool* isOk = nullptr);
+
 #endif // QN_STRING_H

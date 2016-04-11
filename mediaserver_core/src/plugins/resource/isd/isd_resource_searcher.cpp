@@ -1,5 +1,6 @@
 #ifdef ENABLE_ISD
 
+#include <core/resource_management/resource_pool.h>
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
@@ -132,8 +133,12 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
+    auto isDW = resourceData.value<bool>("isDW");
+    vendor = isDW ? lit("Digital Watchdog") : vendor;
+    name = isDW ? name : lit("ISD-") + name;
 
     resource->setTypeId(rt);
+    resource->setVendor(vendor);
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
@@ -156,7 +161,7 @@ QString extractWord(int index, const QByteArray& rawData)
     return QString::fromLatin1(rawData.mid(index, endIndex - index));
 }
 
-QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
+/*QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
     const QHostAddress& discoveryAddress,
@@ -240,6 +245,78 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     return local_result;
 
 
+}*/
+
+void QnPlISDResourceSearcher::processPacket(
+    const QHostAddress& /*discoveryAddr*/,
+    const SocketAddress& /*deviceEndpoint*/,
+    const nx_upnp::DeviceInfo& devInfo,
+    const QByteArray& /*xmlDevInfo*/,
+    QnResourceList& result )
+{
+
+    QAuthenticator auth;
+    auth.setUser(DEFAULT_ISD_USERNAME);
+    auth.setPassword(DEFAULT_ISD_PASSWORD);
+
+    if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
+        return;
+
+    QnMacAddress cameraMAC(devInfo.serialNumber);
+    QnNetworkResourcePtr existingRes = qnResPool->getResourceByMacAddress( devInfo.serialNumber );
+    QAuthenticator cameraAuth;
+    cameraAuth.setUser(DEFAULT_ISD_USERNAME);
+    cameraAuth.setPassword(DEFAULT_ISD_PASSWORD);
+    if( existingRes )
+    {
+        cameraMAC = existingRes->getMAC();
+        cameraAuth = existingRes->getAuth();
+    }
+
+    createResource( devInfo, cameraMAC, auth, result );
+}
+
+void QnPlISDResourceSearcher::createResource(
+    const nx_upnp::DeviceInfo& devInfo,
+    const QnMacAddress& mac,
+    const QAuthenticator& auth,
+    QnResourceList& result )
+{
+
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), devInfo.modelName);
+    if (rt.isNull())
+    {
+        rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
+        if (rt.isNull())
+            return;
+    }
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return; // model forced by ONVIF
+
+    auto isDW = resourceData.value<bool>("isDW");
+    auto vendor = isDW ? lit("Digital Watchdog") : lit("ISD");
+    auto name = isDW ? devInfo.modelName : lit("ISD-") + devInfo.modelName;
+    QnPlIsdResourcePtr resource( new QnPlIsdResource() );
+
+    resource->setTypeId(rt);
+    resource->setVendor(vendor);
+    resource->setName(name);
+    resource->setModel(devInfo.modelName);
+    resource->setUrl(devInfo.presentationUrl);
+    resource->setMAC(mac);
+
+    if (!auth.isNull()) {
+        resource->setDefaultAuth(auth);
+    } else {
+        QAuthenticator defaultAuth;
+        defaultAuth.setUser(DEFAULT_ISD_USERNAME);
+        defaultAuth.setPassword(DEFAULT_ISD_PASSWORD);
+        resource->setDefaultAuth(defaultAuth);
+    }
+
+    result << resource;
 }
 
 #endif // #ifdef ENABLE_ISD

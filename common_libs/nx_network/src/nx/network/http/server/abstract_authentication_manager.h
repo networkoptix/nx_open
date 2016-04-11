@@ -33,6 +33,7 @@ namespace nx_http
             const nx_http::Request& request,
             boost::optional<header::WWWAuthenticate>* const wwwAuthenticate,
             stree::ResourceContainer* authProperties,
+            nx_http::HttpHeaders* const responseHeaders,
             std::unique_ptr<AbstractMsgBodySource>* const msgBody) = 0;
     };
 }

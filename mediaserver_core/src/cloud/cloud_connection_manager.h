@@ -37,6 +37,8 @@ public:
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
+    void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
+
 signals:
     void cloudBindingStatusChanged(bool bindedToCloud);
 

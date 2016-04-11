@@ -8,21 +8,32 @@
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
+#include <nx/streaming/av_codec_media_context.h>
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 const static qint64 OPTIMIZATION_BEGIN_FRAME = 10;
 const static qint64 OPTIMIZATION_MOVING_AVERAGE_RATE = 90;
 
+namespace {
 
-static qint64& movigAverage(qint64& accumulator, qint64 value)
-{
-    static_assert(OPTIMIZATION_MOVING_AVERAGE_RATE < 100, "Moving average K should be below 100%");
-    static const auto movingAvg = static_cast<double>(OPTIMIZATION_MOVING_AVERAGE_RATE) / 100.0;
+    static qint64& movigAverage(qint64& accumulator, qint64 value)
+    {
+        static_assert(OPTIMIZATION_MOVING_AVERAGE_RATE < 100, "Moving average K should be below 100%");
+        static const auto movingAvg = static_cast<double>(OPTIMIZATION_MOVING_AVERAGE_RATE) / 100.0;
 
-    if (accumulator == 0)
-        return accumulator = value;
+        if (accumulator == 0)
+            return accumulator = value;
 
-    return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
+        return accumulator = accumulator * movingAvg + value * (1.0 - movingAvg);
+    }
+
+    CodecID updateCodec(CodecID codec)
+    {
+        if (codec == CODEC_ID_H263P)
+            return CODEC_ID_H263;
+        else
+            return codec;
+    }
 }
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
@@ -155,6 +166,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
     
+    if (!m_encoderCtx)
+        open(video);
+
     QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
         decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(video->compressionType, video, m_mtMode);
@@ -209,6 +223,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if(m_encoderCtx->coded_frame->key_frame)
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+    resultVideoData->compressionType = updateCodec(m_codecId);
     *result = QnCompressedVideoDataPtr(resultVideoData);
 
     ++m_encodedFrames;

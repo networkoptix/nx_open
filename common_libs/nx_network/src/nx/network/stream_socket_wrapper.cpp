@@ -17,11 +17,11 @@ bool StreamSocketWrapper::bind(const SocketAddress& localAddress)
 SocketAddress StreamSocketWrapper::getLocalAddress() const
 { return m_socket->getLocalAddress(); }
 
-void StreamSocketWrapper::close()
-{ m_socket->close(); }
+bool StreamSocketWrapper::close()
+{ return m_socket->close(); }
 
-void StreamSocketWrapper::shutdown()
-{ m_socket->shutdown(); }
+bool StreamSocketWrapper::shutdown()
+{ return m_socket->shutdown(); }
 
 bool StreamSocketWrapper::isClosed() const
 { return m_socket->isClosed(); }

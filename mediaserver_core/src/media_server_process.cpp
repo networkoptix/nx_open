@@ -1129,9 +1129,12 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
 
             // initialize storage immediately in sync mode
-            //TODO: #rvasilenko remove this call. Need refactor
+			// todo: remove this call. Need refactor
             if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
-                qnStorage->initOrUpdate();
+            {
+                if (qnStorage->getParentId() == qnCommon->moduleGUID())
+                    qnStorage->initOrUpdate();
+            }
         }
     }
 

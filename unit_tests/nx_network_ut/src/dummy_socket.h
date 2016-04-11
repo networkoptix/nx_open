@@ -90,8 +90,8 @@ class BufferSocket
 public:
     BufferSocket( const std::string& data );
 
-    virtual void close() override;
-    virtual void shutdown() override;
+    virtual bool close() override;
+    virtual bool shutdown() override;
     virtual bool isClosed() const override;
 
     virtual bool connect(

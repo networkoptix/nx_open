@@ -216,16 +216,16 @@ TEST_F(CdbFunctionalTest, system_activation)
         api::SystemData system1;
         ASSERT_EQ(
             api::ResultCode::ok,
-            bindRandomSystem(account1.email, account1Password, &system1));
+            bindRandomNotActivatedSystem(account1.email, account1Password, &system1));
 
         //checking account1 system list
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
-            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-            ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
+            ASSERT_EQ(systems.size(), 0);   //only activated systems are provided
+            //ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+            //ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            //ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
         }
 
         if (i == 0)
@@ -273,6 +273,93 @@ TEST_F(CdbFunctionalTest, system_activation)
         ASSERT_EQ(
             api::ResultCode::ok,
             unbindSystem(account1.email, account1Password, system1.id));
+    }
+}
+
+TEST_F(CdbFunctionalTest, notification_of_system_removal)
+{
+    constexpr const std::chrono::seconds kSystemGoneForeverPeriod =
+        std::chrono::seconds(5);
+    constexpr const std::chrono::seconds kDropExpiredSystemsPeriodSec =
+        std::chrono::seconds(1);
+
+    addArg("-systemManager/reportRemovedSystemPeriodSec");
+    addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
+    addArg("-systemManager/controlSystemStatusByDb");
+    addArg("true");
+    addArg("-systemManager/dropExpiredSystemsPeriodSec");
+    addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    enum class TestOption
+    {
+        withRestart,
+        withoutRestart
+    };
+
+    const TestOption testOptions[] = { TestOption::withRestart, TestOption::withoutRestart };
+
+    for (const auto& testOption: testOptions)
+    {
+        api::AccountData account1;
+        std::string account1Password;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            addActivatedAccount(&account1, &account1Password));
+
+        //adding system1 to account1
+        api::SystemData system1;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            bindRandomSystem(account1.email, account1Password, &system1));
+
+        api::NonceData nonceData;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getCdbNonce(system1.id, system1.authKey, &nonceData));
+
+        const auto timeJustBeforeSystemRemoval = std::chrono::steady_clock::now();
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            unbindSystem(account1.email, account1Password, system1.id));
+
+        for (int i = 0; i < 3; ++i)
+        {
+            api::NonceData nonceData;
+            const auto timePassedSinceSystemRemoval = 
+                std::chrono::steady_clock::now() - timeJustBeforeSystemRemoval;
+            ASSERT_EQ(
+                timePassedSinceSystemRemoval < kSystemGoneForeverPeriod
+                    ? api::ResultCode::credentialsRemovedPermanently
+                    : api::ResultCode::notAuthorized,
+                getCdbNonce(system1.id, system1.authKey, &nonceData));
+
+            //checking HTTP status code
+            nx_http::HttpClient httpClient;
+            QUrl requestUrl(lit("http://127.0.0.1:%1/cdb/auth/get_nonce").arg(endpoint().port));
+            requestUrl.setUserName(QString::fromStdString(system1.id));
+            requestUrl.setPassword(QString::fromStdString(system1.authKey));
+            ASSERT_TRUE(httpClient.doGet(requestUrl));
+            ASSERT_NE(nullptr, httpClient.response());
+            ASSERT_EQ(
+                nx_http::StatusCode::unauthorized,
+                httpClient.response()->statusLine.statusCode);
+
+            if (i == 0)
+            {
+                if (testOption == TestOption::withRestart)
+                    restart();
+                continue;
+            }
+            else if (i == 1)
+            {
+                //waiting for result code to switch to notAuthorized
+                std::this_thread::sleep_for(
+                    kSystemGoneForeverPeriod + kDropExpiredSystemsPeriodSec*2);
+                continue;
+            }
+        }
     }
 }
 

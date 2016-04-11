@@ -25,11 +25,31 @@ public:
         Forbidden = 4
     };
 
+    /** Presents error as corresponding text with some arguments.
+        E.g., ErrorDescriptor(MissingParameter, "id").text() 
+            will return text like "Missing required parameter 'id'".
+        \note Introduced for error text unification
+    */
+    class ErrorDescriptor
+    {
+    public:
+        ErrorDescriptor(Error errorCode, QString argument);
+        ErrorDescriptor(Error errorCode, QStringList arguments);
+
+        Error errorCode() const;
+        QString text() const;
+
+    private:
+        Error m_errorCode;
+        QStringList m_arguments;
+    };
+
     Error error;
     QString errorString;
 
     QnRestResult();
     void setError(Error errorValue, const QString &errorStringValue = QString());
+    void setError(const ErrorDescriptor& errorDescriptor);
 };
 #define QnRestResult_Fields (error)(errorString)
 

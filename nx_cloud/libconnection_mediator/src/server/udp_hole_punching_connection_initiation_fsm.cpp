@@ -52,40 +52,43 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
     api::ConnectRequest request,
     std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender)
 {
-    m_timer.dispatch([this, originatingPeerConnection, request, connectResponseSender]()  //TODO #ak msvc2015 move to lambda
-    {
-        api::ConnectionRequestedEvent connectionRequestedEvent;
-        connectionRequestedEvent.connectSessionId = std::move(request.connectSessionId);
-        connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerID);
-        connectionRequestedEvent.udpEndpointList.emplace_back(
-            originatingPeerConnection->getSourceAddress());
-        connectionRequestedEvent.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        nx::stun::Message indication(
-            stun::Header(
-                stun::MessageClass::indication,
-                stun::cc::indications::connectionRequested));
-        connectionRequestedEvent.serialize(&indication);
-
-        NX_ASSERT(connectResponseSender);
-        m_connectResponseSender = std::move(connectResponseSender);
-        auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
-        if (!serverConnectionStrongRef)
+    m_timer.dispatch(
+        [this, originatingPeerConnection,
+            request = std::move(request), connectResponseSender]()
         {
-            m_timer.post(std::bind(
-                &UDPHolePunchingConnectionInitiationFsm::done,
-                this,
-                api::ResultCode::serverConnectionBroken));
-            return;
-        }
-        serverConnectionStrongRef->sendMessage(std::move(indication));  //TODO #ak check sendMessage result
-        m_timer.start(
-            kUdpHolePunchingSessionTimeout,
-            std::bind(
-                &UDPHolePunchingConnectionInitiationFsm::done,
-                this,
-                api::ResultCode::noReplyFromServer));
-        m_state = State::waitingServerPeerUDPAddress;
-    });
+            api::ConnectionRequestedEvent connectionRequestedEvent;
+            connectionRequestedEvent.connectSessionId = std::move(request.connectSessionId);
+            connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerID);
+            connectionRequestedEvent.udpEndpointList.emplace_back(
+                originatingPeerConnection->getSourceAddress());
+            connectionRequestedEvent.connectionMethods =
+                api::ConnectionMethod::udpHolePunching;
+            nx::stun::Message indication(
+                stun::Header(
+                    stun::MessageClass::indication,
+                    stun::cc::indications::connectionRequested));
+            connectionRequestedEvent.serialize(&indication);
+
+            NX_ASSERT(connectResponseSender);
+            m_connectResponseSender = std::move(connectResponseSender);
+            auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
+            if (!serverConnectionStrongRef)
+            {
+                m_timer.post(std::bind(
+                    &UDPHolePunchingConnectionInitiationFsm::done,
+                    this,
+                    api::ResultCode::serverConnectionBroken));
+                return;
+            }
+            serverConnectionStrongRef->sendMessage(std::move(indication));  //TODO #ak check sendMessage result
+            m_timer.start(
+                kUdpHolePunchingSessionTimeout,
+                std::bind(
+                    &UDPHolePunchingConnectionInitiationFsm::done,
+                    this,
+                    api::ResultCode::noReplyFromServer));
+            m_state = State::waitingServerPeerUDPAddress;
+        });
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
@@ -94,8 +97,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
     std::function<void(api::ResultCode)> completionHandler)
 {
     m_timer.dispatch(
-        [this, connection, request,
-            completionHandler = std::move(completionHandler)]() mutable  //TODO #msvc2015 move to lambda
+        [this, connection, request = std::move(request),
+            completionHandler = std::move(completionHandler)]() mutable
         {
             if (m_state > State::waitingServerPeerUDPAddress)
             {

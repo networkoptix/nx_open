@@ -11,6 +11,7 @@
 
 #include <QtCore/QThread>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
 
 
@@ -99,11 +100,16 @@ public:
         const unsigned int delayMillis );
     //!Same as above but accepts handler of \a std::function type
     quint64 addTimer(
-        std::function<void(quint64)> taskHandler,
+        nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
         const unsigned int delayMillis );
     quint64 addTimer(
-        std::function<void(quint64)> taskHandler,
+        nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
         TimerDuration delay);
+    //!This timer will triggere every \a delay until deleted
+    quint64 addNonStopTimer(
+        nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
+        TimerDuration delay,
+        TimerDuration firstShotDelay);
     //!Modifies delay on existing timer
     /*!
         If timer is being executed currently, nothing is done.

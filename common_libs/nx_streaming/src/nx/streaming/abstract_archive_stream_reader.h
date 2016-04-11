@@ -73,7 +73,7 @@ public:
     virtual void setPlaybackRange(const QnTimePeriod& playbackRange) = 0;
     virtual QnTimePeriod getPlaybackRange() const = 0;
 
-    virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) = 0;
     virtual MediaQuality getQuality() const = 0;
 
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) = 0;

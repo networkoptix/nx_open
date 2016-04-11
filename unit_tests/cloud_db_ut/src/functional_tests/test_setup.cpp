@@ -324,7 +324,7 @@ api::ResultCode CdbFunctionalTest::resetAccountPassword(
     return resCode;
 }
 
-api::ResultCode CdbFunctionalTest::bindRandomSystem(
+api::ResultCode CdbFunctionalTest::bindRandomNotActivatedSystem(
     const std::string& email,
     const std::string& password,
     api::SystemData* const systemData)
@@ -345,8 +345,28 @@ api::ResultCode CdbFunctionalTest::bindRandomSystem(
                 connection->systemManager(),
                 std::move(sysRegData),
                 std::placeholders::_1));
-
     return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::bindRandomSystem(
+    const std::string& email,
+    const std::string& password,
+    api::SystemData* const systemData)
+{
+    auto resCode = bindRandomNotActivatedSystem(email, password, systemData);
+    if (resCode != api::ResultCode::ok)
+        return resCode;
+
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    //activating system
+    api::NonceData nonceData;
+    resCode = getCdbNonce(systemData->id, systemData->authKey, &nonceData);
+    if (resCode != api::ResultCode::ok)
+        return resCode;
+
+    systemData->status = api::SystemStatus::ssActivated;
+    return api::ResultCode::ok;
 }
 
 api::ResultCode CdbFunctionalTest::unbindSystem(

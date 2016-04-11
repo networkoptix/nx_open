@@ -79,7 +79,7 @@ struct AnDroidDev
         sock->setRecvTimeout(500);
         sock->setSendTimeout(500);
 
-        if (sock->connect(QHostAddress(ip).toString(), 8080, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS))
+        if (sock->connect(QHostAddress(ip).toString(), 8080, AbstractCommunicatingSocket::kDefaultTimeoutMillis))
         {
             android = true;
             

@@ -108,7 +108,7 @@ void MediatorConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         m_isTerminating = true;
     }
 
-    m_timer.pleaseStop(std::move(handler));
+    m_fetchEndpointRetryTimer.pleaseStop(std::move(handler));
 }
 
 boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const

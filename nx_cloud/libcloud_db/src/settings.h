@@ -39,17 +39,29 @@ class Notification
 public:
     bool enabled;
 
-    Notification()
-    :
-        enabled(true)
-    {
-    }
+    Notification();
 };
 
 class AccountManager
 {
 public:
     std::chrono::seconds passwordResetCodeExpirationTimeout;
+};
+
+class SystemManager
+{
+public:
+    /** Attempt to use system credentials will result in \a credentialsRemovedPermanently
+        result code during this period after system removal
+    */
+    std::chrono::seconds reportRemovedSystemPeriod;
+    /** System is removed from DB if has not been activated in this period */
+    std::chrono::seconds notActivatedSystemLivePeriod;
+    /** Once per this period expired systems are removed from DB */
+    std::chrono::seconds dropExpiredSystemsPeriod;
+    bool controlSystemStatusByDb;
+
+    SystemManager();
 };
 
 
@@ -72,6 +84,7 @@ public:
     const Auth& auth() const;
     const Notification& notification() const;
     const AccountManager& accountManager() const;
+    const SystemManager& systemManager() const;
     const QString& cloudBackendUrl() const;
     const QString& changeUser() const;
 
@@ -90,6 +103,7 @@ private:
     Auth m_auth;
     Notification m_notification;
     AccountManager m_accountManager;
+    SystemManager m_systemManager;
     QString m_cloudBackendUrl;
     QString m_changeUser;
 

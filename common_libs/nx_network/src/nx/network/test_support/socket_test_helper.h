@@ -27,14 +27,14 @@ enum class TestTrafficLimitType
 {
     none, // never quit
     incoming, // quits when sends over limit
-    outgoing, // quits when recieves over limit
+    outgoing, // quits when receives over limit
 };
 
 enum class TestTransmissionMode
 {
-    spam, // spams random data as fast as follible, recieves alweys
-    echo, // reads and sends the same data as avaliable
-    echoTest, // sends randome data and verifies if it comes back
+    spam, // send random data as fast as possible, receive always
+    echo, // reads 4K buffer, sends same buffer, waits for futher data...
+    echoTest, // sends random data and verifies if it comes back
 };
 
 //!Reads/writes random data to/from connection
@@ -108,13 +108,43 @@ private:
     TestConnection& operator=(const TestConnection&);
 };
 
+struct ConnectionTestStatistics
+{
+    uint64_t bytesReceived;
+    uint64_t bytesSent;
+    size_t totalConnections;
+    size_t onlineConnections;
+};
+
+NX_NETWORK_API QString toString(const ConnectionTestStatistics& data);
+
+NX_NETWORK_API bool operator==(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right);
+NX_NETWORK_API bool operator!=(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right);
+/** Substracts field by field */
+NX_NETWORK_API ConnectionTestStatistics operator-(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right);
+
+class NX_NETWORK_API ConnectionPool
+{
+public:
+    virtual ~ConnectionPool() {}
+
+    virtual ConnectionTestStatistics statistics() const = 0;
+};
+
 //!Server that listenes randome tcp-port, accepts connections, reads every connection and sends specified bytes number through every connection
 /*!
     \note This class is not thread-safe
 */
 class NX_NETWORK_API RandomDataTcpServer
 :
-    public QnStoppableAsync
+    public QnStoppableAsync,
+    public ConnectionPool
 {
 public:
     RandomDataTcpServer(
@@ -133,7 +163,7 @@ public:
     bool start();
 
     SocketAddress addressBeingListened() const;
-    QString statusLine() const;
+    virtual ConnectionTestStatistics statistics() const override;
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
@@ -141,12 +171,16 @@ private:
     const size_t m_trafficLimit;
     const TestTransmissionMode m_transmissionMode;
     mutable QnMutex m_mutex;
-    std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
+    std::list<std::shared_ptr<TestConnection>> m_aliveConnections;
     SocketAddress m_localAddress;
     size_t m_totalConnectionsAccepted;
+    uint64_t m_totalBytesReceivedByClosedConnections;
+    uint64_t m_totalBytesSentByClosedConnections;
 
-    void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
-    void onConnectionDone( TestConnection* connection );
+    void onNewConnection(
+        SystemError::ErrorCode errorCode,
+        AbstractStreamSocket* newConnection);
+    void onConnectionDone(TestConnection* connection);
 };
 
 //!Establishes numerous connections to specified address, reads all connections (ignoring data) and sends random data back
@@ -155,7 +189,8 @@ private:
 */
 class NX_NETWORK_API ConnectionsGenerator
 :
-    public QnStoppableAsync
+    public QnStoppableAsync,
+    public ConnectionPool
 {
 public:
     static const size_t kInfiniteConnectionCount = 0;
@@ -178,7 +213,10 @@ public:
     void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
+    void setRemoteAddress(SocketAddress remoteAddress);
     void start();
+
+    virtual ConnectionTestStatistics statistics() const override;
 
     size_t totalConnectionsEstablished() const;
     size_t totalBytesSent() const;
@@ -190,7 +228,7 @@ private:
     /** map<connection id, connection> */
     typedef std::map<int, std::unique_ptr<TestConnection>> ConnectionsContainer;
 
-    const SocketAddress m_remoteAddress;
+    SocketAddress m_remoteAddress;
     size_t m_maxSimultaneousConnectionsCount;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;

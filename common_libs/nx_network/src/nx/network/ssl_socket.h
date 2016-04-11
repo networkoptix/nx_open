@@ -44,7 +44,7 @@ public:
     //!Implementation of \a AbstractStreamSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     //!Implementation of \a AbstractStreamSocket::recv
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     //!Implementation of \a AbstractStreamSocket::send
@@ -62,7 +62,7 @@ public:
     virtual bool connectWithoutEncryption(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     //!Implementation of \a AbstractEncryptedStreamSocket::enableClientEncryption
     virtual bool enableClientEncryption() override;
 

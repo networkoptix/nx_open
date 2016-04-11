@@ -14,12 +14,14 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::operation, "operation", QVariant::String);
     registerResource(attr::accountID, "accountID", QVariant::String);
     registerResource(attr::accountEmail, "accountEmail", QVariant::String);
-    registerResource(attr::systemID, "systemID", QVariant::String);
     registerResource(attr::ha1, "ha1", QVariant::String);
     registerResource(attr::userName, "user.name", QVariant::String);
     registerResource(attr::userPassword, "user.password", QVariant::String);
     registerResource(attr::accountStatus, "account.status", QVariant::Int);
     registerResource(attr::systemAccessRole, "systemAccessRole", QVariant::String);
+
+    registerResource(attr::systemID, "systemID", QVariant::String);
+    registerResource(attr::systemStatus, "systemStatus", QVariant::Int);
 
     registerResource(attr::dataAccountRightsOnSystem, "data.accountRightsOnSystem", QVariant::String);
 

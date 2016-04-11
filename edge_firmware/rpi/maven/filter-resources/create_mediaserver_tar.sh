@@ -19,7 +19,9 @@ set -e
 #     fi
 #     echo "$h"
 # }
-TOOLCHAIN_PREFIX=/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
+
+TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-4.8.3
+TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -172,7 +174,7 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" ]]; then
-    cp -f -P $environment/packages/${box}/gcc-4.8.3/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
     cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 

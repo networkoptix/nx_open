@@ -11,7 +11,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/counter.h>
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/db/db_manager.h>
+#include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
 #include "data/account_data.h"
@@ -58,7 +58,7 @@ class TemporaryAccountPasswordManager
 public:
     TemporaryAccountPasswordManager(
         const conf::Settings& settings,
-        nx::db::DBManager* const dbManager) throw(std::runtime_error);
+        nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
     virtual ~TemporaryAccountPasswordManager();
 
     virtual void authenticateByName(
@@ -66,7 +66,7 @@ public:
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
         stree::ResourceContainer* const authProperties,
-        std::function<void(bool)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     void createTemporaryPassword(
         const AuthorizationInfo& authzInfo,
@@ -75,7 +75,7 @@ public:
 
 private:
     const conf::Settings& m_settings;
-    nx::db::DBManager* const m_dbManager;
+    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     QnCounter m_startedAsyncCallsCounter;
     //!map<account email, password data>
     std::multimap<std::string, TemporaryAccountPasswordEx> m_accountPassword;

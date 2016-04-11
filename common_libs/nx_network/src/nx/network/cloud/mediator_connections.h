@@ -224,7 +224,7 @@ public:
     {
         setIndicationHandler(
             nx::stun::cc::indications::connectionRequested,
-            [handler](nx::stun::Message msg)    //TODO #ak #msvc2015 move to lambda
+            [handler = std::move(handler)](nx::stun::Message msg)
             {
                 ConnectionRequestedEvent indicationData;
                 indicationData.parse(msg);

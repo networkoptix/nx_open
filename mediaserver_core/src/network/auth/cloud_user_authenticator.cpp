@@ -228,6 +228,8 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
                     connection->authProvider(),
                     std::move(authRequest),
                     std::placeholders::_1));
+        if (resultCode != nx::cdb::api::ResultCode::ok)
+            CloudConnectionManager::instance()->processCloudErrorCode(resultCode);
     }
     else
     {
@@ -322,7 +324,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     }
 }
 
-void CloudUserAuthenticator::cloudBindingStatusChanged(bool bindedToCloud)
+void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*bindedToCloud*/)
 {
     clear();
 }

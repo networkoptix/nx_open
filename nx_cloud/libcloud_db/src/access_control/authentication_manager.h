@@ -11,6 +11,8 @@
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
 
+#include <cdb/result_code.h>
+
 #include "auth_types.h"
 
 
@@ -46,6 +48,7 @@ public:
         const nx_http::Request& request,
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
         stree::ResourceContainer* authProperties,
+        nx_http::HttpHeaders* const responseHeaders,
         std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody) override;
         
     static nx::String realm(); 
@@ -58,7 +61,7 @@ private:
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
 
     bool validateNonce(const nx_http::StringType& nonce);
-    bool authenticateInDataManagers(
+    api::ResultCode authenticateInDataManagers(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
