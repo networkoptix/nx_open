@@ -3779,7 +3779,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
             matrix.videowall_guid \
         FROM vms_videowall_matrix_items item \
         JOIN vms_videowall_matrix matrix ON matrix.guid = item.matrix_guid \
-        ORDER BY matrix.videowall_guid\
+        ORDER BY item.matrix_guid\
     ");
     if (!queryMatrixItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
