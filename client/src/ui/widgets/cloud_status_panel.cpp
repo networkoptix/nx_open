@@ -44,8 +44,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     setIcon(d->offlineIcon);
     adjustIconSize();
 
-    connect(this, &QnCloudStatusPanel::justPressed,
-            qnCommon->instance<QnCloudStatusWatcher*>(), &QnCloudStatusWatcher::updateSystems);
+    connect(this, &QnCloudStatusPanel::justPressed, qnCommon->instance<QnCloudStatusWatcher>(), &QnCloudStatusWatcher::updateSystems);
 
     d->updateUi();
 }
