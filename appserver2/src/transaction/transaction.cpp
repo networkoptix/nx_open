@@ -74,9 +74,12 @@ namespace ec2
             REGISTER_COMMAND(removeStorages),
             REGISTER_COMMAND(getMediaServersEx),
 
-            REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
+            REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(removeUser),
+            REGISTER_COMMAND(getUserGroups),
+            REGISTER_COMMAND(saveUserGroup),
+            REGISTER_COMMAND(removeUserGroup),
             REGISTER_COMMAND(getAccessRights),
             REGISTER_COMMAND(setAccessRights),
 
@@ -218,6 +221,8 @@ namespace ec2
                 val == removeMediaServer ||
                 val == saveUser ||
                 val == removeUser ||
+                val == saveUserGroup ||
+                val == removeUserGroup ||
                 val == setAccessRights ||
                 val == saveLayout ||
                 val == saveLayouts ||

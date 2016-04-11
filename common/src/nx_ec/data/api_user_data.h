@@ -7,7 +7,12 @@
 namespace ec2
 {
     struct ApiUserData : ApiResourceData {
-        ApiUserData(): isAdmin(false), permissions(0) {}
+        ApiUserData():
+            isAdmin(false),
+            permissions(Qn::NoGlobalPermissions),
+            isLdap(false),
+            isEnabled(true)
+        {}
 
         bool isAdmin; /**< Really this flag must be named isOwner, but we must keep it to maintain mobile client compatibility. */
         Qn::GlobalPermissions permissions;

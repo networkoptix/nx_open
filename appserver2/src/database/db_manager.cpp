@@ -1744,6 +1744,25 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::insertOrReplaceUserGroup(const ApiUserGroupData& data)
+{
+    QSqlQuery query(m_sdb);
+    const QString queryStr = R"(
+        INSERT OR REPLACE INTO vms_user_groups
+        (id, name, permissions)
+        VALUES
+        (:id, :name, :permissions)
+    )";
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    QnSql::bind(data, &query);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
@@ -2305,6 +2324,23 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
+{
+    /* Cleanup all users, belonging to this group. */
+    {
+        QSqlQuery query(m_sdb);
+        const QString queryStr("UPDATE vms_userprofile SET group = NULL WHERE group = :groupId");
+        if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        query.bindValue(":groupId", guid.toRfc4122());
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+    }
+
+    return deleteTableRecord(guid, "vms_user_groups", "id");
+}
+
 ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
 {
     QSqlQuery query(m_sdb);
@@ -2768,6 +2804,14 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     return insertOrReplaceUser(tran.params, internalId);
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran)
+{
+    NX_ASSERT(tran.command == ApiCommand::saveUserGroup, Q_FUNC_INFO, "Unsupported transaction");
+    if (tran.command != ApiCommand::saveUserGroup)
+        return ec2::ErrorCode::serverError;
+    return insertOrReplaceUserGroup(tran.params);
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
 {
     NX_ASSERT(tran.command == ApiCommand::setAccessRights, Q_FUNC_INFO, "Unsupported transaction");
@@ -2777,7 +2821,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessR
     return setAccessRights(tran.params);
 }
 
-ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
+ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -2797,11 +2841,11 @@ ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
     QString objectType = query.value("name").toString();
     if (objectType == "Camera")
         return ApiObject_Camera;
-    else if (objectType == "Storage")
+    else if (objectType == QnResourceTypePool::kStorageTypeId)
         return ApiObject_Storage;
     else if (objectType == QnResourceTypePool::kServerTypeId)
         return ApiObject_Server;
-    else if (objectType == "User")
+    else if (objectType == QnResourceTypePool::kUserTypeId)
         return ApiObject_User;
     else if (objectType == QnResourceTypePool::kLayoutTypeId)
         return ApiObject_Layout;
@@ -2811,7 +2855,7 @@ ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_WebPage;
     else
     {
-        NX_ASSERT(0, "Unknown object type", Q_FUNC_INFO);
+        NX_ASSERT(false, "Unknown object type", Q_FUNC_INFO);
         return ApiObject_NotDefined;
     }
 }
@@ -2850,7 +2894,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
     }
     while(query.next()) {
         ApiObjectInfo info;
-        info.type = (ApiOjectType) query.value(0).toInt();
+        info.type = (ApiObjectType) query.value(0).toInt();
         info.id = QnUuid::fromRfc4122(query.value(1).toByteArray());
         result.push_back(info);
     }
@@ -2858,7 +2902,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
     return result;
 }
 
-ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiOjectType& objectType)
+ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
 {
     ApiObjectInfoList result;
 
@@ -2933,27 +2977,30 @@ ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
-    switch(tran.command) {
-        case ApiCommand::removeCamera:
-            return removeObject(ApiObjectInfo(ApiObject_Camera, tran.params.id));
-        case ApiCommand::removeStorage:
-            return removeObject(ApiObjectInfo(ApiObject_Storage, tran.params.id));
-        case ApiCommand::removeMediaServer:
-            return removeObject(ApiObjectInfo(ApiObject_Server, tran.params.id));
-        case ApiCommand::removeServerUserAttributes:
-            return removeMediaServerUserAttributes(tran.params.id);
-        case ApiCommand::removeLayout:
-            return removeObject(ApiObjectInfo(ApiObject_Layout, tran.params.id));
-        case ApiCommand::removeBusinessRule:
-            return removeObject(ApiObjectInfo(ApiObject_BusinessRule, tran.params.id));
-        case ApiCommand::removeUser:
-            return removeObject(ApiObjectInfo(ApiObject_User, tran.params.id));
-        case ApiCommand::removeVideowall:
-            return removeObject(ApiObjectInfo(ApiObject_Videowall, tran.params.id));
-        case ApiCommand::removeWebPage:
-            return removeObject(ApiObjectInfo(ApiObject_WebPage, tran.params.id));
-        default:
-            return removeObject(ApiObjectInfo(ApiObject_Resource, tran.params.id));
+    switch(tran.command)
+    {
+    case ApiCommand::removeCamera:
+        return removeCamera(tran.params.id);
+    case ApiCommand::removeStorage:
+        return removeStorage(tran.params.id);
+    case ApiCommand::removeMediaServer:
+        return removeServer(tran.params.id);
+    case ApiCommand::removeServerUserAttributes:
+        return removeMediaServerUserAttributes(tran.params.id);
+    case ApiCommand::removeLayout:
+        return removeLayout(tran.params.id);
+    case ApiCommand::removeBusinessRule:
+        return removeBusinessRule(tran.params.id);
+    case ApiCommand::removeUser:
+        return removeUser(tran.params.id);
+    case ApiCommand::removeUserGroup:
+        return removeUserGroup(tran.params.id);
+    case ApiCommand::removeVideowall:
+        return removeVideowall(tran.params.id);
+    case ApiCommand::removeWebPage:
+        return removeWebPage(tran.params.id);
+    default:
+        return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
 }
 
@@ -2986,10 +3033,7 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
     case ApiObject_WebPage:
         result = removeWebPage(apiObject.id);
         break;
-    case ApiObject_Resource:
-        result = removeObject(ApiObjectInfo(getObjectTypeNoLock(apiObject.id), apiObject.id));
-        break;
-    case ApiCommand::NotDefined:
+    case ApiObject_NotDefined:
         result = ErrorCode::ok; // object already removed
         break;
     default:
@@ -3556,6 +3600,27 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDat
 
     return ErrorCode::ok;
 }
+
+//getUserGroups
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& result)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    const QString queryStr = R"(
+        SELECT id, name, permissions
+        FROM vms_user_groups
+        ORDER BY id
+    )";
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    QnSql::fetch_many(query, &result);
+    return ErrorCode::ok;
+}
+
 
 ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {

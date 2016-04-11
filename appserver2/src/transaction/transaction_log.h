@@ -155,6 +155,7 @@ namespace ec2
         QnUuid transactionHash(const ApiStorageData& params) const                { return params.id; }
 		QnUuid transactionHash(const ApiMediaServerUserAttributesData& params) const    { return makeHash(params.serverID.toRfc4122(), "server_attributes"); }
         QnUuid transactionHash(const ApiUserData& params) const                   { return params.id; }
+        QnUuid transactionHash(const ApiUserGroupData& params) const              { return params.id; }
         QnUuid transactionHash(const ApiAccessRightsData& params) const           { return params.userId; }
         QnUuid transactionHash(const ApiLayoutData& params) const                 { return params.id; }
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
