@@ -76,10 +76,6 @@ extern "C"
 
 #include "plugins/plugin_manager.h"
 
-#ifdef _DEBUG
-#include "tests/auto_tester.h"
-#endif
-
 #include "api/session_manager.h"
 #include "ui/actions/action_manager.h"
 #include <nx/network/socket.h>
@@ -268,11 +264,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnClientModule client(startupParams);
 
     /// TODO: #ynikitenkov move other initialization to QnClientModule constructor
-
-    /* Parse command line. */
-#ifdef _DEBUG
-    QnAutoTester autoTester(argc, argv);
-#endif
 
     ec2::DummyHandler dummyEc2RequestHandler;
 
@@ -532,13 +523,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(!startupParams.allowMultipleClientInstances)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
-#ifdef _DEBUG
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
-        QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
-        autoTester.start();
-    }
-#endif
-
     /************************************************************************/
     /* Initializing resource searchers                                      */
     /************************************************************************/
@@ -639,15 +623,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     result = application->exec();
-
-#ifdef _DEBUG
-    if(autoTester.state() == QnAutoTester::Finished) {
-        if(!autoTester.succeeded())
-            result = 1;
-
-        cl_log.log(autoTester.message(), cl_logALWAYS);
-    }
-#endif
 
     QnResourceDiscoveryManager::instance()->stop();
 
