@@ -151,8 +151,9 @@ void ThirdPartyArchiveDelegate::setSingleshotMode( bool /*value*/ )
     //TODO/IMPL
 }
 
-bool ThirdPartyArchiveDelegate::setQuality( MediaQuality quality, bool fastSwitch )
+bool ThirdPartyArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution)
 {
+    Q_UNUSED(resolution); //< not implemented
     return m_archiveReader->setQuality(
         quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh
             ? nxcip::msqHigh

@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #include "udt_pollset.h"
 
 #include <udt/udt.h>
@@ -616,3 +618,5 @@ UdtPollSet::const_iterator UdtPollSet::end() const
 
 }   //network
 }   //nx
+
+#endif

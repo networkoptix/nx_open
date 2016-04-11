@@ -516,9 +516,14 @@ QnUuid QnMediaServerResource::getOriginalGuid() const {
     return m_originalGuid;
 }
 
-void QnMediaServerResource::setOriginalGuid(const QnUuid &guid) {
+void QnMediaServerResource::setOriginalGuid(const QnUuid &guid)
+{
     QnMutexLocker lock(&m_mutex);
     m_originalGuid = guid;
+    NX_ASSERT(m_originalGuid.isNull() ||
+        getStatus() == Qn::Incompatible || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined,
+        Q_FUNC_INFO,
+        "Incompatible servers should not take any status but incompatible or unauthorized");
 }
 
 bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {

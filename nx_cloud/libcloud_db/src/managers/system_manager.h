@@ -8,6 +8,7 @@
 
 #define BOOST_BIND_NO_PLACEHOLDERS
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <stdexcept>
@@ -19,9 +20,10 @@
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <utils/db/async_sql_query_executor.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timermanager.h>
 #include <utils/common/counter.h>
+#include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
@@ -35,6 +37,10 @@
 namespace nx {
 namespace cdb {
 
+namespace conf
+{
+    class Settings;
+}
 class AccountManager;
 
 /*!
@@ -52,6 +58,8 @@ public:
         \throw std::runtime_error In case of failure to pre-fill data cache
     */
     SystemManager(
+        const conf::Settings& settings,
+        TimerManager* const timerManager,
         const AccountManager& accountManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
     virtual ~SystemManager();
@@ -111,7 +119,6 @@ public:
     //    const std::string& systemID,
     //    std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
 
-    boost::optional<data::SystemData> findSystemByID(const std::string& id) const;
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
         - \a accountEmail has no rights for \a systemID
@@ -127,9 +134,22 @@ public:
         data::DataFilter filter);
         
 private:
-    constexpr static const int INDEX_BY_SHARING = 0;
-    constexpr static const int INDEX_BY_ACCOUNT_EMAIL = 1;
-    constexpr static const int INDEX_BY_SYSTEM_ID = 2;
+    typedef boost::multi_index::multi_index_container<
+        data::SystemData,
+        boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<
+                boost::multi_index::member<
+                    api::SystemData, std::string, &api::SystemData::id>>,
+            //indexing by expiration time
+            boost::multi_index::ordered_non_unique<
+                boost::multi_index::member<
+                    data::SystemData, int, &data::SystemData::expirationTimeUtc>,
+                std::greater<int>>
+        >
+    > SystemsDict;
+
+    constexpr static const int SYSTEM_BY_ID_INDEX = 0;
+    constexpr static const int SYSTEM_BY_EXPIRATION_TIME_INDEX = 1;
 
     typedef boost::multi_index::multi_index_container<
         api::SystemSharing,
@@ -145,13 +165,21 @@ private:
         >
     > AccountSystemAccessRoleDict;
 
+    constexpr static const int SHARING_UNIQUE_INDEX = 0;
+    constexpr static const int SHARING_BY_ACCOUNT_EMAIL = 1;
+    constexpr static const int SHARING_BY_SYSTEM_ID = 2;
+
+    const conf::Settings& m_settings;
+    TimerManager* const m_timerManager;
     const AccountManager& m_accountManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     //!map<id, system>
-    Cache<std::string, data::SystemData> m_cache;
+    SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
     QnCounter m_startedAsyncCallsCounter;
+    uint64_t m_dropSystemsTimerId;
+    std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
 
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const connection,
@@ -218,6 +246,12 @@ private:
     nx::db::DBResult fetchSystemToAccountBinder(
         QSqlDatabase* connection,
         int* const /*dummy*/);
+
+    void dropExpiredSystems(uint64_t timerId);
+    nx::db::DBResult deleteExpiredSystemsFromDb(QSqlDatabase* connection);
+    void expiredSystemsDeletedFromDb(
+        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::db::DBResult dbResult);
 };
 
 }   //cdb

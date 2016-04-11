@@ -16,15 +16,25 @@ QnUserAccessRightsResourcesWidget::QnUserAccessRightsResourcesWidget(QWidget* pa
     ui->setupUi(this);
     ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on this layouts."));
 
-    m_model->setResources(qnResPool->getAllCameras(QnResourcePtr()));
+    m_model->setCheckable(true);
+    m_model->setResources(qnResPool->getAllCameras(QnResourcePtr(), true));
+    connect(m_model, &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+    {
+        if (roles.contains(Qt::CheckStateRole)
+            && topLeft.column() <= QnResourceListModel::CheckColumn
+            && bottomRight.column() >= QnResourceListModel::CheckColumn
+            )
+            emit hasChangesChanged();
+    });
+
     ui->resourcesTreeView->setModel(m_model.data());
     ui->resourcesTreeView->setMouseTracking(true);
 
     auto updateThumbnail = [this](const QModelIndex& index)
     {
-        QModelIndex baseIndex = index.column() == Qn::NameColumn
+        QModelIndex baseIndex = index.column() == QnResourceListModel::NameColumn
             ? index
-            : index.sibling(index.row(), Qn::NameColumn);
+            : index.sibling(index.row(), QnResourceListModel::NameColumn);
 
         QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
         ui->nameLabel->setText(toolTip);
@@ -48,4 +58,29 @@ QnUserAccessRightsResourcesWidget::QnUserAccessRightsResourcesWidget(QWidget* pa
 QnUserAccessRightsResourcesWidget::~QnUserAccessRightsResourcesWidget()
 {
 
+}
+
+QSet<QnUuid> QnUserAccessRightsResourcesWidget::checkedResources() const
+{
+    return m_checkedResources;
+}
+
+void QnUserAccessRightsResourcesWidget::setCheckedResources(const QSet<QnUuid>& value)
+{
+    m_checkedResources = value;
+}
+
+bool QnUserAccessRightsResourcesWidget::hasChanges() const
+{
+    return m_model->checkedResources() != m_checkedResources;
+}
+
+void QnUserAccessRightsResourcesWidget::loadDataToUi()
+{
+    m_model->setCheckedResources(m_checkedResources);
+}
+
+void QnUserAccessRightsResourcesWidget::applyChanges()
+{
+    m_checkedResources = m_model->checkedResources();
 }

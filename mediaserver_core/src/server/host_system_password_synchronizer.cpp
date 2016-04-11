@@ -99,7 +99,7 @@ void HostSystemPasswordSynchronizer::at_adminUserChanged( const QnResourcePtr& r
     if( !user )
         return;
 
-    if( !user->isAdmin() )
+    if( !user->isOwner() )
         return;
 
     syncLocalHostRootPasswordWithAdminIfNeeded( user );

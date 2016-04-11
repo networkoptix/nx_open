@@ -10,7 +10,7 @@ angular.module('webadminApp')
 
         $scope.refresh = reload;
         function pingServer(){
-            var request = mediaserver.getSettings(true);
+            var request = mediaserver.getModuleInformation(true);
             request.then(function(){
                 return reload();
             },function(){

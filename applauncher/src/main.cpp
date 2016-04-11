@@ -13,8 +13,8 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 #include <nx/network/socket_global.h>
-#include "version.h"
 
+#include <applauncher_app_info.h>
 #include "applauncher_process.h"
 #include "installation_process.h"
 #include "rdir_syncher.h"
@@ -124,7 +124,7 @@ int main( int argc, char* argv[] )
     QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QString appName = QStringLiteral(QN_APPLICATION_NAME);  //TODO: #GDM implement the common way
+    QString appName = QnApplauncherAppInfo::applicationName();
     
     QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), appName );
     QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), appName );

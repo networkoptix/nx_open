@@ -9,6 +9,7 @@ namespace style
     const int Metrics::kMenuItemVPadding = dp(5);
     const int Metrics::kMenuItemTextLeftPadding = dp(28);
     const int Metrics::kArrowSize = dp(8);
+    const int Metrics::kCrossSize = dp(8);
     const int Metrics::kCheckIndicatorSize = dp(16);
     const int Metrics::kExclusiveIndicatorSize = dp(16);
     const int Metrics::kMenuCheckSize = dp(16);
@@ -24,6 +25,7 @@ namespace style
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
     const char *Properties::kSliderLength = "_qn_sliderLength";
     const char *Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
+    const char *Properties::kTabShape = "_qn_tabShape";
 
     qreal dpr(qreal value)
     {
@@ -44,11 +46,6 @@ namespace style
     bool isDark(const QColor &color)
     {
         return color.toHsl().lightness() < 128;
-    }
-
-    bool isTabRounded(QTabBar::Shape shape)
-    {
-        return shape <= QTabBar::RoundedEast;
     }
 
 

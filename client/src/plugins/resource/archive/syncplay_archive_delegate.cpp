@@ -131,9 +131,9 @@ void QnSyncPlayArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
     m_ownerDelegate->beforeChangeReverseMode(reverseMode);
 }
 
-bool QnSyncPlayArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
+bool QnSyncPlayArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize& size)
 {
-    return m_ownerDelegate->setQuality(quality, fastSwitch);
+    return m_ownerDelegate->setQuality(quality, fastSwitch, size);
 }
 
 QnAbstractMotionArchiveConnectionPtr QnSyncPlayArchiveDelegate::getMotionConnection(int channel)

@@ -7,19 +7,10 @@
 
 #include <utils/common/model_functions_fwd.h>
 
-#ifdef Q_MOC_RUN
-class QnEmail
-#else
-namespace QnEmail
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
 #endif
-{
-#ifdef Q_MOC_RUN
-    Q_GADGET
-    Q_ENUMS(ConnectionType)
-public:
-#else
-    Q_NAMESPACE
-#endif
+QN_DECLARE_METAOBJECT_HEADER(QnEmail, ConnectionType, )
 
     enum ConnectionType {
         Unsecure = 0,

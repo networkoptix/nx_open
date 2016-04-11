@@ -6,40 +6,52 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QnResourceListModel: public QAbstractListModel {
+class QnResourceListModel: public QAbstractItemModel {
     Q_OBJECT
-    typedef QAbstractListModel base_type;
+    typedef QAbstractItemModel base_type;
 
 public:
+    enum Column
+    {
+        NameColumn,
+        CheckColumn,
+        ColumnCount
+    };
+
     QnResourceListModel(QObject *parent = NULL);
     virtual ~QnResourceListModel();
 
-    const QnResourceList &resouces() const;
-    void setResources(const QnResourceList &resouces);
+    const QnResourceList &resources() const;
+    void setResources(const QnResourceList &resources);
     void addResource(const QnResourcePtr &resource);
     void removeResource(const QnResourcePtr &resource);
+
+    QSet<QnUuid> checkedResources() const;
+    void setCheckedResources(const QSet<QnUuid>& ids);
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void updateFromResources();
-    void submitToResources();
+    bool isCheckable() const;
+    void setCheckable(bool value);
 
-    void setShowIp(bool showIp);
-
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+
+    virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    virtual QModelIndex parent(const QModelIndex& child) const override;
 
 private slots:
     void at_resource_resourceChanged(const QnResourcePtr &resource);
 
 protected:
     bool m_readOnly;
-    bool m_showIp;
+    bool m_checkable;
     QnResourceList m_resources;
-    QStringList m_names;
+    QSet<QnUuid> m_checkedResources;
 };
 
 

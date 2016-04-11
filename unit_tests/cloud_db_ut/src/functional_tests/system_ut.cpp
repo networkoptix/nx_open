@@ -278,10 +278,17 @@ TEST_F(CdbFunctionalTest, system_activation)
 
 TEST_F(CdbFunctionalTest, notification_of_system_removal)
 {
-    constexpr const std::chrono::seconds kSystemGoneForeverPeriod = std::chrono::seconds(7);
+    constexpr const std::chrono::seconds kSystemGoneForeverPeriod =
+        std::chrono::seconds(5);
+    constexpr const std::chrono::seconds kDropExpiredSystemsPeriodSec =
+        std::chrono::seconds(1);
 
     addArg("-systemManager/reportRemovedSystemPeriodSec");
     addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
+    addArg("-systemManager/controlSystemStatusByDb");
+    addArg("true");
+    addArg("-systemManager/dropExpiredSystemsPeriodSec");
+    addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -312,15 +319,20 @@ TEST_F(CdbFunctionalTest, notification_of_system_removal)
             api::ResultCode::ok,
             getCdbNonce(system1.id, system1.authKey, &nonceData));
 
+        const auto timeJustBeforeSystemRemoval = std::chrono::steady_clock::now();
         ASSERT_EQ(
             api::ResultCode::ok,
             unbindSystem(account1.email, account1Password, system1.id));
 
-        for (int i = 0; i < 2; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             api::NonceData nonceData;
+            const auto timePassedSinceSystemRemoval = 
+                std::chrono::steady_clock::now() - timeJustBeforeSystemRemoval;
             ASSERT_EQ(
-                api::ResultCode::credentialsRemovedPermanently,
+                timePassedSinceSystemRemoval < kSystemGoneForeverPeriod
+                    ? api::ResultCode::credentialsRemovedPermanently
+                    : api::ResultCode::notAuthorized,
                 getCdbNonce(system1.id, system1.authKey, &nonceData));
 
             //checking HTTP status code
@@ -343,11 +355,9 @@ TEST_F(CdbFunctionalTest, notification_of_system_removal)
             else if (i == 1)
             {
                 //waiting for result code to switch to notAuthorized
-                std::this_thread::sleep_for(kSystemGoneForeverPeriod);
-
-                ASSERT_EQ(
-                    api::ResultCode::notAuthorized,
-                    getCdbNonce(system1.id, system1.authKey, &nonceData));
+                std::this_thread::sleep_for(
+                    kSystemGoneForeverPeriod + kDropExpiredSystemsPeriodSec*2);
+                continue;
             }
         }
     }

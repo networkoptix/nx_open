@@ -66,6 +66,8 @@ void syncSocketServerMainFunc(
         << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(server->listen(clientCount))
         << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->setRecvTimeout(60*1000))
+        << SystemError::getLastOSErrorText().toStdString();
 
     for (int i = clientCount; i > 0; --i)
     {

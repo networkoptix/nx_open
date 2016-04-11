@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
+#include <QtCore/QSize>
 
 class QAbstractVideoSurface;
 
@@ -42,9 +43,10 @@ public:
 
     enum class VideoQuality
     {
-        Auto,
-        Low,
-        High,
+        Auto, //< Auto qualit
+        Low,  //< Native stream, low quality
+        High, //< Native stream, high quality
+        Custom //< Custom resolution (transcoding required)
     };
 
     Q_ENUMS(State)
@@ -90,6 +92,11 @@ public:
     * Video quality
     */
     Q_PROPERTY(VideoQuality videoQuality READ videoQuality WRITE setVideoQuality)
+
+    /**
+    * User defined resolution for custom video quality
+    */
+    Q_PROPERTY(QSize videoResolution READ videoResolution WRITE setVideoResolution)
 public:
     Player(QObject *parent = nullptr);
     ~Player();
@@ -115,6 +122,9 @@ public:
 
     VideoQuality videoQuality() const;
     void setVideoQuality(const VideoQuality& value);
+
+    QSize videoResolution() const;
+    void setVideoResolution(const QSize& value);
 
 public slots:
     void play();

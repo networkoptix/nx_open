@@ -236,6 +236,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
         if (!isSuitable(serverData))
             return;
 
+        NX_ASSERT(serverData.status != Qn::Offline, Q_FUNC_INFO, "Offline status is a mark to remove fake server.");
         QnMediaServerResourcePtr server = makeResource(serverData);
         {
             QnMutexLocker lock(&mutex);
@@ -261,8 +262,8 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
         if (!server)
             return;
 
-        server->setFakeServerModuleInformation(serverData);
         server->setStatus(serverData.status);
+        server->setFakeServerModuleInformation(serverData);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())

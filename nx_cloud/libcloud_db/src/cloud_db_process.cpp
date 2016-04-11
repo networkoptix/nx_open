@@ -130,6 +130,9 @@ int CloudDBProcess::executeApplication()
             return 2;
         }
 
+        TimerManager timerManager;
+        timerManager.start();
+
         std::unique_ptr<AbstractEmailManager> emailManager(
             EMailManagerFactory::create(settings));
         StreeManager streeManager(settings.auth());
@@ -146,6 +149,8 @@ int CloudDBProcess::executeApplication()
             emailManager.get());
 
         SystemManager systemManager(
+            settings,
+            &timerManager,
             accountManager,
             &dbManager);
 
@@ -459,6 +464,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kRenameSystemAccessRoles);
     dbStructureUpdater.addUpdateScript(db::kChangeSystemIdTypeToString);
     dbStructureUpdater.addUpdateScript(db::kAddDeletedSystemState);
+    dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
     return dbStructureUpdater.updateStructSync();
 }
 

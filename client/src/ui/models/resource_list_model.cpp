@@ -1,41 +1,63 @@
 #include "resource_list_model.h"
 
-#include <utils/common/checked_cast.h>
+#include <client/client_globals.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 
+#include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
-#include <client/client_globals.h>
 
-QnResourceListModel::QnResourceListModel(QObject *parent): 
-    QAbstractListModel(parent),
-    m_readOnly(true), // TODO: #Elric change to false, makes more sense.
-    m_showIp(false)
+#include <utils/common/checked_cast.h>
+
+QnResourceListModel::QnResourceListModel(QObject *parent) :
+    base_type(parent),
+    m_readOnly(false),
+    m_checkable(false)
 {}
 
-QnResourceListModel::~QnResourceListModel() {
+QnResourceListModel::~QnResourceListModel()
+{
     return;
 }
 
-bool QnResourceListModel::isReadOnly() const {
+bool QnResourceListModel::isReadOnly() const
+{
     return m_readOnly;
 }
 
-void QnResourceListModel::setReadOnly(bool readOnly) {
+void QnResourceListModel::setReadOnly(bool readOnly)
+{
     m_readOnly = readOnly;
 }
 
-const QnResourceList &QnResourceListModel::resouces() const {
+bool QnResourceListModel::isCheckable() const
+{
+    return m_checkable;
+}
+
+void QnResourceListModel::setCheckable(bool value)
+{
+    if (m_checkable == value)
+        return;
+    beginResetModel();
+    m_checkable = value;
+    endResetModel();
+}
+
+const QnResourceList &QnResourceListModel::resources() const
+{
     return m_resources;
 }
 
-void QnResourceListModel::setResources(const QnResourceList &resouces) {
+void QnResourceListModel::setResources(const QnResourceList &resources)
+{
     beginResetModel();
 
     foreach(const QnResourcePtr &resource, m_resources)
         disconnect(resource.data(), NULL, this, NULL);
 
-    m_resources = resouces;
+    m_resources = resources;
 
     foreach(const QnResourcePtr &resource, m_resources) {
         connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
@@ -46,7 +68,8 @@ void QnResourceListModel::setResources(const QnResourceList &resouces) {
     endResetModel();
 }
 
-void QnResourceListModel::addResource(const QnResourcePtr &resource) {
+void QnResourceListModel::addResource(const QnResourcePtr &resource)
+{
     foreach(const QnResourcePtr &r, m_resources) // TODO: #Elric checking for duplicates does not belong here. Makes no sense!
         if (r->getId() == resource->getId())
             return;
@@ -62,7 +85,8 @@ void QnResourceListModel::addResource(const QnResourcePtr &resource) {
     endInsertRows();
 }
 
-void QnResourceListModel::removeResource(const QnResourcePtr &resource) {
+void QnResourceListModel::removeResource(const QnResourcePtr &resource)
+{
     if (!resource)
         return;
 
@@ -84,41 +108,49 @@ void QnResourceListModel::removeResource(const QnResourcePtr &resource) {
     endRemoveRows();
 }
 
-void QnResourceListModel::updateFromResources() {
-    QStringList names = m_names;
-    m_names.clear();
-
-    if(!names.empty())
-        emit dataChanged(index(0, 0), index(names.size() - 1, 0));
+QSet<QnUuid> QnResourceListModel::checkedResources() const
+{
+    return m_checkedResources;
 }
 
-void QnResourceListModel::submitToResources() {
-    for(int i = 0; i < m_names.size(); i++)
-        if(!m_names[i].isNull())
-            m_resources[i]->setName(m_names[i]);
-    m_names.clear();
+void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
+{
+    if (m_checkedResources == ids)
+        return;
+
+    beginResetModel();
+    m_checkedResources = ids;
+    endResetModel();
 }
 
-void QnResourceListModel::setShowIp(bool showIp) {
-    m_showIp = showIp;
+int QnResourceListModel::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    if (m_checkable)
+        return ColumnCount;
+    return ColumnCount - 1; //CheckColumn is the last
 }
 
-int QnResourceListModel::rowCount(const QModelIndex &parent) const {
+int QnResourceListModel::rowCount(const QModelIndex &parent) const
+{
     if(!parent.isValid())
         return m_resources.size();
 
     return 0;
 }
 
-Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const {
+Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return Qt::NoItemFlags;
+
+    int column = index.column();
+
+    if (column == CheckColumn)
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+
     Qt::ItemFlags result = base_type::flags(index);
     if(m_readOnly)
-        return result;
-
-    if(!index.isValid())
-        return result;
-
-    if(!hasIndex(index.row(), index.column(), index.parent()))
         return result;
 
     const QnResourcePtr &resource = m_resources[index.row()];
@@ -129,9 +161,12 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const {
 }
 
 
-QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
+QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
+{
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
+
+    int column = index.column();
 
     const QnResourcePtr &resource = m_resources[index.row()];
     if(!resource)
@@ -139,35 +174,39 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
 
     switch(role) {
     case Qt::DisplayRole:
-    case Qt::EditRole:
     case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
     case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole: {
-        QString name;
-        if(m_names.size() > index.row() && !m_names[index.row()].isNull()) {
-            name = m_names[index.row()];
-        } else {
-            name = resource->getName();
-        }
+    case Qt::AccessibleDescriptionRole:
+        if (column == NameColumn)
+            return getResourceName(resource);
+        break;
 
-        if (m_showIp && role != Qt::EditRole)
-            return lit("%1 (%2)").arg(name, extractHost(resource->getUrl()));
-        else
-            return name;
-    }
+    case Qt::EditRole:
+        if (column == NameColumn)
+            return getFullResourceName(resource, false);
+        break;
+
     case Qt::DecorationRole:
-        if (index.column() == 0)
+        if (index.column() == NameColumn)
             return qnResIconCache->icon(resource);
         break;
+
+    case Qt::CheckStateRole:
+        if (index.column() == CheckColumn)
+            return m_checkedResources.contains(resource->getId())
+                ? Qt::Checked
+                : Qt::Unchecked;
+        break;
+
     case Qn::ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(resource);
     case Qn::ResourceFlagsRole:
         return static_cast<int>(resource->flags());
-    case Qn::ResourceSearchStringRole: 
+    case Qn::ResourceSearchStringRole:
         return resource->toSearchString();
-    case Qn::ResourceStatusRole: 
+    case Qn::ResourceStatusRole:
         return static_cast<int>(resource->getStatus());
     default:
         break;
@@ -176,34 +215,44 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    if(role != Qt::EditRole)
+bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
 
-    if(!index.isValid())
-        return false;
+    if (index.column() == CheckColumn && role == Qt::CheckStateRole)
+    {
+        const QnResourcePtr &resource = m_resources[index.row()];
+        if (!resource)
+            return false;
 
-    if(!hasIndex(index.row(), index.column(), index.parent()))
-        return false;
-
-    const QnResourcePtr &resource = m_resources[index.row()];
-    if(!resource)
-        return false;
-
-    while(m_names.size() <= index.row())
-        m_names.push_back(QString());
-
-    QString string = value.toString();
-    if(string.isEmpty())
-        string = QString();
-
-    m_names[index.row()] = string;
-    emit dataChanged(index, index);
-    
-    return true;
+        bool checked = static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked;
+        if (checked)
+            m_checkedResources.insert(resource->getId());
+        else
+            m_checkedResources.remove(resource->getId());
+        emit dataChanged(index, index, QVector<int>() << Qt::CheckStateRole);
+        return true;
+    }
+    return false;
 }
 
-void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resource) {
+QModelIndex QnResourceListModel::index(int row, int column, const QModelIndex &parent /*= QModelIndex()*/) const
+{
+    /* Here rowCount and columnCount are checked */
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+    return createIndex(row, column);
+}
+
+QModelIndex QnResourceListModel::parent(const QModelIndex& child) const
+{
+    Q_UNUSED(child)
+    return QModelIndex();
+}
+
+void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resource)
+{
     int row = m_resources.indexOf(resource);
     if(row == -1)
         return;

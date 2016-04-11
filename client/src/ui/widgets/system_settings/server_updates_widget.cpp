@@ -74,13 +74,13 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
     connect(ui->cancelButton,           &QPushButton::clicked,      this, [this] {
-        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             return;
         m_updateTool->cancelUpdate();
     });
 
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
-        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             return;
         m_updateTool->startUpdate(m_targetVersion);
     });
@@ -88,7 +88,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->internetDetailLabel->setVisible(false);
 
     connect(ui->localUpdateButton,      &QPushButton::clicked,      this, [this] {
-        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+        if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             return;
         m_updateTool->startUpdate(ui->filenameLineEdit->text());
     });
@@ -457,7 +457,7 @@ void QnServerUpdatesWidget::autoCheckForUpdatesInternet() {
 }
 
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
-    if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
     if (m_checkingInternet || !m_updateTool->idle())
@@ -555,7 +555,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 }
 
 void QnServerUpdatesWidget::checkForUpdatesLocal() {
-    if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
     if (m_checkingLocal)

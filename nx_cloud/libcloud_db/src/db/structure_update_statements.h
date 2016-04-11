@@ -204,6 +204,12 @@ INSERT INTO system_status( code, description )                              \
                    VALUES( 3,    'deleted' );                               \
 ";
 
+//#CLOUD-299
+static const char kSystemExpirationTime[] =
+"                                                                           \
+ALTER TABLE system ADD COLUMN expiration_utc_timestamp INTEGER DEFAULT 0;   \
+";
+
 }   //db
 }   //cdb
 }   //nx

@@ -231,6 +231,7 @@ bool QnArchiveStreamReader::init()
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
     MediaQuality quality = m_quality;
+    QSize resolution = m_customResolution;
     m_jumpMtx.unlock();
     bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
     if (imSeek && (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode))
@@ -238,7 +239,7 @@ bool QnArchiveStreamReader::init()
         // It is optimization: open and jump at same time
         while (1)
         {
-            m_delegate->setQuality(quality, true);
+            m_delegate->setQuality(quality, true, m_customResolution);
             qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
             bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
             Q_UNUSED(seekOk)
@@ -253,11 +254,12 @@ bool QnArchiveStreamReader::init()
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
             quality = m_quality;
+            resolution = m_customResolution;
             m_jumpMtx.unlock();
         }
     }
 
-    m_delegate->setQuality(quality, true);
+    m_delegate->setQuality(quality, true, resolution);
     if (!m_delegate->open(m_resource)) {
         if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
             emit jumpOccured(requiredJumpTime);
@@ -273,6 +275,7 @@ bool QnArchiveStreamReader::init()
     m_jumpMtx.lock();
     m_oldQuality = quality;
     m_oldQualityFastSwitch = true;
+    m_oldResolution = resolution;
     m_jumpMtx.unlock();
 
     // Alloc common resources
@@ -442,16 +445,18 @@ begin_label:
     m_requiredJumpTime = AV_NOPTS_VALUE;
     MediaQuality quality = m_quality;
     bool qualityFastSwitch = m_qualityFastSwitch;
+    QSize resolution = m_customResolution;
     qint64 tmpSkipFramesToTime = m_tmpSkipFramesToTime;
     m_tmpSkipFramesToTime = 0;
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
     qint64 currentTimeHint = m_currentTimeHint;
     m_currentTimeHint = AV_NOPTS_VALUE;
 
-    bool needChangeQuality = m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch;
+    bool needChangeQuality = m_oldQuality != quality || qualityFastSwitch > m_oldQualityFastSwitch || resolution != m_oldResolution;
     if (needChangeQuality) {
         m_oldQuality = quality;
         m_oldQualityFastSwitch = qualityFastSwitch;
+        m_oldResolution = resolution;
     }
 
     m_dataMarker = m_newDataMarker;
@@ -462,7 +467,7 @@ begin_label:
     if (needChangeQuality)
     {
         // !m_delegate->isRealTimeSource()
-        bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch);
+        bool needSeek = m_delegate->setQuality(quality, qualityFastSwitch, resolution);
         if (needSeek && jumpTime == qint64(AV_NOPTS_VALUE) && reverseMode == m_prevReverseMode)
         {
             qint64 displayTime = determineDisplayTime(reverseMode);
@@ -1170,22 +1175,16 @@ void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
-void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
+void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution)
 {
-    QnMutexLocker lock( &m_jumpMtx );
-    m_oldQuality = m_quality = quality;
-    m_oldQualityFastSwitch = m_qualityFastSwitch = true;
-}
-
-void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
-{
-    if (m_quality != quality || fastSwitch > m_qualityFastSwitch)
+    if (m_quality != quality || fastSwitch > m_qualityFastSwitch || m_customResolution != resolution)
     {
         bool useMutex = !m_externalLocked;
         if (useMutex)
             m_jumpMtx.lock();
         m_quality = quality;
         m_qualityFastSwitch = fastSwitch;
+        m_customResolution = resolution;
         if (useMutex)
             m_jumpMtx.unlock();
     }
@@ -1212,7 +1211,6 @@ void QnArchiveStreamReader::unlock()
 void QnArchiveStreamReader::setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate)
 {
     m_delegate = contextDelegate;
-    connect(m_delegate, SIGNAL(qualityChanged(MediaQuality)), this, SLOT(onDelegateChangeQuality(MediaQuality)), Qt::DirectConnection);
 }
 
 void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)

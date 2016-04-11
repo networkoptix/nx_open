@@ -847,7 +847,7 @@ QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, con
     auto templateValues = unresolvedTemplate.split(",");
     auto cameraValues = valueFromCamera.split(",");
 
-    for(size_t i = 0; i < templateValues.size(); i++)
+    for (int i = 0; i < templateValues.size(); i++)
     {
         if(i >= cameraValues.size())
             break;
@@ -1019,7 +1019,7 @@ void QnActiResource::extractParamValues(const QString &paramValue, const QString
     const auto paramValues = paramValue.split(',');
     const auto paramCount = paramNames.size();
 
-    for(size_t i = 0; i < paramCount; i++)
+    for (int i = 0; i < paramCount; i++)
     {
         auto name = paramNames.at(i).mid(1);
         if(i < paramCount - 1)

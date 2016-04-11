@@ -3,12 +3,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
@@ -84,7 +84,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf help</rdep.packages>
     </properties>
     <profiles>
         <profile>

@@ -85,9 +85,9 @@ public:
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override;
     //!Implementation of AbstractSocket::close
-    virtual void close() override;
+    virtual bool close() override;
     //!Implementation of AbstractSocket::shutdown
-    virtual void shutdown() override;
+    virtual bool shutdown() override;
 
     //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override;
@@ -194,7 +194,7 @@ public:
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS) override;
+        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -225,8 +225,8 @@ public:
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
-    virtual void close() override;
-    virtual void shutdown() override;
+    virtual bool close() override;
+    virtual bool shutdown() override;
 
 private:
     aio::AsyncSocketImplHelper<Pollable>* m_aioHelper;

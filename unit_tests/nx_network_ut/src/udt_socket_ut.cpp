@@ -160,6 +160,7 @@ TEST_F(SocketUdt, cancelConnect)
     serverSocket.pleaseStopSync();
 }
 
+#if 0
 TEST(SocketUdt_UdtPollSet, general)
 {
     UdtPollSet pollset;
@@ -178,6 +179,7 @@ TEST(SocketUdt_UdtPollSet, general)
     auto result = pollset.poll(100);
     ASSERT_EQ(0, result);
 }
+#endif
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
     TEST_F, SocketUdt,

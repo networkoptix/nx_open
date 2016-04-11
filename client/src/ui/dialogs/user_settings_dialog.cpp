@@ -11,6 +11,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
@@ -25,11 +26,9 @@
 
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
-#define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
-
-namespace Qn {
-    const quint64 ExcludingOwnerPermission = GlobalOwnerPermissions & ~GlobalAdminPermissions;
-    const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
+namespace
+{
+    const int kCustomRights = 0x00FFFFFF;
 }
 
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
@@ -77,6 +76,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
 
     //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
+
+    connect(ui->accessRightsWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]() { setHasChanges(); });
 
     setWarningStyle(ui->hintLabel);
 
@@ -203,11 +204,8 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
     else
         m_mode = Mode::OtherUser;
 
-    if (accessController()->globalPermissions()) {
-        createAccessRightsPresets();
-        createAccessRightsAdvanced();
-    }
-
+    createAccessRightsPresets();
+    createAccessRightsAdvanced();
     updateFromResource();
 }
 
@@ -236,10 +234,14 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->emailEdit->setText(m_user->getEmail());
         ui->enabledCheckBox->setChecked(m_user->isEnabled());
 
-        loadAccessRightsToUi(accessController()->globalPermissions(m_user));
+        loadAccessRightsToUi(qnResourceAccessManager->globalPermissions(m_user));
     }
     updateLogin();
     updatePassword();
+
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_user->getId());
+    ui->accessRightsWidget->setAccessibleResources(accessibleResources);
+    ui->accessRightsWidget->loadDataToUi();
 
     setHasChanges(false);
 }
@@ -260,16 +262,20 @@ void QnUserSettingsDialog::submitToResource() {
 
     /* User cannot change it's own rights */
     if (m_accessRightsModified && (permissions & Qn::WriteAccessRightsPermission)) {
-        quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-        if (rights == CUSTOM_RIGHTS)
+        int rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toInt();
+        if (rights == kCustomRights)
             rights = readAccessRightsAdvanced();
-        m_user->setPermissions(rights);
+        m_user->setPermissions(static_cast<Qn::GlobalPermissions>(rights));
     }
     if( m_emailModified )
         m_user->setEmail(ui->emailEdit->text());
 
     if (m_enabledModified)
         m_user->setEnabled(ui->enabledCheckBox->isChecked());
+
+    ui->accessRightsWidget->applyChanges();
+    auto accessibleResources = ui->accessRightsWidget->accessibleResources();
+    qnResourceAccessManager->setAccessibleResources(m_user->getId(), accessibleResources);
 
     setHasChanges(false);
 }
@@ -383,8 +389,8 @@ void QnUserSettingsDialog::updateElement(Element element) {
             hint = tr("Choose access rights.");
             valid = false;
         } else {
-            quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-            if (rights == CUSTOM_RIGHTS)
+            int rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toInt();
+            if (rights == kCustomRights)
                 ui->advancedButton->setChecked(true);
             else
                 fillAccessRightsAdvanced(rights);
@@ -411,7 +417,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
     setHint(element, hint);
 }
 
-void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights) {
+void QnUserSettingsDialog::loadAccessRightsToUi(int rights) {
     selectAccessRightsPreset(rights);
     fillAccessRightsAdvanced(rights);
 }
@@ -434,13 +440,14 @@ void QnUserSettingsDialog::updateSizeLimits() {
 void QnUserSettingsDialog::updateDependantPermissions() {
     m_inUpdateDependensies = true;
 
-    bool isOwner = isCheckboxChecked(Qn::ExcludingOwnerPermission);
-    if (isOwner){
-        setCheckboxEnabled(Qn::ExcludingAdminPermission, false);
-        setCheckboxChecked(Qn::ExcludingAdminPermission);
+    bool isOwner = isCheckboxChecked(Qn::GlobalOwnerPermission);
+    if (isOwner)
+    {
+        setCheckboxEnabled(Qn::GlobalAdminPermission, false);
+        setCheckboxChecked(Qn::GlobalAdminPermission);
     }
 
-    bool isAdmin = isCheckboxChecked(Qn::ExcludingAdminPermission);
+    bool isAdmin = isCheckboxChecked(Qn::GlobalAdminPermission);
     if (isAdmin){
         setCheckboxEnabled(Qn::GlobalEditCamerasPermission, false);
         setCheckboxChecked(Qn::GlobalEditCamerasPermission);
@@ -487,36 +494,39 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = accessController()->globalPermissions(m_user);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
 
     // show only for view of owner
-    if (permissions & Qn::GlobalEditProtectedUserPermission)
-        ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermissions);
+    if (permissions.testFlag(Qn::GlobalOwnerPermission))
+        ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermission);
 
     // show for an admin or for anyone opened by owner
-    if ((permissions & Qn::GlobalProtectedPermission) || (accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission))
-        ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermissions);
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
+        ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermission);
 
     ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissions);
     ui->accessRightsComboBox->addItem(tr("Viewer"), Qn::GlobalViewerPermissions);
     ui->accessRightsComboBox->addItem(tr("Live Viewer"), Qn::GlobalLiveViewerPermissions);
 
-    ui->accessRightsComboBox->addItem(tr("Custom..."), CUSTOM_RIGHTS); // should be the last
+    ui->accessRightsComboBox->addItem(tr("Custom..."), kCustomRights); // should be the last
 }
 
-void QnUserSettingsDialog::createAccessRightsAdvanced() {
+void QnUserSettingsDialog::createAccessRightsAdvanced()
+{
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = accessController()->globalPermissions(m_user);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
     QWidget* previous = ui->advancedButton;
 
-    if (permissions & Qn::GlobalEditProtectedUserPermission)
-        previous = createAccessRightCheckBox(tr("Owner"), Qn::ExcludingOwnerPermission, previous);
-    if ((permissions & Qn::GlobalProtectedPermission) || (accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission))
+    if (permissions.testFlag(Qn::GlobalOwnerPermission))
+        previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalOwnerPermission, previous);
+
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
         previous = createAccessRightCheckBox(tr("Administrator"),
-                     Qn::ExcludingAdminPermission,
+                     Qn::GlobalAdminPermission,
                      previous);
+
     previous = createAccessRightCheckBox(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Can adjust devices settings"),
         tr("Can adjust cameras settings")
@@ -529,7 +539,8 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     updateDependantPermissions();
 }
 
-QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous) {
+QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, int right, QWidget *previous)
+{
     QCheckBox *checkBox = new QCheckBox(text, this);
     ui->accessRightsGroupbox->layout()->addWidget(checkBox);
     m_advancedRights.insert(right, checkBox);
@@ -542,29 +553,34 @@ QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64
     return checkBox;
 }
 
-void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
+void QnUserSettingsDialog::selectAccessRightsPreset(int rights)
+{
     bool custom = true;
-    for (int i = 0; i < ui->accessRightsComboBox->count(); i++) {
-        if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights) {
+    for (int i = 0; i < ui->accessRightsComboBox->count(); i++)
+    {
+        if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights)
+        {
             ui->accessRightsComboBox->setCurrentIndex(i);
             custom = false;
             break;
         }
     }
 
-    if (custom) {
+    if (custom)
+    {
         ui->advancedButton->setChecked(true);
         ui->accessRightsComboBox->setCurrentIndex(ui->accessRightsComboBox->count() - 1);
     }
 }
 
-void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
+void QnUserSettingsDialog::fillAccessRightsAdvanced(int rights)
+{
     if (m_inUpdateDependensies)
         return; //just in case
 
     m_inUpdateDependensies = true;
 
-    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+    for(auto pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
         if(pos.value())
             pos.value()->setChecked((pos.key() & rights) == pos.key());
     m_inUpdateDependensies = false;
@@ -572,15 +588,17 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
     updateDependantPermissions(); // TODO: #GDM #Common rename to something more sane, connect properly
 }
 
-quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
-    quint64 result = Qn::GlobalViewLivePermission;
-    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+int QnUserSettingsDialog::readAccessRightsAdvanced()
+{
+    int result = Qn::GlobalViewLivePermission;
+    for(auto pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
         if(pos.value() && pos.value()->isChecked())
             result |= pos.key();
     return result;
 }
 
-void QnUserSettingsDialog::at_advancedButton_toggled() {
+void QnUserSettingsDialog::at_advancedButton_toggled()
+{
     ui->accessRightsGroupbox->setVisible(ui->advancedButton->isChecked());
 
     /* Do forced activation of all layouts in the chain to avoid flicker.
@@ -599,17 +617,17 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
 
 // Utility functions
 
-bool QnUserSettingsDialog::isCheckboxChecked(quint64 right){
+bool QnUserSettingsDialog::isCheckboxChecked(int right){
     return m_advancedRights[right] ? m_advancedRights[right]->isChecked() : false;
 }
 
-void QnUserSettingsDialog::setCheckboxChecked(quint64 right, bool checked){
+void QnUserSettingsDialog::setCheckboxChecked(int right, bool checked){
     if(QCheckBox *targetCheckBox = m_advancedRights[right]) {
         targetCheckBox->setChecked(checked);
     }
 }
 
-void QnUserSettingsDialog::setCheckboxEnabled(quint64 right, bool enabled){
+void QnUserSettingsDialog::setCheckboxEnabled(int right, bool enabled){
     if(QCheckBox *targetCheckBox = m_advancedRights[right]) {
         targetCheckBox->setEnabled(enabled);
     }

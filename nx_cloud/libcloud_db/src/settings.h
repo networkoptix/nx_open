@@ -39,11 +39,7 @@ class Notification
 public:
     bool enabled;
 
-    Notification()
-    :
-        enabled(true)
-    {
-    }
+    Notification();
 };
 
 class AccountManager
@@ -59,6 +55,13 @@ public:
         result code during this period after system removal
     */
     std::chrono::seconds reportRemovedSystemPeriod;
+    /** System is removed from DB if has not been activated in this period */
+    std::chrono::seconds notActivatedSystemLivePeriod;
+    /** Once per this period expired systems are removed from DB */
+    std::chrono::seconds dropExpiredSystemsPeriod;
+    bool controlSystemStatusByDb;
+
+    SystemManager();
 };
 
 

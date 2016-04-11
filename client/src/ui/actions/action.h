@@ -1,8 +1,5 @@
-#ifndef QN_ACTION_H
-#define QN_ACTION_H
+#pragma once
 
-#include <QtCore/QMetaType>
-#include <QtCore/QPointer>
 #include <QtWidgets/QAction>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -24,15 +21,16 @@ class QnActionParameters;
 
 /**
  * Action class that hooks into actions infrastructure to correctly check
- * conditions and provide proper action parameters even if it was triggered with a 
+ * conditions and provide proper action parameters even if it was triggered with a
  * hotkey.
  */
-class QnAction: public QAction, public QnWorkbenchContextAware {
-    Q_OBJECT;
+class QnAction: public QAction, public QnWorkbenchContextAware
+{
+    Q_OBJECT
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param id                        Identifier of this action.
      * \param parent                    Context-aware parent of this action.
      */
@@ -46,70 +44,53 @@ public:
     /**
      * \returns                         Identifier of this action.
      */
-    QnActions::IDType id() const {
-        return m_id;
-    }
+    QnActions::IDType id() const;
 
     /**
      * \returns                         Scope of this action.
      */
-    Qn::ActionScopes scope() const {
-        return static_cast<Qn::ActionScopes>(static_cast<int>(m_flags) & Qn::ScopeMask);
-    }
+    Qn::ActionScopes scope() const;
 
     /**
      * \returns                         Possible types of this action's default parameter.
      */
-    Qn::ActionParameterTypes defaultParameterTypes() const {
-        return static_cast<Qn::ActionParameterTypes>(static_cast<int>(m_flags) & Qn::TargetTypeMask);
-    }
+    Qn::ActionParameterTypes defaultParameterTypes() const;
 
     /**
      * \param target                    Action parameter key.
      * \returns                         Permissions that are required for the provided parameter.
      */
-    Qn::Permissions requiredPermissions(int target = -1) const {
-        return m_permissions.value(target).required;
-    }
-
-    void setRequiredPermissions(Qn::Permissions requiredPermissions);
+    Qn::Permissions requiredTargetPermissions(int target = -1) const;
 
     /**
-     * \param target                    Action parameter key.
-     * \param requiredPermissions       Permissions required for the provided parameter.
-     */
-    void setRequiredPermissions(int target, Qn::Permissions requiredPermissions);
+    * \param target                    Action parameter key.
+    * \param requiredPermissions       Permissions required for the provided parameter.
+    */
+    void setRequiredTargetPermissions(int target, Qn::Permissions requiredPermissions);
 
     /**
-     * \param target                    Name of the action parameter.
-     * \returns                         Permissions that must not be present for the provided parameter.
-     */
-    Qn::Permissions forbiddenPermissions(int target = -1) const {
-        return m_permissions.value(target).forbidden;
-    }
+    * \param requiredPermissions       Permissions required for the default target.
+    */
+    void setRequiredTargetPermissions(Qn::Permissions requiredPermissions);
 
-    void setForbiddenPermissions(int target, Qn::Permissions forbiddenPermissions);
+    /**
+    * \param requiredPermissions       Global permissions that the current user must have.
+    */
+    void setRequiredGlobalPermission(Qn::GlobalPermission requiredPermissions);
 
-    void setForbiddenPermissions(Qn::Permissions forbiddenPermissions);
 
-    QnActionTypes::ClientModes mode() const {
-        return m_mode;
-    }
+    QnActionTypes::ClientModes mode() const;
 
     void setMode(QnActionTypes::ClientModes mode);
 
-    Qn::ActionFlags flags() const {
-        return m_flags;
-    }
+    Qn::ActionFlags flags() const;
 
     void setFlags(Qn::ActionFlags flags);
 
     /**
      * \returns                         Default text of this action.
      */
-    const QString &normalText() const {
-        return m_normalText;
-    }
+    const QString &normalText() const;
 
     /**
      * \param normalText                Default text of this action.
@@ -119,9 +100,7 @@ public:
     /**
      * \returns                         Text for this action that is to be used when it is toggled.
      */
-    const QString &toggledText() const {
-        return m_toggledText.isEmpty() ? m_normalText : m_toggledText;
-    }
+    const QString &toggledText() const;
 
     /**
      * \param toggledText               Text for this action that is to be used when it is toggled.
@@ -130,12 +109,10 @@ public:
     void setToggledText(const QString &toggledText);
 
     /**
-     * \returns                         Text for this action that is to be used when it is pulled into 
+     * \returns                         Text for this action that is to be used when it is pulled into
      *                                  the enclosing menu.
      */
-    const QString &pulledText() const {
-        return m_pulledText.isEmpty() ? m_normalText : m_pulledText;
-    }
+    const QString &pulledText() const;
 
     /**
      * \param pulledText                Text for this action that is to be used when it is pulled into the
@@ -146,24 +123,18 @@ public:
     /**
      * \returns                         Condition associated with this action, of NULL if none.
      */
-    QnActionCondition *condition() const {
-        return m_condition.data();
-    }
+    QnActionCondition *condition() const;
 
     /**
      * \param condition                 New condition for this action.
      */
     void setCondition(QnActionCondition *condition);
 
-    QnActionFactory *childFactory() const {
-        return m_childFactory.data();
-    }
+    QnActionFactory *childFactory() const;
 
     void setChildFactory(QnActionFactory *childFactory);
 
-    QnActionTextFactory *textFactory() const {
-        return m_textFactory.data();
-    }
+    QnActionTextFactory *textFactory() const;
 
     void setTextFactory(QnActionTextFactory *textFactory);
 
@@ -171,9 +142,7 @@ public:
      * \returns                         Child actions. These action will appear
      *                                  in a submenu for this action.
      */
-    const QList<QnAction *> &children() const {
-        return m_children;
-    }
+    const QList<QnAction *> &children() const;
 
     void addChild(QnAction *action);
 
@@ -218,17 +187,11 @@ private:
     QString defaultToolTipFormat() const;
 
 private:
-    struct Permissions {
-        Permissions(): required(0), forbidden(0) {}
-
-        Qn::Permissions required;
-        Qn::Permissions forbidden;
-    };
-
     const QnActions::IDType m_id;
     Qn::ActionFlags m_flags;
     QnActionTypes::ClientModes m_mode;
-    QHash<int, Permissions> m_permissions;
+    QHash<int, Qn::Permissions> m_targetPermissions;
+    Qn::GlobalPermission m_globalPermission;
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     QPointer<QnActionCondition> m_condition;
@@ -237,7 +200,8 @@ private:
 
     QList<QnAction *> m_children;
 
-    struct ConditionalText {
+    struct ConditionalText
+    {
         QnActionCondition * condition;
         QString text;
         ConditionalText(){}
@@ -248,6 +212,4 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnAction *)
-
-#endif // QN_ACTION_H
 

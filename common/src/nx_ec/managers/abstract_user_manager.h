@@ -86,51 +86,31 @@ namespace ec2
         \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType>
-        int addAccess(const ec2::ApiAccessRightsData& access, TargetType* target, HandlerType handler)
+        int setAccessRights(const ec2::ApiAccessRightsData& data, TargetType* target, HandlerType handler)
         {
-            return addAccess(access, std::static_pointer_cast<impl::SimpleHandler>(
+            return setAccessRights(data, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        ErrorCode addAccessSync(const ec2::ApiAccessRightsData &access)
+        ErrorCode setAccessRightsSync(const ec2::ApiAccessRightsData &data)
         {
             return impl::doSyncCall<impl::SimpleHandler>([=](const impl::SimpleHandlerPtr &handler)
             {
-                return this->addAccess(access, handler);
-            });
-        }
-
-        /*!
-        \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType>
-        int removeAccess(const ec2::ApiAccessRightsData& access, TargetType* target, HandlerType handler)
-        {
-            return removeAccess(access, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        ErrorCode removeAccessSync(const ec2::ApiAccessRightsData &access)
-        {
-            return impl::doSyncCall<impl::SimpleHandler>([=](const impl::SimpleHandlerPtr &handler)
-            {
-                return this->removeAccess(access, handler);
+                return this->setAccessRights(data, handler);
             });
         }
 
     signals:
         void addedOrUpdated(const ec2::ApiUserData& user);
         void removed(const QnUuid& id);
-        void accessAdded(const ec2::ApiAccessRightsData& access);
-        void accessRemoved(const ec2::ApiAccessRightsData& access);
+        void accessRightsChanged(const ec2::ApiAccessRightsData& access);
 
     private:
         virtual int getUsers(impl::GetUsersHandlerPtr handler) = 0;
         virtual int save(const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler) = 0;
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
         virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) = 0;
-        virtual int addAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler) = 0;
+        virtual int setAccessRights(const ec2::ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) = 0;
     };
 
 }

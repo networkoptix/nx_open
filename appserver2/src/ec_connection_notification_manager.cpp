@@ -211,6 +211,11 @@ namespace ec2
         return m_userManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiAccessRightsData>& tran)
+    {
+        return m_userManager->triggerNotification(tran);
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran ) {
         return m_businessEventManager->triggerNotification( tran );
     }

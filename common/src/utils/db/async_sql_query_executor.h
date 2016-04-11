@@ -51,7 +51,7 @@ public:
     template<typename InputData, typename OutputData>
     void executeUpdate(
         std::function<DBResult(QSqlDatabase*, const InputData&, OutputData* const)> dbUpdateFunc,
-        InputData&& input,
+        InputData input,
         std::function<void(DBResult, InputData, OutputData&&)> completionHandler ) 
     {
         openOneMoreConnectionIfNeeded();
@@ -69,7 +69,7 @@ public:
     template<typename InputData>
     void executeUpdate(
         std::function<DBResult(QSqlDatabase*, const InputData&)> dbUpdateFunc,
-        InputData&& input,
+        InputData input,
         std::function<void(DBResult, InputData)> completionHandler )
     {
         openOneMoreConnectionIfNeeded();

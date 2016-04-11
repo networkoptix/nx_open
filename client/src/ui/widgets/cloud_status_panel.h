@@ -1,15 +1,14 @@
 #pragma once
 
-#include <QtWidgets/QToolButton>
-
+#include <ui/widgets/common/tool_button.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnCloudStatusPanelPrivate;
 
-class QnCloudStatusPanel : public QToolButton, QnWorkbenchContextAware
+class QnCloudStatusPanel : public QnToolButton, QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QToolButton base_type;
+    typedef QnToolButton base_type;
 
 public:
     explicit QnCloudStatusPanel(QWidget *parent = nullptr);

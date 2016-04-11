@@ -6,6 +6,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -292,21 +293,27 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     if (!applyChanges)
         return;
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
     auto sessionGuid = qnCommon->runningInstanceGUID();
 
     ec2::ApiUserData backup;
     ec2::fromResourceToApi(user, backup);
 
-    applyChanges(user);
+    QnUuid userId = user->getId();
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection)
-        return;
+    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(userId);
+
+    /* AccessibleResources are also updated here. */
+    applyChanges(user);
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(user, apiUser);
 
-    connection->getUserManager()->save(apiUser, user->getPassword(), this, [this, user, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
+    connection->getUserManager()->save(apiUser, user->getPassword(), this,
+        [this, user, userId, sessionGuid, backup]( int reqID, ec2::ErrorCode errorCode )
     {
         Q_UNUSED(reqID);
 
@@ -318,13 +325,36 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        QnUuid userId = user->getId();
         QnUserResourcePtr existingUser = qnResPool->getResourceById<QnUserResource>(userId);
         if (existingUser)
             ec2::fromApiToResource(backup, existingUser);
 
         emit saveChangesFailed(QnResourceList() << user);
     } );
+
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(userId);
+    ec2::ApiAccessRightsData accessRights;
+    accessRights.userId = userId;
+    for (const auto &id : accessibleResources)
+        accessRights.resourceIds.push_back(id);
+
+    connection->getUserManager()->setAccessRights(accessRights, this,
+        [this, user, sessionGuid, accessibleResources](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session or attributes pool was recreated. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        qnResourceAccessManager->setAccessibleResources(user->getId(), accessibleResources);
+
+        emit saveChangesFailed(QnResourceList() << user);
+    });
 }
 
 /************************************************************************/

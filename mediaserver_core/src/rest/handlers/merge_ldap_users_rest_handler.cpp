@@ -6,7 +6,6 @@
 #include "merge_ldap_users_rest_handler.h"
 
 #include <common/common_module.h>
-#include "common/user_permissions.h"
 #include <nx/network/http/httptypes.h>
 
 #include <core/resource/user_resource.h>
