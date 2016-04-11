@@ -98,9 +98,26 @@ a.external:hover{
 
 .master-success .glyphicon.glyphicon-remove-circle{
   @include kill-glyphicon;
-  width:88px;
-  height: 88px;
+  width:16px;
+  height: 16px;
   background-position: -88px 0px;
+}
+
+
+.master .glyphicon.glyphicon-arrow-left{
+  @include kill-glyphicon;
+  width: 20px;
+  height: 12px;
+  background-position: -64px -88px;
+
+}
+
+.master .glyphicon.glyphicon-arrow-right{
+  @include kill-glyphicon;
+  width:20px;
+  height: 12px;
+  background-position: -64px -100px;
+
 }
 
 .master-success .preloader{
