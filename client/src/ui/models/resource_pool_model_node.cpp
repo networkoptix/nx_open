@@ -4,6 +4,7 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -294,9 +295,13 @@ void QnResourcePoolModelNode::setState(State state) {
 }
 
 bool QnResourcePoolModelNode::calculateBastard() const {
-    switch(m_type) {
+    switch(m_type)
+    {
     case Qn::ItemNode:
-        return m_resource.isNull();
+    {
+        /* Hide non-readable resources. */
+        return !m_resource || !m_model->accessController()->permissions(m_resource).testFlag(Qn::ReadPermission);
+    }
 
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
@@ -321,12 +326,12 @@ bool QnResourcePoolModelNode::calculateBastard() const {
             return true;
 
         /* Hide non-readable resources. */
-        if (!(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission))
+        if (!m_model->accessController()->permissions(m_resource).testFlag(Qn::ReadPermission))
             return true;
 
         if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
             /* Hide local layouts that are not file-based. */
-            if (m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout))
+            if (m_model->snapshotManager()->isLocal(layout) && !layout->isFile())
                 return true;
 
             /* Hide "Preview Search" layouts */
@@ -368,10 +373,10 @@ bool QnResourcePoolModelNode::calculateBastard() const {
         return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission);
 
     case Qn::UsersNode:
-        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
+        return !m_model->accessController()->hasGlobalPermission(Qn::GlobalEditUsersPermission);
 
     case Qn::ServersNode:
-        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+        return !m_model->accessController()->hasGlobalPermission(Qn::GlobalEditServersPermissions);
 
     default:
         NX_ASSERT("Should never get here");
@@ -463,7 +468,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
-            m_editable.value = (m_model->context()->accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
+            m_editable.value = m_model->context()->accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -552,12 +557,13 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::Videowall_Display_Help;
         } else if(m_type == Qn::VideoWallMatrixNode) {
             return Qn::Videowall_Matrix_Help;
-        } else if(m_flags & Qn::layout) {
-            if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
-                return Qn::MainWindow_Tree_MultiVideo_Help;
-            } else {
-                return Qn::MainWindow_Tree_Layouts_Help;
-            }
+        }
+        else if(m_flags & Qn::layout)
+        {
+            if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
+                if (layout->isFile())
+                    return Qn::MainWindow_Tree_MultiVideo_Help;
+            return Qn::MainWindow_Tree_Layouts_Help;
         } else if(m_flags & Qn::user) {
             return Qn::MainWindow_Tree_Users_Help;
         } else if(m_flags & Qn::local) {

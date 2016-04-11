@@ -108,7 +108,7 @@ namespace ec2 {
     {
         QnUuid systemId;
         ApiStatisticsReportInfo reportInfo;
-		
+
         std::vector<ApiBusinessRuleStatistics> businessRules;
         std::vector<ApiCameraDataStatistics> cameras;
         std::vector<ApiClientInfoData> clients;

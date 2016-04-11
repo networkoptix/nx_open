@@ -16,6 +16,7 @@ QnResourceListDialog::QnResourceListDialog(QWidget *parent):
     ui->setupUi(this);
 
     m_model = new QnResourceListModel(this);
+    m_model->setReadOnly(true);
 
     ui->treeView->setModel(m_model);
     ui->topLabel->hide();
@@ -77,14 +78,7 @@ void QnResourceListDialog::setResources(const QnResourceList &resources) {
 }
 
 const QnResourceList &QnResourceListDialog::resources() const {
-    return m_model->resouces();
-}
-
-void QnResourceListDialog::accept() {
-    if(!isReadOnly())
-        m_model->submitToResources();
-
-    QDialog::accept();
+    return m_model->resources();
 }
 
 QDialogButtonBox::StandardButton QnResourceListDialog::exec(QWidget *parent, const QnResourceList &resources, int helpTopicId, const QString &title, const QString &text, const QString &bottomText, QDialogButtonBox::StandardButtons buttons, bool readOnly) {

@@ -43,6 +43,11 @@ public:
             const QStyleOption *option,
             const QWidget *widget = nullptr) const;
 
+    void drawCross(
+            QPainter* painter,
+            const QRect& rect,
+            const QColor& color) const;
+
 public:
     QnGenericPalette palette;
     QnNoptixStyleAnimator *idleAnimator;

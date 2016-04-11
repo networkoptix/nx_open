@@ -7,8 +7,8 @@ namespace ec2
     struct ApiAccessRightsData: ApiData
     {
         QnUuid userId;
-        QnUuid resourceId;
+        std::vector<QnUuid> resourceIds;
     };
-#define ApiAccessRightsData_Fields (userId)(resourceId)
+#define ApiAccessRightsData_Fields (userId)(resourceIds)
 
 } // namespace ec2

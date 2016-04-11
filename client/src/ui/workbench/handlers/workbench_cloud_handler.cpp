@@ -35,7 +35,7 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject *parent)
 {
     Q_D(QnWorkbenchCloudHandler);
 
-    connect(action(QnActions::LoginToCLoud),           &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered);
+    connect(action(QnActions::LoginToCloud),           &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered);
     connect(action(QnActions::LogoutFromCloud),        &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_logoutFromCloudAction_triggered);
     connect(action(QnActions::OpenCloudMainUrl),       &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudMainUrlAction_triggered);
     connect(action(QnActions::OpenCloudManagementUrl), &QAction::triggered,    d,  &QnWorkbenchCloudHandlerPrivate::at_openCloudManagementUrlAction_triggered);

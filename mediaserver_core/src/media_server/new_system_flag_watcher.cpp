@@ -51,7 +51,7 @@ void QnNewSystemServerFlagWatcher::update()
 
         return boost::algorithm::none_of(qnResPool->getResources<QnUserResource>(), [](const QnUserResourcePtr& user)
         {
-            return user->isAdmin() && user->isEnabled();
+            return user->isOwner() && user->isEnabled();
         });
     };
 
@@ -62,7 +62,7 @@ void QnNewSystemServerFlagWatcher::update()
 
         auto owners = qnResPool->getResources<QnUserResource>().filtered([](const QnUserResourcePtr& user)
         {
-            return user->isAdmin() && user->isEnabled();
+            return user->isOwner() && user->isEnabled();
         });
 
         /* Check if there are other owners but admin. */

@@ -229,8 +229,9 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
     }
 
     /* Layout background */
-    if (!m_layout->backgroundImageFilename().isEmpty()) {
-        bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
+    if (!m_layout->backgroundImageFilename().isEmpty())
+    {
+        bool exportedLayout = m_layout->isFile();  // we have changed background to an exported layout
         QScopedPointer<QnAppServerImageCache> cache;
         if (exportedLayout)
             cache.reset(new QnLocalFileCache(this));

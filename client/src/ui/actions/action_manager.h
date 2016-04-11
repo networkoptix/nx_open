@@ -25,7 +25,8 @@ class QnWorkbenchContext;
  * Action manager stores application's actions and presents an interface for
  * creating context menus given current action scope and parameters.
  */
-class QnActionManager: public QObject, public QnWorkbenchContextAware {
+class QnActionManager: public QObject, public QnWorkbenchContextAware
+{
     Q_OBJECT;
 public:
     enum CreationOption {

@@ -105,6 +105,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     auto userManager = connection->getUserManager();
     connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(userManager, &ec2::AbstractUserManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged);
 
     auto layoutManager = connection->getLayoutManager();
     connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
@@ -253,6 +254,14 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
     }
     else
         removeResourceIgnored(resourceId);
+}
+
+void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights)
+{
+    QSet<QnUuid> accessibleResources;
+    for (const QnUuid& id : accessRights.resourceIds)
+        accessibleResources << id;
+    qnResourceAccessManager->setAccessibleResources(accessRights.userId, accessibleResources);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)
