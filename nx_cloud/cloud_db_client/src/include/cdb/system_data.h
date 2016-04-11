@@ -36,8 +36,9 @@ enum SystemStatus
 {
     ssInvalid = 0,
     //!System has been bound but not a single request from that system has been received by cloud
-    ssNotActivated = 1,
-    ssActivated = 2
+    ssNotActivated,
+    ssActivated,
+    ssDeleted
 };
 
 class SystemData

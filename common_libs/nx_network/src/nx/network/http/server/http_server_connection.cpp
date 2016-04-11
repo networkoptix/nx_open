@@ -44,31 +44,8 @@ namespace nx_http
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
         stree::ResourceContainer authInfo;
-        if (m_authenticationManager)
-        {
-            boost::optional<header::WWWAuthenticate> wwwAuthenticate;
-            std::unique_ptr<AbstractMsgBodySource> msgBody;
-            if (!m_authenticationManager->authenticate(
-                    *this,
-                    *request.request,
-                    &wwwAuthenticate,
-                    &authInfo,
-                    &msgBody))
-            {
-                nx_http::Message response(nx_http::MessageType::response);
-                response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
-                if (wwwAuthenticate)
-                {
-                    response.response->headers.emplace(
-                        header::WWWAuthenticate::NAME,
-                        wwwAuthenticate.get().serialized());
-                }
-                return prepareAndSendResponse(
-                    request.request->requestLine.version,
-                    std::move(response),
-                    std::move(msgBody));
-            }
-        }
+        if (!authenticateRequest(*request.request, &authInfo))
+            return;
 
         auto strongRef = shared_from_this();
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
@@ -102,6 +79,46 @@ namespace nx_http
                 std::move( response ),
                 nullptr );
         }
+    }
+
+    bool HttpServerConnection::authenticateRequest(
+        const nx_http::Request& request,
+        stree::ResourceContainer* const authInfo)
+    {
+        if (!m_authenticationManager)
+            return true;    //no authentication manager -> every request is allowed
+
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate;
+        std::unique_ptr<AbstractMsgBodySource> msgBody;
+        nx_http::HttpHeaders responseHeaders;
+        if (m_authenticationManager->authenticate(
+                *this,
+                request,
+                &wwwAuthenticate,
+                authInfo,
+                &responseHeaders,
+                &msgBody))
+        {
+            return true;
+        }
+
+        nx_http::Message response(nx_http::MessageType::response);
+        std::move(
+            responseHeaders.begin(),
+            responseHeaders.end(),
+            std::inserter(response.response->headers, response.response->headers.end()));
+        response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
+        if (wwwAuthenticate)
+        {
+            response.response->headers.emplace(
+                header::WWWAuthenticate::NAME,
+                wwwAuthenticate.get().serialized());
+        }
+        prepareAndSendResponse(
+            request.requestLine.version,
+            std::move(response),
+            std::move(msgBody));
+        return false;
     }
 
     void HttpServerConnection::prepareAndSendResponse(

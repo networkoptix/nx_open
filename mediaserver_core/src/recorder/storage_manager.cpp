@@ -1985,6 +1985,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrlInternal(const QString& fi
 
 bool QnStorageManager::renameFileWithDuration(
     const QString               &oldName,
+    QString                     &newName,
     int64_t                     duration,
     const QnStorageResourcePtr  &storage
 )
@@ -1999,7 +2000,7 @@ bool QnStorageManager::renameFileWithDuration(
         return true; // file's already been renamed
 
     auto nameParts = fname.split(lit("."));
-    auto newName   = nameParts[0] + lit("_") + QString::number(duration);
+    newName = nameParts[0] + lit("_") + QString::number(duration);
 
     for (int i = 1; i < nameParts.size(); ++i)
         newName += lit(".") + nameParts[i];
@@ -2015,19 +2016,26 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
     if (!storage)
         return false;
-    //if (storageIndex >= 0 && provider)
-    //    storage->releaseBitrate(provider);
-    bool renameOK = renameFileWithDuration(fileName, durationMs, storage);
+
+    QString newName;
+    bool renameOK = renameFileWithDuration(fileName, newName, durationMs, storage);
     if (!renameOK)
         qDebug() << lit("File %1 rename failed").arg(fileName);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(cameraUniqueId, quality);
     if (catalog == 0)
         return false;
-    QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
-    if (sdb)
-        sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize, renameOK));
-    return true;
+    auto chunk = catalog->updateDuration(durationMs, fileSize, renameOK);
+    if (chunk.startTimeMs != -1)
+    {
+        QnStorageDbPtr sdb = qnStorageDbPool->getSDB(storage);
+        if (sdb)
+            sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), chunk);
+        return true;
+    }
+    else if (renameOK)
+        qnFileDeletor->deleteFile(newName);
+    return false;
 }
 
 bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)

@@ -19,8 +19,8 @@ public:
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
     SocketAddress getLocalAddress() const override;
-    void close() override;
-    void shutdown() override;
+    bool close() override;
+    bool shutdown() override;
     bool isClosed() const override;
     bool setNonBlockingMode(bool val) override;
     bool getNonBlockingMode(bool* val) const override;

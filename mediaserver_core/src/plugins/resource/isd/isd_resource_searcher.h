@@ -5,9 +5,10 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "../mdns/mdns_resource_searcher.h"
+#include "../upnp/upnp_resource_searcher.h"
 
 
-class QnPlISDResourceSearcher : public QnMdnsResourceSearcher
+class QnPlISDResourceSearcher : public QnUpnpResourceSearcherAsync
 {
 
 public:
@@ -21,11 +22,22 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
-    virtual QList<QnNetworkResourcePtr> processPacket(
-        QnResourceList& result,
-        const QByteArray& responseData,
-        const QHostAddress& discoveryAddress,
-        const QHostAddress& foundHostAddress ) override;
+
+    virtual void processPacket(
+        const QHostAddress& discoveryAddr,
+        const SocketAddress& deviceEndpoint,
+        const nx_upnp::DeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo,
+        QnResourceList& result) override;
+
+private:
+
+    void createResource(
+        const nx_upnp::DeviceInfo& devInfo,
+        const QnMacAddress& mac,
+        const QAuthenticator& auth,
+        QnResourceList& result );
+
 };
 
 #endif // #ifdef ENABLE_ISD

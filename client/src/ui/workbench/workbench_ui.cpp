@@ -70,7 +70,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
-#include <ui/widgets/main_window_title_controls_widget.h>
+#include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -122,20 +122,8 @@ namespace
         qreal height = baseSize * sizeMultiplier;
         qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
-        QnImageButtonWidget *button;
-
-        qreal rotationSpeed = action->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
-        if (!qFuzzyIsNull(rotationSpeed))
-        {
-            QnRotatingImageButtonWidget *rotatingButton =
-                new QnRotatingImageButtonWidget(aliasFromAction(action), parent);
-            rotatingButton->setRotationSpeed(rotationSpeed);
-            button = rotatingButton;
-        }
-        else
-        {
-            button = new QnImageButtonWidget(aliasFromAction(action), parent);
-        }
+        QnImageButtonWidget *button =
+                new QnImageButtonWidget(aliasFromAction(action), parent);
 
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
         button->setFixedSize(width, height);
@@ -333,11 +321,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_titleItem(nullptr),
     m_titleShowButton(nullptr),
-    m_mainMenuButton(nullptr),
-    m_tabBarWidget(nullptr),
-    m_tabBarItem(nullptr),
     m_titleOpacityAnimatorGroup(nullptr),
-    m_titleBackgroundItem(nullptr),
     m_titleYAnimator(nullptr),
     m_titleOpacityProcessor(nullptr),
 
@@ -466,14 +450,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_lastThumbnailsHeight = settings[Qn::WorkbenchPane::Thumbnails].span;
     setThumbnailsVisible(settings[Qn::WorkbenchPane::Thumbnails].state == Qn::PaneState::Opened);
 
-	if (m_titleBackgroundItem)
-    {
-		/* Set up title D&D. */
-		DropInstrument *dropInstrument = new DropInstrument(true, context(), this);
-		display()->instrumentManager()->installInstrument(dropInstrument);
-		dropInstrument->setSurface(m_titleBackgroundItem);
-	}
-
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this, [this]()
     {
         if (!m_inFreespace)
@@ -526,9 +502,6 @@ Qn::ActionScope QnWorkbenchUi::currentScope() const
     if (focusItem == m_sliderItem)
         return Qn::SliderScope;
 
-    if (focusItem == m_tabBarItem)
-        return Qn::TitleBarScope;
-
     if (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem))
         return Qn::SceneScope;
 
@@ -540,9 +513,6 @@ QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
     /* Get items. */
     switch (scope)
     {
-    case Qn::TitleBarScope:
-        return m_tabBarWidget ? m_tabBarWidget->currentParameters(scope) : QnActionParameters();
-
     case Qn::TreeScope:
         return m_treeWidget ? m_treeWidget->currentParameters(scope) : QnActionParameters();
 
@@ -730,21 +700,6 @@ void QnWorkbenchUi::initGraphicsMessageBox()
     messageBoxVLayout->addStretch();
     messageBoxVLayout->addItem(new QnGraphicsMessageBoxItem(graphicsMessageBoxWidget));
     messageBoxVLayout->addStretch();
-}
-
-bool QnWorkbenchUi::event(QEvent *event)
-{
-    bool result = base_type::event(event);
-
-    if (event->type() == QnEvent::WinSystemMenu)
-    {
-        if (m_mainMenuButton->isVisible())
-            m_mainMenuButton->click();
-
-        result = true;
-    }
-
-    return result;
 }
 
 void QnWorkbenchUi::tick(int deltaMSecs)
@@ -1385,29 +1340,13 @@ void QnWorkbenchUi::setTitleUsed(bool used)
 		return;
 
     m_titleItem->setVisible(used);
-    m_titleBackgroundItem->setVisible(used);
     m_titleShowButton->setVisible(used);
 
     if (used)
     {
         m_titleUsed = used;
-
         setTitleOpened(isTitleOpened(), false);
-
         at_titleItem_geometryChanged();
-
-        /* For reasons unknown, tab bar's size gets messed up when it is shown
-         * after new items are added to it. Re-embedding helps, probably there is
-         * a better workaround. */
-        QTabBar *widget = checked_cast<QTabBar *>(m_tabBarItem->widget());
-        m_tabBarItem->setWidget(nullptr);
-        m_tabBarItem->setWidget(widget);
-
-        /* There are cases where even re-embedding doesn't help.
-         * So we cheat even more, forcing the tab bar to refresh. */
-        QTabBar::Shape shape = widget->shape();
-        widget->setShape(QTabBar::TriangularWest);
-        widget->setShape(shape);
     }
     else
     {
@@ -1472,7 +1411,6 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
     {
         m_titleOpacityAnimatorGroup->pause();
         opacityAnimator(m_titleItem)->setTargetValue(foregroundOpacity);
-        opacityAnimator(m_titleBackgroundItem)->setTargetValue(backgroundOpacity);
         opacityAnimator(m_titleShowButton)->setTargetValue(backgroundOpacity);
         m_titleOpacityAnimatorGroup->start();
     }
@@ -1480,7 +1418,6 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
     {
         m_titleOpacityAnimatorGroup->stop();
         m_titleItem->setOpacity(foregroundOpacity);
-        m_titleBackgroundItem->setOpacity(backgroundOpacity);
         m_titleShowButton->setOpacity(backgroundOpacity);
     }
 }
@@ -1502,94 +1439,17 @@ void QnWorkbenchUi::at_titleItem_geometryChanged()
 
     QRectF geometry = m_titleItem->geometry();
 
-    m_titleBackgroundItem->setGeometry(geometry);
-
     m_titleShowButton->setPos(QPointF(
         (geometry.left() + geometry.right() - m_titleShowButton->size().height()) / 2,
         qMax(m_controlsWidget->rect().top(), geometry.bottom())));
 }
 
-void QnWorkbenchUi::at_titleItem_contextMenuRequested(QObject *, QEvent *event)
-{
-    m_tabBarItem->setFocus();
-
-    QGraphicsSceneContextMenuEvent *menuEvent = static_cast<QGraphicsSceneContextMenuEvent *>(event);
-
-    /* Redirect context menu event to tab bar. */
-    QPointF pos = menuEvent->pos();
-    menuEvent->setPos(m_tabBarItem->mapFromItem(m_titleItem, pos));
-    display()->scene()->sendEvent(m_tabBarItem, event);
-    menuEvent->setPos(pos);
-}
-
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_titleBackgroundItem = new QnFramedWidget(m_controlsWidget);
-    m_titleBackgroundItem->setWindowBrush(qApp->palette().color(QPalette::Normal, QPalette::Window));
-    m_titleBackgroundItem->setFrameShape(Qn::NoFrame);
-    m_titleBackgroundItem->setAutoFillBackground(true);
-
-    m_titleItem = new QnClickableWidget(m_controlsWidget);
+    m_titleItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_titleItem->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     m_titleItem->setPos(0.0, 0.0);
-    m_titleItem->setClickableButtons(Qt::LeftButton);
-    m_titleItem->setProperty(Qn::NoHandScrollOver, true);
     m_titleItem->setZValue(10.0);
-
-    QnSingleEventSignalizer *titleMenuSignalizer = new QnSingleEventSignalizer(this);
-    titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
-    m_titleItem->installEventFilter(titleMenuSignalizer);
-
-    /* Note: using QnGeometryGraphicsProxyWidget here fixes the bug #2330 */
-    m_tabBarItem = new QnTabBarGraphicsProxyWidget(m_controlsWidget);
-    m_tabBarItem->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-
-    m_tabBarWidget = new QnLayoutTabBar(nullptr, context());
-    m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
-    m_tabBarItem->setWidget(m_tabBarWidget);
-    m_tabBarWidget->installEventFilter(m_tabBarItem);
-    connect(m_tabBarWidget, &QnLayoutTabBar::tabTextChanged, this, [this](){ m_titleItem->layout()->updateGeometry(); });
-
-    m_mainMenuButton = newActionButton(action(QnActions::MainMenuAction), 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
-
-    QGraphicsLinearLayout *tabBarLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    tabBarLayout->setContentsMargins(0, 0, 0, 0);
-    tabBarLayout->setSpacing(0);
-    tabBarLayout->addItem(m_tabBarItem);
-    tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
-    GraphicsWidget *newTabButton = newActionButton(action(QnActions::OpenNewTabAction), 1.0, Qn::MainWindow_TitleBar_NewLayout_Help);
-    tabBarLayout->addItem(newTabButton);
-    tabBarLayout->setAlignment(newTabButton, Qt::AlignVCenter);
-    tabBarLayout->setItemSpacing(tabBarLayout->count() - 1, 6);
-    GraphicsWidget *layoutMenuButton = newActionButton(action(QnActions::OpenCurrentUserLayoutMenu));
-    tabBarLayout->addItem(layoutMenuButton);
-    tabBarLayout->setAlignment(layoutMenuButton, Qt::AlignVCenter);
-    tabBarLayout->addStretch(0x1000);
-
-    QGraphicsWidget *tabBarWidget = new GraphicsWidget();
-    setHelpTopic(tabBarWidget, Qn::MainWindow_TitleBar_Tabs_Help);
-    tabBarWidget->setLayout(tabBarLayout);
-
-    QGraphicsProxyWidget* titleControlsWidget = new QGraphicsProxyWidget(m_controlsWidget);
-    titleControlsWidget->setWidget(new QnMainWindowTitleControlsWidget(nullptr, context()));
-
-    /* Workaround against qt bug. Before destroying, QWidget sends QHideEvent to notify other widgets.
-     * QGraphicsProxyWidget as its parent catches the event and tries to pass focus to the next child.
-     * As this occurs in the QGraphicsProxyWidget dtor, it is already in the invalid state, what leads to crash.
-     * --gdm, Qt 5.6.0 beta.
-     */
-    titleControlsWidget->setFocusPolicy(Qt::NoFocus);
-
-    QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    titleLayout->setContentsMargins(0, 0, 0, 0);
-    titleLayout->setSpacing(2);
-    titleLayout->addItem(m_mainMenuButton);
-    titleLayout->addItem(tabBarWidget);
-    titleLayout->setAlignment(tabBarWidget, Qt::AlignBottom);
-    titleLayout->setStretchFactor(tabBarWidget, 0x1000);
-    titleLayout->addItem(titleControlsWidget);
-
-    m_titleItem->setLayout(titleLayout);
-    titleLayout->activate(); /* So that it would set title's size. */
 
     const auto toggleTitleBarAction = action(QnActions::ToggleTitleBarAction);
     m_titleShowButton = newShowHideButton(m_controlsWidget, toggleTitleBarAction);
@@ -1616,21 +1476,13 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
     m_titleOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleItem));
-    m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
 
-    connect(m_tabBarWidget,             &QnLayoutTabBar::closeRequested,        this,   [this](QnWorkbenchLayout *layout){ menu()->trigger(QnActions::CloseLayoutAction, QnWorkbenchLayoutList() << layout);});
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateTitleOpacityAnimated);
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateTitleOpacityAnimated);
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_titleOpacityProcessor,    &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(m_titleItem,                &QGraphicsWidget::geometryChanged,      this,   &QnWorkbenchUi::at_titleItem_geometryChanged);
-#ifndef Q_OS_MACX
-    connect(m_tabBarWidget,             &QnLayoutTabBar::tabCloseRequested,     m_titleItem,    &QnClickableWidget::skipDoubleClick);
-    connect(m_tabBarWidget,             &QnLayoutTabBar::currentChanged,        m_titleItem,    &QnClickableWidget::skipDoubleClick);
-    connect(m_titleItem,                &QnClickableWidget::doubleClicked,      action(QnActions::EffectiveMaximizeAction), &QAction::toggle);
-#endif
-    connect(titleMenuSignalizer,        &QnAbstractEventSignalizer::activated,  this,   &QnWorkbenchUi::at_titleItem_contextMenuRequested);
     connect(action(QnActions::ToggleTitleBarAction), &QAction::toggled,                this,   [this](bool checked){ if (!m_ignoreClickEvent) setTitleOpened(checked);});
 
     toggleTitleBarAction->setChecked(settings.state == Qn::PaneState::Opened);
@@ -1980,7 +1832,10 @@ void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
 
     m_calendarShowingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    QSizeF newSize = opened ? QSizeF(250, 200) : QSizeF(250, 0);
+    QSizeF newSize(m_calendarItem->size());
+    if (!opened)
+        newSize.setHeight(0.0);
+
     if (animate)
     {
         m_calendarSizeAnimator->animateTo(newSize);
@@ -2003,7 +1858,10 @@ void QnWorkbenchUi::setDayTimeWidgetOpened(bool opened, bool animate)
 
     m_dayTimeOpened = opened;
 
-    QSizeF newSize = opened ? QSizeF(250, 120) : QSizeF(250, 0);
+    QSizeF newSize(m_dayTimeItem->size());
+    if (!opened)
+        newSize.setHeight(0.0);
+
     if (animate)
     {
         m_dayTimeSizeAnimator->animateTo(newSize);
@@ -2151,7 +2009,8 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
     calendarWidget->installEventFilter(m_calendarItem);
-    m_calendarItem->resize(250, 200);
+    m_calendarItem->resize(250, 192);
+
     m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
     const auto pinCalendarAction = action(QnActions::PinCalendarAction);

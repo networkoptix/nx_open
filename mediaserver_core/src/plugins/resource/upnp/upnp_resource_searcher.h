@@ -3,6 +3,7 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QElapsedTimer>
+#include <QtXml/QXmlDefaultHandler>
 
 #include "core/resource_management/resource_searcher.h"
 #include <nx/network/nettools.h>
@@ -10,7 +11,16 @@
 
 #include <nx/network/upnp/upnp_device_searcher.h>
 
-// TODO: Remove and and use nx_upnp::DeviceSearcher instead!
+
+//struct UpnpDeviceInfo
+//{
+//    QString friendlyName;
+//    QString manufacturer;
+//    QString modelName;
+//    QString serialNumber;
+//    QString presentationUrl;
+//};
+
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
@@ -35,10 +45,12 @@ protected:
         const QByteArray& xmlDevInfo,
         const QAuthenticator &auth,
         QnResourceList& result) = 0;
+
 private:
     QByteArray getDeviceDescription(const QByteArray& uuidStr, const QUrl& url);
     QHostAddress findBestIface(const HostAddress& host);
     void processSocket(AbstractDatagramSocket* socket, QSet<QByteArray>& processedUuid, QnResourceList& result);
+
 protected:
     void readDeviceXml(
         const QByteArray& uuidStr,
@@ -50,6 +62,7 @@ protected:
         const HostAddress& host,
         const HostAddress& sender,
         QnResourceList& result );
+
 private:
     QMap<QString, AbstractDatagramSocket*> m_socketList;
     AbstractDatagramSocket* sockByName(const QnInterfaceAndAddr& iface);

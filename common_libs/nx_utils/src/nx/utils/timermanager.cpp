@@ -18,13 +18,20 @@
 
 using namespace std;
 
+struct TaskContext
+{
+    nx::utils::MoveOnlyFunc<void(quint64)> func;
+    bool singleShot;
+    std::chrono::milliseconds delay;
+};
+
 class TimerManagerImpl
 {
 public:
     QnWaitCondition cond;
     mutable QnMutex mtx;
     //!map<pair<time, timerID>, handler>
-    std::map<std::pair<qint64, quint64>, std::function<void(quint64)> > timeToTask;
+    std::map<std::pair<qint64, quint64>, TaskContext> timeToTask;
     //!map<timerID, time>
     std::map<quint64, qint64> taskToTime;
     bool terminated;
@@ -42,14 +49,16 @@ public:
 
     void addTaskNonSafe(
         const quint64 timerID,
-        std::function<void( quint64 )> taskHandler,
-        const unsigned int delayMillis )
+        nx::utils::MoveOnlyFunc<void( quint64 )> taskHandler,
+        std::chrono::milliseconds delay,
+        std::chrono::milliseconds firstShotDelay,
+        bool singleShot)
     {
-        const qint64 taskTime = monotonicClock.elapsed() + delayMillis;
+        const qint64 taskTime = monotonicClock.elapsed() + firstShotDelay.count();
 
         if( !timeToTask.insert( make_pair(
                 make_pair( taskTime, timerID ),
-                taskHandler ) ).second )
+                TaskContext{std::move(taskHandler), singleShot, delay} ) ).second )
         {
             //ASSERT( false );
         }
@@ -69,6 +78,16 @@ public:
 
         timeToTask.erase( make_pair( it->second, it->first ) );
         taskToTime.erase( it );
+    }
+
+    uint64_t generateNextTimerId()
+    {
+        static QAtomicInt lastTaskID = 0;
+
+        quint64 timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
+        if (timerID == 0)
+            timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
+        return timerID;
     }
 };
 
@@ -108,28 +127,45 @@ quint64 TimerManager::addTimer(
 }
 
 quint64 TimerManager::addTimer(
-    std::function<void(quint64)> taskHandler,
+    nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
     const unsigned int delay )
 {
-    static QAtomicInt lastTaskID = 0;
+    auto timerId = m_impl->generateNextTimerId();
 
     QnMutexLocker lk( &m_impl->mtx );
-
-    quint64 timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
-    if( timerID == 0 )
-        timerID = lastTaskID.fetchAndAddOrdered(1) + 1;
-    m_impl->addTaskNonSafe( timerID, taskHandler, delay );
-
-    return timerID;
+    m_impl->addTaskNonSafe(
+        timerId,
+        std::move(taskHandler),
+        std::chrono::milliseconds(delay),
+        std::chrono::milliseconds(delay),
+        true);
+    return timerId;
 }
 
 quint64 TimerManager::addTimer(
-    std::function<void(quint64)> taskHandler,
+    nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
     std::chrono::milliseconds delay)
 {
     return addTimer(
         std::move(taskHandler),
         delay.count());
+}
+
+quint64 TimerManager::addNonStopTimer(
+    nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
+    TimerDuration delay,
+    TimerDuration firstShotDelay)
+{
+    auto timerId = m_impl->generateNextTimerId();
+
+    QnMutexLocker lk(&m_impl->mtx);
+    m_impl->addTaskNonSafe(
+        timerId,
+        std::move(taskHandler),
+        delay,
+        firstShotDelay,
+        false);
+    return timerId;
 }
 
 bool TimerManager::modifyTimerDelay(
@@ -146,12 +182,17 @@ bool TimerManager::modifyTimerDelay(
         return false;   //no timer with requested id
     auto handlerIter = m_impl->timeToTask.find( std::make_pair( taskIter->second, timerID ) );
     NX_ASSERT( handlerIter != m_impl->timeToTask.end() );
-    auto taskHandler = std::move(handlerIter->second);
+    auto taskHandler = std::move(handlerIter->second.func);
 
     m_impl->taskToTime.erase( taskIter );
     m_impl->timeToTask.erase( handlerIter );
 
-    m_impl->addTaskNonSafe( timerID, taskHandler, newDelayMillis );
+    m_impl->addTaskNonSafe(
+        timerID,
+        std::move(taskHandler),
+        std::chrono::milliseconds(newDelayMillis),
+        std::chrono::milliseconds(newDelayMillis),
+        true);
     return true;
 }
 
@@ -208,22 +249,31 @@ void TimerManager::run()
                 if( currentTime < taskIter->first.first )
                     break;
 
-                auto taskManager = taskIter->second;
                 const quint64 timerID = taskIter->first.second;
+                auto taskContext = std::move(taskIter->second);
 
-                /*std::map<quint64, qint64>::size_type erasedCnt =*/ m_impl->taskToTime.erase( timerID );
-                //ASSERT2( erasedCnt == 1, "erasedCnt = "<<erasedCnt<<", timerID = "<<timerID<<", task time (UTC) = "<<taskIter->first.first );
-                /*map<pair<qint64, quint64>, TimerEventHandler* const>::size_type s1 =*/ m_impl->timeToTask.size();
+                m_impl->taskToTime.erase( timerID );
                 m_impl->timeToTask.erase( taskIter );
-                //ASSERT2( m_impl->timeToTask.size() == s1-1, "s1 = "<<s1<<", m_impl->timeToTask.size() = "<<m_timeToTask.size() );
                 m_impl->runningTaskID = timerID;
                 lk.unlock();
-                taskManager( timerID );
+                taskContext.func( timerID );
 
                 lk.relock();
 
+                if (!taskContext.singleShot)
+                    m_impl->addTaskNonSafe(
+                        timerID,
+                        std::move(taskContext.func),
+                        taskContext.delay,
+                        taskContext.delay,
+                        false);
+
                 m_impl->runningTaskID = 0;
                 m_impl->cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
+
+                lk.unlock();
+                //giving chance to another thread to remove task
+                lk.relock();
 
                 if( m_impl->terminated )
                     break;

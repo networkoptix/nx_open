@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 
 #include <utils/common/cpp14.h>
+#include <utils/common/string.h>
 
 
 namespace nx {
@@ -413,6 +414,49 @@ void TestConnection::reportFinish( SystemError::ErrorCode code )
     return handler(m_id, this, code);
 }
 
+
+////////////////////////////////////////////////////////////
+//// class ConnectionTestStatistics
+////////////////////////////////////////////////////////////
+
+QString toString(const ConnectionTestStatistics& data)
+{
+    return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4")
+        .arg(data.onlineConnections).arg(data.totalConnections)
+        .arg(bytesToString(data.bytesReceived))
+        .arg(bytesToString(data.bytesSent));
+}
+
+bool operator==(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right)
+{
+    return 
+        left.bytesReceived == right.bytesReceived &&
+        left.bytesSent == right.bytesSent &&
+        left.totalConnections == right.totalConnections &&
+        left.onlineConnections == right.onlineConnections;
+}
+
+bool operator!=(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right)
+{
+    return !(left == right);
+}
+
+ConnectionTestStatistics operator-(
+    const ConnectionTestStatistics& left,
+    const ConnectionTestStatistics& right)
+{
+    return ConnectionTestStatistics{
+        left.bytesReceived - right.bytesReceived,
+        left.bytesSent - right.bytesSent,
+        left.totalConnections - right.totalConnections,
+        left.onlineConnections - right.onlineConnections};
+}
+
+
 ////////////////////////////////////////////////////////////
 //// class RandomDataTcpServer
 ////////////////////////////////////////////////////////////
@@ -424,7 +468,9 @@ RandomDataTcpServer::RandomDataTcpServer(
     m_limitType(limitType),
     m_trafficLimit(trafficLimit),
     m_transmissionMode(transmissionMode),
-    m_totalConnectionsAccepted(0)
+    m_totalConnectionsAccepted(0),
+    m_totalBytesReceivedByClosedConnections(0),
+    m_totalBytesSentByClosedConnections(0)
 {
 }
 
@@ -444,7 +490,7 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         [this, handler = std::move(handler)]() mutable
         {
             QnMutexLocker lk(&m_mutex);
-            auto acceptedConnections = std::move(m_acceptedConnections);
+            auto acceptedConnections = std::move(m_aliveConnections);
             lk.unlock();
 
             BarrierHandler completionHandlerInvoker(std::move(handler));
@@ -493,11 +539,23 @@ SocketAddress RandomDataTcpServer::addressBeingListened() const
         : localAddress;
 }
 
-QString RandomDataTcpServer::statusLine() const
+ConnectionTestStatistics RandomDataTcpServer::statistics() const
 {
     QnMutexLocker lock(&m_mutex);
-    return lm("Online connections: %1, Total connections: %2.")
-        .arg(m_acceptedConnections.size()).arg(m_totalConnectionsAccepted);
+
+    uint64_t bytesReceivedByAliveConnections = 0;
+    uint64_t bytesSentByAliveConnections = 0;
+    for (const auto& connection : m_aliveConnections)
+    {
+        bytesReceivedByAliveConnections += connection->totalBytesReceived();
+        bytesSentByAliveConnections += connection->totalBytesSent();
+    }
+
+    return ConnectionTestStatistics{
+        m_totalBytesReceivedByClosedConnections + bytesReceivedByAliveConnections,
+        m_totalBytesSentByClosedConnections + bytesSentByAliveConnections,
+        m_totalConnectionsAccepted,
+        m_aliveConnections.size()};
 }
 
 void RandomDataTcpServer::onNewConnection(
@@ -521,7 +579,7 @@ void RandomDataTcpServer::onNewConnection(
             cl_logDEBUG1);
         QnMutexLocker lk(&m_mutex);
         testConnection->start();
-        m_acceptedConnections.emplace_back(std::move(testConnection));
+        m_aliveConnections.emplace_back(std::move(testConnection));
         ++m_totalConnectionsAccepted;
     }
 
@@ -534,13 +592,15 @@ void RandomDataTcpServer::onConnectionDone(
 {
     QnMutexLocker lk(&m_mutex);
     auto it = std::find_if(
-        m_acceptedConnections.begin(),
-        m_acceptedConnections.end(),
+        m_aliveConnections.begin(),
+        m_aliveConnections.end(),
         [connection](const std::shared_ptr<TestConnection>& sharedConnection) {
             return sharedConnection.get() == connection;
         });
-    if (it != m_acceptedConnections.end())
-        m_acceptedConnections.erase(it);
+    m_totalBytesReceivedByClosedConnections += connection->totalBytesReceived();
+    m_totalBytesSentByClosedConnections += connection->totalBytesSent();
+    if (it != m_aliveConnections.end())
+        m_aliveConnections.erase(it);
 }
 
 
@@ -548,7 +608,8 @@ void RandomDataTcpServer::onConnectionDone(
 ////////////////////////////////////////////////////////////
 //// class ConnectionsGenerator
 ////////////////////////////////////////////////////////////
-ConnectionsGenerator::ConnectionsGenerator(const SocketAddress& remoteAddress,
+ConnectionsGenerator::ConnectionsGenerator(
+    const SocketAddress& remoteAddress,
     size_t maxSimultaneousConnectionsCount,
     TestTrafficLimitType limitType,
     size_t trafficLimit,
@@ -622,6 +683,12 @@ void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
     m_localAddress = std::move(addr);
 }
 
+void ConnectionsGenerator::setRemoteAddress(SocketAddress remoteAddress)
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_remoteAddress = std::move(remoteAddress);
+}
+
 void ConnectionsGenerator::start()
 {
     for( size_t i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
@@ -643,6 +710,25 @@ void ConnectionsGenerator::start()
         ++m_totalConnectionsEstablished;
         m_connections.emplace(connection->id(), std::move(connection));
     }
+}
+
+ConnectionTestStatistics ConnectionsGenerator::statistics() const
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+
+    uint64_t bytesReceivedByAliveConnections = 0;
+    uint64_t bytesSentByAliveConnections = 0;
+    for (const auto& connection : m_connections)
+    {
+        bytesReceivedByAliveConnections += connection.second->totalBytesReceived();
+        bytesSentByAliveConnections += connection.second->totalBytesSent();
+    }
+
+    return ConnectionTestStatistics{
+        m_totalBytesReceived + bytesReceivedByAliveConnections,
+        m_totalBytesSent + bytesSentByAliveConnections,
+        m_totalConnectionsEstablished,
+        m_connections.size() };
 }
 
 size_t ConnectionsGenerator::totalConnectionsEstablished() const

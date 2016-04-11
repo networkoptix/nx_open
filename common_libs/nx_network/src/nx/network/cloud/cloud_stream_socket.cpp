@@ -50,11 +50,12 @@ SocketAddress CloudStreamSocket::getLocalAddress() const
     return SocketAddress();
 }
 
-void CloudStreamSocket::close()
+bool CloudStreamSocket::close()
 {
     shutdown();
     if (m_socketDelegate)
-        m_socketDelegate->close();
+        return m_socketDelegate->close();
+    return true;
 }
 
 bool CloudStreamSocket::isClosed() const
@@ -65,12 +66,12 @@ bool CloudStreamSocket::isClosed() const
     return true;
 }
 
-void CloudStreamSocket::shutdown()
+bool CloudStreamSocket::shutdown()
 {
     {
         QnMutexLocker lk(&m_mutex);
         if (m_terminated)
-            return;
+            return true;
         m_terminated = true;
     }
 
@@ -96,6 +97,7 @@ void CloudStreamSocket::shutdown()
         m_socketDelegate->shutdown();
 
     stoppedPromise.get_future().wait();
+    return true;
 }
 
 AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
@@ -119,6 +121,12 @@ bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
 {
+    unsigned int sendTimeoutBak = 0;
+    if (!getSendTimeout(&sendTimeoutBak))
+        return false;
+    if (!setSendTimeout(timeoutMillis))
+        return false;
+
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
         QnMutexLocker lk(&m_mutex);
@@ -150,6 +158,9 @@ bool CloudStreamSocket::connect(
         SystemError::setLastErrorCode(result);
         return false;
     }
+
+    if (!setSendTimeout(sendTimeoutBak))
+        return false;
 
     return true;
 }

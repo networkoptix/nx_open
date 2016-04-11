@@ -50,7 +50,7 @@ namespace nx_http
         m_msgBodyReadTimeoutMs( 0 ),
         m_authType(authBasicAndDigest),
         m_awaitedMessageNumber( 0 ),
-        m_lastSysErrorCode( SystemError::noError ),
+        m_lastSysErrorCode(SystemError::noError),
         m_requestSequence( 0 )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);

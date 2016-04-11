@@ -7,14 +7,8 @@
 #include <nx/network/stun/cc/custom_stun.h>
 #include <utils/serialization/lexical.h>
 
-
-#ifdef QN_DEMO_SHOW
-static const auto DNS_CACHE_TIME = std::chrono::seconds(1);
-static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(1);
-#else
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
 static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(10);
-#endif
 
 namespace nx {
 namespace network {

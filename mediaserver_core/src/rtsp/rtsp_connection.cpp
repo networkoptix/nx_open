@@ -69,11 +69,23 @@ const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
 QnMutex RtspServerTrackInfo::m_createSocketMutex;
 
-bool updatePort(AbstractDatagramSocket* &socket, int port)
-{
-    delete socket;
-    socket = SocketFactory::createDatagramSocket().release();
-    return socket->bind( SocketAddress( HostAddress::anyHost, port ) );
+namespace {
+
+    bool updatePort(AbstractDatagramSocket* &socket, int port)
+    {
+        delete socket;
+        socket = SocketFactory::createDatagramSocket().release();
+        return socket->bind(SocketAddress(HostAddress::anyHost, port));
+    }
+
+    QByteArray getParamValue(const QByteArray& paramName, const QUrlQuery& urlQuery, const nx_http::HttpHeaders& headers)
+    {
+        QByteArray paramValue = urlQuery.queryItemValue(paramName).toUtf8();
+        if (paramValue.isEmpty())
+            paramValue = nx_http::getHeaderValue(headers, QByteArray("x-") + paramName);
+        return paramValue;
+    }
+
 }
 
 bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
@@ -295,7 +307,7 @@ void QnRtspConnectionProcessor::parseRequest()
         processRangeHeader();
     else
         d->startTime = parseDateTime( pos ); //pos.toLongLong();
-    QByteArray resolutionStr = urlQuery.queryItemValue("resolution").split('/')[0].toUtf8();
+    QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers).split('/')[0];
     if (!resolutionStr.isEmpty())
     {
         QSize videoSize(640,480);
@@ -737,7 +749,8 @@ int QnRtspConnectionProcessor::composeDescribe()
         QnRtspEncoderPtr encoder;
         if (d->useProprietaryFormat)
         {
-            QnRtspFfmpegEncoder* ffmpegEncoder = new QnRtspFfmpegEncoder();
+            bool isVideoTrack = (i < numVideo);
+            QnRtspFfmpegEncoder* ffmpegEncoder = createRtspFfmpegEncoder(isVideoTrack);
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
         }
         else {
@@ -1078,6 +1091,16 @@ void QnRtspConnectionProcessor::checkQuality()
     }
 }
 
+QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isVideo)
+{
+    Q_D(const QnRtspConnectionProcessor);
+
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder();
+    if (isVideo && !d->transcodedVideoSize.isEmpty() && d->codecId != CODEC_ID_NONE)
+        result->setDstResolution(d->transcodedVideoSize, d->codecId);
+    return result;
+}
+
 void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
 {
     Q_D(QnRtspConnectionProcessor);
@@ -1086,7 +1109,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     for (; trackNum < videoLayout->channelCount(); ++trackNum)
     {
         RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
-        vTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+        vTrack->encoder = QnRtspEncoderPtr(createRtspFfmpegEncoder(true));
         vTrack->clientPort = trackNum*2;
         vTrack->clientRtcpPort = trackNum*2 + 1;
         d->trackInfo.insert(trackNum, vTrack);

@@ -31,19 +31,6 @@
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
-
-    bool hasMenuIndicator(const QStyleOptionToolButton *option) {
-        /* Subcontrol requested? */
-        bool result = (option->subControls & QStyle::SC_ToolButtonMenu) || (option->features & QStyleOptionToolButton::Menu);
-
-        /* Delayed menu? */
-        const QStyleOptionToolButton::ToolButtonFeatures menuFeatures = QStyleOptionToolButton::HasMenu | QStyleOptionToolButton::PopupDelay;
-        if (!result)
-            result = (option->features & menuFeatures) == menuFeatures;
-
-        return result;
-    }
-
 } // anonymous namespace
 
 
@@ -59,7 +46,6 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 {
     m_branchClosed = m_skin->icon("tree/branch_closed.png");
     m_branchOpen = m_skin->icon("tree/branch_open.png");
-    m_closeTab = m_skin->icon("titlebar/close_tab.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {
@@ -98,10 +84,6 @@ void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptio
             }
         }
         break;
-    case CC_ToolButton:
-        if(drawToolButtonComplexControl(option, painter, widget))
-            return;
-        break;
     default:
         break;
     }
@@ -128,10 +110,6 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
 
 void QnNoptixStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     switch(element) {
-    case PE_IndicatorTabClose:
-        if(drawTabClosePrimitive(option, painter, widget))
-            return;
-        break;
     case PE_IndicatorBranch:
         if(drawBranchPrimitive(option, painter, widget))
             return;
@@ -257,18 +235,6 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     return true;
 }
 
-bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
-    QStyleOptionToolButton buttonOption;
-    buttonOption.QStyleOption::operator=(*option);
-    buttonOption.state &= ~State_Selected; /* We don'h want 'selected' state overriding 'active'. */
-    buttonOption.subControls = 0;
-    buttonOption.activeSubControls = 0;
-    buttonOption.icon = m_closeTab;
-    buttonOption.toolButtonStyle = Qt::ToolButtonIconOnly;
-
-    return drawToolButtonComplexControl(&buttonOption, painter, widget);
-}
-
 bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     Q_UNUSED(widget);
 
@@ -303,84 +269,6 @@ bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const Q
     painter->setOpacity(opacity);
     return true;
 }
-
-bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
-    const QStyleOptionToolButton *buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-    if (!buttonOption)
-        return false;
-
-    if (buttonOption->features & QStyleOptionToolButton::Arrow)
-        return false; /* We don'h handle arrow tool buttons,... */
-
-    if (qobject_cast<QToolBar *>(widget->parent()))
-        return false; /* ...toolbar buttons,... */
-
-    if(hasMenuIndicator(buttonOption))
-        return false; /* ...menu buttons,... */
-
-    if(buttonOption->icon.isNull() || buttonOption->toolButtonStyle == Qt::ToolButtonTextOnly)
-        return false; /* ...buttons without icons,... */
-
-    if(!buttonOption->text.isNull() && buttonOption->toolButtonStyle != Qt::ToolButtonIconOnly)
-        return false; /* ...and buttons with text. */
-
-    bool sunken = option->state & State_Sunken;
-    if(sunken)
-        setHoverProgress(widget, 0.0);
-    qreal k = hoverProgress(option, widget, 1000.0 / qnGlobals->opacityChangePeriod());
-    QRectF rect = option->rect;
-
-    QIcon::Mode mode;
-    if(!(option->state & State_Enabled)) {
-        mode = QnIcon::Disabled;
-    } else if(option->state & State_Selected) {
-        mode = QnIcon::Selected;
-    } else if(option->state & State_Sunken) {
-        mode = QnIcon::Pressed;
-        k = 1.0;
-        stopHoverTracking(widget);
-    } else if(option->state & State_MouseOver) {
-        mode = QnIcon::Active;
-    } else {
-        mode = QnIcon::Normal;
-    }
-    QIcon::State state = option->state & State_On ? QIcon::On : QIcon::Off;
-
-    /* Is it a rotating button? */
-    qreal rotation = m_rotationAnimator->value(widget);
-    if(state == QIcon::On) {
-        qreal rotationSpeed = widget->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
-        if(!qFuzzyIsNull(rotationSpeed) && !m_rotationAnimator->isRunning(widget))
-            m_rotationAnimator->start(widget, rotationSpeed, m_rotationAnimator->value(widget));
-    } else {
-        m_rotationAnimator->stop(widget);
-    }
-
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    QnScopedPainterSmoothPixmapTransformRollback pixmapRollback(painter, true);
-    QnScopedPainterTransformRollback transformRollback(painter);
-    if(!qFuzzyIsNull(rotation)) {
-        painter->translate(QRectF(option->rect).center());
-        painter->rotate(rotation);
-        painter->translate(-QRectF(option->rect).center());
-    }
-
-    if(mode == QIcon::Active || (mode == QIcon::Normal && !qFuzzyIsNull(k))) {
-        QPixmap pixmap0 = buttonOption->icon.pixmap(rect.toAlignedRect().size(), QIcon::Normal, state);
-        QPixmap pixmap1 = buttonOption->icon.pixmap(rect.toAlignedRect().size(), QIcon::Active, state);
-
-        qreal o = painter->opacity();
-        painter->drawPixmap(rect, pixmap0, pixmap0.rect());
-        painter->setOpacity(o * k);
-        painter->drawPixmap(rect, pixmap1, pixmap1.rect());
-        painter->setOpacity(o);
-    } else {
-        QPixmap pixmap = buttonOption->icon.pixmap(rect.toAlignedRect().size(), mode, state);
-        painter->drawPixmap(rect, pixmap, pixmap.rect());
-    }
-    return true;
-}
-
 
 // -------------------------------------------------------------------------- //
 // Hover animations

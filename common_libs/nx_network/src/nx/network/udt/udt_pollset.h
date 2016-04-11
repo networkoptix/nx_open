@@ -6,6 +6,8 @@
 #ifndef NX_NETWORK_UDT_POLLSET_H
 #define NX_NETWORK_UDT_POLLSET_H
 
+#if 0
+
 #include <memory>
 
 #include "../aio/pollset.h"
@@ -78,5 +80,7 @@ private:
 
 }   //network
 }   //nx
+
+#endif
 
 #endif  //NX_NETWORK_UDT_POLLSET_H

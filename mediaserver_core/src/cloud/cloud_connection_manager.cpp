@@ -75,6 +75,26 @@ const nx::cdb::api::ConnectionFactory& CloudConnectionManager::connectionFactory
     return *m_cdbConnectionFactory;
 }
 
+void CloudConnectionManager::processCloudErrorCode(
+    nx::cdb::api::ResultCode resultCode)
+{
+    NX_LOGX(lm("Error %1 while referring to cloud")
+        .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+
+    if (resultCode == nx::cdb::api::ResultCode::credentialsRemovedPermanently)
+    {
+        NX_LOGX(lm("Error. Cloud reported %1 error. Removing local cloud credentials...")
+            .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+
+        //system has been disconnected from cloud: cleaning up cloud credentials...
+        qnGlobalSettings->resetCloudParams();
+        if (!qnGlobalSettings->synchronizeNowSync())
+        {
+            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+        }
+    }
+}
+
 bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const /*lk*/) const
 {
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();

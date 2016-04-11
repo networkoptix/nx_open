@@ -8,7 +8,7 @@ Item
 
     property bool isMasked: isAvailable && isMaskedPrivate;
     property bool isAvailable: true;
-    property bool isMaskedPrivate;
+    property bool isMaskedPrivate: false;
 
     property Component maskedAreaDelegate;
     property Component areaDelegate;

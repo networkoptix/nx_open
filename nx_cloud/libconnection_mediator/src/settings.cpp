@@ -14,7 +14,8 @@
 #include <nx/utils/timermanager.h>
 #include <utils/serialization/lexical.h>
 
-#include "version.h"
+#include <libconnection_mediator_app_info.h>
+#include <utils/common/app_info.h>
 
 
 namespace
@@ -76,11 +77,11 @@ Settings::Settings()
 #ifdef _WIN32
     m_settings(
         QSettings::SystemScope,
-        QN_ORGANIZATION_NAME,
-        QN_APPLICATION_NAME ),
+        QnAppInfo::organizationName(),
+        QnLibConnectionMediatorAppInfo::applicationName()),
 #else
     m_settings( lit("/opt/%1/%2/etc/%2.conf" )
-                .arg( VER_LINUX_ORGANIZATION_NAME ).arg( kModuleName ),
+                .arg(QnAppInfo::linuxOrganizationName()).arg( kModuleName ),
                 QSettings::IniFormat ),
 #endif
     m_showHelp( false )
@@ -177,7 +178,7 @@ void Settings::loadConfiguration()
     {
 #ifdef Q_OS_LINUX
         m_general.dataDir = QString("/opt/%1/%2/var")
-            .arg(VER_LINUX_ORGANIZATION_NAME).arg(kModuleName);
+            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
 #else
         const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];

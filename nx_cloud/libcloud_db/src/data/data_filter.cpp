@@ -29,6 +29,16 @@ bool DataFilter::empty() const
     return m_rc.empty();
 }
 
+stree::ResourceContainer& DataFilter::rc()
+{
+    return m_rc;
+}
+
+const stree::ResourceContainer& DataFilter::rc() const
+{
+    return m_rc;
+}
+
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, DataFilter* const dataFilter)
 {
     const auto queryItems = urlQuery.queryItems();

@@ -36,9 +36,9 @@ public:
     //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override { return m_abstractSocketProvider()->getLocalAddress(); }
     //!Implementation of AbstractSocket::close
-    virtual void close() override { return m_abstractSocketProvider()->close(); }
+    virtual bool close() override { return m_abstractSocketProvider()->close(); }
     //!Implementation of AbstractSocket::shutdown
-    virtual void shutdown() override { return m_abstractSocketProvider()->shutdown(); }
+    virtual bool shutdown() override { return m_abstractSocketProvider()->shutdown(); }
     //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override { return m_abstractSocketProvider()->isClosed(); }
     //!Implementation of AbstractSocket::setReuseAddrFlag

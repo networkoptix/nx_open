@@ -240,7 +240,7 @@
   <customwidget>
    <class>QnCheckedButton</class>
    <extends>QToolButton</extends>
-   <header>ui/widgets/checked_button.h</header>
+   <header>ui/widgets/common/checked_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

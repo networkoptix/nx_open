@@ -12,3 +12,5 @@ INCLUDEPATH += ${root.dir}/common_libs/nx_email/src/
 win* {
     DEFINES+=_VARIADIC_MAX=8
 }
+
+SOURCES += ${project.build.directory}/libcloud_db_app_info_impl.cpp

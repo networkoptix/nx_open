@@ -16,9 +16,10 @@ FileSocket::FileSocket( const std::string& filePath )
 {
 }
 
-void FileSocket::close()
+bool FileSocket::close()
 {
-    return m_file.close();
+    m_file.close();
+    return true;
 }
 
 bool FileSocket::isClosed() const

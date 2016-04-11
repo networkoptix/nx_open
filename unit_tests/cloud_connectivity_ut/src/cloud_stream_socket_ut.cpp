@@ -275,6 +275,8 @@ TEST_F(CloudStreamSocketTest, cancellation)
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
         serverAddress);
+
+    server.pleaseStopSync();
 }
 
 } // namespace cloud

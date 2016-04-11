@@ -11,10 +11,10 @@
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/custom_style.h>
 
-#include <ui/widgets/settings/general_preferences_widget.h>
-#include <ui/widgets/settings/look_and_feel_preferences_widget.h>
-#include <ui/widgets/settings/recording_settings_widget.h>
-#include <ui/widgets/settings/popup_settings_widget.h>
+#include <ui/widgets/local_settings/general_preferences_widget.h>
+#include <ui/widgets/local_settings/look_and_feel_preferences_widget.h>
+#include <ui/widgets/local_settings/recording_settings_widget.h>
+#include <ui/widgets/local_settings/popup_settings_widget.h>
 
 #include <ui/workbench/workbench_context.h>
 
@@ -28,7 +28,7 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
     addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));
 
-    if (QnScreenRecorder::isSupported()) 
+    if (QnScreenRecorder::isSupported())
         addPage(RecordingPage, new QnRecordingSettingsWidget(this), tr("Screen Recording"));
 
     addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));

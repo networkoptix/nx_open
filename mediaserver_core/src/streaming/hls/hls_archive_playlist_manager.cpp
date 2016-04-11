@@ -62,7 +62,8 @@ namespace nx_hls
 
         if( !archiveDelegate->setQuality(
                 m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
-                true ) )
+                true,
+                QSize()) )
             return false;
         m_delegate.reset( new QnThumbnailsArchiveDelegate(archiveDelegate) );
         m_delegate->setRange( m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec );

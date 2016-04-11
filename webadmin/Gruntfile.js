@@ -598,7 +598,7 @@ module.exports = function (grunt) {
         },
         shell: {
             deploy: {
-                command: 'cd ~/develop/' + package_dir + '; rm .DS_Store; rm ../.DS_Store; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+                command: 'cd ~/develop/' + package_dir + '; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'

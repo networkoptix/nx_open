@@ -16,6 +16,7 @@ ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 CONFIG += no_private_qt_headers_warning
+CONFIG += c++14
 DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${customization.defines}
 DEFINES += ${additional.defines}
@@ -231,7 +232,7 @@ unix: {
   clang {
     QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
   } else {
-    QMAKE_CXXFLAGS += -std=c++11
+    #QMAKE_CXXFLAGS += -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }

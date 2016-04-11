@@ -44,6 +44,7 @@ typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
+class QnRtspFfmpegEncoder;
 
 class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 {
@@ -105,7 +106,7 @@ private:
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
-
+    QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

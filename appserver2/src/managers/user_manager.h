@@ -10,8 +10,9 @@ namespace ec2
     public:
         QnUserNotificationManager( );
 
-        void triggerNotification( const QnTransaction<ApiUserData>& tran );
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification(const QnTransaction<ApiUserData>& tran);
+        void triggerNotification(const QnTransaction<ApiIdData>& tran);
+        void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran);
     };
 
 
@@ -25,7 +26,11 @@ namespace ec2
         virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
+        virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) override;
+        virtual int addAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler) override;
+        virtual int removeAccess(const ec2::ApiAccessRightsData& access, impl::SimpleHandlerPtr handler) override;
     private:
         QueryProcessorType* const m_queryProcessor;
     };
+
 }

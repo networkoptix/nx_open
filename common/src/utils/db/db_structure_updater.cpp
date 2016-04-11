@@ -13,7 +13,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/db/db_helper.h>
 
-#include "db_manager.h"
+#include "async_sql_query_executor.h"
 
 
 namespace nx {
@@ -31,9 +31,9 @@ INSERT INTO db_version_data ( db_version )          \
 
 
 
-DBStructureUpdater::DBStructureUpdater( DBManager* const dbManager )
+DBStructureUpdater::DBStructureUpdater(AsyncSqlQueryExecutor* const dbManager)
 :
-    m_dbManager( dbManager )
+    m_dbManager(dbManager)
 {
     m_updateScripts.push_back( createDbVersionTable );
 }

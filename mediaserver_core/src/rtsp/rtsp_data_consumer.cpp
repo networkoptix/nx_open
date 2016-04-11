@@ -73,8 +73,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_timer.start();
     QnMutexLocker lock( &m_allConsumersMutex );
     m_allConsumers << this;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_needKeyData[i] = false;
+    m_needKeyData.fill(false);
 }
 
 void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
@@ -218,7 +217,7 @@ void QnRtspDataConsumer::cleanupQueueToPos(int lastIndex, int ch)
             const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>( m_dataQueue.atUnsafe(i).get());
             if (!video || video->channelNumber == ch)
             {
-                m_dataQueue.remoteAtUnsafe(i);
+                m_dataQueue.removeAtUnsafe(i);
                 --currentIndex;
                 m_someDataIsDropped = true;
             }
@@ -510,8 +509,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
 
 void QnRtspDataConsumer::setNeedKeyData()
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_needKeyData[i] = true;
+    m_needKeyData.fill(true);
 }
 
 bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)

@@ -146,34 +146,34 @@ SocketAddress Socket<InterfaceToImplement>::getLocalAddress() const
 }
 
 template<typename InterfaceToImplement>
-void Socket<InterfaceToImplement>::shutdown()
+bool Socket<InterfaceToImplement>::shutdown()
 {
     if( m_fd == -1 )
-        return;
+        return true;
 
 #ifdef Q_OS_WIN
-    ::shutdown(m_fd, SD_BOTH);
+    return ::shutdown(m_fd, SD_BOTH) == 0;
 #else
-    ::shutdown(m_fd, SHUT_RDWR);
+    return ::shutdown(m_fd, SHUT_RDWR) == 0;
 #endif
 }
 
 
 template<typename InterfaceToImplement>
-void Socket<InterfaceToImplement>::close()
+bool Socket<InterfaceToImplement>::close()
 {
     shutdown();
 
     if( m_fd == -1 )
-        return;
+        return true;
 
     //checking that socket is not registered in aio
     NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
 
 #ifdef WIN32
-    ::closesocket(m_fd);
+    return ::closesocket(m_fd) == 0;
 #else
-    ::close(m_fd);
+    return ::close(m_fd) == 0;
 #endif
     m_fd = -1;
 }
@@ -794,17 +794,17 @@ bool CommunicatingSocket<InterfaceToImplement>::isConnected() const
 }
 
 template<typename InterfaceToImplement>
-void CommunicatingSocket<InterfaceToImplement>::close()
+bool CommunicatingSocket<InterfaceToImplement>::close()
 {
     m_connected = false;
-    Socket<InterfaceToImplement>::close();
+    return Socket<InterfaceToImplement>::close();
 }
 
 template<typename InterfaceToImplement>
-void CommunicatingSocket<InterfaceToImplement>::shutdown()
+bool CommunicatingSocket<InterfaceToImplement>::shutdown()
 {
     m_connected = false;
-    Socket<InterfaceToImplement>::shutdown();
+    return Socket<InterfaceToImplement>::shutdown();
 }
 
 template<typename InterfaceToImplement>

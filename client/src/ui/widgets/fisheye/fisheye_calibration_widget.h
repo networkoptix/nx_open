@@ -5,7 +5,7 @@
 
 #include <utils/common/connective.h>
 
-#include <ui/widgets/framed_label.h>
+#include <ui/widgets/common/framed_label.h>
 
 namespace Ui {
 class QnFisheyeCalibrationWidget;

@@ -34,15 +34,15 @@ public:
     virtual ~CloudStreamSocket();
 
     //!Implementation of AbstractSocket::*
-    bool bind(const SocketAddress& localAddress) override;
-    SocketAddress getLocalAddress() const override;
-    void close() override;
-    bool isClosed() const override;
-    virtual void shutdown() override;
-    AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual bool bind(const SocketAddress& localAddress) override;
+    virtual SocketAddress getLocalAddress() const override;
+    virtual bool close() override;
+    virtual bool isClosed() const override;
+    virtual bool shutdown() override;
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
     //!Implementation of AbstractStreamSocket::*
-    bool reopen() override;
+    virtual bool reopen() override;
 
     //!Implementation of AbstractCommunicatingSocket::*
     virtual bool connect(

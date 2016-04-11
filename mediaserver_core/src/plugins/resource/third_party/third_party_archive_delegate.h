@@ -43,7 +43,7 @@ public:
     //!Implementation of QnAbstractArchiveDelegate::setSingleshotMode
     virtual void setSingleshotMode( bool value ) override;
     //!Implementation of QnAbstractArchiveDelegate::setQuality
-    virtual bool setQuality( MediaQuality quality, bool fastSwitch ) override;
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override;
     //!Implementation of QnAbstractArchiveDelegate::setRange
     virtual void setRange( qint64 startTime, qint64 endTime, qint64 frameStep ) override;
     //!Implementation of QnAbstractArchiveDelegate::setSendMotion

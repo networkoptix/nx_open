@@ -31,6 +31,7 @@ enum MediaQuality {
     // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
     MEDIA_Quality_ForceHigh,
     MEDIA_Quality_Auto,
+    MEDIA_Quality_CustomResolution,
     MEDIA_Quality_None
 };
 

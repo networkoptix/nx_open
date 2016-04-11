@@ -36,8 +36,21 @@ extern "C"
 #include <nx/streaming/basic_media_context.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
-
 static const int REOPEN_TIMEOUT = 1000;
+
+namespace
+{
+    static const QByteArray kMediaQualityParamName = "x-media-quality";
+    static const QByteArray kResolutionParamName = "x-resolution";
+
+    QString resolutionToString(const QSize& size)
+    {
+        if (size.width() > 0)
+            return lit("%1x%2").arg(size.width()).arg(size.height());
+        else
+            return lit("%1p").arg(size.height());
+    }
+}
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
     QnAbstractArchiveDelegate(),
@@ -551,27 +564,6 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         m_frameCnt++;
     }
 
-
-    /*
-    if (result && result->flags & QnAbstractMediaData::MediaFlags_LIVE)
-    {
-        // Server can change quality for LIVE stream (for archive quality controlled by client only)
-        // So, if server is changed quality, update current quality variables
-        if (qSharedPointerDynamicCast<QnCompressedVideoData>(result))
-        {
-            bool isLowPacket = result->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-            bool isLowQuality = m_quality == MEDIA_Quality_Low;
-            if (isLowPacket != isLowQuality)
-            {
-                m_rtspSession->setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
-                m_qualityFastSwitch = true; // We already have got new quality. So, it is "fast" switch
-                m_quality = isLowPacket ? MEDIA_Quality_Low : MEDIA_Quality_High;
-                emit qualityChanged(m_quality);
-            }
-        }
-    }
-    */
-
     m_lastReceivedTime = qnSyncTime->currentMSecsSinceEpoch();
     return result;
 }
@@ -750,31 +742,43 @@ bool QnRtspClientArchiveDelegate::isRealTimeSource() const
         return m_lastPacketFlags & QnAbstractMediaData::MediaFlags_LIVE;
 }
 
-bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
+bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution)
 {
-    if (m_quality == quality && fastSwitch <= m_qualityFastSwitch)
+    if (m_quality == quality && fastSwitch <= m_qualityFastSwitch && m_resolution == resolution)
         return false;
     m_quality = quality;
     m_qualityFastSwitch = fastSwitch;
+    m_resolution = resolution;
 
-    QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
-    if (quality == MEDIA_Quality_ForceHigh)
-        value = "force-high";
-    else if (quality == MEDIA_Quality_High)
-        value = "high";
-    else
-        value = "low";
+    if (m_quality == MEDIA_Quality_CustomResolution)
+    {
+        m_rtspSession->setAdditionAttribute(kResolutionParamName, resolutionToString(m_resolution).toLatin1());
+        m_rtspSession->removeAdditionAttribute(kMediaQualityParamName);
 
-    QByteArray paramName = "x-media-quality";
-    m_rtspSession->setAdditionAttribute(paramName, value);
+        if (!fastSwitch)
+            m_rtspSession->sendSetParameter(kMediaQualityParamName, resolutionToString(m_resolution).toLatin1());
+    }
+    else {
+        QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
+        if (quality == MEDIA_Quality_ForceHigh)
+            value = "force-high";
+        else if (quality == MEDIA_Quality_High)
+            value = "high";
+        else
+            value = "low";
+
+        m_rtspSession->setAdditionAttribute(kMediaQualityParamName, value);
+        m_rtspSession->removeAdditionAttribute(kResolutionParamName);
+
+        if (!fastSwitch)
+            m_rtspSession->sendSetParameter(kMediaQualityParamName, value);
+    }
 
     if (!m_rtspSession->isOpened())
         return false;
 
-    if (!fastSwitch) {
-        m_rtspSession->sendSetParameter(paramName, value);
+    if (!fastSwitch)
         return false; // switch quality without seek (it is take more time)
-    }
     else
         return true; // need send seek command
 }

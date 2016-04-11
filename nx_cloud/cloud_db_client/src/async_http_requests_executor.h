@@ -28,15 +28,14 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-
-//!Executes HTTP requests asynchronously
-/*!
+/** Executes HTTP requests asynchronously.
     On object destruction all not yet completed requests are cancelled
 */ 
 class AsyncRequestsExecutor
 {
 public:
-    AsyncRequestsExecutor(network::cloud::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
+    AsyncRequestsExecutor(
+        network::cloud::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
     :
         m_cdbEndPointFetcher(cdbEndPointFetcher)
     {
@@ -191,78 +190,57 @@ private:
             std::move(completionHandler));
     }
     
-    //with output
-    template<typename HttpClienType, typename OutputData>
+    template<typename HttpClienType, typename ... OutputData>
     void execute(
         std::unique_ptr<HttpClienType> client,
-        std::function<void(api::ResultCode, OutputData)> completionHandler)
+        std::function<void(api::ResultCode, OutputData...)> completionHandler)
     {
-        //TODO #ak introduce generic implementation with variadic templates available
-
         QnMutexLocker lk(&m_mutex);
         m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
-        auto requestIter = std::prev(m_runningRequests.end());
         client->get(
-            [completionHandler, requestIter, this](
+            [completionHandler, this, thisClient = client.get()](
                 SystemError::ErrorCode errCode,
                 const nx_http::Response* response,
-                OutputData data)
+                OutputData ... data)
             {
                 {
                     QnMutexLocker lk(&m_mutex);
+                    auto requestIter =
+                        std::find_if(
+                            m_runningRequests.begin(),
+                            m_runningRequests.end(),
+                            [thisClient](const std::unique_ptr<QnStoppableAsync>& client)
+                            {
+                                return client.get() == thisClient;
+                            });
+                    if (requestIter == m_runningRequests.end())
+                        return; //request has been cancelled...
                     m_runningRequests.erase(requestIter);
                 }
                 if (errCode != SystemError::noError || !response)
-                    return completionHandler(api::ResultCode::networkError, OutputData());
+                    return completionHandler(
+                        api::ResultCode::networkError,
+                        OutputData()...);
 
                 api::ResultCode resultCode = api::ResultCode::ok;
-                const auto resultCodeStrIter = response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
+                const auto resultCodeStrIter = 
+                    response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
                 if (resultCodeStrIter != response->headers.end())
-                    resultCode = QnLexical::deserialized<api::ResultCode>(resultCodeStrIter->second);
+                {
+                    resultCode = QnLexical::deserialized<api::ResultCode>(
+                        resultCodeStrIter->second);
+                }
                 else
+                {
                     resultCode = api::httpStatusCodeToResultCode(
                         static_cast<nx_http::StatusCode::Value>(
                             response->statusLine.statusCode));
-                completionHandler(resultCode, std::move(data));
+                }
+                completionHandler(resultCode, std::move(data)...);
             });
         m_runningRequests.back() = std::move(client);
     }
-
-    //without output
-    template<typename HttpClienType>
-    void execute(
-        std::unique_ptr<HttpClienType> client,
-        std::function<void(api::ResultCode)> completionHandler)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
-        auto requestIter = std::prev(m_runningRequests.end());
-        client->get(
-            [completionHandler, requestIter, this](
-                SystemError::ErrorCode errCode,
-                const nx_http::Response* response)
-            {
-                {
-                    QnMutexLocker lk(&m_mutex);
-                    m_runningRequests.erase(requestIter);
-                }
-                if (errCode != SystemError::noError || !response)
-                    return completionHandler(api::ResultCode::networkError);
-
-                api::ResultCode resultCode = api::ResultCode::ok;
-                const auto resultCodeStrIter = response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
-                if (resultCodeStrIter != response->headers.end())
-                    resultCode = QnLexical::deserialized<api::ResultCode>(resultCodeStrIter->second);
-                else
-                    resultCode = api::httpStatusCodeToResultCode(
-                        static_cast<nx_http::StatusCode::Value>(
-                            response->statusLine.statusCode));
-                completionHandler(resultCode);
-        });
-        m_runningRequests.back() = std::move(client);
-    }
 };
-
 
 }   //cl
 }   //cdb

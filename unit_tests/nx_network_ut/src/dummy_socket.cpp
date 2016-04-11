@@ -218,14 +218,16 @@ BufferSocket::BufferSocket( const std::string& data )
 {
 }
 
-void BufferSocket::close()
+bool BufferSocket::close()
 {
     m_isOpened = false;
+    return true;
 }
 
-void BufferSocket::shutdown()
+bool BufferSocket::shutdown()
 {
     m_isOpened = false;
+    return true;
 }
 
 bool BufferSocket::isClosed() const

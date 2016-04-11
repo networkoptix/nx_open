@@ -14,7 +14,7 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/counter.h>
-#include <utils/db/db_manager.h>
+#include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
@@ -47,7 +47,7 @@ public:
     AccountManager(
         const conf::Settings& settings,
         TemporaryAccountPasswordManager* const tempPasswordManager,
-        nx::db::DBManager* const dbManager,
+        nx::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) throw(std::runtime_error);
     virtual ~AccountManager();
 
@@ -56,7 +56,7 @@ public:
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
         stree::ResourceContainer* const authProperties,
-        std::function<void(bool)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(
@@ -92,7 +92,7 @@ public:
 private:
     const conf::Settings& m_settings;
     TemporaryAccountPasswordManager* const m_tempPasswordManager;
-    nx::db::DBManager* const m_dbManager;
+    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     //!map<email, account>
     Cache<std::string, data::AccountData> m_cache;

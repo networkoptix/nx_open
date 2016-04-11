@@ -183,6 +183,7 @@ namespace ec2
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiVideowallDataList&);
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiWebPageDataList&);
+            void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
         };
 
 
@@ -240,6 +241,11 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, ec2::ApiUserDataList)
 
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractAccessRightsManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(GetAccessRights,             ec2::ErrorCode, ec2::ApiAccessRightsDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractBusinessEventManager
