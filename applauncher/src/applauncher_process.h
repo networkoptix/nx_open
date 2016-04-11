@@ -21,7 +21,6 @@
 #include "installation_manager.h"
 #include "installation_process.h"
 #include "task_server_new.h"
-#include "version.h"
 
 class ApplauncherProcess
 :

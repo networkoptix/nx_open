@@ -16,6 +16,7 @@
 #include <utils/fs/async_file_processor.h>
 #include <utils/media/custom_output_stream.h>
 
+#include <applauncher_app_info.h>
 #include "applauncher_process.h"
 
 
@@ -187,7 +188,7 @@ namespace detail
 
 #ifndef _WIN32
         //setting execution rights to file
-        if( m_filePath.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
+        if (m_filePath.endsWith(QnApplauncherAppInfo::clientBinaryName()))
             chmod( (m_localDirPath + "/" + m_filePath).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
 #endif
 

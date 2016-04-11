@@ -117,6 +117,7 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <liteMode>false</liteMode>
+        <client.binary.name>client-bin</client.binary.name>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -442,6 +443,7 @@
                 <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
+                <module>applauncher</module>
                 <module>client.core</module>
                 <module>client</module>
                 <module>client.bin</module>
@@ -477,6 +479,7 @@
                 <PlatformToolSet>v140_xp</PlatformToolSet>
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
+                <client.binary.name>${product.name}.exe</client.binary.name>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
@@ -514,7 +517,6 @@
                 </property>
             </activation>
             <modules>
-                <module>applauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
