@@ -2702,9 +2702,7 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
 
 ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
-    qint32 user_ptr_id = getResourceInternalId(data.userId);
-    if (user_ptr_id <= 0)
-        return ErrorCode::dbError;
+    const QByteArray userOrGroupId = data.userId.toRfc4122();
 
     /* Get list of resources, user already has access to. */
     QSet<QnUuid> accessibleResources;
@@ -2713,7 +2711,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
             SELECT resource.guid as resourceId
             FROM vms_access_rights rights
             JOIN vms_resource resource on resource.id = rights.resource_ptr_id
-            WHERE rights.user_ptr_id = :user_ptr_id
+            WHERE rights.guid = :userOrGroupId
         )";
 
         QSqlQuery selectQuery(m_sdb);
@@ -2721,13 +2719,12 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         if (!prepareSQLQuery(&selectQuery, selectQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        selectQuery.bindValue(":user_ptr_id", user_ptr_id);
+        selectQuery.bindValue(":userOrGroupId", userOrGroupId);
         if (!execSQLQuery(&selectQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
         while (selectQuery.next())
             accessibleResources.insert(QnUuid::fromRfc4122(selectQuery.value(0).toByteArray()));
-
     }
 
     QSet<QnUuid> newAccessibleResources;
@@ -2739,17 +2736,18 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     {
         QString insertQueryString = R"(
             INSERT INTO vms_access_rights
-            (user_ptr_id, resource_ptr_id)
+            (guid, resource_ptr_id)
             VALUES
         )";
 
         QStringList values;
+
         for (const QnUuid& resourceId : resourcesToAdd)
         {
             qint32 resource_ptr_id = getResourceInternalId(resourceId);
             if (resource_ptr_id <= 0)
                 return ErrorCode::dbError;
-            values << QString("(%1, %2)").arg(user_ptr_id).arg(resource_ptr_id);
+            values << QString("(%1, %2)").arg(QString::fromUtf8(userOrGroupId)).arg(resource_ptr_id);
         }
         insertQueryString.append(values.join(L',')).append(L';');
 
@@ -2767,10 +2765,10 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         QSqlQuery removeQuery(m_sdb);
         removeQuery.prepare(R"(
             DELETE FROM vms_access_rights
-            WHERE user_ptr_id = :user_ptr_id
+            WHERE guid = :userOrGroupId
             AND resource_ptr_id IN (:resources);
         )");
-        removeQuery.bindValue(":user_ptr_id", user_ptr_id);
+        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
 
         QStringList values;
         for (const QnUuid& resourceId : resourcesToRemove)
@@ -3627,11 +3625,10 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(R"(
-        SELECT user.guid as userId, resource.guid as resourceId
+        SELECT rights.guid as userId, resource.guid as resourceId
         FROM vms_access_rights rights
-        JOIN vms_resource user on user.id = rights.user_ptr_id
         JOIN vms_resource resource on resource.id = rights.resource_ptr_id
-        ORDER BY user.guid
+        ORDER BY rights.guid
     )");
 
     if (!execSQLQuery(&query, Q_FUNC_INFO))

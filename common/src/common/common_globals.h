@@ -885,7 +885,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
 
         /* Shortcuts. */
-        GlobalLiveViewerPermissions         = GlobalViewLivePermission,
+
+        /* Live viewer has access to all cameras by default */
+        GlobalLiveViewerPermissions         = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
 
         GlobalViewerPermissions             = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission,
 
@@ -898,7 +900,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAdvancedViewerPermissions     = GlobalViewerPermissions | GlobalEditCamerasPermission | GlobalPtzControlPermission,
         GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission       | GlobalEditUsersPermission         |
                                               GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessAllCamerasPermission  | GlobalAccessAllLayoutsPermission  | GlobalAccessAllServersPermission  ,
+                                              GlobalAccessAllServersPermission  ,
         GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
     };
 
