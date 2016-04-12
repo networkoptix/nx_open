@@ -68,15 +68,7 @@ describe('Restore password suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger, false);
 
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-        p.emailInput.clear();
-        p.emailInput.sendKeys(p.helper.userEmail);
-        p.submitButton.click();
-        deferred.fulfill();
-        return deferred.promise;
-    }, p.alert.alertMessages.restorePassConfirmSent, p.alert.alertTypes.success, false);
-
+    // TODO: Write correct test to see that link works only once
     //p.alert.checkAlert(function(){
     //    var deferred = protractor.promise.defer();
     //    p.getRestorePassPage(p.helper.userEmail).then(function(){
