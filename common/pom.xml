@@ -24,7 +24,7 @@
         <guid>${common.guid}</guid>
         <!--Global libs-->
         <template>lib</template>
-        <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia zlib-private</qt.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
