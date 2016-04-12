@@ -23,6 +23,7 @@ DEPENDENCY_VERSIONS = {
     "openal": "${openal.version}",
     "libjpeg-turbo": "${libjpeg-turbo.version}",
     "libcreateprocess": "${libcreateprocess.version}",
+    "vmux": "${vmux.version}",
     "server-external": "${server-external.version}",
     "help": "${help.version}"
 }

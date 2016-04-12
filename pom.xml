@@ -157,6 +157,7 @@
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
+        <vmux.version>1.0.0</vmux.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
 

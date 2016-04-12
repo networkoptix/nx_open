@@ -271,54 +271,5 @@
             </dependencies>
         </profile>
 
-        <profile>
-            <id>linux-isd-jaguar</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>com.isdedge</groupId>
-                    <artifactId>vmux</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
-                </property>
-            </activation>
-           <dependencies>
-                <dependency>
-                    <groupId>com.isdedge</groupId>
-                    <artifactId>vmux</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
     </profiles>
 </project>
