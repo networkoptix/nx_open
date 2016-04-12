@@ -152,6 +152,7 @@
         <festival.version>2.4</festival.version>
         <boost.version>1.56.0</boost.version>
         <quazip.version>0.7.1</quazip.version>
+        <openal.version>1.16</openal.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
 
@@ -974,6 +975,7 @@
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <qt.version>5.5.1</qt.version>
+                <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>

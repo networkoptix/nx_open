@@ -78,13 +78,14 @@
 
         <qt.libs>core core-private gui widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -ludt -lcloud_db_client</global.libs>
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <buildLib>sharedlib</buildLib>
         <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf help</rdep.packages>
+        <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
     <profiles>
         <profile>

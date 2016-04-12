@@ -218,13 +218,6 @@
                     <classifier>${platform}-x64</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>com.creativelabs</groupId>
-                    <artifactId>openal</artifactId>
-                    <version>1.16-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>com.networkoptix.hdwitness</groupId>
                     <artifactId>vmaxproxy</artifactId>
                     <version>2.1-SNAPSHOT</version>
@@ -636,13 +629,6 @@
                     <groupId>net.sourceforge</groupId>
                     <artifactId>libjpeg-turbo</artifactId>
                     <version>1.4.2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.creativelabs</groupId>
-                    <artifactId>openal</artifactId>
-                    <version>1.17.2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>

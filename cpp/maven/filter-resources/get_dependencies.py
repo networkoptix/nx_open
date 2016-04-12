@@ -18,6 +18,7 @@ DEPENDENCY_VERSIONS = {
     "festival-vox": "${festival.version}",
     "boost": "${boost.version}",
     "quazip": "${quazip.version}",
+    "openal": "${openal.version}",
     "server-external": "${server-external.version}",
     "help": "${help.version}"
 }
