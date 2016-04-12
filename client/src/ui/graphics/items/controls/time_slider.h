@@ -165,7 +165,6 @@ public:
     bool isThumbnailsVisible() const;
     qreal thumbnailsHeight() const;
     qreal rulerHeight() const;
-    void setRulerHeight(qreal rulerHeight);
 
     QnThumbnailsLoader* thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader* value, qreal aspectRatio); // TODO: #Elric remove aspectRatio
@@ -231,7 +230,6 @@ protected:
 
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint) const override;
 
-    static QVector<QnTimeStep> createRelativeSteps();
     static void createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps);
     static void enumerateSteps(QVector<QnTimeStep>& steps);
 
@@ -246,19 +244,24 @@ private:
 
     struct TimeStepData
     {
-        TimeStepData(): tickmarkTextOversize(1.0), currentHeight(0.0), targetHeight(0.0), currentLineOpacity(0.0), targetLineOpacity(0.0), currentTextOpacity(0.0), targetTextOpacity(0.0) {}
+        TimeStepData(): tickmarkTextOversize(1.0),
+            currentHeight(0.0), targetHeight(0.0), heightSpeed(0.0),
+            currentLineOpacity(0.0), targetLineOpacity(0.0), lineOpacitySpeed(0.0),
+            currentTextOpacity(0.0), targetTextOpacity(0.0), textOpacitySpeed(0.0) {}
 
         qreal tickmarkTextOversize;
 
         qreal currentHeight;
         qreal targetHeight;
+        qreal heightSpeed;
+
         qreal currentLineOpacity;
         qreal targetLineOpacity;
+        qreal lineOpacitySpeed;
+
         qreal currentTextOpacity;
         qreal targetTextOpacity;
-
-        int currentTextHeight;
-        qreal currentLineHeight;
+        qreal textOpacitySpeed;
     };
 
     struct LineData
@@ -293,7 +296,17 @@ private:
 
     QRectF thumbnailsRect() const;
     QRectF rulerRect() const;
+    QRectF dateBarRect() const;
+    QRectF tickmarkBarRect() const;
+    QRectF lineBarRect() const;
+
     qreal effectiveLineStretch(int line) const;
+
+    /* Returns tickmark level clamped in range [0...maxTickmarkLevels] (warning! not [0...maxTickmarkLevels-1]) */
+    int tickmarkLevel(int stepIndex) const;
+
+    QColor tickmarkLineColor(int level) const;
+    QColor tickmarkTextColor(int level) const;
 
     void setMarkerSliderPosition(Marker marker, qint64 position);
 
@@ -314,7 +327,6 @@ private:
     void drawBookmarks(QPainter* painter, const QRectF& rect);
 
     void updatePixmapCache();
-    void updateVisibleLineCount();
     void updateToolTipVisibility();
     void updateToolTipText();
     void updateSteps();
@@ -337,8 +349,8 @@ private:
     Q_SLOT void addThumbnail(const QnThumbnail& thumbnail);
     Q_SLOT void clearThumbnails();
 
-    void animateStepValues(int deltaMSecs);
-    void animateThumbnails(int deltaMSecs);
+    void animateStepValues(int deltaMs);
+    void animateThumbnails(int deltaMs);
     bool animateThumbnail(qreal dt, ThumbnailData& data);
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
@@ -394,6 +406,7 @@ private:
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
+    int m_maxStepIndex;
     qreal m_msecsPerPixel;
     qreal m_animationUpdateMSecsPerPixel;
     QVector<qint64> m_nextTickmarkPos;
@@ -411,14 +424,13 @@ private:
     bool m_thumbnailsVisible;
 
     qreal m_rulerHeight;
-    qreal m_prefferedHeight;
 
     int m_lastMinuteAnimationDelta;
     QPixmap m_progressPastPattern;
     QPixmap m_progressFuturePattern;
     QVector<bool> m_lastMinuteIndicatorVisible;
 
-    QnTimeSliderPixmapCache *m_pixmapCache;
+    QnTimeSliderPixmapCache* m_pixmapCache;
 
     QVector<qint64> m_indicators;
 
@@ -429,7 +441,7 @@ private:
     QPointF m_currentRulerRectMousePos;
     qreal m_lastLineBarValue;
 
-    QnBookmarksViewer *m_bookmarksViewer;
+    QnBookmarksViewer* m_bookmarksViewer;
     bool m_bookmarksVisible;
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 };

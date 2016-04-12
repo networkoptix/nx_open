@@ -80,7 +80,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_muteButton = newActionButton(QnActions::ToggleMuteAction);
     m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));
-    m_muteButton->setPreferredSize(20, 20);
+    m_muteButton->setPreferredSize(24, 24);
 
     m_liveButton = newActionButton(QnActions::JumpToLiveAction);
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
@@ -121,7 +121,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
-    m_timeSlider->setRulerHeight(70.0);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     m_timeScrollBar->setPreferredHeight(16);

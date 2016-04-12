@@ -6,11 +6,12 @@
 
 #include <utils/common/model_functions_fwd.h>
 
+#include <vector>
+
 struct QnTimeSliderColors {
 public:
     QnTimeSliderColors();
 
-    QColor tickmark;
     QColor positionMarker;
     QColor indicator;
 
@@ -38,11 +39,15 @@ public:
 
     QColor pastLastMinute;
     QColor futureLastMinute;
+
+    std::vector<QColor> tickmarkLines;
+    std::vector<QColor> tickmarkText;
 };
-#define QnTimeSliderColors_Fields (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)\
+#define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
     (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
     (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute)\
-    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)
+    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (tickmarkLines)(tickmarkText)
 
 struct QnTimeScrollBarColors {
     QnTimeScrollBarColors();

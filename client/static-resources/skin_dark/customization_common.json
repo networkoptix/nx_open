@@ -199,40 +199,45 @@
         "colors": {
             "_": "Time slider colors.",
             
-            "tickmark": "QColor(255, 255, 255, 255)",
-            "positionMarker": "QColor(255, 255, 255, 196)",
+            "positionMarker": "light4",
             "indicator": "QColor(128, 160, 192, 128)",
             
             "selection": "selection",
             "selectionMarker": "selection.lighter",
             
-            "pastBackground": "QColor(255, 255, 255, 24)",
-            "futureBackground": "QColor(0, 0, 0, 64)",
+            "pastBackground": "green_d3",
+            "futureBackground": "green_d3",
             
-            "pastRecording": "QColor(64, 255, 64, 128)",
-            "futureRecording": "QColor(64, 255, 64, 64)",
+            "pastRecording": "green_core",
+            "futureRecording": "green_core",
             
             "pastMotion": "QColor(255, 0, 0, 128)",
             "futureMotion": "QColor(255, 0, 0, 64)",
             
-            "separator": "QColor(255, 255, 255, 64)",
+            "separator": "dark6",
             
-            "dateOverlay": "QColor(255, 255, 255, 48)",
-            "dateOverlayAlternate": "selection.setAlpha(48)",
+            "dateOverlay": "dark11",
+            "dateOverlayAlternate": "dark9",
+
+            "tickmarkLines": [ "light10", "dark17", "dark13", "dark9" ],
+            "tickmarkText" : [ "light8", "light16", "dark15" ],
 
             "_": "Do not touch two values below! They was set accurately with help of color-picker.",
             "pastLastMinute": "QColor(24, 24, 24, 255)",
             "futureLastMinute": "QColor(0, 0, 0, 255)"
         },
-        "palette": { "default": { "windowText": "#FFFFFF" } }        
+        "palette": { "default": { 
+            "window": "dark6",
+            "windowText": "#FFFFFF" 
+        }} 
     },
     
     "QnTimeScrollBar": {
         "colors": {
-            "indicator": "#ffffffff",
-            "border": "#80808080",
-            "handle": "#ffffff20"
-        }
+            "indicator": "light4",
+            "handle": "dark12"
+        },
+        "palette": { "default": { "window": "dark4" } }
     },
 
     "QnControlBackgroundWidget": {

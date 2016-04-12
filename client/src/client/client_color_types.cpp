@@ -9,7 +9,6 @@
 #include <utils/common/model_functions.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
-    tickmark = QColor(255, 255, 255, 255);
     positionMarker = QColor(255, 255, 255, 196);
     indicator = QColor(128, 160, 192, 128);
 
@@ -38,6 +37,9 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     pastLastMinute = QColor(24, 24, 24, 255);
     futureLastMinute = QColor(0, 0, 0, 255);
+
+    tickmarkLines.push_back(QColor(255, 255, 255, 255));
+    tickmarkText.push_back(QColor(255, 255, 255, 255));
 }
 
 QnTimeScrollBarColors::QnTimeScrollBarColors() {
