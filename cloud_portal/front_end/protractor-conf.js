@@ -19,7 +19,7 @@ exports.config = {
     // Spec patterns are relative to the current working directly when
     // protractor is called.
     specs: ['test/e2e/**/*spec.js'],
-    //specs: ['test/e2e/restore_pass/*spec.js'],
+    //specs: ['test/e2e/system_page/share_spec.js'],
 
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
@@ -33,7 +33,7 @@ exports.config = {
 
         var imap = {
             user: "noptixqa@gmail.com",
-            password: "qweasd123qwe",
+            password: "qweasd!@#",
             host: "imap.gmail.com",
             port: 993,
             tls: true,
