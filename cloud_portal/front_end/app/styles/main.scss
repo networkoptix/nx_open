@@ -187,12 +187,15 @@ footer {
     display: none;
 }
 
-
-.user-name{
+@mixin ellipsis{
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: normal;
+  white-space: nowrap;
   max-width: 100%;
+}
+
+.user-name{
+  @include ellipsis;
 }
 td.user-name{
   max-width: 200px;
@@ -206,10 +209,7 @@ td.user-name{
     line-height: 24px;
     margin-bottom: 2px;
 
-    max-width: 100%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    @include ellipsis;
   }
   .user-name{
     font-size: $font-size-h6;

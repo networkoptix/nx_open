@@ -165,7 +165,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 return $scope.settings || $scope.$parent && this.getSettings($scope.$parent) || null;
             }
         };
-    }]).controller("DialogCtrl",['$scope', '$uibModalInstance','settingsfunction', function($scope, $uibModalInstance,settings){
+    }]).controller("DialogCtrl",['$scope', '$uibModalInstance','settings', function($scope, $uibModalInstance,settings){
         $scope.settings = settings;
 
         $scope.close = function(){
