@@ -22,9 +22,19 @@ CLH264RtpParser::CLH264RtpParser():
         m_keyDataExists(false),
         m_idrFound(false),
         m_frameExists(false),
+
         m_firstSeqNum(0),
         m_packetPerNal(0),
-        m_videoFrameSize(0)
+
+        m_prevBuiltinPpsFound(false),
+        m_prevBuiltinSpsFound(false),
+        m_prevKeyDataExists(false),
+        m_prevIdrFound(false),
+        m_prevFrameExists(false),
+
+        m_videoFrameSize(0),
+        m_additionalVideoFrameSize(0),
+        m_previousChunksBufOffset(0)
         //m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128)
 {
 }
@@ -166,9 +176,12 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
         addHeaderSize = getSpsPpsSize();
 
-    int totalSize = m_videoFrameSize + addHeaderSize;
+    int totalSize = m_videoFrameSize + addHeaderSize + m_additionalVideoFrameSize;
+
     if (totalSize > MAX_ALLOWED_FRAME_SIZE)
+    {
         return QnCompressedVideoDataPtr();
+    }
 
     QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(
         new QnWritableCompressedVideoData(
@@ -187,6 +200,20 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
     //result->data.write(m_videoBuffer);
     size_t spsNaluStartOffset = (size_t)-1;
     size_t spsNaluSize = 0;
+
+    for (size_t i = 0; i < m_previousChunks.size(); ++i)
+    {
+        if (m_previousChunks[i].nalStart)
+        {
+            if( (spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0) )
+                spsNaluSize = result->m_data.size() - spsNaluStartOffset;
+            result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            if( (m_previousChunks[i].len > 0) && ((*((const char*)m_previousChunksBuf + m_previousChunks[i].bufferOffset) & 0x1f) == nuSPS) )
+                spsNaluStartOffset = result->m_data.size();
+        }
+        result->m_data.uncheckedWrite((const char*) m_previousChunksBuf + m_previousChunks[i].bufferOffset, m_previousChunks[i].len);
+    }
+
     for (uint i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].nalStart)
@@ -230,6 +257,21 @@ bool CLH264RtpParser::clearInternalBuffer()
     return false;
 }
 
+bool CLH264RtpParser::clearPreviousChunksBuffer()
+{
+    m_previousChunks.clear();
+    m_previousChunksBufOffset = 0;
+    m_additionalVideoFrameSize = 0;
+
+    m_builtinSpsFound = m_prevBuiltinSpsFound;
+    m_builtinPpsFound = m_prevBuiltinPpsFound;
+    m_keyDataExists = m_prevKeyDataExists;
+    m_idrFound = m_prevIdrFound;
+    m_frameExists = m_prevFrameExists;
+
+    return false;
+}
+
 bool isIFrame(const quint8* data, int dataLen)
 {
     if (dataLen < 2)
@@ -259,6 +301,27 @@ bool isIFrame(const quint8* data, int dataLen)
     }
 }
 
+bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen )
+{
+    bool isSlice = nalType >= nuSliceNonIDR && nalType <= nuSliceIDR;
+    if(!isSlice)
+        return false;
+
+    BitStreamReader bitReader;
+    bitReader.setBuffer(data+1, data + dataLen);
+    int macroNum = -1;
+    try
+    {
+        macroNum = NALUnit::extractUEGolombCode(bitReader);
+    }
+    catch(BitStreamException &e)
+    {
+        return false;
+    }
+
+    return macroNum == 0;
+}
+
 void CLH264RtpParser::updateNalFlags(int nalUnitType, const quint8* data, int dataLen)
 {
     if (nalUnitType == nuSPS)
@@ -274,6 +337,25 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType, const quint8* data, int da
         }
         else if (!m_idrFound && isIFrame(data, dataLen)) {
             m_keyDataExists = true;
+        }
+    }
+}
+
+void CLH264RtpParser::updatePrevNalFlags(int nalUnitType, const quint8* data, int dataLen)
+{
+    if (nalUnitType == nuSPS)
+        m_prevBuiltinSpsFound = true;
+    else if (nalUnitType == nuPPS)
+        m_prevBuiltinPpsFound = true;
+    else if (nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
+    {
+        m_prevFrameExists = true;
+        if (nalUnitType == nuSliceIDR) {
+            m_prevKeyDataExists = true;
+            m_prevIdrFound = true;
+        }
+        else if (!m_prevIdrFound && isIFrame(data, dataLen)) {
+            m_prevKeyDataExists = true;
         }
     }
 }
@@ -345,6 +427,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     int packetType = *curPtr & 0x1f;
     int nalRefIDC = *curPtr++ & 0xe0;
+    bool isFirstNal = false;
 
     switch (packetType)
     {
@@ -364,11 +447,28 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                     return clearInternalBuffer();
 
                 nalUnitType = *curPtr & 0x1f;
+                isFirstNal = isFirstSliceNal(nalUnitType, curPtr, bufferEnd - curPtr) || isFirstNal;
+                if(isFirstNal)
+                {
+                    m_mediaData = createVideoData(
+                        rtpBufferBase,
+                        ntohl(rtpHeader->timestamp),
+                        statistics);
+                    updatePrevNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
+                    clearPreviousChunksBuffer();
+                    memcpy(m_previousChunksBuf + m_previousChunksBufOffset, curPtr, nalUnitLen);
+                    m_previousChunks.push_back(Chunk(m_previousChunksBufOffset, nalUnitLen, true));
+                    m_previousChunksBufOffset += nalUnitLen;
+                    m_additionalVideoFrameSize += nalUnitLen + 4;
+                }
+                else
+                {
+                    m_chunks.push_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
+                    m_videoFrameSize += nalUnitLen + 4;
+                    updateNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
+                }
                 //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
                 //m_videoBuffer.write((const char*)curPtr, nalUnitLen);
-                m_chunks.push_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
-                m_videoFrameSize += nalUnitLen + 4;
-                updateNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
             }
             break;
@@ -378,11 +478,13 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 return clearInternalBuffer();
             nalUnitType = *curPtr & 0x1f;
             updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
+
             if (*curPtr  & 0x80) // FU_A first packet
             {
                 m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
                 //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                isFirstNal = isFirstSliceNal(nalUnitType, curPtr, bufferEnd - curPtr);
                 nalUnitType |= nalRefIDC;
                 //m_videoBuffer.write( (const char*) &nalUnitType, 1);
             }
@@ -412,8 +514,26 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 --curPtr;
                 *curPtr = nalUnitType;
             }
-            m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0));
-            m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
+            //
+
+            if(isFirstNal)
+            {
+                auto nalUnitLen = bufferEnd - curPtr;
+                m_mediaData = createVideoData(
+                    rtpBufferBase,
+                    ntohl(rtpHeader->timestamp),
+                    statistics);
+                clearPreviousChunksBuffer();
+                memcpy(m_previousChunksBuf + m_previousChunksBufOffset, curPtr, nalUnitLen);
+                m_previousChunks.push_back(Chunk(m_previousChunksBufOffset, nalUnitLen, true));
+                m_previousChunksBufOffset += nalUnitLen;
+                m_additionalVideoFrameSize += nalUnitLen + 4;
+            }
+            else
+            {
+                m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, m_packetPerNal == 0));
+                m_videoFrameSize += bufferEnd - curPtr + (m_packetPerNal == 0 ? 4 : 0);
+            }
             break;
         case MTAP16_PACKET:
         case MTAP24_PACKET:
@@ -424,28 +544,47 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             nalUnitType = *curPtr & 0x1f;
             //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
             //m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
-            m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
-            m_videoFrameSize += bufferEnd - curPtr + 4;
-            updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
+            isFirstNal = isFirstSliceNal(nalUnitType, curPtr, bufferEnd - curPtr);
+            if(isFirstNal)
+            {
+                auto nalUnitLen = bufferEnd - curPtr;
+                m_mediaData = createVideoData(
+                    rtpBufferBase,
+                    ntohl(rtpHeader->timestamp),
+                    statistics);
+                updatePrevNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
+                clearPreviousChunksBuffer();
+                memcpy(m_previousChunksBuf + m_previousChunksBufOffset, curPtr, nalUnitLen);
+                m_previousChunks.push_back(Chunk(m_previousChunksBufOffset, nalUnitLen, true));
+                m_previousChunksBufOffset += nalUnitLen;
+                m_additionalVideoFrameSize += nalUnitLen + 4;
+            }
+            else
+            {
+                m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
+                m_videoFrameSize += bufferEnd - curPtr + 4;
+                updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
+            }
+
             break; // ignore unknown data
     }
 
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if (rtpHeader->marker && m_frameExists) {
-        m_mediaData = createVideoData(
-            rtpBufferBase,
-            ntohl(rtpHeader->timestamp),
-            statistics
-        ); // last packet
-        if (!m_mediaData)
+    if(isFirstNal)
+    {
+        if(!m_mediaData)
         {
             processPacketLost();
             return false;
         }
-        gotData = true;
+        else
+        {
+            gotData = true;
+        }
     }
+
     return true;
 }
 

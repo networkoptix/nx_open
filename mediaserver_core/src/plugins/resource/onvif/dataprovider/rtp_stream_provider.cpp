@@ -22,6 +22,9 @@ void QnRtpStreamReader::setRequest(const QString& request)
 
 QnAbstractMediaDataPtr QnRtpStreamReader::getNextData() 
 {
+    if (needMetaData())
+        return getMetaData();
+
     return m_rtpReader.getNextData();
 }
 

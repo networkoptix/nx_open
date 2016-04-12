@@ -80,6 +80,7 @@
 #include <plugins/resource/droid/droid_resource_searcher.h>
 #include <plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
 #include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
+#include <plugins/resource/flir/flir_resource_searcher.h>
 #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/mserver_resource_searcher.h>
@@ -2168,6 +2169,10 @@ void MediaServerProcess::run()
     QnPlISDResourceSearcher isdResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&isdResourceSearcher);
 #endif
+
+
+    QnFlirResourceSearcher flirResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&flirResourceSearcher);
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );

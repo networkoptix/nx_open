@@ -298,6 +298,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
+    qRegisterMetaType<QnIOPortData>();
+    qRegisterMetaType<QnIOPortDataList>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
@@ -306,6 +308,8 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
+    QnJsonSerializer::registerSerializer<QnIOPortData>();
+    QnJsonSerializer::registerSerializer<QnIOPortDataList>();
 
     qn_commonMetaTypes_initialized = true;
 }

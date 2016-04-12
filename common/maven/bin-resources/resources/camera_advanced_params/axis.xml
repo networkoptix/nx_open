@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<plugin
+	name="Axis"
+	version="1" 
+	unique_id="A6CC59F4-A1EE-4BB9-921D-971F4254B4A5">
+	<parameters>
+		<group name="Imaging">
+			<group name="Image Appearance">
+				<param id="root.ImageSource.I0.Sensor.ColorLevel"
+					name="Color Level"
+					description="Select from 1 to 100."
+					dataType="Number"
+					range="1,100"
+					readCmd="param.cgi"/>
+				<param id="root.ImageSource.I0.Sensor.Brightness"
+					name="Brighness"
+					description="Select from 1 (lowest) to 100 (highest)."
+					dataType="Number"
+					range="1,100"
+					readCmd="param.cgi"/>
+                <param id="root.ImageSource.I0.Sensor.Sharpness"
+					name="Sharpness"
+					description="Select from 1 (lowest) to 100 (highest)."
+					dataType="Number"
+					range="1,100"
+					readCmd="param.cgi"/>
+				<param id="root.ImageSource.I0.Sensor.Contrast"
+					name="Contrast"
+					description="Select from 1 (lowest) to 100 (highest)"
+					dataType="Number"
+					range="1,100"
+					readCmd="param.cgi"/>
+            </group>
+            <group name="White Balance">
+				<param id="root.ImageSource.I0.Sensor.WhiteBalance"
+					name="White Balance Mode"
+					dataType="Enumeration"
+					range="Auto,Hold,Fixed outdoor 1,Fixed outdoor 2,Fixed indoor,Fixed fluorescent 1,Fixed fluorerescent 2"
+                    internalRange="auto,hold,fixed_outdoor1,fixed_outdoor2,fixed_indoor,fixed_fluor1,fixed_fluor2"
+					readCmd="param.cgi"/>
+            </group>
+            <group name="Exposure settings">
+				<param id="root.ImageSource.I0.Sensor.ExposureValue"
+					name="Exposure Value"
+                    description="Select from 1 (lowest) to 100 (highest)"
+					dataType="Number"
+					range="1,100"
+					readCmd="param.cgi"/>
+				<param id="root.ImageSource.I0.Sensor.BacklightCompensation"
+					name="Backlight Compensation Mode"
+					description="Backlight compensation mode"
+					dataType="Enumeration"
+					range="Enabled,Disabled"
+                    internalRange="yes,no"
+					readCmd="param.cgi"/>                
+				<param id="root.ImageSource.I0.Sensor.ExposurePriority"
+					name="Exposure Priority"
+					dataType="Enumeration"
+					range="Default,Motion,Low noise"
+                    internalRange="50,100,0"
+					readCmd="param.cgi"/>
+			</group>
+		</group>
+		<group name="Audio">
+			<param 	id="root.AudioSource.A0.InputGain"
+				name="Audio input gain"
+				dataType="Enumeration"
+				range="Mute,Auto,-12,-9,-6,-3,-1.5,0,1.5,3,6,9,12,15,18,21,24,27,30,33"
+                inputRange="mute,auto,-12,-9,-6,-3,-1.5,0,1.5,3,6,9,12,15,18,21,24,27,30,33"
+				readCmd="param.cgi"/>
+			<param 	id="root.AudioSource.A0.OutputGain"
+				name="Audio output gain"
+				description="Select from 0 (most quiet) to 100 (loudest)"
+				dataType="Number"
+				range="0,100"
+				readCmd="system"/>
+		</group>
+		<group name="Maintenance">
+			<param 	id="Reboot"
+				dataType="Button"
+				name="Reboot" 
+				description="This operation reboots the device."
+				readCmd="restart.cgi"
+                writeCmd=""/>
+			<param 	id="FactoryDefault"
+				dataType="Button"
+				name="Soft Reset"
+				description="Reset settings to factory default except IP settings"
+				readCmd="factorydefault.cgi"
+                writeCmd=""/>
+			<param 	id="HardFactoryDefault"
+				dataType="Button"
+				name="Hard Reset"
+				description="Reset settings to factory default (includes IP settings)"
+				readCmd="hardfactorydefault.cgi"
+                writeCmd=""/>
+		</group>
+	</parameters>
+</plugin>

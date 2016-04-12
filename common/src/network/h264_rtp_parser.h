@@ -40,8 +40,18 @@ private:
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
 
+    bool m_prevBuiltinPpsFound;
+    bool m_prevBuiltinSpsFound;
+    bool m_prevKeyDataExists;
+    bool m_prevIdrFound;
+    bool m_prevFrameExists;
+
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
+    int m_additionalVideoFrameSize;
+    std::vector<Chunk> m_previousChunks;
+    char* m_previousChunksBuf[MAX_ALLOWED_FRAME_SIZE];
+    size_t m_previousChunksBufOffset;
 
 private:
     void serializeSpsPps(QnByteArray& dst);
@@ -54,7 +64,9 @@ private:
     );
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
+    bool clearPreviousChunksBuffer();
     void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
+    void updatePrevNalFlags(int nalUnitType, const quint8* data, int dataLen);
     int getSpsPpsSize() const;
 };
 

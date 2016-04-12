@@ -1,7 +1,7 @@
 #include "resource_data.h"
 
 #include <cassert>
-
+#include <api/model/api_ioport_data.h>
 #include <core/ptz/ptz_mapper.h>
 #include <core/onvif/onvif_config_data.h>
 #include <utils/serialization/json_functions.h>
@@ -17,6 +17,7 @@ public:
         registerKey<Qn::PtzCapabilities>(lit("ptzCapabilities"));
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
+        registerKey<QnIOPortDataList>(lit("ioSettings"));
     }
 
 protected:

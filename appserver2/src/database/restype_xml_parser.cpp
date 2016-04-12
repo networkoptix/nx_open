@@ -3,10 +3,13 @@
 
 namespace ec2
 {
+const QString kRootCameraId("1b7181ce-0227-d3f7-9443-c86aab922d96");
 
 ResTypeXmlParser::ResTypeXmlParser(ApiResourceTypeDataList& data): 
     m_data(data),
+    m_rootResType(nullptr),
     m_resTypeFound(false)
+
 {
 
 }
@@ -18,6 +21,15 @@ const ApiResourceTypeData* ResTypeXmlParser::findResTypeByName(const QString& na
             return &m_data[i];
     }
     return 0;
+}
+
+ApiResourceTypeData* ResTypeXmlParser::getRootResourceType(const QString& type) const
+{
+    for(auto& item : m_data)
+        if(item.name == type && item.parentId.empty())
+            return &item;
+
+    return nullptr;
 }
 
 bool ResTypeXmlParser::addParentType(ApiResourceTypeData& data, const QString& parentName)
@@ -43,6 +55,16 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
         return false;
     }
     newData.vendor = m_vendor;
+    if(!attrs.value("id").isEmpty() && !attrs.value("type").isEmpty()) {
+        if(m_rootResType == nullptr)
+            m_rootResType = getRootResourceType(attrs.value("type"));
+
+        Q_ASSERT(m_rootResType);
+        newData.id = QnUuid(attrs.value("id"));
+        newData.parentId.push_back(m_rootResType->id);
+        m_data.push_back(newData);
+        return true;
+    }
     if (attrs.value("public").isEmpty()) {
         if (!addParentType(newData, m_vendor + lit(" Camera")))
             return false;
