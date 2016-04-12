@@ -1,7 +1,7 @@
 #ifndef UPDATE_DIALOG_H
 #define UPDATE_DIALOG_H
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 class QnWorkbenchStateDelegate;
 

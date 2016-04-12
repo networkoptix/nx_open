@@ -2,8 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/generic_tabbed_dialog.h>
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 class QnWorkbenchStateDelegate;
 class QnServerSettingsWidget;
@@ -30,7 +29,7 @@ public:
 
     QnServerSettingsDialog(QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
-   
+
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
 

@@ -20,7 +20,7 @@ class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnR
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
-    void reset(const ec2::ApiAccessRightsDataList& accessRights);
+    void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights);
 
     /** List of resources ids, the given user has access to. */
     QSet<QnUuid> accessibleResources(const QnUuid& userId) const;

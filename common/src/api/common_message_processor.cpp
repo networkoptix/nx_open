@@ -459,7 +459,7 @@ void QnCommonMessageProcessor::resetTime()
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)
 {
-    qnResourceAccessManager->reset(accessRights);
+    qnResourceAccessManager->resetAccessibleResources(accessRights);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)

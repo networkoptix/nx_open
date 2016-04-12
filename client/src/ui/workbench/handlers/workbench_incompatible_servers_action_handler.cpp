@@ -16,7 +16,7 @@
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/progress_dialog.h>
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 

@@ -46,7 +46,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     });
 }
 
-void QnResourceAccessManager::reset(const ec2::ApiAccessRightsDataList& accessRights)
+void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights)
 {
     m_accessibleResources.clear();
     for (const auto& item : accessRights)
@@ -55,6 +55,7 @@ void QnResourceAccessManager::reset(const ec2::ApiAccessRightsDataList& accessRi
         for (const auto& id : item.resourceIds)
             accessibleResources << id;
     }
+    m_permissionsCache.clear();
 }
 
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
@@ -65,6 +66,14 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
 {
     m_accessibleResources[userId] = resources;
+
+    for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
+    {
+        if (iter.key().userId == userId)
+            iter = m_permissionsCache.erase(iter);
+        else
+            ++iter;
+    }
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr &user) const
