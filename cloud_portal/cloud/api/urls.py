@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^systems',                                systems.list_systems),
 
 
-    url(r'^ping',                                common.ping),
+    url(r'^ping',                                   common.ping),
 ]
