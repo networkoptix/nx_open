@@ -24,6 +24,8 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
+
+        <rdep.packages>gtest gmock</rdep.packages>
     </properties>
 
 </project>

@@ -32,6 +32,6 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>ffmpeg</rdep.packages>
+        <rdep.packages>gtest ffmpeg</rdep.packages>
     </properties>
 </project>

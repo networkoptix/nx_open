@@ -7,6 +7,8 @@ import platform_detection
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {
     "qt": "${qt.version}",
+    "gtest": "${gtest.version}",
+    "gmock": "${gmock.version}",
     "ffmpeg": "${ffmpeg.version}",
     "openssl": "${openssl.version}",
     "openldap": "${openldap.version}",

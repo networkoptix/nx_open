@@ -29,7 +29,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
-        <rdep.packages>openssl ffmpeg quazip</rdep.packages>
+        <rdep.packages>gtest openssl ffmpeg quazip</rdep.packages>
     </properties>
 
     <dependencies>
