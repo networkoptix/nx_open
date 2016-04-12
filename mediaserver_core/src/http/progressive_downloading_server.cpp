@@ -388,9 +388,9 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
         nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
-        d->killTimerID = TimerManager::instance()->addTimer(
+        d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
             this,
-            sessionLiveTimeoutSec*MS_PER_SEC );
+            std::chrono::milliseconds(sessionLiveTimeoutSec*MS_PER_SEC));
 
     setObjectName( "QnProgressiveDownloadingConsumer" );
 }
@@ -410,7 +410,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
         d->killTimerID = 0;
     }
     if( killTimerID )
-        TimerManager::instance()->joinAndDeleteTimer( killTimerID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( killTimerID );
 
     stop();
 }

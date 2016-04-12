@@ -4,13 +4,16 @@
 #include "nx/streaming/abstract_data_consumer.h"
 #include "network/tcp_connection_processor.h"
 #include "network/tcp_listener.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 class QnFfmpegTranscoder;
 
 class QnProgressiveDownloadingConsumerPrivate;
 
-class QnProgressiveDownloadingConsumer: virtual public QnTCPConnectionProcessor, public TimerEventHandler
+class QnProgressiveDownloadingConsumer
+:
+    virtual public QnTCPConnectionProcessor,
+    public nx::utils::TimerEventHandler
 {
 public:
     QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);

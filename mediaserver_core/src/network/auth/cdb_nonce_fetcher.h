@@ -18,7 +18,7 @@
 #include <QtCore/QObject>
 
 #include <cdb/connection.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/safe_direct_connection.h>
@@ -71,7 +71,7 @@ private:
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
-    TimerManager::TimerGuard m_timerID;
+    nx::utils::TimerManager::TimerGuard m_timerID;
     std::random_device m_rd;
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;

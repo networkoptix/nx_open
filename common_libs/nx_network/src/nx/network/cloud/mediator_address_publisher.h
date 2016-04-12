@@ -1,7 +1,7 @@
 #ifndef NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H
 #define NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "mediator_connections.h"
 #include "nx/network/aio/timer.h"
@@ -18,10 +18,10 @@ public:
     MediatorAddressPublisher(
             std::shared_ptr< hpm::api::MediatorServerTcpConnection > mediatorConnection );
 
-    static const TimerDuration DEFAULT_UPDATE_INTERVAL;
+    static const std::chrono::milliseconds DEFAULT_UPDATE_INTERVAL;
 
     /** Should be called before initial @fn updateAuthorization */
-    void setUpdateInterval( TimerDuration updateInterval );
+    void setUpdateInterval(std::chrono::milliseconds updateInterval );
     void updateAddresses( std::list< SocketAddress > addresses );
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -33,7 +33,7 @@ private:
 
 private:
     QnMutex m_mutex;
-    TimerDuration m_updateInterval;
+    std::chrono::milliseconds m_updateInterval;
     enum class State { kInit, kProgress, kTerminated } m_state;
 
     std::list< SocketAddress > m_reportedAddresses;

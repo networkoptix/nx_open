@@ -662,8 +662,10 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         oldCatalogs << fileCatalog;
     }
 
+    auto connectionName = sqlDb.connectionName();
     sqlDb.close();
-    QSqlDatabase::removeDatabase(sqlDb.connectionName());
+    sqlDb = QSqlDatabase();
+    QSqlDatabase::removeDatabase(connectionName);
     QFile::rename(fileName, fileName + lit("_deprecated"));
 
     auto sdb = qnStorageDbPool->getSDB(storage);
