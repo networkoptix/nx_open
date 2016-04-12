@@ -7,4 +7,4 @@ CREATE TABLE "vms_access_rights" (
     PRIMARY KEY(guid, resource_ptr_id)
     );
     
-CREATE UNIQUE INDEX idx_access_rights_guid ON vms_access_rights(guid);
+CREATE INDEX idx_access_rights_guid ON vms_access_rights(guid);

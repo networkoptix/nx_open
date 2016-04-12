@@ -2705,13 +2705,13 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     const QByteArray userOrGroupId = data.userId.toRfc4122();
 
     /* Get list of resources, user already has access to. */
-    QSet<QnUuid> accessibleResources;
+    QSet<qint32> accessibleResources;
+
     {
         QString selectQueryString = R"(
-            SELECT resource.guid as resourceId
-            FROM vms_access_rights rights
-            JOIN vms_resource resource on resource.id = rights.resource_ptr_id
-            WHERE rights.guid = :userOrGroupId
+            SELECT resource_ptr_id
+            FROM vms_access_rights
+            WHERE guid = :userOrGroupId
         )";
 
         QSqlQuery selectQuery(m_sdb);
@@ -2724,14 +2724,19 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
             return ErrorCode::dbError;
 
         while (selectQuery.next())
-            accessibleResources.insert(QnUuid::fromRfc4122(selectQuery.value(0).toByteArray()));
+            accessibleResources.insert(selectQuery.value(0).toInt());
     }
 
-    QSet<QnUuid> newAccessibleResources;
-    for (const QnUuid& id : data.resourceIds)
-        newAccessibleResources << id;
+    QSet<qint32> newAccessibleResources;
+    for (const QnUuid& resourceId : data.resourceIds)
+    {
+        qint32 resource_ptr_id = getResourceInternalId(resourceId);
+        if (resource_ptr_id <= 0)
+            return ErrorCode::dbError;
+        newAccessibleResources << resource_ptr_id;
+    }
 
-    QSet<QnUuid> resourcesToAdd = newAccessibleResources - accessibleResources;
+    QSet<qint32> resourcesToAdd = newAccessibleResources - accessibleResources;
     if (!resourcesToAdd.empty())
     {
         QString insertQueryString = R"(
@@ -2742,24 +2747,21 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 
         QStringList values;
 
-        for (const QnUuid& resourceId : resourcesToAdd)
-        {
-            qint32 resource_ptr_id = getResourceInternalId(resourceId);
-            if (resource_ptr_id <= 0)
-                return ErrorCode::dbError;
-            values << QString("(%1, %2)").arg(QString::fromUtf8(userOrGroupId)).arg(resource_ptr_id);
-        }
-        insertQueryString.append(values.join(L',')).append(L';');
+        for (const qint32& resource_ptr_id : resourcesToAdd)
+             values << QString("(:userOrGroupId, %1)").arg(resource_ptr_id);
+         insertQueryString.append(values.join(L',')).append(L';');
 
         QSqlQuery insertQuery(m_sdb);
         insertQuery.setForwardOnly(true);
         if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
+        insertQuery.bindValue(":userOrGroupId", userOrGroupId);
+
         if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
 
-    QSet<QnUuid> resourcesToRemove = accessibleResources - newAccessibleResources;
+    QSet<qint32> resourcesToRemove = accessibleResources - newAccessibleResources;
     if (!resourcesToRemove.empty())
     {
         QSqlQuery removeQuery(m_sdb);
@@ -2771,13 +2773,9 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         removeQuery.bindValue(":userOrGroupId", userOrGroupId);
 
         QStringList values;
-        for (const QnUuid& resourceId : resourcesToRemove)
-        {
-            qint32 resource_ptr_id = getResourceInternalId(resourceId);
-            if (resource_ptr_id <= 0)
-                return ErrorCode::dbError;
+        for (const qint32& resource_ptr_id : resourcesToRemove)
             values << QString::number(resource_ptr_id);
-        }
+
         removeQuery.bindValue(":resources", values.join(L','));
         if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
