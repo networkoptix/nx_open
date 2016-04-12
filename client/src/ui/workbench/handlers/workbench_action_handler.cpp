@@ -67,7 +67,6 @@
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
@@ -75,7 +74,6 @@
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
@@ -83,7 +81,9 @@
 #include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
-#include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
