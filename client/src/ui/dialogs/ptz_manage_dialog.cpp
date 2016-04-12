@@ -24,7 +24,6 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/widgets/ptz_tour_widget.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

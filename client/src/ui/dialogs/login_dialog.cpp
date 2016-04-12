@@ -22,7 +22,6 @@
 #include <core/resource/resource.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>

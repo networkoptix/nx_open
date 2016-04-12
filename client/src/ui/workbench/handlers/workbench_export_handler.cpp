@@ -31,7 +31,6 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>

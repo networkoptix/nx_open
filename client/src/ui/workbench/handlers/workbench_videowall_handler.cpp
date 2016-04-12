@@ -57,7 +57,6 @@
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/videowall_settings_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

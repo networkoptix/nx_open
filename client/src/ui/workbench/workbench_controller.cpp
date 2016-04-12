@@ -46,7 +46,6 @@
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
 #include <ui/dialogs/file_dialog.h>
-#include <ui/dialogs/message_box.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>

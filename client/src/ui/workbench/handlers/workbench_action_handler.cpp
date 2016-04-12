@@ -73,14 +73,12 @@
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>

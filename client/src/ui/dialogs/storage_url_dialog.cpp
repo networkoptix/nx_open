@@ -10,8 +10,6 @@
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/dialogs/message_box.h>
-
 QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags)
     : base_type(parent, windowFlags)
     , ui(new Ui::StorageUrlDialog())

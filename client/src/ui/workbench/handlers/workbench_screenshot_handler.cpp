@@ -30,7 +30,6 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
