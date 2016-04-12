@@ -31,13 +31,14 @@
         <global.libs>-lmediaserver_core -lcommon -lnx_network -lnx_utils -lnx_streaming -lappserver2 -lonvif -lnx_email -ludt -lcloud_db_client</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-ldl -lldap</linux.oslibs>
-        <linux.arm.oslibs>-llber -lsasl2</linux.arm.oslibs>
+        <linux.arm.oslibs>-lsasl2</linux.arm.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
         <rdep.packages>gtest openssl ffmpeg quazip sigar</rdep.packages>
+        <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
     <dependencies>
         <dependency>

@@ -294,13 +294,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openldap</groupId>
-                    <artifactId>openldap</artifactId>
-                    <version>${openldap.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
@@ -346,13 +339,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openldap</groupId>
-                    <artifactId>openldap</artifactId>
-                    <version>${openldap.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
@@ -392,13 +378,6 @@
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
                 <dependency>
-                    <groupId>org.openldap</groupId>
-                    <artifactId>openldap</artifactId>
-                    <version>${openldap.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
@@ -427,13 +406,6 @@
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.openldap</groupId>
-                    <artifactId>openldap</artifactId>
-                    <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
@@ -469,13 +441,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>              
-                <dependency>
-                    <groupId>org.openldap</groupId>
-                    <artifactId>openldap</artifactId>
-                    <version>${openldap.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>                     
             </dependencies>
         </profile>
         

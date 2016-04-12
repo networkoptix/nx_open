@@ -146,7 +146,7 @@
         <gmock.version>1.7.0</gmock.version>
         <ffmpeg.version>0.11.4</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
-        <openldap.version>2.4.42-SNAPSHOT</openldap.version>
+        <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
@@ -201,6 +201,7 @@
         <rdep.packages/>
         <rdep.windows.packages/>
         <rdep.linux.packages/>
+        <rdep.linux.arm.packages/>
         <rdep.mac.packages/>
         <rdep.android.packages/>
         <rdep.ios.packages/>
