@@ -3,10 +3,6 @@ TEMPLATE = lib
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
 include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
 
-exists( ${libdir}/libcreateprocess.pri ) {
-  include(${libdir}/libcreateprocess.pri)
-}
-
 INCLUDEPATH += ${root.dir}/appserver2/src/
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 INCLUDEPATH += ${root.dir}/common_libs/nx_email/src/

@@ -48,5 +48,24 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>linux-isd-jaguar</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.arm.packages>sasl2 openldap libcreateprocess</rdep.linux.arm.packages>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

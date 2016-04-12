@@ -212,6 +212,7 @@
             </activation>
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
+                <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>
         <profile>

@@ -22,6 +22,7 @@ DEPENDENCY_VERSIONS = {
     "quazip": "${quazip.version}",
     "openal": "${openal.version}",
     "libjpeg-turbo": "${libjpeg-turbo.version}",
+    "libcreateprocess": "${libcreateprocess.version}",
     "server-external": "${server-external.version}",
     "help": "${help.version}"
 }
