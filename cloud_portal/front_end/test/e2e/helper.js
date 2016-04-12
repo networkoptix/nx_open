@@ -33,12 +33,12 @@ var Helper = function () {
 
     // Get valid email with random number between 100 and 1000
     this.getRandomEmail = function() {
-        var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
+        var randomNumber = Math.floor((Math.random() * 100000)+10000); // Random number between 1000 and 10000
         return 'noptixqa+' + randomNumber + '@gmail.com';
     };
     // Get valid email with random number between 100 and 1000
     this.getRandomEmailWith = function(addition) {
-        var randomNumber = Math.floor((Math.random() * 10000)+1000); // Random number between 1000 and 10000
+        var randomNumber = Math.floor((Math.random() * 100000)+10000); // Random number between 1000 and 10000
         return 'noptixqa+'+ addition + randomNumber + '@gmail.com';
     };
     this.userEmail = 'noptixqa+1@gmail.com'; // valid existing email
