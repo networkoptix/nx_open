@@ -57,6 +57,10 @@ public:
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
+    QByteArray generateNonce() const;
+
+    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
@@ -65,7 +69,6 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
 #endif
-
 private:
     class TempAuthenticationKeyCtx
     {
@@ -125,7 +128,6 @@ private:
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         QnUuid* authUserId);
-    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QnMutex m_mutex;
 #ifndef USE_USER_RESOURCE_PROVIDER
