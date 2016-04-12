@@ -6,10 +6,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <ui/dialogs/camera_settings_dialog.h>
-#include <ui/dialogs/server_settings_dialog.h>
+#include <ui/dialogs/resource_properties/camera_settings_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
 
-#include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
 
 QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject *parent /*= nullptr*/):

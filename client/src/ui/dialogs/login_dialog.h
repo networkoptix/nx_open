@@ -9,7 +9,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <client/client_settings.h>
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 class QnAbstractPreferencesWidget;
 

@@ -3,7 +3,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 
 class Ui_QnMessageBox;
 class QnMessageBoxPrivate;

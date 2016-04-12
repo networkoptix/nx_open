@@ -14,7 +14,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
-#include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>

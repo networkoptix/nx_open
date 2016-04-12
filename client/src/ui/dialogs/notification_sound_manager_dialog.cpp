@@ -6,7 +6,7 @@
 
 #include <client/client_settings.h>
 
-#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/workbench/workbench_context.h>

@@ -50,7 +50,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 
 class QPushButton;
 class QLabel;

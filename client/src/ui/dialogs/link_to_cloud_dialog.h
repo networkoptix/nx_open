@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 namespace Ui

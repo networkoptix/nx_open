@@ -5,7 +5,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 #include <utils/common/connective.h>
 
 /**
@@ -22,7 +22,7 @@ public:
     QDialogButtonBox::StandardButton clickedButton() const {
         return m_clickedButton;
     }
-    
+
 protected:
     QDialogButtonBox* buttonBox() const;
     void setButtonBox(QDialogButtonBox *buttonBox);

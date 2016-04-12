@@ -8,7 +8,7 @@
 #include <QtWidgets/QLineEdit>
 
 #include <ui/style/custom_style.h>
-#include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
 
 #include <utils/common/string.h>
 

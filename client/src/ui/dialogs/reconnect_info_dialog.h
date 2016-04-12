@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QDialog>
 
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 #include <core/resource/resource_fwd.h>
 
 namespace Ui {

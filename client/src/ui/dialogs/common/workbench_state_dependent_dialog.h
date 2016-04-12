@@ -8,7 +8,7 @@
 
 #include <utils/common/forward.h>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
 
 #include <ui/workbench/workbench_state_manager.h>

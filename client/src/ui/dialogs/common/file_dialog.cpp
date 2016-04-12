@@ -1,4 +1,4 @@
-#include "ui/dialogs/file_dialog.h"
+#include "ui/dialogs/common/file_dialog.h"
 
 #include <QtCore/QSet>
 
