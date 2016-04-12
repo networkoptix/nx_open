@@ -75,7 +75,7 @@ void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
     if (camera && user)
     {
-        canViewArchive = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission)
+        canViewArchive = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
     }
     else
     {
