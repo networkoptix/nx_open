@@ -131,6 +131,7 @@
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
+        <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
@@ -149,7 +150,7 @@
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
-        <boost.version>1.56-SNAPSHOT</boost.version>
+        <boost.version>1.56.0</boost.version>
         <quazip.version>0.7.1</quazip.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
@@ -199,6 +200,8 @@
         <rdep.mac.packages/>
         <rdep.android.packages/>
         <rdep.ios.packages/>
+        <!-- Default packages for cpp projects -->
+        <rdep.global.packages>qt boost</rdep.global.packages>
         
         
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

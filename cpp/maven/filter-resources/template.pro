@@ -117,8 +117,7 @@ LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/
 }
 LIBS += ${global.libs}
 
-INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
-                ${qt.dir}/include \
+INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
                 ${qt.dir}/include/QtZlib \
                 ${project.build.sourceDirectory} \

@@ -35,7 +35,7 @@ def get_versioned_package_name(package):
     return package
 
 def get_packages(target):
-    packages = """${rdep.packages}"""
+    packages = """${rdep.global.packages} ${rdep.packages}"""
 
     target_platform = platform_detection.get_platform_for_target(target)
 

@@ -27,8 +27,6 @@
         <qt.libs>core</qt.libs>
 
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
-        
-        <rdep.packages>qt</rdep.packages>
     </properties>
     <dependencies>
         <dependency>
