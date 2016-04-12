@@ -47,7 +47,7 @@
     There are no external dependencies used in this example. All you need to build the library is a relatively modern C++ compiler.
 
     \section usage Usage
-    You should have NX Mediaserver installed. Put built plugin library in mediaserver/bin/plugins folder and restart mediaserver.
+    You should have NX Mediaserver installed. Put built plugin library in mediaserver/bin/plugins (linux) or mediaserver/plugins (windows) folder and restart mediaserver.
     Connect to the server with client. In external storage selection dialog you should be able to see new storage type (FTP). 
     Enter valid ftp url and credentials and press Ok. For example, 
 	\code
