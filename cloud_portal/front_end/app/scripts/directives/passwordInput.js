@@ -19,17 +19,21 @@ angular.module('cloudApp')
                 scope.Config = Config;
                 scope.weakPassword = true;
                 function loadCommonPasswords(){
-                    cloudApi.getCommonPasswords().then(function(data){
-                        Config.commonPasswordsList = data.data;
-                        checkCommonPassword();
-                    });
+                    if(!Config.commonPasswordsList) {
+                        cloudApi.getCommonPasswords().then(function (data) {
+                            Config.commonPasswordsList = data.data;
+                            checkCommonPassword();
+                        });
+                        return false;
+                    }
+                    return true;
                 }
+                loadCommonPasswords(); // Load passwords online
                 function checkCommonPassword(){
                     if(!scope.ngModel){
                         return;
                     }
-                    if(!Config.commonPasswordsList){
-                        loadCommonPasswords();
+                    if(!loadCommonPasswords()){
                         return;
                     }
                     // Check if password is directly in common list
