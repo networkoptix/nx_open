@@ -10,7 +10,10 @@ class QnFfmpegTranscoder;
 
 class QnProgressiveDownloadingConsumerPrivate;
 
-class QnProgressiveDownloadingConsumer: virtual public QnTCPConnectionProcessor, public TimerEventHandler
+class QnProgressiveDownloadingConsumer
+:
+    virtual public QnTCPConnectionProcessor,
+    public nx::utils::TimerEventHandler
 {
 public:
     QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);

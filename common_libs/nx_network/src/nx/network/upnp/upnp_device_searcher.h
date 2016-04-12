@@ -56,7 +56,7 @@ public:
 class NX_NETWORK_API DeviceSearcher
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public QnStoppable
 {
     Q_OBJECT

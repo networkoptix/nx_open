@@ -47,7 +47,7 @@ public:
             const std::string& address,
             const std::string& user,
             const std::string& password,
-            TimerDuration updateInterval)> FactoryFunc;
+            std::chrono::milliseconds updateInterval)> FactoryFunc;
 
     virtual ~AbstractCloudDataProviderFactory() {}
 
@@ -55,7 +55,7 @@ public:
         const std::string& address,
         const std::string& user,
         const std::string& password,
-        TimerDuration updateInterval);
+        std::chrono::milliseconds updateInterval);
 
     static void setFactoryFunc(FactoryFunc factoryFunc);
 };
@@ -65,18 +65,18 @@ class CloudDataProvider
     : public AbstractCloudDataProvider
 {
 public:
-    static const TimerDuration DEFAULT_UPDATE_INTERVAL;
+    static const std::chrono::milliseconds DEFAULT_UPDATE_INTERVAL;
 
     CloudDataProvider( const std::string& address,
                        const std::string& user,
                        const std::string& password,
-                       TimerDuration updateInterval = DEFAULT_UPDATE_INTERVAL );
+                       std::chrono::milliseconds updateInterval = DEFAULT_UPDATE_INTERVAL );
     ~CloudDataProvider();
 
     virtual boost::optional< System > getSystem( const String& systemId ) const override;
 
 private:
-    const TimerDuration m_updateInterval;
+    const std::chrono::milliseconds m_updateInterval;
 
     void updateSystemsAsync();
 
@@ -84,7 +84,7 @@ private:
     std::map< String, System > m_systemCache;
 
     bool m_isTerminated;
-    TimerManager::TimerGuard m_timerGuard;
+    nx::utils::TimerManager::TimerGuard m_timerGuard;
 
     std::unique_ptr< cdb::api::ConnectionFactory > m_connectionFactory;
     std::unique_ptr< cdb::api::Connection > m_connection;

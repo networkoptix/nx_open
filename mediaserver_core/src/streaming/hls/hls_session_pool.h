@@ -85,7 +85,7 @@ namespace nx_hls
     */
     class HLSSessionPool
     :
-        public TimerEventHandler
+        public nx::utils::TimerEventHandler
     {
     public:
         //!Locks specified session id for \a ScopedSessionIDLock life time

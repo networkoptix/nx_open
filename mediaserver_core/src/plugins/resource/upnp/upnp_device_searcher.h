@@ -54,7 +54,7 @@ public:
 class UPNPDeviceSearcher
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public QnStoppable
 {
     Q_OBJECT

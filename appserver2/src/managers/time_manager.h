@@ -194,7 +194,7 @@ namespace ec2
         {
             SocketAddress peerAddress;
             nx_http::AuthInfoCache::AuthorizationCacheItem authData;
-            TimerManager::TimerGuard syncTimerID;
+            nx::utils::TimerManager::TimerGuard syncTimerID;
             nx_http::AsyncHttpClientPtr httpClient;
             //!request round-trip time
             boost::optional<qint64> rttMillis;

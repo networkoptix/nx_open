@@ -27,7 +27,7 @@ class ApplauncherProcess
     public QObject,
     public QnStoppable,
     public AbstractRequestProcessor,
-    public TimerEventHandler
+    public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 

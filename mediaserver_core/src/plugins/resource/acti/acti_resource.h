@@ -23,7 +23,7 @@ class QnActiPtzController;
 class QnActiResource
 :
     public QnPhysicalCameraResource,
-    public TimerEventHandler
+    public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 

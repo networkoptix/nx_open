@@ -34,9 +34,9 @@ CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultG
         this, &CdbNonceFetcher::cloudBindingStatusChanged);
 
     QnMutexLocker lk(&m_mutex);
-    m_timerID = TimerManager::instance()->addTimer(
+    m_timerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-        0);
+        std::chrono::milliseconds::zero());
 }
 
 CdbNonceFetcher::~CdbNonceFetcher()
@@ -146,7 +146,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     if (!m_connection)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
-        m_timerID = TimerManager::instance()->addTimer(
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
             kGetNonceRetryTimeout);
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb (2), m_timerID %1")
@@ -170,7 +170,7 @@ void CdbNonceFetcher::gotNonce(
         NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
         CloudConnectionManager::instance()->processCloudErrorCode(resCode);
-        m_timerID = TimerManager::instance()->addTimer(
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
             kGetNonceRetryTimeout);
         return;
@@ -192,7 +192,7 @@ void CdbNonceFetcher::gotNonce(
 
     m_cdbNonceQueue.emplace_back(std::move(nonceCtx));
 
-    m_timerID = TimerManager::instance()->addTimer(
+    m_timerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
         nonce.validPeriod/2);
 }
@@ -217,9 +217,9 @@ void CdbNonceFetcher::cloudBindingStatusChanged(bool bindedToCloud)
 
     QnMutexLocker lk(&m_mutex);
     if (m_timerID)
-        TimerManager::instance()->modifyTimerDelay(m_timerID.get(), 0);
+        nx::utils::TimerManager::instance()->modifyTimerDelay(m_timerID.get(), std::chrono::milliseconds::zero());
     else
-        m_timerID = TimerManager::instance()->addTimer(
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-            0);
+            std::chrono::milliseconds::zero());
 }

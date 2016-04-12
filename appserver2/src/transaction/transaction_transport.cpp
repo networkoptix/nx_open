@@ -264,7 +264,7 @@ QnTransactionTransport::~QnTransactionTransport()
         m_sendKeepAliveTask = 0;    //no new task can be added
     }
     if( sendKeepAliveTaskLocal )
-        TimerManager::instance()->joinAndDeleteTimer( sendKeepAliveTaskLocal );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( sendKeepAliveTaskLocal );
 
     {
         auto httpClientLocal = m_httpClient;
@@ -918,9 +918,9 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
     else
     {
         //we using http client to send transactions
-        m_sendKeepAliveTask = TimerManager::instance()->addTimer(
+        m_sendKeepAliveTask = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, std::placeholders::_1),
-            m_tcpKeepAliveTimeout.count());
+            m_tcpKeepAliveTimeout);
     }
 }
 

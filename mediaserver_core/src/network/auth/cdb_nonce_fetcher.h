@@ -71,7 +71,7 @@ private:
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
     std::unique_ptr<nx::cdb::api::Connection> m_connection;
-    TimerManager::TimerGuard m_timerID;
+    nx::utils::TimerManager::TimerGuard m_timerID;
     std::random_device m_rd;
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;

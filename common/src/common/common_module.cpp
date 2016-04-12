@@ -42,7 +42,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
 
     /* Init statics. */
     qnProductFeatures();
-    store<TimerManager>(new TimerManager());
+    store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);

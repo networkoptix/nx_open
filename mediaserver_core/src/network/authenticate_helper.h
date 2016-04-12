@@ -70,7 +70,7 @@ private:
     class TempAuthenticationKeyCtx
     {
     public:
-        TimerManager::TimerGuard timeGuard;
+        nx::utils::TimerManager::TimerGuard timeGuard;
         QString path;
 
         TempAuthenticationKeyCtx() {}

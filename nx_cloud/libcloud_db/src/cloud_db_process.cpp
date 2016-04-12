@@ -130,7 +130,7 @@ int CloudDBProcess::executeApplication()
             return 2;
         }
 
-        TimerManager timerManager;
+        nx::utils::TimerManager timerManager;
         timerManager.start();
 
         std::unique_ptr<AbstractEmailManager> emailManager(

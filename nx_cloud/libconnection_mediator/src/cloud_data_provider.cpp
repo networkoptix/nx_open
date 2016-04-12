@@ -21,7 +21,7 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
     const std::string& address,
     const std::string& user,
     const std::string& password,
-    TimerDuration updateInterval)
+    std::chrono::milliseconds updateInterval)
 {
     if (cloudDataProviderFactoryFunc)
         return cloudDataProviderFactoryFunc(
@@ -79,7 +79,7 @@ std::ostream& operator<<( std::ostream& os,
 
 // impl
 
-const TimerDuration CloudDataProvider::DEFAULT_UPDATE_INTERVAL
+const std::chrono::milliseconds CloudDataProvider::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 5 );
 
 static nx::cdb::api::ConnectionFactory* makeConnectionFactory( const std::string& address )
@@ -109,7 +109,7 @@ static nx::cdb::api::ConnectionFactory* makeConnectionFactory( const std::string
 CloudDataProvider::CloudDataProvider( const std::string& address,
                                       const std::string& user,
                                       const std::string& password,
-                                      TimerDuration updateInterval )
+                                      std::chrono::milliseconds updateInterval )
     : m_updateInterval( std::move( updateInterval ) )
     , m_isTerminated( false )
     , m_connectionFactory( makeConnectionFactory( address ) )
@@ -180,7 +180,7 @@ void CloudDataProvider::updateSystemsAsync()
 
         QnMutexLocker lk( &m_mutex );
         if( !m_isTerminated )
-            m_timerGuard = TimerManager::instance()->addTimer(
+            m_timerGuard = nx::utils::TimerManager::instance()->addTimer(
                 [ this ]( quint64 ) { updateSystemsAsync(); }, m_updateInterval );
     } );
 }

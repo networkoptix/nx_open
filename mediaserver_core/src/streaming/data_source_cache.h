@@ -37,7 +37,7 @@ typedef QSharedPointer<DataSourceContext> DataSourceContextPtr;
 
 class DataSourceCache
 :
-    public TimerEventHandler
+    public nx::utils::TimerEventHandler
 {
 public:
     static const unsigned int DEFAULT_LIVE_TIME_MS = 3*1000;

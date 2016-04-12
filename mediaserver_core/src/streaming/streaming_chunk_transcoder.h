@@ -35,7 +35,7 @@ class QnTranscoder;
 class StreamingChunkTranscoder
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public Singleton<StreamingChunkTranscoder>,
     public Qn::EnableSafeDirectConnection
 {

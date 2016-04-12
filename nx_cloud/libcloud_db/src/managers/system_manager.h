@@ -59,7 +59,7 @@ public:
     */
     SystemManager(
         const conf::Settings& settings,
-        TimerManager* const timerManager,
+        nx::utils::TimerManager* const timerManager,
         const AccountManager& accountManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
     virtual ~SystemManager();
@@ -170,7 +170,7 @@ private:
     constexpr static const int SHARING_BY_SYSTEM_ID = 2;
 
     const conf::Settings& m_settings;
-    TimerManager* const m_timerManager;
+    nx::utils::TimerManager* const m_timerManager;
     const AccountManager& m_accountManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     //!map<id, system>
