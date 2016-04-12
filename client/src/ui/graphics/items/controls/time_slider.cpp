@@ -1944,10 +1944,10 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     drawSelection(painter);
 
     /* Draw position marker. */
-    drawMarker(painter, sliderPosition(), m_colors.positionMarker);
+    drawMarker(painter, sliderPosition(), m_colors.positionMarker, 2.0);
 
     /* Draw indicators. */
-    foreach(qint64 position, m_indicators)
+    foreach (qint64 position, m_indicators)
         drawMarker(painter, position, m_colors.indicator);
 }
 
@@ -2022,12 +2022,12 @@ void QnTimeSlider::drawSelection(QPainter* painter)
     drawMarker(painter, m_selectionEnd, m_colors.selectionMarker);
 }
 
-void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color)
+void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color, qreal width)
 {
     if (pos < m_windowStart || pos > m_windowEnd)
         return;
 
-    QPen pen(color, 2.0);
+    QPen pen(color, width);
     pen.setCapStyle(Qt::FlatCap);
 
     QnScopedPainterPenRollback penRollback(painter, pen);
@@ -2820,7 +2820,7 @@ void QnTimeSlider::changeEvent(QEvent* event)
     {
     case QEvent::FontChange:
     case QEvent::PaletteChange:
-        //updatePixmapCache(); //TODO #vkutin #common Check and remove this method if everything's working fine
+        updatePixmapCache();
         break;
     default:
         break;
