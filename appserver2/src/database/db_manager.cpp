@@ -3624,12 +3624,15 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(R"(
+    const QString queryStr = R"(
         SELECT rights.guid as userId, resource.guid as resourceId
         FROM vms_access_rights rights
         JOIN vms_resource resource on resource.id = rights.resource_ptr_id
         ORDER BY rights.guid
-    )");
+    )";
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
