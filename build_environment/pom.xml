@@ -604,57 +604,5 @@
             </dependencies>
         </profile>
 
-        <!-- Mobile client profiles -->
-        <profile>
-            <id>mobile-android-desktop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>android-desktop</value>
-                </property>
-            </activation>
-        </profile>
-        <profile>
-            <id>mobile-android</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>android</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>libjpeg-turbo</artifactId>
-                    <version>1.4.2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>mobile-ios</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>mac</family>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>ios</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>net.sourceforge</groupId>
-                    <artifactId>libjpeg-turbo</artifactId>
-                    <version>1.4.1-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 </project>
