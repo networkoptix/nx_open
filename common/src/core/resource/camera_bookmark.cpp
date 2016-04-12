@@ -263,7 +263,13 @@ QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &tags, const Q
 void QnCameraBookmark::sortBookmarks(QnCameraBookmarkList &bookmarks
     , const QnBookmarkSortOrder orderBy)
 {
-    std::sort(bookmarks.begin(), bookmarks.end(), createPredicate(orderBy));
+    /* For some reason clang fails to compile this if createPredicate is passed directly to std::sort.
+       Using lambda for this works. */
+    auto pred = createPredicate(orderBy);
+    std::sort(bookmarks.begin(), bookmarks.end(), [pred](const QnCameraBookmark &first, const QnCameraBookmark &second)
+    {
+        return pred(first, second);
+    });
 }
 
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
