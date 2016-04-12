@@ -1,7 +1,7 @@
 #ifndef NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H
 #define NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "mediator_connections.h"
 #include "nx/network/aio/timer.h"

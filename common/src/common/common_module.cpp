@@ -28,7 +28,7 @@
 
 #include <nx/network/socket_global.h>
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);

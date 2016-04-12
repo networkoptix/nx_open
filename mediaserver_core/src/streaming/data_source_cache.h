@@ -13,7 +13,7 @@
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <transcoding/transcoder.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "streaming_chunk_cache_key.h"
 

@@ -12,7 +12,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include "utils/common/id.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/http/httptypes.h>

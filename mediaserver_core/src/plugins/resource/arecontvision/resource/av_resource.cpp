@@ -15,7 +15,7 @@
 #include <utils/common/concurrent.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/ping.h>

@@ -21,7 +21,7 @@
 #include <boost/multi_index/member.hpp>
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 

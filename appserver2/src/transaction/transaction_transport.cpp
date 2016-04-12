@@ -10,7 +10,7 @@
 
 #include <nx_ec/ec_proto_version.h>
 #include <utils/bsf/sized_data_decoder.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/media/custom_output_stream.h>

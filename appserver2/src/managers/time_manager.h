@@ -18,7 +18,7 @@
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
 #include <nx/network/http/httptypes.h>

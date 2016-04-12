@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "timermanager.h"
+#include "timer_manager.h"
 
 #include <map>
 #include <string>

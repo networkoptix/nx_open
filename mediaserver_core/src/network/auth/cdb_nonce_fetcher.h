@@ -18,7 +18,7 @@
 #include <QtCore/QObject>
 
 #include <cdb/connection.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/safe_direct_connection.h>

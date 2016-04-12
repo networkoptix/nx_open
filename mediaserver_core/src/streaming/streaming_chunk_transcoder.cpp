@@ -13,7 +13,7 @@
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "ondemand_media_data_provider.h"
 #include "live_media_cache_reader.h"

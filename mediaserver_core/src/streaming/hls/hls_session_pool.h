@@ -15,7 +15,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include <nx/streaming/media_data_packet.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "api/model/audit/auth_session.h"
 #include "audit/audit_manager_fwd.h"

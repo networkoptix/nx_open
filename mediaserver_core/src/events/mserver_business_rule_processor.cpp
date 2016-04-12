@@ -31,7 +31,7 @@
 #include <utils/email/email.h>
 #include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
 #include <nx/email/mustache/mustache_helper.h>

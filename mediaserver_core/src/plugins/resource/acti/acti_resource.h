@@ -10,7 +10,7 @@
 #include "core/resource/camera_resource.h"
 #include "nx/streaming/media_data_packet.h"
 #include "utils/common/request_param.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/multipartcontentparser.h>

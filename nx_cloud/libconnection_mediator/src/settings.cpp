@@ -11,7 +11,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/serialization/lexical.h>
 
 #include <libconnection_mediator_app_info.h>
