@@ -6,6 +6,8 @@ exports.config = {
     //chromeDriver: 'node_modules/protractor/selenium/chromedriver',
 
     baseUrl: 'http://127.0.0.1:9000',
+    //baseUrl: 'http://cloud-demo.hdw.mx',
+
 
     // Capabilities to be passed to the webdriver instance.
     capabilities: {
