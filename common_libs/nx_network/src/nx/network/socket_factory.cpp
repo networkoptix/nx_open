@@ -89,7 +89,7 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
         s_enforcedStreamSocketType);
 
 #ifdef ENABLE_SSL
-    if( result && sslRequired )
+    if( result && ( sslRequired || s_isSslEnforced ) )
         result.reset( new QnSSLSocket( result.release(), false ) );
 #endif
     
@@ -108,7 +108,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         s_enforcedStreamSocketType);
 
 #ifdef ENABLE_SSL
-    if( result && sslRequired )
+    if( result && ( sslRequired || s_isSslEnforced ) )
         result.reset( new SSLServerSocket( result.release(), true ) );
 #endif // ENABLE_SSL
 
@@ -156,6 +156,12 @@ bool SocketFactory::isStreamSocketTypeEnforced()
     return s_enforcedStreamSocketType != SocketType::cloud;
 }
 
+void SocketFactory::enforceSsl( bool isEnforced )
+{
+    s_isSslEnforced = isEnforced;
+    qWarning() << ">>> SocketFactory::enforceSsl(" << isEnforced << ") <<<";
+}
+
 SocketFactory::CreateStreamSocketFuncType 
     SocketFactory::setCreateStreamSocketFunc(
         CreateStreamSocketFuncType newFactoryFunc)
@@ -178,3 +184,5 @@ SocketFactory::CreateStreamServerSocketFuncType
 std::atomic< SocketFactory::SocketType >
     SocketFactory::s_enforcedStreamSocketType(
         SocketFactory::SocketType::cloud );
+
+std::atomic< bool > SocketFactory::s_isSslEnforced( false );

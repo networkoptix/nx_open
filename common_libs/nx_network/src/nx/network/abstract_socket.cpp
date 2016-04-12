@@ -51,6 +51,27 @@ void AbstractCommunicatingSocket::registerTimer(
         std::move(handler));
 }
 
+void AbstractCommunicatingSocket::readFixedAsync(
+    nx::Buffer* const buf, size_t minimalSize,
+    std::function<void(SystemError::ErrorCode, size_t)> handler,
+    size_t baseSize)
+{
+    NX_CRITICAL(buf->capacity() >= minimalSize);
+    readSomeAsync(
+        buf,
+        [this, buf, minimalSize, handler = std::move(handler), baseSize](
+            SystemError::ErrorCode code, size_t size)
+        {
+            if (code != SystemError::noError || size == 0 ||
+                buf->size() >= minimalSize)
+            {
+                return handler(code, buf->size() - baseSize);
+            }
+
+            readFixedAsync(buf, minimalSize, std::move(handler), baseSize);
+        });
+}
+
 void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));

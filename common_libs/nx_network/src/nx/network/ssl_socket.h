@@ -91,6 +91,7 @@ protected:
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal( const void* buffer, unsigned int bufferLen );
 
+public:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
@@ -112,8 +113,7 @@ private:
     // Async version
     int asyncRecvInternal( void* buffer , unsigned int bufferLen );
     int asyncSendInternal( const void* buffer , unsigned int bufferLen );
-    IOMode readMode() const;
-    IOMode writeMode() const;
+    IOMode ioMode() const;
     void init();
 };
 
@@ -133,7 +133,6 @@ public:
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
 
-protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,

@@ -275,6 +275,12 @@ public:
         nx::Buffer* const buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
+    //!Reads at least @param minimalSize bytes from socket asynchronously
+    void readFixedAsync(
+        nx::Buffer* const buf, size_t minimalSize,
+        std::function<void(SystemError::ErrorCode, size_t)> handler,
+        size_t baseSize = 0);
+
     //!Asynchnouosly writes all bytes from input buffer
     /*!
         \param buf Calling party MUST guarantee that this object is not freed until send completion
