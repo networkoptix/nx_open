@@ -287,20 +287,6 @@
 
             <dependencies>
                 <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>com.isdedge</groupId>
                     <artifactId>vmux</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
@@ -332,20 +318,6 @@
             </activation>
            <dependencies>
                 <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
                     <groupId>com.isdedge</groupId>
                     <artifactId>vmux</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
@@ -355,94 +327,5 @@
             </dependencies>
         </profile>
 
-        <profile>
-            <id>linux-arm-rpi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>rpi</value>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-arm-bpi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>bpi</value>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>linux-arm-bananapi</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>bananapi</value>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
-            </dependencies>
-        </profile>
-        
     </profiles>
 </project>

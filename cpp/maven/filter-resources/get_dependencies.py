@@ -21,7 +21,6 @@ DEPENDENCY_VERSIONS = {
     "boost": "${boost.version}",
     "quazip": "${quazip.version}",
     "openal": "${openal.version}",
-    "openldap": "${openldap.version}",
     "libjpeg-turbo": "${libjpeg-turbo.version}",
     "server-external": "${server-external.version}",
     "help": "${help.version}"
