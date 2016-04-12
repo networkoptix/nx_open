@@ -373,8 +373,9 @@ public:
     }
 
     virtual int getCapabilities() const override {
-        NX_ASSERT(0);
-        return 0;
+        return QnAbstractStorageResource::cap::DBReady || QnAbstractStorageResource::cap::ReadFile || 
+            QnAbstractStorageResource::cap::WriteFile || QnAbstractStorageResource::cap::RemoveFile || 
+            QnAbstractStorageResource::cap::ListFile;
     }
 
     virtual bool initOrUpdate() const override {

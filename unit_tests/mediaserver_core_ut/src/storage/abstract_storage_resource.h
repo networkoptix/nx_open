@@ -76,7 +76,6 @@ namespace test
             );
             PluginManager::instance()->loadPlugins(MSSettings::roSettings());
 
-            using namespace std::placeholders;
             for (const auto storagePlugin : 
                     PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(
                         nx_spl::IID_StorageFactory
@@ -86,7 +85,7 @@ namespace test
                     storagePlugin->storageType(),
                     std::bind(
                         &QnThirdPartyStorageResource::instance,
-                        _1,
+                        std::placeholders::_1,
                         storagePlugin
                     ),
                     false

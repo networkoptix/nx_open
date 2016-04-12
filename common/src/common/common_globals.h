@@ -1,6 +1,7 @@
 #ifndef QN_COMMON_GLOBALS_H
 #define QN_COMMON_GLOBALS_H
 
+#define BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
 #include <limits>
 

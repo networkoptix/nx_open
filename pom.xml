@@ -78,7 +78,7 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>        
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
@@ -204,8 +204,8 @@
         <rdep.ios.packages/>
         <!-- Default packages for cpp projects -->
         <rdep.global.packages>qt boost</rdep.global.packages>
-        
-        
+
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -417,17 +417,22 @@
                 </property>
             </activation>
             <modules>
-                <!--<module>plugins/axiscamplugin</module>-->
                 <module>common_libs/nx_email</module>
+
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
-                <module>plugins/genericrtspplugin</module>
-                <!--module>storage_plugins/ftpstorageplugin</module-->
-                <module>plugins/image_library_plugin</module>
-                <module>plugins/mjpg_link</module>
+
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
-                <!--<module>mediaproxy</module> -->
+
+                <module>plugins/genericrtspplugin</module>
+                <module>plugins/image_library_plugin</module>
+                <module>plugins/mjpg_link</module>
+
+                <!-- <module>plugins/axiscamplugin</module> -->
+                <!-- <module>storage_plugins/ftpstorageplugin</module> -->
+
+                <!-- <module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>
             <properties>
@@ -833,10 +838,42 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <quazip.version>0.7</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
+                <modification>tx1</modification>
+                <rdep.target>tx1</rdep.target>
+                <qt.spec/>
+                <linux.defines>DISABLE_FESTIVAL</linux.defines>
+            </properties>
+            <modules>
+                <module>client.core</module>
+                <module>client</module>
+                <module>client.bin</module>
+                <module>common_libs/nx_audio</module>
             </modules>
         </profile>
         <profile>
@@ -1041,11 +1078,11 @@
                 <property>
                     <name>webadmin</name>
                     <value>true</value>
-                </property>                
+                </property>
             </activation>
             <modules>
                 <module>webadmin</module>
-            </modules>            
-        </profile>        
+            </modules>
+        </profile>
     </profiles>
 </project>

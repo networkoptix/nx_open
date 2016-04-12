@@ -17,7 +17,6 @@ public:
     bool getParamPhysicalByChannel(int channel, const QString& name, QString &val);
 
     void updateFlipState();
-    virtual bool isAbstractResource() const override { return false; }
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 

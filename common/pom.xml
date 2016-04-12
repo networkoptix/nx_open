@@ -126,6 +126,24 @@
         </profile>
 
         <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>gcc-4.8.4 sysroot quazip</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>

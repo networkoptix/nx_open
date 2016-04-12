@@ -1,5 +1,26 @@
 #include "frame_scaler.h"
 
+#ifdef __arm__
+
+//TODO: implement?
+void QnFrameScaler::downscale(
+    const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst,
+    DownscaleFactor factor) {}
+
+void QnFrameScaler::downscalePlate_factor2(
+    unsigned char* dst, int dstStride, const unsigned char* src,
+    int src_width, int src_stride, int src_height) {}
+
+void QnFrameScaler::downscalePlate_factor4(
+    unsigned char* dst, int dstStride, const unsigned char* src,
+    int src_width, int src_stride, int src_height) {}
+
+void QnFrameScaler::downscalePlate_factor8(
+    unsigned char* dst, int dstStride, const unsigned char* src,
+    int src_width, int src_stride, int src_height) {}
+
+#else
+
 #include <cassert>
 
 #include <emmintrin.h>
@@ -346,3 +367,5 @@ void QnFrameScaler::downscalePlate_factor8(unsigned char* dst,  int dstStride, c
         src_line2+=(src_stride<<3);
     }
 }
+
+#endif

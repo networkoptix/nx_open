@@ -139,6 +139,7 @@ quint64 TimerManager::addTimer(
         std::chrono::milliseconds(delay),
         std::chrono::milliseconds(delay),
         true);
+    NX_LOGX(lm("Added timer %1, delay %2 ms").arg(timerId).arg(delay), cl_logDEBUG2);
     return timerId;
 }
 
@@ -165,6 +166,8 @@ quint64 TimerManager::addNonStopTimer(
         delay,
         firstShotDelay,
         false);
+    NX_LOGX(lm("Added non stop timer %1, delay %2 ms, first shot delay %3")
+        .arg(timerId).arg(delay).arg(firstShotDelay), cl_logDEBUG2);
     return timerId;
 }
 
@@ -172,6 +175,9 @@ bool TimerManager::modifyTimerDelay(
     quint64 timerID,
     const unsigned int newDelayMillis )
 {
+    NX_LOGX(lm("Modifying timer %1, new delay %2 ms")
+        .arg(timerID).arg(newDelayMillis), cl_logDEBUG2);
+
     QnMutexLocker lk( &m_impl->mtx );
     if( m_impl->runningTaskID == timerID )
         return false; //timer being executed at the moment
@@ -183,16 +189,20 @@ bool TimerManager::modifyTimerDelay(
     auto handlerIter = m_impl->timeToTask.find( std::make_pair( taskIter->second, timerID ) );
     NX_ASSERT( handlerIter != m_impl->timeToTask.end() );
     auto taskHandler = std::move(handlerIter->second.func);
+    const bool singleShot = handlerIter->second.singleShot;
 
     m_impl->taskToTime.erase( taskIter );
     m_impl->timeToTask.erase( handlerIter );
+
+    NX_LOGX(lm("Modifyed timer %1, new delay %2 ms")
+        .arg(timerID).arg(newDelayMillis), cl_logDEBUG2);
 
     m_impl->addTaskNonSafe(
         timerID,
         std::move(taskHandler),
         std::chrono::milliseconds(newDelayMillis),
         std::chrono::milliseconds(newDelayMillis),
-        true);
+        singleShot);
     return true;
 }
 
@@ -205,6 +215,8 @@ void TimerManager::deleteTimer( const quint64& timerID )
 {
     QnMutexLocker lk( &m_impl->mtx );
 
+    NX_LOGX(lm("Deleting timer %1").arg(timerID), cl_logDEBUG2);
+
     m_impl->deleteTaskNonSafe( timerID );
 }
 
@@ -215,6 +227,8 @@ void TimerManager::joinAndDeleteTimer( const quint64& timerID )
 
     if( QThread::currentThread() != this )
     {
+        NX_LOGX(lm("Waiting for timer %1 to complete").arg(timerID), cl_logDEBUG2);
+
         while( m_impl->runningTaskID == timerID )
             m_impl->cond.wait( lk.mutex() );      //waiting for timer handler execution finish
     }
@@ -256,7 +270,10 @@ void TimerManager::run()
                 m_impl->timeToTask.erase( taskIter );
                 m_impl->runningTaskID = timerID;
                 lk.unlock();
+
+                NX_LOGX(lm("Executing task %1").arg(timerID), cl_logDEBUG2);
                 taskContext.func( timerID );
+                NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
 
                 lk.relock();
 

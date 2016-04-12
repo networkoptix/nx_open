@@ -1,214 +1,282 @@
+#include <cassert>
+#include <algorithm>
+#include <string>
 #include "storage_db.h"
+#include <boost/scope_exit.hpp>
 
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
-
-
-#include <core/resource/storage_plugin_factory.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
-#include <utils/serialization/sql.h>
 #include <nx/utils/log/log.h>
 #include "utils/common/util.h"
 
-static const int COMMIT_INTERVAL = 1000 * 60 * 1;
+const uint8_t kDbVersion = 1;
+
+namespace
+{
+const std::chrono::seconds kVacuumInterval(3600 * 24);
+
+class VacuumHandler : public nx::media_db::DbHelperHandler
+{
+public:
+    VacuumHandler(QnStorageDb::UuidToCatalogs &readData) : m_readData(readData) {}
+
+public:
+    void handleCameraOp(const nx::media_db::CameraOperation &/*cameraOp*/,
+                        nx::media_db::Error /*error*/) override
+    {
+
+    }
+
+    void handleMediaFileOp(const nx::media_db::MediaFileOperation &/*mediaFileOp*/,
+                           nx::media_db::Error /*error*/) override
+    {
+
+    }
+
+    void handleError(nx::media_db::Error error) override
+    {
+        NX_LOG(lit("%1 temporary DB file error").arg(Q_FUNC_INFO), cl_logWARNING);
+        m_error = error;
+    }
+
+    void handleRecordWrite(nx::media_db::Error error) override
+    {
+        NX_LOG(lit("%1 temporary DB file write error").arg(Q_FUNC_INFO), cl_logWARNING);
+        m_error = error;
+    }
+
+    nx::media_db::Error getError() const { return m_error; }
+
+private:
+    QnStorageDb::UuidToCatalogs &m_readData;
+    nx::media_db::Error m_error;
+};
+
+} // namespace <anonynous>
 
 QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
-    QnDbHelper(),
     m_storage(s),
     m_storageIndex(storageIndex),
-    m_tran(m_sdb, m_mutex),
-    m_needReopenDB(false)
+    m_dbHelper(this),
+    m_ioDevice(nullptr),
+    m_lastReadError(nx::media_db::Error::NoError),
+    m_lastWriteError(nx::media_db::Error::NoError),
+    m_gen(m_rd()),
+    m_vacuumTimePoint(std::chrono::system_clock::now()),
+    m_vacuumThreadRunning(false)
 {
-    m_lastTranTime.restart();
 }
 
 QnStorageDb::~QnStorageDb()
 {
-    flushRecords();
+    if (m_vacuumThread.joinable())
+        m_vacuumThread.join();
 }
 
-bool QnStorageDb::deleteRecords(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, qint64 startTimeMs)
+int QnStorageDb::fillCameraOp(nx::media_db::CameraOperation &cameraOp,
+                              const QString &cameraUniqueId)
 {
-    QnMutexLocker lock( &m_syncMutex );
-    m_recordsToDelete << DeleteRecordInfo(cameraUniqueId, catalog, startTimeMs);
-    return true;
+    int cameraId = qHash(cameraUniqueId);
+
+    cameraOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+    cameraOp.setCameraId(cameraId);
+    cameraOp.setCameraUniqueIdLen(cameraUniqueId.size());
+    cameraOp.setCameraUniqueId(QByteArray(cameraUniqueId.toLatin1().constData(),
+                                          cameraUniqueId.size()));
+    return cameraId;
 }
 
-
-bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
+int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
 {
-    QSqlQuery query(m_sdb);
-    if (delRecord.startTimeMs != -1)
-        query.prepare("DELETE FROM storage_data WHERE unique_id = ? and role = ? and start_time = ?");
-    else
-        query.prepare("DELETE FROM storage_data WHERE unique_id = ? and role = ?");
-    query.addBindValue(delRecord.cameraUniqueId);
-    query.addBindValue((int) delRecord.catalog);
-    if (delRecord.startTimeMs != -1)
-        query.addBindValue(delRecord.startTimeMs);
-    if (!query.exec())
+    int cameraId;
     {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        m_needReopenDB = true;
-        return false;
-    }
-    return true;
-}
+        QnMutexLocker lk(&m_syncMutex);
+        auto it = m_uuidToHash.left.find(cameraUniqueId);
+        if (it == m_uuidToHash.left.end())
+        {
+            nx::media_db::CameraOperation cameraOp;
+            cameraId = fillCameraOp(cameraOp, cameraUniqueId);
+            auto existHashIdIt = m_uuidToHash.right.find(cameraId);
 
-bool QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
-{
-    QnMutexLocker locker( &m_syncMutex );
+            while (existHashIdIt != m_uuidToHash.right.end())
+            {
+                std::uniform_int_distribution<uint16_t> dist(0, std::numeric_limits<uint16_t>::max());
+                cameraId = dist(m_gen);
+                existHashIdIt = m_uuidToHash.right.find(cameraId);
+            }
 
-    if (chunk.durationMs <= 0)
-        return true;
+            NX_ASSERT(existHashIdIt == m_uuidToHash.right.end());
+            if (existHashIdIt != m_uuidToHash.right.end())
+                NX_LOG(lit("%1 Bad camera hash").arg(Q_FUNC_INFO), cl_logWARNING);
 
-    m_delayedData << DelayedData(cameraUniqueId, catalog, chunk);
-    if (m_lastTranTime.elapsed() < COMMIT_INTERVAL)
-        return true;
-
-    return flushRecordsNoLock();
-}
-
-bool QnStorageDb::flushRecords()
-{
-    QnMutexLocker locker( &m_syncMutex );
-    return flushRecordsNoLock();
-}
-
-bool QnStorageDb::flushRecordsNoLock()
-{
-    QnDbTransactionLocker tran(getTransaction());
-    for(const DelayedData& data: m_delayedData)
-        if( !addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk) )
-            return false;
-
-    for(const DeleteRecordInfo& delRecord: m_recordsToDelete) {
-        if (!deleteRecordsInternal(delRecord)) {
-            return false; // keep record list to delete. try to the next time
+            m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
+            m_dbHelper.writeRecord(cameraOp);
         }
+        else
+            cameraId = it->second;
     }
-
-    if( !tran.commit() )
-    {
-        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
-        m_needReopenDB = true;
-        return false;
-    }
-    m_lastTranTime.restart();
-    m_delayedData.clear();
-    m_recordsToDelete.clear();
-    return true;
+    return cameraId;
 }
 
-bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
+bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
+                                QnServer::ChunksCatalog catalog,
+                                qint64 startTimeMs)
 {
-    QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)");
+    nx::media_db::MediaFileOperation mediaFileOp;
+    mediaFileOp.setCameraId(getCameraIdHash(cameraUniqueId));
+    mediaFileOp.setCatalog(catalog);
+    mediaFileOp.setStartTime(startTimeMs);
+    mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
 
-    query.addBindValue(cameraUniqueId); // unique_id
-    query.addBindValue(catalog); // role
-    query.addBindValue(chunk.startTimeMs); // start_time
-    query.addBindValue(chunk.timeZone); // timezone
-    query.addBindValue(chunk.fileIndex); // file_index
-    query.addBindValue(chunk.durationMs); // duration
-    query.addBindValue(chunk.getFileSize()); // filesize
+    m_dbHelper.writeRecord(mediaFileOp);
 
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        m_needReopenDB = true;
-        return false;
-    }
-
-    return true;
-}
-
-bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks)
-{
-    QnMutexLocker lk(&m_syncMutex);
-    QnDbTransactionLocker tran(getTransaction());
-
-    QSqlQuery query(m_sdb);
-    query.prepare("DELETE FROM storage_data WHERE unique_id = ? AND role = ?");
-    query.addBindValue(cameraUniqueId);
-    query.addBindValue(catalog);
-
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        m_needReopenDB = true;
-        return false;
-    }
-
-    for(const DeviceFileCatalog::Chunk& chunk: chunks)
     {
-        if (chunk.durationMs == -1)
-            continue;
-
-        if (!addRecordInternal(cameraUniqueId, catalog, chunk)) {
+        QnMutexLocker lk(&m_errorMutex);
+        if (m_lastWriteError != nx::media_db::Error::NoError &&
+            m_lastWriteError != nx::media_db::Error::Eof)
+        {
+            NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
             return false;
         }
     }
 
-    if( !tran.commit() )
-    {
-        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
-        m_needReopenDB = true;
-        return false;
-    }
     return true;
+}
+
+template<typename Callback>
+void QnStorageDb::startVacuumAsync(Callback callback)
+{
+    if (m_vacuumThreadRunning)
+    {
+        callback(false);
+        return;
+    }
+
+    if (m_vacuumThread.joinable())
+        m_vacuumThread.join();
+
+    m_vacuumThread = std::thread([this, callback] 
+                                 { 
+                                     m_vacuumThreadRunning = true;
+                                     callback(vacuum());
+                                     m_vacuumThreadRunning = false; 
+                                 });
+}
+
+bool QnStorageDb::addRecord(const QString& cameraUniqueId,
+                            QnServer::ChunksCatalog catalog, 
+                            const DeviceFileCatalog::Chunk& chunk)
+{
+    {
+        QnMutexLocker lk(&m_vacuumMutex);
+        auto timeSinceLastVacuum =
+            std::chrono::duration_cast<std::chrono::seconds>
+                (std::chrono::system_clock::now() - m_vacuumTimePoint);
+
+        if (timeSinceLastVacuum > kVacuumInterval)
+        {
+            m_vacuumTimePoint = std::chrono::system_clock::now();
+            startVacuumAsync(
+                [](bool result)
+                {
+                    if (result)
+                    {
+                        NX_LOG(lit("Sheduled vacuum media DB on storage %1 successfull"), cl_logDEBUG1);
+                    } 
+                    else
+                    {
+                        NX_LOG(lit("Sheduled vacuum media DB on storage %1 failed"), cl_logWARNING);
+                    }
+                });
+        }
+    }
+
+    nx::media_db::MediaFileOperation mediaFileOp;
+    mediaFileOp.setCameraId(getCameraIdHash(cameraUniqueId));
+    mediaFileOp.setCatalog(catalog);
+    mediaFileOp.setDuration(chunk.durationMs);
+    mediaFileOp.setFileSize(chunk.getFileSize());
+    mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
+    mediaFileOp.setStartTime(chunk.startTimeMs);
+    mediaFileOp.setTimeZone(chunk.timeZone);
+
+    m_dbHelper.writeRecord(mediaFileOp);
+
+    {
+        QnMutexLocker lk(&m_errorMutex);
+        if (m_lastWriteError != nx::media_db::Error::NoError &&
+            m_lastWriteError != nx::media_db::Error::Eof)
+        {
+            NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, 
+                                QnServer::ChunksCatalog catalog,
+                                const std::deque<DeviceFileCatalog::Chunk>& chunks)
+{
+    bool result = true;
+    bool delResult = deleteRecords(cameraUniqueId, catalog, -1);
+
+    for (const auto &chunk : chunks)
+    {
+        bool addResult = addRecord(cameraUniqueId, catalog, chunk);
+        result = result && addResult;
+    }
+    return result && delResult;
 }
 
 bool QnStorageDb::open(const QString& fileName)
 {
-    // TODO: #akulikov If storage is DBReady, DB should work via Storage::IODevice.
-    //       But this change requires DB implementation to be able to work via IODevice, and this is not the case right now.
-    addDatabase(fileName, QString("QnStorageManager_%1").arg(fileName));
-    return m_sdb.open() && createDatabase();
+    return createDatabase(fileName);
 }
 
-bool QnStorageDb::createDatabase()
+bool QnStorageDb::resetIoDevice()
 {
-    QnDbTransactionLocker tran(&m_tran);
-    if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
+    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite));
+    if (!m_ioDevice)
     {
-        if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
-            return false;
-        }
-    }
-
-    if (!applyUpdates(":/storage_updates"))
         return false;
-
-    if( !tran.commit() )
-    {
-        qWarning() << Q_FUNC_INFO << m_sdb.lastError().text();
-        return false;
+        NX_LOG(lit("%1 DB file open failed").arg(Q_FUNC_INFO), cl_logWARNING);
     }
-
-    m_lastTranTime.restart();
+    m_dbHelper.setDevice(m_ioDevice.get());
     return true;
 }
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
+bool QnStorageDb::createDatabase(const QString &fileName)
+{
+    m_dbFileName = fileName;
+    if (!resetIoDevice())
+        return false;
+
+    m_dbHelper.setMode(nx::media_db::Mode::Read);
+    
+    if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
+    {   // either file has just been created or unrecognized format
+        return startDbFile();
+    }
+
+    return true;
+}
+
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() 
+{
     QVector<DeviceFileCatalogPtr> result;
     result << loadChunksFileCatalog();
 
-    addCatalogFromMediaFolder(
-        lit("hi_quality"),
-        QnServer::HiQualityCatalog,
-        result
-    );
-
-    addCatalogFromMediaFolder(
-        lit("low_quality"),
-        QnServer::LowQualityCatalog,
-        result
-    );
+    addCatalogFromMediaFolder(lit("hi_quality"), QnServer::HiQualityCatalog, result);
+    addCatalogFromMediaFolder(lit("low_quality"), QnServer::LowQualityCatalog, result);
 
     return result;
 }
 
-bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServer::ChunksCatalog catalog, const QString& uniqueId)
+bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result,
+                            QnServer::ChunksCatalog catalog,
+                            const QString& uniqueId)
 {
     for(const DeviceFileCatalogPtr& c: result)
     {
@@ -218,112 +286,349 @@ bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServe
     return false;
 }
 
-void QnStorageDb::addCatalogFromMediaFolder(
-    const QString&                  postfix,
-    QnServer::ChunksCatalog         catalog,
-    QVector<DeviceFileCatalogPtr>&  result
-)
+void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
+                                            QnServer::ChunksCatalog catalog,
+                                            QVector<DeviceFileCatalogPtr>& result)
 {
-    QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
+    QString root = closeDirPath(QFileInfo(m_dbFileName).absoluteDir().path()) + postfix;
+
     QnAbstractStorageResource::FileInfoList files;
     if (m_storage)
         files = m_storage->getFileList(root);
     else
         files = QnAbstractStorageResource::FIListFromQFIList(
-            QDir(root).entryInfoList(
-                QDir::Dirs | QDir::NoDotAndDotDot,
-                QDir::Name
-            )
-        );
+            QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, 
+                                     QDir::Name));
 
     for (const QnAbstractStorageResource::FileInfo& fi: files)
     {
         QString uniqueId = fi.baseName();
-        if (!isCatalogExistInResult(result, catalog, uniqueId)) {
-            result
-                << DeviceFileCatalogPtr(
-                        new DeviceFileCatalog(
-                            uniqueId,
-                            catalog,
-                            QnServer::StoragePool::None
-                        )
-                    );
-        }
+        if (!isCatalogExistInResult(result, catalog, uniqueId)) 
+            result << DeviceFileCatalogPtr(new DeviceFileCatalog(uniqueId, catalog, 
+                                                                 QnServer::StoragePool::None));
     }
 }
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
-    QnWriteLocker lock(&m_mutex);
+bool QnStorageDb::startDbFile()
+{
+    m_ioDevice.reset();
+    m_storage->removeFile(m_dbFileName);
 
+    if (!resetIoDevice())
+        return false;
+
+    m_dbHelper.setMode(nx::media_db::Mode::Write);
+    nx::media_db::Error error = m_dbHelper.writeFileHeader(kDbVersion);
+
+    if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
+        NX_LOG(lit("%1 write DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
+    m_dbVersion = kDbVersion;
+
+    return true;
+}
+
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
+{
     QVector<DeviceFileCatalogPtr> result;
-
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT * FROM storage_data WHERE role <= :max_role ORDER BY unique_id, role, start_time");
-    query.bindValue(":max_role", (int)QnServer::HiQualityCatalog);
-
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        m_needReopenDB = true;
-        return result;
-    }
-    QSqlRecord queryInfo = query.record();
-    int idFieldIdx = queryInfo.indexOf("unique_id");
-    int roleFieldIdx = queryInfo.indexOf("role");
-    int startTimeFieldIdx = queryInfo.indexOf("start_time");
-    int fileNumFieldIdx = queryInfo.indexOf("file_index");
-    int timezoneFieldIdx = queryInfo.indexOf("timezone");
-    int durationFieldIdx = queryInfo.indexOf("duration");
-    int filesizeFieldIdx = queryInfo.indexOf("filesize");
-
-    DeviceFileCatalogPtr fileCatalog;
-    std::deque<DeviceFileCatalog::Chunk> chunks;
-    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
-    QByteArray prevId;
-    while (query.next())
-    {
-        QByteArray id = query.value(idFieldIdx).toByteArray();
-        QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
-        if (id != prevId || catalog != prevCatalog)
-        {
-            if (fileCatalog) {
-                fileCatalog->addChunks(chunks);
-                result << fileCatalog;
-                chunks.clear();
-            }
-
-            prevCatalog = catalog;
-            prevId = id;
-            fileCatalog = DeviceFileCatalogPtr(
-                new DeviceFileCatalog(
-                    QString::fromUtf8(id),
-                    catalog,
-                    QnServer::StoragePool::None // It's not important here
-                )
-            );
-        }
-        qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
-        qint64 filesize = query.value(filesizeFieldIdx).toLongLong();
-        int timezone = query.value(timezoneFieldIdx).toInt();
-        int fileNum = query.value(fileNumFieldIdx).toInt();
-        int durationMs = query.value(durationFieldIdx).toInt();
-        chunks.push_back(DeviceFileCatalog::Chunk(startTime, m_storageIndex, fileNum, durationMs, (qint16) timezone, (quint16) (filesize >> 32), (quint32) filesize));
-    }
-    if (fileCatalog) {
-        fileCatalog->addChunks(chunks);
-        result << fileCatalog;
-    }
-
+    vacuum(&result);
     return result;
 }
 
-QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
+bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data) 
 {
-    if( m_needReopenDB )
+    QnMutexLocker lk(&m_readMutex);
+
+    BOOST_SCOPE_EXIT(this_)
     {
-        if( m_sdb.open() && createDatabase())
-            m_needReopenDB = false;
+        this_->m_dbHelper.setMode(nx::media_db::Mode::Write);
+    }
+    BOOST_SCOPE_EXIT_END
+
+    m_readData.clear();
+    m_dbHelper.setMode(nx::media_db::Mode::Read);
+
+    if (!resetIoDevice())
+    {
+        startDbFile();
+        return false;
     }
 
-    return &m_tran;
+    if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
+    {
+        NX_LOG(lit("%1 read DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        startDbFile();
+        return false;
+    }
+
+    NX_ASSERT(m_dbHelper.getDevice());
+
+    if ((!m_dbHelper.getDevice() || !m_ioDevice->isOpen()))
+    {
+        NX_LOG(lit("%1 DB file open error").arg(Q_FUNC_INFO), cl_logWARNING);
+        startDbFile();
+        return false;
+    }
+
+    nx::media_db::Error error;
+    while ((error = m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
+    {
+        QnMutexLocker lk(&m_errorMutex);
+        m_lastReadError = error;
+    }
+
+    if (!vacuumInternal() && !startDbFile())
+        return false;
+
+    if (data)
+        *data = buildReadResult();
+
+    return true;
+}
+
+bool QnStorageDb::vacuumInternal()
+{
+    QString tmpDbFileName = m_dbFileName + ".tmp";
+    std::unique_ptr<QIODevice> tmpFile(m_storage->open(tmpDbFileName,
+                                                       QIODevice::ReadWrite));
+    if (!tmpFile)
+    {
+        NX_LOG(lit("%1 temporary DB file open error").arg(Q_FUNC_INFO), cl_logWARNING);
+        return false;
+    }
+
+    VacuumHandler vh(m_readData);
+    nx::media_db::DbHelper tmpDbHelper(&vh);
+    tmpDbHelper.setDevice(tmpFile.get());
+    tmpDbHelper.setMode(nx::media_db::Mode::Write);
+
+    nx::media_db::Error error = tmpDbHelper.writeFileHeader(m_dbVersion);
+    if (error == nx::media_db::Error::WriteError)
+    {
+        NX_LOG(lit("%1 temporary DB file write header error").arg(Q_FUNC_INFO), cl_logWARNING);
+        return false;
+    }
+
+    for (auto it = m_uuidToHash.right.begin(); it != m_uuidToHash.right.end(); ++it)
+    {
+        nx::media_db::CameraOperation camOp;
+        camOp.setCameraId(it->first);
+        camOp.setCameraUniqueId(QByteArray(it->second.toLatin1().constData(),
+                                           it->second.size()));
+        camOp.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
+        camOp.setCameraUniqueIdLen(it->second.size());
+
+        tmpDbHelper.writeRecord(camOp);
+    }
+
+    static const size_t kCatalogsCount = 2;
+
+    for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
+    {
+        for (size_t i = 0; i < kCatalogsCount; ++i)
+        {
+            for (auto chunkIt = it->second[i].cbegin(); chunkIt != it->second[i].cend(); ++chunkIt)
+            {
+                nx::media_db::MediaFileOperation mediaFileOp;
+                auto cameraIdIt = m_uuidToHash.left.find(it->first);
+                NX_ASSERT(cameraIdIt != m_uuidToHash.left.end());
+
+                mediaFileOp.setCameraId(cameraIdIt->second);
+                mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :
+                                       QnServer::ChunksCatalog::HiQualityCatalog);
+                mediaFileOp.setDuration(chunkIt->durationMs);
+                mediaFileOp.setFileSize(chunkIt->getFileSize());
+                mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationAdd);
+                mediaFileOp.setStartTime(chunkIt->startTimeMs);
+                mediaFileOp.setTimeZone(chunkIt->timeZone);
+
+                tmpDbHelper.writeRecord(mediaFileOp);
+            }
+        }
+    }
+    if (vh.getError() == nx::media_db::Error::WriteError)
+        return false;
+    tmpDbHelper.setMode(nx::media_db::Mode::Read); // flush
+
+    m_ioDevice.reset();
+    bool res = m_storage->removeFile(m_dbFileName);
+    NX_ASSERT(res);
+    if (!res)
+        NX_LOG(lit("%1 temporary DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
+
+    tmpFile.reset();
+    res = m_storage->renameFile(tmpDbFileName, m_dbFileName);
+    NX_ASSERT(res);
+    if (!res)
+        NX_LOG(lit("%1 temporary DB rename file error").arg(Q_FUNC_INFO), cl_logWARNING);
+
+    res = resetIoDevice();
+    NX_ASSERT(res);
+
+    auto readDataCopy = m_readData;
+    uint8_t dbVersion;
+
+    m_readData.clear();
+    m_dbHelper.setMode(nx::media_db::Mode::Read);
+    NX_ASSERT(m_dbHelper.getDevice());
+
+    error = m_dbHelper.readFileHeader(&dbVersion);
+    NX_ASSERT(error == nx::media_db::Error::NoError);
+    NX_ASSERT(dbVersion == m_dbVersion);
+    if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
+    {
+        NX_LOG(lit("%1 DB file read header error after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
+        return false;
+    }
+
+    while ((error= m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
+    {
+        QnMutexLocker lk(&m_errorMutex);
+        m_lastReadError = error;
+    }
+
+    bool isDataConsistent = checkDataConsistency(readDataCopy);
+    NX_ASSERT(isDataConsistent);
+    if (!isDataConsistent)
+    {
+        NX_LOG(lit("%1 DB is not consistent after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
+        return false;
+    }
+
+    return true;
+}
+
+bool QnStorageDb::checkDataConsistency(const UuidToCatalogs &readDataCopy) const
+{
+    for (auto it = readDataCopy.cbegin(); it != readDataCopy.cend(); ++it)
+    {
+        auto otherIt = m_readData.find(it->first);
+        if (otherIt == m_readData.cend())
+        {
+            if (!it->second[0].empty() || !it->second[1].empty())
+                return false;
+            else
+                continue;
+        }
+        for (size_t i = 0; i < 2; ++i)
+        {
+            if (otherIt->second[i] != it->second[i])
+                return false;
+        }
+    }
+    return true;
+}
+
+QVector<DeviceFileCatalogPtr> QnStorageDb::buildReadResult() const
+{
+    QVector<DeviceFileCatalogPtr> result;
+    for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
+    {
+        DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(it->first, 
+                                                                  QnServer::ChunksCatalog::LowQualityCatalog,
+                                                                  QnServer::StoragePool::None));
+        newFileCatalog->assignChunksUnsafe(it->second[0].cbegin(), it->second[0].cend());
+        result.push_back(newFileCatalog);
+
+        newFileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(it->first, 
+                                                                    QnServer::ChunksCatalog::HiQualityCatalog,
+                                                                    QnServer::StoragePool::None));
+        newFileCatalog->assignChunksUnsafe(it->second[1].cbegin(), it->second[1].cend());
+        result.push_back(newFileCatalog);
+    }
+    return result;
+}
+
+void QnStorageDb::handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
+                                 nx::media_db::Error error) 
+{
+    if (error == nx::media_db::Error::ReadError)
+        return;
+    
+    QString cameraUniqueId = cameraOp.getCameraUniqueId();
+    auto uuidIt = m_uuidToHash.left.find(cameraUniqueId);
+
+    if (uuidIt == m_uuidToHash.left.end())
+        m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraOp.getCameraId()));
+}
+
+void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
+                                    nx::media_db::Error error) 
+{
+    if (error == nx::media_db::Error::ReadError)
+        return;
+
+    uint16_t cameraId = mediaFileOp.getCameraId();
+    auto cameraUuidIt = m_uuidToHash.right.find(cameraId);
+    auto opType = mediaFileOp.getRecordType();
+    auto opCatalog = mediaFileOp.getCatalog();
+
+    // camera with this ID should have already been found
+    NX_ASSERT(cameraUuidIt != m_uuidToHash.right.end());
+    if (cameraUuidIt == m_uuidToHash.right.end())
+    {
+        NX_LOG(lit("%1 Got media file with unknown camera ID. Skipping.").arg(Q_FUNC_INFO), cl_logWARNING);
+        return;
+    }
+
+    auto existCameraIt = m_readData.find(cameraUuidIt->second);
+    bool emplaceSuccess;
+    if (existCameraIt == m_readData.cend())
+        std::tie(existCameraIt, emplaceSuccess) = m_readData.emplace(cameraUuidIt->second, LowHiChunksCatalogs());
+
+    int catalogIndex = opCatalog == QnServer::ChunksCatalog::LowQualityCatalog ? 0 : 1;
+    ChunkSet *currentChunkSet = &existCameraIt->second[catalogIndex];
+
+    DeviceFileCatalog::Chunk newChunk(
+        DeviceFileCatalog::Chunk(mediaFileOp.getStartTime(), m_storageIndex,
+                                 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION,
+                                 mediaFileOp.getDuration(), mediaFileOp.getTimeZone(),
+                                 (quint16)(mediaFileOp.getFileSize() >> 32),
+                                 (quint32)mediaFileOp.getFileSize()));
+    switch (opType)
+    {
+    case nx::media_db::RecordType::FileOperationAdd:
+    {
+        auto existChunk = currentChunkSet->find(newChunk);
+        if (existChunk == currentChunkSet->cend())
+            currentChunkSet->insert(newChunk);
+        else
+        {
+            currentChunkSet->erase(existChunk);
+            currentChunkSet->insert(newChunk);
+        }
+        break;
+    }
+    case nx::media_db::RecordType::FileOperationDelete:
+    {
+        if (newChunk.startTimeMs == -1)
+            currentChunkSet->clear();
+        else
+            for (auto it = currentChunkSet->begin(); it != currentChunkSet->end();)
+            {
+                if (it->startTimeMs == newChunk.startTimeMs)
+                    it = currentChunkSet->erase(it);
+                else
+                    ++it;
+            }
+        break;
+    }
+    default:
+        assert(false);
+        NX_LOG(lit("%1 Unknown record type.").arg(Q_FUNC_INFO), cl_logWARNING);
+        break;
+    }
+}
+
+void QnStorageDb::handleError(nx::media_db::Error error) 
+{
+    QnMutexLocker lk(&m_errorMutex);
+    NX_LOG(lit("%1 DB error").arg(Q_FUNC_INFO), cl_logWARNING);
+    m_lastReadError = error;
+}
+
+void QnStorageDb::handleRecordWrite(nx::media_db::Error error)
+{
+    QnMutexLocker lk(&m_errorMutex);
+    NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
+    m_lastWriteError = error;
 }

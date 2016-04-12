@@ -73,6 +73,7 @@
 #include <utils/math/color_transformations.h>
 #include <api/common_message_processor.h>
 #include <business/actions/abstract_business_action.h>
+#include <utils/media/sse_helper.h>
 
 namespace
 {
@@ -304,7 +305,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
     m_renderer->destroyAsync();
 
-    foreach(__m128i *data, m_binaryMotionMask)
+    for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
 }
@@ -1021,7 +1022,7 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
         m_binaryMotionMask.pop_back();
     }
     while(m_binaryMotionMask.size() < channelCount()) {
-        m_binaryMotionMask.push_back(static_cast<__m128i *>(qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, 32)));
+        m_binaryMotionMask.push_back(static_cast<simd128i *>(qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, 32)));
         memset(m_binaryMotionMask.back(), 0, MD_WIDTH * MD_HEIGHT / 8);
     }
 
