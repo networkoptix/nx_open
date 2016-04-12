@@ -66,7 +66,7 @@ private:
 
     mutable QnMutex m_mutex;
     std::unique_ptr<AbstractNonceProvider> m_defaultGenerator;
-    std::atomic<bool> m_bindedToCloud;
+    bool m_bindedToCloud;
     //map<cdb_nonce, valid_time>
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
