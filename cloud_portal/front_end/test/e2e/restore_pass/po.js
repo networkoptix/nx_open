@@ -48,7 +48,7 @@ RestorePasswordPage = function () {
         this.emailInput.clear();
         this.emailInput.sendKeys(email);
         this.submitButton.click();
-        this.alert.catchAlert(this.alert.alertMessages.restorePassConfirmSent, this.alert.alertTypes.success);
+        expect(this.helper.htmlBody.getText()).toContain(this.alert.alertMessages.restorePassConfirmSent);
     };
 
     this.getTokenFromEmail = function(email, userEmail) {
