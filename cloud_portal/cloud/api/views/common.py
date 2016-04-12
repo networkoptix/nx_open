@@ -7,6 +7,6 @@ from api.controllers import cloud_api
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def ping():
+def ping(request):
     data = cloud_api.ping()
     return api_success(data)
