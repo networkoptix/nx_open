@@ -549,7 +549,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetPropertyList(fullData.allProperties);
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
-    resetAccessRights(fullData.accessRights);
+    qnResourceAccessManager->resetAccessibleResources(fullData.accessRights);
+    qnResourceAccessManager->resetUserGroups(fullData.userGroups);
 
     resetLicenses(fullData.licenses);
     resetTime();

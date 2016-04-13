@@ -58,6 +58,11 @@ void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRight
     m_permissionsCache.clear();
 }
 
+void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& userGroups)
+{
+    m_userGroups = userGroups;
+}
+
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
 {
     return m_accessibleResources[userId];
@@ -74,6 +79,11 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const
         else
             ++iter;
     }
+}
+
+ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
+{
+    return m_userGroups;
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr &user) const

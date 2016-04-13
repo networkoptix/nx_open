@@ -3977,6 +3977,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     db_load(data.cameras);
     db_load(data.cameraUserAttributesList);
     db_load(data.users);
+    db_load(data.userGroups);
     db_load(data.layouts);
     db_load(data.videowalls);
     db_load(data.webPages);

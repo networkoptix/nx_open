@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <nx/utils/singleton.h>
 
@@ -22,9 +23,13 @@ public:
 
     void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights);
 
+    void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
+
     /** List of resources ids, the given user has access to. */
     QSet<QnUuid> accessibleResources(const QnUuid& userId) const;
     void setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources);
+
+    ec2::ApiUserGroupDataList userGroups() const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -76,6 +81,8 @@ private:
     bool m_readOnlyMode;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
+    ec2::ApiUserGroupDataList m_userGroups;
+
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 
     struct PermissionKey
