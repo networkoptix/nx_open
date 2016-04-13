@@ -236,7 +236,7 @@ void socketSimpleAsync(
     QByteArray serverBuffer;
     serverBuffer.reserve(128);
     std::vector<std::unique_ptr<AbstractStreamSocket>> clients;
-    std::function< void(SystemError::ErrorCode, AbstractStreamSocket*) > acceptor
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor
         = [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
         serverResults.push(code);
@@ -246,7 +246,7 @@ void socketSimpleAsync(
         clients.emplace_back(socket);
         auto& client = clients.back();
         ASSERT_TRUE(client->setNonBlockingMode(true));
-        client->readWaitAllAsync(
+        client->readAsyncAtLeast(
             &serverBuffer, testMessage.size(),
             [&](SystemError::ErrorCode code, size_t size)
             {

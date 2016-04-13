@@ -51,28 +51,17 @@ void AbstractCommunicatingSocket::registerTimer(
         std::move(handler));
 }
 
-void AbstractCommunicatingSocket::readWaitAllAsync(
-    nx::Buffer* const buf, size_t minimalSize,
-    std::function<void(SystemError::ErrorCode, size_t)> handler,
-    size_t initBufSize)
+void AbstractCommunicatingSocket::readAsyncAtLeast(
+    nx::Buffer* const buffer, size_t minimalSize,
+    std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    if (initBufSize == 0)
-        initBufSize = buf->size();
+    NX_CRITICAL(
+        buffer->capacity() >= buffer->size() + static_cast<int>(minimalSize),
+        "Not enough place in the buffer!");
 
-    NX_CRITICAL(buf->capacity() >= initBufSize + minimalSize);
-    readSomeAsync(
-        buf,
-        [this, buf, minimalSize, handler = std::move(handler), initBufSize](
-            SystemError::ErrorCode code, size_t size)
-        {
-            if (code != SystemError::noError || size == 0 ||
-                buf->size() >= minimalSize)
-            {
-                return handler(code, buf->size() - initBufSize);
-            }
-
-            readWaitAllAsync(buf, minimalSize, std::move(handler), initBufSize);
-        });
+    readAsyncAtLeastImpl(
+        buffer, minimalSize, std::move(handler),
+        static_cast<size_t>(buffer->size()));
 }
 
 void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -85,6 +74,27 @@ void AbstractCommunicatingSocket::pleaseStopSync()
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
+void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
+    nx::Buffer* const buffer, size_t minimalSize,
+    std::function<void(SystemError::ErrorCode, size_t)> handler,
+    size_t initBufSize)
+{
+    readSomeAsync(
+        buffer,
+        [this, buffer, minimalSize, handler = std::move(handler), initBufSize](
+            SystemError::ErrorCode code, size_t size)
+        {
+            if (code != SystemError::noError || size == 0 ||
+                static_cast<size_t>(buffer->size()) >= initBufSize + minimalSize)
+            {
+                return handler(
+                    code, static_cast<size_t>(buffer->size()) - initBufSize);
+            }
+
+            readAsyncAtLeastImpl(
+                buffer, minimalSize, std::move(handler), initBufSize);
+        });
+}
 
 ////////////////////////////////////////////////////////////
 //// class AbstractDatagramSocket
