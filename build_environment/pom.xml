@@ -191,13 +191,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.intel</groupId>
-                    <artifactId>mfx</artifactId>
-                    <version>2012-R2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>
