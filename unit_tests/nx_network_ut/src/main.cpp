@@ -31,7 +31,7 @@ int main(int  argc, char **argv)
         if(!file.open(QIODevice::ReadOnly))
             return -2;
 
-        nx::network::QnSSLSocket::initSSLEngine(file.readAll());
+        nx::network::SslSocket::initSSLEngine(file.readAll());
     }
 
     const int result = RUN_ALL_TESTS();

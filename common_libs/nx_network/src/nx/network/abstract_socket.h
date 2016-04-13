@@ -276,10 +276,10 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
     //!Reads at least @param minimalSize bytes from socket asynchronously
-    void readFixedAsync(
+    void readWaitAllAsync(
         nx::Buffer* const buf, size_t minimalSize,
         std::function<void(SystemError::ErrorCode, size_t)> handler,
-        size_t baseSize = 0);
+        size_t initBufSize = 0);
 
     //!Asynchnouosly writes all bytes from input buffer
     /*!

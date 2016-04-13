@@ -90,7 +90,7 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
 
 #ifdef ENABLE_SSL
     if( result && ( sslRequired || s_isSslEnforced ) )
-        result.reset( new QnSSLSocket( result.release(), false ) );
+        result.reset( new SslSocket( result.release(), false ) );
 #endif
     
     return std::move( result );
@@ -109,7 +109,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
 
 #ifdef ENABLE_SSL
     if( result && ( sslRequired || s_isSslEnforced ) )
-        result.reset( new SSLServerSocket( result.release(), true ) );
+        result.reset( new SslServerSocket( result.release(), true ) );
 #endif // ENABLE_SSL
 
     return std::move( result );

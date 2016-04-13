@@ -1739,7 +1739,7 @@ void MediaServerProcess::run()
     if( f.isOpen() )
     {
         const QByteArray& certData = f.readAll();
-        nx::network::QnSSLSocket::initSSLEngine( certData );
+        nx::network::SslSocket::initSSLEngine( certData );
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
@@ -2517,7 +2517,7 @@ void MediaServerProcess::run()
     //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
-    nx::network::QnSSLSocket::releaseSSLEngine();
+    nx::network::SslSocket::releaseSSLEngine();
     authHelper.reset();
 
     fileDeletor.reset();

@@ -246,7 +246,7 @@ void socketSimpleAsync(
         clients.emplace_back(socket);
         auto& client = clients.back();
         ASSERT_TRUE(client->setNonBlockingMode(true));
-        client->readFixedAsync(
+        client->readWaitAllAsync(
             &serverBuffer, testMessage.size(),
             [&](SystemError::ErrorCode code, size_t size)
             {

@@ -11,18 +11,18 @@ namespace test {
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
     TEST, SslFreeTcpSockets,
-    [](){ return std::make_unique<SSLServerSocket>(new TCPServerSocket, true); },
+    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket, true); },
     &std::make_unique<TCPSocket>);
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
     TEST, SslEnabledTcpSockets,
-    [](){ return std::make_unique<SSLServerSocket>(new TCPServerSocket, true); },
-    [](){ return std::make_unique<QnSSLSocket>(new TCPSocket, false); });
+    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket, true); },
+    [](){ return std::make_unique<SslSocket>(new TCPSocket, false); });
 
 NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
     TEST, SslEnforcedTcpSockets,
-    [](){ return std::make_unique<SSLServerSocket>(new TCPServerSocket, false); },
-    [](){ return std::make_unique<QnSSLSocket>(new TCPSocket, false); });
+    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket, false); },
+    [](){ return std::make_unique<SslSocket>(new TCPSocket, false); });
 
 } // namespace test
 } // namespace network

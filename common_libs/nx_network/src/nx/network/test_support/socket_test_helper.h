@@ -98,6 +98,9 @@ private:
 
     void onConnected( SystemError::ErrorCode code );
     void startIO();
+    void startSpamIO();
+    void startEchoIO();
+    void startEchoTestIO();
     void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
     void readAllAsync( std::function<void()> handler );
