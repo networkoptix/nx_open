@@ -32,5 +32,7 @@
         <qt.libs>core gui widgets</qt.libs>
         <global.libs>-lcommon -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
+
+        <rdep.packages>qtsingleapplication</rdep.packages>
     </properties>
 </project>

@@ -14,8 +14,6 @@ INCLUDEPATH +=  ${root.dir}/appserver2/src \
 
 LIBS += $$FESTIVAL_LIB
 
-include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsingleapplication.pri)
-
 mac {
     INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers
 }

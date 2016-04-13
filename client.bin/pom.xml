@@ -28,7 +28,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg quazip festival festival-vox</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox qtsingleapplication</rdep.packages>
         <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
 

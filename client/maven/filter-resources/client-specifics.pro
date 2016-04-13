@@ -2,8 +2,6 @@ INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/client.core/src \
                 ${root.dir}/nx_cloud/cloud_db_client/src/include
 
-include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsingleapplication.pri)
-
 mac {
     INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers
 }

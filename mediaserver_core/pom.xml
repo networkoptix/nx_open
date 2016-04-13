@@ -34,7 +34,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>server-external openssl ffmpeg onvif quazip sigar</rdep.packages>
+        <rdep.packages>server-external openssl ffmpeg onvif quazip sigar qtsinglecoreapplication qtservice</rdep.packages>
     </properties>
 
     <dependencies>
