@@ -207,8 +207,7 @@
         <rdep.mac.packages/>
         <rdep.android.packages/>
         <rdep.ios.packages/>
-        <!-- Default packages for cpp projects -->
-        <rdep.global.packages>qt boost</rdep.global.packages>
+        <rdep.global.packages/>
 
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -292,6 +291,10 @@
                                     <filtering>true</filtering>
                                 </resource>
                                 <resource>
+                                    <directory>${root.dir}/build_utils/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
                                 </resource>
@@ -311,6 +314,30 @@
                                     </excludes>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>get_dependencies.py</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
+                            </environmentVariables>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
                     </execution>
                 </executions>
