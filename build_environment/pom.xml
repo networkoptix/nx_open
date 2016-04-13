@@ -175,23 +175,5 @@
                 </plugins>
             </build>
         </profile>
-
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.microsoft</groupId>
-                    <artifactId>directx</artifactId>
-                    <version>JUN2010-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 </project>
