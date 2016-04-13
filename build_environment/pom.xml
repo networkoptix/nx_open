@@ -185,20 +185,6 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>appserver</artifactId>
-                    <version>2.2.1-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${platform}-x86</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>appserver</artifactId>
-                    <version>2.2.1-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${platform}-x64</classifier>
-                </dependency>
-                <dependency>
                     <groupId>com.networkoptix.hdwitness</groupId>
                     <artifactId>vmaxproxy</artifactId>
                     <version>2.1-SNAPSHOT</version>
