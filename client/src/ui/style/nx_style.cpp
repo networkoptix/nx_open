@@ -24,7 +24,6 @@
 #include <private/qfont_p.h>
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/variant.h>
 
 using namespace style;
 
@@ -611,7 +610,7 @@ void QnNxStyle::drawComplexControl(
                 painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
                 painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
-                SliderFeatures features = option->styleObject ? qvariant_cast<unsigned int>(option->styleObject->property(Properties::kSliderFeatures), 0): 0;
+                SliderFeatures features = static_cast<SliderFeatures>(option->styleObject ? option->styleObject->property(Properties::kSliderFeatures).toInt() : 0);
                 if (features.testFlag(SliderFeature::FillingUp))
                 {
                     QRectF fillDrawRect = grooveRect.adjusted(1, 1, -1, -1);
@@ -1961,8 +1960,9 @@ int QnNxStyle::pixelMetric(
     case PM_SliderLength:
         if (option && option->styleObject)
         {
-            int result = qvariant_cast<int>(option->styleObject->property(Properties::kSliderLength), -1);
-            if (result >= 0)
+            bool ok(false);
+            int result = option->styleObject->property(Properties::kSliderLength).toInt(&ok);
+            if (ok && result >= 0)
                 return result;
         }
         return dp(16);
