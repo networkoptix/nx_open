@@ -1,7 +1,7 @@
 #ifndef MEDIATOR_MOCKS
 #define MEDIATOR_MOCKS
 
-#include <gmock.h>
+#include <gmock/gmock.h>
 
 #include <mediaserver_api.h>
 
