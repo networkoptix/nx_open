@@ -15,7 +15,7 @@ public:
     virtual ~GraphicsWidgetPrivate();
 
     GraphicsWidgetSceneData *ensureSceneData();
-    
+
     static bool movableAncestorIsSelected(const QGraphicsItem *item);
     bool movableAncestorIsSelected() const { return movableAncestorIsSelected(q_func()); }
 
@@ -58,9 +58,9 @@ protected:
         QPointF startPinPoint;
         QSizeF startSize;
         ConstrainedGeometrically *constrained;
-        WindowData(): 
-            grabbedSection(Qt::NoSection), 
-            closeButtonHovered(false), 
+        WindowData():
+            grabbedSection(Qt::NoSection),
+            closeButtonHovered(false),
             closeButtonGrabbed(false),
             constrained(NULL)
         {}
