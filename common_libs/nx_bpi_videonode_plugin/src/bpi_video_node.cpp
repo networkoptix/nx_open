@@ -263,12 +263,12 @@ void QSGVideoMaterialShader_YUV_BiPlanarTiled::updateState(const RenderState &st
     mat->bind();
 
     program()->setUniformValue(m_id_colorMatrix, mat->m_colorMatrix);
-    program()->setUniformValue(m_id_planeWidth,  mat->m_planeWidth * mat->m_framePixelWidth);
+    program()->setUniformValue(m_id_planeWidth,  (float) mat->m_planeWidth * mat->m_framePixelWidth);
     program()->setUniformValue(m_id_planeHeight, (float) mat->m_framePixelHeight);
 
-    program()->setUniformValue(m_id_pixelWidth,  mat->m_framePixelWidth);
-    program()->setUniformValue(m_id_pixelHeight, mat->m_framePixelHeight);
-    program()->setUniformValue(m_id_blocksPerLine, mat->m_framePixelWidth / 32);
+    program()->setUniformValue(m_id_pixelWidth,  (float)mat->m_framePixelWidth);
+    program()->setUniformValue(m_id_pixelHeight, (float) mat->m_framePixelHeight);
+    program()->setUniformValue(m_id_blocksPerLine, (float) (mat->m_framePixelWidth / 32));
 
     if (state.isOpacityDirty()) {
         mat->m_opacity = state.opacity();
