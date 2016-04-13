@@ -19,6 +19,7 @@
 #include <onvif/soapEventBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
+#include <onvif/soapStub.h>
 
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
@@ -32,7 +33,6 @@
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
-#include "soapStub.h"
 #include "onvif_ptz_controller.h"
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
