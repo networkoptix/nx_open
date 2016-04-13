@@ -27,7 +27,6 @@
         <master.project.directory>plugins/image_library_plugin</master.project.directory>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lonvif</global.libs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 

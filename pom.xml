@@ -149,7 +149,7 @@
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
-        <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
+        <onvif.version>2.1.2-io</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
         <boost.version>1.56.0</boost.version>

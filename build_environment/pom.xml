@@ -177,25 +177,6 @@
         </profile>
 
         <profile>
-            <id>nomobile</id>
-            <activation>
-                <property>
-                    <name>newmobile</name>
-                    <value>!true</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org</groupId>
-                    <artifactId>onvif</artifactId>
-                    <version>${onvif.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
             <id>windows</id>
             <activation>
                 <os>
