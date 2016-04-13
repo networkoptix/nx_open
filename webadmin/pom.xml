@@ -62,7 +62,7 @@
                     </execution>        
                     <execution>
                         <id>rdep</id>
-                        <phase>deploy</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
