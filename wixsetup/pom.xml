@@ -25,7 +25,7 @@
         <ClientFontsDir>${libdir}\${arch}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\${arch}\bin\${build.configuration}\qml</ClientQmlDir>
         <Vs2015crtDir>${environment.dir}\wix\vs2015crt\${arch}</Vs2015crtDir>
-        <rdep.packages>appserver-2.2.1</rdep.packages>
+        <rdep.packages>appserver-2.2.1 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
@@ -139,9 +139,6 @@
                         <configuration>
                             <encoding>utf-8</encoding>
                             <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
-                            <!-- <excludes>
-										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->	
                             <ignoreMissingFile>true</ignoreMissingFile>                                    
                             <replacements>
                                 <replacement>
