@@ -46,7 +46,24 @@ MediaServerEmulator::MediaServerEmulator(
 
 MediaServerEmulator::~MediaServerEmulator()
 {
+    if (m_mediatorConnector)
+    {
+        m_mediatorConnector->pleaseStopSync();
+        m_mediatorConnector.reset();
+    }
+    if (m_serverClient)
+    {
+        m_serverClient->pleaseStopSync();
+        m_serverClient.reset();
+    }
+    if (m_mediatorUdpClient)
+    {
+        m_mediatorUdpClient->pleaseStopSync();
+        m_mediatorUdpClient.reset();
+    }
+
     pleaseStopSync();
+    m_httpServer.pleaseStop();
 }
 
 bool MediaServerEmulator::start()
