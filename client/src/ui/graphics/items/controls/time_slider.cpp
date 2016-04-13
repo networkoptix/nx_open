@@ -598,14 +598,22 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
 
 
     //: Do not translate this string unless you know what you're doing.
-    QString dFormat = tr("dd MMMM", "Format for displaying days on timeline.");
+    QString hmFormat = tr("hh:mm", "Format for displaying hours and minutes on timeline.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString hmApFormat = tr("hh:mm ap", "Format for displaying hours and minutes on timeline, with am/pm indicator.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString hApFormat = tr("h ap", "Format for displaying hours on timeline, with am/pm indicator.");
+
+    //: Do not translate this string unless you know what you're doing.
+    QString dFormat = tr("dd", "Format for displaying days on timeline.");
 
     //: Do not translate this string unless you know what you're doing.
     QString moFormat = tr("MMMM", "Format for displaying months on timeline.");
 
     //: Do not translate this string unless you know what you're doing.
     QString yFormat = tr("yyyy", "Format for displaying years on timeline");
-
 
     //: Do not translate this string unless you know what you're doing.
     QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying minute caption in timeline's header, without am/pm indicator.");
@@ -628,22 +636,25 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     //: Do not translate this string unless you know what you're doing.
     QString dateYearsFormat = tr("yyyy", "Format for displaying year caption in timeline's header");
 
+    const QString& hFormat = ampm ? hApFormat  : hmFormat;
+    const QString& mFormat = ampm ? hmApFormat : hmFormat;
+
     *absoluteSteps <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                10,     1000,   msSuffix,       QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                50,     1000,   msSuffix,       QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                100,    1000,   msSuffix,       QString(),          false) <<
         QnTimeStep(QnTimeStep::Milliseconds,    1ll,                                500,    1000,   msSuffix,       QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             1,      60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             5,      60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             10,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll,                             30,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        1,      60,     mSuffix,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        5,      60,     mSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        10,     60,     mSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60,                        30,     60,     mSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Milliseconds,    1000ll * 60 * 60,                   1,      24,     hSuffix,        ampm ? dateHoursApFormat : dateHoursFormat, false) <<
-        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     hSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     hSuffix,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             1,      60,     sSuffix,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             5,      60,     sSuffix,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             10,     60,     sSuffix,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Seconds,         1000ll,                             30,     60,     sSuffix,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      60,     mFormat,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      60,     mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     60,     mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     60,     mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   1,      24,     hFormat,        ampm ? dateHoursApFormat : dateHoursFormat, false) <<
+        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     hFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     hFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Days,            1000ll * 60 * 60 * 24,              1,      31,     dFormat,        dateDaysFormat,     false) <<
         QnTimeStep(QnTimeStep::Months,          1000ll * 60 * 60 * 24 * 31,         1,      12,     moFormat,       dateMonthsFormat,   false) <<
         QnTimeStep(QnTimeStep::Years,           1000ll * 60 * 60 * 24 * 365,        1,      50000,  yFormat,        dateYearsFormat,    false) <<
