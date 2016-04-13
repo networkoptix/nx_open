@@ -520,6 +520,9 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event)
     if (watched == m_speedSlider && event->type() == QEvent::GraphicsSceneWheel)
         return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
 
+    if (event->type() == QEvent::PaletteChange)
+        setFrameColor(palette().color(QPalette::Midlight));
+
     return base_type::eventFilter(watched, event);
 }
 

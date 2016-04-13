@@ -12,7 +12,8 @@ class QnTimeScrollBar;
 class QnWorkbenchNavigator;
 class QGraphicsProxyWidget;
 
-class QnNavigationItem : public QnFramedWidget, public QnWorkbenchContextAware {
+class QnNavigationItem : public QnFramedWidget, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef QnFramedWidget base_type;
