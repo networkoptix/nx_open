@@ -43,7 +43,7 @@ public:
 // TODO: implement over mocked sockets
 TEST( UpnpDeviceSearcher, DISABLED_General )
 {
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher;
     TestSearchHandler testSearcher;
     QThread::sleep( 5 );

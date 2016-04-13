@@ -936,8 +936,10 @@ TEST(MediaDbTest, Migration_from_sqlite)
         }
     }
 
+    auto connectionName = sqlDb.connectionName();
     sqlDb.close();
-    QSqlDatabase::removeDatabase(sqlDb.connectionName());
+    sqlDb = QSqlDatabase();
+    QSqlDatabase::removeDatabase(connectionName);
     QnStorageManager::migrateSqliteDatabase(storage);
     auto mergedCatalogs = sdb->loadFullFileCatalog();
 

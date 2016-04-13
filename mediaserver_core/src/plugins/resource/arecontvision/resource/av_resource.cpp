@@ -15,7 +15,7 @@
 #include <utils/common/concurrent.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/ping.h>
@@ -321,7 +321,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
             }
 
             //scheduling auto-reset
-            TimerManager::instance()->addTimer(
+            nx::utils::TimerManager::instance()->addTimer(
                 [url](qint64){
                     auto resetOutputUrl = url;
                     resetOutputUrl.setPath(lit("/set?auxout=off"));
@@ -329,7 +329,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
                         resetOutputUrl,
                         [](SystemError::ErrorCode, int, nx_http::BufferType){});
                 },
-                autoResetTimeoutMS);
+                std::chrono::milliseconds(autoResetTimeoutMS));
         };
 
     const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};

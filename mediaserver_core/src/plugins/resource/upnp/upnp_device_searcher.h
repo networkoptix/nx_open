@@ -15,7 +15,7 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>
@@ -54,7 +54,7 @@ public:
 class UPNPDeviceSearcher
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public QnStoppable
 {
     Q_OBJECT

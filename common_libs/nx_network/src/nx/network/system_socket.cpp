@@ -170,12 +170,14 @@ bool Socket<InterfaceToImplement>::close()
     //checking that socket is not registered in aio
     NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
 
-#ifdef WIN32
-    return ::closesocket(m_fd) == 0;
-#else
-    return ::close(m_fd) == 0;
-#endif
+    auto fd = m_fd;
     m_fd = -1;
+
+#ifdef WIN32
+    return ::closesocket(fd) == 0;
+#else
+    return ::close(fd) == 0;
+#endif
 }
 
 template<typename InterfaceToImplement>

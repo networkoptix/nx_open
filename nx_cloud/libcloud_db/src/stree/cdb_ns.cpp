@@ -45,5 +45,5 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::requestPath, "request.path", QVariant::String);
 }
 
-}   //cdb
-}   //nx
+}   //namespace cdb
+}   //namespace nx

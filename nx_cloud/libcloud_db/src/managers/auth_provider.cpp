@@ -17,6 +17,7 @@
 #include "account_manager.h"
 #include "system_manager.h"
 #include "stree/cdb_ns.h"
+#include "settings.h"
 
 
 namespace nx {
@@ -24,15 +25,15 @@ namespace cdb {
 
 namespace {
     const char SECRET_NONCE_KEY[] = "neurod.ru";
-    const std::chrono::hours NONCE_VALIDITY_PERIOD(4);
-    const std::chrono::minutes INTERMEDIATE_RESPONSE_VALIDITY_PERIOD(5);
     const size_t CDB_NONCE_SIZE = 31;
 }
 
 AuthenticationProvider::AuthenticationProvider(
+    const conf::Settings& settings,
     const AccountManager& accountManager,
     const SystemManager& systemManager)
 :
+    m_settings(settings),
     m_accountManager(accountManager),
     m_systemManager(systemManager)
 {
@@ -69,7 +70,7 @@ void AuthenticationProvider::getCdbNonce(
 
     api::NonceData result;
     result.nonce.assign(nonce.constData(), nonce.size());
-    result.validPeriod = NONCE_VALIDITY_PERIOD;
+    result.validPeriod = m_settings.auth().nonceValidityPeriod;
 
     completionHandler(api::ResultCode::ok, std::move(result));
 }
@@ -94,7 +95,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     if (!parseNonce(authRequest.nonce, &random3Bytes, &timestamp, &nonceHash))
         return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
 
-    if (std::chrono::seconds(timestamp)+NONCE_VALIDITY_PERIOD <
+    if (std::chrono::seconds(timestamp) + m_settings.auth().nonceValidityPeriod <
         std::chrono::system_clock::now().time_since_epoch())
     {
         return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
@@ -105,13 +106,15 @@ void AuthenticationProvider::getAuthenticationResponse(
         return completionHandler(api::ResultCode::invalidNonce, api::AuthResponse());
 
     //checking that username corresponds to account user and requested system is shared with that user
-    const auto account = m_accountManager.findAccountByUserName(authRequest.username.c_str());
+    const auto account = 
+        m_accountManager.findAccountByUserName(authRequest.username.c_str());
     if (!account)
         return completionHandler(api::ResultCode::badUsername, api::AuthResponse());
     if (account->statusCode != api::AccountStatus::activated)
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 
-    const auto systemAccessRole = m_systemManager.getAccountRightsForSystem(account->email, systemID);
+    const auto systemAccessRole = 
+        m_systemManager.getAccountRightsForSystem(account->email, systemID);
     if (systemAccessRole == api::SystemAccessRole::none)
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
 
@@ -121,8 +124,10 @@ void AuthenticationProvider::getAuthenticationResponse(
     const auto intermediateResponse = nx_http::calcIntermediateResponse(
         account->passwordHa1.c_str(),
         authRequest.nonce.c_str());
-    response.intermediateResponse.assign(intermediateResponse.constData(), intermediateResponse.size());
-    response.validPeriod = INTERMEDIATE_RESPONSE_VALIDITY_PERIOD;
+    response.intermediateResponse.assign(
+        intermediateResponse.constData(),
+        intermediateResponse.size());
+    response.validPeriod = m_settings.auth().intermediateResponseValidityPeriod;
 
     completionHandler(api::ResultCode::ok, std::move(response));
 }

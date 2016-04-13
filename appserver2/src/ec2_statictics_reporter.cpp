@@ -120,8 +120,9 @@ namespace ec2
         QnMutexLocker lk(&m_mutex);
         if (!m_timerDisabled)
         {
-            m_timerId = TimerManager::instance()->addTimer(
-                std::bind(&Ec2StaticticsReporter::timerEvent, this), m_timerCycle);
+            m_timerId = nx::utils::TimerManager::instance()->addTimer(
+                std::bind(&Ec2StaticticsReporter::timerEvent, this),
+                std::chrono::milliseconds(m_timerCycle));
 
             NX_LOG(lit("Ec2StaticticsReporter: Timer is set with delay %1")
                    .arg(m_timerCycle), cl_logDEBUG1);
@@ -140,7 +141,7 @@ namespace ec2
         }
 
         if (timerId)
-            TimerManager::instance()->joinAndDeleteTimer(*timerId);
+            nx::utils::TimerManager::instance()->joinAndDeleteTimer(*timerId);
 
         if (auto client = m_httpClient)
             client->terminate();
@@ -177,7 +178,7 @@ namespace ec2
             qnGlobalSettings->synchronizeNow();
         }
 
-        const uint timeCycle = parseTimerDuration(
+        const uint timeCycle = nx::utils::parseTimerDuration(
                     qnGlobalSettings->statisticsReportTimeCycle(),
                     std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
