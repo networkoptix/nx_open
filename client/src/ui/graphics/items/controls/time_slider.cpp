@@ -92,22 +92,15 @@ namespace {
      * step may become smaller that this value. */
     const qreal minTickmarkLineStepPixels = 5.0;
 
-    /** Critical distance between tickmarks from the same group.
-     * Tickmarks that are closer to each other will never be displayed. */
-    const qreal criticalTickmarkLineStepPixels = 2.0;
+    /** Minimal distance between tickmark labels from the same group. */
+    const qreal minTickmarkTextSpacingPixels = 5.0;
 
     /** Estimated maximal size of tickmark text label. */
     const qreal maxTickmarkTextSizePixels = 80.0;
 
-    /** Minimal distance between tickmark labels from the same group. */
-    const qreal minTickmarkTextSpacingPixels = 6.0;
-
-    /** Critical distance between tickmark labels from the same group. */
-    const qreal criticalTickmarkTextSpacingPixels = 2.0;
-
     /* Tickmark animation parameters. */
-    const qreal tickmarkHeightAnimationMs = 1000.0;
-    const qreal tickmarkOpacityAnimationMs = 1000.0;
+    const qreal tickmarkHeightAnimationMs = 500.0;
+    const qreal tickmarkOpacityAnimationMs = 500.0;
 
 
     /* Dates bar. */
@@ -1623,6 +1616,12 @@ void QnTimeSlider::updateStepAnimationTargets()
         if (extraLevelsAllowed < 0)
         {
             qreal labelWidth = m_stepData[minStepIndex].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel];
+            if ((minStepIndex < maxStepIndexLimit) && maxDisplayedTextLevel)
+            {
+                qreal prevLabelWidth = m_stepData[minStepIndex+1].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel-1];
+                labelWidth = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0);
+            }
+
             qreal minTextStepPixels = labelWidth + minTickmarkTextSpacingPixels;
 
             /* Check against minimal allowed tickmark text distance: */
@@ -1649,6 +1648,7 @@ void QnTimeSlider::updateStepAnimationTargets()
 
     /* Adjust target tickmark heights and opacities. */
     qreal prevTextVisible = 1.0; /* - "boolean" 0.0 or 1.0, used as multiplier */
+    qreal prevLabelWidth = 0.0; /* - we track previous level text label widths to avoid overlapping with them */
     int minLevelStepIndex = qMax(0, m_maxStepIndex - maxTickmarkLevels);
 
     for (int i = stepCount - 1; i >= minLevelStepIndex; --i)
@@ -1667,21 +1667,14 @@ void QnTimeSlider::updateStepAnimationTargets()
         }
         else
         {
-            qreal minTextStepPixels = labelWidth + minTickmarkTextSpacingPixels;
+            qreal minTextStepPixels = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0) + minTickmarkTextSpacingPixels;
             data.targetTextOpacity = separationPixels < minTextStepPixels ? 0.0 : 1.0;
             data.targetTextOpacity *= prevTextVisible;
+            prevLabelWidth = labelWidth;
         }
 
         data.targetLineOpacity = qFuzzyIsNull(data.targetHeight) ? 0.0 : 1.0;
         prevTextVisible = data.targetTextOpacity;
-
-        /* Adjust for max height & opacity. */
-        qreal maxHeight = qMax(0.0, separationPixels - criticalTickmarkLineStepPixels);
-        data.currentHeight = qMin(data.currentHeight, maxHeight);
-
-        qreal criticalTextStepPixels = labelWidth + criticalTickmarkTextSpacingPixels;
-        if (separationPixels < criticalTextStepPixels)
-            data.currentTextOpacity = 0.0;
 
         /* Compute speeds. */
         data.heightSpeed = qMax(data.heightSpeed, speed(data.currentHeight, data.targetHeight, tickmarkHeightAnimationMs));
