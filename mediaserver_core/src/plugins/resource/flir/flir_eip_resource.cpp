@@ -383,7 +383,7 @@ void QnFlirEIPResource::fetchAndSetAdvancedParameters()
     QnCameraAdvancedParams params;
     if (!loadAdvancedParametersTemplateFromFile(
             params,
-            lit("/home/fp/develop/netoptix_vms/common/maven/bin-resources/resources/camera_advanced_params/") + templateFile))
+            lit(":/camera_advanced_params/") + templateFile))
     {
         return;
     }
