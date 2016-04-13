@@ -90,7 +90,18 @@ bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* cons
 
     if (status != 0)
     {
-        // TODO: #mux Translate status into corresponding SystemError?
+        SystemError::ErrorCode code;
+        switch (status)
+        {
+            case EAI_NONAME: code = SystemError::hostNotFound; break;
+            case EAI_AGAIN: code = SystemError::again; break;
+            case EAI_MEMORY: code = SystemError::nomem; break;
+            case EAI_SYSTEM: return false; // System error returned in `errno'
+
+            // TODO: #mux Translate some other status codes?
+            default: code = SystemError::dnsServerFailure; break;
+        };
+
         SystemError::setLastErrorCode( SystemError::dnsServerFailure );
         return false;
     }
