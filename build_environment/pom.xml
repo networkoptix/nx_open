@@ -198,13 +198,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.microsoft</groupId>
-                    <artifactId>redistributable</artifactId>
-                    <version>vs2012-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}</classifier>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>
