@@ -2256,8 +2256,10 @@ QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
         return lit("blue");
     case kGreen:
         return lit("green");
-    case kBrang:
+    case kBrand:
         return lit("brand");
+    case kRed:
+        return lit("red");
     }
 
     return QString();

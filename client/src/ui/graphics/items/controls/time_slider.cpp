@@ -163,6 +163,7 @@ namespace {
     const int startDragDistance = 5;
 
     const int bookmarkFontHeight = 11;
+    const int bookmarkFontWeight = QFont::DemiBold;
     const int bookmarkTextPadding = 6;
     const int minBookmarkTextCharsVisible = 6;
 
@@ -1443,11 +1444,11 @@ void QnTimeSlider::updatePixmapCache()
 {
     QFont localFont(font());
     m_pixmapCache->setDefaultFont(localFont);
-    m_pixmapCache->setDefaultColor(palette().color(QPalette::WindowText));
+    m_pixmapCache->setDefaultColor(palette().color(QPalette::BrightText));
 
     localFont.setWeight(dateTextFontWeight);
     m_pixmapCache->setDateFont(localFont);
-    m_pixmapCache->setDateColor(palette().color(QPalette::WindowText));
+    m_pixmapCache->setDateColor(m_colors.dateBarText);
 
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16);
 
@@ -1513,7 +1514,7 @@ void QnTimeSlider::updateLineCommentPixmap(int line)
         return;
 
     QFont font(m_pixmapCache->defaultFont());
-    font.setWeight(qMin(maxHeight, lineLabelFontHeight));
+    font.setPixelSize(qMin(maxHeight, lineLabelFontHeight));
     font.setWeight(lineLabelFontWeight);
 
     m_lineData[line].commentPixmap = m_pixmapCache->textPixmap(m_lineData[line].comment, m_pixmapCache->defaultColor(), font);
@@ -1903,13 +1904,10 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
                 drawLastMinute(painter, lineRect);
 
             if (line)
-            drawSeparator(painter, lineRect);
-
+                drawSeparator(painter, lineRect);
 
             lineTop += lineHeight;
         }
-
-        drawBookmarks(painter, lineBarRect);
     }
 
     /* Draw thumbnails. */
@@ -1933,6 +1931,9 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
 
         lineTop += lineHeight;
     }
+
+    /* Draw bookmarks. */
+    drawBookmarks(painter, lineBarRect);
 
     /* Draw tickmarks. */
     drawTickmarks(painter, tickmarkBarRect());
@@ -2214,6 +2215,12 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
 
 void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
 {
+    const auto backgroundColor = [this](qint64 number) -> QColor
+    {
+        return m_colors.dateBarBackgrounds.empty() ? QColor(Qt::gray) :
+            m_colors.dateBarBackgrounds[number % m_colors.dateBarBackgrounds.size()];
+    };
+
     int stepCount = m_steps.size();
 
     /* Find index of the highlight time step. */
@@ -2241,7 +2248,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         qreal x1 = quickPositionFromValue(pos1 - m_localOffset);
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(number % 2 ? m_colors.dateOverlay : m_colors.dateOverlayAlternate);
+        painter->setBrush(backgroundColor(number));
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
         QPixmap pixmap = m_pixmapCache->dateTextPixmap(pos0, dateTextFontHeight, highlightStep);
@@ -2386,6 +2393,9 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QBrush pastBrush(m_colors.pastBookmarkBound);
     QBrush futureBrush(m_colors.futureBookmarkBound);
 
+    QFont font(m_pixmapCache->defaultFont());
+    font.setWeight(bookmarkFontWeight);
+
     for (int i = 0; i < bookmarks.size(); ++i)
     {
         const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
@@ -2435,8 +2445,8 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         if (text != bookmark.name && text.length() - elideStringLength < minBookmarkTextCharsVisible)
             continue;
 
-        QPixmap pixmap = m_pixmapCache->textPixmap(text, bookmarkFontHeight);
-        qreal textY = bookmarkRect.top() + (bookmarkRect.height() - pixmap.height()) / 2;
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, bookmarkFontHeight, palette().color(QPalette::BrightText), font);
+        qreal textY = qRound(bookmarkRect.top() + (bookmarkRect.height() - pixmap.height() + 1.0) / 2.0);
         painter->drawPixmap(textRect.left(), textY, pixmap);
     }
 }

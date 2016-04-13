@@ -53,6 +53,14 @@
         "green_d2":     "#2a551e",
         "green_d3":     "#22391e",
 
+        "red_l2":       "#e34545",
+        "red_l1":       "#d53232",
+        "red_core":     "#c22626",
+        "red_d1":       "#aa1e1e",
+        "red_d2":       "#8e1717",
+        "red_d3":       "#741414",
+        "red_d4":       "#5e1010",
+
         "brand_l2":     "#43c2ff",
         "brand_l1":     "#39b2ef",
         "brand_core":   "#2fa2db",
@@ -200,10 +208,10 @@
             "_": "Time slider colors.",
             
             "positionMarker": "light4",
-            "indicator": "QColor(128, 160, 192, 128)",
+            "indicator": "blue9.setAlpha(153)",
             
-            "selection": "selection",
-            "selectionMarker": "selection.lighter",
+            "selection": "blue8.setAlpha(77)",
+            "selectionMarker": "blue9.setAlpha(153)",
             
             "pastBackground": "green_d3",
             "futureBackground": "green_d3",
@@ -211,24 +219,27 @@
             "pastRecording": "green_core",
             "futureRecording": "green_core",
             
-            "pastMotion": "QColor(255, 0, 0, 128)",
-            "futureMotion": "QColor(255, 0, 0, 64)",
+            "pastMotion": "red_d1",
+            "futureMotion": "red_d1",
             
             "separator": "dark6",
             
-            "dateOverlay": "dark11",
-            "dateOverlayAlternate": "dark9",
+            "dateBarBackgrounds": [ "dark11", "dark9" ],
+            "dateBarText": "light4",
+
+            "pastLastMinute": "dark6",
+            "futureLastMinute": "dark6",
+
+            "pastBookmark": "blue12.setAlpha(204)",
+            "futureBookmark": "blue12.setAlpha(204)",
+            "pastBookmarkBound": "link",
+            "futureBookmarkBound": "link",
 
             "tickmarkLines": [ "light10", "dark17", "dark13", "dark9" ],
-            "tickmarkText" : [ "light8", "light16", "dark15" ],
-
-            "_": "Do not touch two values below! They was set accurately with help of color-picker.",
-            "pastLastMinute": "QColor(24, 24, 24, 255)",
-            "futureLastMinute": "QColor(0, 0, 0, 255)"
+            "tickmarkText" : [ "light8", "light16", "dark15" ]
         },
         "palette": { "default": { 
-            "window": "dark6",
-            "windowText": "#FFFFFF" 
+            "window": "dark6"
         }} 
     },
     

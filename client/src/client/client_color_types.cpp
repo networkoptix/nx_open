@@ -32,8 +32,8 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     separator = QColor(255, 255, 255, 64);
 
-    dateOverlay = QColor(255, 255, 255, 48);
-    dateOverlayAlternate = withAlpha(selection, 48);
+    dateBarBackgrounds.push_back(QColor(255, 255, 255, 48));
+    dateBarText = QColor(255, 255, 255, 255);
 
     pastLastMinute = QColor(24, 24, 24, 255);
     futureLastMinute = QColor(0, 0, 0, 255);

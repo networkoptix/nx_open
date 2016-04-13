@@ -34,8 +34,8 @@ public:
 
     QColor separator;
 
-    QColor dateOverlay;
-    QColor dateOverlayAlternate;
+    std::vector<QColor> dateBarBackgrounds;
+    QColor dateBarText;
 
     QColor pastLastMinute;
     QColor futureLastMinute;
@@ -45,7 +45,7 @@ public:
 };
 #define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
     (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
-    (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute)\
+    (separator)(dateBarBackgrounds)(dateBarText)(pastLastMinute)(futureLastMinute)\
     (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
     (tickmarkLines)(tickmarkText)
 
