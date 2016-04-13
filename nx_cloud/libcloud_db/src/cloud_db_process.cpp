@@ -175,6 +175,7 @@ int CloudDBProcess::executeApplication()
             systemManager);
 
         AuthenticationProvider authProvider(
+            settings,
             accountManager,
             systemManager);
 
