@@ -244,12 +244,12 @@ private:
 
     struct TimeStepData
     {
-        TimeStepData(): tickmarkTextOversize(1.0),
+        TimeStepData(): textWidthToHeight(0.0),
             currentHeight(0.0), targetHeight(0.0), heightSpeed(0.0),
             currentLineOpacity(0.0), targetLineOpacity(0.0), lineOpacitySpeed(0.0),
             currentTextOpacity(0.0), targetTextOpacity(0.0), textOpacitySpeed(0.0) {}
 
-        qreal tickmarkTextOversize;
+        qreal textWidthToHeight;
 
         qreal currentHeight;
         qreal targetHeight;
