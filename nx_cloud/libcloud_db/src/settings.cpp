@@ -288,12 +288,12 @@ void Settings::loadConfiguration()
         std::chrono::seconds(
             m_settings.value(
                 kNonceValidityPeriod,
-                kDefaultNonceValidityPeriod.count()).toInt());
+                (int)kDefaultNonceValidityPeriod.count()).toInt());
     m_auth.intermediateResponseValidityPeriod = 
         std::chrono::seconds(
             m_settings.value(
                 kIntermediateResponseValidityPeriod,
-                kDefaultIntermediateResponseValidityPeriod.count()).toInt());
+                (int)kDefaultIntermediateResponseValidityPeriod.count()).toInt());
 }
 
 }   //conf
