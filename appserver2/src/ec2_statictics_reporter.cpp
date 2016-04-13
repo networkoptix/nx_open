@@ -153,11 +153,15 @@ namespace ec2
 
     void Ec2StaticticsReporter::timerEvent()
     {
-        {   /* Security check */
+        {
+            /* Admin may still not exist here if we are initializing database too long (e.g. debug). */
             const auto admin = qnResPool->getAdministrator();
-            NX_ASSERT(admin, Q_FUNC_INFO, "Administrator must exist here");
             if (!admin)
+            {
+                /* Try again. */
+                setupTimer();
                 return;
+            }
         }
 
         if (!qnGlobalSettings->isStatisticsAllowed())
