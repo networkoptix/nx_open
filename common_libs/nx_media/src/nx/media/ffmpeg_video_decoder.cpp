@@ -11,6 +11,8 @@ extern "C" {
 
 #include "aligned_mem_video_buffer.h"
 
+#include <QFile>
+
 namespace nx {
 namespace media {
 
@@ -92,6 +94,8 @@ public:
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+
+    QByteArray testData;
 };
 
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -191,6 +195,31 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 
+#if 1
+    // test data
+	const QVideoFrame::PixelFormat Format_Tiled32x32NV12 = QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
+
+    if (d->testData.isEmpty())
+    {
+        QFile file("f:\\yuv_frames\\frame_1920x1080_26_native.dat");
+        file.open(QIODevice::ReadOnly);
+        d->testData = file.readAll();
+    }
+
+    quint8* srcData[4];
+    srcData[0] = (quint8*) d->testData.data();
+    srcData[1] = srcData[0] + qPower2Ceil((unsigned) d->frame->width, 32) * qPower2Ceil((unsigned) d->frame->height, 32);
+
+    int srcLineSize[4];
+    srcLineSize[0] = srcLineSize[1] = qPower2Ceil((unsigned) d->frame->width, 32);
+
+    auto alignedBuffer = new AlignedMemVideoBuffer(srcData, srcLineSize, 2); //< two planes buffer
+    auto videoFrame = new QVideoFrame(alignedBuffer, QSize(d->frame->width, d->frame->height), Format_Tiled32x32NV12);
+
+    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
+    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
+
+#else
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
     const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, d->frame->height);
     const int lineSize = alignedWidth;
@@ -222,6 +251,7 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
     }
     
     videoFrame->unmap();
+#endif
 
     result->reset(videoFrame);
 }
