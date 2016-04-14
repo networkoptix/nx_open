@@ -72,11 +72,13 @@ void UdpHolePunchingRendezvousConnector::connect(
         {
             auto udtConnection = std::make_unique<UdtStreamSocket>();
             udtConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
-            bool result = true;
             //moving system socket handler from m_mediatorUdpClient to m_udtConnection
+            bool result = true;
             if (m_udpSocket)
+            {
                 result = udtConnection->bindToUdpSocket(std::move(*m_udpSocket));
-            m_udpSocket.reset();
+                m_udpSocket.reset();
+            }
             if (!result ||
                 !udtConnection->setRendezvous(true) ||
                 !udtConnection->setNonBlockingMode(true) ||
