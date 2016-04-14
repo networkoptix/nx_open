@@ -63,9 +63,7 @@ void UdpHolePunchingRendezvousConnector::dispatch(nx::utils::MoveOnlyFunc<void()
 
 void UdpHolePunchingRendezvousConnector::connect(
     std::chrono::milliseconds timeout,
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<UdtStreamSocket>)> completionHandler)
+    ConnectCompletionHandler completionHandler)
 {
     post(   //just to simplify code (get rid of synchronization)
         [this, timeout, completionHandler = std::move(completionHandler)]() mutable
@@ -88,9 +86,10 @@ void UdpHolePunchingRendezvousConnector::connect(
                 NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
                     .arg(m_connectSessionId).arg(SystemError::toString(errorCode)),
                     cl_logDEBUG1);
-                return completionHandler(
+                completionHandler(
                     errorCode,
                     nullptr);
+                return;
             }
 
             m_completionHandler = std::move(completionHandler);
