@@ -37,3 +37,8 @@ win32 {
 # QMAKE_EXTRA_COMPILERS += idlc
 
 HEADERS += ${project.build.directory}/axclient/axclient_app_info.h
+
+win32 {
+    PRECOMPILED_HEADER = StdAfx.h
+    PRECOMPILED_SOURCE = StdAfx.cpp
+}    
