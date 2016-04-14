@@ -45,6 +45,7 @@ namespace nx_api
             In other case, it is caller's responsibility to syunchronize access to the connection object.
         \note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
         \note This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
+        \note It is allowed to free instance within event handler
     */
     template<
         class CustomConnectionType
@@ -62,15 +63,19 @@ namespace nx_api
             StreamConnectionHolder<CustomConnectionType>* connectionManager,
             std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
         :
-            m_connectionManager( connectionManager ),
-            m_streamSocket( std::move(streamSocket) ),
-            m_bytesToSend( 0 )
+            m_connectionManager(connectionManager),
+            m_streamSocket(std::move(streamSocket)),
+            m_bytesToSend(0),
+            m_connectionFreedFlag(nullptr)
         {
             m_readBuffer.reserve( READ_BUFFER_CAPACITY );
         }
 
         ~BaseServerConnection()
         {
+            if (m_connectionFreedFlag)
+                *m_connectionFreedFlag = true;
+
             stopWhileInAioThread();
         }
 
@@ -129,6 +134,14 @@ namespace nx_api
             return m_streamSocket;
         }
 
+        /** Moves socket to the caller.
+            \a BaseServerConnection instance MUST be deleted just after this call
+        */
+        std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
+        {
+            return std::move(m_streamSocket);
+        }
+
     protected:
         SocketAddress getForeignAddress() const
         {
@@ -146,6 +159,7 @@ namespace nx_api
         nx::Buffer m_readBuffer;
         size_t m_bytesToSend;
         std::forward_list<std::function<void()>> m_connectionCloseHandlers;
+        bool* m_connectionFreedFlag;
 
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
@@ -159,7 +173,14 @@ namespace nx_api
                     static_cast<CustomConnectionType*>(this) );
 
             NX_ASSERT( m_readBuffer.size() == bytesRead );
-            static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
+
+            bool connectionFreed = false;
+            m_connectionFreedFlag = &connectionFreed;
+            static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer );
+            if (connectionFreed)
+                return; //connection has been removed by handler
+            m_connectionFreedFlag = nullptr;
+
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(
                 &m_readBuffer,

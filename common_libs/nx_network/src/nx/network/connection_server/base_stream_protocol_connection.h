@@ -6,10 +6,8 @@
 #ifndef BASE_STREAM_PROTOCOL_CONNECTION_H
 #define BASE_STREAM_PROTOCOL_CONNECTION_H
 
-#include <atomic>
 #include <deque>
 #include <functional>
-#include <mutex>
 
 #include <boost/optional.hpp>
 
@@ -31,6 +29,7 @@ namespace nx_api
 
         \note SerializerType::serialize is allowed to reallocate source buffer if needed, 
             but it is not recommended due to performance considerations!
+        \note It is allowed to free instance within event handler
     */
     template<
         class CustomConnectionType,
@@ -88,7 +87,14 @@ namespace nx_api
                     {
                         //processing request
                         //NOTE interleaving is not supported yet
+
+                        bool connectionFreed = false;
+                        m_connectionFreedFlag = &connectionFreed;
                         static_cast<CustomConnectionType*>(this)->processMessage( std::move(m_request) );
+                        if (connectionFreed)
+                            return; //connection has been removed by handler
+                        m_connectionFreedFlag = nullptr;
+
                         m_parser.reset();
                         m_request.clear();
                         m_parser.setMessage( &m_request );
@@ -333,6 +339,10 @@ namespace nx_api
         {
         }
 
+        /** \a handler will receive all incoming messages.
+            \note It is required to call \a BaseStreamProtocolConnection::startReadingConnection
+                to start receiving messages
+        */
         template<class T>
         void setMessageHandler( T&& handler )
         {
