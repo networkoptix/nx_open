@@ -7,6 +7,8 @@
 
 #include <nx/utils/move_only_func.h>
 
+#include <utils/common/stoppable.h>
+
 
 namespace nx {
 namespace network {
