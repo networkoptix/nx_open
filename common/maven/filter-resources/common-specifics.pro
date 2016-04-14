@@ -1,3 +1,7 @@
+!android {
+    QT += zlib-private
+}
+
 mac:!ios {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
   LIBS += -lobjc -framework Foundation -framework AppKit
