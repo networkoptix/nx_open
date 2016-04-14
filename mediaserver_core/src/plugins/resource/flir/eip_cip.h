@@ -6,10 +6,10 @@
 #include <utils/network/socket.h>
 #include <cstdint>
 
-using TCPSocketPtr = QSharedPointer<AbstractStreamSocket>;
-using eip_status_t = quint16;
-using cip_general_status_t = quint8;
-using eip_session_handle_t = quint32;
+typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
+typedef quint16 eip_status_t;
+typedef quint8 cip_general_status_t;
+typedef quint32 eip_session_handle_t;
 
 struct EIPEncapsulationHeader
 {
@@ -20,13 +20,8 @@ struct EIPEncapsulationHeader
     quint64 senderContext;
     quint32 options;
 
-    static const size_t SIZE =
-        sizeof(commandCode) +
-        sizeof(dataLength) +
-        sizeof(sessionHandle) +
-        sizeof(status) +
-        sizeof(senderContext) +
-        sizeof(options);
+    static const size_t SIZE = 192;
+
     static QByteArray encode(const EIPEncapsulationHeader& header);
 };
 
@@ -93,9 +88,10 @@ struct EIPPacket
 
 struct CIPPath
 {
-    quint8 classId = 0;
-    quint8 instanceId = 0;
-    quint8 attributeId = 0;
+    CIPPath(): classId(0), instanceId(0), attributeId(0){}
+    quint8 classId;
+    quint8 instanceId;
+    quint8 attributeId;
 };
 
 namespace EIPCommand
@@ -203,31 +199,31 @@ namespace CIPItemID
 
 namespace CIPSegmentType
 {
-    const quint8 PORT_SEGMENT = 0b00000000;
-    const quint8 LOGICAL_SEGMENT = 0b00100000;
-    const quint8 NETWORK_SEGMENT = 0b01000000;
-    const quint8 SYMBOLIC_SEGMENT = 0b01100000;
-    const quint8 DATA_SEGMENT = 0b10000000;
-    const quint8 DATA_TYPE_CONSTRUCTED = 0b10100000;
-    const quint8 DATA_TYPE_ELEMENTARY = 0b11000000;
+    const quint8 PORT_SEGMENT = 0; //0b00000000;
+    const quint8 LOGICAL_SEGMENT = 0x20; //0b00100000;
+    const quint8 NETWORK_SEGMENT = 0x40; //0b01000000;
+    const quint8 SYMBOLIC_SEGMENT = 0x60; //0b01100000;
+    const quint8 DATA_SEGMENT = 0x80; //0b10000000;
+    const quint8 DATA_TYPE_CONSTRUCTED = 0xA0;//0x0b10100000;
+    const quint8 DATA_TYPE_ELEMENTARY = 0xC0; //0b11000000;
 }
 
 namespace CIPSegmentLogicalType
 {
-    const quint8 CLASS_ID = 0b00000000;
-    const quint8 INSTANCE_ID = 0b00000100;
-    const quint8 MEMBER_ID = 0b00001000;
-    const quint8 CONNECTION_POINT = 0b00001100;
-    const quint8 ATTRIBUTE_ID = 0b00010000;
-    const quint8 SPECIAL = 0b00010100;
-    const quint8 SERVICE_ID = 0b00011000;
+    const quint8 CLASS_ID = 0; //0b00000000;
+    const quint8 INSTANCE_ID = 0x04;//0b00000100;
+    const quint8 MEMBER_ID = 0x08;//0b00001000;
+    const quint8 CONNECTION_POINT = 0x0C; //0b00001100;
+    const quint8 ATTRIBUTE_ID = 0x10; //0b00010000;
+    const quint8 SPECIAL = 0x14; //0b00010100;
+    const quint8 SERVICE_ID = 0x18; //0b00011000;
 }
 
 namespace CIPSegmentLogicalFormat
 {
-    const quint8 BIT_8 = 0b00000000;
-    const quint8 BIT_16 = 0b00000001;
-    const quint8 BIT_32 = 0b00000010;
+    const quint8 BIT_8 = 0; //0b00000000;
+    const quint8 BIT_16 = 0x01; //0b00000001;
+    const quint8 BIT_32 = 0x02; //0b00000010;
 }
 
 namespace CIPCommonLogicalSegment

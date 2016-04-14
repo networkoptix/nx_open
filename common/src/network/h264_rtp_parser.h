@@ -29,6 +29,7 @@ private:
     QList<QByteArray> m_sdpSpsPps;
     SPSUnit m_sps;
     bool m_spsInitialized;
+    bool m_canUseMarkerBit;
     int m_frequency;
     int m_rtpChannel;
     int m_prevSequenceNum;
@@ -67,6 +68,7 @@ private:
     bool clearPreviousChunksBuffer();
     void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
     void updatePrevNalFlags(int nalUnitType, const quint8* data, int dataLen);
+    void createVideoDataAndServePrevChunksBuffer();
     int getSpsPpsSize() const;
 };
 

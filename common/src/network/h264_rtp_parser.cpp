@@ -14,6 +14,7 @@ static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 CLH264RtpParser::CLH264RtpParser():
         QnRtpVideoStreamParser(),
         m_spsInitialized(false),
+        m_canUseMarkerBit(false),
         m_frequency(90000), // default value
         m_rtpChannel(98),
         m_prevSequenceNum(-1),
@@ -360,6 +361,20 @@ void CLH264RtpParser::updatePrevNalFlags(int nalUnitType, const quint8* data, in
     }
 }
 
+void CLH264RtpParser::createVideoDataAndServePrevChunksBuffer()
+{
+    /*m_mediaData = createVideoData(
+        rtpBufferBase,
+        ntohl(rtpHeader->timestamp),
+        statistics);
+    updatePrevNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
+    clearPreviousChunksBuffer();
+    memcpy(m_previousChunksBuf + m_previousChunksBufOffset, curPtr, nalUnitLen);
+    m_previousChunks.push_back(Chunk(m_previousChunksBufOffset, nalUnitLen, true));
+    m_previousChunksBufOffset += nalUnitLen;
+    m_additionalVideoFrameSize += nalUnitLen + 4;*/
+}
+
 bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
@@ -372,6 +387,9 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         return clearInternalBuffer();
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
+    if(rtpHeader->marker)
+        m_canUseMarkerBit = true;
+
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     if (rtpHeader->extension)
     {
@@ -428,7 +446,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
     int packetType = *curPtr & 0x1f;
     int nalRefIDC = *curPtr++ & 0xe0;
     bool isFirstNal = false;
-
+    bool videoDataCreated = false;
     switch (packetType)
     {
         case STAP_B_PACKET:
@@ -447,15 +465,19 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                     return clearInternalBuffer();
 
                 nalUnitType = *curPtr & 0x1f;
-                isFirstNal = isFirstSliceNal(nalUnitType, curPtr, bufferEnd - curPtr) || isFirstNal;
-                if(isFirstNal)
+                isFirstNal = isFirstSliceNal(nalUnitType, curPtr, bufferEnd - curPtr);
+                if((isFirstNal || videoDataCreated) && !m_canUseMarkerBit)
                 {
-                    m_mediaData = createVideoData(
-                        rtpBufferBase,
-                        ntohl(rtpHeader->timestamp),
-                        statistics);
+                    if(!videoDataCreated)
+                    {
+                        m_mediaData = createVideoData(
+                            rtpBufferBase,
+                            ntohl(rtpHeader->timestamp),
+                            statistics);
+                        clearPreviousChunksBuffer();
+                        videoDataCreated = true;
+                    }
                     updatePrevNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
-                    clearPreviousChunksBuffer();
                     memcpy(m_previousChunksBuf + m_previousChunksBufOffset, curPtr, nalUnitLen);
                     m_previousChunks.push_back(Chunk(m_previousChunksBufOffset, nalUnitLen, true));
                     m_previousChunksBufOffset += nalUnitLen;
@@ -471,6 +493,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 //m_videoBuffer.write((const char*)curPtr, nalUnitLen);
                 curPtr += nalUnitLen;
             }
+            isFirstNal = videoDataCreated;
             break;
         case FU_B_PACKET:
         case FU_A_PACKET:
@@ -516,7 +539,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             }
             //
 
-            if(isFirstNal)
+            if(isFirstNal && !m_canUseMarkerBit)
             {
                 auto nalUnitLen = bufferEnd - curPtr;
                 m_mediaData = createVideoData(
@@ -545,7 +568,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
             //m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
             isFirstNal = isFirstSliceNal(nalUnitType, curPtr, bufferEnd - curPtr);
-            if(isFirstNal)
+            if(isFirstNal && !m_canUseMarkerBit)
             {
                 auto nalUnitLen = bufferEnd - curPtr;
                 m_mediaData = createVideoData(
@@ -572,7 +595,25 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if(isFirstNal)
+    if (rtpHeader->marker && m_frameExists)
+    {
+        m_mediaData = createVideoData(
+            rtpBufferBase,
+            ntohl(rtpHeader->timestamp),
+            statistics
+        );
+        updatePrevNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
+        clearPreviousChunksBuffer();
+        if (!m_mediaData)
+        {
+            processPacketLost();
+            return false;
+        }
+        gotData = true;
+        return true;
+    }
+
+    if(isFirstNal && !m_canUseMarkerBit)
     {
         if(!m_mediaData)
         {
