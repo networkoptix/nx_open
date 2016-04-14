@@ -5,7 +5,8 @@ attribute highp vec4 qt_VertexPosition;
 attribute highp vec2 qt_VertexTexCoord;
 varying highp vec2 plane1TexCoord;
 
-void main() {
+void main()
+{
     plane1TexCoord = qt_VertexTexCoord * vec2(planeWidth, planeHeight);
     gl_Position = qt_Matrix * qt_VertexPosition;
 }
