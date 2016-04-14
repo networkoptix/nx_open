@@ -23,15 +23,16 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
-class UdpHolePunchingRendezvousConnector;
+class RendezvousConnector;
 
 /** Establishes cross-nat connection to the specified host using UDP hole punching technique.
     \note One instance can keep only one session
     \note Can be safely freed within connect handler. 
-        Otherwise, \a UdpHolePunchingTunnelConnector::pleaseStop is required
+        Otherwise, \a TunnelConnector::pleaseStop is required
  */
-class NX_NETWORK_API UdpHolePunchingTunnelConnector
+class NX_NETWORK_API TunnelConnector
 :
     public AbstractTunnelConnector
 {
@@ -39,10 +40,10 @@ public:
     /**
         @param mediatorAddress This param is for test only
     */
-    UdpHolePunchingTunnelConnector(
+    TunnelConnector(
         AddressEntry targetHostAddress,
         boost::optional<SocketAddress> mediatorAddress = boost::none);
-    virtual ~UdpHolePunchingTunnelConnector();
+    virtual ~TunnelConnector();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
@@ -72,13 +73,13 @@ private:
     nx::network::aio::Timer m_timer;
     bool m_done;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
-    std::deque<std::unique_ptr<UdpHolePunchingRendezvousConnector>> m_rendezvousConnectors;
+    std::deque<std::unique_ptr<RendezvousConnector>> m_rendezvousConnectors;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
     void onUdtConnectionEstablished(
-        UdpHolePunchingRendezvousConnector* rendezvousConnectorPtr,
+        RendezvousConnector* rendezvousConnectorPtr,
         std::unique_ptr<UdtStreamSocket> udtConnection,
         SystemError::ErrorCode errorCode);
     void onTimeout();
@@ -90,6 +91,7 @@ private:
         SystemError::ErrorCode /*errorCode*/);
 };
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

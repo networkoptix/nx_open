@@ -1,8 +1,8 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/udp_hole_punching/incoming_tunnel_udt_connection.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching/udp_hole_punching_acceptor.h>
+#include <nx/network/cloud/tunnel/udp/incoming_tunnel_udt_connection.h>
+#include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <utils/thread/sync_queue.h>
 
@@ -10,6 +10,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 namespace test {
 
 static const size_t kTestConnections = 10;
@@ -265,6 +266,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
 }
 
 } // namespace test
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

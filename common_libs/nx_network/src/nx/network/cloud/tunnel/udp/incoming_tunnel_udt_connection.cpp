@@ -8,6 +8,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     String connectionId,
@@ -202,6 +203,7 @@ void IncomingTunnelUdtConnection::connectionSocketError(
     }
 }
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

@@ -9,14 +9,15 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 // TODO #mux comment
-class NX_NETWORK_API UdpHolePunchingTunnelAcceptor
+class NX_NETWORK_API TunnelAcceptor
 :
     public AbstractTunnelAcceptor
 {
 public:
-    explicit UdpHolePunchingTunnelAcceptor(SocketAddress peerAddress);
+    explicit TunnelAcceptor(SocketAddress peerAddress);
 
     void setUdtConnectTimeout(std::chrono::milliseconds timeout);
     void setUdpRetransmissionTimeout(std::chrono::milliseconds timeout);
@@ -50,6 +51,7 @@ private:
         std::unique_ptr<AbstractIncomingTunnelConnection>)> m_acceptHandler;
 };
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

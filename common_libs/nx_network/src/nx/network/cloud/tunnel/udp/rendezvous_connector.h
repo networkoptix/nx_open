@@ -18,11 +18,12 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 /** Initiates rendezvous connection with given remote address.
     \note Instance can be safely freed within its aio thread (e.g., within completion handler)
 */
-class UdpHolePunchingRendezvousConnector
+class RendezvousConnector
 :
     public aio::AbstractPollable
 {
@@ -34,11 +35,11 @@ public:
     /**
         @param udpSocket If not empty, this socket is passed to udt socket
     */
-    UdpHolePunchingRendezvousConnector(
+    RendezvousConnector(
         nx::String connectSessionId,
         SocketAddress remotePeerAddress,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
-    virtual ~UdpHolePunchingRendezvousConnector();
+    virtual ~RendezvousConnector();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
@@ -64,6 +65,7 @@ private:
     void onUdtConnectFinished(SystemError::ErrorCode errorCode);
 };
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

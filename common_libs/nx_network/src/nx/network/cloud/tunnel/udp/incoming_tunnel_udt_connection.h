@@ -9,6 +9,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 class NX_NETWORK_API IncomingTunnelUdtConnection
 :
@@ -52,6 +53,7 @@ private:
         std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
 };
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

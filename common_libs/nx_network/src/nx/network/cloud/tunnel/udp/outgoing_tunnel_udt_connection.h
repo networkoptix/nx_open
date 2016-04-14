@@ -23,6 +23,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 class UdpHolePunchingTimeouts
 {
@@ -125,6 +126,7 @@ private:
     void onKeepAliveTimeout();
 };
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

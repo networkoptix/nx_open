@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "udp_hole_punching_rendezvous_connector.h"
+#include "rendezvous_connector.h"
 
 #include <nx/utils/log/log.h>
 
@@ -13,8 +13,9 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
-UdpHolePunchingRendezvousConnector::UdpHolePunchingRendezvousConnector(
+RendezvousConnector::RendezvousConnector(
     nx::String connectSessionId,
     SocketAddress remotePeerAddress,
     std::unique_ptr<nx::network::UDPSocket> udpSocket)
@@ -25,12 +26,12 @@ UdpHolePunchingRendezvousConnector::UdpHolePunchingRendezvousConnector(
 {
 }
 
-UdpHolePunchingRendezvousConnector::~UdpHolePunchingRendezvousConnector()
+RendezvousConnector::~RendezvousConnector()
 {
     m_udtConnection.reset();
 }
 
-void UdpHolePunchingRendezvousConnector::pleaseStop(
+void RendezvousConnector::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_aioThreadBinder.pleaseStop(
@@ -40,28 +41,28 @@ void UdpHolePunchingRendezvousConnector::pleaseStop(
         });
 }
 
-aio::AbstractAioThread* UdpHolePunchingRendezvousConnector::getAioThread()
+aio::AbstractAioThread* RendezvousConnector::getAioThread()
 {
     return m_aioThreadBinder.getAioThread();
 }
 
-void UdpHolePunchingRendezvousConnector::bindToAioThread(
+void RendezvousConnector::bindToAioThread(
     aio::AbstractAioThread* aioThread)
 {
     m_aioThreadBinder.bindToAioThread(aioThread);
 }
 
-void UdpHolePunchingRendezvousConnector::post(nx::utils::MoveOnlyFunc<void()> func)
+void RendezvousConnector::post(nx::utils::MoveOnlyFunc<void()> func)
 {
     m_aioThreadBinder.post(std::move(func));
 }
 
-void UdpHolePunchingRendezvousConnector::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+void RendezvousConnector::dispatch(nx::utils::MoveOnlyFunc<void()> func)
 {
     m_aioThreadBinder.dispatch(std::move(func));
 }
 
-void UdpHolePunchingRendezvousConnector::connect(
+void RendezvousConnector::connect(
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler completionHandler)
 {
@@ -101,19 +102,19 @@ void UdpHolePunchingRendezvousConnector::connect(
                     //need post to be sure that aio subsystem does not use socket anymore
                     post(
                         std::bind(
-                            &UdpHolePunchingRendezvousConnector::onUdtConnectFinished,
+                            &RendezvousConnector::onUdtConnectFinished,
                             this,
                             errorCode));
                 });
         });
 }
 
-SocketAddress UdpHolePunchingRendezvousConnector::remoteAddress() const
+SocketAddress RendezvousConnector::remoteAddress() const
 {
     return m_remotePeerAddress;
 }
 
-void UdpHolePunchingRendezvousConnector::onUdtConnectFinished(
+void RendezvousConnector::onUdtConnectFinished(
     SystemError::ErrorCode errorCode)
 {
     if (errorCode != SystemError::noError)
@@ -138,6 +139,7 @@ void UdpHolePunchingRendezvousConnector::onUdtConnectFinished(
     completionHandler(SystemError::noError, std::move(udtConnection));
 }
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx
