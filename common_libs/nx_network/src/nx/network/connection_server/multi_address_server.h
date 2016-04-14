@@ -21,17 +21,20 @@
 template<class SocketServerType>
     class MultiAddressServer
 {
+    template<typename... Args>
+    static std::unique_ptr<SocketServerType> realFactoryFunc(Args... params)
+    {
+        return std::make_unique<SocketServerType>(params...);
+    }
+
 public:
     template<typename... Args>
     MultiAddressServer(Args... args)
     {
-        //TODO #ak this is work around gcc 4.8 bug. Remove tuple in gcc 4.9
-        std::tuple<Args...> params(std::move(args)...);
-        m_socketServerFactory =
-            [params = std::move(params)]() -> std::unique_ptr<SocketServerType>
-            {
-                return std::make_unique<SocketServerType>(std::get<Args>(params)...);
-            };
+        //TODO #ak this is work around gcc 4.8 bug. Return to lambda in gcc 4.9
+        typedef std::unique_ptr<SocketServerType>(*RealFactoryFuncType)(Args...);
+        m_socketServerFactory = 
+            std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
     /*!
