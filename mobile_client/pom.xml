@@ -28,7 +28,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl</rdep.packages>
         <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
@@ -94,6 +94,19 @@
             </activation>
             <properties>
                 <provisioning_profile>${customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>lite</id>
+            <activation>
+                <property>
+                    <name>liteMode</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages>openssl ffmpeg</rdep.packages>
             </properties>
         </profile>
 
@@ -212,6 +225,7 @@
                 </property>
             </activation>
             <properties>
+                <rdep.packages>openssl ffmpeg</rdep.packages>
                 <rdep.linux.packages>quazip opengl-es-mali openal</rdep.linux.packages>
                 <linux.oslibs>-lz</linux.oslibs>
             </properties>
