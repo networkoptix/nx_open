@@ -205,7 +205,6 @@ public:
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
     void addChunks(const std::deque<Chunk>& chunk);
-    void intersectWithToTime(const std::deque<Chunk> &chunks, qint64 timeMs);
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;

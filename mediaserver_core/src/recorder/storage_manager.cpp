@@ -1368,24 +1368,11 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
         catalogMap = m_devFileCatalog[catalogIdx];
     }
 
-    std::map<QString, qint64> catalogTolastChunk;
-    for (auto it = catalogMap.cbegin(); it != catalogMap.cend(); ++it)
-        catalogTolastChunk[it.key()] = it.value()->lastChunkStartTime();
-
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
-        }
-    }
-
-    {
-        QnMutexLocker lock(&m_mutexCatalog);
-        for (auto it = catalogMap.cbegin(); it != catalogMap.cend(); ++it) {
-            auto catalog = it.value();
-            auto thisCatalog = m_devFileCatalog[catalogIdx][it.key()];
-            thisCatalog->intersectWithToTime(catalog->m_chunks, catalogTolastChunk[it.key()]);
         }
     }
 }
