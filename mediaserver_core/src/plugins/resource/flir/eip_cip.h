@@ -20,7 +20,13 @@ struct EIPEncapsulationHeader
     quint64 senderContext;
     quint32 options;
 
-    static const size_t SIZE = 192;
+    static const size_t SIZE = 
+        sizeof(decltype(commandCode)) + 
+        sizeof(decltype(dataLength)) + 
+        sizeof(decltype(sessionHandle)) + 
+        sizeof(decltype(status)) + 
+        sizeof(decltype(senderContext)) + 
+        sizeof(decltype(options));
 
     static QByteArray encode(const EIPEncapsulationHeader& header);
 };

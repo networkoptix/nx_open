@@ -27,6 +27,7 @@ public:
     EIPAsyncClient(QHostAddress hostAddress);
     ~EIPAsyncClient();
     static const unsigned int kEipPort = 44818;
+    void setPort(quint16 port);
     bool doServiceRequestAsync(const MessageRouterRequest& request);
     MessageRouterResponse getResponse();
 
@@ -35,6 +36,7 @@ signals:
 
 private:
     QHostAddress m_hostAddress;
+    quint16 m_port;
     QnMutex m_mutex;
 
     std::shared_ptr<AbstractStreamSocket> m_socket;

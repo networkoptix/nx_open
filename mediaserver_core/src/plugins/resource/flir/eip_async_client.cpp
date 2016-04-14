@@ -5,6 +5,7 @@ const size_t RECEIVE_BUFFER_SIZE = 1024*50;
 
 EIPAsyncClient::EIPAsyncClient(QHostAddress hostAddress) :
     m_hostAddress(hostAddress),
+    m_port(kEipPort),
     m_terminated(false),
     m_inProcess(false),
     m_responseFound(0),
@@ -24,6 +25,11 @@ EIPAsyncClient::~EIPAsyncClient()
     terminate();
 }
 
+void EIPAsyncClient::setPort(quint16 port)
+{
+    m_port = port;
+}
+
 void EIPAsyncClient::terminate()
 {
     QnMutexLocker lk(&m_mutex);
@@ -38,7 +44,7 @@ void EIPAsyncClient::terminate()
 void EIPAsyncClient::initSocket()
 {
     m_socket = std::make_shared<TCPSocket>();
-    if(!(m_socket->connect(m_hostAddress.toString(), static_cast<unsigned short>(kEipPort))))
+    if(!(m_socket->connect(m_hostAddress.toString(), static_cast<unsigned short>(m_port))))
         NX_LOG(lit("Async Ethernet/IP client failed to connect to host: %1:%2")
             .arg(m_hostAddress.toString())
             .arg(kEipPort),

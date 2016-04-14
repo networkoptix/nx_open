@@ -170,7 +170,7 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
 bool SimpleEIPClient::connect()
 {
     QnMutexLocker lock(&m_mutex);
-    return m_eipSocket->connect(m_hostAddress.toString(), kDefaultEipPort);
+    return m_eipSocket->connect(m_hostAddress.toString(), m_port);
 }
 
 bool SimpleEIPClient::registerSession()
