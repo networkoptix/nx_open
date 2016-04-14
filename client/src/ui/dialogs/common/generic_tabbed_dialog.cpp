@@ -12,7 +12,8 @@
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
 
-namespace {
+namespace
+{
     const int invalidPage = -1;
 }
 
@@ -26,37 +27,47 @@ QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget *parent /* = 0 */, Qt::Wind
 
 }
 
-int QnGenericTabbedDialog::currentPage() const {
+int QnGenericTabbedDialog::currentPage() const
+{
     if (!m_tabWidget)
         return invalidPage;
 
-    for(const Page &page: m_pages) {
+    for(const Page &page: m_pages)
+    {
         if (m_tabWidget->currentWidget() == page.widget)
             return page.key;
     }
     return invalidPage;
 }
 
-void QnGenericTabbedDialog::setCurrentPage(int key) {
+void QnGenericTabbedDialog::setCurrentPage(int key)
+{
     if (!m_tabWidget)
         return;
 
-    for(const Page &page: m_pages) {
+    for(const Page &page: m_pages)
+    {
         if (page.key != key)
             continue;
+        NX_ASSERT(page.visible && page.enabled);
+        if (!page.visible || !page.enabled)
+            return;
+
         m_tabWidget->setCurrentWidget(page.widget);
         break;
     }
 }
 
-void QnGenericTabbedDialog::reject() {
+void QnGenericTabbedDialog::reject()
+{
     if (!forcefullyClose())
         return;
     base_type::reject();
     emit dialogClosed();
 }
 
-void QnGenericTabbedDialog::accept() {
+void QnGenericTabbedDialog::accept()
+{
     if (!canApplyChanges())
         return;
 
@@ -65,7 +76,8 @@ void QnGenericTabbedDialog::accept() {
     emit dialogClosed();
 }
 
-bool QnGenericTabbedDialog::forcefullyClose()  {
+bool QnGenericTabbedDialog::forcefullyClose()
+{
     /* Very rare outcome. */
     if (!canDiscardChanges())
         return false;
@@ -75,7 +87,8 @@ bool QnGenericTabbedDialog::forcefullyClose()  {
     return true;
 }
 
-void QnGenericTabbedDialog::loadDataToUi() {
+void QnGenericTabbedDialog::loadDataToUi()
+{
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         for(const Page &page: m_pages)
@@ -85,18 +98,22 @@ void QnGenericTabbedDialog::loadDataToUi() {
     updateButtonBox();
 }
 
-void QnGenericTabbedDialog::retranslateUi() {
+void QnGenericTabbedDialog::retranslateUi()
+{
     for(const Page &page: m_pages)
         page.widget->retranslateUi();
 }
 
-void QnGenericTabbedDialog::applyChanges() {
+void QnGenericTabbedDialog::applyChanges()
+{
     for(const Page &page: m_pages)
-        page.widget->applyChanges();
+        if (page.enabled && page.visible)
+            page.widget->applyChanges();
     updateButtonBox();
 }
 
-void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, const QString &title) {
+void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, const QString &title)
+{
     if (!m_tabWidget)
         initializeTabWidget();
 
@@ -123,17 +140,67 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
 }
 
 
-void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled) {
+void QnGenericTabbedDialog::setPageVisible(int key, bool visible)
+{
     NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
 
     if (!m_tabWidget)
         return;
 
-    for(const Page &page: m_pages) {
+    int indexToInsert = 0;
+    for (Page &page : m_pages)
+    {
+        /* Checking last visible widget before current. */
+        if (page.key != key)
+        {
+            if (page.visible)
+            {
+                int prevIndex = m_tabWidget->indexOf(page.widget);
+                if (prevIndex >= 0)
+                    indexToInsert = prevIndex + 1;
+            }
+            continue;
+        }
+
+        if (page.visible == visible)
+            return;
+        page.visible = visible;
+
+        if (visible)
+        {
+            m_tabWidget->insertTab(indexToInsert, page.widget, page.title);
+        }
+        else
+        {
+            int indexToRemove = m_tabWidget->indexOf(page.widget);
+            NX_ASSERT(indexToRemove >= 0);
+            if (indexToRemove >= 0)
+                m_tabWidget->removeTab(indexToRemove);
+        }
+        return;
+    }
+
+    qnWarning("QnGenericTabbedDialog '%1' does not contain %2", metaObject()->className(), key);
+}
+
+void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled)
+{
+    NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");
+
+    if (!m_tabWidget)
+        return;
+
+    for (Page &page: m_pages)
+    {
         if (page.key != key)
             continue;
 
+        if (page.enabled == enabled)
+            return;
+        page.enabled = enabled;
+
         int index = m_tabWidget->indexOf(page.widget);
+        NX_ASSERT(index >= 0);
         if (index < 0)
             return;
 
@@ -145,14 +212,16 @@ void QnGenericTabbedDialog::setPageEnabled(int key, bool enabled) {
 }
 
 
-void QnGenericTabbedDialog::setTabWidget(QTabWidget *tabWidget) {
+void QnGenericTabbedDialog::setTabWidget(QTabWidget *tabWidget)
+{
     if(m_tabWidget.data() == tabWidget)
         return;
 
     m_tabWidget = tabWidget;
 }
 
-void QnGenericTabbedDialog::initializeTabWidget() {
+void QnGenericTabbedDialog::initializeTabWidget()
+{
     if(m_tabWidget)
         return; /* Already initialized with a direct call to setTabWidget in derived class's constructor. */
 
@@ -169,50 +238,71 @@ void QnGenericTabbedDialog::initializeTabWidget() {
     setTabWidget(tabWidgets[0]);
 }
 
-bool QnGenericTabbedDialog::canApplyChanges() {
-    return all_of(m_pages, [](const Page &page){
-        return page.widget->canApplyChanges();
+bool QnGenericTabbedDialog::canApplyChanges()
+{
+    if (m_readOnly)
+        return false;
+
+    return all_of(m_pages, [](const Page &page)
+    {
+        return !page.enabled || !page.visible || page.widget->canApplyChanges();
     });
 }
 
-bool QnGenericTabbedDialog::canDiscardChanges() {
-    return all_of(m_pages, [](const Page &page){
-        return page.widget->canDiscardChanges();
+bool QnGenericTabbedDialog::canDiscardChanges()
+{
+    if (m_readOnly)
+        return true;
+
+    return all_of(m_pages, [](const Page &page)
+    {
+        return !page.enabled || !page.visible || page.widget->canDiscardChanges();
     });
 }
 
-bool QnGenericTabbedDialog::hasChanges() const {
-    return any_of(m_pages, [](const Page &page){
-        return page.widget->hasChanges();
+bool QnGenericTabbedDialog::hasChanges() const
+{
+    if (m_readOnly)
+        return false;
+
+    return any_of(m_pages, [](const Page &page)
+    {
+        return page.enabled && page.visible && page.widget->hasChanges();
     });
 }
 
-QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::allPages() const {
+QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::allPages() const
+{
     return m_pages;
 }
 
-QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const {
+QList<QnGenericTabbedDialog::Page> QnGenericTabbedDialog::modifiedPages() const
+{
     QList<QnGenericTabbedDialog::Page> result;
     for(const Page &page: m_pages)
-        if (page.widget->hasChanges())
+        if (page.enabled && page.visible && page.widget->hasChanges())
             result << page;
     return result;
 }
 
-bool QnGenericTabbedDialog::isReadOnly() const {
+bool QnGenericTabbedDialog::isReadOnly() const
+{
     return m_readOnly;
 }
 
-void QnGenericTabbedDialog::setReadOnly( bool readOnly ) {
+void QnGenericTabbedDialog::setReadOnly( bool readOnly )
+{
     for(const Page &page: m_pages)
         page.widget->setReadOnly(readOnly);
     m_readOnly = readOnly;
 }
 
-void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
+void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
+{
     base_type::buttonBoxClicked(button);
 
-    switch (button) {
+    switch (button)
+    {
     case QDialogButtonBox::Apply:
         if (canApplyChanges())
             applyChanges();
@@ -222,13 +312,15 @@ void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton bu
     }
 }
 
-void QnGenericTabbedDialog::initializeButtonBox() {
+void QnGenericTabbedDialog::initializeButtonBox()
+{
     base_type::initializeButtonBox();
     updateButtonBox();
 }
 
 
-void QnGenericTabbedDialog::updateButtonBox() {
+void QnGenericTabbedDialog::updateButtonBox()
+{
     if (m_updating || !buttonBox())
         return;
 

@@ -40,7 +40,7 @@ public:
 
     /**
     * \param user                      User to get global permissions for.
-    * \param requiredPermissions       Global permissions to check.
+    * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const QnUserResourcePtr &user, Qn::GlobalPermission requiredPermission) const;
@@ -50,8 +50,15 @@ public:
     * \param resource                  Resource to get permissions for.
     * \returns                         Permissions that user have for the given resource.
     */
-    Qn::Permissions permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource);
+    Qn::Permissions permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
 
+    /**
+    * \param user                      User that should have permissions.
+    * \param resource                  Resource to get permissions for.
+    * \param requiredPermission        Permission to check.
+    * \returns                         Whether actual permissions include required permission.
+    */
+    bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const;
 private:
     /**
     * \param permissions               Permission flags containing some deprecated values.

@@ -888,18 +888,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Shortcuts. */
 
         /* Live viewer has access to all cameras by default */
-        GlobalLiveViewerPermissions         = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+        GlobalLiveViewerPermissionSet       = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
 
-        GlobalViewerPermissions             = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission,
+        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalPtzControlPermission,
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalPtzControlPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission | GlobalPtzControlPermission,
+        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalPtzControlPermission,
 
-        GlobalAdvancedViewerPermissions     = GlobalViewerPermissions | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission       | GlobalEditUsersPermission         |
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalEditCamerasPermission | GlobalPtzControlPermission,
+
+        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       | GlobalEditUsersPermission         |
                                               GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
                                               GlobalAccessAllServersPermission  ,
         GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
@@ -980,7 +981,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
-    (Qn::Permissions)(Qn::GlobalPermissions)
+    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
     ,
     (metatype)(numeric)(lexical)
 )

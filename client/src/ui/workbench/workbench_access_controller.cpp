@@ -59,7 +59,8 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourceList &r
     return result;
 }
 
-bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const {
+bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const
+{
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 

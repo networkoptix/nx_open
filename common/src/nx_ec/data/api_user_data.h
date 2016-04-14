@@ -11,11 +11,19 @@ namespace ec2
             isAdmin(false),
             permissions(Qn::NoGlobalPermissions),
             isLdap(false),
-            isEnabled(true)
+            isEnabled(true),
+            isCloud(false)
         {}
 
-        bool isAdmin; /**< Really this flag must be named isOwner, but we must keep it to maintain mobile client compatibility. */
+        /** Really this flag must be named isOwner, but we must keep it to maintain mobile client compatibility. */
+        bool isAdmin;
+
+        /** Global user permissions. */
         Qn::GlobalPermissions permissions;
+
+        /** Id of the access rights group. */
+        QnUuid group;
+
         QString email;
         QnLatin1Array digest;
         QnLatin1Array hash;
@@ -24,8 +32,11 @@ namespace ec2
         QString realm;
 		bool isLdap;
 		bool isEnabled;
+
+        /** Flag if user is created from the Cloud. */
+        bool isCloud;
     };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)(group)(isCloud)
 
 }
 

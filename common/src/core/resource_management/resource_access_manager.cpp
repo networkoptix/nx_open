@@ -110,6 +110,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
     result = undeprecate(result);
     m_globalPermissionsCache.insert(userId, result);
+    qDebug() << "storing" << static_cast<int>(result) << "for user" << user->getName();
 
     return result;
 }
@@ -119,7 +120,7 @@ bool QnResourceAccessManager::hasGlobalPermission(const QnUserResourcePtr &user,
     return globalPermissions(user).testFlag(requiredPermission);
 }
 
-Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource)
+Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
     NX_ASSERT(user && resource, Q_FUNC_INFO, "We must not request permissions for absent resources.");
     if (!user || !resource)
@@ -135,6 +136,11 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
     Qn::Permissions result = calculatePermissions(user, resource);
     m_permissionsCache.insert(key, result);
     return result;
+}
+
+bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const
+{
+    return permissions(user, resource).testFlag(requiredPermission);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions permissions)

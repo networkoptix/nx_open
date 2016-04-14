@@ -4,13 +4,18 @@
 #include <client/client_globals.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
+
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/models/resource_list_model.h>
 
-QnUserAccessRightsResourcesWidget::QnUserAccessRightsResourcesWidget(QWidget* parent /*= 0*/):
+QnUserAccessRightsResourcesWidget::QnUserAccessRightsResourcesWidget(Filter filter, QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::UserAccessRightsResourcesWidget()),
+    m_filter(filter),
+    m_targetId(),
     m_model(new QnResourceListModel())
 {
     ui->setupUi(this);
@@ -60,27 +65,63 @@ QnUserAccessRightsResourcesWidget::~QnUserAccessRightsResourcesWidget()
 
 }
 
-QSet<QnUuid> QnUserAccessRightsResourcesWidget::checkedResources() const
+
+QnUuid QnUserAccessRightsResourcesWidget::targetId() const
 {
-    return m_checkedResources;
+    return m_targetId;
 }
 
-void QnUserAccessRightsResourcesWidget::setCheckedResources(const QSet<QnUuid>& value)
+void QnUserAccessRightsResourcesWidget::setTargetId(const QnUuid& id)
 {
-    m_checkedResources = value;
+    NX_ASSERT(targetIsValid(id));
+    m_targetId = id;
 }
 
 bool QnUserAccessRightsResourcesWidget::hasChanges() const
 {
-    return m_model->checkedResources() != m_checkedResources;
+    /* Validate target. */
+    if (!targetIsValid(m_targetId))
+        return false;
+
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_targetId);
+    //TODO: #GDM #access filter by type
+
+    return m_model->checkedResources() != accessibleResources;
 }
 
 void QnUserAccessRightsResourcesWidget::loadDataToUi()
 {
-    m_model->setCheckedResources(m_checkedResources);
+    /* Validate target. */
+    if (!targetIsValid(m_targetId))
+        return;
+
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_targetId);
+    //TODO: #GDM #access filter by type
+
+    m_model->setCheckedResources(accessibleResources);
 }
 
 void QnUserAccessRightsResourcesWidget::applyChanges()
 {
-    m_checkedResources = m_model->checkedResources();
+    /* Validate target. */
+    if (!targetIsValid(m_targetId))
+        return;
+
+    //TODO: #GDM #access filter by type
+    qnResourceAccessManager->setAccessibleResources(m_targetId, m_model->checkedResources());
 }
+
+bool QnUserAccessRightsResourcesWidget::targetIsValid(const QnUuid& id) const
+{
+    if (id.isNull())
+        return false;
+
+    /* Check if it is valid user id. */
+    if (qnResPool->getResourceById<QnUserResource>(id))
+        return true;
+
+    /* Check if it is valid user group id. */
+    const auto& userGroups = qnResourceAccessManager->userGroups();
+    return boost::algorithm::any_of(userGroups, [id](const ec2::ApiUserGroupData& group) { return group.id == id; });
+}
+

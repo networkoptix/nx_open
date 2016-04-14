@@ -4,7 +4,6 @@
 
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
-class QnWorkbenchStateDelegate;
 class QnServerSettingsWidget;
 class QnRecordingStatisticsWidget;
 class QnStorageConfigWidget;
@@ -19,7 +18,8 @@ class QnServerSettingsDialog: public QnWorkbenchStateDependentTabbedDialog {
     typedef QnWorkbenchStateDependentTabbedDialog base_type;
 
 public:
-    enum DialogPage {
+    enum DialogPage
+    {
         SettingsPage,
         StatisticsPage,
         StorageManagmentPage,

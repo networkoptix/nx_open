@@ -39,6 +39,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     });
 
 
+    //TODO: #GDM #access connect to resource pool to check if server was deleted
+
     ui->buttonBox->addButton(m_webPageButton, QDialogButtonBox::HelpRole);
     setHelpTopic(m_webPageButton, Qn::ServerSettings_WebClient_Help);
 
@@ -53,7 +55,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
 
         if (!servers.isEmpty())
             setServer(servers.first());
-    });  
+    });
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -63,10 +65,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
-    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);   
+    safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 }
 
-QnServerSettingsDialog::~QnServerSettingsDialog() 
+QnServerSettingsDialog::~QnServerSettingsDialog()
 {}
 
 QnMediaServerResourcePtr QnServerSettingsDialog::server() const {
