@@ -326,6 +326,8 @@ private:
     void drawThumbnail(QPainter* painter, const ThumbnailData& data, const QRectF& targetRect, const QRectF& boundingRect);
     void drawBookmarks(QPainter* painter, const QRectF& rect);
 
+    int findTopLevelStepIndex() const;
+
     void updatePixmapCache();
     void updateToolTipVisibility();
     void updateToolTipText();

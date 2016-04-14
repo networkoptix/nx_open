@@ -70,22 +70,22 @@ namespace {
     /* Tickmark bar. */
 
     /** Maximal number of simultaneously shown tickmark levels. */
-    const int maxTickmarkLevels = 4;
+    const int numTickmarkLevels = 4;
 
     /** Last displayed text level. */
     const int maxDisplayedTextLevel = 2;
 
     /** Tickmark lengths for all levels. */
-    const std::array<int, maxTickmarkLevels + 1> tickmarkLengthPixels = { 15, 10, 5, 5, 0 };
+    const std::array<int, numTickmarkLevels + 1> tickmarkLengthPixels = { 15, 10, 5, 5, 0 };
 
     /** Font pixel heights for all tickmark levels. */
-    const std::array<int, maxTickmarkLevels + 1> tickmarkFontHeights = { 12, 12, 11, 11, 0 };
+    const std::array<int, numTickmarkLevels + 1> tickmarkFontHeights = { 12, 12, 11, 11, 0 };
 
     /** Tickmark text pixel heights for all levels. */
-    const std::array<int, maxTickmarkLevels + 1> tickmarkTextHeightPixels = { 20, 20, 20, 20, 0 };
+    const std::array<int, numTickmarkLevels + 1> tickmarkTextHeightPixels = { 20, 20, 20, 20, 0 };
 
     /** Font weights for all tickmark levels. */
-    const std::array<int, maxTickmarkLevels + 1> tickmarkFontWeights = { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
+    const std::array<int, numTickmarkLevels + 1> tickmarkFontWeights = { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
 
     /** Minimal distance between tickmarks from the same group for this group to be visible.
      * Note that because of the fact that tickmarks do not disappear instantly, in some cases
@@ -456,7 +456,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_thumbnailsVisible(false),
     m_rulerHeight(dateBarHeightPixels + tickBarHeightPixels + lineBarHeightPixels),
     m_lastMinuteAnimationDelta(0),
-    m_pixmapCache(new QnTimeSliderPixmapCache(maxTickmarkLevels, this)),
+    m_pixmapCache(new QnTimeSliderPixmapCache(numTickmarkLevels, this)),
     m_localOffset(0),
     m_currentRulerRectMousePos(),
     m_lastLineBarValue(),
@@ -552,8 +552,8 @@ QnTimeSlider::~QnTimeSlider()
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps)
 {
-    //: Translate this into 'none' or 'forced' if you want to switch off automatic detection of
-    //: Do not translate this string unless you know what you're doing.
+    //: Translate this into 'none' or 'forced' if you want to switch off automatic detection.
+    //:  Do not translate this string unless you know what you're doing.
     QString ampmUsage = tr("auto", "AM/PM usage based on user's system locale.");
 
     bool ampm;
@@ -1230,7 +1230,7 @@ qreal QnTimeSlider::effectiveLineStretch(int line) const
 
 int QnTimeSlider::tickmarkLevel(int stepIndex) const
 {
-    return qBound(0, m_maxStepIndex - stepIndex, maxTickmarkLevels);
+    return qBound(0, m_maxStepIndex - stepIndex, numTickmarkLevels);
 }
 
 QColor QnTimeSlider::tickmarkLineColor(int level) const
@@ -1452,7 +1452,7 @@ void QnTimeSlider::updatePixmapCache()
 
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16);
 
-    for (int i = 0; i < maxTickmarkLevels; ++i)
+    for (int i = 0; i < numTickmarkLevels; ++i)
     {
         localFont.setWeight(tickmarkFontWeights[i]);
         m_pixmapCache->setTickmarkColor(i, tickmarkTextColor(i));
@@ -1541,10 +1541,10 @@ void QnTimeSlider::updateTickmarkTextSteps()
 
     for (int i = 0; i < m_steps.size(); i++)
     {
-        static const int testHeight = 12;
+        static const int referenceHeight = tickmarkFontHeights[0];
         QString text = toLongestShortString(m_steps[i]);
-        QPixmap pixmap = m_pixmapCache->textPixmap(text, testHeight);
-        m_stepData[i].textWidthToHeight = static_cast<qreal>(pixmap.width()) / testHeight;
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, referenceHeight);
+        m_stepData[i].textWidthToHeight = static_cast<qreal>(pixmap.width()) / referenceHeight;
     }
 }
 
@@ -1583,15 +1583,12 @@ void QnTimeSlider::updateMinimalWindow()
     setWindowStart(m_windowStart);
 }
 
-void QnTimeSlider::updateStepAnimationTargets()
+int QnTimeSlider::findTopLevelStepIndex() const
 {
-    bool updateNeeded = (qAbs(m_msecsPerPixel - m_animationUpdateMSecsPerPixel) / qMin(m_msecsPerPixel, m_animationUpdateMSecsPerPixel)) > msecsPerPixelChangeThreshold;
-    if (!updateNeeded || m_steps.empty())
-        return;
-
     int stepCount = m_steps.size();
     qreal width = rect().width();
 
+    /* Detect which steps map into visible tickmark levels. */
     int minStepIndex = stepCount - 1;
     int maxStepIndexLimit = minStepIndex; /* m_maxStepIndex won't be greater than maxStepIndexLimit */
     int extraLevelsAllowed = -1; /* possible extra levels without text labels */
@@ -1618,7 +1615,7 @@ void QnTimeSlider::updateStepAnimationTargets()
             qreal labelWidth = m_stepData[minStepIndex].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel];
             if ((minStepIndex < maxStepIndexLimit) && maxDisplayedTextLevel)
             {
-                qreal prevLabelWidth = m_stepData[minStepIndex+1].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel-1];
+                qreal prevLabelWidth = m_stepData[minStepIndex + 1].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel - 1];
                 labelWidth = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0);
             }
 
@@ -1626,8 +1623,11 @@ void QnTimeSlider::updateStepAnimationTargets()
 
             /* Check against minimal allowed tickmark text distance: */
             if (separationPixels < minTextStepPixels)
-                if ((extraLevelsAllowed = maxTickmarkLevels - maxDisplayedTextLevel - 1) <= 0)
+            {
+                extraLevelsAllowed = numTickmarkLevels - maxDisplayedTextLevel - 1;
+                if (extraLevelsAllowed <= 0)
                     break;
+            }
         }
         else
         {
@@ -1642,16 +1642,24 @@ void QnTimeSlider::updateStepAnimationTargets()
     /* We want at least 2 levels: */
     maxStepIndexLimit = qMax(maxStepIndexLimit, 1);
 
-    /* Correct range: */
-    m_maxStepIndex = qMin(minStepIndex + maxTickmarkLevels - 1, maxStepIndexLimit);
-    minStepIndex = qMin(minStepIndex, m_maxStepIndex - 1);
+    /* Correct max step index: */
+    return qMin(minStepIndex + numTickmarkLevels - 1, maxStepIndexLimit);
+}
+
+void QnTimeSlider::updateStepAnimationTargets()
+{
+    bool updateNeeded = (qAbs(m_msecsPerPixel - m_animationUpdateMSecsPerPixel) / qMin(m_msecsPerPixel, m_animationUpdateMSecsPerPixel)) > msecsPerPixelChangeThreshold;
+    if (!updateNeeded || m_steps.empty())
+        return;
+
+    m_maxStepIndex = findTopLevelStepIndex();
 
     /* Adjust target tickmark heights and opacities. */
     qreal prevTextVisible = 1.0; /* - "boolean" 0.0 or 1.0, used as multiplier */
     qreal prevLabelWidth = 0.0; /* - we track previous level text label widths to avoid overlapping with them */
-    int minLevelStepIndex = qMax(0, m_maxStepIndex - maxTickmarkLevels);
+    int minLevelStepIndexMinusOne = qMax(0, m_maxStepIndex - numTickmarkLevels);
 
-    for (int i = stepCount - 1; i >= minLevelStepIndex; --i)
+    for (int i = m_steps.size() - 1; i >= minLevelStepIndexMinusOne; --i)
     {
         TimeStepData& data = m_stepData[i];
         qreal separationPixels = m_steps[i].stepMSecs / m_msecsPerPixel;
@@ -1680,6 +1688,15 @@ void QnTimeSlider::updateStepAnimationTargets()
         data.heightSpeed = qMax(data.heightSpeed, speed(data.currentHeight, data.targetHeight, tickmarkHeightAnimationMs));
         data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speed(data.currentLineOpacity, data.targetLineOpacity, tickmarkOpacityAnimationMs));
         data.textOpacitySpeed = qMax(data.textOpacitySpeed, speed(data.currentTextOpacity, data.targetTextOpacity, tickmarkOpacityAnimationMs));
+    }
+
+    /* Clean up remaining steps. */
+    for (int i = minLevelStepIndexMinusOne - 1; i >= 0; --i)
+    {
+        TimeStepData& data = m_stepData[i];
+        data.currentHeight = data.targetHeight = 0.0;
+        data.currentLineOpacity = data.targetLineOpacity = 0.0;
+        data.currentTextOpacity = data.targetTextOpacity = 0.0;
     }
 
     m_animationUpdateMSecsPerPixel = m_msecsPerPixel;
@@ -2182,7 +2199,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
     int stepCount = m_steps.size();
 
     /* Find minimal tickmark step index. */
-    int minStepIndex = qMax(m_maxStepIndex - maxTickmarkLevels, 0);
+    int minStepIndex = qMax(m_maxStepIndex - numTickmarkLevels, 0); /* min level step index minus one */
     for (; minStepIndex < stepCount; minStepIndex++)
         if (!qFuzzyIsNull(m_stepData[minStepIndex].currentHeight))
             break;
