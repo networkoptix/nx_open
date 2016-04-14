@@ -693,6 +693,17 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64
     return Chunk();
 }
 
+void DeviceFileCatalog::intersectWithToTime(const std::deque<Chunk> &chunks, qint64 timeMs)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto timeIt = std::upper_bound(m_chunks.cbegin(), m_chunks.cend(), timeMs);
+    std::deque<Chunk> tmpChunks;
+    std::set_difference(m_chunks.cbegin(), timeIt, chunks.cbegin(), chunks.cend(), std::back_inserter(tmpChunks));
+    if (timeIt != m_chunks.cend())
+        std::copy(timeIt, m_chunks.cend(), std::back_inserter(tmpChunks));
+    m_chunks = std::move(tmpChunks);
+}
+
 qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QnMutexLocker lock( &m_mutex );
