@@ -481,7 +481,7 @@ module.exports = function (grunt) {
         },
         protractor_webdriver: {
             options:{
-
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom',
             },
             default:{
 
