@@ -13,6 +13,10 @@ import distutils.spawn
 from fsutil import copy_recursive
 from platform_detection import *
 
+ROOT_CONFIG_NAME = ".rdep"
+PACKAGE_CONFIG_NAME = ".rdpack"
+ANY_KEYWORD = "any"
+DEBUG_SUFFIX = "-debug"
 RSYNC = [ "rsync" ]
 RSYNC_CHMOD_ARG = None
 if detect_platform() == "windows":
@@ -22,40 +26,17 @@ if detect_platform() == "windows":
 
 DEFAULT_SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 
+verbose = False
+
 def is_relative_to(path, parent):
     return path.startswith(parent)
 
-class Rdep:
-    ROOT_CONFIG_NAME = ".rdep"
-    PACKAGE_CONFIG_NAME = ".rdpack"
-    ANY_KEYWORD = "any"
-    DEBUG_SUFFIX = "-debug"
+def verbose_message(message):
+    if verbose:
+        print message
 
-    def __init__(self, root):
-        self.root = root
-        self.verbose = False
-        self.url = self.get_config_value("General", "url")
-        self.ssh = self.get_config_value("General", "ssh")
-
-    def _verbose_message(self, message):
-        if self.verbose:
-            print message
-
-    def _verbose_rsync(self, command):
-        self.verbose_message("Executing rsync:\n{0}".format(" ".join(command)))
-
-    def get_config_value(self, section, option):
-        config_file = os.path.join(self.root, ROOT_CONFIG_NAME)
-        if not os.path.isfile(config_file):
-            return None
-
-        config = ConfigParser.ConfigParser()
-        config.read(config_file)
-        if not config.has_option(section, option):
-            return None
-
-        return config.get(section, option)
-
+def verbose_rsync(command):
+    verbose_message("Executing rsync:\n{0}".format(" ".join(command)))
 
 def find_root(path, file_name):
     while not os.path.isfile(os.path.join(path, file_name)):
@@ -76,6 +57,25 @@ def get_repository_root():
             if root.endswith("/"):
                 root = root[:-1]
     return root
+
+
+def get_root_config_value(path, section, option):
+    config_file = os.path.join(path, ROOT_CONFIG_NAME)
+    if not os.path.isfile(config_file):
+        return None
+
+    config = ConfigParser.ConfigParser()
+    config.read(config_file)
+    if not config.has_option(section, option):
+        return None
+
+    return config.get(section, option)
+
+def get_sync_url(path):
+    return get_root_config_value(path, "General", "url")
+
+def get_ssh_args(path):
+    return get_root_config_value(path, "General", "ssh")
 
 def package_config_path(path):
     return os.path.join(path, PACKAGE_CONFIG_NAME)
