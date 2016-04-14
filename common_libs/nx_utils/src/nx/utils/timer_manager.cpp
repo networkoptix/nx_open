@@ -148,7 +148,7 @@ TimerId TimerManager::addTimer(
 
 TimerId TimerManager::addNonStopTimer(
     MoveOnlyFunc<void(TimerId)> func,
-    std::chrono::milliseconds delay,
+    std::chrono::milliseconds repeatPeriod,
     std::chrono::milliseconds firstShotDelay)
 {
     const auto timerId = generateNextTimerId();
@@ -157,10 +157,10 @@ TimerId TimerManager::addNonStopTimer(
     addTaskNonSafe(
         lk,
         timerId,
-        TaskContext(std::move(func), delay),
+        TaskContext(std::move(func), repeatPeriod),
         firstShotDelay);
-    NX_LOGX(lm("Added non stop timer %1, delay %2, first shot delay %3")
-        .arg(timerId).arg(delay).arg(firstShotDelay),
+    NX_LOGX(lm("Added non stop timer %1, repeat period %2, first shot delay %3")
+        .arg(timerId).arg(repeatPeriod).arg(firstShotDelay),
         cl_logDEBUG2);
     return timerId;
 }
@@ -186,7 +186,7 @@ bool TimerManager::modifyTimerDelay(
 
     auto taskContext = std::move(handlerIter->second);
     if (!taskContext.singleShot)
-        taskContext.delay = newDelay;
+        taskContext.repeatPeriod = newDelay;
 
     m_taskToTime.erase(taskIter);
     m_timeToTask.erase(handlerIter);
@@ -277,7 +277,7 @@ void TimerManager::run()
                         lk,
                         timerID,
                         std::move(taskContext),
-                        taskContext.delay);
+                        taskContext.repeatPeriod);
 
                 m_runningTaskID = 0;
                 m_cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
@@ -366,11 +366,11 @@ TimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _func)
 
 TimerManager::TaskContext::TaskContext(
     MoveOnlyFunc<void(TimerId)> _func,
-    std::chrono::milliseconds _delay)
+    std::chrono::milliseconds _repeatPeriod)
 :
     func(std::move(_func)),
     singleShot(false),
-    delay(_delay)
+    repeatPeriod(_repeatPeriod)
 {
 }
 
@@ -382,28 +382,25 @@ std::chrono::milliseconds parseTimerDuration(
 {
     std::chrono::milliseconds res;
     bool ok(true);
-    const auto toUInt = [&](int len)
+    const auto toUInt = [&](int suffixLen)
     {
-        return len ? duration.left(duration.length() - len).toULongLong(&ok)
+        return suffixLen
+            ? duration.left(duration.length() - suffixLen).toULongLong(&ok)
             : duration.toULongLong(&ok);
     };
 
     if (duration.endsWith(lit("ms"), Qt::CaseInsensitive))
         res = std::chrono::milliseconds(toUInt(2));
+    else if (duration.endsWith(lit("s"), Qt::CaseInsensitive))
+        res = std::chrono::seconds(toUInt(1));
+    else if (duration.endsWith(lit("m"), Qt::CaseInsensitive))
+        res = std::chrono::minutes(toUInt(1));
+    else if (duration.endsWith(lit("h"), Qt::CaseInsensitive))
+        res = std::chrono::hours(toUInt(1));
+    else if (duration.endsWith(lit("d"), Qt::CaseInsensitive))
+        res = std::chrono::hours(toUInt(1)) * 24;
     else
-        if (duration.endsWith(lit("s"), Qt::CaseInsensitive))
-            res = std::chrono::seconds(toUInt(1));
-        else
-            if (duration.endsWith(lit("m"), Qt::CaseInsensitive))
-                res = std::chrono::minutes(toUInt(1));
-            else
-                if (duration.endsWith(lit("h"), Qt::CaseInsensitive))
-                    res = std::chrono::hours(toUInt(1));
-                else
-                    if (duration.endsWith(lit("d"), Qt::CaseInsensitive))
-                        res = std::chrono::hours(toUInt(1)) * 24;
-                    else
-                        res = std::chrono::seconds(toUInt(0));
+        res = std::chrono::seconds(toUInt(0));
 
     return (ok && res.count()) ? res : defaultValue;
 }
