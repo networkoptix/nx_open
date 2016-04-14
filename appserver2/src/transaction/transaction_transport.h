@@ -114,6 +114,9 @@ public:
 
     void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
 
+    std::chrono::milliseconds connectionKeepAliveTimeout() const;
+    int keepAliveProbeCount() const;
+
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,

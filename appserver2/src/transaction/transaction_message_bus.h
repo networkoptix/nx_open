@@ -269,6 +269,8 @@ namespace ec2
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
         void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
         void emitRemotePeerUnauthorized(const QnUuid& id);
+        void onEc2ConnectionSettingsChanged();
+
     private:
         /** Info about us. */
         Qn::PeerType m_localPeerType;
