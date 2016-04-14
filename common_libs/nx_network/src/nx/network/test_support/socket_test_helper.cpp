@@ -751,14 +751,10 @@ size_t ConnectionsGenerator::totalIncompleteTasks() const
     return m_totalIncompleteTasks;
 }
 
-QString ConnectionsGenerator::returnCodes() const
+const std::map<SystemError::ErrorCode, size_t>&
+    ConnectionsGenerator::returnCodes() const
 {
-    QStringList descriptions;
-    for (const auto& error : m_returnCodes)
-        descriptions << lm("%2 [%1 time(s)]").arg(error.second)
-            .arg(SystemError::toString(error.first));
-
-    return descriptions.join(QLatin1Literal("; "));
+    return m_returnCodes;
 }
 
 void ConnectionsGenerator::onConnectionFinished(
