@@ -8,6 +8,7 @@
 
 #include <list>
 #include <memory>
+#include <tuple>
 
 #include <common/common_globals.h>
 #include <utils/common/cpp14.h>
@@ -24,11 +25,12 @@ public:
     template<typename... Args>
     MultiAddressServer(Args... args)
     {
+        //TODO #ak this is work around gcc 4.8 bug. Remove tuple in gcc 4.9
+        std::tuple<Args...> params(std::move(args)...);
         m_socketServerFactory =
-            [args...]() -> std::unique_ptr<SocketServerType>
+            [params = std::move(params)]() -> std::unique_ptr<SocketServerType>
             {
-                return std::make_unique<SocketServerType>(
-                    std::move(args)...);
+                return std::make_unique<SocketServerType>(std::get<Args>(params)...);
             };
     }
 
