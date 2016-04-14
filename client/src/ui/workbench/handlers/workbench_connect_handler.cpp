@@ -445,7 +445,8 @@ void QnWorkbenchConnectHandler::showWelcomeScreen() {
 }
 
 
-void QnWorkbenchConnectHandler::clearConnection() {
+void QnWorkbenchConnectHandler::clearConnection()
+{
     context()->instance<QnWorkbenchStateManager>()->tryClose(true);
 
     /* Get ready for the next connection. */
@@ -455,14 +456,23 @@ void QnWorkbenchConnectHandler::clearConnection() {
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+    QnResourceList resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);
+
+    /* Also remove layouts that were just added and have no 'remote' flag set. */
+    foreach (const QnLayoutResourcePtr& layout, resourcePool()->getResources<QnLayoutResource>())
+    {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = layout->isFile();
+        if (!(isLocal && isFile))  //do not remove exported layouts
+            resourcesToRemove.push_back(layout);
+    }
 
     QVector<QnUuid> idList;
-    idList.reserve(remoteResources.size());
-    foreach(const QnResourcePtr& res, remoteResources)
+    idList.reserve(resourcesToRemove.size());
+    foreach(const QnResourcePtr& res, resourcesToRemove)
         idList.push_back(res->getId());
 
-    resourcePool()->removeResources(remoteResources);
+    resourcePool()->removeResources(resourcesToRemove);
     resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     QnCameraUserAttributePool::instance()->clear();
@@ -470,15 +480,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
 
     propertyDictionary->clear(idList);
     qnStatusDictionary->clear(idList);
-
-    /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
-        bool isLocal = snapshotManager()->isLocal(layout);
-        bool isFile = layout->isFile();
-        if(isLocal && isFile)  //do not remove exported layouts
-            continue;
-        resourcePool()->removeResource(layout);
-    }
 
     qnLicensePool->reset();
     qnCommon->setLocalSystemName(QString());
