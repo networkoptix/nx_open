@@ -74,7 +74,7 @@ EIPPacket SimpleEIPClient::buildEIPEncapsulatedPacket(
     addressItem.dataLength = 0x0000;
 
     // This field should contain CID and is necessary only for connected messages
-    // We use unconnected messagess
+    // We use unconnected messages
     QDataStream stream(&addressItem.data, QIODevice::WriteOnly);
     stream << quint32(0x00b000b0);
 
@@ -192,7 +192,10 @@ bool SimpleEIPClient::registerSession()
 
     encoded.append(EIPEncapsulationHeader::encode(encPacketHeader));
 
-    stream << quint16(0x0001) /* Protocol version*/ << quint16(0x0000) /*Options flags*/;
+    const quint16 protocolVersion(0x0001);
+    const quint16 optionFlags(0);
+
+    stream << protocolVersion << optionFlags;
     encoded.append(buf);
 
     m_eipSocket->send(encoded);
@@ -203,7 +206,7 @@ bool SimpleEIPClient::registerSession()
 
     if(encPacketHeader.status != EIPStatus::kEipStatusSuccess)
     {
-        qDebug() << "Session registration error:" << encPacketHeader.status;
+        qDebug() << "Sync Ethernet/IP client session registration error:" << encPacketHeader.status;
         return false;
     }
 
