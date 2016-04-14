@@ -1,9 +1,11 @@
+
 #include <gtest/gtest.h>
 
-#include <utils/thread/sync_queue.h>
-#include <nx/network/cloud/tunnel/incoming_tunnel_udt_connection.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
+#include <nx/network/cloud/tunnel/udp_hole_punching/incoming_tunnel_udt_connection.h>
+#include <nx/network/cloud/tunnel/udp_hole_punching/udp_hole_punching_acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <utils/thread/sync_queue.h>
+
 
 namespace nx {
 namespace network {

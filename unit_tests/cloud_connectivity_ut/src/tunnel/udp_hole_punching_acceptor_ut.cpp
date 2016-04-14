@@ -1,13 +1,15 @@
+
 #include <gtest/gtest.h>
 
 #include <random>
 #include <thread>
 
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
+#include <nx/network/cloud/tunnel/udp_hole_punching/udp_hole_punching_acceptor.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_server.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <utils/thread/sync_queue.h>
+
 
 namespace nx {
 namespace network {

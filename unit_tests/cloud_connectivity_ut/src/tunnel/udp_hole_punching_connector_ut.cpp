@@ -10,7 +10,7 @@
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_connector.h>
+#include <nx/network/cloud/tunnel/udp_hole_punching/udp_hole_punching_connector.h>
 #include <nx/network/socket_global.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 

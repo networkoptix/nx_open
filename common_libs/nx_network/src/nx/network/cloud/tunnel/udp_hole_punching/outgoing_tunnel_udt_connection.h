@@ -13,11 +13,11 @@
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "abstract_outgoing_tunnel_connection.h"
-#include "nx/network/udt/udt_socket.h"
+#include "../abstract_outgoing_tunnel_connection.h"
 
 
 namespace nx {

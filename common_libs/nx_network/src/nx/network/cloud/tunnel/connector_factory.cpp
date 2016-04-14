@@ -5,7 +5,7 @@
 
 #include "connector_factory.h"
 
-#include "udp_hole_punching_connector.h"
+#include "udp_hole_punching/udp_hole_punching_connector.h"
 
 
 namespace nx {
