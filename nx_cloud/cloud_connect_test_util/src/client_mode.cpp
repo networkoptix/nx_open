@@ -73,6 +73,38 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
             });
     }
 
+    SocketAddress targetAddress(target);
+    std::vector<SocketAddress> targetList;
+    if (targetAddress.address.toString().contains('.'))
+    {
+        // looks like normal address, just use it
+        targetList.push_back(std::move(targetAddress));
+    }
+    else
+    {
+        // it's likelly a system id, so resolve it
+        typedef nx::network::cloud::AddressResolver::TypedAddress TypedAddress;
+        std::promise<void> promise;
+        nx::network::SocketGlobals::addressResolver().resolveDomain(
+            std::move(targetAddress.address),
+            [&targetAddress, &targetList, &promise](std::vector<
+                nx::network::cloud::AddressResolver::TypedAddress> list)
+        {
+            for (auto& address : list)
+            {
+                SocketAddress a(std::move(address.first), targetAddress.port);
+                targetList.push_back(std::move(a));
+            }
+
+            promise.set_value();
+        });
+
+        promise.get_future().wait();
+    }
+
+    std::cout << lm("Target(s): %1")
+        .arg(containerString(targetList)).toStdString() << std::endl;
+
     const uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(target),

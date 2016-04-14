@@ -99,9 +99,9 @@ public:
     void removeFixedAddress(
         const HostAddress& hostName, const SocketAddress& hostAddress);
 
-    typedef std::pair<HostAddress, AddressType> TypedAddres;
+    typedef std::pair<HostAddress, AddressType> TypedAddress;
 
-    static QString toString(const TypedAddres& address);
+    static QString toString(const TypedAddress& address);
 
     //!Resolves domain address to the list of subdomains
     /*!
@@ -112,7 +112,7 @@ public:
      */
     void resolveDomain(
         const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler );
+        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler );
 
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::vector<AddressEntry>)> ResolveHandler;
