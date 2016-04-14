@@ -61,7 +61,7 @@ QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, cons
 
 
     const auto vendorId = getVendorIdFromDevice(eipClient);
-    if(vendorId != FLIR_VENDOR_ID)
+    if(vendorId != kFlirVendorId)
     {
         return result;
     }
@@ -80,16 +80,16 @@ QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, cons
 quint16 QnFlirResourceSearcher::getVendorIdFromDevice(SimpleEIPClient& eipClient) const
 {
     auto data = eipClient.doServiceRequest(
-        CIPServiceCode::CIP_SERVICE_GET_ATTRIBUTE_SINGLE,
-        FlirEIPClass::IDENTITY,
+        CIPServiceCode::kGetAttributeSingle,
+        FlirEIPClass::kIdentity,
         0x01,
-        FlirEIPIdentityAttribute::VENDOR_NUMBER,
+        FlirEIPIdentityAttribute::kVendorNumber,
         QByteArray());
 
-    if(data.generalStatus != CIPGeneralStatus::SUCCESS &&
-        data.generalStatus != CIPGeneralStatus::ALREADY_IN_REQUESTED_MODE)
+    if(data.generalStatus != CIPGeneralStatus::kSuccess &&
+        data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qDebug() << "ERROR OCCURED WHEN RETRIEVING VENDOR" << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
     }
 
     return qFromLittleEndian<quint16>(reinterpret_cast<const uchar*>(data.data.constData()));
@@ -98,16 +98,16 @@ quint16 QnFlirResourceSearcher::getVendorIdFromDevice(SimpleEIPClient& eipClient
 QString QnFlirResourceSearcher::getMACAdressFromDevice(SimpleEIPClient& eipClient) const
 {
     auto data = eipClient.doServiceRequest(
-        CIPServiceCode::CIP_SERVICE_GET_ATTRIBUTE_SINGLE,
-        FlirEIPClass::ETHERNET,
+        CIPServiceCode::kGetAttributeSingle,
+        FlirEIPClass::kEthernet,
         0x01,
-        FlirEIPEthernetAttribute::PHYSICAL_ADDRESS,
+        FlirEIPEthernetAttribute::kPhysicalAddress,
         QByteArray());
 
-    if(data.generalStatus != CIPGeneralStatus::SUCCESS &&
-        data.generalStatus != CIPGeneralStatus::ALREADY_IN_REQUESTED_MODE)
+    if(data.generalStatus != CIPGeneralStatus::kSuccess &&
+        data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qDebug() << "ERROR OCCURED WHEN RETRIEVING MAC ADDRESS" << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving vendor." << data.generalStatus << data.additionalStatus;
     }
 
     return QString(data.data.toHex());
@@ -116,16 +116,16 @@ QString QnFlirResourceSearcher::getMACAdressFromDevice(SimpleEIPClient& eipClien
 QString QnFlirResourceSearcher::getModelFromDevice(SimpleEIPClient& eipClient) const
 {
     auto data = eipClient.doServiceRequest(
-        CIPServiceCode::CIP_SERVICE_GET_ATTRIBUTE_SINGLE,
-        FlirEIPClass::IDENTITY,
+        CIPServiceCode::kGetAttributeSingle,
+        FlirEIPClass::kIdentity,
         0x01,
-        FlirEIPIdentityAttribute::PRODUCT_NAME,
+        FlirEIPIdentityAttribute::kProductName,
         QByteArray());
 
-    if(data.generalStatus != CIPGeneralStatus::SUCCESS &&
-        data.generalStatus != CIPGeneralStatus::ALREADY_IN_REQUESTED_MODE)
+    if(data.generalStatus != CIPGeneralStatus::kSuccess &&
+        data.generalStatus != CIPGeneralStatus::kAlreadyInRequestedMode)
     {
-        qDebug() << "ERROR OCCURED WHEN RETRIEVING MODEL" << data.generalStatus << data.additionalStatus;
+        qWarning() << "Flir plugin. Error occured when retrieving model." << data.generalStatus << data.additionalStatus;
     }
 
     auto model = QString::fromLatin1(data.data.mid(1));
@@ -143,8 +143,8 @@ QString QnFlirResourceSearcher::getFirmwareFromDevice(SimpleEIPClient &eipClient
     requestData.append(requestParam.toLatin1());
 
     auto data = eipClient.doServiceRequest(
-        FlirEIPPassthroughService::READ_ASCII,
-        FlirEIPClass::PASSTHROUGH,
+        FlirEIPPassthroughService::kReadAscii,
+        FlirEIPClass::kPassThrough,
         0x01,
         0,
         requestData);

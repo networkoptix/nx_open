@@ -7,9 +7,9 @@ class SimpleEIPClient
 {
 
 public:
-    static const quint16 DEFAULT_EIP_PORT = 0xAF12;
-    static const qint8 DEFAULT_EIP_TIMEOUT = 4;
-    static const size_t BUFFER_SIZE = 1024*16;
+    static const quint16 kDefaultEipPort = 0xAF12;
+    static const qint8 kDefaultEipTimeout = 4;
+    static const size_t kBufferSize = 1024*16;
 
 public:
     SimpleEIPClient(QHostAddress addr);
@@ -34,7 +34,7 @@ private:
     quint32 m_sessionHandle;
     TCPSocketPtr m_eipSocket;
     bool m_connected;
-    char m_recvBuffer[BUFFER_SIZE];
+    char m_recvBuffer[kBufferSize];
 
 
 private:

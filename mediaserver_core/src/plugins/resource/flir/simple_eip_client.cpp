@@ -5,7 +5,7 @@
 
 SimpleEIPClient::SimpleEIPClient(QHostAddress addr) :
     m_hostAddress(addr),
-    m_port(DEFAULT_EIP_PORT)
+    m_port(kDefaultEipPort)
 {
     initSocket();
 }
@@ -36,21 +36,21 @@ MessageRouterRequest SimpleEIPClient::buildMessageRouterRequest(
     request.serviceCode = serviceId;
     request.pathSize = attributeId == 0 ? 2 : 3;
     request.epath[0] =
-        CIPSegmentType::LOGICAL_SEGMENT |
-        CIPSegmentLogicalType::CLASS_ID |
-        CIPSegmentLogicalFormat::BIT_8;
+        CIPSegmentType::kLogicalSegment |
+        CIPSegmentLogicalType::kClassId |
+        CIPSegmentLogicalFormat::kBit8;
     request.epath[1] = classId;
     request.epath[2] =
-        CIPSegmentType::LOGICAL_SEGMENT |
-        CIPSegmentLogicalType::INSTANCE_ID |
-        CIPSegmentLogicalFormat::BIT_8;
+        CIPSegmentType::kLogicalSegment |
+        CIPSegmentLogicalType::kInstanceId |
+        CIPSegmentLogicalFormat::kBit8;
     request.epath[3] = instanceId;
     if(attributeId != 0)
     {
         request.epath[4] =
-            CIPSegmentType::LOGICAL_SEGMENT |
-            CIPSegmentLogicalType::ATTRIBUTE_ID |
-            CIPSegmentLogicalFormat::BIT_8;
+            CIPSegmentType::kLogicalSegment |
+            CIPSegmentLogicalType::kAttributeId |
+            CIPSegmentLogicalFormat::kBit8;
         request.epath[5] = attributeId;
     }
     request.data = data;
@@ -63,14 +63,14 @@ EIPPacket SimpleEIPClient::buildEIPEncapsulatedPacket(
 {
 
     EIPPacket encPacket;
-    encPacket.header.commandCode = EIPCommand::EIP_COMMAND_SEND_RR_DATA;
+    encPacket.header.commandCode = EIPCommand::kEipCommandSendRRData;
     encPacket.header.sessionHandle = m_sessionHandle;
 
     CPFPacket cpfPacket;
     CPFItem addressItem;
     CPFItem dataItem;
 
-    addressItem.typeId = CIPItemID::NULL_ADDRESS;
+    addressItem.typeId = CIPItemID::kNullAddress;
     addressItem.dataLength = 0x0000;
 
     // This field should contain CID and is necessary only for connected messages
@@ -80,7 +80,7 @@ EIPPacket SimpleEIPClient::buildEIPEncapsulatedPacket(
 
     auto encodedRequest = MessageRouterRequest::encode(request);
 
-    dataItem.typeId = CIPItemID::UNCONNECTED_ITEM_DATA;
+    dataItem.typeId = CIPItemID::kUnconnectedItemData;
     dataItem.dataLength = encodedRequest.size();
     dataItem.data = encodedRequest;
 
@@ -89,7 +89,7 @@ EIPPacket SimpleEIPClient::buildEIPEncapsulatedPacket(
     cpfPacket.items.push_back(dataItem);
 
     encPacket.data.handle = 0;
-    encPacket.data.timeout = DEFAULT_EIP_TIMEOUT;
+    encPacket.data.timeout = kDefaultEipTimeout;
     encPacket.data.cpfPacket = cpfPacket;
 
     encPacket.header.status = 0;
@@ -110,10 +110,11 @@ MessageRouterResponse SimpleEIPClient::getServiceResponseData(const QByteArray& 
         header.dataLength);
 
     auto cpf = CPFPacket::decode(data.mid(
-        sizeof(EIPEncapsulationData::handle) + sizeof(EIPEncapsulationData::timeout)));
+        sizeof(decltype(EIPEncapsulationData::handle)) + 
+        sizeof(decltype(EIPEncapsulationData::timeout))));
 
     for(const auto& item: cpf.items)
-        if(item.typeId == CIPItemID::UNCONNECTED_ITEM_DATA)
+        if(item.typeId == CIPItemID::kUnconnectedItemData)
             return MessageRouterResponse::decode(item.data);
 
     return response;
@@ -126,7 +127,7 @@ eip_status_t SimpleEIPClient::tryGetResponse(const MessageRouterRequest &request
 
     m_eipSocket->send(encodedEncapPacket);
 
-    auto bytesRead =  m_eipSocket->recv(m_recvBuffer, BUFFER_SIZE);
+    auto bytesRead =  m_eipSocket->recv(m_recvBuffer, kBufferSize);
     auto header = EIPPacket::parseHeader(QByteArray(m_recvBuffer, EIPEncapsulationHeader::SIZE));
     data = QByteArray(m_recvBuffer, bytesRead);
 
@@ -155,7 +156,7 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
     QnMutexLocker lock(&m_mutex);
     QByteArray response;
     auto status = tryGetResponse(request, response);
-    if(status == EIPStatus::EIP_STATUS_INVALID_SESSION_HANDLE)
+    if(status == EIPStatus::kEipStatusInvalidSessionHandle)
     {
         lock.unlock();
         registerSession();
@@ -169,7 +170,7 @@ MessageRouterResponse SimpleEIPClient::doServiceRequest(const MessageRouterReque
 bool SimpleEIPClient::connect()
 {
     QnMutexLocker lock(&m_mutex);
-    return m_eipSocket->connect(m_hostAddress.toString(), DEFAULT_EIP_PORT);
+    return m_eipSocket->connect(m_hostAddress.toString(), kDefaultEipPort);
 }
 
 bool SimpleEIPClient::registerSession()
@@ -182,7 +183,7 @@ bool SimpleEIPClient::registerSession()
     stream.setByteOrder(QDataStream::LittleEndian);
     EIPEncapsulationHeader encPacketHeader;
 
-    encPacketHeader.commandCode = EIPCommand::EIP_COMMAND_REGISTER_SESSION;
+    encPacketHeader.commandCode = EIPCommand::kEipCommandRegisterSession;
     encPacketHeader.dataLength = 0x0004;
     encPacketHeader.sessionHandle = 0;
     encPacketHeader.status = 0;
@@ -195,12 +196,12 @@ bool SimpleEIPClient::registerSession()
     encoded.append(buf);
 
     m_eipSocket->send(encoded);
-    auto bytesRead = m_eipSocket->recv(m_recvBuffer, BUFFER_SIZE);
+    auto bytesRead = m_eipSocket->recv(m_recvBuffer, kBufferSize);
 
     QByteArray response(m_recvBuffer, bytesRead);
     encPacketHeader = EIPPacket::parseHeader(response);
 
-    if(encPacketHeader.status != EIPStatus::EIP_STATUS_SUCCESS)
+    if(encPacketHeader.status != EIPStatus::kEipStatusSuccess)
     {
         qDebug() << "Session registration error:" << encPacketHeader.status;
         return false;
@@ -220,7 +221,7 @@ bool SimpleEIPClient::unregisterSession()
     QByteArray encoded;
 
     EIPEncapsulationHeader encHeader;
-    encHeader.commandCode = EIPCommand::EIP_COMMAND_UNREGISTER_SESSION;
+    encHeader.commandCode = EIPCommand::kEipCommandUnregisterSession;
     encHeader.dataLength = 0;
     encHeader.sessionHandle = m_sessionHandle;
     encHeader.status = 0;

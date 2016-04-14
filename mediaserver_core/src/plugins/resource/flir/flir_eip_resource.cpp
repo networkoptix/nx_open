@@ -20,7 +20,7 @@ QnFlirEIPResource::~QnFlirEIPResource()
 QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
 {    
     return MessageRouterRequest::buildEPath(
-        FlirEIPClass::PASSTHROUGH,
+        FlirEIPClass::kPassThrough,
         0x01);
 }
 
@@ -83,22 +83,22 @@ quint8 QnFlirEIPResource::getServiceCodeByType(const QString& type, const Params
 {
     if(type == FlirDataType::Ascii)
         return mode == ParamsRequestMode::SetMode ?
-            FlirEIPPassthroughService::WRITE_ASCII :
-            FlirEIPPassthroughService::READ_ASCII;
+            FlirEIPPassthroughService::kWriteAscii :
+            FlirEIPPassthroughService::kReadAscii;
     else if (type == FlirDataType::Int)
         return  mode == ParamsRequestMode::SetMode ?
-            FlirEIPPassthroughService::WRITE_INT32 :
-            FlirEIPPassthroughService::READ_INT32;
+            FlirEIPPassthroughService::kWriteInt32 :
+            FlirEIPPassthroughService::kReadInt32;
     else if(type == FlirDataType::Double)
         return  mode == ParamsRequestMode::SetMode ?
-            FlirEIPPassthroughService::WRITE_DOUBLE :
-            FlirEIPPassthroughService::READ_DOUBLE;
+            FlirEIPPassthroughService::kWriteDouble :
+            FlirEIPPassthroughService::kReadDouble;
     else if(type == FlirDataType::Bool)
         return  mode == ParamsRequestMode::SetMode ?
-            FlirEIPPassthroughService::WRITE_BOOL :
-            FlirEIPPassthroughService::READ_BOOL;
+            FlirEIPPassthroughService::kWriteBool :
+            FlirEIPPassthroughService::kReadBool;
 
-    return FlirEIPPassthroughService::READ_ASCII;
+    return FlirEIPPassthroughService::kReadAscii;
 }
 
 bool QnFlirEIPResource::isPassthroughParam(const QnCameraAdvancedParameter &param) const
@@ -138,7 +138,7 @@ MessageRouterRequest QnFlirEIPResource::buildEIPGetRequest(const QnCameraAdvance
     else
     {
         CIPPath cipPath = parseParamCIPPath(param);
-        request.serviceCode = CIPServiceCode::CIP_SERVICE_GET_ATTRIBUTE_SINGLE;
+        request.serviceCode = CIPServiceCode::kGetAttributeSingle;
         request.pathSize = 3;
         request.epath = MessageRouterRequest::buildEPath(
             cipPath.classId,
@@ -166,7 +166,7 @@ MessageRouterRequest QnFlirEIPResource::buildEIPSetRequest(const QnCameraAdvance
     else
     {
         CIPPath cipPath= parseParamCIPPath(param);
-        request.serviceCode = CIPServiceCode::CIP_SERVICE_SET_ATTRIBUTE_SINGLE;
+        request.serviceCode = CIPServiceCode::kSetAttributeSingle;
         request.pathSize = 3;
         request.epath = MessageRouterRequest::buildEPath(
             cipPath.classId,
@@ -299,7 +299,7 @@ bool QnFlirEIPResource::commitParam(const QnCameraAdvancedParameter &param)
         return false;
 
     MessageRouterRequest request;
-    request.serviceCode = FlirEIPPassthroughService::WRITE_BOOL;
+    request.serviceCode = FlirEIPPassthroughService::kWriteBool;
     request.epath = PASSTHROUGH_EPATH();
     request.pathSize = 2;
     request.data[0] = commitCmd.size();
@@ -318,8 +318,8 @@ bool  QnFlirEIPResource::handleButtonParam(const QnCameraAdvancedParameter &para
         data = QByteArray::fromHex(param.writeCmd.toLatin1());
 
     auto code = param.readCmd == lit("reset") ?
-        CIPServiceCode::CIP_SERVICE_RESET :
-        CIPServiceCode::CIP_SERVICE_SET_ATTRIBUTE_SINGLE;
+        CIPServiceCode::kReset :
+        CIPServiceCode::kSetAttributeSingle;
 
     MessageRouterRequest request;
     request.epath = MessageRouterRequest::buildEPath(
@@ -331,7 +331,7 @@ bool  QnFlirEIPResource::handleButtonParam(const QnCameraAdvancedParameter &para
     request.pathSize = (path.attributeId == 0 ? 2 : 3);
 
     auto response = m_eipClient->doServiceRequest(request);
-    return (response.generalStatus == CIPGeneralStatus::SUCCESS);
+    return (response.generalStatus == CIPGeneralStatus::kSuccess);
 }
 
 bool QnFlirEIPResource::getParamPhysical(const QString &id, QString &value)
@@ -344,7 +344,7 @@ bool QnFlirEIPResource::getParamPhysical(const QString &id, QString &value)
     const auto eipRequest = buildEIPGetRequest(param);
     const auto response = m_eipClient->doServiceRequest(eipRequest);
 
-    if(response.generalStatus != CIPGeneralStatus::SUCCESS)
+    if(response.generalStatus != CIPGeneralStatus::kSuccess)
         return false;
 
     value = parseEIPResponse(response, param);
@@ -363,7 +363,7 @@ bool QnFlirEIPResource::setParamPhysical(const QString &id, const QString &value
     const auto eipRequest = buildEIPSetRequest(param, value);
     const auto response = m_eipClient->doServiceRequest(eipRequest);
 
-    res = (response.generalStatus == CIPGeneralStatus::SUCCESS);
+    res = (response.generalStatus == CIPGeneralStatus::kSuccess);
 
     if(!res)
         return res;
@@ -487,10 +487,10 @@ MessageRouterRequest QnFlirEIPResource::buildEIPOutputPortRequest(const QString 
 {
     MessageRouterRequest request;
 
-    request.serviceCode = CIPServiceCode::CIP_SERVICE_SET_ATTRIBUTE_SINGLE;
+    request.serviceCode = CIPServiceCode::kSetAttributeSingle;
     request.pathSize = 3;
     request.epath = MessageRouterRequest::buildEPath(
-        FlirEIPClass::PHYSICAL_IO,
+        FlirEIPClass::kPhysicalIO,
         0x01,
         getOutputPortCIPAttributeById(portId));
 
@@ -521,10 +521,10 @@ void QnFlirEIPResource::checkInputPortStatus(quint64 timerId)
 
     MessageRouterRequest request;
     request.serviceCode =
-        CIPServiceCode::CIP_SERVICE_GET_ATTRIBUTE_SINGLE;
+        CIPServiceCode::kGetAttributeSingle;
     request.pathSize = 3;
     request.epath = MessageRouterRequest::buildEPath(
-        FlirEIPClass::PHYSICAL_IO,
+        FlirEIPClass::kPhysicalIO,
         0x01,
         getInputPortCIPAttribute(m_currentCheckingPortNumber));
 
@@ -540,10 +540,10 @@ void QnFlirEIPResource::checkInputPortStatusDone()
 {
     QnMutexLocker lock(&m_ioMutex);
     auto response =  m_eipAsyncClient->getResponse();
-    bool portState = response.data[0] != 0;
+    bool portState = response.data[0] != char(0);
 
     if(portState != m_inputPortStates[m_currentCheckingPortNumber]
-        && response.generalStatus == CIPGeneralStatus::SUCCESS)
+        && response.generalStatus == CIPGeneralStatus::kSuccess)
     {
         m_inputPortStates[m_currentCheckingPortNumber] = portState;
         lock.unlock();

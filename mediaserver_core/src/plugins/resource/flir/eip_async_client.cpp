@@ -11,7 +11,7 @@ EIPAsyncClient::EIPAsyncClient(QHostAddress hostAddress) :
     m_hasPendingRequest(false),
     m_dataLength(0),
     m_currentState(EIPClientState::NeedSession),
-    m_eipStatus(EIPStatus::EIP_STATUS_SUCCESS),
+    m_eipStatus(EIPStatus::kEipStatusSuccess),
     m_sessionHandle(0)
 {
     m_recvBuffer.reserve(RECEIVE_BUFFER_SIZE);
@@ -38,10 +38,10 @@ void EIPAsyncClient::terminate()
 void EIPAsyncClient::initSocket()
 {
     m_socket = std::make_shared<TCPSocket>();
-    if(!(m_socket->connect(m_hostAddress.toString(), EIP_PORT)))
+    if(!(m_socket->connect(m_hostAddress.toString(), static_cast<unsigned short>(kEipPort))))
         NX_LOG(lit("Async Ethernet/IP client failed to connect to host: %1:%2")
             .arg(m_hostAddress.toString())
-            .arg(EIP_PORT),
+            .arg(kEipPort),
             cl_logDEBUG2);
 }
 
@@ -98,12 +98,12 @@ void EIPAsyncClient::processHeaderBytes()
     if(m_headerBuffer.size() == EIPEncapsulationHeader::SIZE)
     {
         auto header = EIPPacket::parseHeader(m_headerBuffer);
-        if(header.status == EIPStatus::EIP_STATUS_SUCCESS)
+        if(header.status == EIPStatus::kEipStatusSuccess)
         {
             m_dataLength = header.dataLength;
             m_currentState = EIPClientState::ReadingData;
         }
-        else if(header.status == EIPStatus::EIP_STATUS_INVALID_SESSION_HANDLE)
+        else if(header.status == EIPStatus::kEipStatusInvalidSessionHandle)
         {
             m_currentState = EIPClientState::NeedSession;
         }
@@ -153,7 +153,7 @@ void EIPAsyncClient::processSessionBytes()
         return;
 
     auto header = EIPPacket::parseHeader(m_headerBuffer);
-    if(header.status == EIPStatus::EIP_STATUS_SUCCESS)
+    if(header.status == EIPStatus::kEipStatusSuccess)
     {
         m_sessionHandle = header.sessionHandle;
         m_currentState = EIPClientState::ReadyToRequest;
@@ -229,10 +229,11 @@ void EIPAsyncClient::processPacket(const nx::Buffer &buf)
         header.dataLength);
 
     auto cpf = CPFPacket::decode(data.mid(
-        sizeof(EIPEncapsulationData::handle) + sizeof(EIPEncapsulationData::timeout)));
+        sizeof(decltype(EIPEncapsulationData::handle)) + 
+        sizeof(decltype(EIPEncapsulationData::timeout))));
 
     for(const auto& item: cpf.items)
-        if(item.typeId == CIPItemID::UNCONNECTED_ITEM_DATA)
+        if(item.typeId == CIPItemID::kUnconnectedItemData)
         {
             m_responseFound = true;
             m_response = MessageRouterResponse::decode(item.data);
@@ -307,14 +308,14 @@ void EIPAsyncClient::unregisterSession()
 nx::Buffer EIPAsyncClient::buildEIPServiceRequest(const MessageRouterRequest &request) const
 {
     EIPPacket encPacket;
-    encPacket.header.commandCode = EIPCommand::EIP_COMMAND_SEND_RR_DATA;
+    encPacket.header.commandCode = EIPCommand::kEipCommandSendRRData;
     encPacket.header.sessionHandle = m_sessionHandle;
 
     CPFPacket cpfPacket;
     CPFItem addressItem;
     CPFItem dataItem;
 
-    addressItem.typeId = CIPItemID::NULL_ADDRESS;
+    addressItem.typeId = CIPItemID::kNullAddress;
     addressItem.dataLength = 0;
 
     // This field should contain CID and is necessary only for connected messages
@@ -324,7 +325,7 @@ nx::Buffer EIPAsyncClient::buildEIPServiceRequest(const MessageRouterRequest &re
 
     auto encodedRequest = MessageRouterRequest::encode(request);
 
-    dataItem.typeId = CIPItemID::UNCONNECTED_ITEM_DATA;
+    dataItem.typeId = CIPItemID::kUnconnectedItemData;
     dataItem.dataLength = encodedRequest.size();
     dataItem.data = encodedRequest;
 
@@ -351,7 +352,7 @@ nx::Buffer EIPAsyncClient::buildEIPRegisterSessionRequest()
     stream.setByteOrder(QDataStream::LittleEndian);
     EIPEncapsulationHeader encPacketHeader;
 
-    encPacketHeader.commandCode = EIPCommand::EIP_COMMAND_REGISTER_SESSION;
+    encPacketHeader.commandCode = EIPCommand::kEipCommandRegisterSession;
     encPacketHeader.dataLength = 4;
     encPacketHeader.sessionHandle = 0;
     encPacketHeader.status = 0;

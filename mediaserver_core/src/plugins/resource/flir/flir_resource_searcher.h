@@ -20,7 +20,7 @@ public:
     QnFlirResourceSearcher();
     ~QnFlirResourceSearcher();
 
-    static const quint16 FLIR_VENDOR_ID = 1161;
+    static const quint16 kFlirVendorId = 1161;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;

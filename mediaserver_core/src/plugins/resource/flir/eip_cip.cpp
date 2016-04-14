@@ -14,13 +14,13 @@ QByteArray MessageRouterRequest::encode(const MessageRouterRequest& request)
 QByteArray MessageRouterRequest::buildEPath(quint8 classId, quint8 instanceId, quint8 attributeId)
 {
     QByteArray epath;
-    epath[0] = CIPCommonLogicalSegment::CLASS_SEGMENT_8;
+    epath[0] = CIPCommonLogicalSegment::kClassSegment8;
     epath[1] = classId;
-    epath[2] = CIPCommonLogicalSegment::INSTANCE_SEGMENT_8;
+    epath[2] = CIPCommonLogicalSegment::kInstanceSegment8;
     epath[3] = instanceId;
     if(attributeId != 0)
     {
-        epath[4] = CIPCommonLogicalSegment::ATTRIBUTE_SEGMENT_8;
+        epath[4] = CIPCommonLogicalSegment::kAttributeSegment8;
         epath[5] = attributeId;
     }
 
@@ -108,7 +108,7 @@ QByteArray CPFItem::encode(const CPFItem& item)
     stream.setByteOrder(QDataStream::LittleEndian);
 
     stream << item.typeId << item.dataLength;
-    if(item.typeId != CIPItemID::NULL_ADDRESS)
+    if(item.typeId != CIPItemID::kNullAddress)
         encoded.append(item.data);
 
     return encoded;
