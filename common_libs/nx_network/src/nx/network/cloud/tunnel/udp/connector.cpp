@@ -13,7 +13,7 @@
 #include <utils/serialization/lexical.h>
 
 #include "outgoing_tunnel_udt_connection.h"
-#include "rendezvous_connector.h"
+#include "rendezvous_connector_with_verification.h"
 
 
 namespace nx {
@@ -227,7 +227,7 @@ void TunnelConnector::onConnectResponse(
             effectiveConnectTimeout = milliseconds(1);   //zero timeout is infinity
     }
 
-    auto rendezvousConnector = std::make_unique<RendezvousConnector>(
+    auto rendezvousConnector = std::make_unique</*RendezvousConnector*/RendezvousConnectorWithVerification>(
         m_connectSessionId,
         std::move(response.udpEndpointList.front()),
         std::move(m_mediatorUdpClient->takeSocket())); //moving system socket handler from m_mediatorUdpClient to udt connection

@@ -109,7 +109,12 @@ void RendezvousConnector::connect(
         });
 }
 
-SocketAddress RendezvousConnector::remoteAddress() const
+const nx::String& RendezvousConnector::connectSessionId() const
+{
+    return m_connectSessionId;
+}
+
+const SocketAddress& RendezvousConnector::remoteAddress() const
 {
     return m_remotePeerAddress;
 }

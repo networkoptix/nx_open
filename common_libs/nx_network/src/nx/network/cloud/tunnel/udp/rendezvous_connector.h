@@ -52,10 +52,13 @@ public:
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler);
 
-    SocketAddress remoteAddress() const;
+    const nx::String& connectSessionId() const;
+    const SocketAddress& remoteAddress() const;
+
+protected:
+    aio::Timer m_aioThreadBinder;
 
 private:
-    aio::Timer m_aioThreadBinder;
     const nx::String m_connectSessionId;
     const SocketAddress m_remotePeerAddress;
     std::unique_ptr<nx::network::UDPSocket> m_udpSocket;

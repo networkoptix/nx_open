@@ -23,6 +23,8 @@ namespace test {
 
 using nx::hpm::MediaServerEmulator;
 
+constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
+
 class TunnelConnector
 :
     public ::testing::Test
@@ -134,7 +136,14 @@ private:
                 result.connection = std::move(connection);
                 connectedPromise.set_value(std::move(result));
             });
-        *connectResult = connectedPromise.get_future().get();
+        auto connectedFuture = connectedPromise.get_future();
+        ASSERT_EQ(
+            std::future_status::ready,
+            connectedFuture.wait_for(
+                connectTimeout == std::chrono::milliseconds::zero()
+                ? kDefaultTestTimeout
+                : connectTimeout*2));
+        *connectResult = connectedFuture.get();
         connectResult->executionTime = 
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - t1);
@@ -156,6 +165,32 @@ TEST_F(TunnelConnector, general)
     ASSERT_NE(nullptr, connectResult.connection);
 
     connectResult.connection->pleaseStopSync();
+}
+
+TEST_F(TunnelConnector, noSynAck)
+{
+    //starting mediator
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds(5),
+        MediaServerEmulator::ActionToTake::ignoreSyn);
+
+    ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
+}
+
+TEST_F(TunnelConnector, badSynAck)
+{
+    //starting mediator
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds::zero(),   //no timeout
+        MediaServerEmulator::ActionToTake::sendBadSynAck);
+
+    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
 }
 
 TEST_F(TunnelConnector, timeout)

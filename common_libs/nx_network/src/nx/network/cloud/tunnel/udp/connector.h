@@ -53,7 +53,9 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
     virtual int getPriority() const override;
-    /** Only one connect can be running at a time. */
+    /** Only one connect can be running at a time.
+        @param timeout 0 - no timeout
+    */
     virtual void connect(
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void(
