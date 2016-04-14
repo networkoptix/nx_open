@@ -1,4 +1,4 @@
-!android {
+!android:!ios {
     QT += zlib-private
 }
 

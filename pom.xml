@@ -1094,7 +1094,9 @@
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
+                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.1i</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
