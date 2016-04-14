@@ -163,11 +163,13 @@ TEST_F(UdpHolePunchingTunnelConnector, timeout)
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const std::chrono::milliseconds connectTimeout(1000 + (rand() % 3000));
+    //const std::chrono::milliseconds connectTimeout(5 + (rand() % 10));
+    //const std::chrono::milliseconds connectTimeout(150 + (rand() % 150));
 
     for (int i = 0; i < 2; ++i)
     {
         boost::optional<SocketAddress> mediatorAddressForConnector;
-        if (i == 0)
+        if ((i & 1) == 0)
         {
             //timing out udt connection...
         }

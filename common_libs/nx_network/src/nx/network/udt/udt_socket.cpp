@@ -409,7 +409,7 @@ bool UdtSocket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getLastError(SystemError::ErrorCode* /*errorCode*/) const
 {
-    NX_ASSERT(!isClosed());
+    //NX_ASSERT(!isClosed());
     //*errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
     //TODO #ak
     SystemError::setLastErrorCode(SystemError::notImplemented);
