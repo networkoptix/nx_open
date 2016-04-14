@@ -9,6 +9,8 @@
 #include <atomic>
 #include <memory>
 
+#ifndef __clang__
+
 #ifdef __GNUC__
 #include <features.h>
 #endif
@@ -88,5 +90,7 @@ template<
 }
 #endif  //USE_OWN_MAKE_UNIQUE
 }   //std
+
+#endif // __clang__
 
 #endif  //libcommon_cpp14_h
