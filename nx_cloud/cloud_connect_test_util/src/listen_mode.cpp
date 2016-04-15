@@ -3,10 +3,12 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
+#include <utils/common/ssl_gen_cert.h>
 
 namespace nx {
 namespace cctu {
@@ -21,7 +23,8 @@ void printListenOptions(std::ostream* const outStream)
     "                               Specify credentials to use to connect to mediator\n"
     "  --server-id={server_id}      Id used when registering on mediator\n"
     "  --local-address={ip:port}    Local address to listen\n"
-    "  --udt                        Use udt instead of tcp. Only if listening local address\n";
+    "  --udt                        Use udt instead of tcp. Only if listening local address\n"
+    "  --ssl                        Uses SSL on top of server socket type\n";
 }
 
 int runInListenMode(const std::multimap<QString, QString>& args)
@@ -87,6 +90,23 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     {
         std::cerr << "error. You have to specifiy --cloud-credentials or --local-address " << std::endl;
         return 1;
+    }
+
+    if (args.find("ssl") != args.end())
+    {
+        const auto sslCert = tmpnam(nullptr);
+        if (const auto ret = generateSslCertificate(sslCert, "cctu", "US", "cctu"))
+            return ret;
+
+        QFile file(QString::fromUtf8(sslCert));
+        if(!file.open(QIODevice::ReadOnly))
+        {
+            std::cerr << "Could not generate SSL certificate" << std::endl;
+            return 2;
+        }
+
+        nx::network::SslSocket::initSSLEngine(file.readAll());
+        serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
     }
 
     server.setServerSocket(std::move(serverSocket));

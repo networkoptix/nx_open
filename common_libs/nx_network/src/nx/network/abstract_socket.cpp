@@ -57,7 +57,7 @@ void AbstractCommunicatingSocket::readAsyncAtLeast(
 {
     NX_CRITICAL(
         buffer->capacity() >= buffer->size() + static_cast<int>(minimalSize),
-        "Not enough place in the buffer!");
+        "Not enough space in the buffer!");
 
     readAsyncAtLeastImpl(
         buffer, minimalSize, std::move(handler),
