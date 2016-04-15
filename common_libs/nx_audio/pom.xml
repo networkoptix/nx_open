@@ -27,6 +27,7 @@
 
         <qt.libs>core</qt.libs>
         <global.libs>-lcommon</global.libs>
+        <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
 
     <profiles>
