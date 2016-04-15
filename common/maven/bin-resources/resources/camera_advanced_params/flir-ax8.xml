@@ -72,11 +72,12 @@
                     description=""
                     dataType="Bool"
                     readCmd="bool"/>                              
-            <param id="68.01.02"
+            <param id=".image.sysimg.measureFuncs.isotherm.1.type"
                     name="Isotherm type"
                     description=""
                     dataType="Enumeration"
                     range="Above,Below"
+                    internalRange="above,below"
                     readCmd="ascii"/> 
             <param id="68.01.03"
                     name="Isotherm Level"

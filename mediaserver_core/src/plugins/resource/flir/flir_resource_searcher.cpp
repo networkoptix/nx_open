@@ -136,7 +136,7 @@ QString QnFlirResourceSearcher::getModelFromDevice(SimpleEIPClient& eipClient) c
 
 QString QnFlirResourceSearcher::getFirmwareFromDevice(SimpleEIPClient &eipClient) const
 {
-    QString requestParam(".version.kits.appkit.ver");
+    QString requestParam(".version.swcombination.ver");
 
     QByteArray requestData;
     requestData[0] = requestParam.size();
