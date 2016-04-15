@@ -29,7 +29,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
         <rdep.packages>openssl ffmpeg quazip festival festival-vox qtsingleapplication</rdep.packages>
-        <rdep.windows.packages>openal</rdep.windows.packages>
+        <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
     </properties>
 
     <dependencies>
