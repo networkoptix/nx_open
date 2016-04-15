@@ -49,7 +49,7 @@ protected:
     :
         stunClientMock(std::make_shared<network::test::StunAsyncClientMock>()),
         manualAcceptorStop(false),
-        udpStunServer(stunMessageDispatcher),
+        udpStunServer(&stunMessageDispatcher),
         isUdpServerEnabled(true),
         connectionRequests(0)
     {
