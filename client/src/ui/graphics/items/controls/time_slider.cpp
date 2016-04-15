@@ -552,17 +552,19 @@ QnTimeSlider::~QnTimeSlider()
 
 void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTimeStep>* relativeSteps)
 {
-    //: Translate this into 'none' or 'forced' if you want to switch off automatic detection.
-    //:  Do not translate this string unless you know what you're doing.
-    QString ampmUsage = tr("auto", "AM/PM usage based on user's system locale.");
-
-    bool ampm;
-    if (ampmUsage == lit("forced"))
-        ampm = true;
-    else if (ampmUsage == lit("none"))
-        ampm = false;
-    else
-        ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
+    static const QString hmFormat           = lit("hh:mm");                 //< Format for displaying hours and minutes on timeline.
+    static const QString hmApFormat         = lit("hh:mm ap");              //< Format for displaying hours and minutes on timeline, with am/pm indicator.
+    static const QString hApFormat          = lit("h ap");                  //< Format for displaying hours on timeline, with am/pm indicator.
+    static const QString dFormat            = lit("dd");                    //< Format for displaying days on timeline.
+    static const QString moFormat           = lit("MMMM");                  //< Format for displaying months on timeline.
+    static const QString yFormat            = lit("yyyy");                  //< Format for displaying years on timeline
+    static const QString dateMinsFormat     = lit("dd MMMM yyyy hh:mm");    //< Format for displaying minute caption in timeline's header, without am/pm indicator.
+    static const QString dateMinsApFormat   = lit("dd MMMM yyyy hh:mm ap"); //< Format for displaying minute caption in timeline's header, with am/pm indicator.
+    static const QString dateHoursFormat    = lit("dd MMMM yyyy hh:mm");    //< Format for displaying hour caption in timeline's header, without am/pm indicator.
+    static const QString dateHoursApFormat  = lit("dd MMMM yyyy h ap");     //< Format for displaying hour caption in timeline's header, with am/pm indicator.
+    static const QString dateDaysFormat     = lit("dd MMMM yyyy");          //< Format for displaying day caption in timeline's header.
+    static const QString dateMonthsFormat   = lit("MMMM yyyy");             //< Format for displaying month caption in timeline's header.
+    static const QString dateYearsFormat    = lit("yyyy");                  //< Format for displaying year caption in timeline's header
 
     //: Do not translate this string unless you know what you're doing.
     QString msSuffix = tr("ms", "Suffix for displaying milliseconds on timeline.");
@@ -585,47 +587,9 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     //: Do not translate this string unless you know what you're doing.
     QString ySuffix = tr("y", "Suffix for displaying years on timeline.");
 
+    bool ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
 
-    //: Do not translate this string unless you know what you're doing.
-    QString hmFormat = tr("hh:mm", "Format for displaying hours and minutes on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString hmApFormat = tr("hh:mm ap", "Format for displaying hours and minutes on timeline, with am/pm indicator.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString hApFormat = tr("h ap", "Format for displaying hours on timeline, with am/pm indicator.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dFormat = tr("dd", "Format for displaying days on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString moFormat = tr("MMMM", "Format for displaying months on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString yFormat = tr("yyyy", "Format for displaying years on timeline");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateMinsFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying minute caption in timeline's header, without am/pm indicator.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateMinsApFormat = tr("dd MMMM yyyy hh:mm ap", "Format for displaying minute caption in timeline's header, with am/pm indicator.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateHoursFormat = tr("dd MMMM yyyy hh:mm", "Format for displaying hour caption in timeline's header, without am/pm indicator.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateHoursApFormat = tr("dd MMMM yyyy h ap", "Format for displaying hour caption in timeline's header, with am/pm indicator.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateDaysFormat = tr("dd MMMM yyyy", "Format for displaying day caption in timeline's header.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateMonthsFormat = tr("MMMM yyyy", "Format for displaying month caption in timeline's header.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dateYearsFormat = tr("yyyy", "Format for displaying year caption in timeline's header");
-
-    const QString& hFormat = ampm ? hApFormat  : hmFormat;
+    const QString& hFormat = ampm ? hApFormat : hmFormat;
     const QString& mFormat = ampm ? hmApFormat : hmFormat;
 
     *absoluteSteps <<
