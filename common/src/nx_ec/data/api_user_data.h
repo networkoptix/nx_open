@@ -22,7 +22,7 @@ namespace ec2
         Qn::GlobalPermissions permissions;
 
         /** Id of the access rights group. */
-        QnUuid group;
+        QnUuid groupId;
 
         QString email;
         QnLatin1Array digest;
@@ -36,7 +36,7 @@ namespace ec2
         /** Flag if user is created from the Cloud. */
         bool isCloud;
     };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)(group)(isCloud)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)(groupId)(isCloud)
 
 }
 

@@ -1696,49 +1696,60 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
-    QSqlQuery insQuery(m_sdb);
-    if (!data.hash.isEmpty())
-        insQuery.prepare("\
-            INSERT OR REPLACE INTO auth_user (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined, first_name, last_name) \
-            VALUES (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '', '', '')\
-        ");
-    else
-        insQuery.prepare("UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name");
-    QnSql::bind(data, &insQuery);
-    insQuery.bindValue(":internalId", internalId);
-    //insQuery.bindValue(":name", data.name);
-    if (!insQuery.exec())
     {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
+        const QString authQueryStr = data.hash.isEmpty()
+            ? "UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name"
+            : R"(
+                INSERT OR REPLACE
+                INTO auth_user
+                (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined, first_name, last_name)
+                VALUES
+                (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '', '', '')
+            )";
+
+
+        QSqlQuery authQuery(m_sdb);
+        if (!prepareSQLQuery(&authQuery, authQueryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+        QnSql::bind(data, &authQuery);
+        authQuery.bindValue(":internalId", internalId);
+        if (!execSQLQuery(&authQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
     }
 
-    QSqlQuery insQuery2(m_sdb);
-    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled) "
-                      "VALUES (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled)");
-    QnSql::bind(data, &insQuery2);
-	if (data.digest.isEmpty() && !data.isLdap)
     {
-        // keep current digest value if exists
-        QSqlQuery digestQuery(m_sdb);
-        digestQuery.setForwardOnly(true);
-        digestQuery.prepare("SELECT digest, crypt_sha512_hash FROM vms_userprofile WHERE user_id = ?");
-        digestQuery.addBindValue(internalId);
-        if (!digestQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << digestQuery.lastError().text();
+        const QString profileQueryStr = R"(
+            INSERT OR REPLACE
+            INTO vms_userprofile
+            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud)
+            VALUES
+            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :groupId, :isCloud)
+        )";
+
+        QSqlQuery profileQuery(m_sdb);
+        if (!prepareSQLQuery(&profileQuery, profileQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
-        }
-        if (digestQuery.next())
+        QnSql::bind(data, &profileQuery);
+
+        if (data.digest.isEmpty() && !data.isLdap)
         {
-            insQuery2.bindValue(":digest", digestQuery.value(0).toByteArray());
-            insQuery2.bindValue(":cryptSha512Hash", digestQuery.value(1).toByteArray());
+            // keep current digest value if exists
+            QSqlQuery digestQuery(m_sdb);
+            digestQuery.setForwardOnly(true);
+            if (!prepareSQLQuery(&digestQuery, "SELECT digest, crypt_sha512_hash FROM vms_userprofile WHERE user_id = ?", Q_FUNC_INFO))
+                return ErrorCode::dbError;
+            digestQuery.addBindValue(internalId);
+            if (!execSQLQuery(&digestQuery, Q_FUNC_INFO))
+                return ErrorCode::dbError;
+            if (digestQuery.next())
+            {
+                profileQuery.bindValue(":digest", digestQuery.value(0).toByteArray());
+                profileQuery.bindValue(":cryptSha512Hash", digestQuery.value(1).toByteArray());
+            }
         }
-    }
-    insQuery2.bindValue(":internalId", internalId);
-    if (!insQuery2.exec())
-    {
-        qWarning() << Q_FUNC_INFO << insQuery2.lastError().text();
-        return ErrorCode::dbError;
+        profileQuery.bindValue(":internalId", internalId);
+        if (execSQLQuery(&profileQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
     }
 
     return ErrorCode::ok;
@@ -3575,22 +3586,23 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
-    //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
+    const QString queryStr = R"(
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
+        u.is_superuser as isAdmin, u.email,
+        p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions,
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud
+        FROM vms_resource r
+        JOIN auth_user u on u.id = r.id
+        JOIN vms_userprofile p on p.user_id = u.id
+        ORDER BY r.guid
+    )";
+
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        u.is_superuser as isAdmin, u.email, p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions, \
-        p.is_ldap as isLdap, p.is_enabled as isEnabled \
-        FROM vms_resource r \
-        JOIN auth_user u  on u.id = r.id\
-        JOIN vms_userprofile p on p.user_id = u.id\
-        ORDER BY r.guid\
-    "));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     QnSql::fetch_many(query, &userList);
 
