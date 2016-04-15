@@ -28,6 +28,7 @@ template<class SocketServerType>
     }
 
 public:
+    /** Arguments are copied to the actual server object */
     template<typename... Args>
     MultiAddressServer(Args... args)
     {
