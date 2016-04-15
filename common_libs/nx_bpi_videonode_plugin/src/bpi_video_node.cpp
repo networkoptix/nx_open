@@ -46,7 +46,7 @@ protected:
 
         m_id_planeWidth = program()->uniformLocation("planeWidth");
         m_id_planeHeight = program()->uniformLocation("planeHeight");
-        m_id_yTextureHeight = program()->uniformLocation("yTextureHeight");
+        m_id_HalfTextureHeight = program()->uniformLocation("halfTextureHeight");
 
         m_id_plane1Textures = program()->uniformLocation("plane1Textures");
         m_id_plane2Texture = program()->uniformLocation("plane2Texture");
@@ -60,7 +60,7 @@ protected:
     int m_id_matrix;
     int m_id_planeWidth;
     int m_id_planeHeight;
-    int m_id_yTextureHeight;
+    int m_id_HalfTextureHeight;
 
     int m_id_plane1Textures;
     int m_id_plane2Texture;
@@ -284,9 +284,9 @@ void QSGVideoMaterialShader_YUV_BiPlanarTiled::updateState(const RenderState &st
     program()->setUniformValue(m_id_colorMatrix, mat->m_colorMatrix);
     program()->setUniformValue(m_id_planeWidth,  (float) mat->m_planeWidth * mat->m_framePixelWidth);
     program()->setUniformValue(m_id_planeHeight, (float) mat->m_framePixelHeight);
-    program()->setUniformValue(m_id_yTextureHeight, (float) (mat->m_framePixelHeight / 2.0));
+    program()->setUniformValue(m_id_HalfTextureHeight, (float) (mat->m_framePixelHeight / 2.0));
 
-    program()->setUniformValue(m_id_yBlocksCount, (float) mat->m_yBlocksCount);
+    program()->setUniformValue(m_id_yBlocksCount, (float) mat->m_yBlocksCount / 2);
     program()->setUniformValue(m_id_yBlocksPerLine, (float) (mat->m_framePixelWidth / 32));
 
     if (state.isOpacityDirty()) {
