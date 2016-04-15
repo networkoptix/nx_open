@@ -140,7 +140,7 @@ var Helper = function () {
         var userAccountDropdownMenu = navbar.element(by.css('[uib-dropdown-menu]'));
         var logoutLink = userAccountDropdownMenu.element(by.linkText('Logout'));
 
-        expect(userAccountDropdownToggle.isDisplayed()).toBe(true);
+        expect(userAccountDropdownToggle.isPresent()).toBe(true);
 
         userAccountDropdownToggle.click();
         logoutLink.click();
@@ -182,8 +182,8 @@ var Helper = function () {
         browser.controlFlow().wait(this.getEmailTo(userEmail, this.emailSubjects.register).then(function (email) {
             // extract registration token from the link in the email message
 
-            var pathToIndex = '/static/index.html#';
-            var pattern = new RegExp(pathToIndex + "/activate/(\\w+)", "g");
+            var pathToIndex = '/static/index.html#/';
+            var pattern = new RegExp(pathToIndex + "activate/(\\w+)", "g");
             var regCode = pattern.exec(email.html)[1];
             console.log(regCode);
             browser.get('/#/activate/' + regCode);
