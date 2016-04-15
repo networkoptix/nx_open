@@ -69,6 +69,8 @@ public:
     bool isTimeSynchronizationEnabled() const;
     bool takeCameraOwnershipWithoutLock() const;
 
+    std::chrono::seconds proxyConnectTimeout() const;
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -120,6 +122,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+    /** seconds */
+    QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor;
     QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
