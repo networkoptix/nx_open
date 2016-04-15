@@ -193,6 +193,21 @@ TEST_F(TunnelConnector, badSynAck)
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 
+//currently, this test requires hack in UnreliableMessagePipeline::messageSent:
+//  errorCode have to be set to SystemError::connectionReset
+//TEST_F(TunnelConnector, remotePeerUdpPortNotAccessible)
+//{
+//    //starting mediator
+//    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+//
+//    const auto connectResult = doSimpleConnectTest(
+//        std::chrono::seconds::zero(),   //no timeout
+//        MediaServerEmulator::ActionToTake::proceedWithConnection);
+//
+//    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+//    ASSERT_EQ(nullptr, connectResult.connection);
+//}
+
 TEST_F(TunnelConnector, timeout)
 {
     //starting mediator

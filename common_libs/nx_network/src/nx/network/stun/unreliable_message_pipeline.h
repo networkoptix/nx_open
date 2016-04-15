@@ -290,10 +290,18 @@ private:
             NX_ASSERT(bytesSent == m_sendQueue.front().serializedMessage.size());
         }
 
-        if (m_sendQueue.front().completionHandler)
-            m_sendQueue.front().completionHandler(
+        auto completionHandler = std::move(m_sendQueue.front().completionHandler);
+        if (completionHandler)
+        {
+            bool thisHasBeenFreed = false;
+            m_terminationFlag = &thisHasBeenFreed;
+            completionHandler(
                 errorCode,
                 std::move(resolvedTargetAddress));
+            if (thisHasBeenFreed)
+                return;
+            m_terminationFlag = nullptr;
+        }
         m_sendQueue.pop_front();
 
         if (!m_sendQueue.empty())
