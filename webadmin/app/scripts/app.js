@@ -1,7 +1,6 @@
 'use strict';
 
 angular.module('webadminApp', [
-    'ipCookie',
     'ngResource',
     'ngSanitize',
     'ngRoute',
@@ -15,7 +14,26 @@ angular.module('webadminApp', [
         'self',
         Config.cloud.portalWhiteList]);
 }).config(function ($routeProvider) {
-    $routeProvider
+
+    var universalResolves = {
+        currentUser: function(mediaserver){
+            return mediaserver.getCurrentUser();
+        }
+    };
+
+    var customRouteProvider = angular.extend({}, $routeProvider, {
+        when: function(path, route) {
+            route.resolve = (route.resolve) ? route.resolve : {};
+            angular.extend(route.resolve, universalResolves);
+            $routeProvider.when(path, route);
+            return this;
+        },
+        otherwise:function(route){
+            $routeProvider.otherwise( route);
+        }
+    });
+
+    customRouteProvider
         .when('/settings', {
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
@@ -83,10 +101,7 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/view'
         });
-});
-
-
-angular.module('webadminApp').run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
     var original = $location.path;
     $location.path = function (path, reload) {
         if (reload === false) {
