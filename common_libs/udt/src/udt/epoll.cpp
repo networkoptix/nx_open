@@ -592,6 +592,7 @@ int CEPoll::doSystemPoll(
 
     memset(ev, 0, sizeof(ev));
     struct timespec timeout;
+    int msTimeOut = 0;
     if (msTimeOut >= 0)
     {
         memset(&timeout, 0, sizeof(timeout));
