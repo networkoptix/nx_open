@@ -34,11 +34,8 @@ bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) {
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    smtp.setUser(settings.user);
-    smtp.setPassword(settings.password);
-
     if (!smtp.connectToHost()) return false;
-    bool result = smtp.login();
+    bool result = smtp.login(settings.user, settings.password);
     smtp.quit();
     return result;
 }
