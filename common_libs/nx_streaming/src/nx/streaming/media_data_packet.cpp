@@ -5,7 +5,7 @@
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_OSX
 #include <smmintrin.h>
 #endif
 
