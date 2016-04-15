@@ -6,6 +6,13 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
 
+namespace
+{
+    int qPower2Ceil(int value, int step) {
+        return ((value - 1) & ~(step - 1)) + step;
+    }
+}
+
 QSGVideoNode *QSGVideoNodeFactory_YUV::createNode(const QVideoSurfaceFormat &format)
 {
     return new QSGVideoNode_YUV(format);
@@ -39,6 +46,7 @@ protected:
 
         m_id_planeWidth = program()->uniformLocation("planeWidth");
         m_id_planeHeight = program()->uniformLocation("planeHeight");
+        m_id_yTextureHeight = program()->uniformLocation("yTextureHeight");
 
         m_id_plane1Texture = program()->uniformLocation("plane1Texture");
         m_id_plane2Texture = program()->uniformLocation("plane2Texture");
@@ -53,6 +61,7 @@ protected:
     int m_id_matrix;
     int m_id_planeWidth;
     int m_id_planeHeight;
+    int m_id_yTextureHeight;
 
     int m_id_plane1Texture;
     int m_id_plane2Texture;
@@ -177,8 +186,8 @@ void QnBpiSGVideoMaterial_YUV::bind()
     if (m_frame.isValid()) {
         if (m_frame.map(QAbstractVideoBuffer::ReadOnly))
         {
-            int fw = m_frame.width();
-            int fh = m_frame.height();
+            int fw = qPower2Ceil(m_frame.width(), 32);
+            int fh = qPower2Ceil(m_frame.height(), 32);
 
             int fullSize = fw*fh;
 
@@ -195,7 +204,7 @@ void QnBpiSGVideoMaterial_YUV::bind()
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
             m_framePixelWidth = m_frame.width();
-            m_framePixelHeight = m_frame.height();
+            m_framePixelHeight = fh;
 
             {
                 const int y = 0;
@@ -207,11 +216,11 @@ void QnBpiSGVideoMaterial_YUV::bind()
                 functions->glActiveTexture(GL_TEXTURE1);
                 bindTexture(m_textureIds[1], 512, m_yBlocksCount / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
 
-                ////functions->glActiveTexture(GL_TEXTURE2);
-                ////bindTexture(m_textureIds[2], 1024, m_yBlocksCount - 1024, m_frame.bits(y) + 1024 * 1024, GL_LUMINANCE);
+                functions->glActiveTexture(GL_TEXTURE2);
+                bindTexture(m_textureIds[2], 1024, m_yBlocksCount / 2, m_frame.bits(y) + fw*fh / 2, GL_LUMINANCE);
 
                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
-                bindTexture(m_textureIds[0], 1024, m_yBlocksCount/*1024*/, m_frame.bits(y), GL_LUMINANCE);
+                bindTexture(m_textureIds[0], 1024, m_yBlocksCount / 2 , m_frame.bits(y), GL_LUMINANCE);
             }
 
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
@@ -275,6 +284,7 @@ void QSGVideoMaterialShader_YUV_BiPlanarTiled::updateState(const RenderState &st
     program()->setUniformValue(m_id_colorMatrix, mat->m_colorMatrix);
     program()->setUniformValue(m_id_planeWidth,  (float) mat->m_planeWidth * mat->m_framePixelWidth);
     program()->setUniformValue(m_id_planeHeight, (float) mat->m_framePixelHeight);
+    program()->setUniformValue(m_id_yTextureHeight, (float) (mat->m_framePixelHeight / 2.0));
 
     program()->setUniformValue(m_id_yBlocksCount, (float) mat->m_yBlocksCount);
     program()->setUniformValue(m_id_yBlocksPerLine, (float) (mat->m_framePixelWidth / 32));
