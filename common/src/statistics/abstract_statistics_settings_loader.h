@@ -10,12 +10,14 @@ struct QnStatisticsSettings
 {
     int limit;
     int storeDays;
+    int minSendPeriodSecs;
     QnStringsSet filters;
+    QString statisticsServerUrl;
 
     QnStatisticsSettings();
 };
 
-#define QnStatisticsSettings_Fields (limit)(storeDays)(filters)
+#define QnStatisticsSettings_Fields (limit)(storeDays)(minSendPeriodSecs)(filters)(statisticsServerUrl)
 QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsSettings, (json)(ubjson)(xml)(csv_record)(eq)(metatype))
 
 class QnAbstractStatisticsSettingsLoader : public QObject
@@ -34,6 +36,8 @@ public:
     virtual bool settingsAvailable() = 0;
 
     virtual QnStatisticsSettings settings() = 0;
+
+    virtual void updateSettings() = 0;
 
 signals:
     void settingsAvailableChanged();

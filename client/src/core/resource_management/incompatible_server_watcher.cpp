@@ -96,6 +96,7 @@ void QnIncompatibleServerWatcher::stop()
         ids = d->fakeUuidByServerUuid.values();
         d->fakeUuidByServerUuid.clear();
         d->serverUuidByFakeUuid.clear();
+        d->discoveredServerItemById.clear();
     }
 
     for (const QnUuid &id: ids)

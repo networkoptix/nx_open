@@ -6,20 +6,53 @@
 
 #ifdef USE_LIBJPEG
 #include <libjpeg/jpeglib.h>
+#include <setjmp.h>
 #endif
 
 #ifdef USE_LIBJPEG
-static void imageCleanup(void *info)
+
+namespace
 {
-    delete [](uchar*)info;
+
+    void imageCleanup(void *info)
+    {
+        delete [](uchar*)info;
+    }
+
+    struct error_mgr : jpeg_error_mgr
+    {
+        jmp_buf setjmp_buffer;
+    };
+
+    void error_exit(j_common_ptr cinfo)
+    {
+        error_mgr *err = static_cast<error_mgr *>(cinfo->err);
+
+        char message[JMSG_LENGTH_MAX];
+        (*cinfo->err->format_message)(cinfo, message);
+        qWarning() << message;
+
+        longjmp(err->setjmp_buffer, 1);
+    }
+
 }
 
 QImage decompressJpegImage(const char *data, size_t size)
 {
     jpeg_decompress_struct jinfo;
-    jpeg_error_mgr jerr;
+    error_mgr jerr;
+    uchar *buffer = nullptr;
 
     jinfo.err = jpeg_std_error(&jerr);
+    jerr.error_exit = &error_exit;
+
+    if (setjmp(jerr.setjmp_buffer))
+    {
+        jpeg_destroy_decompress(&jinfo);
+        if (buffer)
+            delete []buffer;
+        return QImage();
+    }
 
     jpeg_create_decompress(&jinfo);
     jpeg_mem_src(&jinfo, (uchar*)data, size);
@@ -31,7 +64,7 @@ QImage decompressJpegImage(const char *data, size_t size)
     int width = jinfo.output_width;
     int height = jinfo.output_height;
     int bytesPerLine = jinfo.output_width * jinfo.output_components;
-    uchar *buffer = new uchar[bytesPerLine * height];
+    buffer = new uchar[bytesPerLine * height];
 
     while (jinfo.output_scanline < jinfo.output_height)
     {

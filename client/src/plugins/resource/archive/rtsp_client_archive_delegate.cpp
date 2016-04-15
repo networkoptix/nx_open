@@ -177,10 +177,14 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         return;
     }
 
+    auto currentServer = qnResPool->getResourceById(camera->getParentId());
     QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
-    if (mediaServerList.size() <= 1) {
+    /* Or check if archive belong to the current server only */
+    if (mediaServerList.isEmpty() ||
+        mediaServerList.size() == 1 && mediaServerList[0] == currentServer)
+    {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
@@ -261,14 +265,15 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        if (m_isMultiserverAllowed)
-            checkMinTimeFromOtherServer(m_camera);
-
         qint64 endTime = m_position;
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
+
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera);
+
         RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
             setRtpData(trackInfo[0]->ioDevice);

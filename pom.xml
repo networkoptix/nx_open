@@ -165,6 +165,7 @@
         <!--QT plugins used-->
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
+	<!-- Linux Only -->
         <qtplugin3/>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -607,6 +608,7 @@
                 <module>debsetup/mediaserver-deb</module>
             </modules>
             <properties>
+                <qtplugin3>platforminputcontexts</qtplugin3>
                 <modification>ubuntu</modification>
             </properties>
         </profile>
@@ -970,5 +972,22 @@
                 <compile.option1/>
             </properties>
         </profile>
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>test</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <modules>
+                <module>unit_tests</module>
+            </modules>
+        </profile>        
     </profiles>
 </project>

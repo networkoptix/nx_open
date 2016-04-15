@@ -51,6 +51,7 @@ namespace {
     const QString nameBackupQualities(lit("backupQualities"));
     const QString nameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
     const QString nameStatisticsAllowed(lit("statisticsAllowed"));
+	const QString nameCrossdomainEnabled(lit("crossdomainEnabled"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -69,6 +70,8 @@ namespace {
 
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
+    const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
+    const int kProxyConnectTimeoutDefault = 5;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
@@ -162,6 +165,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameBackupQualities, Qn::CameraBackup_Both, this);
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameBackupNewCamerasByDefault, false, this);
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(nameStatisticsAllowed, QnOptionalBool(), this);
+	m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCrossdomainEnabled, true, this);	
 
     QList<QnAbstractResourcePropertyAdaptor*> ec2Adaptors;
     m_ec2ConnectionKeepAliveTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
@@ -189,6 +193,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         true,
         this);
     ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
+    m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kProxyConnectTimeout,
+        kProxyConnectTimeoutDefault,
+        this);
+    ec2Adaptors << m_proxyConnectTimeoutAdaptor;
 
     for(auto adaptor: ec2Adaptors)
         connect(
@@ -218,6 +227,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
         << m_statisticsAllowedAdaptor
+		<< m_crossdomainXmlEnabledAdaptor
         << ec2Adaptors
         << m_arecontRtspEnabled
         ;
@@ -261,6 +271,14 @@ bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
 
 void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled) {
     m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
+}
+
+bool QnGlobalSettings::isCrossdomainXmlEnabled() const {
+    return m_crossdomainXmlEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled) {
+    m_crossdomainXmlEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -435,7 +453,8 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
 }
 
-bool QnGlobalSettings::isTimeSynchronizationEnabled() const {
+bool QnGlobalSettings::isTimeSynchronizationEnabled() const
+{
     return m_timeSynchronizationEnabledAdaptor->value();
 }
 
@@ -447,6 +466,11 @@ bool QnGlobalSettings::arecontRtspEnabled() const
 void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 {
     m_arecontRtspEnabled->setValue(newVal);
+}
+
+std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
+{
+    return std::chrono::seconds(m_proxyConnectTimeoutAdaptor->value());
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

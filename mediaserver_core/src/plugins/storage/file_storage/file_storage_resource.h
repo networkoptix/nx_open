@@ -41,7 +41,7 @@ public:
     virtual qint64 getTotalSpace() override;
 
     virtual int getCapabilities() const override;
-    virtual bool isAvailable() const override;
+    virtual bool initOrUpdate() const override;
 
     virtual void setUrl(const QString& url) override;
 
@@ -60,7 +60,7 @@ public:
 private:
     virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
-    bool initOrUpdate() const;
+    bool initOrUpdateInternal() const;
     bool updatePermissions() const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
@@ -79,7 +79,6 @@ private:
 
     void setLocalPathSafe(const QString &path) const;
     QString getLocalPathSafe() const;
-
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -87,16 +86,15 @@ public:
     static void removeOldDirs();
 
 private:
-    // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
-    mutable bool m_dirty;
-    mutable bool m_valid;
+    mutable std::atomic<bool> m_valid;
+    mutable boost::optional<bool> m_dbReady;
 
 private:
-    mutable QnMutex     m_mutexPermission;
+    mutable QnMutex     m_mutexCheckStorage;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
 
-    mutable qint64      m_cachedTotalSpace;
+    mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
 };

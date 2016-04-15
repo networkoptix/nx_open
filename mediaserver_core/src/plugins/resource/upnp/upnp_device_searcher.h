@@ -139,7 +139,10 @@ private:
     mutable QnMutex m_mutex;
     quint64 m_timerID;
     std::list<UPNPSearchHandler*> m_handlers;
+    mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     //map<local interface ip, socket>
+
+    //Sockets in this list listen for unicast responses to correspondent interface
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
     HttpClientsDict m_httpClients;
@@ -150,6 +153,10 @@ private:
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
 
+    //Receive socket listens for multicast packets on all interfaces
+    std::shared_ptr<AbstractDatagramSocket> m_receiveSocket;
+    nx::Buffer m_receiveBuffer;
+
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
     void onSomeBytesRead(
@@ -158,7 +165,9 @@ private:
         nx::Buffer* readBuffer,
         size_t bytesRead ) noexcept;
 
-    void dispatchDiscoverPackets();
+    void dispatchDiscoverPackets();\
+    bool isInterfaceListChanged() const;
+    void updateReceiveSocket();
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml(
         const QByteArray& uuidStr,

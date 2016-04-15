@@ -444,7 +444,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 
     auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
     storage->setSpaceLimit(spaceLimit);
-    storage->setUsedForWriting(storage->isWritable());
+    storage->setUsedForWriting(storage->initOrUpdate() && storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
@@ -558,6 +558,7 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
+        // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
@@ -1069,7 +1070,13 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
         for(const QnResourcePtr& storage: storages)
+        {
             messageProcessor->updateResource( storage );
+            // initialize storage immediately in sync mode
+			// todo: remove this call. Need refactor
+            if (storage->getParentId() == qnCommon->moduleGUID())
+                storage.dynamicCast<QnStorageResource>()->initOrUpdate();
+        }
     }
 
 
@@ -1407,7 +1414,6 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 bool MediaServerProcess::initTcpListener()
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
-    m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
     m_httpModManager->addCustomRequestMod( std::bind(
@@ -1460,7 +1466,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
-    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
@@ -2190,6 +2196,9 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
+        m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
+
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
         qnCommon->updateModuleInformation();
@@ -2199,9 +2208,11 @@ void MediaServerProcess::run()
         typedef ec2::Ec2StaticticsReporter stats;
         bool adminParamsChanged = false;
 
+        // TODO: #ynikitenkov fix to use qnGlobalSettings in 2.6
         // TODO: fix, when VS supports init lists:
         //       for (const auto& param : { stats::SR_TIME_CYCLE, stats::SR_SERVER_API })
-        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API };
+        const QString* statParams[] = { &stats::SR_TIME_CYCLE, &stats::SR_SERVER_API
+            , &QnMultiserverStatisticsRestHandler::kSettingsUrlParam };
         for (auto it = &statParams[0]; it != &statParams[sizeof(statParams)/sizeof(statParams[0])]; ++it)
         {
             const QString& param = **it;

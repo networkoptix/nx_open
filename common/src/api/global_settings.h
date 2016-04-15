@@ -44,6 +44,9 @@ public:
     bool isServerAutoDiscoveryEnabled() const;
     void setServerAutoDiscoveryEnabled(bool enabled);
 
+    bool isCrossdomainXmlEnabled() const;
+    void setCrossdomainXmlEnabled(bool enabled);
+
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
 
@@ -81,6 +84,8 @@ public:
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
+    std::chrono::seconds proxyConnectTimeout() const;
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -113,6 +118,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_crossdomainXmlEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
@@ -143,6 +149,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+    /** seconds */
+    QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor;
 
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabled;
 

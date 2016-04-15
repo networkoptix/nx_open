@@ -6,5 +6,10 @@
 
 struct QnSendStatisticsRequestData : public QnMultiserverRequestData
 {
+    void loadFromParams(const QnRequestParamList& params) override;
+
+    QnRequestParamList toParams() const override;
+
+    QString statisticsServerUrl;
     QnMetricHashesList metricsList;
 };

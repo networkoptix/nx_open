@@ -29,7 +29,7 @@ class QnThumbnailImageButtonWidget: public QnImageButtonWidget {
 
 public:
     QnThumbnailImageButtonWidget(QGraphicsItem *parent = NULL):
-        base_type(parent) {}
+        base_type(lit("thumbnails_image"), parent) {}
 
     const QImage& thumbnail() const {
         return m_thumbnail;

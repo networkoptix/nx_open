@@ -184,6 +184,8 @@ Window {
             var connectionState = connectionManager.connectionState
             if (connectionState == QnConnectionManager.Connected)
             {
+                lockScreenOrientation()
+
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
@@ -200,6 +202,8 @@ Window {
             }
             else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "")
             {
+                unlockScreenOrientation()
+
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
 
@@ -211,6 +215,8 @@ Window {
         }
 
         onConnectionFailed: {
+            unlockScreenOrientation()
+
             Main.openFailedSession(
                         currentSessionId,
                         currentHost, currentPort,
@@ -228,6 +234,7 @@ Window {
     Component.onCompleted: {
         updateNavigationBarPlaceholderSize()
         if (loginSessionManager.lastUsedSessionId) {
+            lockScreenOrientation()
             currentSystemName = loginSessionManager.lastUsedSessionSystemName()
             stackView.push(resourcesPageComponent)
             LoginFunctions.connectToServer(
@@ -260,4 +267,14 @@ Window {
     }
 
     Screen.onPrimaryOrientationChanged: updateNavigationBarPlaceholderSize()
+
+    function lockScreenOrientation()
+    {
+        setScreenOrientation(Screen.orientation)
+    }
+
+    function unlockScreenOrientation()
+    {
+        setScreenOrientation(Qt.PrimaryOrientation)
+    }
 }

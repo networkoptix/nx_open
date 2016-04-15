@@ -94,15 +94,18 @@ public:
         TruncableChunk              chunk;
         QString                     cameraId;
         QnServer::ChunksCatalog     quality;
+        bool                        isBackup;
 
         UniqueChunk(
             const TruncableChunk        &chunk, 
             const QString               &cameraId,
-            QnServer::ChunksCatalog     quality
+            QnServer::ChunksCatalog     quality,
+            bool                        isBackup
         ) 
           : chunk(chunk),
             cameraId(cameraId),
-            quality(quality)
+            quality(quality),
+            isBackup(isBackup)
         {}
     };
 
@@ -264,17 +267,19 @@ inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs,
 {
     return lhs.chunk.toBaseChunk().startTimeMs == rhs.chunk.toBaseChunk().startTimeMs &&
            lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
-           lhs.cameraId == rhs.cameraId &&
-           lhs.quality == rhs.quality;
+           lhs.cameraId == rhs.cameraId && lhs.quality == rhs.quality && 
+           lhs.isBackup == rhs.isBackup;
 }
 
 inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs, 
                         const DeviceFileCatalog::UniqueChunk    &rhs)
 {
-    if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality) {
+    if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality || lhs.isBackup != rhs.isBackup) {
         return lhs.cameraId < rhs.cameraId ?
                true : lhs.cameraId > rhs.cameraId ?
-                      false : lhs.quality < rhs.quality;
+                      false : lhs.quality < rhs.quality ? 
+                            true : lhs.quality > rhs.quality ? 
+                                false : lhs.isBackup < rhs.isBackup;
     } else {
         return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
     }

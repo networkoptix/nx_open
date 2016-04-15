@@ -85,6 +85,9 @@ namespace ConnectionType
 
 static const int DEFAULT_READ_BUFFER_SIZE = 4 * 1024;
 static const int SOCKET_TIMEOUT = 1000 * 1000;
+//following value is for VERY slow networks and VERY large transactions (e.g., some large image)
+    //Connection keep-alive timeout is not influenced by this value
+static const std::chrono::minutes kSocketSendTimeout(23);
 const char* QnTransactionTransport::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary";
 const char* QnTransactionTransport::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
@@ -140,7 +143,9 @@ QnTransactionTransport::QnTransactionTransport(
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
-    if( !m_outgoingDataSocket->setSendTimeout(m_idleConnectionTimeout.count()) )
+    using namespace std::chrono;
+    if (!m_outgoingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count()))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QnLog::EC2_TRAN_LOG,
@@ -938,20 +943,24 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
 
 void QnTransactionTransport::monitorConnectionForClosure(
     SystemError::ErrorCode errorCode,
-    size_t bytesRead )
+    size_t bytesRead)
 {
     QnMutexLocker lock( &m_mutex );
 
-    if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
+    if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed by remote peer").
-            arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()), cl_logWARNING );
-        return setStateNoLock( State::Error );
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("transaction connection %1 received from %2 failed: %3")
+                .arg(m_connectionGuid.toString())
+                .arg(m_outgoingDataSocket->getForeignAddress().toString())
+                .arg(SystemError::toString(errorCode)),
+            cl_logWARNING);
+        return setStateNoLock(State::Error);
     }
 
-    if( bytesRead == 0 )
+    if (bytesRead == 0)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed").
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("transaction connection %1 received from %2 has been closed by remote peer").
             arg(m_connectionGuid.toString()).arg(m_outgoingDataSocket->getForeignAddress().toString()),
             cl_logWARNING );
         return setStateNoLock( State::Error );
@@ -1115,8 +1124,10 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         //using http client just to authenticate on server
         if( !m_outgoingTranClient )
         {
+            using namespace std::chrono;
             m_outgoingTranClient = nx_http::AsyncHttpClient::create();
-            m_outgoingTranClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
+            m_outgoingTranClient->setSendTimeoutMs(
+                duration_cast<milliseconds>(kSocketSendTimeout).count());   //it can take a long time to send large transactions
             m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,
@@ -1575,8 +1586,10 @@ void QnTransactionTransport::startListeningNonSafe()
 
     if( m_incomingDataSocket )
     {
+        using namespace std::chrono;
         m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_incomingDataSocket->setSendTimeout(SOCKET_TIMEOUT);
+        m_incomingDataSocket->setSendTimeout(
+            duration_cast<milliseconds>(kSocketSendTimeout).count());
         m_incomingDataSocket->setNonBlockingMode(true);
         using namespace std::placeholders;
         m_lastReceiveTimer.restart();
@@ -1601,8 +1614,11 @@ void QnTransactionTransport::postTransactionDone( const nx_http::AsyncHttpClient
 
     if( client->failed() || !client->response() )
     {
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Unknown network error posting transaction to %1").
-            arg(m_postTranBaseUrl.toString()), cl_logWARNING );
+        NX_LOG(QnLog::EC2_TRAN_LOG,
+            lit("Network error posting transaction to %1. system result code: %2")
+                .arg(m_postTranBaseUrl.toString())
+                .arg(SystemError::toString(client->lastSysErrorCode())),
+            cl_logWARNING);
         setStateNoLock( Error );
         return;
     }

@@ -22,7 +22,7 @@ angular.module('webadminApp')
             disabledVendors: {label:"Disabled vendors", type:"text"},
             ec2AliveUpdateIntervalSec: {label:"System alive update interval", type:"number"},
             ec2ConnectionKeepAliveTimeoutSec: {label:"Connection keep alive timeout", type:"number"},
-            ec2KeepAliveProbeCount: {label:"Connection keep probes", type:"number"},
+            ec2KeepAliveProbeCount: {label:"Connection keep alive probes", type:"number"},
             emailFrom: {label:"Email from", type:"text"},
             emailSignature: {label:"Email signature", type:"text"},
             emailSupportEmail: {label:"Support Email", type:"text"},
@@ -40,6 +40,7 @@ angular.module('webadminApp')
             smptPassword: {label:"SMTP password", type:"text"},
             smtpUser: {label:"SMTP user", type:"text"},
             updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"},
+            crossdomainEnabled: {label:"Enable webclient flash player support (crossdomain.xml)", type:"checkbox"},	    
             arecontRtspEnabled: {label:"Arecont RTSP Enabled", type:"checkbox"},
 
             backupNewCamerasByDefault: {label:"Backup new cameras by default",type:"checkbox"},

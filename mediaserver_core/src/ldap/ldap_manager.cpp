@@ -40,6 +40,23 @@
 
 #include "network/authutil.h"
 
+namespace {
+    Qn::LdapResult translateErrorCode(LDAP_RESULT ldapCode)
+    {
+        switch(ldapCode)
+        {
+        case LDAP_SUCCESS:
+            return Qn::Ldap_NoError;
+        case LDAP_SIZELIMIT_EXCEEDED:
+            return Qn::Ldap_SizeLimit;
+        case LDAP_INVALID_CREDENTIALS:
+            return Qn::Ldap_InvalidCredentials;
+        default:
+            return Qn::Ldap_Other;
+        }
+    }
+}
+
 #ifdef Q_OS_WIN
 static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert) {
     Q_UNUSED(Connection)
@@ -194,13 +211,14 @@ public:
     Qn::AuthResult authenticateWithDigest(const QString &login, const QString &digest);
     QString getRealm();
 
-    QString lastError() const;
+    LDAP_RESULT lastErrorCode() const;
+    QString lastErrorString() const;
 
 private:
     bool detectLdapVendor(LdapVendor &);
 
     const QnLdapSettings& m_settings;
-    QString m_lastError;
+    LDAP_RESULT m_lastErrorCode;
 
     std::unique_ptr<DirectoryType> m_dType;
     LDAP *m_ld;
@@ -230,13 +248,13 @@ bool LdapSession::connect()
 
     if (m_ld == 0)
     {
-        m_lastError = LdapErrorStr(LdapGetLastError());
+        m_lastErrorCode = LdapGetLastError();
         return false;
     }
 #elif defined(Q_OS_LINUX)
     if (ldap_initialize(&m_ld, QSTOCW(uri.toString())) != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(LdapGetLastError());
+        m_lastErrorCode = LdapGetLastError();
         return false;
     }
 #endif
@@ -245,7 +263,7 @@ bool LdapSession::connect()
     int rc = ldap_set_option(m_ld, LDAP_OPT_PROTOCOL_VERSION, &desired_version);
     if (rc != 0)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -258,7 +276,7 @@ bool LdapSession::connect()
     rc = ldap_connect(m_ld, NULL); // Need to connect before SASL bind!
     if (rc != 0)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 #endif
@@ -281,10 +299,10 @@ bool LdapSession::connect()
 
 bool LdapSession::fetchUsers(QnLdapUsers &users)
 {
-    int rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
+    LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -294,7 +312,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users)
     rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -326,7 +344,7 @@ bool LdapSession::testSettings()
     int rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -336,7 +354,7 @@ bool LdapSession::testSettings()
     rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -360,7 +378,7 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
     ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
     if (res != LDAP_SASL_BIND_IN_PROGRESS) {
-        m_lastError = LdapErrorStr(res);
+        m_lastErrorCode = res;
         return Qn::Auth_ConnectError;
     }
     
@@ -423,7 +441,7 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
     if (res == LDAP_SUCCESS)
         return Qn::Auth_OK;
     else {
-        m_lastError = LdapErrorStr(res);
+        m_lastErrorCode = res;
         return Qn::Auth_WrongPassword;
     }
 }
@@ -442,7 +460,7 @@ QString LdapSession::getRealm()
     ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
     ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
     if (res != LDAP_SASL_BIND_IN_PROGRESS) {
-        m_lastError = LdapErrorStr(res);
+        m_lastErrorCode = res;
         return result;
     }
     
@@ -463,9 +481,14 @@ QString LdapSession::getRealm()
     return result;
 }
 
-QString LdapSession::lastError() const
+LDAP_RESULT LdapSession::lastErrorCode() const
 {
-    return m_lastError;
+    return m_lastErrorCode;
+}
+
+QString LdapSession::lastErrorString() const
+{
+    return LdapErrorStr(m_lastErrorCode);
 }
 
 bool LdapSession::detectLdapVendor(LdapVendor &vendor)
@@ -473,7 +496,7 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     int rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -483,7 +506,7 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     rc = ldap_search_ext_s(m_ld, NULL, LDAP_SCOPE_BASE, NULL, NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
-        m_lastError = LdapErrorStr(rc);
+        m_lastErrorCode = rc;
         return false;
     }
 
@@ -504,43 +527,27 @@ bool LdapSession::detectLdapVendor(LdapVendor &vendor)
     return true;
 }
 
-bool QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) {
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings)
+{
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::fetchUsers: connect(): %1").arg(session.lastError()), cl_logWARNING );
-        return false;
+        NX_LOG( QString::fromLatin1("QnLdapManager::fetchUsers: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        return translateErrorCode(session.lastErrorCode());
     }
 
     if (!session.fetchUsers(users))
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::fetchUsers: fetchUser(): %1").arg(session.lastError()), cl_logWARNING );
-        return false;
+        NX_LOG( QString::fromLatin1("QnLdapManager::fetchUsers: fetchUser(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        return translateErrorCode(session.lastErrorCode());
     }
 
-    return true;
+    return Qn::Ldap_NoError;
 }
 
-bool QnLdapManager::fetchUsers(QnLdapUsers &users) {
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
     QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
     return fetchUsers(users, settings);
-}
-
-bool QnLdapManager::testSettings(const QnLdapSettings& settings) {
-    LdapSession session(settings);
-    if (!session.connect())
-    {
-        NX_LOG( QString::fromLatin1("QnLdapManager::testSettings: connect(): %1").arg(session.lastError()), cl_logWARNING );
-        return false;
-    }
-
-    if (!session.testSettings())
-    {
-        NX_LOG( QString::fromLatin1("QnLdapManager::testSettings: testSettings(): %1").arg(session.lastError()), cl_logWARNING );
-        return false;
-    }
-
-    return true;
 }
 
 Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
@@ -548,13 +555,13 @@ Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: connect(): %1").arg(session.lastError()), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
         return Qn::Auth_ConnectError;
     }
 
     auto authResult = session.authenticateWithDigest(login, digest);
     if (authResult != Qn::Auth_OK)
-        NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: authenticateWithDigest(): %1").arg(session.lastError()), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: authenticateWithDigest(): %1").arg(session.lastErrorString()), cl_logWARNING );
 
     return authResult;
 }
@@ -570,14 +577,14 @@ Qn::AuthResult  QnLdapManager::realm(QString* realm) const
         LdapSession session(settings);
         if (!session.connect())
         {
-            NX_LOG( QString::fromLatin1("QnLdapManager::realm: connect(): %1").arg(session.lastError()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("QnLdapManager::realm: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
             return Qn::Auth_ConnectError;
         }
 
         QString realm = session.getRealm();
         if (realm.isEmpty())
         {
-            NX_LOG( QString::fromLatin1("QnLdapManager::realm: realm(): %1").arg(session.lastError()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("QnLdapManager::realm: realm(): %1").arg(session.lastErrorString()), cl_logWARNING );
             return Qn::Auth_ConnectError;
         }
 
@@ -585,4 +592,17 @@ Qn::AuthResult  QnLdapManager::realm(QString* realm) const
     }
     *realm = m_realmCache[uriString];
     return Qn::Auth_OK;
+}
+
+QString QnLdapManager::errorMessage(Qn::LdapResult ldapResult)
+{
+    switch(ldapResult)
+    {
+    case Qn::Ldap_SizeLimit:
+        return lit("User limit exceeded. Narrow your filter or fix server configuration.");
+    case Qn::Ldap_InvalidCredentials:
+        return lit("Invalid credentials");
+    default:
+        return lit("Invalid ldap settings");
+    }
 }

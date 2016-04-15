@@ -127,15 +127,27 @@ public:
         }
         else
         {
-            //checking that socket is not registered in aio
-            Q_ASSERT_X(
-                !HostAddressResolver::instance()->isRequestIDKnown(this),
-                Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (1)" );
-            Q_ASSERT_X(
-                !aio::AIOService::instance()->isSocketBeingWatched(this->m_socket),
-                Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );
+            if (HostAddressResolver::instance()->isRequestIDKnown(this))
+            {
+                Q_ASSERT_X(
+                    false, Q_FUNC_INFO,
+                    "You MUST cancel running async socket operation before "
+                    "deleting socket if you delete socket from non-aio thread (1)");
+
+                // SIGSEGV in release to make usefull crash dump!
+                *reinterpret_cast<volatile int*>(0) = 1;
+            }
+
+            if (aio::AIOService::instance()->isSocketBeingWatched(this->m_socket))
+            {
+                Q_ASSERT_X(
+                    false, Q_FUNC_INFO,
+                    "You MUST cancel running async socket operation before "
+                    "deleting socket if you delete socket from non-aio thread (2)");
+
+                // SIGSEGV in release to make usefull crash dump!
+                *reinterpret_cast<volatile int*>(0) = 2;
+            }
         }
     }
 

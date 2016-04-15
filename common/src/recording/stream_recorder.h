@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <random>
+
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
@@ -191,6 +193,7 @@ protected:
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
+    void cleanFfmpegContexts();
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
@@ -244,6 +247,9 @@ private:
     bool m_recordingFinished;
     Role m_role;
     QnImageFilterHelper m_extraTranscodeParams;
+
+    std::random_device m_rd;
+    std::mt19937 m_gen;
 };
 
 Q_DECLARE_METATYPE(QnStreamRecorder::ErrorStruct)

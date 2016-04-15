@@ -322,10 +322,13 @@ int formatJSonStringInternal(const char* srcPtr, const char* srcEnd, char* dstPt
     const char* srcPtrBase = srcPtr;
     int indent = 0;
     bool quoted = false;
+    bool escaped = false;
     for (; srcPtr < srcEnd; ++srcPtr)
     {
-        if (*srcPtr == '"' && (srcPtr > srcPtrBase || srcPtr[-1] != '\\'))
+        if (*srcPtr == '"' && !escaped)
             quoted = !quoted;
+
+        escaped = *srcPtr == '\\' && !escaped;
 
         int symbolIdx = INPUT_DELIMITERS.indexOf(*srcPtr);
         bool isDelimBefore = (symbolIdx >= 0 && INDENTS[symbolIdx] < 0);

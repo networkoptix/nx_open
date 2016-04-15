@@ -11,7 +11,7 @@ import "../controls"
 import ".."
 
 QnPage {
-    id: videoPlayer
+    id: videoPage
 
     title: mainWindow.currentSystemName
 
@@ -26,6 +26,7 @@ QnPage {
         readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
         readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
         readonly property bool failed: player.failed
+        readonly property bool offline: serverOffline || cameraOffline
 
         property bool showOfflineStatus: false
         property bool cameraWarningVisible: (showOfflineStatus || cameraUnauthorized || d.failed) && !player.playing
@@ -33,27 +34,30 @@ QnPage {
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
 
+        onOfflineChanged:
+        {
+            if (offline)
+            {
+                offlineStatusDelay.restart()
+            }
+            else
+            {
+                offlineStatusDelay.stop()
+                showOfflineStatus = false
+            }
+        }
+
         Timer {
             id: offlineStatusDelay
 
             interval: 20 * 1000
             repeat: false
-            running: d.serverOffline || d.cameraOffline
+            running: false
 
             onTriggered: d.showOfflineStatus = true
         }
 
         onShowOfflineStatusChanged: updateOfflineDisplay()
-
-        onServerOfflineChanged: {
-            if (!d.serverOffline)
-                d.showOfflineStatus = d.cameraOffline
-        }
-
-        onCameraOfflineChanged: {
-            if (!d.cameraOffline)
-                d.showOfflineStatus = d.serverOffline
-        }
 
         onFailedChanged: {
             if (failed)
@@ -156,12 +160,12 @@ QnPage {
             if (!d.videoNavigation.paused)
                 player.play()
         }
-        onHidden: videoPlayer.forceActiveFocus()
+        onHidden: videoPage.forceActiveFocus()
     }
 
     QnActiveCameraThumbnailLoader {
         id: thumbnailLoader
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
         Component.onCompleted: initialize(parent)
     }
 
@@ -266,6 +270,9 @@ QnPage {
                 font.pixelSize: sp(32)
                 font.weight: Font.Normal
 
+                wrapMode: Text.WordWrap
+                width: videoPage.width
+
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 text: {
@@ -298,7 +305,7 @@ QnPage {
 
     QnMediaPlayer {
         id: player
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
 
         onPlayingChanged: {
             if (playing)
@@ -328,7 +335,7 @@ QnPage {
 
     QnCameraAccessRightsHelper {
         id: accessRightsHelper
-        resourceId: videoPlayer.resourceId
+        resourceId: videoPage.resourceId
     }
 
     Loader {
