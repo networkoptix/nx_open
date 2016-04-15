@@ -148,7 +148,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
     if( allowedAuthMethods & AuthMethod::cookie )
     {
         const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
-        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
+        int customAuthInfoPos = cookie.indexOf(URL_QUERY_AUTH_KEY_NAME);
         if (customAuthInfoPos >= 0) {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::cookie;
@@ -607,6 +607,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     }
     if( authResult != Qn::Auth_OK)
     {
+#if 0
         nx_http::insertHeader(
             &responseHeaders.headers,
             nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(outUserResource ? outUserResource->getRealm() : QnAppInfo::realm()).toUtf8() ));
@@ -615,6 +616,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
         QString clientGuid = lit("%1=%2").arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).arg(QnUuid::createUuid().toString());
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
+#endif        
     }
     return authResult;
 }
@@ -644,6 +646,11 @@ void QnAuthHelper::addAuthHeader(
     nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader(
         headerName,
         auth.arg(realm).arg(QLatin1String(m_nonceProvider->generateNonce())).toLatin1() ) );
+}
+
+QByteArray QnAuthHelper::generateNonce() const
+{
+    return m_nonceProvider->generateNonce();
 }
 
 #ifndef USE_USER_RESOURCE_PROVIDER

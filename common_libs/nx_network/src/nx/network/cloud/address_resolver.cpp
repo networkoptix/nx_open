@@ -148,7 +148,7 @@ void AddressResolver::removeFixedAddress(
 
 void AddressResolver::resolveDomain(
     const HostAddress& domain,
-    utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler)
+    utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler)
 {
     m_mediatorConnection->resolveDomain(
         nx::hpm::api::ResolveDomainRequest(domain.toString().toUtf8()),
@@ -160,7 +160,7 @@ void AddressResolver::resolveDomain(
                 .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 
-            std::vector<TypedAddres> result;
+            std::vector<TypedAddress> result;
             const auto suffix = lit(".") + domain.toString();
             {
                 // TODO: #mux Think about better representation to increase performance

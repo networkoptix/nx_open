@@ -266,8 +266,8 @@ namespace ec2
          *     %value false
          *     %value true
          * %param storageType Type of the method to access the storage.
-         *     %value "local"
-         *     %value "smb"
+         *     %value local
+         *     %value smb
          * %param addParams List of storage additional parameters. Intended for
          *     internal use; leave empty when creating a new storage.
          * %param isBackup Whether the storage is used for backup.
@@ -613,8 +613,12 @@ namespace ec2
          *         %value CameraBackup_LowQuality Backup is in low quality.
          *         %value CameraBackup_Both Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
          *         %value CameraBackup_Default A default value is used for backup options.
-         *     %param status Camera status. Possible values are: 'Offline', 'Online', 'Recording'
-         *     %param addParams List of additional parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c
+         *     %param status Camera status.
+         *         %value Offline
+         *         %value Online
+         *         %value Recording
+         *     %param addParams List of additional parameters for camera. This list can contain
+         *         such information as full ONVIF URL, camera maximum fps, etc.
          * %// AbstractCameraManager::getCamerasEx
          */
         registerGetFuncHandler<std::nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
@@ -631,14 +635,18 @@ namespace ec2
          *     %param url Is empty.
          *     %param spaceLimit Storage space to leave free on the storage,
          *         in bytes.
-         *     %param usedForWriting Whether writing to the storage is
-         *         allowed: false or true.
-         *     %param storageType Type of the method to access the storage:
-         *         "local" or "smb".
+         *     %param usedForWriting Whether writing to the storage is allowed.
+         *         %value false
+         *         %value true
+         *     %param storageType Type of the method to access the storage.
+         *         %value local
+         *         %value smb
          *     %param addParams List of storage additional parameters.
          *         Intended for internal use; leave empty when creating a new
          *         storage.
-         *     %param isBackup Whether the storage is used for backup: false or true.
+         *     %param isBackup Whether the storage is used for backup.
+         *         %value false
+         *         %value true
          */
         registerGetFuncHandler<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
 
@@ -704,7 +712,7 @@ namespace ec2
          * </p>
          * %param id User unique id. Should be generated when creating a new user.
          * %param parentId Should be empty.
-         * %param name Layout name.
+         * %param name User name.
          * %param url Should be empty.
          * %param typeId Should have fixed value.
          *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
@@ -712,7 +720,7 @@ namespace ec2
          *     a previously received object, use false when creating a new one.
          *     %value false
          *     %value true
-         * %param permissions Combination (via "|") of the following flags:
+ * %param permissions Combination (via "|") of the following flags:
          *     %value GlobalOwnerPermission Root, can edit admins.
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
          *     %value GlobalEditLayoutsPermission Can create and edit layouts.
@@ -725,10 +733,14 @@ namespace ec2
          *     %value GlobalPtzControlPermission Can change camera's PTZ state.
          *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
          * %param email User's email.
-         * %param digest Digest hash. Supply empty string when creating, keep
-         *     the value when modifying.
-         * %param hash User hash. Supply empty string when creating, keep
-         *     the value when modifying.
+         * %param digest HA1 digest hash from user password, as per RFC 2069. When modifying an
+         *     existing user, supply empty string. When creating a new user, calculate the value
+         *     based on UTF-8 password as follows:
+         *     <code>digest = md5(name + ":" + realm + ":" + password).toHex();</code>
+         * %param hash User password hash. When modifying an existing user, supply empty string.
+         *     When creating a new user, calculate the value based on UTF-8 password as follows:
+         *     <code>salt = rand().toHex();
+         *     hash = "md5$" + salt + "$" + md5(salt + password).toHex();</code>
          * %param cryptSha512Hash Cryptography key hash. Supply empty string
          *     when creating, keep the value when modifying.
          * %param realm Should have fixed value which can be obtained via gettime call.

@@ -18,7 +18,7 @@ CREATE TABLE "vms_server_user_attributes" (
     backup_duration         INTEGER         NOT NULL
                                             DEFAULT '-1',
     backup_bitrate          INTEGER         NOT NULL
-                                            DEFAULT '-1'
+                                            DEFAULT '-12500000'
 );
 
 -- Other properties are not published to production yet
