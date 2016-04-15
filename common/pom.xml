@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.6.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
@@ -155,6 +155,24 @@
             </activation>
             <properties>
                 <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>gcc-4.8.4 sysroot quazip</rdep.linux.packages>
             </properties>
         </profile>
 

@@ -78,7 +78,6 @@
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <ui/widgets/main_window_title_bar_widget.h>
 
@@ -483,12 +482,15 @@ void QnMainWindow::updateHelpTopic() {
             setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
             return;
         }
-        if (QnLayoutResourcePtr resource = layout->resource()) {
-            if (context()->snapshotManager()->isFile(resource.dynamicCast<QnLayoutResource>())) {
+        if (QnLayoutResourcePtr resource = layout->resource())
+        {
+            if (resource->isFile())
+            {
                 setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help, true);
                 return;
             }
-            if (!resource->backgroundImageFilename().isEmpty()) {
+            if (!resource->backgroundImageFilename().isEmpty())
+            {
                 setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_EMapping_Help);
                 return;
             }

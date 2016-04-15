@@ -558,20 +558,31 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
         return;
     }
 
-    const auto resourceIsWebPage = [this]()
+    const auto calculateSliderVisible = [this]()
     {
+        if (action(QnActions::ToggleTourModeAction)->isChecked())
+            return false;
+
         if (!navigator()->currentWidget())
             return false;
 
         const auto resource = navigator()->currentWidget()->resource();
-        return (resource && resource->flags().testFlag(Qn::web_page));
+        if (!resource)
+            return false;
+
+        const auto flags = resource->flags();
+
+        if (flags & (Qn::still_image | Qn::server | Qn::videowall))  /* Any of the flags is sufficient. */
+            return false;
+
+        if ((flags & Qn::web_page) == Qn::web_page)                  /* Qn::web_page is as flag combination. */
+            return false;
+
+        return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+            || !navigator()->currentWidget()->resource()->flags().testFlag(Qn::live);   /* Show slider for local files. */
     };
 
-    bool sliderVisible =
-        navigator()->currentWidget() != nullptr &&
-        !(navigator()->currentWidget()->resource()->flags() & (Qn::still_image | Qn::server | Qn::videowall)) && !resourceIsWebPage() &&
-        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & Qn::live)) &&
-        !action(QnActions::ToggleTourModeAction)->isChecked();
+    bool sliderVisible = calculateSliderVisible();
 
     if (m_inactive)
     {
@@ -1446,7 +1457,7 @@ void QnWorkbenchUi::at_titleItem_geometryChanged()
 
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
-    m_titleItem = new QGraphicsProxyWidget(m_controlsWidget);
+    m_titleItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_titleItem->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setZValue(10.0);
@@ -2475,7 +2486,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
         [this, bookmarksViewer]()
     {
         const bool readonly =  qnCommon->isReadOnly()
-            || !accessController()->hasGlobalPermissions(Qn::GlobalEditCamerasPermission);
+            || !accessController()->hasGlobalPermission(Qn::GlobalEditCamerasPermission);
 
         bookmarksViewer->setReadOnly(readonly);
     };

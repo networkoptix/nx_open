@@ -18,7 +18,7 @@
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
 #include <nx/network/http/httptypes.h>
@@ -194,7 +194,7 @@ namespace ec2
         {
             SocketAddress peerAddress;
             nx_http::AuthInfoCache::AuthorizationCacheItem authData;
-            TimerManager::TimerGuard syncTimerID;
+            nx::utils::TimerManager::TimerGuard syncTimerID;
             nx_http::AsyncHttpClientPtr httpClient;
             //!request round-trip time
             boost::optional<qint64> rttMillis;

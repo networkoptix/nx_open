@@ -11,9 +11,9 @@ public:
 
     bool sendEmail(
         const QnEmailSettings& settings,
-        const ec2::ApiEmailData& message);
-    bool sendEmail( const ec2::ApiEmailData& message );
-    bool testConnection(const QnEmailSettings &settings);
+        const ec2::ApiEmailData& message) const;
+    bool sendEmail( const ec2::ApiEmailData& message ) const;
+    bool testConnection(const QnEmailSettings &settings) const;
 };
 
 #endif // EMAIL_MANAGER_IMPL_H

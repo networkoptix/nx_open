@@ -9,29 +9,32 @@
 #include <chrono>
 #include <functional>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <nx/utils/move_only_func.h>
-#include <nx/utils/singleton.h>
+#include "move_only_func.h"
+#include "thread/mutex.h"
+#include "thread/wait_condition.h"
+#include "singleton.h"
 
 
-//!Interface of receiver of timer events
+namespace nx {
+namespace utils {
+
+typedef quint64 TimerId;
+
+//!Abstract interface for receiving timer events
 class NX_UTILS_API TimerEventHandler
 {
 public:
     virtual ~TimerEventHandler() {}
 
-    //!Called on timer expire
+    //!Called on timer event
     /*!
         \param timerID 
     */
-    virtual void onTimer( const quint64& timerID ) = 0;
+    virtual void onTimer(const TimerId& timerID) = 0;
 };
-
-class TimerManagerImpl;
-
-// Chousen to represent the best TimerManager resolution
-typedef std::chrono::milliseconds TimerDuration;
 
 //!Timer events scheduler
 /*!
@@ -58,7 +61,7 @@ public:
 
     public:
         TimerGuard();
-        TimerGuard( quint64 timerID );
+        TimerGuard( TimerId timerID );
         TimerGuard( TimerGuard&& right );
         /*!
             Calls \a TimerGuard::reset()
@@ -69,16 +72,16 @@ public:
 
         //!Cancels timer and blocks until running handler returns
         void reset();
-        quint64 get() const;
+        TimerId get() const;
         //!Returns timer without deleting it
-        quint64 release();
+        TimerId release();
 
         operator bool_type() const;
         bool operator==( const TimerGuard& right ) const;
         bool operator!=( const TimerGuard& right ) const;
 
     private:
-        quint64 m_timerID;
+        TimerId m_timerID;
 
         TimerGuard( const TimerGuard& right );
         TimerGuard& operator=( const TimerGuard& right );
@@ -90,40 +93,40 @@ public:
     TimerManager();
     virtual ~TimerManager();
 
+    //!Adds timer that is executed once after \a delay expiration
     /*!
         \param taskHandler
         \param delay Timeout (millisecond) to call taskHandler->onTimer()
         \return ID of created timer. Always non-zero
     */
-    quint64 addTimer(
+    TimerId addTimer(
         TimerEventHandler* const taskHandler,
-        const unsigned int delayMillis );
-    //!Same as above but accepts handler of \a std::function type
-    quint64 addTimer(
-        nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
-        const unsigned int delayMillis );
-    quint64 addTimer(
-        nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
-        TimerDuration delay);
-    //!This timer will triggere every \a delay until deleted
-    quint64 addNonStopTimer(
-        nx::utils::MoveOnlyFunc<void(quint64)> taskHandler,
-        TimerDuration delay,
-        TimerDuration firstShotDelay);
+        std::chrono::milliseconds delay);
+    //!Adds timer that is executed once after \a delay expiration
+    TimerId addTimer(
+        MoveOnlyFunc<void(TimerId)> taskHandler,
+        std::chrono::milliseconds delay);
+    //!This timer will trigger every \a delay until deleted
+    /*!
+        \note first event will trigger after \a firstShotDelay period
+    */
+    TimerId addNonStopTimer(
+        MoveOnlyFunc<void(TimerId)> taskHandler,
+        std::chrono::milliseconds repeatPeriod,
+        std::chrono::milliseconds firstShotDelay);
     //!Modifies delay on existing timer
     /*!
         If timer is being executed currently, nothing is done.
         Otherwise, timer will be called in \a newDelayMillis from now
         \return \a true, if timer delay has been changed
     */
-    bool modifyTimerDelay(quint64 timerID, const unsigned int newDelayMillis);
-    bool modifyTimerDelay(quint64 timerID, std::chrono::milliseconds delay);
+    bool modifyTimerDelay(TimerId timerID, std::chrono::milliseconds delay);
     /*!
         If task is already running, it can be still running after method return
         If timer handler is being executed at the moment, it can still be executed after return of this method
         \param timerID ID of timer, created by \a addTimer call. If no such timer, nothing is done
     */
-    void deleteTimer( const quint64& timerID );
+    void deleteTimer(const TimerId& timerID);
     //!Delete timer and wait for handler execution (if its is being executed)
     /*!
         This method garantees that timer \a timerID handler is not being executed after return of this method.
@@ -133,7 +136,7 @@ public:
         \param timerID ID of timer, created by \a addTimer call. If no such timer, nothing is done
         \note If this method is called from \a TimerEventHandler::onTimer to delete timer being executed, nothing is done
     */
-    void joinAndDeleteTimer( const quint64& timerID );
+    void joinAndDeleteTimer(const TimerId& timerID);
 
     void stop();
 
@@ -141,11 +144,45 @@ protected:
     virtual void run();
 
 private:
-    TimerManagerImpl* m_impl;
+    struct TaskContext
+    {
+        MoveOnlyFunc<void(TimerId)> func;
+        bool singleShot;
+        std::chrono::milliseconds repeatPeriod;
+
+        TaskContext(MoveOnlyFunc<void(TimerId)> _func);
+        TaskContext(
+            MoveOnlyFunc<void(TimerId)> _func,
+            std::chrono::milliseconds _repeatPeriod);
+    };
+
+    QnWaitCondition m_cond;
+    mutable QnMutex m_mtx;
+    //!map<pair<time, timerID>, handler>
+    std::map<std::pair<qint64, TimerId>, TaskContext> m_timeToTask;
+    //!map<timerID, time>
+    std::map<TimerId, qint64> m_taskToTime;
+    bool m_terminated;
+    //!ID of task, being executed. 0, if no running task
+    TimerId m_runningTaskID;
+    QElapsedTimer m_monotonicClock;
+
+    void addTaskNonSafe(
+        const QnMutexLockerBase& lk,
+        const TimerId timerID,
+        TaskContext taskContext,
+        std::chrono::milliseconds delay);
+    void deleteTaskNonSafe(
+        const QnMutexLockerBase& lk,
+        const TimerId timerID);
+    uint64_t generateNextTimerId();
 };
 
-TimerDuration NX_UTILS_API parseTimerDuration(
+std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
     const QString& duration,
-    TimerDuration defaultValue = TimerDuration(0) );
+    std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
+
+}   //namespace utils
+}   //namespace nx
 
 #endif //TIMERMANAGER_H

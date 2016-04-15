@@ -66,13 +66,13 @@ namespace
     const bool kDefaultNotificationEnabled = true;
 
     const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeoutSec");
-    const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout(std::chrono::hours(24));
+    const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout = std::chrono::hours(24);
 
     const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriodSec");
-    const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec(30*86400);  //a month
+    const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec = std::chrono::hours(30 * 24);  //a month
 
     const QLatin1String kNotActivatedSystemLivePeriodSec("systemManager/notActivatedSystemLivePeriodSec");
-    const std::chrono::seconds kDefaultNotActivatedSystemLivePeriodSec(30 * 86400);  //a month
+    const std::chrono::seconds kDefaultNotActivatedSystemLivePeriodSec = std::chrono::hours(30 * 24);  //a month
 
     const QLatin1String kDropExpiredSystemsPeriodSec("systemManager/dropExpiredSystemsPeriodSec");
     const std::chrono::seconds kDefaultDropExpiredSystemsPeriodSec = std::chrono::hours(12);
@@ -81,9 +81,16 @@ namespace
     const bool kDefaultControlSystemStatusByDb = false;
 
     //auth settings
+    const QString kModuleName = lit("cloud_db");
+
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
-    const QString kModuleName = lit( "cloud_db" );
+
+    const QLatin1String kNonceValidityPeriod("auth/nonceValidityPeriodSec");
+    const std::chrono::seconds kDefaultNonceValidityPeriod = std::chrono::hours(4);
+
+    const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriodSec");
+    const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
 }
 
 
@@ -277,6 +284,16 @@ void Settings::loadConfiguration()
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+    m_auth.nonceValidityPeriod = 
+        std::chrono::seconds(
+            m_settings.value(
+                kNonceValidityPeriod,
+                (int)kDefaultNonceValidityPeriod.count()).toInt());
+    m_auth.intermediateResponseValidityPeriod = 
+        std::chrono::seconds(
+            m_settings.value(
+                kIntermediateResponseValidityPeriod,
+                (int)kDefaultIntermediateResponseValidityPeriod.count()).toInt());
 }
 
 }   //conf

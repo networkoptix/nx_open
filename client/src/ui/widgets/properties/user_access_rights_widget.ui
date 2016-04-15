@@ -34,9 +34,6 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QTabWidget" name="tabWidget">
-        <property name="tabShape">
-         <enum>QTabWidget::Triangular</enum>
-        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>

@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
@@ -27,7 +28,7 @@
 
 #include <nx/network/socket_global.h>
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
@@ -41,7 +42,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
 
     /* Init statics. */
     qnProductFeatures();
-    store<TimerManager>(new TimerManager());
+    store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
@@ -55,6 +56,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     instance<QnServerAdditionalAddressesDictionary>();
 
     instance<QnResourcePool>();
+    instance<QnResourceAccessManager>();
 
     instance<QnGlobalSettings>();
 

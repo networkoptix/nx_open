@@ -127,7 +127,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         layout->requestStore();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
-        if (user->isAdmin())
+        if (user->isOwner())
             qnCommon->updateModuleInformation();
     }
 }

@@ -197,6 +197,8 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     setHelpTopic(this, Qn::Administration_RoutingManagement_Help);
 
     m_serverListModel = new QnResourceListModel(this);
+    m_serverListModel->setReadOnly(true);
+
     SortedServersProxyModel *sortedServersModel = new SortedServersProxyModel(this);
     sortedServersModel->setSourceModel(m_serverListModel);
     sortedServersModel->setDynamicSortFilter(true);

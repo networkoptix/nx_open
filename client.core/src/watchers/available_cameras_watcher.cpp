@@ -1,17 +1,11 @@
 #include "available_cameras_watcher.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
-#include <common/user_permissions.h>
 #include <utils/common/connective.h>
-
-namespace {
-    bool userIsAdmin(const QnUserResourcePtr &user) {
-        return user->isAdmin() || (user->getPermissions() & Qn::GlobalProtectedPermission);
-    }
-}
 
 class QnAvailableCamerasWatcherPrivate : public Connective<QObject> {
     typedef Connective<QObject> base_type;
@@ -61,7 +55,8 @@ QnUserResourcePtr QnAvailableCamerasWatcher::user() const {
     return d->user;
 }
 
-void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr &user) {
+void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr &user)
+{
     Q_D(QnAvailableCamerasWatcher);
     if (d->user == user)
         return;
@@ -75,7 +70,7 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr &user) {
         connect(d->user, &QnUserResource::permissionsChanged, this, [this](){
             Q_D(QnAvailableCamerasWatcher);
 
-            bool acceptAllCameras = userIsAdmin(d->user);
+            bool acceptAllCameras = qnResourceAccessManager->hasGlobalPermission(d->user, Qn::GlobalAdminPermission);
             if (d->acceptAllCameras != acceptAllCameras)
                 d->initialize();
         });
@@ -183,7 +178,7 @@ void QnAvailableCamerasWatcherPrivate::initialize() {
     if (!user)
         return;
 
-    acceptAllCameras = userIsAdmin(user);
+    acceptAllCameras = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
     if (acceptAllCameras) {
         for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true))

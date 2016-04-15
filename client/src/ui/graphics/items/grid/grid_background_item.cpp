@@ -18,7 +18,6 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_display.h>
 
 #include <utils/common/warnings.h>
@@ -155,7 +154,7 @@ void QnGridBackgroundItem::updateDefaultBackground() {
     if (d->imageMode != background.imageMode) {
         d->imageMode = background.imageMode;
         hasChanges = true;
-    }    
+    }
 
     /* Early return if nothing image-related changed. */
     if (!hasChanges)
@@ -213,7 +212,7 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
     Q_D(QnGridBackgroundItem);
 
     bool isDefaultBackground = layout->backgroundImageFilename().isEmpty();
-    bool isExportedLayout = snapshotManager()->isFile(layout);
+    bool isExportedLayout = layout->isFile();
 
     QnClientBackground background = qnSettings->background();
 
@@ -224,10 +223,10 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
     QSize imageSize = isDefaultBackground
         ? QSize(1, 1)
         : layout->backgroundSize();
-       
+
     qreal opacity = isDefaultBackground
         ? background.actualImageOpacity()
-        : qBound(0.0, layout->backgroundOpacity(), 1.0);    
+        : qBound(0.0, layout->backgroundOpacity(), 1.0);
 
     Qn::ImageBehaviour imageMode = background.imageMode;
 

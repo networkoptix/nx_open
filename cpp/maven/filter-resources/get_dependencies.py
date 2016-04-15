@@ -18,7 +18,8 @@ DEPENDENCY_VERSIONS = {
     "festival-vox": "${festival.version}",
     "boost": "${boost.version}",
     "quazip": "${quazip.version}",
-    "server-external": "${server-external.version}"
+    "server-external": "${server-external.version}",
+    "help": "${help.version}"
 }
 
 def get_package_version(package):

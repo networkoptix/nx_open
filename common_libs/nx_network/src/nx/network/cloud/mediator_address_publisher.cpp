@@ -7,7 +7,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-const TimerDuration MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
+const std::chrono::milliseconds MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 10 );
 
 MediatorAddressPublisher::MediatorAddressPublisher(
@@ -18,7 +18,7 @@ MediatorAddressPublisher::MediatorAddressPublisher(
 {
 }
 
-void MediatorAddressPublisher::setUpdateInterval( TimerDuration updateInterval )
+void MediatorAddressPublisher::setUpdateInterval(std::chrono::milliseconds updateInterval)
 {
     QnMutexLocker lk( &m_mutex );
     m_updateInterval = updateInterval;

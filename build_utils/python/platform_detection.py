@@ -45,7 +45,7 @@ def get_platform_for_target(target):
         return "linux"
     elif target.startswith("macosx"):
         return "macosx"
-    elif target in [ "rpi", "bpi", "isd", "isd_s2" ]:
+    elif target in [ "rpi", "bpi", "tx1", "isd", "isd_s2" ]:
         return "linux"
     elif target.startswith("android"):
         return "android"

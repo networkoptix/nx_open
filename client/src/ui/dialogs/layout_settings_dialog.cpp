@@ -26,7 +26,6 @@
 #include <ui/style/globals.h>
 #include <ui/widgets/common/framed_label.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
@@ -195,7 +194,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     Q_D(QnLayoutSettingsDialog);
 
-    m_cache = snapshotManager()->isFile(layout)
+    m_cache = layout->isFile()
             ? new QnLocalFileCache(this)
             : new QnAppServerImageCache(this);
 

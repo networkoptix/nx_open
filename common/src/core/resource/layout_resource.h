@@ -81,6 +81,10 @@ public:
     /** Locked state - locked layout cannot be modified in any way */
     bool locked() const;
     void setLocked(bool value);
+
+    /** Check if layout is an exported file. */
+    bool isFile() const;
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

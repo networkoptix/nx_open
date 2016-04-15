@@ -49,10 +49,6 @@ QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
     m_flagsByLayout.clear();
 }
 
-bool QnWorkbenchLayoutSnapshotManager::isFile(const QnLayoutResourcePtr &resource) {
-    return resource && (resource->flags() & Qn::url) && !resource->getUrl().isEmpty();
-}
-
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
     if(!resource) {
         qnNullWarning(resource);

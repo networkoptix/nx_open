@@ -505,11 +505,14 @@ private:
                     m_recvBuffer->capacity() - bufSizeBak );
                 if( bytesRead == -1 )
                 {
+                    const auto lastError = SystemError::getLastOSErrorCode();
                     m_recvBuffer->resize( bufSizeBak );
 
-                    const auto lastError = SystemError::getLastOSErrorCode();
-                    if (lastError == SystemError::wouldBlock)
+                    if( lastError == SystemError::again ||
+                        lastError == SystemError::wouldBlock )
+                    {
                         return; // false positive
+                    }
 
                     recvHandlerLocal( lastError, (size_t)-1 );
                 }
@@ -544,8 +547,11 @@ private:
                     if( bytesWritten == -1 )
                     {
                         const auto lastError = SystemError::getLastOSErrorCode();
-                        if (lastError == SystemError::wouldBlock)
+                        if( lastError == SystemError::again ||
+                            lastError == SystemError::wouldBlock )
+                        {
                             return; // false positive
+                        }
 
                         sendHandlerLocal( lastError, m_sendBufPos );
                     }

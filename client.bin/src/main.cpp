@@ -132,7 +132,7 @@ extern "C"
 #include "api/runtime_info_manager.h"
 
 #include <nx/network/socket_global.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -328,7 +328,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-	// TODO: #Elric why QString???
+    // TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {
         bool ok;
         Qn::LightModeFlags lightModeOverride(startupParams.lightMode.toInt(&ok));
@@ -340,7 +340,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     //TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
+#ifndef __arm__
     QnPerformanceTest::detectLightMode();
+#else
+    // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
+    //       constructor call. Need to find the way to work it around.
+#endif
 
 #ifdef Q_OS_MACX
     if (mac_isSandboxed())

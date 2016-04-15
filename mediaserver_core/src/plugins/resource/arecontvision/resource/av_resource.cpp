@@ -15,7 +15,7 @@
 #include <utils/common/concurrent.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/ping.h>
@@ -131,51 +131,6 @@ CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int
 void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 {
     QnNetworkResource::setHostAddress(hostAddr);
-}
-
-bool QnPlAreconVisionResource::unknownResource() const
-{
-    return isAbstractResource();
-}
-
-QnResourcePtr QnPlAreconVisionResource::updateResource()
-{
-    QString model;
-    QString model_release;
-
-    if (!getParamPhysical(lit("model"), model))
-        return QnNetworkResourcePtr(0);
-
-    if (!getParamPhysical(lit("model=releasename"), model_release))
-        return QnNetworkResourcePtr(0);
-
-    if (model_release != model) {
-        //this camera supports release name
-        model = model_release;
-    }
-    else
-    {
-        //old camera; does not support release name; but must support fullname
-        if (getParamPhysical(lit("model=fullname"), model_release))
-            model = model_release;
-    }
-
-    QnNetworkResourcePtr result(createResourceByName(model));
-    if (result)
-    {
-        result->setName(model);
-        result->setHostAddress(getHostAddress());
-        (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
-        result->setMAC(getMAC());
-        result->setId(getId());
-        result->setFlags(flags());
-    }
-    else
-    {
-        NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
-    }
-
-    return result;
 }
 
 bool QnPlAreconVisionResource::ping()
@@ -366,7 +321,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
             }
 
             //scheduling auto-reset
-            TimerManager::instance()->addTimer(
+            nx::utils::TimerManager::instance()->addTimer(
                 [url](qint64){
                     auto resetOutputUrl = url;
                     resetOutputUrl.setPath(lit("/set?auxout=off"));
@@ -374,7 +329,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
                         resetOutputUrl,
                         [](SystemError::ErrorCode, int, nx_http::BufferType){});
                 },
-                autoResetTimeoutMS);
+                std::chrono::milliseconds(autoResetTimeoutMS));
         };
 
     const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
@@ -783,12 +738,6 @@ bool QnPlAreconVisionResource::isRTSPSupported() const
            QnGlobalSettings::instance()->arecontRtspEnabled() &&
            qnCommon->dataPool()->data(toSharedPointer(this)).
                value<bool>(lit("isRTSPSupported"), true);
-}
-
-bool QnPlAreconVisionResource::isAbstractResource() const
-{
-    QnUuid baseTypeId = qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract"));
-    return getTypeId() == baseTypeId;
 }
 
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)

@@ -77,7 +77,7 @@ protected slots:
     void updateAccessRights() { updateElement(AccessRights); }
     void updateEmail() { updateElement(Email); }
     void updateEnabled() { updateElement(Enabled); }
-    void loadAccessRightsToUi(quint64 rights);
+    void loadAccessRightsToUi(int rights);
 
     void updateDependantPermissions();
 
@@ -103,19 +103,19 @@ private:
 
     void createAccessRightsPresets();
     void createAccessRightsAdvanced();
-    QCheckBox *createAccessRightCheckBox(QString text, quint64 right, QWidget *previous);
-    void selectAccessRightsPreset(quint64 rights);
-    void fillAccessRightsAdvanced(quint64 rights);
-    quint64 readAccessRightsAdvanced();
+    QCheckBox *createAccessRightCheckBox(QString text, int right, QWidget *previous);
+    void selectAccessRightsPreset(int rights);
+    void fillAccessRightsAdvanced(int rights);
+    int readAccessRightsAdvanced();
 
     /** Utility function to access checkboxes. */
-    bool isCheckboxChecked(quint64 right);
+    bool isCheckboxChecked(int right);
 
     /** Utility function to access checkboxes. */
-    void setCheckboxChecked(quint64 right, bool checked = true);
+    void setCheckboxChecked(int right, bool checked = true);
 
     /** Utility function to access checkboxes. */
-    void setCheckboxEnabled(quint64 right, bool enabled = true);
+    void setCheckboxEnabled(int right, bool enabled = true);
 
     QScopedPointer<Ui::UserSettingsDialog> ui;
     Mode m_mode;
@@ -127,7 +127,7 @@ private:
     std::array<QString, ElementCount> m_hints;
     std::array<ElementFlags, ElementCount> m_flags;
     bool m_hasChanges;
-    QHash<quint64, QCheckBox*> m_advancedRights;
+    QHash<int, QCheckBox*> m_advancedRights;
 
     /** Status variable to avoid unneeded checks. */
     bool m_inUpdateDependensies;

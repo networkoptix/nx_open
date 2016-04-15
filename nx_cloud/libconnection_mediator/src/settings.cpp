@@ -11,7 +11,7 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/serialization/lexical.h>
 
 #include <libconnection_mediator_app_info.h>
@@ -161,7 +161,7 @@ void Settings::loadConfiguration()
     m_cloudDB.user = m_settings.value(kCdbUser, kDefaultCdbUser).toString();
     m_cloudDB.password = m_settings.value(kCdbPassword, kDefaultCdbPassword).toString();
     m_cloudDB.updateInterval = duration_cast<seconds>(
-        parseTimerDuration(m_settings.value(
+        nx::utils::parseTimerDuration(m_settings.value(
             kCdbUpdateInterval,
             static_cast<qulonglong>(kDefaultCdbUpdateInterval.count())).toString()));
 

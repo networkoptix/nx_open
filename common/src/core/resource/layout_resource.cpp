@@ -377,3 +377,8 @@ void QnLayoutResource::setLocked(bool value) {
     }
     emit lockedChanged(::toSharedPointer(this));
 }
+
+bool QnLayoutResource::isFile() const
+{
+    return flags().testFlag(Qn::url) && !getUrl().isEmpty();
+}

@@ -10,6 +10,7 @@
 
 #include <utils/common/stoppable.h>
 
+#include "aio/abstract_pollable.h"
 #include "aio/timer.h"
 
 
@@ -59,22 +60,6 @@ private:
     std::chrono::milliseconds m_maxDelay;
 };
 
-namespace aio {
-
-/** TODO #ak deal with Pollable and AbstractPollable */
-class AbstractPollable
-{
-public:
-    virtual ~AbstractPollable() {}
-
-    virtual aio::AbstractAioThread* getAioThread() = 0;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) = 0;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) = 0;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) = 0;
-};
-
-}   //aio
-
 /** Implements request retry policy, specified in STUN rfc.
     There are maximum N retries, delay between retries is increased by 
         some multiplier with each unsuccessful try.
@@ -84,8 +69,7 @@ public:
 */
 class NX_NETWORK_API RetryTimer
 :
-    public aio::AbstractPollable,
-    public QnStoppableAsync
+    public aio::AbstractPollable
 {
 public:
     RetryTimer(const RetryPolicy& policy);

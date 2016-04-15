@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -78,7 +78,7 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>        
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
@@ -117,6 +117,7 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <liteMode>false</liteMode>
+        <client.binary.name>client-bin</client.binary.name>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -134,7 +135,7 @@
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
-        <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -144,13 +145,14 @@
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
-        <protobuf.version>2.6.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
         <boost.version>1.56-SNAPSHOT</boost.version>
         <quazip.version>0.7.1</quazip.version>
         <server-external.version>3.0.0</server-external.version>
+        <help.version>${customization}-3.0.0</help.version>
 
         <qt.libs/>
         <global.libs/>
@@ -197,8 +199,8 @@
         <rdep.mac.packages/>
         <rdep.android.packages/>
         <rdep.ios.packages/>
-        
-        
+
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -410,17 +412,22 @@
                 </property>
             </activation>
             <modules>
-                <!--<module>plugins/axiscamplugin</module>-->
                 <module>common_libs/nx_email</module>
+
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
-                <module>plugins/genericrtspplugin</module>
-                <!--module>storage_plugins/ftpstorageplugin</module-->
-                <module>plugins/image_library_plugin</module>
-                <module>plugins/mjpg_link</module>
+
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
-                <!--<module>mediaproxy</module> -->
+
+                <module>plugins/genericrtspplugin</module>
+                <module>plugins/image_library_plugin</module>
+                <module>plugins/mjpg_link</module>
+
+                <!-- <module>plugins/axiscamplugin</module> -->
+                <!-- <module>storage_plugins/ftpstorageplugin</module> -->
+
+                <!-- <module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>
             <properties>
@@ -441,6 +448,7 @@
                 <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
+                <module>applauncher</module>
                 <module>client.core</module>
                 <module>client</module>
                 <module>client.bin</module>
@@ -476,6 +484,7 @@
                 <PlatformToolSet>v140_xp</PlatformToolSet>
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
+                <client.binary.name>${product.name}.exe</client.binary.name>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
@@ -513,7 +522,6 @@
                 </property>
             </activation>
             <modules>
-                <module>applauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
@@ -825,10 +833,42 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <quazip.version>0.7</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
+                <modification>tx1</modification>
+                <rdep.target>tx1</rdep.target>
+                <qt.spec/>
+                <linux.defines>DISABLE_FESTIVAL</linux.defines>
+            </properties>
+            <modules>
+                <module>client.core</module>
+                <module>client</module>
+                <module>client.bin</module>
+                <module>common_libs/nx_audio</module>
             </modules>
         </profile>
         <profile>
@@ -1031,11 +1071,11 @@
                 <property>
                     <name>webadmin</name>
                     <value>true</value>
-                </property>                
+                </property>
             </activation>
             <modules>
                 <module>webadmin</module>
-            </modules>            
-        </profile>        
+            </modules>
+        </profile>
     </profiles>
 </project>

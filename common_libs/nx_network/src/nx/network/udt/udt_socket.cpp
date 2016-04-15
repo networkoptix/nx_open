@@ -207,7 +207,7 @@ bool UdtSocket<InterfaceToImplement>::close()
     NX_LOG(lit("closing UDT socket %1").arg(udtHandle), cl_logDEBUG2);
 #endif
 
-    int ret = UDT::close(m_impl->udtHandle);
+    const int ret = UDT::close(m_impl->udtHandle);
     m_impl->udtHandle = UDT::INVALID_SOCK;
     m_state = detail::SocketState::closed;
     return ret == 0;
@@ -409,7 +409,7 @@ bool UdtSocket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getLastError(SystemError::ErrorCode* /*errorCode*/) const
 {
-    NX_ASSERT(!isClosed());
+    //NX_ASSERT(!isClosed());
     //*errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
     //TODO #ak
     SystemError::setLastErrorCode(SystemError::notImplemented);

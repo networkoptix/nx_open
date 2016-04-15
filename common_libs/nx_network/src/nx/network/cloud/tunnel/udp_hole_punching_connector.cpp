@@ -14,6 +14,11 @@
 
 #include "outgoing_tunnel_udt_connection.h"
 
+#define USE_RENDEZVOUS_CONNECTOR
+#ifdef USE_RENDEZVOUS_CONNECTOR
+#include "udp_hole_punching_rendezvous_connector.h"
+#endif
+
 
 namespace nx {
 namespace network {
@@ -43,6 +48,9 @@ UdpHolePunchingTunnelConnector::~UdpHolePunchingTunnelConnector()
 {
     //it is OK if called after pleaseStop or within aio thread after connect handler has been called
     m_mediatorUdpClient.reset();
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    m_rendezvousConnectors.clear();
+#endif
     m_udtConnection.reset();
 }
 
@@ -54,10 +62,33 @@ void UdpHolePunchingTunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> 
             //m_udtConnection cannot be modified since all processing is already stopped
             m_mediatorUdpClient.reset();
             m_timer.pleaseStopSync();
-            if (!m_udtConnection)
-                return handler();
-            m_udtConnection->pleaseStop(std::move(handler));
+#ifdef USE_RENDEZVOUS_CONNECTOR
+            m_rendezvousConnectors.clear();
+#endif
+            m_udtConnection.reset();    //we do not use this connection so can just remove it here
+            handler();
         });
+}
+
+aio::AbstractAioThread* UdpHolePunchingTunnelConnector::getAioThread()
+{
+    return m_timer.getAioThread();
+}
+
+void UdpHolePunchingTunnelConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    m_timer.bindToAioThread(aioThread);
+    m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+}
+
+void UdpHolePunchingTunnelConnector::post(nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_timer.post(std::move(func));
+}
+
+void UdpHolePunchingTunnelConnector::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+{
+    m_timer.dispatch(std::move(func));
 }
 
 int UdpHolePunchingTunnelConnector::getPriority() const
@@ -176,7 +207,7 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
     m_connectResultReport.resultCode =
         api::UdpHolePunchingResultCode::targetPeerHasNoUdpAddress;
 
-    //extracting m_targetHostUdpAddress from response
+    //extracting target address from response
     if (response.udpEndpointList.empty())
     {
         NX_LOGX(lm("session %1. mediator reported empty UDP address list for host %2")
@@ -187,13 +218,14 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
             SystemError::connectionReset);
     }
     //TODO #ak what if there are several addresses in udpEndpointList?
+#ifndef USE_RENDEZVOUS_CONNECTOR
     m_targetHostUdpAddress = std::move(response.udpEndpointList.front());
+#endif
 
     m_connectResultReport.resultCode =
         api::UdpHolePunchingResultCode::noSynFromTargetPeer;
 
     //initiating rendezvous connect to the target host
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
     m_timer.cancelSync();   //we are in timer's thread
     //from now on relying on UdtConnection timeout
     using namespace std::chrono;
@@ -204,6 +236,15 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
         if (effectiveConnectTimeout == milliseconds::zero())
             effectiveConnectTimeout = milliseconds(1);   //zero timeout is infinity
     }
+
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    auto rendezvousConnector = std::make_unique<UdpHolePunchingRendezvousConnector>(
+        m_connectSessionId,
+        std::move(response.udpEndpointList.front()),
+        std::move(m_mediatorUdpClient->takeSocket())); //moving system socket handler from m_mediatorUdpClient to udt connection
+    rendezvousConnector->bindToAioThread(m_timer.getAioThread());
+#else
+    auto udtConnection = std::make_unique<UdtStreamSocket>();
     if (!udtConnection->bindToUdpSocket(std::move(*m_mediatorUdpClient->takeSocket())) ||    //moving system socket handler from m_mediatorUdpClient to m_udtConnection
         !udtConnection->setRendezvous(true) ||
         !udtConnection->setNonBlockingMode(true) ||
@@ -218,14 +259,35 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
             errorCode);
     }
 
-    m_mediatorUdpClient.reset();
-
     udtConnection->bindToAioThread(m_timer.getAioThread());
     m_udtConnection = std::move(udtConnection);
+#endif
 
+    m_mediatorUdpClient.reset();
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    NX_LOGX(lm("session %1. Udt rendezvous connect to %2")
+        .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
+        cl_logDEBUG1);
+#else
     NX_LOGX(lm("session %1. Udt rendezvous connect to %2")
         .arg(m_connectSessionId).arg(m_targetHostUdpAddress->toString()),
         cl_logDEBUG1);
+#endif
+
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    rendezvousConnector->connect(
+        effectiveConnectTimeout,
+        [this, rendezvousConnectorPtr = rendezvousConnector.get()](
+            SystemError::ErrorCode errorCode,
+            std::unique_ptr<UdtStreamSocket> udtConnection)
+        {
+            onUdtConnectionEstablished(
+                rendezvousConnectorPtr,
+                std::move(udtConnection),
+                errorCode);
+        });
+    m_rendezvousConnectors.emplace_back(std::move(rendezvousConnector));
+#else
     m_udtConnection->connectAsync(
         *m_targetHostUdpAddress,
         [this](SystemError::ErrorCode errorCode)
@@ -237,21 +299,53 @@ void UdpHolePunchingTunnelConnector::onConnectResponse(
                     this,
                     errorCode));
         });
+#endif
 }
 
 void UdpHolePunchingTunnelConnector::onUdtConnectionEstablished(
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    UdpHolePunchingRendezvousConnector* rendezvousConnectorPtr,
+    std::unique_ptr<UdtStreamSocket> udtConnection,
+#endif
     SystemError::ErrorCode errorCode)
 {
     //we are in m_timer's aio thread
     if (m_done)
         return; //just ignoring
 
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    auto rendezvousConnectorIter = std::find_if(
+        m_rendezvousConnectors.begin(),
+        m_rendezvousConnectors.end(),
+        [rendezvousConnectorPtr](
+            const std::unique_ptr<UdpHolePunchingRendezvousConnector>& val)
+        {
+            return val.get() == rendezvousConnectorPtr;
+        });
+    NX_ASSERT(rendezvousConnectorIter != m_rendezvousConnectors.end());
+    auto rendezvousConnector = std::move(*rendezvousConnectorIter);
+    m_rendezvousConnectors.erase(rendezvousConnectorIter);
+#endif
+
     if (errorCode != SystemError::noError)
     {
+#ifdef USE_RENDEZVOUS_CONNECTOR
+        NX_LOGX(lm("session %1. Failed to establish UDT connection to %2. %3")
+            .arg(m_connectSessionId)
+            .arg(rendezvousConnector->remoteAddress().toString())
+            .arg(SystemError::toString(errorCode)),
+            cl_logDEBUG1);
+#else
         NX_LOGX(lm("session %1. Failed to establish UDT connection to %2. %3")
             .arg(m_connectSessionId).arg(m_targetHostUdpAddress->toString())
             .arg(SystemError::toString(errorCode)),
             cl_logDEBUG1);
+#endif
+
+#ifdef USE_RENDEZVOUS_CONNECTOR
+        if (!m_rendezvousConnectors.empty())
+            return; //waiting for other connectors to complete
+#endif
         holePunchingDone(
             api::UdpHolePunchingResultCode::udtConnectFailed,
             errorCode);
@@ -259,11 +353,26 @@ void UdpHolePunchingTunnelConnector::onUdtConnectionEstablished(
     }
     
     //success!
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    NX_LOGX(lm("session %1. Udp hole punching to %2 is a success!")
+        .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
+        cl_logDEBUG2);
+#else
     NX_LOGX(lm("session %1. Udp hole punching to %2 is a success!")
         .arg(m_connectSessionId).arg(m_targetHostUdpAddress->toString()),
-         cl_logDEBUG2);
+        cl_logDEBUG2);
+#endif
 
-    //introducing delay to give server some time to call accept
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    //stopping other rendezvous connectors
+    m_rendezvousConnectors.clear(); //can do since we are in aio thread
+
+    NX_CRITICAL(udtConnection);
+    m_udtConnection = std::move(udtConnection);
+    rendezvousConnector.reset();
+#endif
+
+    //introducing delay to give server some time to call accept (work around udt bug)
     m_timer.cancelSync();
     m_timer.start(
         std::chrono::milliseconds(200),
@@ -281,11 +390,16 @@ void UdpHolePunchingTunnelConnector::onTimeout()
         .arg(QnLexical::serialized(m_connectResultReport.resultCode)),
         cl_logDEBUG1);
 
+#ifdef USE_RENDEZVOUS_CONNECTOR
+    NX_ASSERT(m_udtConnection == nullptr);
+    m_rendezvousConnectors.clear(); //can do since we are in aio thread
+#else
     if (m_udtConnection)
     {
         //stopping UDT connection
         m_udtConnection->cancelIOSync(aio::etWrite);
     }
+#endif
 
     holePunchingDone(
         m_connectResultReport.resultCode,
@@ -300,7 +414,7 @@ void UdpHolePunchingTunnelConnector::holePunchingDone(
     m_timer.cancelSync();
 
     //stopping processing of incoming packets, events...
-    m_done = true;
+    m_done = true;  //TODO #ak redundant?
 
     m_connectResultReport.sysErrorCode = sysErrorCode;
     if (resultCode == api::UdpHolePunchingResultCode::noResponseFromMediator)

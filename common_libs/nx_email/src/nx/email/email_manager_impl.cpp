@@ -28,7 +28,8 @@ EmailManagerImpl::EmailManagerImpl()
 {
 }
 
-bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) {
+bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) const
+{
     int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
 
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
@@ -45,7 +46,7 @@ bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) {
 
 bool EmailManagerImpl::sendEmail(
     const QnEmailSettings& settings,
-    const ec2::ApiEmailData& data )
+    const ec2::ApiEmailData& data ) const
 {
     if (!settings.isValid())
         return true;    // empty settings should not give us an error while trying to send email, should them?
@@ -65,7 +66,7 @@ bool EmailManagerImpl::sendEmail(
     for (const QString &recipient: data.to) {
         message.addRecipient(EmailAddress(recipient));
     }
-    
+
     message.setSubject(data.subject);
     message.addPart(new MimeHtml(data.body));
 
@@ -106,7 +107,7 @@ bool EmailManagerImpl::sendEmail(
     return true;
 }
 
-bool EmailManagerImpl::sendEmail( const ec2::ApiEmailData& data )
+bool EmailManagerImpl::sendEmail( const ec2::ApiEmailData& data ) const
 {
     return sendEmail(
         QnGlobalSettings::instance()->emailSettings(),

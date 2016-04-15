@@ -13,7 +13,7 @@ namespace nx_upnp {
 
 class NX_NETWORK_API PortMapper
         : SearchAutoHandler
-        , TimerEventHandler
+        , nx::utils::TimerEventHandler
 {
 public:
     PortMapper( quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,

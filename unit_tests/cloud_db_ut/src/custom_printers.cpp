@@ -35,6 +35,6 @@ void PrintTo(ResultCode val, ::std::ostream* os) {
     *os << QnLexical::serialized(val).toStdString();
 }
 
-}   //api
-}   //cdb
-}   //nx
+}   //namespace api
+}   //namespace cdb
+}   //namespace nx

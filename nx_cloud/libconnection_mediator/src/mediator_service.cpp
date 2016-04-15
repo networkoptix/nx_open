@@ -87,7 +87,7 @@ int MediatorProcess::executeApplication()
         return 2;
     }
 
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     std::unique_ptr<AbstractCloudDataProvider> cloudDataProvider;
     if (settings.cloudDB().runWithCloud)
     {

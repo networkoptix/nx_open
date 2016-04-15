@@ -176,7 +176,7 @@ namespace nx_hls
             }
 
             delete sessionCtx.session;
-            TimerManager::instance()->joinAndDeleteTimer( sessionCtx.removeTaskID );
+            nx::utils::TimerManager::instance()->joinAndDeleteTimer( sessionCtx.removeTaskID );
         }
 
         HLSSessionPool_instance = nullptr;
@@ -243,7 +243,8 @@ namespace nx_hls
         std::map<QString, HLSSessionContext>::iterator it = m_sessionByID.find( id );
         if( it == m_sessionByID.end() || it->second.keepAliveTimeoutMS == 0 )
             return;
-        it->second.removeTaskID = TimerManager::instance()->addTimer( this, it->second.keepAliveTimeoutMS );
+        it->second.removeTaskID = nx::utils::TimerManager::instance()->addTimer(
+            this, std::chrono::milliseconds(it->second.keepAliveTimeoutMS));
         m_taskToSessionID.insert( std::make_pair( it->second.removeTaskID, id ) );
     }
 

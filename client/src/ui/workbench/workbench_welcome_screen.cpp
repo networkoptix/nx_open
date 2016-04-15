@@ -272,7 +272,7 @@ void QnWorkbenchWelcomeScreen::manageCloudAccount()
 
 void QnWorkbenchWelcomeScreen::loginToCloud()
 {
-    menu()->trigger(QnActions::LoginToCLoud);
+    menu()->trigger(QnActions::LoginToCloud);
 }
 
 void QnWorkbenchWelcomeScreen::createAccount()

@@ -222,7 +222,7 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
     size_t totalIncompleteTasks() const;
-    QString returnCodes() const;
+    const std::map<SystemError::ErrorCode, size_t>& returnCodes() const;
 
 private:
     /** map<connection id, connection> */

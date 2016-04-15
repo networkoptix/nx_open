@@ -5,8 +5,7 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/log/log.h>
-
-#include "version.h"
+#include <applauncher_app_info.h>
 
 
 namespace {
@@ -94,7 +93,7 @@ QnClientInstallationPtr QnClientInstallation::installationForPath(const QString 
     QnClientInstallationPtr installation(new QnClientInstallation());
     installation->m_rootPath = rootPath;
 
-    QString binary = QN_CLIENT_EXECUTABLE_NAME;
+    QString binary = QnApplauncherAppInfo::clientBinaryName();
     if (rootDir.exists(binary)) {
         installation->m_binaryPath = binary;
     } else {

@@ -31,7 +31,7 @@
 #include <utils/email/email.h>
 #include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
 #include <nx/email/mustache/mustache_helper.h>
@@ -180,7 +180,7 @@ QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
     {
         const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
         lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( taskID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( taskID );
         lk.relock();
         if( m_aggregatedEmails.begin()->periodicTaskID == taskID )  //task has not been removed in sendAggregationEmail while we were waiting
             m_aggregatedEmails.erase( m_aggregatedEmails.begin() );
@@ -465,9 +465,9 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
     {
         aggregatedData.action = QnSendMailBusinessActionPtr( new QnSendMailBusinessAction( *action ) );
         using namespace std::placeholders;
-        aggregatedData.periodicTaskID = TimerManager::instance()->addTimer(
+        aggregatedData.periodicTaskID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnMServerBusinessRuleProcessor::sendAggregationEmail, this, aggregationKey),
-            emailAggregationPeriodMS );
+            std::chrono::milliseconds(emailAggregationPeriodMS));
     }
 
     ++aggregatedData.eventCount;

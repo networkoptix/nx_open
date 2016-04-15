@@ -1,13 +1,12 @@
 
 #include "rtu_context.h"
 
-#include <version.h>
-
 #include <base/constants.h>
 #include <base/selection.h>
 #include <base/servers_finder.h>
 #include <base/changes_manager.h>
 #include <base/apply_changes_task.h>
+#include <base/nxtool_app_info.h>
 #include <models/changes_progress_model.h>
 #include <models/servers_selection_model.h>
 
@@ -334,32 +333,32 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
 
 QString rtu::RtuContext::toolDisplayName() const
 {
-    return QStringLiteral(QN_APPLICATION_DISPLAY_NAME);
+    return ApplicationInfo::applicationDisplayName();
 }
 
 bool rtu::RtuContext::isBeta() const
 {
-    return (QStringLiteral("true") == QStringLiteral(QN_BETA));
+    return ApplicationInfo::isBeta();
 }
 
 QString rtu::RtuContext::toolVersion() const
 {
-    return QStringLiteral(QN_APPLICATION_VERSION);
+    return ApplicationInfo::applicationVersion();
 }
 
 QString rtu::RtuContext::toolRevision() const
 {
-    return QStringLiteral(QN_APPLICATION_REVISION);
+    return ApplicationInfo::applicationRevision();
 }
 
 QString rtu::RtuContext::toolSupportLink() const
 {
-    return QStringLiteral(QN_SUPPORT_LINK);
+    return ApplicationInfo::supportUrl();
 }
 
 QString rtu::RtuContext::toolCompanyUrl() const
 {
-    return QStringLiteral(QN_COMPANY_URL);
+    return ApplicationInfo::companyUrl();
 }
 
 int rtu::RtuContext::currentPage() const

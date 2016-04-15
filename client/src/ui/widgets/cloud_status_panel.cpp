@@ -18,7 +18,6 @@ public:
 
     void updateUi();
     void updateSystems();
-    void at_clicked();
 
 public:
     QMenu *cloudMenu;
@@ -35,17 +34,17 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
 {
     Q_D(QnCloudStatusPanel);
 
-    connect(this, &QnCloudStatusPanel::clicked, d, &QnCloudStatusPanelPrivate::at_clicked);
-    setPopupMode(QToolButton::InstantPopup);
-
     setProperty(style::Properties::kDontPolishFontProperty, true);
     QFont font = qApp->font();
     font.setPixelSize(font.pixelSize() - 1);
     setFont(font);
 
+    setPopupMode(QToolButton::InstantPopup);
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     setIcon(d->offlineIcon);
-    setIconSize(QSize(24, 24));
+    adjustIconSize();
+
+    connect(this, &QnCloudStatusPanel::justPressed, qnCommon->instance<QnCloudStatusWatcher>(), &QnCloudStatusWatcher::updateSystems);
 
     d->updateUi();
 }
@@ -65,6 +64,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
     Q_Q(QnCloudStatusPanel);
 
     cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
+    cloudMenu->setWindowFlags(cloudMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
     systemsMenu = cloudMenu->addMenu(tr("Connect to System..."));
     cloudMenu->addSeparator();
     cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
@@ -74,8 +74,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
     connect(cloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,           this,   &QnCloudStatusPanelPrivate::updateUi);
     //TODO: #dklychkov Uncomment when cloud login is implemented
 //    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::cloudSystemsChanged,     this,   &QnCloudStatusPanelPrivate::updateSystems);
-
-    updateSystems();
+//    updateSystems();
 }
 
 void QnCloudStatusPanelPrivate::updateUi()
@@ -90,6 +89,7 @@ void QnCloudStatusPanelPrivate::updateUi()
         q->setText(tr("Login to cloud..."));
         q->setIcon(offlineIcon);
         q->setMenu(nullptr);
+        connect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
         return;
     }
 
@@ -102,6 +102,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     q->setText(cloudStatusWatcher->cloudLogin());
     q->setIcon(onlineIcon);
     q->setMenu(cloudMenu);
+    disconnect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
 }
 
 void QnCloudStatusPanelPrivate::updateSystems()
@@ -119,17 +120,4 @@ void QnCloudStatusPanelPrivate::updateSystems()
     }
 
     systemsMenu->menuAction()->setVisible(!systemsMenu->actions().isEmpty());
-}
-
-void QnCloudStatusPanelPrivate::at_clicked()
-{
-    Q_Q(QnCloudStatusPanel);
-
-    if (q->base_type::menu())
-    {
-        qnCommon->instance<QnCloudStatusWatcher>()->updateSystems();
-        return;
-    }
-
-    q->action(QnActions::LoginToCLoud)->trigger();
 }

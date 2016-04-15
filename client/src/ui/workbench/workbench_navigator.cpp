@@ -71,7 +71,6 @@ extern "C"
 #include "workbench_context.h"
 #include "workbench_item.h"
 #include "workbench_layout.h"
-#include "workbench_layout_snapshot_manager.h"
 
 #include "camera/thumbnails_loader.h"
 #include "nx/streaming/abstract_archive_stream_reader.h"
@@ -1284,8 +1283,9 @@ void QnWorkbenchNavigator::updateLines() {
     }
 
     QnLayoutResourcePtr currentLayoutResource = workbench()->currentLayout()->resource().staticCast<QnLayoutResource>();
-    if (context()->snapshotManager()->isFile(currentLayoutResource) ||
-        (currentLayoutResource && !currentLayoutResource->getLocalRange().isEmpty()))
+    if (currentLayoutResource &&
+        (currentLayoutResource->isFile() || !currentLayoutResource->getLocalRange().isEmpty())
+        )
     {
         m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);

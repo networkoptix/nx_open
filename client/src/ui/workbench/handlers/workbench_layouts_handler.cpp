@@ -101,7 +101,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
     if(!(accessController()->permissions(layout) & Qn::SavePermission))
         return;
 
-    if (snapshotManager()->isFile(layout)) {
+    if (layout->isFile()) {
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
@@ -129,10 +129,13 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     if(!user)
         return;
 
-    if(snapshotManager()->isFile(layout)) {
+    if (layout->isFile())
+    {
         context()->instance<QnWorkbenchExportHandler>()->doAskNameAndExportLocalLayout(layout->getLocalRange(), layout, Qn::LayoutLocalSaveAs);
         return;
-    } else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+    }
+    else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+    {
         return;
     }
 
@@ -426,11 +429,16 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
     if(!saveResources.empty()) {
         QnLayoutResourceList fileResources, normalResources, videowallReviewResources;
         foreach(const QnLayoutResourcePtr &resource, saveResources) {
-            if(snapshotManager()->isFile(resource)) {
+            if(resource->isFile())
+            {
                 fileResources.push_back(resource);
-            } else if (!resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+            }
+            else if (!resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+            {
                 videowallReviewResources.push_back(resource);
-            } else {
+            }
+            else
+            {
                 normalResources.push_back(resource);
             }
         }
@@ -493,7 +501,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 
         Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
         if((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
-            if(!snapshotManager()->isFile(resource)) /* Not a file. */
+            if(!resource->isFile()) /* Not a file. */
                 resourcePool()->removeResource(resource);
     }
 }

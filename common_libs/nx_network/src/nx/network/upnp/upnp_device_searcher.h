@@ -16,7 +16,7 @@
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/network/aio/aioeventhandler.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -56,7 +56,7 @@ public:
 class NX_NETWORK_API DeviceSearcher
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public QnStoppable
 {
     Q_OBJECT

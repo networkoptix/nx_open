@@ -191,7 +191,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         if (existCamRes)
         {
             QnUuid newTypeId = newNetRes->getTypeId();
-            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource();
+            bool updateTypeId = existCamRes->getTypeId() != newNetRes->getTypeId(); 
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
                 if (isForeign || updateTypeId)
@@ -267,24 +267,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         resources << extraResources;
         return true;
     }
-
-
-
-    QnResourceList swapList;
-    for(const QnResourcePtr &res: resources)
-    {
-        if (res->unknownResource())
-        {
-            QnResourcePtr updetedRes = res->updateResource();
-            if (updetedRes)
-                swapList.push_back(updetedRes);
-        }
-        else
-        {
-            swapList.push_back(res);
-        }
-    }
-    resources = swapList;
 
     resources << extraResources;
 

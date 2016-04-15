@@ -50,7 +50,7 @@ namespace ec2
             const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             QByteArray& /*result*/,
-            QByteArray&, /*contentType*/ 
+            QByteArray&, /*contentType*/
             const QnRestConnectionProcessor*) override
         {
             return nx_http::StatusCode::badRequest;

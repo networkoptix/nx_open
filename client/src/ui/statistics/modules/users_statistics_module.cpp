@@ -3,12 +3,12 @@
 
 #include <utils/common/model_functions.h>
 
-#include <common/user_permissions.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 
 namespace
 {
@@ -34,21 +34,19 @@ QnUsersStatisticsModule::~QnUsersStatisticsModule()
 
 QnStatisticValuesHash QnUsersStatisticsModule::values() const
 {
-    const auto accessController = context()->accessController();
-    if (!accessController)
-        return QnStatisticValuesHash();
-
     QnStatisticValuesHash result;
 
     const auto availableUsers = qnResPool->getResources<QnUserResource>();
-    NX_ASSERT(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
+    //NX_ASSERT(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
+    if (availableUsers.isEmpty())
+        return result;
 
     // Adds number of each permission
     typedef QHash<QString, int> PermissionCountHash;
     PermissionCountHash permissionsCount;
     for (const auto &userResource: availableUsers)
     {
-        const auto permissions = accessController->globalPermissions(userResource);
+        const auto permissions = qnResourceAccessManager->globalPermissions(userResource);
 
         static const auto kDelimieter = L'|';
         const auto permissionsList = QnLexical::serialized(permissions)
@@ -70,7 +68,10 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     if (!currentUser)
         return result;
 
-    const auto currentUserPermissions = accessController->globalPermissions();
+    const auto accessController = context()->accessController();
+    const auto currentUserPermissions = accessController
+        ? accessController->globalPermissions()
+        : qnResourceAccessManager->globalPermissions(currentUser);
     const auto value = QnLexical::serialized(currentUserPermissions);
     result.insert(kPermissionsTag, value);
 

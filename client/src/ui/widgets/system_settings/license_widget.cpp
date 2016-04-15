@@ -32,6 +32,8 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
+    setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
+
     ui->onlineKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
     setWarningStyle(ui->fileLineEdit);

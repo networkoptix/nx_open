@@ -1555,7 +1555,7 @@ void rtu::ServersSelectionModel::addServer(const BaseServerInfo &baseInfo)
     ItemSearchInfo searchInfo;
     if (m_impl->findServer(baseInfo.id, &searchInfo))
     {
-        Q_ASSERT(searchInfo.serverInfoIterator->locked
+        Q_ASSERT_X(searchInfo.serverInfoIterator->locked
             , Q_FUNC_INFO, "Server should be locked in this situation");
         if (searchInfo.serverInfoIterator->locked)
             --searchInfo.serverInfoIterator->removeRequestsCounter;

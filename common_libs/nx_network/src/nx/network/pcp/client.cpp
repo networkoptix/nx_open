@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/network/nettools.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include <QDateTime>
 

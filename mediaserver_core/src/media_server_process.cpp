@@ -21,6 +21,7 @@
 #include <QtCore/QUrl>
 #include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
+#include <utils/call_counter/call_counter.h>
 #include <QtCore/QThreadPool>
 
 #include <QtNetwork/QUdpSocket>
@@ -741,9 +742,9 @@ void MediaServerProcess::dumpSystemUsageStats()
     QnMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
         return;
-    m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
+    m_dumpSystemResourceUsageTaskID = nx::utils::TimerManager::instance()->addTimer(
         std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
-        SYSTEM_USAGE_DUMP_TIMEOUT );
+        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT) );
 }
 
 #ifdef Q_OS_WIN
@@ -1697,6 +1698,8 @@ QHostAddress MediaServerProcess::getPublicAddress()
 
 void MediaServerProcess::run()
 {
+    QnCallCountStart(std::chrono::milliseconds(5000));
+
     ffmpegInit();
 
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
@@ -1985,7 +1988,6 @@ void MediaServerProcess::run()
     PluginManager pluginManager(QString(), &pluginContainer);
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
-    using namespace std::placeholders;
     for (const auto storagePlugin :
          PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
@@ -1993,7 +1995,7 @@ void MediaServerProcess::run()
             storagePlugin->storageType(),
             std::bind(
                 &QnThirdPartyStorageResource::instance,
-                _1,
+                std::placeholders::_1,
                 storagePlugin
             ),
             false
@@ -2264,7 +2266,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
     nx::network::SocketGlobals::addressPublisher().setUpdateInterval(
-        parseTimerDuration(
+        nx::utils::parseTimerDuration(
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
             nx::network::cloud::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
 
@@ -2397,9 +2399,9 @@ void MediaServerProcess::run()
     QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
 
-    m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
+    m_dumpSystemResourceUsageTaskID = nx::utils::TimerManager::instance()->addTimer(
         std::bind( &MediaServerProcess::dumpSystemUsageStats, this ),
-        SYSTEM_USAGE_DUMP_TIMEOUT );
+        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 
     QnRecordingManager::instance()->start();
     QnMServerResourceSearcher::instance()->start();
@@ -2443,7 +2445,7 @@ void MediaServerProcess::run()
         dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
         m_dumpSystemResourceUsageTaskID = 0;
     }
-    TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
+    nx::utils::TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
     QnResourceDiscoveryManager::instance()->pleaseStop();
@@ -2453,7 +2455,7 @@ void MediaServerProcess::run()
 
     QnResource::stopCommandProc();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
-    TimerManager::instance()->stop();
+    nx::utils::TimerManager::instance()->stop();
 
     hlsSessionPool.reset();
     streamingChunkTranscoder.reset();

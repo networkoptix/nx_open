@@ -11,8 +11,7 @@
 #include <QJsonDocument>
 
 #include <nx/mediaserver/api/version_holder.h>
-
-#include <version.h>
+#include <base/nxtool_app_info.h>
 
 namespace nx {
 namespace mediaserver {
@@ -52,8 +51,8 @@ const QString kSysInfoTag = "systemInformation";
 const QString kCustomizationTag = "customization";
 
 const QString kUserAgent = QString("%1/%2")
-    .arg(QLatin1String(QN_APPLICATION_DISPLAY_NAME),
-        QLatin1String(QN_APPLICATION_VERSION));
+    .arg(rtu::ApplicationInfo::applicationDisplayName(),
+         rtu::ApplicationInfo::applicationVersion());
 
 const QString kAdminUserName = QStringLiteral("admin");
 
