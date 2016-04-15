@@ -15,6 +15,8 @@
 
 #include <utils/email/email.h>
 
+#include <utils/common/model_functions.h>
+
 namespace
 {
     const int kUserGroupIdRole = Qt::UserRole + 1;
@@ -45,6 +47,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QWidget* parent /*= 0*/):
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateEmail);
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserSettingsWidget::updateAccessRights);
     connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserSettingsWidget::hasChangesChanged);
 
     //setWarningStyle(ui->hintLabel);
@@ -64,6 +67,8 @@ void QnUserSettingsWidget::setUser(const QnUserResourcePtr &user)
         return;
 
     m_user = user;
+    if (m_user)
+        qDebug() << "Set User:" << m_user->getName();
 
     m_mode = !m_user
         ? Mode::Invalid
@@ -93,24 +98,20 @@ bool QnUserSettingsWidget::hasChanges() const
         if (m_user->isEnabled() != ui->enabledButton->isChecked())
             return true;
 
-        int index = ui->groupComboBox->currentIndex();
-        NX_ASSERT(index >= 0);
-        if (index >= 0)
+        QnUuid groupId = selectedUserGroup();
+        if (!groupId.isNull())
         {
-            QnUuid groupId = ui->groupComboBox->itemData(index, kUserGroupIdRole).value<QnUuid>();
-            if (!groupId.isNull())
-            {
-                if (m_user->userGroup() != groupId)
-                    return true;
-            }
-            else
-            {
-                Qn::GlobalPermissions permissions = ui->groupComboBox->itemData(index, kPermissionsRole).value<Qn::GlobalPermissions>();
-                if (permissions != m_user->getPermissions())
-                    return true;
-            }
-
+            if (m_user->userGroup() != groupId)
+                return true;
         }
+        else
+        {
+            Qn::GlobalPermissions permissions = selectedPermissions();
+            if (permissions != m_user->getPermissions())
+                return true;
+        }
+
+
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -127,55 +128,53 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (!m_user)
         return;
+    qDebug() << "Loading data for" << m_user->getName();
 
     ui->loginEdit->setText(m_user->getName());
     ui->emailEdit->setText(m_user->getEmail());
+    ui->passwordEdit->clear();
+    ui->confirmPasswordEdit->clear();
+    ui->currentPasswordEdit->clear();
     ui->enabledButton->setChecked(m_user->isEnabled());
 
+    /* If there is only one entry in permissions combobox, this check doesn't matter. */
     int customPermissionsIndex = ui->groupComboBox->count() - 1;
-    NX_ASSERT(ui->groupComboBox->itemData(customPermissionsIndex, kPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
-    NX_ASSERT(ui->groupComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
+    NX_ASSERT(customPermissionsIndex == 0 ||
+        ui->groupComboBox->itemData(customPermissionsIndex, kPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
+    NX_ASSERT(customPermissionsIndex == 0 ||
+        ui->groupComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
 
+    int permissionsIndex = customPermissionsIndex;
     if (m_mode == Mode::NewUser)
     {
-        int index = ui->groupComboBox->findData(qVariantFromValue(Qn::GlobalLiveViewerPermissionSet), kPermissionsRole, Qt::MatchExactly);
-        NX_ASSERT(index >= 0);
-        if (index >= 0)
-            ui->groupComboBox->setCurrentIndex(index);
-        else
-            ui->groupComboBox->setCurrentIndex(customPermissionsIndex);
+        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(Qn::GlobalLiveViewerPermissionSet), kPermissionsRole, Qt::MatchExactly);
+        NX_ASSERT(permissionsIndex >= 0);
     }
     else
     {
         Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
         qDebug() << "searching preset for user" << m_user->getName() << "with permissions" << static_cast<int>(permissions);
+        qDebug() << QnLexical::serialized(permissions);
 
-        int index = customPermissionsIndex;
         if (!m_user->userGroup().isNull())
         {
-            index = ui->groupComboBox->findData(qVariantFromValue(m_user->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
-            if (index < 0)
-                index = customPermissionsIndex;
-
+            permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(m_user->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
         }
         else if (permissions != Qn::NoGlobalPermissions)
         {
-            for (int i = 0; i < ui->groupComboBox->count(); ++i)
-            {
-                qDebug() << ui->groupComboBox->itemText(i) << static_cast<int>(ui->groupComboBox->itemData(i, kPermissionsRole).value<Qn::GlobalPermissions>());
-            }
-
-
-            int index = ui->groupComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
-            if (index < 0)
-                index = customPermissionsIndex;
+            permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
         }
-        ui->groupComboBox->setCurrentIndex(index);
     }
+
+    if (permissionsIndex < 0)
+        permissionsIndex = customPermissionsIndex;
+    ui->groupComboBox->setCurrentIndex(permissionsIndex);
+
 
     updateLogin();
     updatePassword();
     updateEmail();
+    updateAccessRights();
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -202,24 +201,19 @@ void QnUserSettingsWidget::applyChanges()
 
         if (permissions.testFlag(Qn::WriteAccessRightsPermission))
         {
-            int index = ui->groupComboBox->currentIndex();
-            NX_ASSERT(index >= 0);
-            if (index >= 0)
+            QnUuid groupId = selectedUserGroup();
+            if (!groupId.isNull())
             {
-                QnUuid groupId = ui->groupComboBox->itemData(index, kUserGroupIdRole).value<QnUuid>();
-                if (!groupId.isNull())
-                {
-                    user->setUserGroup(groupId);
-                }
-                else
-                {
-                    Qn::GlobalPermissions permissions = ui->groupComboBox->itemData(index, kPermissionsRole).value<Qn::GlobalPermissions>();
-                    if (permissions != Qn::NoGlobalPermissions)
-                        user->setPermissions(permissions);
-                    /* Otherwise permissions must be loaded from custom tabs. */
-                }
-
+                user->setUserGroup(groupId);
             }
+            else
+            {
+                Qn::GlobalPermissions permissions = selectedPermissions();
+                if (permissions != Qn::NoGlobalPermissions)
+                    user->setPermissions(permissions);
+                /* Otherwise permissions must be loaded from custom tabs. */
+            }
+
         }
 
         if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -229,6 +223,13 @@ void QnUserSettingsWidget::applyChanges()
             user->setEnabled(ui->enabledButton->isChecked());
     });
 
+}
+
+bool QnUserSettingsWidget::isCustomAccessRights() const
+{
+    int index = ui->groupComboBox->currentIndex();
+    return selectedPermissions() == Qn::NoGlobalPermissions
+        && selectedUserGroup().isNull();
 }
 
 void QnUserSettingsWidget::updateLogin()
@@ -333,6 +334,19 @@ void QnUserSettingsWidget::updateEmail()
     ui->emailEdit->setPalette(palette);
 }
 
+void QnUserSettingsWidget::updateAccessRights()
+{
+    if (isCustomAccessRights())
+    {
+
+    }
+    else
+    {
+
+
+    }
+}
+
 void QnUserSettingsWidget::updateControlsAccess()
 {
     Qn::Permissions permissions = accessController()->permissions(m_user);
@@ -362,12 +376,12 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
     if (!m_user)
         return;
 
-    auto addBuiltInGroup = [this](const QString &name, Qn::GlobalPermissions permission)
+    auto addBuiltInGroup = [this](const QString &name, Qn::GlobalPermissions permissions)
     {
         int index = ui->groupComboBox->count();
         ui->groupComboBox->insertItem(index, name);
         ui->groupComboBox->setItemData(index,   qVariantFromValue(QnUuid()),    kUserGroupIdRole);
-        ui->groupComboBox->setItemData(index,   qVariantFromValue(permission),  kPermissionsRole);
+        ui->groupComboBox->setItemData(index,   qVariantFromValue(permissions), kPermissionsRole);
     };
 
     auto addCustomGroup = [this](const ec2::ApiUserGroupData &group)
@@ -398,7 +412,15 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
             addCustomGroup(group);
     }
 
+    addBuiltInGroup(tr("New Group..."), Qn::NoGlobalPermissions);
     addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
+
+    qDebug() << "Access rights presets refreshed";
+    for (int i = 0; i < ui->groupComboBox->count(); ++i)
+    {
+        Qn::GlobalPermissions p = ui->groupComboBox->itemData(i, kPermissionsRole).value<Qn::GlobalPermissions>();
+        qDebug() << ui->groupComboBox->itemText(i) << ":" << static_cast<int>(p) << ":" << QnLexical::serialized(p);
+    }
 }
 
 void QnUserSettingsWidget::createAccessRightsAdvanced()
@@ -477,6 +499,16 @@ void QnUserSettingsWidget::fillAccessRightsAdvanced(int rights)
     //m_inUpdateDependensies = false;
 
     //updateDependantPermissions(); // TODO: #GDM #Common rename to something more sane, connect properly
+}
+
+Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
+{
+    return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
+}
+
+QnUuid QnUserSettingsWidget::selectedUserGroup() const
+{
+    return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
 }
 
 // Utility functions

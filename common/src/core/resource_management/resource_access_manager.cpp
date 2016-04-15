@@ -37,6 +37,13 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
             connect(layout, &QnLayoutResource::userCanEditChanged,  this, removeResourceFromCache);
             connect(layout, &QnLayoutResource::lockedChanged,       this, removeResourceFromCache);
         }
+
+        if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
+        {
+            connect(user, &QnUserResource::permissionsChanged,  this, removeResourceFromCache);
+            connect(user, &QnUserResource::userGroupChanged,    this, removeResourceFromCache);
+        }
+
     });
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, removeResourceFromCache](const QnResourcePtr& resource)
@@ -110,7 +117,6 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
     result = undeprecate(result);
     m_globalPermissionsCache.insert(userId, result);
-    qDebug() << "storing" << static_cast<int>(result) << "for user" << user->getName();
 
     return result;
 }

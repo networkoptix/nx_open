@@ -28,6 +28,14 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     setPageVisible(LayoutsPage, false);
     setPageVisible(ServersPage, false);
 
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]
+    {
+        bool customAccessRights = m_settingsPage->isCustomAccessRights();
+        setPageVisible(CamerasPage, customAccessRights);
+        setPageVisible(LayoutsPage, customAccessRights);
+        setPageVisible(ServersPage, customAccessRights);
+    });
+
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
     {
