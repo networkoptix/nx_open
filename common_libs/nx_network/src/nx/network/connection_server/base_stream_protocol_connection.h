@@ -55,8 +55,7 @@ namespace nx_api
             std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
         :
             BaseType( connectionManager, std::move(streamSocket) ),
-            m_serializerState( SerializerState::done ),
-            m_connectionFreedFlag( nullptr )
+            m_serializerState( SerializerState::done )
         {
             static const size_t DEFAULT_SEND_BUFFER_SIZE = 4*1024;
             m_writeBuffer.reserve( DEFAULT_SEND_BUFFER_SIZE );
@@ -66,8 +65,6 @@ namespace nx_api
 
         virtual ~BaseStreamProtocolConnection()
         {
-            if( m_connectionFreedFlag )
-                *m_connectionFreedFlag = true;
         }
 
         void bytesReceived( const nx::Buffer& buf )
@@ -88,12 +85,14 @@ namespace nx_api
                         //processing request
                         //NOTE interleaving is not supported yet
 
-                        bool connectionFreed = false;
-                        m_connectionFreedFlag = &connectionFreed;
-                        static_cast<CustomConnectionType*>(this)->processMessage( std::move(m_request) );
-                        if (connectionFreed)
-                            return; //connection has been removed by handler
-                        m_connectionFreedFlag = nullptr;
+                        {
+                            nx::utils::ObjectDestructionFlag::Watcher watcher(
+                                &m_connectionFreedFlag);
+                            static_cast<CustomConnectionType*>(this)->processMessage(
+                                std::move(m_request));
+                            if (watcher.objectDestroyed())
+                                return; //connection has been removed by handler
+                        }
 
                         m_parser.reset();
                         m_request.clear();
@@ -126,12 +125,11 @@ namespace nx_api
 
                 if( sendCompletionHandler )
                 {
-                    bool connectionFreed = false;
-                    m_connectionFreedFlag = &connectionFreed;
+                    nx::utils::ObjectDestructionFlag::Watcher watcher(
+                        &m_connectionFreedFlag);
                     sendCompletionHandler( SystemError::noError );
-                    if( connectionFreed )
+                    if (watcher.objectDestroyed())
                         return; //connection has been removed by handler
-                    m_connectionFreedFlag = nullptr;
                 }
 
                 processAnotherSendTaskIfAny();
@@ -238,7 +236,7 @@ namespace nx_api
         nx::Buffer m_writeBuffer;
         std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
         std::deque<SendTask> m_sendQueue;
-        bool* m_connectionFreedFlag;
+        nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
         void sendMessageInternal( const MessageType& msg )
         {
@@ -283,14 +281,15 @@ namespace nx_api
 
         void reportErrorAndCloseConnection( SystemError::ErrorCode errorCode )
         {
-            bool connectionFreed = false;
-            m_connectionFreedFlag = &connectionFreed;
             NX_ASSERT( !m_sendQueue.empty() );
             auto handler = std::move( m_sendQueue.front().handler );
-            handler( errorCode );
-            if( connectionFreed )
-                return; //connection has been removed by handler
-            m_connectionFreedFlag = nullptr;
+            {
+                nx::utils::ObjectDestructionFlag::Watcher watcher(
+                    &m_connectionFreedFlag);
+                handler(errorCode);
+                if (watcher.objectDestroyed())
+                    return; //connection has been removed by handler
+            }
             this->connectionManager()->closeConnection(
                 errorCode,
                 static_cast<CustomConnectionType*>(this) );

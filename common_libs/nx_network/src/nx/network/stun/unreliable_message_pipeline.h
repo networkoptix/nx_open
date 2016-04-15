@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
@@ -69,15 +70,12 @@ public:
     UnreliableMessagePipeline(CustomPipeline* customPipeline)
     :
         m_customPipeline(customPipeline),
-        m_socket(std::make_unique<UDPSocket>()),
-        m_terminationFlag(nullptr)
+        m_socket(std::make_unique<UDPSocket>())
     {
     }
 
     ~UnreliableMessagePipeline()
     {
-        if (m_terminationFlag)
-            *m_terminationFlag = true;
     }
 
     /**
@@ -147,8 +145,7 @@ public:
     */
     std::unique_ptr<network::UDPSocket> takeSocket()
     {
-        if (m_terminationFlag)
-            *m_terminationFlag = true;
+        m_terminationFlag.markAsDeleted();
         //we MUST be in aio thread. TODO #ak add NX_ASSERT for aio thread
         m_socket->cancelIOSync(aio::etNone); 
         return std::move(m_socket);
@@ -193,7 +190,7 @@ private:
     nx::Buffer m_readBuffer;
     ParserType m_messageParser;
     std::deque<OutgoingMessageContext> m_sendQueue;
-    bool* m_terminationFlag;
+    nx::utils::ObjectDestructionFlag m_terminationFlag;
 
     void onBytesRead(
         SystemError::ErrorCode errorCode,
@@ -206,12 +203,11 @@ private:
         {
             NX_LOGX(lm("Error reading from socket. %1").
                 arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-            bool terminated = false;
-            m_terminationFlag = &terminated;
+
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
             m_customPipeline->ioFailure(errorCode);
-            if (terminated)
+            if (watcher.objectDestroyed())
                 return; //this has been freed
-            m_terminationFlag = nullptr;
             m_socket->registerTimer(
                 kRetryReadAfterFailureTimeout,
                 [this]() { startReceivingMessages(); });
@@ -224,14 +220,12 @@ private:
         m_messageParser.setMessage(&msg);
         if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
         {
-            bool terminated = false;
-            m_terminationFlag = &terminated;
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
             m_customPipeline->messageReceived(
                 std::move(sourceAddress),
                 std::move(msg));
-            if (terminated)
+            if (watcher.objectDestroyed())
                 return; //this has been freed
-            m_terminationFlag = nullptr;
         }
         else
         {
@@ -293,14 +287,12 @@ private:
         auto completionHandler = std::move(m_sendQueue.front().completionHandler);
         if (completionHandler)
         {
-            bool thisHasBeenFreed = false;
-            m_terminationFlag = &thisHasBeenFreed;
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
             completionHandler(
                 errorCode,
                 std::move(resolvedTargetAddress));
-            if (thisHasBeenFreed)
+            if (watcher.objectDestroyed())
                 return;
-            m_terminationFlag = nullptr;
         }
         m_sendQueue.pop_front();
 

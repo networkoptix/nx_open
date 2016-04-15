@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <utils/common/stoppable.h>
 
 #include "stream_socket_server.h"
@@ -65,17 +66,13 @@ namespace nx_api
         :
             m_connectionManager(connectionManager),
             m_streamSocket(std::move(streamSocket)),
-            m_bytesToSend(0),
-            m_connectionFreedFlag(nullptr)
+            m_bytesToSend(0)
         {
             m_readBuffer.reserve( READ_BUFFER_CAPACITY );
         }
 
         ~BaseServerConnection()
         {
-            if (m_connectionFreedFlag)
-                *m_connectionFreedFlag = true;
-
             stopWhileInAioThread();
         }
 
@@ -159,7 +156,7 @@ namespace nx_api
         nx::Buffer m_readBuffer;
         size_t m_bytesToSend;
         std::forward_list<std::function<void()>> m_connectionCloseHandlers;
-        bool* m_connectionFreedFlag;
+        nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
@@ -174,12 +171,12 @@ namespace nx_api
 
             NX_ASSERT( m_readBuffer.size() == bytesRead );
 
-            bool connectionFreed = false;
-            m_connectionFreedFlag = &connectionFreed;
-            static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer );
-            if (connectionFreed)
-                return; //connection has been removed by handler
-            m_connectionFreedFlag = nullptr;
+            {
+                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+                static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer );
+                if (watcher.objectDestroyed())
+                    return; //connection has been removed by handler
+            }
 
             m_readBuffer.resize( 0 );
             m_streamSocket->readSomeAsync(
