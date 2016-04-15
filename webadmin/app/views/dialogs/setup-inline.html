@@ -83,7 +83,7 @@
     <form class="master-controls" name="cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="Email" required autofocus ng-change="clearCloudError()">
+                   type="email" placeholder="Email" autocomplete="new-password"  required autofocus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
