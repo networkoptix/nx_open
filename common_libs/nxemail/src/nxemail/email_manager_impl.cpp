@@ -74,9 +74,6 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    smtp.setUser(settings.user);
-    smtp.setPassword(settings.password);
-
     if( !smtp.connectToHost() )
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
@@ -84,7 +81,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
             .arg(SmtpClient::toString(connectionType)).arg(SystemError::toString(errorCode)), cl_logWARNING );
         return false;
     }
-    if( !smtp.login() )
+    if( !smtp.login(settings.user, settings.password) )
     {
         NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
         smtp.quit();
