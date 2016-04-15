@@ -173,7 +173,7 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     rm -Rf $BUILD_DIR/opt/networkoptix/
 fi
 
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
     cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
     cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi

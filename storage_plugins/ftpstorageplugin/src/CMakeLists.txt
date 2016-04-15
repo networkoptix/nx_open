@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(TARGET ftp_library)
+set(TARGET ftpstorageplugin)
 
 project(${TARGET})
 

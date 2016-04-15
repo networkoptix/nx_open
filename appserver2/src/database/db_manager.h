@@ -584,6 +584,7 @@ namespace ec2
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_needResyncCameraUserAttributes;
+        bool m_needResyncServerUserAttributes;
         bool m_dbJustCreated;
         bool m_isBackupRestore;
         bool m_needResyncLayout;
