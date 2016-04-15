@@ -973,5 +973,22 @@
                 <compile.option1/>
             </properties>
         </profile>
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>test</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <modules>
+                <module>unit_tests</module>
+            </modules>
+        </profile>        
     </profiles>
 </project>
