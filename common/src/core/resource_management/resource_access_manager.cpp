@@ -99,6 +99,10 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     if (!user)
         return Qn::NoGlobalPermissions;
 
+    /* Handle just-created user situation. */
+    if (user->flags().testFlag(Qn::local))
+        return user->getPermissions();
+
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
     QnUuid userId = user->getId();

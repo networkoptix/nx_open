@@ -835,6 +835,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
+        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
+                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
 
         /* Media-specific permissions. */
         ExportPermission                = 0x2000,   /**< Permission to export video parts. */

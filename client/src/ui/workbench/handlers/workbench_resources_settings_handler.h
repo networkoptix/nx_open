@@ -17,6 +17,7 @@ public:
 private:
     void at_cameraSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
+    void at_newUserAction_triggered();
     void at_userSettingsAction_triggered();
 
 private:

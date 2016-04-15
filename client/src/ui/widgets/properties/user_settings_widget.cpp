@@ -1,6 +1,8 @@
 #include "user_settings_widget.h"
 #include "ui_user_settings_widget.h"
 
+#include <api/app_server_connection.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -14,8 +16,6 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/email/email.h>
-
-#include <utils/common/model_functions.h>
 
 namespace
 {
@@ -67,12 +67,10 @@ void QnUserSettingsWidget::setUser(const QnUserResourcePtr &user)
         return;
 
     m_user = user;
-    if (m_user)
-        qDebug() << "Set User:" << m_user->getName();
 
     m_mode = !m_user
         ? Mode::Invalid
-        : m_user->getId().isNull()
+        : m_user->flags().testFlag(Qn::local)
         ? Mode::NewUser
         : m_user == context()->user()
         ? Mode::OwnUser
@@ -83,6 +81,9 @@ bool QnUserSettingsWidget::hasChanges() const
 {
     if (!m_user)
         return false;
+
+    if (m_mode == Mode::NewUser)
+        return true;
 
     Qn::Permissions permissions = accessController()->permissions(m_user);
 
@@ -128,7 +129,6 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (!m_user)
         return;
-    qDebug() << "Loading data for" << m_user->getName();
 
     ui->loginEdit->setText(m_user->getName());
     ui->emailEdit->setText(m_user->getEmail());
@@ -145,26 +145,17 @@ void QnUserSettingsWidget::loadDataToUi()
         ui->groupComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
 
     int permissionsIndex = customPermissionsIndex;
-    if (m_mode == Mode::NewUser)
-    {
-        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(Qn::GlobalLiveViewerPermissionSet), kPermissionsRole, Qt::MatchExactly);
-        NX_ASSERT(permissionsIndex >= 0);
-    }
-    else
-    {
-        Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
-        qDebug() << "searching preset for user" << m_user->getName() << "with permissions" << static_cast<int>(permissions);
-        qDebug() << QnLexical::serialized(permissions);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
 
-        if (!m_user->userGroup().isNull())
-        {
-            permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(m_user->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
-        }
-        else if (permissions != Qn::NoGlobalPermissions)
-        {
-            permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
-        }
+    if (!m_user->userGroup().isNull())
+    {
+        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(m_user->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
     }
+    else if (permissions != Qn::NoGlobalPermissions)
+    {
+        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
+    }
+
 
     if (permissionsIndex < 0)
         permissionsIndex = customPermissionsIndex;
@@ -185,6 +176,7 @@ void QnUserSettingsWidget::applyChanges()
     if (isReadOnly())
         return;
 
+    //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     qnResourcesChangesManager->saveUser(m_user, [this](const QnUserResourcePtr &user)
     {
         Qn::Permissions permissions = accessController()->permissions(user);
@@ -193,10 +185,40 @@ void QnUserSettingsWidget::applyChanges()
             user->setName(ui->loginEdit->text().trimmed());
 
         //empty text means 'no change'
-        if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->passwordEdit->text().isEmpty()) //TODO: #GDM #access implement correct check
+        const QString newPassword = ui->passwordEdit->text().trimmed();
+        if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
         {
-            user->setPassword(ui->passwordEdit->text());
+            user->setPassword(newPassword);
             user->generateHash();
+            if (m_mode == Mode::OwnUser)
+            {
+                /* Password was changed. Change it in global settings and hope for the best. */
+                QUrl url = QnAppServerConnectionFactory::url();
+                url.setPassword(newPassword);
+                //// TODO #elric: This is a totally evil hack. Store password hash/salt in user.
+                //context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+                QnAppServerConnectionFactory::setUrl(url);
+
+                //QnConnectionDataList savedConnections = qnSettings->customConnections();
+                //if (!savedConnections.isEmpty()
+                //    && !savedConnections.first().url.password().isEmpty()
+                //    && qnUrlEqual(savedConnections.first().url, url))
+                //{
+                //    QnConnectionData current = savedConnections.takeFirst();
+                //    current.url = url;
+                //    savedConnections.prepend(current);
+                //    qnSettings->setCustomConnections(savedConnections);
+                //}
+
+                //QnConnectionData lastUsed = qnSettings->lastUsedConnection();
+                //if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
+                //    lastUsed.url = url;
+                //    qnSettings->setLastUsedConnection(lastUsed);
+                //}
+
+            }
+
+            user->setPassword(QString());
         }
 
         if (permissions.testFlag(Qn::WriteAccessRightsPermission))
@@ -221,6 +243,8 @@ void QnUserSettingsWidget::applyChanges()
 
         if (permissions.testFlag(Qn::WriteAccessRightsPermission))
             user->setEnabled(ui->enabledButton->isChecked());
+
+
     });
 
 }
@@ -349,7 +373,9 @@ void QnUserSettingsWidget::updateAccessRights()
 
 void QnUserSettingsWidget::updateControlsAccess()
 {
-    Qn::Permissions permissions = accessController()->permissions(m_user);
+    Qn::Permissions permissions = m_user
+        ? accessController()->permissions(m_user)
+        : Qn::NoPermissions;
 
     ui->loginEdit->setReadOnly(!permissions.testFlag(Qn::WriteNamePermission));
 
@@ -414,13 +440,6 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
 
     addBuiltInGroup(tr("New Group..."), Qn::NoGlobalPermissions);
     addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
-
-    qDebug() << "Access rights presets refreshed";
-    for (int i = 0; i < ui->groupComboBox->count(); ++i)
-    {
-        Qn::GlobalPermissions p = ui->groupComboBox->itemData(i, kPermissionsRole).value<Qn::GlobalPermissions>();
-        qDebug() << ui->groupComboBox->itemText(i) << ":" << static_cast<int>(p) << ":" << QnLexical::serialized(p);
-    }
 }
 
 void QnUserSettingsWidget::createAccessRightsAdvanced()

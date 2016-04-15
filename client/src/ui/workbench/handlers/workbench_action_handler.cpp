@@ -235,7 +235,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(QnActions::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(action(QnActions::RemoveFromServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
-    connect(action(QnActions::NewUserAction),                          SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
     connect(action(QnActions::RenameResourceAction),                   SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
     connect(action(QnActions::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
     connect(action(QnActions::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
@@ -1883,28 +1882,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     deleteResources(moreResourceToDelete);
 }
 
-void QnWorkbenchActionHandler::at_newUserAction_triggered()
-{
-    //QnUserResourcePtr user(new QnUserResource());
-    //user->setPermissions(Qn::GlobalLiveViewerPermissions);
-
-    //QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
-    //dialog->setWindowModality(Qt::ApplicationModal);
-    //dialog->setUser(user);
-    //dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    //setHelpTopic(dialog.data(), Qn::NewUser_Help);
-    //do {
-    //    if(!dialog->exec())
-    //        return;
-    //    dialog->submitToResource();
-    //} while (!validateResourceName(user, user->getName()));
-
-    //user->setId(QnUuid::createUuid());
-
-    //qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
-    //user->setPassword(QString()); // forget the password now
-}
-
 void QnWorkbenchActionHandler::closeApplication(bool force) {
     /* Try close, if force - exit anyway. */
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
@@ -1932,119 +1909,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 
     QnNonModalDialogConstructor<QnAdjustVideoDialog> dialogConstructor(m_adjustVideoDialog, mainWindow());
     adjustVideoDialog()->setWidget(widget);
-}
-
-void QnWorkbenchActionHandler::at_userSettingsAction_triggered()
-{
-    //QnActionParameters params = menu()->currentParameters(sender());
-    //QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
-    //if(!user)
-    //    return;
-
-    //Qn::Permissions permissions = accessController()->permissions(user);
-    //if(!(permissions & Qn::ReadPermission))
-    //    return;
-
-    //QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
-    //dialog->setWindowModality(Qt::ApplicationModal);
-    //dialog->setWindowTitle(tr("User Settings"));
-    //setHelpTopic(dialog.data(), Qn::UserSettings_Help);
-
-    //dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
-
-    //QnUserSettingsDialog::ElementFlags zero(0);
-
-    //QnUserSettingsDialog::ElementFlags flags =
-    //    ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-    //    ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : zero);
-
-    //QnUserSettingsDialog::ElementFlags loginFlags =
-    //    ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-    //    ((permissions & Qn::WriteNamePermission) ? QnUserSettingsDialog::Editable : zero);
-
-    //QnUserSettingsDialog::ElementFlags passwordFlags =
-    //    ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : zero) | /* There is no point to display flag edit field if password cannot be changed. */
-    //    ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : zero);
-    //passwordFlags &= flags;
-
-    //QnUserSettingsDialog::ElementFlags accessRightsFlags =
-    //    ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-    //    ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
-    //accessRightsFlags &= flags;
-
-    //QnUserSettingsDialog::ElementFlags emailFlags =
-    //    ((permissions & Qn::ReadEmailPermission) ? QnUserSettingsDialog::Visible : zero) |
-    //    ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
-    //emailFlags &= flags;
-
-    //QnUserSettingsDialog::ElementFlags enabledFlags =
-    //    ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable | QnUserSettingsDialog::Visible : zero);
-    //enabledFlags &= flags;
-
-    //dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
-    //dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
-    //dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
-    //dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
-    //dialog->setElementFlags(QnUserSettingsDialog::Enabled, enabledFlags);
-
-
-    //// TODO #Elric: This is a totally evil hack. Store password hash/salt in user.
-    //QString currentPassword = QnAppServerConnectionFactory::url().password();
-    //if(user == context()->user()) {
-    //    dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
-    //    dialog->setCurrentPassword(currentPassword);
-    //} else {
-    //    dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    //}
-
-    //dialog->setUser(user);
-    //if(!dialog->exec() || !dialog->hasChanges())
-    //    return;
-
-    //if (!(permissions & Qn::SavePermission))
-    //    return;
-
-    //qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
-    //    dialog->submitToResource();
-    //});
-
-    ////TODO: #GDM SafeMode what to rollback if current password changes cannot be saved?
-
-    //QString newPassword = user->getPassword();
-    //user->setPassword(QString());
-
-    //if (user != context()->user() || newPassword.isEmpty() || newPassword == currentPassword)
-    //    return;
-
-
-    ///* Password was changed. Change it in global settings and hope for the best. */
-    //QUrl url = QnAppServerConnectionFactory::url();
-    //url.setPassword(newPassword);
-
-    //// TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-    //context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
-
-    //QnAppServerConnectionFactory::setUrl(url);
-
-    ///* QnAppServerConnectionFactory::url() contains user name in lower case. We'd better use the original name for UI. */
-    //url.setUserName(user->getName());
-
-    //QnConnectionDataList savedConnections = qnSettings->customConnections();
-    //if (!savedConnections.isEmpty()
-    //    && !savedConnections.first().url.password().isEmpty()
-    //    && qnUrlEqual(savedConnections.first().url, url))
-    //{
-    //    QnConnectionData current = savedConnections.takeFirst();
-    //    current.url = url;
-    //    savedConnections.prepend(current);
-    //    qnSettings->setCustomConnections(savedConnections);
-    //}
-
-    //QnConnectionData lastUsed = qnSettings->lastUsedConnection();
-    //if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
-    //    lastUsed.url = url;
-    //    qnSettings->setLastUsedConnection(lastUsed);
-    //}
 }
 
 void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {

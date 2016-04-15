@@ -15,7 +15,8 @@ QnUserAccessRightsResourcesWidget::QnUserAccessRightsResourcesWidget(Filter filt
     base_type(parent),
     ui(new Ui::UserAccessRightsResourcesWidget()),
     m_filter(filter),
-    m_targetId(),
+    m_targetGroupId(),
+    m_targetUser(),
     m_model(new QnResourceListModel())
 {
     ui->setupUi(this);
@@ -66,24 +67,37 @@ QnUserAccessRightsResourcesWidget::~QnUserAccessRightsResourcesWidget()
 }
 
 
-QnUuid QnUserAccessRightsResourcesWidget::targetId() const
+QnUuid QnUserAccessRightsResourcesWidget::targetGroupId() const
 {
-    return m_targetId;
+    return m_targetGroupId;
 }
 
-void QnUserAccessRightsResourcesWidget::setTargetId(const QnUuid& id)
+void QnUserAccessRightsResourcesWidget::setTargetGroupId(const QnUuid& id)
 {
-    NX_ASSERT(targetIsValid(id));
-    m_targetId = id;
+    NX_ASSERT(m_targetUser.isNull());
+    m_targetGroupId = id;
+    NX_ASSERT(m_targetGroupId.isNull() || targetIsValid());
+}
+
+QnUserResourcePtr QnUserAccessRightsResourcesWidget::targetUser() const
+{
+    return m_targetUser;
+}
+
+void QnUserAccessRightsResourcesWidget::setTargetUser(const QnUserResourcePtr& user)
+{
+    NX_ASSERT(m_targetGroupId.isNull());
+    m_targetUser = user;
+    NX_ASSERT(!user || targetIsValid());
 }
 
 bool QnUserAccessRightsResourcesWidget::hasChanges() const
 {
     /* Validate target. */
-    if (!targetIsValid(m_targetId))
+    if (!targetIsValid())
         return false;
 
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_targetId);
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(targetId());
     //TODO: #GDM #access filter by type
 
     return m_model->checkedResources() != accessibleResources;
@@ -92,10 +106,10 @@ bool QnUserAccessRightsResourcesWidget::hasChanges() const
 void QnUserAccessRightsResourcesWidget::loadDataToUi()
 {
     /* Validate target. */
-    if (!targetIsValid(m_targetId))
+    if (!targetIsValid())
         return;
 
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(m_targetId);
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(targetId());
     //TODO: #GDM #access filter by type
 
     m_model->setCheckedResources(accessibleResources);
@@ -104,24 +118,31 @@ void QnUserAccessRightsResourcesWidget::loadDataToUi()
 void QnUserAccessRightsResourcesWidget::applyChanges()
 {
     /* Validate target. */
-    if (!targetIsValid(m_targetId))
+    if (!targetIsValid())
         return;
 
     //TODO: #GDM #access filter by type
-    qnResourceAccessManager->setAccessibleResources(m_targetId, m_model->checkedResources());
+    qnResourceAccessManager->setAccessibleResources(targetId(), m_model->checkedResources());
 }
 
-bool QnUserAccessRightsResourcesWidget::targetIsValid(const QnUuid& id) const
+bool QnUserAccessRightsResourcesWidget::targetIsValid() const
 {
-    if (id.isNull())
-        return false;
-
     /* Check if it is valid user id. */
-    if (qnResPool->getResourceById<QnUserResource>(id))
+    if (m_targetUser)
         return true;
+
+    if (m_targetGroupId.isNull())
+        return false;
 
     /* Check if it is valid user group id. */
     const auto& userGroups = qnResourceAccessManager->userGroups();
-    return boost::algorithm::any_of(userGroups, [id](const ec2::ApiUserGroupData& group) { return group.id == id; });
+    return boost::algorithm::any_of(userGroups, [this](const ec2::ApiUserGroupData& group) { return group.id == m_targetGroupId; });
+}
+
+QnUuid QnUserAccessRightsResourcesWidget::targetId() const
+{
+    return m_targetUser
+        ? m_targetUser->getId()
+        : m_targetGroupId;
 }
 

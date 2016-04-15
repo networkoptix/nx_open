@@ -32,22 +32,26 @@ public:
     QnUserAccessRightsResourcesWidget(Filter filter, QWidget* parent = 0);
     virtual ~QnUserAccessRightsResourcesWidget();
 
-    /** Id of the target user or group. */
-    QnUuid targetId() const;
+    /** Id of the target . */
+    QnUuid targetGroupId() const;
+    /** Set if of the group. */
+    void setTargetGroupId(const QnUuid& id);
 
-    /** Set if of the user or group. */
-    void setTargetId(const QnUuid& id);
+    QnUserResourcePtr targetUser() const;
+    void setTargetUser(const QnUserResourcePtr& user);
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
 private:
-    bool targetIsValid(const QnUuid& id) const;
+    bool targetIsValid() const;
+    QnUuid targetId() const;
 
 private:
     QScopedPointer<Ui::UserAccessRightsResourcesWidget> ui;
     const Filter m_filter;
-    QnUuid m_targetId;
+    QnUuid m_targetGroupId;
+    QnUserResourcePtr m_targetUser;
     QScopedPointer<QnResourceListModel> m_model;
 };

@@ -1748,7 +1748,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
             }
         }
         profileQuery.bindValue(":internalId", internalId);
-        if (execSQLQuery(&profileQuery, Q_FUNC_INFO))
+        if (!execSQLQuery(&profileQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
 

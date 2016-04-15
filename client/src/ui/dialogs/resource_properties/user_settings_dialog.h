@@ -38,6 +38,9 @@ public:
 
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
+    virtual void retranslateUi() override;
+
+    virtual void applyChanges() override;
 
 private:
     Q_DISABLE_COPY(QnUserSettingsDialog)
