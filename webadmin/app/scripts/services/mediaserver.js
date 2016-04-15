@@ -1,11 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, ipCookie, $log) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $log) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
-
 
         var proxy = '';
         if(location.search.indexOf('proxy=')>0){
@@ -22,14 +21,24 @@ angular.module('webadminApp')
             }
         }
 
-        ipCookie('Authorization','Digest', { path: '/' });
-
         function getModuleInformation(){
             return $http.get(proxy + '/api/moduleInformation?showAddresses=true');
         }
 
         var offlineDialog = null;
         var loginDialog = null;
+        function callLogin(){
+            if (loginDialog === null) { //Dialog is not displayed
+                loginDialog = $modal.open({
+                    templateUrl: 'views/login.html',
+                    keyboard:false,
+                    backdrop:'static'
+                });
+                loginDialog.result.then(function () {
+                    loginDialog = null;
+                });
+            }
+        }
         function offlineHandler(error){
             // Check 401 against offline
             var inlineMode = typeof(setupDialog)!='undefined'; // Qt registered object
@@ -39,16 +48,7 @@ angular.module('webadminApp')
                 return; // inline mode - do not do anything
             }
             if(error.status === 401) {
-                if (loginDialog === null) { //Dialog is not displayed
-                    loginDialog = $modal.open({
-                        templateUrl: 'views/login.html',
-                        keyboard:false,
-                        backdrop:'static'
-                    });
-                    loginDialog.result.then(function () {
-                        loginDialog = null;
-                    });
-                }
+                callLogin();
                 return;
             }
             if(error.status === 0) {
@@ -72,7 +72,6 @@ angular.module('webadminApp')
         }
         function wrapRequest(request){
             request.catch(offlineHandler);
-
             return request;
         }
         function wrapPost(url,data){
@@ -94,35 +93,26 @@ angular.module('webadminApp')
             return obj;
         }
 
-        function getNonce(){
-            var deferred = $q.defer();
-            function resolver(data){
-                $log.log("Server responsed: " + data.statusText);
-                var realm = ipCookie('realm');
-                var nonce = ipCookie('nonce');
-                $log.log("Authorization - reading nonce:" + nonce + " realm:" + realm);
-                if(!realm || !nonce){
-                    deferred.reject(null);
-                }
-                deferred.resolve({
-                    realm: realm,
-                    nonce: nonce
-                });
-            }
-            $log.log("Request nonce");
-            $http.get(proxy + '/api/getCurrentUser').then(resolver,resolver);
-            return deferred.promise;
-        }
+
         return {
+            getNonce:function(){
+               return $http.get(proxy + '/api/getNonce');
+            },
+            logout:function(){
+                $localStorage.$reset();
+                return $http.post(proxy + '/api/cookieLogout');
+            },
             login:function(login,password){
                 var deferred = $q.defer();
-                this.logout().then(function(){
-                    // Calculate digest
-                    getNonce().then(function(data){
-                        var realm = data.realm;
-                        var nonce = data.nonce;
+                var self = this;
+                function reject(error){
+                    deferred.reject(error);
+                }
 
-                        $log.log("Authorization - got nonce:" + nonce + " realm:" + realm);
+                function sendLogin(){
+                    self.getNonce().then(function(data){
+                        var realm = data.data.reply.realm;
+                        var nonce = data.data.reply.nonce;
 
                         var digest = md5(login + ':' + realm + ':' + password);
                         var method = md5('GET:');
@@ -130,49 +120,23 @@ angular.module('webadminApp')
                         var auth = Base64.encode(login + ':' + nonce + ':' + authDigest);
 
                         /*
-                         console.log('debug auth - realm:',realm);
-                         console.log('debug auth - nonce:',nonce);
-                         console.log('debug auth - login:',login);
-                         console.log('debug auth - password:',$scope.user.password);
-                         console.log('debug auth - digest = md5(login:realm:password):',digest);
-                         console.log('debug auth - method:','GET:');
-                         console.log('debug auth - md5(method):',method);
-                         console.log('debug auth -  authDigest = md5(digest:nonce:md5(method)):',authDigest);
-                         console.log('debug auth -  auth = base64(login:nonce:authDigest):',auth);
-                         */
-
-                        /*
                          var rtspmethod = md5('PLAY:');
                          var rtspDigest = md5(digest + ':' + nonce + ':' + rtspmethod);
                          var authRtsp = Base64.encode(login + ':' + nonce + ':' + rtspDigest);
-                         ipCookie('auth_rtsp',authRtsp, { path: '/' });
                          */
 
-                        ipCookie('auth', auth, { path: '/' });
-
-                        $log.log("Authorization - cookie set auth:" + ipCookie('auth'));
+                        $localStorage.auth = auth;
 
                         // Check auth again - without catching errors
-                        return $http.get(proxy + '/api/getCurrentUser').then(function(data){
+                        return $http.post(proxy + '/api/cookieLogin',{
+                            auth: auth
+                        }).then(function(data){
                             deferred.resolve(data);
-                        },function(error){
-                            deferred.reject(error);
-                        });
-                    },function(error){
-                        deferred.reject(error);
-                    });
-                },function(error){
-                    deferred.reject(error);
-                });
-                return deferred.promise;
-            },
-            logout:function(){
-                ipCookie.remove('auth', { path: '/' });
-                ipCookie.remove('nonce',{ path: '/' });
-                ipCookie.remove('realm',{ path: '/' });
-
-                var deferred = $q.defer();
-                deferred.resolve();
+                        },reject);
+                    },reject);
+                }
+                sendLogin();
+                // self.logout().then(sendLogin, sendLogin);
                 return deferred.promise;
             },
             url:function(){
@@ -188,12 +152,10 @@ angular.module('webadminApp')
                 return proxy + '/api/showLog' + (params||'');
             },
             authForMedia:function(){
-                //return ipCookie('authKey'); // TODO: REMOVE
-                return ipCookie('auth');
+                return $localStorage.auth;
             },
             authForRtsp:function(){
-                //return ipCookie('authKey'); // TODO: REMOVE
-                return ipCookie('auth_rtsp');
+                return $localStorage.auth; // auth_rtsp
             },
 
             previewUrl:function(cameraPhysicalId,time,width,height){
@@ -372,7 +334,7 @@ angular.module('webadminApp')
                 url = url || proxy;
                 return wrapGet(url + '/api/statistics?salt=' + (new Date()).getTime());
             },
-            getCurrentUser:function(forcereload){
+            getCurrentUser:function (forcereload){
                 if(cacheCurrentUser === null || forcereload){
                     cacheCurrentUser = wrapGet(proxy + '/api/getCurrentUser');
                 }

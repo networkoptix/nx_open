@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie, $sessionStorage) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, $sessionStorage) {
         $scope.user = {
             isAdmin: true
         };
@@ -24,11 +24,11 @@ angular.module('webadminApp')
 
         });
         $scope.isActive = function (path) {
-            var path = $location.path();
-            if(!path){
+            var local_path = $location.path();
+            if(!local_path ){
                 return false;
             }
-            var currentPath = $location.path().split('/')[1];
+            var currentPath = local_path.split('/')[1];
             return currentPath.split('?')[0] === path.split('/')[1].split('?')[0];
         };
 
