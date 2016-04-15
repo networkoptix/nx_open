@@ -1257,7 +1257,6 @@ TCPServerSocket::TCPServerSocket()
 
 TCPServerSocket::~TCPServerSocket()
 {
-    //checking that socket is not registered in aio
     NX_CRITICAL(
         !nx::network::SocketGlobals::aioService()
             .isSocketBeingWatched(static_cast<Pollable*>(this)),

@@ -132,18 +132,16 @@ public:
         }
         else
         {
-            // checking that socket is not registered in aio
-            if ((m_addressResolverIsInUse.load() &&
+            static const char* kFailureMessage =
+                "You MUST cancel running async socket operation before "
+                "deleting socket if you delete socket from non-aio thread";
+            NX_CRITICAL(
+                !(m_addressResolverIsInUse.load() &&
                     nx::network::SocketGlobals::addressResolver()
-                        .isRequestIdKnown(this)) ||
-                nx::network::SocketGlobals::aioService()
-                    .isSocketBeingWatched(this->m_socket))
-            {
-                NX_CRITICAL(
-                    false,
-                    "You MUST cancel running async socket operation before "
-                    "deleting socket if you delete socket from non-aio thread");
-            }
+                        .isRequestIdKnown(this)), kFailureMessage);
+            NX_CRITICAL(
+                !nx::network::SocketGlobals::aioService()
+                    .isSocketBeingWatched(this->m_socket), kFailureMessage);
         }
     }
 
