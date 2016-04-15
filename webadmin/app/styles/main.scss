@@ -160,9 +160,21 @@ body {
   top:0;
   padding-top:57px;
 }
-.scroll-container{
-  height:100%;
-  overflow:auto;
+
+@media screen and (min-height: $screen-sm-min) {
+  body.api-xml{
+    overflow: hidden;
+  }
+
+  .scroll-container {
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+code{
+  display:inline-block;
+  white-space: normal;
 }
 
 /* all links */
