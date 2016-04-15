@@ -78,6 +78,8 @@ QString getCPUString()
 
     //TODO/ARM
     return QString();
-
+#else
+    //TODO
+    return QString();
 #endif
 }
