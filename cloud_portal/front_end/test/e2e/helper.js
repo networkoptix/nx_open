@@ -277,7 +277,13 @@ var Helper = function () {
 
     this.isSubstr = function(string, substring) {
         if (string.indexOf(substring) > -1) return true;
-    }
+    };
+
+    this.whyException = function(reason) {
+        expect(reason.name).toBe("");
+        expect(reason.message).toBe("");
+        expect(reason.stack).toBe("");
+    };
 };
 
 module.exports = Helper;
