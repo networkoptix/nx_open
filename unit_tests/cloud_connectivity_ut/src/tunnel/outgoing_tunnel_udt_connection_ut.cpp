@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/outgoing_tunnel_udt_connection.h>
+#include <nx/network/cloud/tunnel/udp/outgoing_tunnel_udt_connection.h>
 #include <nx/network/udt/udt_socket.h>
 #include <utils/common/cpp14.h>
 
@@ -11,6 +11,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 class OutgoingTunnelUdtConnectionTest
 :
@@ -78,7 +79,7 @@ protected:
     std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 
     std::vector<ConnectContext> startConnections(
-        OutgoingTunnelUdtConnection* const tunnelConnection,
+        udp::OutgoingTunnelUdtConnection* const tunnelConnection,
         size_t connectionsToCreate,
         boost::optional<int> minTimeoutMillis,
         boost::optional<int> maxTimeoutMillis)
@@ -337,6 +338,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, controlConnectionFailure)
     tunnelConnection.pleaseStopSync();
 }
 
-}   //cloud
-}   //network
-}   //nx
+}   //namespace udp
+}   //namespace cloud
+}   //namespace network
+}   //namespace nx

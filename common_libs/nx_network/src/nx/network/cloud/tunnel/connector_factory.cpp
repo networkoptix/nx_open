@@ -5,7 +5,7 @@
 
 #include "connector_factory.h"
 
-#include "udp_hole_punching_connector.h"
+#include "udp/connector.h"
 
 
 namespace nx {
@@ -23,7 +23,7 @@ ConnectorFactory::CloudConnectors
     CloudConnectors connectors;
     connectors.emplace(
         CloudConnectType::kUdtHp,
-        std::make_unique<UdpHolePunchingTunnelConnector>(
+        std::make_unique<udp::TunnelConnector>(
             address));
     return connectors;
 }

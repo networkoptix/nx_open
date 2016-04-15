@@ -19,7 +19,7 @@ class TestServer
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher)
-        : SocketServer(dispatcher, false) {}
+        : SocketServer(&dispatcher, false) {}
 
     std::vector<std::shared_ptr<ServerConnection>> connections;
 

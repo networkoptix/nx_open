@@ -19,7 +19,7 @@ namespace stun {
 
 static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
-UDPServer::UDPServer(const MessageDispatcher& dispatcher)
+UDPServer::UDPServer(const MessageDispatcher* dispatcher)
 :
     m_messagePipeline(this),
     m_boundToLocalAddress(false),
@@ -82,7 +82,7 @@ const std::unique_ptr<network::UDPSocket>& UDPServer::socket()
 
 void UDPServer::messageReceived(SocketAddress sourceAddress, Message mesage)
 {
-    m_dispatcher.dispatchRequest(
+    m_dispatcher->dispatchRequest(
         std::make_shared<UDPMessageResponseSender>(this, std::move(sourceAddress)),
         std::move(mesage));
 }

@@ -117,7 +117,7 @@ int MediatorProcess::executeApplication()
 
     //accepting STUN requests by both tcp and udt
     MultiAddressServer<stun::SocketServer> tcpStunServer(
-        stunMessageDispatcher,
+        &stunMessageDispatcher,
         false,
         SocketFactory::NatTraversalType::nttDisabled);
     if (!tcpStunServer.bind(settings.stun().addrToListenList))
@@ -127,7 +127,7 @@ int MediatorProcess::executeApplication()
         return 3;
     }
 
-    MultiAddressServer<stun::UDPServer> udpStunServer(stunMessageDispatcher);
+    MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
     if (!udpStunServer.bind(settings.stun().addrToListenList))
     {
         NX_LOG(lit("Can not bind to UDP addresses: %1")

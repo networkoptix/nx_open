@@ -8,6 +8,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     String connectionId,
@@ -159,7 +160,11 @@ void IncomingTunnelUdtConnection::writeResponse()
     hpm::api::UdpHolePunchingSynAck synAck;
     synAck.connectSessionId = m_connectionId;
 
-    stun::Message message;
+    stun::Message message(
+        stun::Header(
+            stun::MessageClass::successResponse,
+            stun::cc::methods::udpHolePunchingSynAck,
+            m_connectionMessage.header.transactionId));
     synAck.serialize(&message);
 
     stun::MessageSerializer serializer;
@@ -202,6 +207,7 @@ void IncomingTunnelUdtConnection::connectionSocketError(
     }
 }
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

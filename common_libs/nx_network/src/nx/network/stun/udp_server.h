@@ -34,7 +34,7 @@ class NX_NETWORK_API UDPServer
         MessageSerializer> PipelineType;
 
 public:
-    UDPServer(const MessageDispatcher& dispatcher);
+    UDPServer(const MessageDispatcher* dispatcher);
     virtual ~UDPServer();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -57,7 +57,7 @@ public:
 private:
     PipelineType m_messagePipeline;
     bool m_boundToLocalAddress;
-    const MessageDispatcher& m_dispatcher;
+    const MessageDispatcher* m_dispatcher;
 
     virtual void messageReceived(SocketAddress sourceAddress, Message mesage) override;
     virtual void ioFailure(SystemError::ErrorCode) override;
