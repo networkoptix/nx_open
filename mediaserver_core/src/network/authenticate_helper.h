@@ -61,6 +61,16 @@ public:
 
     Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
+    /*!
+    \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
+    */
+    Qn::AuthResult authenticateByUrl(
+        const QByteArray& authRecord,
+        const QByteArray& method,
+        nx_http::Response& response,
+        QnUuid* authUserId,
+        QnUserResourcePtr* const outUserResource = nullptr) const;
+
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
@@ -140,15 +150,6 @@ private:
     std::unique_ptr<AbstractUserDataProvider> m_userDataProvider;
 
     void authenticationExpired( const QString& path, quint64 timerID );
-    /*!
-        \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
-    */
-    Qn::AuthResult authenticateByUrl(
-        const QByteArray& authRecord,
-        const QByteArray& method,
-        nx_http::Response& response,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
     void applyClientCalculatedPasswordHashToResource(
         const QnUserResourcePtr& userResource,

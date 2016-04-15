@@ -2,9 +2,16 @@
 
 #include <rest/server/rest_connection_processor.h>
 #include "nx/network/http/httptypes.h"
+#include <http/custom_headers.h>
 
 int QnCookieLogoutRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
-    nx_http::insertHeader(&owner->response()->headers, nx_http::HttpHeader("Set-Cookie", QByteArray()));
+    QString cookieDeletePattern(lit("%1=deleted; path=/; HttpOnly; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"));
+
+    nx_http::insertHeader(&owner->response()->headers, 
+        nx_http::HttpHeader("Set-Cookie", cookieDeletePattern.arg("auth").toUtf8()));
+    nx_http::insertHeader(&owner->response()->headers, 
+        nx_http::HttpHeader("Set-Cookie", cookieDeletePattern.arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).toUtf8()));
+
     return nx_http::StatusCode::ok;
 }

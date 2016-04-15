@@ -162,6 +162,12 @@ QnUuid QnRestConnectionProcessor::authUserId() const
     return d->authUserId;
 }
 
+void QnRestConnectionProcessor::setAuthUserId(const QnUuid& authUserId)
+{
+    Q_D(QnRestConnectionProcessor);
+    d->authUserId = authUserId;
+}
+
 const nx_http::Request& QnRestConnectionProcessor::request() const
 {
     Q_D(const QnRestConnectionProcessor);

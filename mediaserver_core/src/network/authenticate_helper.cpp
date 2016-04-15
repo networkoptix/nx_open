@@ -148,7 +148,7 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
     if( allowedAuthMethods & AuthMethod::cookie )
     {
         const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
-        int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
+        int customAuthInfoPos = cookie.indexOf(URL_QUERY_AUTH_KEY_NAME);
         if (customAuthInfoPos >= 0) {
             if (usedAuthMethod)
                 *usedAuthMethod = AuthMethod::cookie;
