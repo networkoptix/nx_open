@@ -25,9 +25,9 @@ void printConnectOptions(std::ostream* const outStream)
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
         "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
-        "                        Bytes to receive before closing connection\n"
-        "  --bytes-to-send={N}   Bytes to send before closing connection\n"
-        "  --udt                 Use udt instead of tcp\n";
+        "                       Bytes to receive before closing connection\n"
+        "  --bytes-to-send={N}  Bytes to send before closing connection\n"
+        "  --udt                Force using udt socket. Disables cloud connect\n";
 }
 
 int runInConnectMode(const std::multimap<QString, QString>& args)
