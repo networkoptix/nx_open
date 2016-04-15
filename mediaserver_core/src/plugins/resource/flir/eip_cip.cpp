@@ -55,7 +55,7 @@ MessageRouterResponse MessageRouterResponse::decode(const QByteArray& buf)
 
     if(sizeOfData > 0)
     {
-        std::unique_ptr<char[]> tmp(new char[response.sizeOfAdditionalStatus]);
+        std::unique_ptr<char[]> tmp(new char[sizeOfData]);
         stream.readRawData(tmp.get(), sizeOfData);
         response.data.append(tmp.get(), sizeOfData);
     }
