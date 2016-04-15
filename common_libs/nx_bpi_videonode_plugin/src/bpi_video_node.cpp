@@ -48,9 +48,8 @@ protected:
         m_id_planeHeight = program()->uniformLocation("planeHeight");
         m_id_yTextureHeight = program()->uniformLocation("yTextureHeight");
 
-        m_id_plane1Texture = program()->uniformLocation("plane1Texture");
+        m_id_plane1Textures = program()->uniformLocation("plane1Textures");
         m_id_plane2Texture = program()->uniformLocation("plane2Texture");
-        m_id_plane3Texture = program()->uniformLocation("plane3Texture");
         m_id_colorMatrix = program()->uniformLocation("colorMatrix");
         m_id_opacity = program()->uniformLocation("opacity");
 
@@ -63,9 +62,8 @@ protected:
     int m_id_planeHeight;
     int m_id_yTextureHeight;
 
-    int m_id_plane1Texture;
+    int m_id_plane1Textures;
     int m_id_plane2Texture;
-    int m_id_plane3Texture;
     int m_id_colorMatrix;
     int m_id_opacity;
 
@@ -275,9 +273,11 @@ void QSGVideoMaterialShader_YUV_BiPlanarTiled::updateState(const RenderState &st
     Q_UNUSED(oldMaterial);
 
     QnBpiSGVideoMaterial_YUV *mat = static_cast<QnBpiSGVideoMaterial_YUV *>(newMaterial);
-    program()->setUniformValue(m_id_plane1Texture, 0);
+
+    static const GLint yTextureIndices[] = { 0, 2 };
+    program()->setUniformValueArray(m_id_plane1Textures, yTextureIndices, 2);
     program()->setUniformValue(m_id_plane2Texture, 1);
-    program()->setUniformValue(m_id_plane3Texture, 2);
+//    program()->setUniformValue(m_id_plane3Texture, 2);
 
     mat->bind();
 
