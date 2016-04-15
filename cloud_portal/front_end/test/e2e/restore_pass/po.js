@@ -56,7 +56,8 @@ RestorePasswordPage = function () {
         expect(email.headers.to).toEqual(userEmail);
 
         // extract registration token from the link in the email message
-        var pattern = /\/static\/index.html#\/restore_password\/([\w=]+)/g;
+        var pathToIndex = '/static/index.html#';
+        var pattern = new RegExp(pathToIndex + "/restore_password/([\\w]+)", "g");
         var regCode = pattern.exec(email.html)[1];
         console.log(regCode);
         return regCode;

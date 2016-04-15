@@ -74,7 +74,8 @@ var RegisterPage = function () {
 
         browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.helper.emailSubjects.register).then(function (email) {
             // extract registration token from the link in the email message
-            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
+            var pathToIndex = '/static/index.html#';
+            var pattern = new RegExp(pathToIndex + "/activate/(\\w+)", "g");
             var regCode = pattern.exec(email.html)[1];
             console.log(regCode);
             browser.get('/#/activate/' + regCode);

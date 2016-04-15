@@ -1,5 +1,17 @@
 'use strict';
 
+/*
+    Tests cheat-sheet:
+
+    Use x to disable suit or case, e.g.
+    xdescribe - to disable all specs in the suit
+    xit - to disable one spec
+
+    Use f to run only one suit or case, e.g.
+    fdescribe  - to run only this suit
+    fit - to run only this spec
+ */
+
 var Helper = function () {
     var AlertSuite = require('./alerts_check.js');
     this.alert = new AlertSuite();
@@ -169,7 +181,9 @@ var Helper = function () {
 
         browser.controlFlow().wait(this.getEmailTo(userEmail, this.emailSubjects.register).then(function (email) {
             // extract registration token from the link in the email message
-            var pattern = /\/static\/index.html#\/activate\/(\w+)/g;
+
+            var pathToIndex = '/static/index.html#';
+            var pattern = new RegExp(pathToIndex + "/activate/(\\w+)", "g");
             var regCode = pattern.exec(email.html)[1];
             console.log(regCode);
             browser.get('/#/activate/' + regCode);
