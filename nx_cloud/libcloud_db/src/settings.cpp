@@ -81,9 +81,16 @@ namespace
     const bool kDefaultControlSystemStatusByDb = false;
 
     //auth settings
+    const QString kModuleName = lit("cloud_db");
+
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
-    const QString kModuleName = lit( "cloud_db" );
+
+    const QLatin1String kNonceValidityPeriod("auth/nonceValidityPeriodSec");
+    const std::chrono::seconds kDefaultNonceValidityPeriod = std::chrono::hours(4);
+
+    const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriodSec");
+    const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
 }
 
 
@@ -277,6 +284,16 @@ void Settings::loadConfiguration()
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+    m_auth.nonceValidityPeriod = 
+        std::chrono::seconds(
+            m_settings.value(
+                kNonceValidityPeriod,
+                (int)kDefaultNonceValidityPeriod.count()).toInt());
+    m_auth.intermediateResponseValidityPeriod = 
+        std::chrono::seconds(
+            m_settings.value(
+                kIntermediateResponseValidityPeriod,
+                (int)kDefaultIntermediateResponseValidityPeriod.count()).toInt());
 }
 
 }   //conf

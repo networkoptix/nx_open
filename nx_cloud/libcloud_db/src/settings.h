@@ -32,6 +32,8 @@ class Auth
 {
 public:
     QString rulesXmlPath;
+    std::chrono::seconds nonceValidityPeriod;
+    std::chrono::seconds intermediateResponseValidityPeriod;
 };
 
 class Notification

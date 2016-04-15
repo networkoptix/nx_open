@@ -90,7 +90,8 @@ public:
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
         m_natTraversalEnabled( _natTraversalEnabled ),
-        m_asyncSendIssued( false )
+        m_asyncSendIssued( false ),
+        m_addressResolverIsInUse( false )
     {
         NX_ASSERT( this->m_socket );
         NX_ASSERT( m_abstractSocketPtr );
@@ -131,11 +132,18 @@ public:
         }
         else
         {
-            //checking that socket is not registered in aio
-            NX_ASSERT(
-                !nx::network::SocketGlobals::aioService().isSocketBeingWatched(this->m_socket),
-                Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );
+            // checking that socket is not registered in aio
+            if ((m_addressResolverIsInUse.load() &&
+                    nx::network::SocketGlobals::addressResolver()
+                        .isRequestIdKnown(this)) ||
+                nx::network::SocketGlobals::aioService()
+                    .isSocketBeingWatched(this->m_socket))
+            {
+                NX_CRITICAL(
+                    false,
+                    "You MUST cancel running async socket operation before "
+                    "deleting socket if you delete socket from non-aio thread");
+            }
         }
     }
 
@@ -193,6 +201,7 @@ public:
             return;
         }
 
+        m_addressResolverIsInUse = true;
         nx::network::SocketGlobals::addressResolver().resolveAsync(
             addr.address,
             [this, addr]( SystemError::ErrorCode errorCode,
@@ -382,6 +391,7 @@ private:
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     const bool m_natTraversalEnabled;
     std::atomic<bool> m_asyncSendIssued;
+    std::atomic<bool> m_addressResolverIsInUse;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
@@ -505,11 +515,14 @@ private:
                     m_recvBuffer->capacity() - bufSizeBak );
                 if( bytesRead == -1 )
                 {
+                    const auto lastError = SystemError::getLastOSErrorCode();
                     m_recvBuffer->resize( bufSizeBak );
 
-                    const auto lastError = SystemError::getLastOSErrorCode();
-                    if (lastError == SystemError::wouldBlock)
+                    if( lastError == SystemError::again ||
+                        lastError == SystemError::wouldBlock )
+                    {
                         return; // false positive
+                    }
 
                     recvHandlerLocal( lastError, (size_t)-1 );
                 }
@@ -544,8 +557,11 @@ private:
                     if( bytesWritten == -1 )
                     {
                         const auto lastError = SystemError::getLastOSErrorCode();
-                        if (lastError == SystemError::wouldBlock)
+                        if( lastError == SystemError::again ||
+                            lastError == SystemError::wouldBlock )
+                        {
                             return; // false positive
+                        }
 
                         sendHandlerLocal( lastError, m_sendBufPos );
                     }

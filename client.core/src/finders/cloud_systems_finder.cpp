@@ -135,7 +135,7 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
 void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &system)
 {
     using namespace nx::network;
-    typedef std::vector<cloud::AddressResolver::TypedAddres> AddressVector;
+    typedef std::vector<cloud::AddressResolver::TypedAddress> AddressVector;
 
     auto &resolver = nx::network::SocketGlobals::addressResolver();
     const QPointer<QnCloudSystemsFinder> guard(this);

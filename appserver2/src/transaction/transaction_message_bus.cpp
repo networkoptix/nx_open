@@ -272,7 +272,7 @@ namespace ec2
     }
 
     QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
-        :
+    :
         m_localPeerType(peerType),
         //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
         m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -305,7 +305,7 @@ namespace ec2
 
         connect(
             QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
-            this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+            this, &QnTransactionMessageBus::onEc2ConnectionSettingsChanged);
     }
 
     void QnTransactionMessageBus::start()
@@ -1764,6 +1764,29 @@ namespace ec2
         QnMutexLocker lock( &m_mutex );
         if (!m_alivePeers.contains(id))
             emit remotePeerUnauthorized( id );
+    }
+
+    void QnTransactionMessageBus::onEc2ConnectionSettingsChanged()
+    {
+        //we need break connection only if following settings have been changed:
+        //  connectionKeepAliveTimeout
+        //  keepAliveProbeCount
+        const auto connectionKeepAliveTimeout = 
+            QnGlobalSettings::instance()->connectionKeepAliveTimeout();
+        const auto keepAliveProbeCount =
+            QnGlobalSettings::instance()->keepAliveProbeCount();
+
+        QnMutexLocker lock(&m_mutex);
+
+        for (QnTransactionTransport* transport : m_connections)
+        {
+            if (transport->connectionKeepAliveTimeout() != connectionKeepAliveTimeout ||
+                transport->keepAliveProbeCount() != keepAliveProbeCount)
+            {
+                //resetting connection
+                transport->setState(ec2::QnTransactionTransport::Error);
+            }
+        }
     }
 
     void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {

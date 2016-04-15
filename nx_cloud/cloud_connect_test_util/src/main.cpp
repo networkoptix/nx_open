@@ -1,28 +1,32 @@
-/**********************************************************
-* Mar 3, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <chrono>
 #include <iostream>
 #include <iomanip>
 #include <thread>
 
-#include <nx/network/cloud/cloud_stream_socket.h>
-#include <nx/network/http/httpclient.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/test_support/socket_test_helper.h>
-
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
 
 #include "listen_mode.h"
+#include "client_mode.h"
 
+void printHelp(int /*argc*/, char* /*argv*/[])
+{
+    std::cout << "\n";
+    nx::cctu::printListenOptions(&std::cout);
+    std::cout << "\n";
+    nx::cctu::printConnectOptions(&std::cout);
+    std::cout << "\n";
+    nx::cctu::printHttpClientOptions(&std::cout);
 
-void printHelp(int argc, char* argv[]);
-int runInListenMode(const std::multimap<QString, QString>& args);
-int runInConnectMode(const std::multimap<QString, QString>& args);
-int runInHttpClientMode(const std::multimap<QString, QString>& args);
+    std::cout <<
+        "\n"
+        "Common options:\n"
+        "  --enforce-mediator={endpoint}    Enforces custom mediator address\n"
+        "  --log-level={level}              Log level to console"
+        "\n"
+        << std::endl;
+}
 
 int main(int argc, char* argv[])
 {
@@ -49,177 +53,19 @@ int main(int argc, char* argv[])
 
     // reading mode
     if (args.find("listen") != args.end())
-        return runInListenMode(args);
+        return nx::cctu::runInListenMode(args);
 
     if (args.find("connect") != args.end())
-        return runInConnectMode(args);
+        return nx::cctu::runInConnectMode(args);
 
     if (args.find("http-client") != args.end())
-        return runInHttpClientMode(args);
+        return nx::cctu::runInHttpClientMode(args);
 
     std::cerr<<"error. Unknown mode"<<std::endl;
     printHelp(argc, argv);
 
     return 0;
 }
-
-const auto kDefaultTotalConnections = 100;
-const int kDefaultMaxConcurrentConnections = 1;
-const int kDefaultBytesToReceive = 1024 * 1024;
-
-int runInConnectMode(const std::multimap<QString, QString>& args)
-{
-    QString target;
-    if (!readArg(args, "target", &target))
-    {
-        std::cerr << "error. Required parameter \"target\" is missing" << std::endl;
-        return 1;
-    }
-
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
-
-    int totalConnections = kDefaultTotalConnections;
-    readArg(args, "total-connections", &totalConnections);
-
-    int maxConcurrentConnections = kDefaultMaxConcurrentConnections;
-    readArg(args, "max-concurrent-connections", &maxConcurrentConnections);
-
-    nx::network::test::TestTrafficLimitType 
-        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
-
-    QString trafficLimit = bytesToString(kDefaultBytesToReceive);
-    readArg(args, "bytes-to-receive", &trafficLimit);
-
-    if (readArg(args, "bytes-to-send", &trafficLimit))
-        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing;
-
-    auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("echo") != args.end())
-        transmissionMode = nx::network::test::TestTransmissionMode::echoTest;
-
-    if (args.find("udt") != args.end())
-    {
-        SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
-    }
-    else
-    {
-        SocketFactory::setCreateStreamSocketFunc(
-            [](bool /*ssl*/, SocketFactory::NatTraversalType /*ntt*/)
-            {
-                return std::make_unique<nx::network::cloud::CloudStreamSocket>();
-            });
-    }
-
-    const uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
-    nx::network::test::ConnectionsGenerator connectionsGenerator(
-        SocketAddress(target),
-        maxConcurrentConnections,
-        trafficLimitType,
-        trafficLimitBytes != 0 ? trafficLimitBytes : kDefaultBytesToReceive,
-        totalConnections,
-        transmissionMode);
-
-    std::promise<void> finishedPromise;
-    connectionsGenerator.setOnFinishedHandler(
-        [&finishedPromise]{ finishedPromise.set_value(); });
-
-    const auto startTime = std::chrono::steady_clock::now();
-    connectionsGenerator.start();
-
-    auto finishedFuture = finishedPromise.get_future();
-    printStatsAndWaitForCompletion(
-        &connectionsGenerator,
-        [&finishedFuture]() -> bool
-        {
-            return finishedFuture.wait_for(std::chrono::seconds::zero())
-                == std::future_status::ready;
-        });
-
-    const auto testDuration =
-        std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::steady_clock::now() - startTime);
-
-    std::cout << "\n\nconnect summary: "
-        "  total time: " << testDuration.count() << "s\n"
-        "  total connections: " <<
-            connectionsGenerator.totalConnectionsEstablished() << "\n"
-        "  total bytes sent: " <<
-            bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << "\n"
-        "  total bytes received: " <<
-            bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
-        "  total incomplete tasks: " <<
-            connectionsGenerator.totalIncompleteTasks() << "\n\n"
-        "  report: " << connectionsGenerator.returnCodes().toStdString() << "\n" <<
-            std::endl;
-
-    return 0;
-}
-
-int runInHttpClientMode(const std::multimap<QString, QString>& args)
-{
-    QString urlStr;
-    if (!readArg(args, "url", &urlStr))
-    {
-        std::cerr << "error. Required parameter \"url\" is missing" << std::endl;
-        return 1;
-    }
-
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
-
-    nx_http::HttpClient client;
-    client.setSendTimeoutMs(15000);
-    if (!client.doGet(urlStr) || !client.response())
-    {
-        std::cerr<<"No response has been received"<<std::endl;
-        return 1;
-    }
-
-    std::cout<<"Received response:\n\n"
-        << client.response()->toString().toStdString()
-        <<"\n";
-
-    if (nx_http::getHeaderValue(client.response()->headers, "Content-Type") == "application/json")
-    {
-        while (!client.eof())
-        {
-            const auto buf = client.fetchMessageBodyBuffer();
-            std::cout<<buf.constData();
-        }
-    }
-
-    std::cout << std::endl;
-    return 0;
-}
-
-void printHelp(int /*argc*/, char* /*argv*/[])
-{
-    std::cout << "\n";
-    printListenOptions(&std::cout);
-    std::cout <<
-        "\n"
-        "Connect mode:\n"
-        "  --connect                        Enable connect mode\n"
-        "  --echo                           Makes connections to verify server responses\n"
-        "  --target={endpoint}              Regular or cloud address of server\n"
-        "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
-        "                                   Number of connections to try\n"
-        "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
-        "                                   Bytes to receive before closing connection\n"
-        "  --bytes-to-send=                 Bytes to send before closing connection\n"
-        "  --udt                            Use udt instead of tcp\n"
-        "\n"
-        "Http client mode:\n"
-        "  --http-client                    Enable Http client mode\n"
-        "  --url={http url}                 Url to trigger\n"
-        "\n"
-        "Common options:\n"
-        "  --enforce-mediator={endpoint}    Enforces custom mediator address\n"
-        "  --log-level={level}              Log level"
-        "\n"
-        << std::endl;
-}
-
 
 //--http-client --url=http://admin:admin@server1.ffc8e5a2-a173-4b3d-8627-6ab73d6b234d/api/gettime
 //AK server:
@@ -234,7 +80,6 @@ void printHelp(int /*argc*/, char* /*argv*/[])
 
 --enforce-mediator=10.0.2.41:3345 --listen --echo --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:02e780b8-2dc3-4389-9af3-8170de591835 --server-id=xxx
 --enforce-mediator=10.0.2.41:3345 --connect --echo --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0 --bytes-to-recieve=1m --total-connections=5 --max-concurrent-connections=5
-
 
 --listen --local-address=0.0.0.0:5724 --udt
 --connect --target=192.168.0.1:5724 --udt

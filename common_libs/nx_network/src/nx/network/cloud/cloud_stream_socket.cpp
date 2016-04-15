@@ -32,6 +32,11 @@ CloudStreamSocket::CloudStreamSocket()
 
 CloudStreamSocket::~CloudStreamSocket()
 {
+    // checking that resolution is not in progress
+    NX_CRITICAL(
+        !nx::network::SocketGlobals::addressResolver().isRequestIdKnown(this),
+        "You MUST cancel running async socket operation before "
+        "deleting socket if you delete socket from non-aio thread");
 }
 
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)

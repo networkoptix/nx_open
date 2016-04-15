@@ -15,6 +15,8 @@ DataSourceCache::DataSourceCache()
 {
 }
 
+const unsigned int DataSourceCache::DEFAULT_LIVE_TIME_MS;
+
 DataSourceCache::~DataSourceCache()
 {
     //removing all timers
