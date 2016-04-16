@@ -39,9 +39,10 @@ Yunhong Gu, last updated 01/01/2011
 *****************************************************************************/
 
 #ifdef __linux__
-#include <sys/epoll.h>
 #include <unistd.h>
+#include <sys/epoll.h>
 #elif __APPLE__
+#include <unistd.h>
 #include <sys/event.h>
 #endif
 #include <algorithm>
