@@ -6,6 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "transaction.h"
+#include "transaction_descriptor.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_camera_data.h"
@@ -58,16 +59,74 @@ namespace ec2
 
         bool contains(const QnTranState& state) const;
 
+        template<typename Param>
+        struct GenericTransactionDescriptorSaveVisitor
+        {
+            template<typename Descriptor>
+            void operator ()(const Descriptor &d)
+            {
+                m_errorCode = d.save(m_tran, m_tlog);
+            }
+
+            GenericTransactionDescriptorSaveVisitor(const QnTransaction<Param> &tran, const QnTransactionLog &tlog)
+                : m_tran(tran),
+                  m_tlog(tlog)
+            {}
+
+            ErrorCode getError() const { return m_errorCode; }
+        private:
+            const QnTransaction<Param> &m_tran;
+            QnTransactionLog &m_tlog;
+            const ErrorCode m_errorCode;
+        };
+
+        template<typename Param>
+        struct GenericTransactionDescriptorSaveSerializedVisitor
+        {
+            template<typename Descriptor>
+            void operator ()(const Descriptor &d)
+            {
+                m_errorCode = d.save(m_tran, m_serializedTran, m_tlog);
+            }
+
+            GenericTransactionDescriptorSaveSerializedVisitor(const QnTransaction<Param> &tran, const QByteArray &serializedTran, const QnTransactionLog &tlog)
+                : m_tran(tran),
+                  m_serializedTran(serializedTran),
+                  m_tlog(tlog)
+            {}
+
+            ErrorCode getError() const { return m_errorCode; }
+        private:
+            const QnTransaction<Param> &m_tran;
+            QnTransactionLog &m_tlog;
+            const QByteArray &m_serializedTran;
+            const ErrorCode m_errorCode;
+        };
+
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran)
         {
-            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-            return saveToDB(tran, transactionHash(tran.params), serializedTran);
+//            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+//            return saveToDB(tran, transactionHash(tran.params), serializedTran);
+
+            auto filteredDescriptors = getTransactionDescriptorsFilteredByTransactionParams<T>();
+            static_assert(std::tuple_size<decltype(filteredDescriptors)>::value, "Should be at least one Transaction descriptor to proceed");
+            GenericTransactionDescriptorSaveVisitor<T> visitor(tran, *this);
+            visitTransactionDescriptorIfValue(tran.command, visitor, filteredDescriptors);
+
+            return visitor.getError();
         }
 
         template <class T>
-        ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran) {
-            return saveToDB(tran, transactionHash(tran.params), serializedTran);
+        ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        {
+//            return saveToDB(tran, transactionHash(tran.params), serializedTran);
+            auto filteredDescriptors = getTransactionDescriptorsFilteredByTransactionParams<T>();
+            static_assert(std::tuple_size<decltype(filteredDescriptors)>::value, "Should be at least one Transaction descriptor to proceed");
+            GenericTransactionDescriptorSaveSerializedVisitor<T> visitor(tran, serializedTran, *this);
+            visitTransactionDescriptorIfValue(tran.command, visitor, filteredDescriptors);
+
+            return visitor.getError();
         }
 
         ErrorCode saveTransaction(const QnTransaction<ApiStorageDataList>& , const QByteArray&) {
@@ -219,6 +278,7 @@ namespace ec2
 
         qint64 getTransactionLogTime() const;
         void setTransactionLogTime(qint64 value);
+        ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
     private:
         friend class QnDbManager;
 
@@ -228,7 +288,6 @@ namespace ec2
 
         int currentSequenceNoLock() const;
 
-        ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
     private:
         struct UpdateHistoryData

@@ -175,6 +175,7 @@ namespace ec2
             testLdapSettings            = 11001, /**< QnLdapSettings */
 
             maxTransactionValue         = 65535
+
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
@@ -187,7 +188,9 @@ namespace ec2
 
         /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
+
     }
+
 
     //!Contains information on how transaction has been delivered
     class QnTranDeliveryInformation
