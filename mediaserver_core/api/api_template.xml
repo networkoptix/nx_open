@@ -1779,7 +1779,7 @@
                         </li>
                         <li>To log in:
                         	<ol>
- 		                       	<li>Request <code>/api/getNonce</code>
+ 		                       	<li>Request <code>/api/getNonce</code></li>
             	                <li>In response you'll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
                 	            <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
                     	        <li>Request <code>/api/cookieLogin</code>(POST) pass auth parameter there</li>
