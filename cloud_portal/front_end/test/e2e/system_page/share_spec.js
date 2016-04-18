@@ -4,14 +4,6 @@ describe('Share suite', function () {
 
     var p = new SystemPage();
 
-    beforeAll(function() {
-        console.log("\nShare start\n");
-    });
-
-    afterAll(function() {
-        console.log("\nShare finish\n");
-    });
-
     afterEach(function(){
         p.helper.logout();
     });

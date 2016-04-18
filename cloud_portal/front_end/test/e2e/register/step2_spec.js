@@ -3,14 +3,6 @@ var RegisterPage = require('./po.js');
 describe('Registration step2', function () {
     var p = new RegisterPage();
 
-    beforeAll(function() {
-        console.log('Registration step2 start');
-    });
-
-    afterAll(function() {
-        console.log('Registration step2 finish');
-    });
-
     beforeEach(function() {
         p.helper.get(p.url);
     });

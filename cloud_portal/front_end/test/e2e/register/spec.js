@@ -3,14 +3,6 @@ var RegisterPage = require('./po.js');
 describe('Registration suite', function () {
     var p = new RegisterPage();
 
-    beforeAll(function() {
-        console.log('Registration suite start');
-    });
-
-    afterAll(function() {
-        console.log('Registration suite finish');
-    });
-
     beforeEach(function() {
         p.helper.get(p.url);
     });
@@ -124,7 +116,7 @@ describe('Registration suite', function () {
         p.lastNameInput.sendKeys(p.helper.userLastName);
         p.passwordInput.sendKeys(p.helper.userPassword);
 
-        p.emailInput.sendKeys(p.helper.getRandomEmailWith('#!$%&\'*+-/=?^_\`{}|~@gmail.com'));
+        p.emailInput.sendKeys(p.helper.getRandomEmailWith('#!$%&\'*-/=?^_\`{}|~'));
 
         p.submitButton.click();
         expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);

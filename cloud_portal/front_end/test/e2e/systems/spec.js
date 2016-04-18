@@ -5,13 +5,11 @@ describe('Systems list suite', function () {
     var p = new SystemsListPage();
 
     beforeAll(function() {
-        p.helper.login(p.helper.userEmail, p.helper.userPassword);
-        console.log("\nSystems start\n");
+        p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
     });
 
     afterAll(function() {
         p.helper.logout();
-        console.log("\nSystems finish\n");
     });
 
     it("should show list of Systems", function () {
@@ -86,13 +84,13 @@ describe('Systems list suite', function () {
         var newLastName = 'newLastName';
         p.helper.changeAccountNames(newFirstName, newLastName);
         p.helper.logout();
-        p.helper.login(p.helper.userEmail2, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
         // TODO: use systemName to identify system here
         expect(p.systemOwner(p.systemsList.first()).getText()).toContain(newFirstName);
         expect(p.systemOwner(p.systemsList.first()).getText()).toContain(newLastName);
 
         p.helper.logout();
-        p.helper.login(p.helper.userEmail, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
     });
 
     xit("should display systems sorted (status, then owner); user's systems go first", function () {

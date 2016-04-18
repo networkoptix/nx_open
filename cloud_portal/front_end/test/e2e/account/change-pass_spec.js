@@ -5,12 +5,10 @@ describe('Change password suite', function () {
     var p = new AccountPage();
 
     beforeAll(function() {
-        console.log('\nChange password start\n');
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
 
     afterAll(function() {
-        console.log('\nChange password finish\n');
         p.helper.logout();
     });
 

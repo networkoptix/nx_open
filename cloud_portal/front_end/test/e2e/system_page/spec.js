@@ -4,14 +4,6 @@ describe('System suite', function () {
 
     var p = new SystemPage();
 
-    beforeAll(function() {
-        console.log("\nSystem page start\n");
-    });
-
-    afterAll(function() {
-        console.log("\nSystem page finish\n");
-    });
-
     //it("has system name, owner and OpenInNx button visible on every system page", function() {
     //    p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
     //
@@ -167,11 +159,13 @@ describe('System suite', function () {
     }, 60000);
 
     it("should display same user data as showed in user account (stress to cyrillic)", function() {
-        p.helper.login(p.userEmailAdmin);
+        p.helper.login(p.helper.userEmailAdmin);
         p.helper.get(p.helper.urls.account);
 
         p.helper.changeAccountNames(p.helper.userNameCyrillic, p.helper.userNameCyrillic);
         p.helper.getSysPage(p.systemLink);
+        p.usrDataRow(p.helper.userEmailAdmin).getText().then(function(text){console.log(text)});
         expect(p.usrDataRow(p.helper.userEmailAdmin).getText()).toContain(p.helper.userNameCyrillic + ' ' + p.helper.userNameCyrillic);
+        p.helper.logout();
     });
 });

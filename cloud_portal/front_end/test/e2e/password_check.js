@@ -33,7 +33,6 @@ var PasswordFieldSuite = function () {
 
         // Check that particular message does NOT appear
         var checkNoPasswordWarning = function (strength) {
-            expect(self.helpBlock.element(by.css('.label')).getAttribute('class')).not.toContain(strength.class);
             expect(self.helpBlock.element(by.css('.label')).getText()).not.toContain(strength.text);
         };
 
@@ -73,7 +72,7 @@ var PasswordFieldSuite = function () {
                 checkPasswordWarning(self.passwordWeak);
 
                 pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('asdo iu2Q#');
+                pageObj.passCheck.input.sendKeys(self.helper.userPasswordCyrillic);
                 checkPasswordWarning(self.passwordIncorrect);
 
                 pageObj.passCheck.input.clear();

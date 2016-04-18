@@ -4,14 +4,6 @@ describe('User list suite', function () {
 
     var p = new SystemPage();
 
-    beforeAll(function() {
-        console.log("\nUser list start\n");
-    });
-
-    afterAll(function() {
-        console.log("\nUser list finish\n");
-    });
-
     beforeEach(function(){
         p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
     });
