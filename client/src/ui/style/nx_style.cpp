@@ -117,7 +117,7 @@ namespace
             if (option->state.testFlag(QStyle::State_On) || option->state.testFlag(QStyle::State_Off))
                 return true;
 
-            const QPushButton* buttonWidget = qobject_cast<const QPushButton*>(option->styleObject);
+            const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
             if (buttonWidget && buttonWidget->isCheckable())
                 return true;
         }
