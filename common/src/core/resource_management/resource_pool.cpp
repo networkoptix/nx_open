@@ -254,29 +254,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourceList QnResourcePool::getResources(const QVector<QnUuid>& idList) const {
-    QnMutexLocker locker( &m_resourcesMtx );
-    QnResourceList result;
-    for (const auto& id: idList) {
-        const auto itr = m_resources.find(id);
-        if (itr != m_resources.end())
-            result.push_back(itr.value());
-    }
-    return result;
-}
-
- QnResourceList QnResourcePool::getResources(const std::vector<QnUuid>& idList) const {
-    QnMutexLocker locker(&m_resourcesMtx);
-    QnResourceList result;
-    for (const auto& id: idList) {
-        const auto itr = m_resources.find(id);
-        if (itr != m_resources.end())
-            result.push_back(itr.value());
-    }
-    return result;
-}
-
-QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
+ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
     QnMutexLocker locker( &m_resourcesMtx );
 
     QHash<QnUuid, QnResourcePtr>::const_iterator resIter = m_resources.find(id);

@@ -5,32 +5,24 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
 
 namespace Ui
 {
-    class UserAccessRightsResourcesWidget;
+    class PermissionsWidget;
 }
 
-class QnResourceListModel;
-
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
-class QnUserAccessRightsResourcesWidget : public Connective<QnAbstractPreferencesWidget>
+class QnPermissionsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    enum Filter
-    {
-        CamerasFilter,
-        LayoutsFilter,
-        ServersFilter
-    };
-
-    QnUserAccessRightsResourcesWidget(Filter filter, QWidget* parent = 0);
-    virtual ~QnUserAccessRightsResourcesWidget();
+    QnPermissionsWidget(QWidget* parent = 0);
+    virtual ~QnPermissionsWidget();
 
     /** Id of the target . */
     QnUuid targetGroupId() const;
@@ -49,9 +41,7 @@ private:
     QnUuid targetId() const;
 
 private:
-    QScopedPointer<Ui::UserAccessRightsResourcesWidget> ui;
-    const Filter m_filter;
+    QScopedPointer<Ui::PermissionsWidget> ui;
     QnUuid m_targetGroupId;
     QnUserResourcePtr m_targetUser;
-    QScopedPointer<QnResourceListModel> m_model;
 };
