@@ -48,7 +48,8 @@ RestorePasswordPage = function () {
         this.emailInput.clear();
         this.emailInput.sendKeys(email);
         this.submitButton.click();
-        expect(this.helper.htmlBody.getText()).toContain(this.alert.alertMessages.restorePassConfirmSent);
+        expect(element(by.css('.process-success')).isDisplayed()).toBe(true);
+        expect(element(by.css('.process-success')).getText()).toContain(this.alert.alertMessages.restorePassConfirmSent);
     };
 
     this.getTokenFromEmail = function(email, userEmail) {
@@ -67,7 +68,9 @@ RestorePasswordPage = function () {
         expect(this.passwordInput.isPresent()).toBe(true);
         this.passwordInput.sendKeys(newPassword);
         this.savePasswordButton.click();
-        expect(this.helper.htmlBody.getText()).toContain(this.alert.alertMessages.restorePassSuccess);
+        expect(element(by.css('.process-success')).isDisplayed()).toBe(true);
+        expect(element(by.css('.process-success')).getText()).toContain(this.alert.alertMessages.restorePassSuccess);
+
     };
 
     //this.verifySecondAttemptFails = function(newPassword) {

@@ -176,7 +176,8 @@ var Helper = function () {
         passwordInput.sendKeys(userPassword);
 
         submitButton.click();
-        expect(this.htmlBody.getText()).toContain(this.alert.alertMessages.registerSuccess);
+        expect(element(by.css('.process-success')).isDisplayed()).toBe(true);
+        expect(element(by.css('.process-success')).getText()).toContain(this.alert.alertMessages.registerSuccess);
 
         return userEmail;
     };
