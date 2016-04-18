@@ -249,6 +249,19 @@ var Helper = function () {
         share: ""
     };
 
+    this.readPrevEmails = function() {
+        var deferred = protractor.promise.defer();
+        function onPrevMail(mail) {
+            console.log("Open email to: " + mail.headers.to);
+            deferred.fulfill(mail);
+            notifier.stop();
+            notifier.removeListener("mail", onPrevMail);
+        }
+        notifier.on("mail", onPrevMail);
+        notifier.start();
+        return deferred.promise;
+    };
+
     this.getEmailTo = function(emailAddress, emailSubject) {
         var deferred = protractor.promise.defer();
         console.log("Waiting for an email...");

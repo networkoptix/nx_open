@@ -3,6 +3,10 @@ var RegisterPage = require('./po.js');
 describe('Registration step2', function () {
     var p = new RegisterPage();
 
+    beforeAll(function() {
+        browser.controlFlow().wait(p.helper.readPrevEmails());
+    });
+
     beforeEach(function() {
         p.helper.get(p.url);
     });
