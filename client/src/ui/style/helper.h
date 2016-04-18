@@ -23,6 +23,7 @@ namespace style
         static const int kSortIndicatorSize;
         static const int kRounding;
         static const QSize kSwitchSize;
+        static const int kSwitchMargin;   /**< Margin between switch subcontrol and right side of a control, eg. push button */
     };
 
     class Properties
