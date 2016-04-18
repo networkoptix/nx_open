@@ -274,10 +274,11 @@ var Helper = function () {
     var RestorePassObject = require('./restore_pass/po.js');
     this.restorePassword = function(userEmail, newPassword) {
         this.restorePassObj = new RestorePassObject();
+        var password = newPassword || self.userPassword;
         browser.get('/#/restore_password/');
         browser.waitForAngular();
         this.restorePassObj.getRestorePassPage(userEmail).then(function() {
-            self.restorePassObj.setNewPassword(newPassword);
+            self.restorePassObj.setNewPassword(password);
         });
     };
 
