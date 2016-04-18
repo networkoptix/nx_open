@@ -82,8 +82,11 @@ struct TransactionDescriptor
     CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
 
-    TransactionDescriptor(bool isPersistent, bool isSystem, const char *name, GetHashFuncType<ParamType> getHashFunc, SaveTranFuncType<ParamType> saveFunc, SaveSerializedTranFuncType<ParamType> saveSerializedFunc,
-                          CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc, TriggerNotificationFuncType<ParamType> triggerNotificationFunc)
+    TransactionDescriptor(bool isPersistent, bool isSystem, const char *name,
+                          GetHashFuncType<ParamType> getHashFunc, SaveTranFuncType<ParamType> saveFunc,
+                          SaveSerializedTranFuncType<ParamType> saveSerializedFunc,
+                          CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc,
+                          TriggerNotificationFuncType<ParamType> triggerNotificationFunc)
         : isPersistent(isPersistent),
           isSystem(isSystem),
           name(name),
@@ -98,7 +101,10 @@ struct TransactionDescriptor
 struct NotDefinedType {};
 
 extern std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
-           TransactionDescriptor<ApiCommand::tranSyncRequest, ApiSyncRequestData>> transactionDescriptors;
+                  TransactionDescriptor<ApiCommand::tranSyncRequest, ApiSyncRequestData>,
+                  TransactionDescriptor<ApiCommand::lockRequest, ApiLockData>,
+                  TransactionDescriptor<ApiCommand::lockResponse, ApiLockData>,
+                  TransactionDescriptor<ApiCommand::unlockRequest, ApiLockData>> transactionDescriptors;
 
 /* Compile-time IndexSequence implementation (since stdc++lib shipped with g++ 4.8.2 doesn't have it) */
 template<size_t... Indexes> struct IndexSequence {};
@@ -138,7 +144,8 @@ constexpr size_t getIndexByValueHelper(const IndexSequence<I>&, const std::tuple
 template<ApiCommand::Value value, size_t I, size_t... Indexes, typename... Args>
 constexpr size_t getIndexByValueHelper(const IndexSequence<I, Indexes...> &, const std::tuple<Args...> &tuple)
 {
-    return IsValueEqual<value, typename std::tuple_element<I, std::tuple<Args...>>::type>::v ? I : getIndexByValueHelper<value>(IndexSequence<Indexes...>(), tuple);
+    return IsValueEqual<value, typename std::tuple_element<I, std::tuple<Args...>>::type>::v ?
+           I : getIndexByValueHelper<value>(IndexSequence<Indexes...>(), tuple);
 }
 
 template<ApiCommand::Value value, size_t... Indexes, typename... Args>
@@ -175,7 +182,8 @@ constexpr size_t getIndexByParamsHelper(const IndexSequence<I>&, const std::tupl
 template<typename Params, size_t I, size_t... Indexes, typename... Args>
 constexpr size_t getIndexByParamsHelper(const IndexSequence<I, Indexes...> &, const std::tuple<Args...> &tuple)
 {
-    return IsParamsEqual<Params, typename std::tuple_element<I, std::tuple<Args...>>::type>::v ? I : getIndexByParamsHelper<Params>(IndexSequence<Indexes...>(), tuple);
+    return IsParamsEqual<Params, typename std::tuple_element<I, std::tuple<Args...>>::type>::v ?
+           I : getIndexByParamsHelper<Params>(IndexSequence<Indexes...>(), tuple);
 }
 
 template<typename Params, size_t... Indexes, typename... Args>
@@ -188,7 +196,8 @@ template<typename Params, typename... Args>
 constexpr auto getTransactionDescriptorByTransactionParamsImpl(const std::tuple<Args...> &tuple)
 {
     constexpr const size_t I = getIndexByParams<Params>(typename MakeIndexSequence<sizeof...(Args)>::type(), tuple);
-    static_assert(std::is_same<typename std::remove_reference<decltype(std::get<I>(tuple))>::type::paramType, Params>::value, "Transaction parameter not found");
+    static_assert(std::is_same<typename std::remove_reference<decltype(std::get<I>(tuple))>::type::paramType, Params>::value,
+                  "Transaction parameter not found");
     return std::get<I>(tuple);
 }
 

@@ -105,7 +105,8 @@ namespace ec2
             : m_abstractTransaction(abstractTransaction),
               m_serializedTran(serializedTran),
               m_stream(stream),
-              m_f(f)
+              m_f(f),
+              m_result(false)
         {}
 
         bool getResult() const { return m_result; }
@@ -162,7 +163,8 @@ namespace ec2
 
         HandleTranParamsJsonVisitor(const QnAbstractTransaction &abstractTransaction, Function f)
             : m_abstractTransaction(abstractTransaction),
-              m_f(f)
+              m_f(f),
+              m_result(false)
         {}
 
         bool getResult() const { return m_result; }
