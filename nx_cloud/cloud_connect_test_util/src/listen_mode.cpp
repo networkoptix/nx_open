@@ -1,8 +1,3 @@
-/**********************************************************
-* mar 29, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "listen_mode.h"
 
 #include <nx/network/cloud/cloud_server_socket.h>
@@ -13,6 +8,21 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
 
+namespace nx {
+namespace cctu {
+
+void printListenOptions(std::ostream* const outStream)
+{
+    *outStream<<
+    "Listen mode (can listen on local or cloud address):\n"
+    "  --listen                     Enable listen mode\n"
+    "  --echo                       Makes server to mirror data instead of spaming\n"
+    "  --cloud-credentials={system_id}:{authentication_key}\n"
+    "                               Specify credentials to use to connect to mediator\n"
+    "  --server-id={server_id}      Id used when registering on mediator\n"
+    "  --local-address={ip:port}    Local address to listen\n"
+    "  --udt                        Use udt instead of tcp. Only if listening local address\n";
+}
 
 int runInListenMode(const std::multimap<QString, QString>& args)
 {
@@ -95,19 +105,6 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     return result;
 }
 
-void printListenOptions(std::ostream* const outStream)
-{
-    *outStream<<
-    "Listen mode (can listen on local or cloud address):\n"
-    "  --listen                         Enable listen mode\n"
-    "  --echo                           Makes server to mirror data instead of spaming\n"
-    "  --cloud-credentials={system_id}:{authentication_key}\n"
-    "                                   Specify credentials to use to connect to mediator\n"
-    "  --server-id={server_id}          Id used when registering on mediator\n"
-    "  --local-address={ip:port}        Local address to listen\n"
-    "  --udt                            Use udt instead of tcp. Only if listening local address\n";
-}
-
 int printStatsAndWaitForCompletion(
     nx::network::test::ConnectionPool* const connectionPool,
     nx::utils::MoveOnlyFunc<bool()> interruptCondition)
@@ -176,3 +173,6 @@ int printStatsAndWaitForCompletion(
 
     return 0;
 }
+
+} // namespace cctu
+} // namespace nx

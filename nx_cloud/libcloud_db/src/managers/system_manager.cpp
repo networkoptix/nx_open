@@ -29,7 +29,7 @@ namespace cdb {
 
 SystemManager::SystemManager(
     const conf::Settings& settings,
-    TimerManager* const timerManager,
+    nx::utils::TimerManager* const timerManager,
     const AccountManager& accountManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
 :

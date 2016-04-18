@@ -81,10 +81,25 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest) ||      //supporting only digest authentication for cloud-based authentication
         (!m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"])))    //nonce must be valid cloud nonce
     {
-        NX_LOGX(lm("Refusing authentication. username %1, nonce %2")
-            .arg(authorizationHeader.userid())
-            .arg(authorizationHeader.digest->params["nonce"]),
-            cl_logDEBUG2);
+        if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
+        {
+            NX_LOGX(lm("Refusing basic authentication. username %1")
+                .arg(authorizationHeader.userid()),
+                cl_logDEBUG2);
+        }
+        else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
+        {
+            NX_LOGX(lm("Refusing digest authentication. username %1, nonce %2")
+                .arg(authorizationHeader.userid())
+                .arg(authorizationHeader.digest->params["nonce"]),
+                cl_logDEBUG2);
+        }
+        else
+        {
+            NX_LOGX(lm("Unknown authentication type: %1")
+                .arg(nx_http::header::AuthScheme::toString(authorizationHeader.authScheme)),
+                cl_logDEBUG2);
+        }
         return m_defaultAuthenticator->authorize(
             method,
             authorizationHeader,

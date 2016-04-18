@@ -29,6 +29,7 @@
         <module>connection_mediator_ut</module>
         <module>appserver2_ut</module>
         <module>cloud_connectivity_ut</module>
+        <module>utils_ut</module>
     </modules>       
     <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
 <!--    <profiles>

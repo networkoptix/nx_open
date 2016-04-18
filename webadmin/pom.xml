@@ -32,7 +32,7 @@
                         <configuration>
                             <filesets>
                                 <fileset>
-                                    <directory>${project.build.sourceDirectory}</directory>
+                                    <directory>${basedir}</directory>
                                     <includes>
                                         <include>external.dat</include>
                                     </includes>
@@ -59,7 +59,21 @@
                                 <exec dir="${project.basedir}" executable="./build.sh" failifexecutionfails="true" failonerror="true" />
                             </target>
                         </configuration>
-                    </execution>                    
+                    </execution>        
+                    <execution>
+                        <id>rdep</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                            <target>                            
+                                <chmod file="${project.build.directory}/rdep.sh" perm="755"/>				
+                                <exec dir="${project.build.directory}" executable="./rdep.sh" failifexecutionfails="true" failonerror="true" />
+                            </target>
+                        </configuration>
+                    </execution>                       
                 </executions>
             </plugin>
 

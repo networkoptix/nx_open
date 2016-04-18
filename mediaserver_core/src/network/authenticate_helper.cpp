@@ -326,10 +326,10 @@ QPair<QString, QString> QnAuthHelper::createAuthenticationQueryItemForPath( cons
     QnMutexLocker lk( &m_mutex );
 
     //adding active period
-    TimerManager::TimerGuard timerGuard(
-        TimerManager::instance()->addTimer(
+    nx::utils::TimerManager::TimerGuard timerGuard(
+        nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnAuthHelper::authenticationExpired, this, authKey, std::placeholders::_1),
-            std::min(periodMillis, MAX_AUTHENTICATION_KEY_LIFE_TIME_MS ) ) );
+            std::chrono::milliseconds(std::min(periodMillis, MAX_AUTHENTICATION_KEY_LIFE_TIME_MS))));
 
     TempAuthenticationKeyCtx ctx;
     ctx.timeGuard = std::move( timerGuard );

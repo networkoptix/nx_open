@@ -143,7 +143,7 @@ void MediatorFunctionalTest::registerCloudDataProvider(
             const std::string& address,
             const std::string& user,
             const std::string& password,
-            TimerDuration updateInterval)
+            std::chrono::milliseconds updateInterval)
     {
         return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
     });

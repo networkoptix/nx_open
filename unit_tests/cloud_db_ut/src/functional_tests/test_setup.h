@@ -42,7 +42,6 @@ public:
 
     SocketAddress endpoint() const;
 
-protected:
     nx::cdb::api::ConnectionFactory* connectionFactory();
     api::ModuleInfo moduleInfo() const;
 

@@ -45,7 +45,7 @@ void ApplauncherProcess::pleaseStop()
     std::for_each(
         m_killProcessTasks.begin(),
         m_killProcessTasks.end(),
-        []( const std::pair<qint64, KillProcessTask>& val ){ TimerManager::instance()->joinAndDeleteTimer(val.first); } );
+        []( const std::pair<qint64, KillProcessTask>& val ){ nx::utils::TimerManager::instance()->joinAndDeleteTimer(val.first); } );
     m_killProcessTasks.clear();
 }
 
@@ -557,7 +557,8 @@ bool ApplauncherProcess::addProcessKillTimer(
             return true;
         }
 
-        m_killProcessTasks[TimerManager::instance()->addTimer( this, request->timeoutMillis )] = task;
+        m_killProcessTasks[nx::utils::TimerManager::instance()->addTimer(
+            this, std::chrono::milliseconds(request->timeoutMillis))] = task;
     }
 
     response->result = applauncher::api::ResultType::ok;

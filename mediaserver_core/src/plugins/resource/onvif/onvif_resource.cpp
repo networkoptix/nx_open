@@ -29,7 +29,7 @@
 #include "utils/math/math.h"
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
@@ -37,7 +37,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
 #include "core/onvif/onvif_config_data.h"
@@ -264,7 +264,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
             lk.unlock();
 
-            TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
+            nx::utils::TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
             if( !outputTask.active )
             {
                 //returning port to inactive state
@@ -1452,9 +1452,9 @@ bool QnPlOnvifResource::setRelayOutputState(
     QnMutexLocker lk( &m_ioPortMutex );
 
     using namespace std::placeholders;
-    const quint64 timerID = TimerManager::instance()->addTimer(
+    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, active, autoResetTimeoutMS),
-        0 );
+        std::chrono::milliseconds::zero());
     m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, active, autoResetTimeoutMS);
     return true;
 }
@@ -1620,14 +1620,15 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     if( m_renewSubscriptionTimerID )
     {
-        TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+        nx::utils::TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
         m_renewSubscriptionTimerID = 0;
     }
-    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+    m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+        std::chrono::milliseconds(
+            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND));
 
     if (m_appStopping)
         return false;
@@ -2684,11 +2685,12 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         ? (response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime)
         : DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     using namespace std::placeholders;
-    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+    m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+        std::chrono::milliseconds(
+            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND));
 }
 
 void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& encoderId)
@@ -2832,9 +2834,9 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
 
     //removing timer
     if( nextPullMessagesTimerIDBak > 0 )
-        TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
     if( renewSubscriptionTimerIDBak > 0 )
-        TimerManager::instance()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
     //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -3055,15 +3057,16 @@ bool QnPlOnvifResource::createPullPointSubscription()
         using namespace std::placeholders;
         if( m_renewSubscriptionTimerID )
         {
-            TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+            nx::utils::TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
             m_renewSubscriptionTimerID = 0;
         }
 
-        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+        m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+            std::chrono::milliseconds(
+                (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
                 ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-                : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+                : renewSubsciptionTimeoutSec)*MS_PER_SECOND));
     }
 
     m_eventMonitorType = emtPullPoint;
@@ -3071,13 +3074,13 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     if( m_nextPullMessagesTimerID != 0 )
     {
-        TimerManager::instance()->deleteTimer( m_nextPullMessagesTimerID );
+        nx::utils::TimerManager::instance()->deleteTimer( m_nextPullMessagesTimerID );
         m_nextPullMessagesTimerID = 0;
     }
 
-    m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
+    m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::pullMessages, this, std::placeholders::_1),
-        PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
+        std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
     return true;
 }
 
@@ -3226,11 +3229,11 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
 
         if( m_renewSubscriptionTimerID )
         {
-            TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+            nx::utils::TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
             m_renewSubscriptionTimerID = 0;
         }
 
-        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+        m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
             [this]( quint64 timerID )
             {
                 QnMutexLocker lk( &m_ioPortMutex );
@@ -3245,7 +3248,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
                 createPullPointSubscription();
                 lk.relock();
             },
-            0 );
+            std::chrono::milliseconds::zero() );
         return;
     }
 
@@ -3259,9 +3262,9 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
     using namespace std::placeholders;
     NX_ASSERT( m_nextPullMessagesTimerID == 0 );
     if( m_nextPullMessagesTimerID == 0 )    //otherwise, we already have timer somehow
-        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
+        m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
+            std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(
@@ -3475,9 +3478,9 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     {
         //adding task to reset port state
         using namespace std::placeholders;
-        const quint64 timerID = TimerManager::instance()->addTimer(
+        const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, !active, 0),
-            autoResetTimeoutMS );
+            std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);
     }
 #endif
