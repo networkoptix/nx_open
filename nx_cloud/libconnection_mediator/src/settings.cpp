@@ -15,6 +15,7 @@
 #include <utils/serialization/lexical.h>
 
 #include <libconnection_mediator_app_info.h>
+#include <nx/network/cloud/data/connection_parameters.h>
 #include <utils/common/app_info.h>
 
 
@@ -70,14 +71,15 @@ namespace
     //CloudConnect
     const QLatin1String kRendezvousConnectTimeout("cloudConnect/rendezvousConnectTimeout");
     constexpr const std::chrono::seconds kDefaultRendezvousConnectTimeout =
-        std::chrono::seconds(15);
+        nx::hpm::api::kRendezvousConnectTimeoutDefault;
 
     const QLatin1String kUdpTunnelKeepAliveInterval("cloudConnect/udpTunnelKeepAliveInterval");
     constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
-        std::chrono::seconds(15);
+        nx::hpm::api::kUdpTunnelKeepAliveIntervalDefault;
 
     const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
-    constexpr const int kDefaultUdpTunnelKeepAliveRetries = 3;
+    constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
+        nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 }
 
 
