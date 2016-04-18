@@ -51,7 +51,9 @@ var Helper = function () {
     // Get valid email with random number between 100 and 1000
     this.getRandomEmailWith = function(addition) {
         var randomNumber = Math.floor((Math.random() * 100000)+10000); // Random number between 1000 and 10000
-        return 'noptixqa+'+ addition + randomNumber + '@gmail.com';
+        var email = 'noptixqa+'+ addition + randomNumber + '@gmail.com';
+        console.log(email);
+        return email;
     };
     this.userEmail = 'noptixqa+1@gmail.com'; // valid existing email
     this.userEmail2 = 'noptixqa+2@gmail.com';
@@ -141,13 +143,16 @@ var Helper = function () {
         var logoutLink = userAccountDropdownMenu.element(by.linkText('Logout'));
 
         expect(userAccountDropdownToggle.isPresent()).toBe(true);
+        userAccountDropdownToggle.getText().then(function(text) {
+            if(self.isSubstr(text, 'noptixqa')) {
+                userAccountDropdownToggle.click();
+                logoutLink.click();
+                browser.sleep(500); // such a shame, but I can't solve it right now
 
-        userAccountDropdownToggle.click();
-        logoutLink.click();
-        browser.sleep(500); // such a shame, but I can't solve it right now
-
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(this.loginSuccessElement.isDisplayed()).toBe(false);
+                // Check that element that is visible only for authorized user is NOT displayed on page
+                expect(self.loginSuccessElement.isDisplayed()).toBe(false);
+            }
+        });
     };
 
     this.register = function(firstName, lastName, email, password) {
@@ -279,11 +284,11 @@ var Helper = function () {
         if (string.indexOf(substring) > -1) return true;
     };
 
-    this.whyException = function(reason) {
-        expect(reason.name).toBe("");
-        expect(reason.message).toBe("");
-        expect(reason.stack).toBe("");
-    };
+    //this.whyException = function(reason) {
+    //    expect(reason.name).toBe("");
+    //    expect(reason.message).toBe("");
+    //    expect(reason.stack).toBe("");
+    //};
 };
 
 module.exports = Helper;

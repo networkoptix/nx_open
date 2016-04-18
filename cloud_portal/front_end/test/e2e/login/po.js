@@ -9,6 +9,8 @@ LoginPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
+    var self = this;
+
     this.get = function () {
         browser.get('/');
         browser.waitForAngular();
@@ -59,7 +61,6 @@ LoginPage = function () {
     this.htmlBody = element(by.css('body'));
 
     this.restoreEmailInput = element(by.model('data.email'));
-    this.newPasswordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
     this.submitButton = element(by.buttonText('Restore password'));
     this.savePasswordButton = element(by.buttonText('Save password'));
 
@@ -72,13 +73,16 @@ LoginPage = function () {
     };
     this.logout = function () {
         expect(this.userAccountDropdownToggle.isDisplayed()).toBe(true);
+        this.userAccountDropdownToggle.getText().then(function(text) {
+            if(self.helper.isSubstr(text, 'noptixqa')) {
+                self.userAccountDropdownToggle.click();
+                self.userLogoutLink.click();
+                browser.sleep(500); // such a shame, but I can't solve it right now
 
-        this.userAccountDropdownToggle.click();
-        this.userLogoutLink.click();
-        browser.sleep(500); // such a shame, but I can't solve it right now
-
-        // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(this.loginSuccessElement.isDisplayed()).toBe(false);
+                // Check that element that is visible only for authorized user is NOT displayed on page
+                expect(self.loginSuccessElement.isDisplayed()).toBe(false);
+            }
+        });
     };
 };
 
