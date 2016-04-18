@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 COMPANY_NAME=${deb.customization.company.name}
 
 PACKAGENAME=${installer.name}-mediaserver
@@ -15,9 +17,9 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 BETA=""
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
+if [[ "${beta}" == "true" ]]; then
+  BETA="-beta"
+fi
 
 FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
 
@@ -38,6 +40,18 @@ SERVER_IMAGEFORMATS_PATH=$SERVER_BIN_PATH/imageformats
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
+
+QT_LIBS=\
+( \
+    Core \
+    Gui \
+    Network \
+    Concurrent \
+    Multimedia \
+    Sql \
+    Xml \
+    XmlPatterns
+)
 
 # Prepare stage dir
 rm -rf $STAGE
@@ -61,6 +75,14 @@ cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 rm -f $LIBSTAGE/*.debug
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+
+for lib in "${QT_LIBS[@]}"
+do
+    SONAME=libQt5${lib}.so.${qt.version}
+    cp ${qt.dir}/lib/$SONAME $LIBSTAGE
+    LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
+    ln -sf $LIBSTAGE/$SONAME $LIBSTAGE/$LINK_TARGET
+done
 
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
