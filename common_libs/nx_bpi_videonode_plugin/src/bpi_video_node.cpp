@@ -46,28 +46,28 @@ protected:
 
         m_id_planeWidth = program()->uniformLocation("planeWidth");
         m_id_planeHeight = program()->uniformLocation("planeHeight");
-        m_id_HalfTextureHeight = program()->uniformLocation("halfTextureHeight");
+        m_id_yTextureHeight = program()->uniformLocation("yTextureHeight");
 
-        m_id_plane1Textures = program()->uniformLocation("plane1Textures");
+        m_id_plane1Texture = program()->uniformLocation("plane1Texture");
         m_id_plane2Texture = program()->uniformLocation("plane2Texture");
         m_id_colorMatrix = program()->uniformLocation("colorMatrix");
         m_id_opacity = program()->uniformLocation("opacity");
 
-        m_id_yBlocksCount = program()->uniformLocation("yBlocksCount");
+        m_id_uvBlocksCount = program()->uniformLocation("uvBlocksCount");
         m_id_yBlocksPerLine = program()->uniformLocation("yBlocksPerLine");
     }
 
     int m_id_matrix;
     int m_id_planeWidth;
     int m_id_planeHeight;
-    int m_id_HalfTextureHeight;
+    int m_id_yTextureHeight;
 
-    int m_id_plane1Textures;
+    int m_id_plane1Texture;
     int m_id_plane2Texture;
     int m_id_colorMatrix;
     int m_id_opacity;
 
-    int m_id_yBlocksCount;
+    int m_id_uvBlocksCount;
     int m_id_yBlocksPerLine;
 };
 
@@ -117,7 +117,7 @@ public:
     int m_textureSize;
     int m_planeCount;
 
-    int m_yBlocksCount;
+    int m_uvBlocksCount;
 
     GLuint m_textureIds[3];
     GLfloat m_planeWidth;
@@ -202,23 +202,20 @@ void QnBpiSGVideoMaterial_YUV::bind()
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
             m_framePixelWidth = m_frame.width();
-            m_framePixelHeight = fh;
+            m_framePixelHeight = m_frame.height();
 
             {
                 const int y = 0;
                 const int uv = 1;
 
                 m_planeWidth = qreal(fw) / m_frame.bytesPerLine(y);
-                m_yBlocksCount = (m_textureSize + 1023) / 1024;
+                m_uvBlocksCount = m_textureSize / 2048;
 
                 functions->glActiveTexture(GL_TEXTURE1);
-                bindTexture(m_textureIds[1], 512, m_yBlocksCount / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
-
-                functions->glActiveTexture(GL_TEXTURE2);
-                bindTexture(m_textureIds[2], 1024, m_yBlocksCount / 2, m_frame.bits(y) + fw*fh / 2, GL_LUMINANCE);
+                bindTexture(m_textureIds[1], 512, m_uvBlocksCount, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
 
                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
-                bindTexture(m_textureIds[0], 1024, m_yBlocksCount / 2 , m_frame.bits(y), GL_LUMINANCE);
+                bindTexture(m_textureIds[0], 1024, m_uvBlocksCount, m_frame.bits(y), GL_LUMINANCE_ALPHA);
             }
 
             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
@@ -274,20 +271,18 @@ void QSGVideoMaterialShader_YUV_BiPlanarTiled::updateState(const RenderState &st
 
     QnBpiSGVideoMaterial_YUV *mat = static_cast<QnBpiSGVideoMaterial_YUV *>(newMaterial);
 
-    static const GLint yTextureIndices[] = { 0, 2 };
-    program()->setUniformValueArray(m_id_plane1Textures, yTextureIndices, 2);
+    program()->setUniformValue(m_id_plane1Texture, 0);
     program()->setUniformValue(m_id_plane2Texture, 1);
-//    program()->setUniformValue(m_id_plane3Texture, 2);
 
     mat->bind();
 
     program()->setUniformValue(m_id_colorMatrix, mat->m_colorMatrix);
     program()->setUniformValue(m_id_planeWidth,  (float) mat->m_planeWidth * mat->m_framePixelWidth);
     program()->setUniformValue(m_id_planeHeight, (float) mat->m_framePixelHeight);
-    program()->setUniformValue(m_id_HalfTextureHeight, (float) (mat->m_framePixelHeight / 2.0));
+    program()->setUniformValue(m_id_yTextureHeight, (GLint) (mat->m_framePixelHeight / 2.0));
 
-    program()->setUniformValue(m_id_yBlocksCount, (float) mat->m_yBlocksCount / 2);
-    program()->setUniformValue(m_id_yBlocksPerLine, (float) (mat->m_framePixelWidth / 32));
+    program()->setUniformValue(m_id_uvBlocksCount, (GLint) mat->m_uvBlocksCount);
+    program()->setUniformValue(m_id_yBlocksPerLine, (GLint) (mat->m_framePixelWidth / 32));
 
     if (state.isOpacityDirty()) {
         mat->m_opacity = state.opacity();
