@@ -98,7 +98,13 @@ namespace detail
                TransactionDescriptor<ApiCommand::tranSyncRequest, ApiSyncRequestData>,
                TransactionDescriptor<ApiCommand::lockRequest, ApiLockData>,
                TransactionDescriptor<ApiCommand::lockResponse, ApiLockData>,
-               TransactionDescriptor<ApiCommand::unlockRequest, ApiLockData>> transactionDescriptors =
+               TransactionDescriptor<ApiCommand::unlockRequest, ApiLockData>,
+               TransactionDescriptor<ApiCommand::peerAliveInfo, ApiPeerAliveData>,
+               TransactionDescriptor<ApiCommand::tranSyncDone, ApiTranSyncDoneData>,
+               TransactionDescriptor<ApiCommand::testConnection, ApiLoginData>,
+               TransactionDescriptor<ApiCommand::connect, ApiLoginData>,
+               TransactionDescriptor<ApiCommand::openReverseConnection, ApiReverseConnectionData>
+    > transactionDescriptors =
      std::make_tuple (
         TRANSACTION_DESCRIPTOR(ApiCommand::NotDefined, NotDefinedType,
                                true, // persistent
@@ -123,7 +129,7 @@ namespace detail
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveSerializedTransactionHelper(InvalidGetHashHelper()), // save
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
                                InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
@@ -131,7 +137,7 @@ namespace detail
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveSerializedTransactionHelper(InvalidGetHashHelper()), // save
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
                                InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
@@ -139,11 +145,54 @@ namespace detail
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveSerializedTransactionHelper(InvalidGetHashHelper()), // save
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
                                InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::peerAliveInfo, ApiPeerAliveData,
+                               false, // persistent
+                               true, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
+                               InvalidTriggerNotificationHelper() // trigger notification
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::tranSyncDone, ApiTranSyncDoneData,
+                               false, // persistent
+                               true, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
+                               InvalidTriggerNotificationHelper() // trigger notification
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::testConnection, ApiLoginData,
+                               false, // persistent
+                               false, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
+                               InvalidTriggerNotificationHelper() // trigger notification
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::connect, ApiLoginData,
+                               false, // persistent
+                               false, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
+                               InvalidTriggerNotificationHelper() // trigger notification
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::openReverseConnection, ApiReverseConnectionData,
+                               false, // persistent
+                               true, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
+                               [](const QnTransaction<ApiReverseConnectionData> &tran, NotificationParams &notificationParams)
+                               {
+                                    NX_ASSERT(tran.command == ApiCommand::openReverseConnection);
+                                    emit notificationParams.ecConnection->reverseConnectionRequested(tran.params);
+                               } // trigger notification
                               )
-
     );
 #undef TRANSACTION_DESCRIPTOR
 }

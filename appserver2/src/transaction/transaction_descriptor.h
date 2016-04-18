@@ -101,10 +101,16 @@ struct TransactionDescriptor
 struct NotDefinedType {};
 
 extern std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
-                  TransactionDescriptor<ApiCommand::tranSyncRequest, ApiSyncRequestData>,
-                  TransactionDescriptor<ApiCommand::lockRequest, ApiLockData>,
-                  TransactionDescriptor<ApiCommand::lockResponse, ApiLockData>,
-                  TransactionDescriptor<ApiCommand::unlockRequest, ApiLockData>> transactionDescriptors;
+               TransactionDescriptor<ApiCommand::tranSyncRequest, ApiSyncRequestData>,
+               TransactionDescriptor<ApiCommand::lockRequest, ApiLockData>,
+               TransactionDescriptor<ApiCommand::lockResponse, ApiLockData>,
+               TransactionDescriptor<ApiCommand::unlockRequest, ApiLockData>,
+               TransactionDescriptor<ApiCommand::peerAliveInfo, ApiPeerAliveData>,
+               TransactionDescriptor<ApiCommand::tranSyncDone, ApiTranSyncDoneData>,
+               TransactionDescriptor<ApiCommand::testConnection, ApiLoginData>,
+               TransactionDescriptor<ApiCommand::connect, ApiLoginData>,
+               TransactionDescriptor<ApiCommand::openReverseConnection, ApiReverseConnectionData>
+> transactionDescriptors;
 
 /* Compile-time IndexSequence implementation (since stdc++lib shipped with g++ 4.8.2 doesn't have it) */
 template<size_t... Indexes> struct IndexSequence {};
