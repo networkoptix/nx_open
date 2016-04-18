@@ -1,7 +1,6 @@
 
 #include "acceptor.h"
 
-#include <nx/network/cloud/cloud_config.h>
 #include <utils/serialization/lexical.h>
 
 #include "incoming_tunnel_udt_connection.h"
@@ -13,19 +12,14 @@ namespace cloud {
 namespace udp {
 
 TunnelAcceptor::TunnelAcceptor(
-    SocketAddress peerAddress)
+    SocketAddress peerAddress,
+    nx::hpm::api::ConnectionParameters connectionParametes)
 :
     m_peerAddress(std::move(peerAddress)),
-    m_udtConnectTimeout(kHpUdtConnectTimeout),
+    m_connectionParameters(std::move(connectionParametes)),
     m_udpRetransmissionTimeout(stun::UDPClient::kDefaultRetransmissionTimeOut),
     m_udpMaxRetransmissions(stun::UDPClient::kDefaultMaxRetransmissions)
 {
-}
-
-void TunnelAcceptor::setUdtConnectTimeout(
-    std::chrono::milliseconds timeout)
-{
-    m_udtConnectTimeout = timeout;
 }
 
 void TunnelAcceptor::setUdpRetransmissionTimeout(
@@ -114,7 +108,7 @@ void TunnelAcceptor::connectionAckResult(
         if (!m_udtConnectionSocket->bindToUdpSocket(std::move(*socket)) ||
             !m_udtConnectionSocket->setRendezvous(true) ||
             !m_udtConnectionSocket->setSendTimeout(
-                m_udtConnectTimeout.count()) ||
+                m_connectionParameters.rendezvousConnectTimeout.count()) ||
             !m_udtConnectionSocket->setNonBlockingMode(true))
         {
             return executeAcceptHandler(
@@ -156,7 +150,9 @@ void TunnelAcceptor::initiateUdtConnection()
             executeAcceptHandler(
                 SystemError::noError,
                 std::make_unique<IncomingTunnelUdtConnection>(
-                    m_connectionId, std::move(socket)));
+                    m_connectionId,
+                    std::move(socket),
+                    m_connectionParameters));
         });
 }
 

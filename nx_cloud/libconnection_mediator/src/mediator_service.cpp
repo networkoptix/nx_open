@@ -111,6 +111,7 @@ int MediatorProcess::executeApplication()
         &stunMessageDispatcher,
         &listeningPeerPool);
     HolePunchingProcessor cloudConnectProcessor(
+        settings,
         cloudDataProvider.get(),
         &stunMessageDispatcher,
         &listeningPeerPool);

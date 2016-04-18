@@ -39,10 +39,13 @@ protected:
         ASSERT_EQ(results.pop(), SystemError::noError);
         ASSERT_EQ(results.pop(), SystemError::noError);
 
+        nx::hpm::api::ConnectionParameters connectionParameters;
+        connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
+        connectionParameters.udpTunnelKeepAliveRetries = 1;
         connection = std::make_unique<IncomingTunnelUdtConnection>(
             kConnectionId.toUtf8(),
             std::move(tmpSocket),
-            kMaxKeepAliveInterval);
+            std::move(connectionParameters));
         acceptForever();
     }
 

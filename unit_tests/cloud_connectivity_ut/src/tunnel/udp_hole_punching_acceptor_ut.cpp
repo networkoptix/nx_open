@@ -78,10 +78,11 @@ protected:
         mediatorConnection.reset(new hpm::api::MediatorServerTcpConnection(
             stunClientMock, &dummyCloudSystemCredentialsProvider));
 
-        tunnelAcceptor.reset(new TunnelAcceptor(k2ndPeerAddress));
+        nx::hpm::api::ConnectionParameters connectionParameters;
+        connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
+        tunnelAcceptor.reset(new TunnelAcceptor(k2ndPeerAddress, connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
         tunnelAcceptor->setMediatorConnection(mediatorConnection);
-        tunnelAcceptor->setUdtConnectTimeout(kSocketTimeout);
         tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);
         tunnelAcceptor->setUdpMaxRetransmissions(1);
 

@@ -65,6 +65,19 @@ namespace
     const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
 
     const QString kModuleName = lit("connection_mediator");
+
+
+    //CloudConnect
+    const QLatin1String kRendezvousConnectTimeout("cloudConnect/rendezvousConnectTimeout");
+    constexpr const std::chrono::seconds kDefaultRendezvousConnectTimeout =
+        std::chrono::seconds(15);
+
+    const QLatin1String kUdpTunnelKeepAliveInterval("cloudConnect/udpTunnelKeepAliveInterval");
+    constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
+        std::chrono::seconds(15);
+
+    const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
+    constexpr const int kDefaultUdpTunnelKeepAliveRetries = 3;
 }
 
 
@@ -112,6 +125,11 @@ const Stun& Settings::stun() const
 const Http& Settings::http() const
 {
     return m_http;
+}
+
+const api::ConnectionParameters& Settings::connectionParameters() const
+{
+    return m_connectionParameters;
 }
 
 const Logging& Settings::logging() const
@@ -172,6 +190,19 @@ void Settings::loadConfiguration()
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
+
+    m_connectionParameters.rendezvousConnectTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            kRendezvousConnectTimeout,
+            static_cast<qulonglong>(kDefaultRendezvousConnectTimeout.count())).toString());
+    m_connectionParameters.udpTunnelKeepAliveInterval =
+        nx::utils::parseTimerDuration(m_settings.value(
+            kUdpTunnelKeepAliveInterval,
+            static_cast<qulonglong>(kDefaultUdpTunnelKeepAliveInterval.count())).toString());
+    m_connectionParameters.udpTunnelKeepAliveRetries = m_settings.value(
+        kUdpTunnelKeepAliveRetries,
+        kDefaultUdpTunnelKeepAliveRetries).toInt();
+
 
     //analyzing values
     if (m_general.dataDir.isEmpty())

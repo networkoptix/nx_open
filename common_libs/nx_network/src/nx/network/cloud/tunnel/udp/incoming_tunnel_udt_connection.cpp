@@ -1,9 +1,9 @@
 #include "incoming_tunnel_udt_connection.h"
 
-#include <nx/network/cloud/cloud_config.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/utils/log/log.h>
+
 
 namespace nx {
 namespace network {
@@ -13,14 +13,12 @@ namespace udp {
 IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     String connectionId,
     std::unique_ptr<UdtStreamSocket> connectionSocket,
-    std::chrono::milliseconds maxKeepAliveInterval)
+    const nx::hpm::api::ConnectionParameters& connectionParameters)
 :
     AbstractIncomingTunnelConnection(std::move(connectionId)),
     m_maxKeepAliveInterval(
-        maxKeepAliveInterval == std::chrono::milliseconds::zero()
-        ? std::chrono::duration_cast<std::chrono::milliseconds>(
-            kHpUdtKeepAliveInterval * kHpUdtKeepAliveRetries)
-        : maxKeepAliveInterval),
+        connectionParameters.udpTunnelKeepAliveInterval *
+        connectionParameters.udpTunnelKeepAliveRetries),
     m_lastKeepAlive(std::chrono::steady_clock::now()),
     m_state(SystemError::noError),
     m_connectionSocket(std::move(connectionSocket)),
