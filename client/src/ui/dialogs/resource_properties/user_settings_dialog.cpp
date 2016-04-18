@@ -7,7 +7,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/widgets/properties/user_settings_widget.h>
-#include <ui/widgets/properties/user_access_rights_resources_widget.h>
+#include <ui/widgets/properties/accessible_resources_widget.h>
+#include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -17,17 +18,20 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     ui(new Ui::UserSettingsDialog()),
     m_user(),
     m_settingsPage(new QnUserSettingsWidget(this)),
-    m_camerasPage(new QnUserAccessRightsResourcesWidget(QnUserAccessRightsResourcesWidget::CamerasFilter, this)),
-    m_layoutsPage(new QnUserAccessRightsResourcesWidget(QnUserAccessRightsResourcesWidget::LayoutsFilter, this)),
-    m_serversPage(new QnUserAccessRightsResourcesWidget(QnUserAccessRightsResourcesWidget::ServersFilter, this))
+    m_permissionsPage(new QnPermissionsWidget(this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(QnAccessibleResourcesWidget::CamerasFilter, this)),
+    m_layoutsPage(new QnAccessibleResourcesWidget(QnAccessibleResourcesWidget::LayoutsFilter, this)),
+    m_serversPage(new QnAccessibleResourcesWidget(QnAccessibleResourcesWidget::ServersFilter, this))
 {
     ui->setupUi(this);
 
     addPage(SettingsPage, m_settingsPage, tr("User Information"));
+    addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
+    setPageVisible(PermissionsPage, false);
     setPageVisible(CamerasPage, false);
     setPageVisible(LayoutsPage, false);
     setPageVisible(ServersPage, false);
@@ -35,6 +39,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]
     {
         bool customAccessRights = m_settingsPage->isCustomAccessRights();
+        setPageVisible(PermissionsPage, customAccessRights);
         setPageVisible(CamerasPage, customAccessRights);
         setPageVisible(LayoutsPage, customAccessRights);
         setPageVisible(ServersPage, customAccessRights);
@@ -90,6 +95,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
         return;
 
     m_settingsPage->setUser(user);
+    m_permissionsPage->setTargetUser(user);
     m_camerasPage->setTargetUser(user);
     m_layoutsPage->setTargetUser(user);
     m_serversPage->setTargetUser(user);

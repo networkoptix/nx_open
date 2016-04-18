@@ -5,7 +5,8 @@
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 class QnUserSettingsWidget;
-class QnUserAccessRightsResourcesWidget;
+class QnPermissionsWidget;
+class QnAccessibleResourcesWidget;
 
 namespace Ui
 {
@@ -49,9 +50,10 @@ private:
     QnUserResourcePtr m_user;
 
     QnUserSettingsWidget* m_settingsPage;
-    QnUserAccessRightsResourcesWidget* m_camerasPage;
-    QnUserAccessRightsResourcesWidget* m_layoutsPage;
-    QnUserAccessRightsResourcesWidget* m_serversPage;
+    QnPermissionsWidget* m_permissionsPage;
+    QnAccessibleResourcesWidget* m_camerasPage;
+    QnAccessibleResourcesWidget* m_layoutsPage;
+    QnAccessibleResourcesWidget* m_serversPage;
 
 };
 

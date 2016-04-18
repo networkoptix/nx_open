@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UserAccessRightsResourcesWidget</class>
- <widget class="QWidget" name="UserAccessRightsResourcesWidget">
+ <class>AccessibleResourcesWidget</class>
+ <widget class="QWidget" name="AccessibleResourcesWidget">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -109,6 +109,21 @@ namespace
 
         return static_cast<TabShape>(widget->property(Properties::kTabShape).toInt());
     }
+
+    bool isCheckableButton(const QStyleOption* option)
+    {
+        if (qstyleoption_cast<const QStyleOptionButton*>(option))
+        {
+            if (option->state.testFlag(QStyle::State_On) || option->state.testFlag(QStyle::State_Off))
+                return true;
+
+            const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
+            if (buttonWidget && buttonWidget->isCheckable())
+                return true;
+        }
+
+        return false;
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -1457,6 +1472,32 @@ void QnNxStyle::drawControl(
         }
         break;
 
+    case CE_PushButtonLabel:
+        {
+            if (isCheckableButton(option))
+            {
+                /* Calculate minimal label width: */
+                const QStyleOptionButton* buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
+                int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
+                if (!buttonOption->icon.isNull())
+                    minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
+                if (!buttonOption->text.isEmpty())
+                    minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
+
+                /* Draw standard button content left-aligned: */
+                QStyleOptionButton newOpt(*buttonOption);
+                newOpt.rect.setWidth(minLabelWidth);
+                base_type::drawControl(element, &newOpt, painter, widget);
+
+                /* Draw switch right-aligned: */
+                newOpt.rect.setWidth(Metrics::kSwitchSize.width());
+                newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                drawSwitch(painter, &newOpt, widget);
+                return;
+            }
+        }
+        break;
+
     case CE_Splitter:
         {
             painter->fillRect(option->rect, option->palette.shadow());
@@ -2005,8 +2046,14 @@ QSize QnNxStyle::sizeFromContents(
     switch (type)
     {
     case CT_PushButton:
-        return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
-                     qMax(size.height(), Metrics::kButtonHeight));
+        {
+            QSize switchSize;
+            if (isCheckableButton(option))
+                switchSize = Metrics::kSwitchSize + QSize(Metrics::kSwitchMargin, 0);
+
+            return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + switchSize.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
+                qMax(qMax(size.height(), switchSize.height()), Metrics::kButtonHeight));
+        }
 
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));

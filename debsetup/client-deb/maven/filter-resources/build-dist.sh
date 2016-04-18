@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 COMPANY_NAME=${deb.customization.company.name}
 FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
@@ -21,9 +23,9 @@ LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 BETA=""
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
+if [[ "${beta}" == "true" ]]; then
+  BETA="-beta"
+fi
 
 FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
 
@@ -46,6 +48,30 @@ CLIENT_BG_PATH=${libdir}/backgrounds
 CLIENT_HELP_PATH=${ClientHelpSourceDir}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
+
+QT_LIBS=\
+( \
+    Core \
+    Gui \
+    Widgets \
+    Network \
+    Concurrent \
+    Multimedia \
+    OpenGL \
+    WebKit \
+    WebKitWidgets \
+    WebChannel \
+    Qml \
+    Quick \
+    QuickWidgets \
+    X11Extras \
+    Sql \
+    Xml \
+    XmlPatterns \
+    Sensors \
+    PrintSupport \
+    Positioning
+)
 
 #. $CLIENT_BIN_PATH/env.sh
 
@@ -88,6 +114,14 @@ cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
+for lib in "${QT_LIBS[@]}"
+do
+    SONAME=libQt5${lib}.so.${qt.version}
+    cp ${qt.dir}/lib/$SONAME $LIBSTAGE
+    LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
+    ln -sf $LIBSTAGE/$SONAME $LIBSTAGE/$LINK_TARGET
+done
+
 cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
 cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
 cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
@@ -117,6 +151,6 @@ install -m 644 debian/templates $STAGE/DEBIAN
 cp -r bin/update.json $STAGETARGET
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
 echo "zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip $STAGETARGET"
-cd $STAGETARGET 
+cd $STAGETARGET
 zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*
 mv -f client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ${project.build.directory}

@@ -4,6 +4,7 @@
 
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
+#include <utils/media/sse_helper.h>
 
 #include <transcoding/ffmpeg_transcoder.h>
 #include <transcoding/ffmpeg_video_transcoder.h>

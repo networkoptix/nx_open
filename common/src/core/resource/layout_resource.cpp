@@ -382,3 +382,8 @@ bool QnLayoutResource::isFile() const
 {
     return flags().testFlag(Qn::url) && !getUrl().isEmpty();
 }
+
+bool QnLayoutResource::isGlobal() const
+{
+    return getParentId().isNull();
+}
