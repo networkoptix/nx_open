@@ -30,7 +30,5 @@
 
         <qt.libs>qml quick core gui network</qt.libs>
         <windows.oslibs>Ws2_32.lib</windows.oslibs>
-
-        <rdep.packages>qt</rdep.packages>        
     </properties>    
 </project>

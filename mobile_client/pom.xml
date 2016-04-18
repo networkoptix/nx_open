@@ -21,16 +21,18 @@
 
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
         <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lcommon -lnx_utils -ludt</global.libs>
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
-        <android.oslibs>-lturbojpeg -lopenal</android.oslibs>
+        <android.oslibs>-lturbojpeg</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
         <rdep.packages>openssl ffmpeg</rdep.packages>
-        <rdep.windows.packages>quazip</rdep.windows.packages>
+        <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
+        <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
+        <rdep.ios.packages>libjpeg-turbo</rdep.ios.packages>
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>

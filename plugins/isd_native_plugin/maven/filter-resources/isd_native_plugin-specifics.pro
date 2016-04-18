@@ -6,8 +6,6 @@ win32 {
 
 LIBS -= -lcommon
 
-include( ${libdir}/vmux.pri )
-
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug
   ext_debug2.depends = $(DESTDIR)$(TARGET)

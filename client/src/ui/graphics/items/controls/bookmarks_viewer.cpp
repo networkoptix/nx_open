@@ -570,12 +570,10 @@ private:
     void updateTimestampInternal(qint64 timestamp);
 
 private:
-    typedef QScopedPointer<BookmarkToolTipFrame> BookmarkToolTipFramePtr;
-
     const GetBookmarksFunc m_getBookmarks;
     const GetPosOnTimelineFunc m_getPos;
 
-    BookmarkToolTipFramePtr m_tooltip;
+    QPointer<BookmarkToolTipFrame> m_tooltip;
 
     QnBookmarksViewer * const m_owner;
     HoverFocusProcessor *m_hoverProcessor;
@@ -755,11 +753,28 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
         ? m_bookmarks.mid(0, kMaxBookmarksCount) : m_bookmarks);
 
 
-    if (trimmedBookmarks.empty())
+    if (m_tooltip)
     {
-        m_tooltip.reset();
+        if (m_hoverProcessor)
+            m_hoverProcessor->removeTargetItem(m_tooltip.data());
+
+        /*
+         * This workaround is required (Qt 5.6.0 RC) because of the following crash scenario:
+         *  * Deleting of QnTooltipWidget causes all its children to be deleted (in dtor of QGraphicsItem)
+         *  * Some children are QnProxyLabel's
+         *  * In dtor of QnProxyLabel we calling setWidget(nullptr), that calls unsetCursor() method
+         *  * Here we are seeking the next widget at the current position..
+         *  * .. finding our deleting QnTooltipWidget ..
+         *  * .. checking its boundingRect() ..
+         *  * .. and crashing, as boundingRect() is a virtual function, overridden in the destroyed class.
+         */
+        m_tooltip->setVisible(false);
+
+        delete m_tooltip.data();
     }
-    else
+    m_tooltip.clear();
+
+    if (!trimmedBookmarks.empty())
     {
         // TODO: #ynikitenkov Replace emitBookmarkEventFunc,
         // emitTagEventFunc with Qt::QueuedConnection later
@@ -773,8 +788,8 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
             qApp->postEvent(this, new TagActionEvent(eventId, tag));
         };
 
-        m_tooltip.reset(new BookmarkToolTipFrame(trimmedBookmarks, (bookmarksLeft > 0)
-            , m_colors, emitTagEventFunc, emitBookmarkEventFunc, m_owner));
+        m_tooltip = new BookmarkToolTipFrame(trimmedBookmarks, (bookmarksLeft > 0),
+            m_colors, emitTagEventFunc, emitBookmarkEventFunc, m_owner);
     }
 
     if (m_tooltip)

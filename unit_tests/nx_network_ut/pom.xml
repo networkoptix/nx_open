@@ -25,7 +25,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <rdep.packages>openssl ffmpeg quazip</rdep.packages>
+        <rdep.packages>gtest gmock openssl ffmpeg quazip</rdep.packages>
     </properties>
 
     <dependencies>

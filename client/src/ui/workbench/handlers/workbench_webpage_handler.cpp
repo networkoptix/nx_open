@@ -9,7 +9,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 
-#include <ui/dialogs/generic/input_dialog.h>
+#include <ui/dialogs/common/input_dialog.h>
 
 namespace
 {

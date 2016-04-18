@@ -86,6 +86,9 @@ namespace ec2
             removeUser                  = 502,  /**< ApiIdData */
             getAccessRights             = 503,  /**< ApiAccessRightsDataList */
             setAccessRights             = 504,  /**< ApiAccessRightsDataList */
+            getUserGroups               = 505,  /**< ApiUserGroupDataList */
+            saveUserGroup               = 506,  /**< ApiUserGroupData */
+            removeUserGroup             = 507,  /**< ApiIdData */
 
             /* Layout resource */
             getLayouts                  = 600,  /**< ApiLayoutDataList */

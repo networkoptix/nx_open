@@ -1,5 +1,5 @@
-exists( ${libdir}/libcreateprocess.pri ) {
-  include( ${libdir}/libcreateprocess.pri )
+!android:!ios {
+    QT += zlib-private
 }
 
 mac:!ios {
@@ -18,5 +18,3 @@ mac:!ios {
 }
 
 SOURCES += ${project.build.directory}/app_info_impl.cpp
-SOURCES += ${project.build.directory}/common_app_info_impl.cpp
-SOURCES += ${project.build.directory}/compatibility_info.cpp

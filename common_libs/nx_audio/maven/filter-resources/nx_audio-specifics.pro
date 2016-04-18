@@ -1,10 +1,7 @@
 TEMPLATE = lib
 CONFIG += console
 
-INCLUDEPATH += ${root.dir}/common/src/ \
-               ${qt.dir}/include/QtCore/ \
-               ${qt.dir}/include/QtCore/$$QT_VERSION/ \
-               ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
+INCLUDEPATH += ${root.dir}/common/src
 
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug

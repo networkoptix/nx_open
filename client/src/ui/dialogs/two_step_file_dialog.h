@@ -4,7 +4,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QFileDialog>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui {
     class QnTwoStepFileDialog;

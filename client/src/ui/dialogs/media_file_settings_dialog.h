@@ -3,7 +3,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 

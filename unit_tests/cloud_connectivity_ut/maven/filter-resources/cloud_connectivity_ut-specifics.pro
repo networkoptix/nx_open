@@ -1,9 +1,6 @@
 TEMPLATE = app
 CONFIG += console
 
-include( ${libdir}/gtest.pri )
-include( ${libdir}/gmock.pri )
-
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include
 INCLUDEPATH += ${root.dir}/nx_cloud/
 

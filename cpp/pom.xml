@@ -22,6 +22,7 @@
         <!--<product.title>${project.name}</product.title>      -->
         <postfix.libs/>
         <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
+        <rdep.global.packages>qt boost</rdep.global.packages>
     </properties>
 
     <build>
@@ -100,23 +101,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
-                    <execution>
-                        <id>get-rdep-artifacts</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${init.python.dir}/${python.executable}</executable>
-                            <arguments>
-                                <argument>get_dependencies.py</argument>
-                            </arguments>
-                            <environmentVariables>
-                                <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
-                            </environmentVariables>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>gen-qrc</id>
                         <phase>process-sources</phase>

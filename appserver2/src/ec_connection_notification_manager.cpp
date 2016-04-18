@@ -119,6 +119,7 @@ namespace ec2
         case ApiCommand::removeStorage:
             return m_mediaServerManager->triggerNotification( tran );
         case ApiCommand::removeUser:
+        case ApiCommand::removeUserGroup:
             return m_userManager->triggerNotification( tran );
         case ApiCommand::removeBusinessRule:
             return m_businessEventManager->triggerNotification( tran );
@@ -209,6 +210,10 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiUserData>& tran ) {
         return m_userManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiUserGroupData>& tran) {
+        return m_userManager->triggerNotification(tran);
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiAccessRightsData>& tran)

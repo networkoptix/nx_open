@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QDialog>
 #include <utils/ping_utility.h>
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 
 class QTextEdit;
 

@@ -19,10 +19,9 @@ namespace ec2
 {
     class LicenseManagerImpl;
 
-    enum ApiOjectType
+    enum ApiObjectType
     {
         ApiObject_NotDefined,
-        ApiObject_Resource,
         ApiObject_Server,
         ApiObject_Camera,
         ApiObject_User,
@@ -31,14 +30,13 @@ namespace ec2
         ApiObject_BusinessRule,
         ApiObject_Storage,
         ApiObject_WebPage,
-        ApiObject_Dummy
     };
     struct ApiObjectInfo
     {
         ApiObjectInfo() {}
-        ApiObjectInfo(const ApiOjectType& type, const QnUuid& id): type(type), id(id) {}
+        ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
 
-        ApiOjectType type;
+        ApiObjectType type;
         QnUuid id;
     };
     class ApiObjectInfoList: public std::vector<ApiObjectInfo>
@@ -140,7 +138,7 @@ namespace ec2
 		// --------- misc -----------------------------
         QnUuid getID() const;
 
-        ApiOjectType getObjectType(const QnUuid& objectId)
+        ApiObjectType getObjectType(const QnUuid& objectId)
         {
             QnWriteLocker lock( &m_mutex );
             return getObjectTypeNoLock( objectId );
@@ -148,9 +146,9 @@ namespace ec2
         /*!
             \note This overload should be called within transaction
         */
-        ApiOjectType getObjectTypeNoLock(const QnUuid& objectId);
+        ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
         ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
-        ApiObjectInfoList getObjectsNoLock(const ApiOjectType& objectType);
+        ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
         bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
@@ -226,6 +224,9 @@ namespace ec2
         //getUserList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
+        //getUserGroupList
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& groupList);
+
         //getAccessRights
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
@@ -281,6 +282,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
             NX_ASSERT(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
@@ -482,6 +484,8 @@ namespace ec2
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
+        ErrorCode insertOrReplaceUserGroup(const ApiUserGroupData& data);
+        ErrorCode removeUserGroup( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);

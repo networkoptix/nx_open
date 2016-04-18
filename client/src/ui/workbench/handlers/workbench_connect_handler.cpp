@@ -39,7 +39,7 @@
 
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/reconnect_info_dialog.h>
-#include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/opengl/gl_functions.h>
@@ -67,8 +67,6 @@
 #include <utils/reconnect_helper.h>
 
 #include <nx/utils/log/log.h>
-
-#include "compatibility.h"
 
 namespace
 {
@@ -325,12 +323,6 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     QnEc2ConnectionRequestResult result;
     ec2::ErrorCode errCode = ec2::ErrorCode::ok;
 
-#ifdef QN_DEMO_SHOW
-    /* We surely must not compile client without this define for now */
-    int retryCount = appServerUrl.port() > 0 ? 1 : 50;
-#endif
-
-    for (int i = 0; i < retryCount; ++i)
     {
         m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
             appServerUrl, clientData, &result, &QnEc2ConnectionRequestResult::processEc2Reply);
@@ -341,17 +333,12 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         errCode = static_cast<ec2::ErrorCode>(result.exec());
         NX_LOG(lit("Connection error %1").arg((int)errCode), cl_logDEBUG2);
 
+        /* Hiding message box from current connect. */
+        hideMessageBox();
+
         /* Check if we have entered 'connect' method again while were in 'connecting...' state */
         if (m_connectingHandle != result.handle())
             return ec2::ErrorCode::ok;
-
-        if (errCode == ec2::ErrorCode::ok)
-            break;
-
-        QThread::msleep(500);
-
-        /* Hiding message box from current connect. */
-        hideMessageBox();
     }
     m_connectingHandle = 0;
 
@@ -458,7 +445,8 @@ void QnWorkbenchConnectHandler::showWelcomeScreen() {
 }
 
 
-void QnWorkbenchConnectHandler::clearConnection() {
+void QnWorkbenchConnectHandler::clearConnection()
+{
     context()->instance<QnWorkbenchStateManager>()->tryClose(true);
 
     /* Get ready for the next connection. */
@@ -468,14 +456,23 @@ void QnWorkbenchConnectHandler::clearConnection() {
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+    QnResourceList resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);
+
+    /* Also remove layouts that were just added and have no 'remote' flag set. */
+    foreach (const QnLayoutResourcePtr& layout, resourcePool()->getResources<QnLayoutResource>())
+    {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = layout->isFile();
+        if (!(isLocal && isFile))  //do not remove exported layouts
+            resourcesToRemove.push_back(layout);
+    }
 
     QVector<QnUuid> idList;
-    idList.reserve(remoteResources.size());
-    foreach(const QnResourcePtr& res, remoteResources)
+    idList.reserve(resourcesToRemove.size());
+    foreach(const QnResourcePtr& res, resourcesToRemove)
         idList.push_back(res->getId());
 
-    resourcePool()->removeResources(remoteResources);
+    resourcePool()->removeResources(resourcesToRemove);
     resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     QnCameraUserAttributePool::instance()->clear();
@@ -483,15 +480,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
 
     propertyDictionary->clear(idList);
     qnStatusDictionary->clear(idList);
-
-    /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
-        bool isLocal = snapshotManager()->isLocal(layout);
-        bool isFile = layout->isFile();
-        if(isLocal && isFile)  //do not remove exported layouts
-            continue;
-        resourcePool()->removeResource(layout);
-    }
 
     qnLicensePool->reset();
     qnCommon->setLocalSystemName(QString());

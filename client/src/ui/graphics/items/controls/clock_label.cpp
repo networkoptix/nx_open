@@ -5,6 +5,7 @@
 #include <client/client_settings.h>
 
 #include <ui/common/palette.h>
+#include <ui/style/nx_style.h>
 #include <utils/common/synctime.h>
 
 
@@ -74,38 +75,37 @@ QnClockLabel::QnClockLabel(const QString &format, QGraphicsItem *parent):
     init(format);
 }
 
-QnClockLabel::~QnClockLabel() {
-    return;
+QnClockLabel::~QnClockLabel()
+{
 }
 
-void QnClockLabel::init(const QString &format) {
+void QnClockLabel::init(const QString &format)
+{
     QFont font;
-    font.setPixelSize(30);
+    font.setPixelSize(18);
+    font.setWeight(QFont::DemiBold);
     setFont(font);
 
-    setPaletteColor(this, QPalette::WindowText, QColor(64, 130, 180, 128));
-
     m_provider = new QnClockDataProvider(format, this);
-    connect( m_provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText );
+    connect(m_provider, &QnClockDataProvider::timeChanged, this, &GraphicsLabel::setText);
 
-
-    m_serverTimeAction = new QAction( tr( "Server Time" ), this );
-    addAction( m_serverTimeAction );
-    m_localTimeAction = new QAction( tr( "Local System Time" ), this );
-    addAction( m_localTimeAction );
+    m_serverTimeAction = new QAction(tr("Server Time"), this);
+    addAction(m_serverTimeAction);
+    m_localTimeAction = new QAction(tr("Local System Time"), this);
+    addAction(m_localTimeAction);
 }
 
-void QnClockLabel::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
+void QnClockLabel::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
 #ifdef _DEBUG
     //displaying clock type selection menu
     QMenu menu;
-    menu.addActions( actions() );
-    QAction* selectedAction = menu.exec( event->screenPos() );
-    if( selectedAction == m_serverTimeAction )
-        m_provider->setClockType( QnClockDataProvider::serverClock );
-    else if( selectedAction == m_localTimeAction )
-        m_provider->setClockType( QnClockDataProvider::localSystemClock );
+    menu.addActions(actions());
+    QAction* selectedAction = menu.exec(event->screenPos());
+    if (selectedAction == m_serverTimeAction)
+        m_provider->setClockType(QnClockDataProvider::serverClock);
+    else if(selectedAction == m_localTimeAction)
+        m_provider->setClockType(QnClockDataProvider::localSystemClock);
 #else
     base_type::contextMenuEvent( event );
 #endif
