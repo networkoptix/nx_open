@@ -39,6 +39,12 @@ var AlertSuite = function () {
     }
 
     function closeAlert(){
+        self.alert.click();
+        browser.sleep(300);
+        expect(self.alert.isPresent()).toBe(false);
+    }
+
+    function closeAlertByButton(){
         self.alertCloseButton.click();
         browser.sleep(500);
 
@@ -69,7 +75,7 @@ var AlertSuite = function () {
             callAlert().then(function(){
                 waitAlert();
                 checkAlertContent(message, type);
-                //closeAlert();
+                closeAlert();
                 finishAlertCheck();
             });
         });
@@ -88,7 +94,7 @@ var AlertSuite = function () {
                 callAlert().then(function(){
                     waitAlert();
                     checkAlertTimeout(false);
-                    closeAlert();
+                    closeAlertByButton();
                     finishAlertCheck();
                 });
             });
