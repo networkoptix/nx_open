@@ -26,15 +26,16 @@
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
 
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lappserver2 -lonvif -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
+        <qt.libs>core core-private network xml xmlpatterns sql concurrent multimedia zlib-private</qt.libs>
+        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>server-external openssl ffmpeg quazip sigar</rdep.packages>
+        <rdep.packages>server-external openssl ffmpeg onvif quazip sigar qtsinglecoreapplication qtservice</rdep.packages>
+        <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
 
     <dependencies>
@@ -212,6 +213,7 @@
             </activation>
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
+                <rdep.linux.arm.packages>openldap libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>
         <profile>

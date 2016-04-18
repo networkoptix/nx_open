@@ -1,16 +1,8 @@
 TEMPLATE = app
 
 INCLUDEPATH += \
-    ${root.dir}/appserver2/src/ \
-    ${root.dir}/client.core/src/ \
-	${qt.dir}/include/QtMultimedia/ \
-    ${qt.dir}/include/QtMultimedia/$$QT_VERSION/ \
-    ${qt.dir}/include/QtMultimedia/$$QT_VERSION/QtMultimedia/ \
-	${qt.dir}/include/QtGui/ \
-    ${qt.dir}/include/QtGui/$$QT_VERSION/ \
-    ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
-
-
+    ${root.dir}/appserver2/src \
+    ${root.dir}/client.core/src \
 
 unix: !ios {
     LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"

@@ -12,9 +12,11 @@ static const int MSEC_PER_SEC = 1000;
 
 QnUserResource::QnUserResource():
     m_permissions(0),
+    m_userGroup(),
     m_isOwner(false),
 	m_isLdap(false),
 	m_isEnabled(true),
+    m_isCloud(false),
     m_passwordExpirationTimestamp(0)
 {
     addFlags(Qn::user | Qn::remote);
@@ -30,9 +32,11 @@ QnUserResource::QnUserResource(const QnUserResource& right)
     m_cryptSha512Hash(right.m_cryptSha512Hash),
     m_realm(right.m_realm),
     m_permissions(right.m_permissions),
+    m_userGroup(right.m_userGroup),
     m_isOwner(right.m_isOwner),
     m_isLdap(right.m_isLdap),
     m_isEnabled(right.m_isEnabled),
+    m_isCloud(right.m_isCloud),
     m_email(right.m_email),
     m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
 {
@@ -72,8 +76,12 @@ void QnUserResource::setPassword(const QString& password)
     emit passwordChanged(::toSharedPointer(this));
 }
 
-void QnUserResource::generateHash() {
+void QnUserResource::generateHash()
+{
     QString password = getPassword();
+    NX_ASSERT(!password.isEmpty(), Q_FUNC_INFO, "Invalid password");
+    if (password.isEmpty())
+        return;
 
     QByteArray salt = QByteArray::number(rand(), 16);
     QCryptographicHash md5(QCryptographicHash::Md5);
@@ -95,7 +103,8 @@ void QnUserResource::generateHash() {
     setCryptSha512Hash( linuxCryptSha512( password.toUtf8(), generateSalt( LINUX_CRYPT_SALT_LENGTH ) ) );
 }
 
-bool QnUserResource::checkPassword(const QString &password) {
+bool QnUserResource::checkPassword(const QString &password)
+{
     QnMutexLocker locker( &m_mutex );
 
     if( !m_digest.isEmpty() )
@@ -204,6 +213,23 @@ void QnUserResource::setOwner(bool isOwner)
     emit permissionsChanged(::toSharedPointer(this));
 }
 
+QnUuid QnUserResource::userGroup() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_userGroup;
+}
+
+void QnUserResource::setUserGroup(const QnUuid& group)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_userGroup == group)
+            return;
+        m_userGroup = group;
+    }
+    emit userGroupChanged(::toSharedPointer(this));
+}
+
 bool QnUserResource::isLdap() const
 {
     QnMutexLocker locker(&m_mutex);
@@ -212,11 +238,12 @@ bool QnUserResource::isLdap() const
 
 void QnUserResource::setLdap(bool isLdap)
 {
-    QnMutexLocker locker(&m_mutex);
-    if (m_isLdap == isLdap)
-        return;
-    m_isLdap = isLdap;
-
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_isLdap == isLdap)
+            return;
+        m_isLdap = isLdap;
+    }
     emit ldapChanged(::toSharedPointer(this));
 }
 
@@ -228,11 +255,29 @@ bool QnUserResource::isEnabled() const
 
 void QnUserResource::setEnabled(bool isEnabled)
 {
-    QnMutexLocker locker(&m_mutex);
-    if (m_isEnabled == isEnabled)
-        return;
-    m_isEnabled = isEnabled;
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_isEnabled == isEnabled)
+            return;
+        m_isEnabled = isEnabled;
+    }
     emit enabledChanged(::toSharedPointer(this));
+}
+
+bool QnUserResource::isCloud() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_isCloud;
+}
+
+void QnUserResource::setCloud(bool value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_isCloud == value)
+            return;
+        m_isCloud = value;
+    }
 }
 
 QString QnUserResource::getEmail() const
@@ -258,22 +303,26 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
-        if (m_password != localOther->m_password) {
+        if (m_password != localOther->m_password)
+        {
             m_password = localOther->m_password;
             modifiedFields << "passwordChanged";
         }
 
-        if (m_hash != localOther->m_hash) {
+        if (m_hash != localOther->m_hash)
+        {
             m_hash = localOther->m_hash;
             modifiedFields << "hashChanged";
         }
 
-        if (m_digest != localOther->m_digest) {
+        if (m_digest != localOther->m_digest)
+        {
             m_digest = localOther->m_digest;
             modifiedFields << "digestChanged";
         }
 
-        if (m_cryptSha512Hash != localOther->m_cryptSha512Hash ) {
+        if (m_cryptSha512Hash != localOther->m_cryptSha512Hash )
+        {
             m_cryptSha512Hash = localOther->m_cryptSha512Hash;
             modifiedFields << "cryptSha512HashChanged";
         }
@@ -284,30 +333,46 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             modifiedFields << "permissionsChanged";
         }
 
+        if (m_userGroup != localOther->m_userGroup)
+        {
+            m_userGroup = localOther->m_userGroup;
+            modifiedFields << "userGroupChanged";
+        }
+
         if (m_isOwner != localOther->m_isOwner)
         {
             m_isOwner = localOther->m_isOwner;
             modifiedFields << "permissionsChanged";
         }
 
-        if (m_email != localOther->m_email) {
+        if (m_email != localOther->m_email)
+        {
             m_email = localOther->m_email;
             modifiedFields << "emailChanged";
         }
 
-		if (m_realm != localOther->m_realm) {
+		if (m_realm != localOther->m_realm)
+        {
             m_realm = localOther->m_realm;
             modifiedFields << "realmChanged";
         }
 
-        if (m_isEnabled != localOther->m_isEnabled) {
+        if (m_isEnabled != localOther->m_isEnabled)
+        {
             m_isEnabled = localOther->m_isEnabled;
             modifiedFields << "enabledChanged";
         }
 
-        if (m_isLdap != localOther->m_isLdap) {
+        if (m_isLdap != localOther->m_isLdap)
+        {
             m_isLdap = localOther->m_isLdap;
             modifiedFields << "ldapChanged";
+        }
+
+        if (m_isCloud != localOther->m_isCloud)
+        {
+            m_isCloud = localOther->isCloud();
+            NX_ASSERT(false, Q_FUNC_INFO, "This property was designed to be read-only");
         }
     }
 }

@@ -4,6 +4,8 @@
 
 struct QnAppInfo
 {
+    static int ec2ProtoVersion();
+
     static QString organizationName();
     static QString linuxOrganizationName();
     static QString realm();

@@ -37,7 +37,8 @@ void QnProxyLabel::init() {
     setCacheMode(ItemCoordinateCache);
 }
 
-QnProxyLabel::~QnProxyLabel() {
+QnProxyLabel::~QnProxyLabel()
+{
     setWidget(NULL); /* Note that without this call we get stack overflow. */
 }
 
@@ -176,7 +177,7 @@ int QnProxyLabel::selectionStart() const {
 
 bool QnProxyLabel::eventFilter(QObject *object, QEvent *event) {
     if(object == widget()) {
-        // TODO: #Elric we can do without stopping show/hide state propagation. 
+        // TODO: #Elric we can do without stopping show/hide state propagation.
         // Just need to filter all close events that were caused by visibility changes.
         if(event->type() == QEvent::Show || event->type() == QEvent::Hide)
             return QGraphicsWidget::eventFilter(object, event); /* Skip QGraphicsProxyWidget's implementation. */
@@ -186,7 +187,7 @@ bool QnProxyLabel::eventFilter(QObject *object, QEvent *event) {
             return true;
         }
     }
-    
+
     return base_type::eventFilter(object, event);
 }
 

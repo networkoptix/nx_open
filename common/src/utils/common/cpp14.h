@@ -9,6 +9,8 @@
 #include <atomic>
 #include <memory>
 
+#ifndef __clang__
+
 #ifdef __GNUC__
 #include <features.h>
 #endif
@@ -62,5 +64,7 @@ std::unique_ptr<ResultType, std::default_delete<ResultType>>
     return std::unique_ptr<ResultType>(
         static_cast<ResultType*>(sourcePtr.release()));
 }
+
+#endif // __clang__
 
 #endif  //libcommon_cpp14_h

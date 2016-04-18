@@ -8,6 +8,8 @@
 
 #include <QtCore/QStringList>
 
+#include <nx/utils/log/assert.h>
+
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 

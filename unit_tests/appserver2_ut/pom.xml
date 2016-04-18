@@ -28,7 +28,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>gtest openssl quazip</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

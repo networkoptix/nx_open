@@ -5,7 +5,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialogButtonBox>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui {
     class ConnectionNameDialog;

@@ -5,9 +5,6 @@ INCLUDEPATH += ${root.dir}/nx_cloud/libcloud_db/src
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 INCLUDEPATH += ${root.dir}/nx_cloud/
 
-include( ${libdir}/gtest.pri )
-include( ${libdir}/gmock.pri )
-
 !win32 {
   ext_debug2.target  = $(TARGET).debug
   ext_debug2.depends = $(TARGET)

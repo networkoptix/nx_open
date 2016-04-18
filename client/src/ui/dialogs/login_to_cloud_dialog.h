@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 
 namespace Ui
 {

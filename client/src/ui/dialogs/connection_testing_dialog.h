@@ -7,7 +7,7 @@
 #include <api/model/connection_info.h>
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/help/help_topics.h>
 
 

@@ -1,6 +1,6 @@
 #include "sound.h"
 
-#ifdef Q_OS_MACX
+#ifdef Q_OS_MAC
 #include <openal/al.h>
 #include <openal/alc.h>
 #else

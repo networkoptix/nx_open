@@ -94,7 +94,7 @@ angular.module('webadminApp')
                             $scope.settings.cloudEmail).then(successHandler,errorHandler);
                     }, cloudErrorHandler);
             }else{
-                cloudAPI.disconnect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+                cloudAPI.disconnect( cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                     function(){
                         //2. Save settings to local server
                         mediaserver.clearCloudSystemCredentials().then(successHandler,errorHandler);

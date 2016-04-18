@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', function ($scope, mediaserver, ipCookie,$sessionStorage,dialogs) {
+    .controller('LoginCtrl', function ($scope, mediaserver,$sessionStorage,dialogs) {
 
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication

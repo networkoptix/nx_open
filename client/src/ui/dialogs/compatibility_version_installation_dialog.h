@@ -11,7 +11,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/connective.h>
 #include <update/updates_common.h>
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 
 class QnCompatibilityVersionInstallationTool;
 class QnMediaServerUpdateTool;

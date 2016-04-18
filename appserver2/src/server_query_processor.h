@@ -306,7 +306,7 @@ namespace ec2
         template<class HandlerType>
         void removeResourceAsync(
             QnTransaction<ApiIdData>& tran,
-            ApiOjectType resourceType,
+            ApiObjectType resourceType,
             HandlerType handler )
         {
             using namespace std::placeholders;
@@ -318,7 +318,7 @@ namespace ec2
 
         ErrorCode removeResourceSync(
             QnTransaction<ApiIdData>& tran,
-            ApiOjectType resourceType,
+            ApiObjectType resourceType,
             std::list<std::function<void()>>* const transactionsToSend )
         {
             ErrorCode errorCode = ErrorCode::ok;

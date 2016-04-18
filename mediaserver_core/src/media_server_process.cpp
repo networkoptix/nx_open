@@ -200,7 +200,6 @@
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
-#include "compatibility.h"
 #include "streaming/hls/hls_session_pool.h"
 #include "streaming/hls/hls_server.h"
 #include "streaming/streaming_chunk_transcoder.h"
@@ -2022,16 +2021,7 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker* compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size())
-        compatibilityChecker = &remoteChecker;
-    else
-        compatibilityChecker = &localChecker;
-
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qnCommon->engineVersion(), "ECS", connectInfo.version))
+    if (connectInfo.nxClusterProtoVersion != QnAppInfo::ec2ProtoVersion())
     {
         NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
         return;

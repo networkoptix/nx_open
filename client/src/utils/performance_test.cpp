@@ -13,8 +13,6 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <ui/dialogs/message_box.h>
-
 #ifdef Q_OS_LINUX
 #include <X11/X.h>
 #include <X11/Xlib.h>

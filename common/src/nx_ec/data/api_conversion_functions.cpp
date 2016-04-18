@@ -694,6 +694,8 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
 	dst->setEnabled(src.isEnabled);
     dst->setEmail(src.email);
     dst->setHash(src.hash);
+    dst->setUserGroup(src.groupId);
+    dst->setCloud(src.isCloud);
 
     dst->setPermissions(src.permissions);
     dst->setDigest(src.digest);
@@ -712,6 +714,8 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
     dst.realm = src->getRealm();
+    dst.isCloud = src->isCloud();
+    dst.groupId = src->userGroup();
 }
 
 template<class List>

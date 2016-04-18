@@ -24,6 +24,7 @@
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_camera_history_data.h"
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx_ec/data/api_user_group_data.h>
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -684,6 +685,14 @@ namespace ec2
          */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
 
+        /**%apidoc GET /ec2/getUserGroups
+        * Return user groups registered in the system.
+        * %param[default] format
+        * %return Return object in requested format
+        * %// AbstractUserManager::getUserGroups
+        */
+        registerGetFuncHandler<std::nullptr_t, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
+
         /**%apidoc GET /ec2/getAccessRights
         * Return list of accessible resources ids for each user in the system.
         * %param[default] format
@@ -732,6 +741,9 @@ namespace ec2
          *     %value GlobalEditCamerasPermission Can edit camera settings.
          *     %value GlobalPtzControlPermission Can change camera's PTZ state.
          *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+         *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
+         *     %value GlobalAccessAllServersPermission Has access to all servers
          * %param email User's email.
          * %param digest HA1 digest hash from user password, as per RFC 2069. When modifying an
          *     existing user, supply empty string. When creating a new user, calculate the value
@@ -765,6 +777,44 @@ namespace ec2
          * %// AbstractUserManager::remove
          */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUser);
+
+
+        /**%apidoc POST /ec2/saveUserGroup
+        * <p>
+        * Parameters should be passed as a JSON object in POST message body with
+        * content type "application/json". Example of such object can be seen in
+        * the result of the corresponding GET function.
+        * </p>
+        * %param id Group unique id. Should be generated when creating a new group.
+        * %param name Group name.
+        * %param permissions Combination (via "|") of the following flags:
+        *     %value GlobalEditLayoutsPermission Can create and edit layouts.
+        *     %value GlobalEditUsersPermission Can create and edit users.
+        *     %value GlobalEditServersPermissions Can edit server settings.
+        *     %value GlobalViewLivePermission Can view live stream of available cameras.
+        *     %value GlobalViewArchivePermission Can view archives of available cameras.
+        *     %value GlobalExportPermission Can export archives of available cameras.
+        *     %value GlobalEditCamerasPermission Can edit camera settings.
+        *     %value GlobalPtzControlPermission Can change camera's PTZ state.
+        *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+        *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+        *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
+        *     %value GlobalAccessAllServersPermission Has access to all servers
+        * %// AbstractUserManager::saveGroup
+        */
+        registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
+
+        /**%apidoc POST /ec2/removeUserGroup
+        * Delete the specified user group.
+        * <p>
+        * Parameters should be passed as a JSON object in POST message body with
+        * content type "application/json". Example of such object can be seen in
+        * the result of the corresponding GET function.
+        * </p>
+        * %param id User unique id.
+        * %// AbstractUserManager::removeUserGroup
+        */
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
 
         /**%apidoc GET /ec2/getVideowalls
          * Return list of video walls

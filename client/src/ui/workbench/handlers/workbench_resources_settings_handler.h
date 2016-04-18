@@ -4,6 +4,7 @@
 
 class QnCameraSettingsDialog;
 class QnServerSettingsDialog;
+class QnUserSettingsDialog;
 
 class QnWorkbenchResourcesSettingsHandler: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -16,9 +17,11 @@ public:
 private:
     void at_cameraSettingsAction_triggered();
     void at_serverSettingsAction_triggered();
+    void at_newUserAction_triggered();
+    void at_userSettingsAction_triggered();
 
 private:
     QPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
     QPointer<QnServerSettingsDialog> m_serverSettingsDialog;
-
+    QPointer<QnUserSettingsDialog> m_userSettingsDialog;
 };

@@ -1,19 +1,9 @@
-INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/ \
-                ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
-                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
-                ${qt.dir}/include/QtGui/ \
-                ${qt.dir}/include/QtGui/$$QT_VERSION/ \
-                ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
-                ${root.dir}/appserver2/src/ \
-                ${root.dir}/client.core/src/ \
-                ${root.dir}/nx_cloud/cloud_db_client/src/include/
-
-include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsingleapplication.pri)
+INCLUDEPATH +=  ${root.dir}/appserver2/src \
+                ${root.dir}/client.core/src \
+                ${root.dir}/nx_cloud/cloud_db_client/src/include
 
 mac {
-    INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ \
-                   ${qt.dir}/lib/QtGui.framework/Headers/$$QT_VERSION/QtGui \
-                   ${qt.dir}/lib/QtWidgets.framework/Headers/$$QT_VERSION/QtWidgets
+    INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers
 }
 
 unix: !mac {

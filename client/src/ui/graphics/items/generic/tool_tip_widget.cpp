@@ -62,7 +62,7 @@ namespace  {
             path->lineTo(x, y);
             return;
         }
-        
+
         int angle;
         if(pos0.x() < pos1.x()) {
             if(pos0.y() < pos1.y()) {
@@ -95,8 +95,8 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFl
     m_autoSize(true)
 {}
 
-QnToolTipWidget::~QnToolTipWidget() {
-    return;
+QnToolTipWidget::~QnToolTipWidget()
+{
 }
 
 QPointF QnToolTipWidget::tailPos() const {
@@ -107,7 +107,7 @@ Qn::Border QnToolTipWidget::tailBorder() const {
     QPointF distance = m_tailPos - QnGeometry::closestPoint(rect(), m_tailPos);
     if(qFuzzyIsNull(distance))
         return Qn::NoBorders;
-    
+
     if(distance.y() < distance.x()) {
         if(distance.y() < -distance.x()) {
             return Qn::TopBorder;
@@ -129,7 +129,7 @@ void QnToolTipWidget::setTailPos(const QPointF &tailPos) {
 
     m_tailPos = tailPos;
 
-    /* Note that changing tailPos position affects bounding rect, 
+    /* Note that changing tailPos position affects bounding rect,
      * but not the actual widget's geometry. */
     prepareGeometryChange();
     invalidateShape();
@@ -198,9 +198,9 @@ void QnToolTipWidget::setAutoSize(bool autoSize) {
     m_autoSize = autoSize;
 }
 
-QRectF QnToolTipWidget::boundingRect() const {
+QRectF QnToolTipWidget::boundingRect() const
+{
     ensureShape();
-
     return m_boundingRect;
 }
 

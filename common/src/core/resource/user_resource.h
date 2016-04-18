@@ -42,14 +42,21 @@ public:
     bool isOwner() const;
     void setOwner(bool isOwner);
 
+    QnUuid userGroup() const;
+    void setUserGroup(const QnUuid& group);
+
     bool isLdap() const;
     void setLdap(bool isLdap);
 
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
 
+    bool isCloud() const;
+    void setCloud(bool value);
+
     QString getEmail() const;
     void setEmail(const QString &email);
+
     virtual Qn::ResourceStatus getStatus() const override;
 
     //!Millis since epoch (1970-01-01, UTC)
@@ -65,6 +72,7 @@ signals:
     void digestChanged(const QnResourcePtr &resource);
     void cryptSha512HashChanged(const QnResourcePtr &resource);
     void permissionsChanged(const QnResourcePtr &user);
+    void userGroupChanged(const QnResourcePtr &user);
     void emailChanged(const QnResourcePtr &user);
 	void realmChanged(const QnResourcePtr &user);
     void enabledChanged(const QnResourcePtr &user);
@@ -80,9 +88,11 @@ private:
     QByteArray m_cryptSha512Hash;
     QString m_realm;
     Qn::GlobalPermissions m_permissions;
+    QnUuid m_userGroup;
     bool m_isOwner;
     bool m_isLdap;
     bool m_isEnabled;
+    bool m_isCloud;
     QString m_email;
     qint64 m_passwordExpirationTimestamp;
 };

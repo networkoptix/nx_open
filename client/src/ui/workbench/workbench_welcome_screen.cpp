@@ -19,7 +19,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
-#include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
 
 namespace
