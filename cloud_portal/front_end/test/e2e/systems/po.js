@@ -14,7 +14,7 @@ var SystemsListPage = function () {
         return ancestor.element(by.buttonText('Open in Nx Witness'));
     };
     this.systemOwner = function(ancestor) {
-        return ancestor.element(by.css('.system-owner'));
+        return ancestor.element(by.css('.user-name'));
     };
 };
 
