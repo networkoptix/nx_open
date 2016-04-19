@@ -222,6 +222,9 @@ void UPNPDeviceSearcher::onSomeBytesRead(
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QnMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return;
+
             //removing socket from m_socketList
             for( map<QString, SocketReadCtx>::iterator
                 it = m_socketList.begin();
