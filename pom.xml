@@ -161,6 +161,7 @@
         <vmux.version>1.0.0</vmux.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
+        <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
         <global.libs/>
