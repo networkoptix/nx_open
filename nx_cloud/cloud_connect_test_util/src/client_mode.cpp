@@ -83,21 +83,20 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     else
     {
         // it's likelly a system id, so resolve it
-        typedef nx::network::cloud::AddressResolver::TypedAddress TypedAddress;
         std::promise<void> promise;
         nx::network::SocketGlobals::addressResolver().resolveDomain(
             std::move(targetAddress.address),
-            [&targetAddress, &targetList, &promise](std::vector<
-                nx::network::cloud::AddressResolver::TypedAddress> list)
-        {
-            for (auto& address : list)
+            [&targetAddress, &targetList, &promise](
+                std::vector<nx::network::cloud::TypedAddress> list)
             {
-                SocketAddress a(std::move(address.first), targetAddress.port);
-                targetList.push_back(std::move(a));
-            }
+                for (auto& it : list)
+                {
+                    targetList.push_back(SocketAddress(
+                        std::move(it.address), targetAddress.port));
+                }
 
-            promise.set_value();
-        });
+                promise.set_value();
+            });
 
         promise.get_future().wait();
     }
@@ -107,7 +106,7 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
 
     const uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
     nx::network::test::ConnectionsGenerator connectionsGenerator(
-        SocketAddress(target),
+        std::move(targetList),
         maxConcurrentConnections,
         trafficLimitType,
         trafficLimitBytes != 0 ? trafficLimitBytes : kDefaultBytesToReceive,
