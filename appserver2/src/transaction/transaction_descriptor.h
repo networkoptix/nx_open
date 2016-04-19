@@ -6,6 +6,7 @@
 #include <utility>
 #include <tuple>
 #include <type_traits>
+#include <cstring>
 
 #include "transaction.h"
 #include "nx_ec/data/api_connection_data.h"
@@ -283,7 +284,7 @@ constexpr auto getTransactionDescriptorsByTransactionParamsImpl(const std::tuple
 
 /* Visit TransactionDescriptor with specified ApiCommand::Value tag in runtime implementation*/
 template<int I, typename F>
-struct DescriptorsVisitor
+struct DescriptorsByValueVisitor
 {
     template<typename... Args>
     static void apply(ApiCommand::Value value, F f, const std::tuple<Args...> &tuple)
@@ -296,13 +297,13 @@ struct DescriptorsVisitor
         }
         else
         {
-            DescriptorsVisitor<I - 1, F>::apply(value, f, tuple);
+            DescriptorsByValueVisitor<I - 1, F>::apply(value, f, tuple);
         }
     }
 };
 
 template<typename F>
-struct DescriptorsVisitor<-1, F>
+struct DescriptorsByValueVisitor<-1, F>
 {
     template<typename... Args>
     static void apply(ApiCommand::Value, F, const std::tuple<Args...> &)
@@ -314,7 +315,43 @@ struct DescriptorsVisitor<-1, F>
 template<typename F, typename... Args>
 void visitIfValueImpl(ApiCommand::Value value, F f, const std::tuple<Args...> &tuple)
 {
-    DescriptorsVisitor<(int)sizeof...(Args) - 1, F>::apply(value, f, tuple);
+    DescriptorsByValueVisitor<(int)sizeof...(Args) - 1, F>::apply(value, f, tuple);
+}
+
+/* Visit TransactionDescriptor with specified ApiCommand::Value tag in runtime implementation*/
+template<int I, typename F>
+struct DescriptorsByNameVisitor
+{
+    template<typename... Args>
+    static void apply(const char *name, F f, const std::tuple<Args...> &tuple)
+    {
+        const auto &cur = std::get<I>(tuple);
+        if (std::strcmp(cur.name, name) == 0)
+        {
+            f(cur);
+            return;
+        }
+        else
+        {
+            DescriptorsByNameVisitor<I - 1, F>::apply(name, f, tuple);
+        }
+    }
+};
+
+template<typename F>
+struct DescriptorsByNameVisitor<-1, F>
+{
+    template<typename... Args>
+    static void apply(const char *, F, const std::tuple<Args...> &)
+    {
+        NX_ASSERT(0, "Unknown ApiCommand value");
+    }
+};
+
+template<typename F, typename... Args>
+void visitIfNameImpl(const char *name, F f, const std::tuple<Args...> &tuple)
+{
+    DescriptorsByNameVisitor<(int)sizeof...(Args) - 1, F>::apply(name, f, tuple);
 }
 
 } // namespace detail
@@ -347,6 +384,18 @@ template<typename F, typename... Args>
 void visitTransactionDescriptorIfValue(ApiCommand::Value value, F f, const std::tuple<Args...> &tuple)
 {
     return detail::visitIfValueImpl(value, f, tuple);
+}
+
+template<typename F, typename... Args>
+void visitTransactionDescriptorIfName(const char *name, F f)
+{
+    return detail::visitIfNameImpl(name, f, detail::transactionDescriptors);
+}
+
+template<typename F, typename... Args>
+void visitTransactionDescriptorIfName(const char *name, F f, const std::tuple<Args...> &tuple)
+{
+    return detail::visitIfNameImpl(name, f, tuple);
 }
 
 } //namespace ec2
