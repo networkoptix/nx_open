@@ -95,9 +95,9 @@ namespace aio
 
 
     //////////////////////////////////////////////////////////
-    // ConstIteratorImpl
+    // ConstIteratorImplOld
     //////////////////////////////////////////////////////////
-    class ConstIteratorImpl
+    class ConstIteratorImplOld
     {
     public:
         int currentIndex;
@@ -105,7 +105,7 @@ namespace aio
         aio::EventType triggeredEvent;
         aio::EventType handlerToUse;
 
-        ConstIteratorImpl()
+        ConstIteratorImplOld()
         :
             currentIndex( 0 ),
             pollSetImpl( NULL ),
@@ -195,13 +195,13 @@ namespace aio
     //////////////////////////////////////////////////////////
     PollSet::const_iterator::const_iterator()
     :
-        m_impl( new ConstIteratorImpl() )
+        m_impl( new ConstIteratorImplOld() )
     {
     }
 
     PollSet::const_iterator::const_iterator( const const_iterator& right )
     :
-        m_impl( new ConstIteratorImpl( *right.m_impl ) )
+        m_impl( new ConstIteratorImplOld( *right.m_impl ) )
     {
     }
 
