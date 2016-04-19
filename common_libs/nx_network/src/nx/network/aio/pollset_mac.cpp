@@ -4,7 +4,7 @@
 * PollSet class implementation for macosx/freebsd
 ***********************************************************/
 
-#if 0
+#if 1
 #if defined(__APPLE__) || defined(__FreeBSD__)
 
 #include "pollset.h"
