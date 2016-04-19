@@ -19,6 +19,9 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    virtual void pressedNotify(QGraphicsSceneMouseEvent *event) override;
+    virtual void releasedNotify(QGraphicsSceneMouseEvent *event) override;
+
 private:
     QScopedPointer<QnTwoWayAudioWidgetPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(QnTwoWayAudioWidget)

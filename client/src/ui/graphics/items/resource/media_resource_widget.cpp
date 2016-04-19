@@ -233,13 +233,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
         addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
 
-        static int i = 0;
         auto updateContentsMargins = [this]()
         {
-            i++;
             auto positionOverlayGeometry = overlayWidgets().positionOverlay->contentSize();
             auto margins = m_compositeTextOverlay->contentsMargins();
-            qDebug() << i << "positionOverlayGeometry" << positionOverlayGeometry;
             margins.setBottom(positionOverlayGeometry.height() + 4);
             m_compositeTextOverlay->setContentsMargins(margins);
         };
