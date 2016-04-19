@@ -120,8 +120,11 @@ public:
         serializedMessage.reserve(nx::network::kTypicalMtuSize);
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
-        NX_ASSERT(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
-                nx_api::SerializerState::done);
+        if (messageSerializer.serialize(&serializedMessage, &bytesWritten) != 
+            nx_api::SerializerState::done)
+        {
+            NX_ASSERT(false);
+        }
 
         m_socket->dispatch(
             [this, endpoint = std::move(destinationEndpoint),
