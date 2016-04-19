@@ -535,7 +535,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
-    return getCameraCapabilities() & capabilities;
+    return (getCameraCapabilities() & capabilities) == capabilities;
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
