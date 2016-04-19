@@ -24,8 +24,9 @@
 
 using namespace std;
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
     static const int MAX_EVENTS_TO_RECEIVE = 32;
 
     class PollSetImpl
@@ -338,7 +339,9 @@ namespace aio
         endIter.m_impl->currentIndex = m_impl->receivedEventCount;
         return endIter;
     }
-}
+}   // namespace aio
+}   // namespace network
+}   // namespace nx
 
 #endif  //defined(__APPLE__) || defined(__FreeBSD__)
 #endif
