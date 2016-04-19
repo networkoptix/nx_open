@@ -8,6 +8,8 @@ class QnAudioStreamerPool : public Singleton<QnAudioStreamerPool>
 public:
     QnAudioStreamerPool();
 
+    static const QString kChooseClientAutomatically;
+
     bool startStreamToResource(const QString& clientId, const QString& resourceId);
     bool stopStreamToResource(const QString& clientId, const QString& resourceId);
 };

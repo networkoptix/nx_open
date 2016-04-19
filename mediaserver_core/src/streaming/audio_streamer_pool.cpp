@@ -4,6 +4,8 @@
 #include "core/resource_management/resource_pool.h"
 #include "camera/camera_pool.h"
 
+const QString QnAudioStreamerPool::kChooseClientAutomatically("auto");
+
 QnAudioStreamerPool::QnAudioStreamerPool()
 {
 }
@@ -13,7 +15,7 @@ bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const Q
     auto res = qnResPool->getResourceById(QnUuid::fromStringSafe(resourceId));
     if(!res)
     {
-        qDebug() << "2WAY AUDIO: Resource Not fouhd";
+        qDebug() << "2WAY AUDIO: Resource Not found";
         return false;
     }
 
@@ -35,7 +37,7 @@ bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const Q
     for(const auto& res: sourceCamResources)
     {
         qDebug() << "2WAY AUDIO: Desktop camera unique id:" << res->getUniqueId();
-        if(res->getUniqueId() == clientId)
+        if((res->getUniqueId() == clientId) || clientId == kChooseClientAutomatically)
         {
             qDebug() << "2WAY AUDIO: Desktop camera found";
             sourceCam = qnCameraPool->getVideoCamera(res);
@@ -57,6 +59,7 @@ bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const Q
 
     qDebug() << "Setting up data transmitter";
     reader->addDataProcessor(transmitter);
+    transmitter->start();
     reader->startIfNotRunning();
 
     return true;
