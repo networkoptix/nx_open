@@ -182,7 +182,7 @@ var Helper = function () {
         return userEmail;
     };
 
-    this.getActivationPage = function(userEmail) {
+    this.getActivationLink = function(userEmail) {
         var deferred = protractor.promise.defer();
 
         browser.controlFlow().wait(this.getEmailTo(userEmail, this.emailSubjects.register).then(function (email) {
@@ -192,9 +192,9 @@ var Helper = function () {
             var pattern = new RegExp(pathToIndex + "activate/(\\w+)", "g");
             var regCode = pattern.exec(email.html)[1];
             console.log(regCode);
-            browser.get('/#/activate/' + regCode);
+            var url = ('/#/activate/' + regCode);
 
-            deferred.fulfill(userEmail);
+            deferred.fulfill(url);
         }));
 
         return deferred.promise;
@@ -204,7 +204,8 @@ var Helper = function () {
         var userEmail = this.register(firstName, lastName, password, email);
         var deferred = protractor.promise.defer();
 
-        this.getActivationPage(userEmail).then( function(userEmail) {
+        this.getActivationLink(userEmail).then( function(url) {
+            self.get(url);
             expect(self.htmlBody.getText()).toContain(self.alert.alertMessages.registerConfirmSuccess);
             deferred.fulfill(userEmail);
         });
