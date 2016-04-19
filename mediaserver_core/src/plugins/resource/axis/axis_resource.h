@@ -71,6 +71,8 @@ public:
 
     AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
+
+    virtual QnAbstractAudioTransmitter* getAudioTransmitter() override;
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
@@ -142,6 +144,7 @@ private:
         const QString& paramName,
         unsigned int* paramValue );
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
+    bool initialize2WayAudio(CLSimpleHTTPClient* const http);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     bool readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPorts);
@@ -151,6 +154,8 @@ private:
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
     bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
     void resetHttpClient(nx_http::AsyncHttpClientPtr& value);
+
+
 
     /*!
         Convert port number to ID

@@ -13,6 +13,7 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
+#include "core/dataconsumer/audio_data_transmitter.h"
 
 #include <mutex>
 #include <map>
@@ -256,6 +257,8 @@ public:
 
     bool isCameraInfoSavedToDisk(int pool) const;
     void setCameraInfoSavedToDisk(int pool);
+
+    virtual QnAbstractAudioTransmitter* getAudioTransmitter();
 
 public slots:
     virtual void inputPortListenerAttached();

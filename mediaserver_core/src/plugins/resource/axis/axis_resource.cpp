@@ -20,6 +20,7 @@
 #include <utils/common/model_functions.h>
 #include "utils/common/concurrent.h"
 #include "common/common_module.h"
+#include "axis_audio_transmitter.h"
 
 using namespace std;
 
@@ -507,6 +508,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     if (!initializeIOPorts( &http ))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
+    if(!initialize2WayAudio(&http))
+        return CameraDiagnostics::UnknownErrorResult();
+
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
     // determin camera max resolution
@@ -825,6 +829,12 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
     CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toUInt();
     return status;
+}
+
+bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
+{
+    setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+    return true;
 }
 
 void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
@@ -1325,6 +1335,11 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
+}
+
+QnAbstractAudioTransmitter* QnPlAxisResource::getAudioTransmitter()
+{
+    return new QnAxisAudioTransmitter();
 }
 
 #endif // #ifdef ENABLE_AXIS
