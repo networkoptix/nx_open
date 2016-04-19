@@ -19,7 +19,7 @@ bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const Q
 
     auto resource = res.dynamicCast<QnSecurityCamResource>();
 
-    if(resource->getCameraCapabilities() & Qn::AudioTransmitCapability != Qn::AudioTransmitCapability)
+    if(!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
     {
         qDebug() << "2WAY AUDIO: No capabilty to transmit audio";
         return false;
