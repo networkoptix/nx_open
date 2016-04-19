@@ -69,7 +69,7 @@ var RegisterPage = function () {
         this.emailInput.sendKeys(this.helper.getRandomEmail());
     };
 
-    this.getActivationPage = function(userEmail) {
+    this.getActivationLink = function(userEmail) {
         var deferred = protractor.promise.defer();
 
         browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.helper.emailSubjects.register).then(function (email) {
@@ -78,9 +78,8 @@ var RegisterPage = function () {
             var pattern = new RegExp(pathToIndex + "activate/(\\w+)", "g");
             var regCode = pattern.exec(email.html)[1];
             console.log(regCode);
-            browser.get('/#/activate/' + regCode);
 
-            deferred.fulfill();
+            deferred.fulfill('/#/activate/' + regCode);
         }));
 
         return deferred.promise;
