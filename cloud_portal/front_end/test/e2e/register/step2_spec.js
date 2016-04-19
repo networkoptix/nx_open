@@ -3,21 +3,17 @@ var RegisterPage = require('./po.js');
 describe('Registration step2', function () {
     var p = new RegisterPage();
 
-    beforeAll(function() {
-        browser.controlFlow().wait(p.helper.readPrevEmails());
-    });
-
     beforeEach(function() {
         p.helper.get(p.url);
     });
 
-    xit("should open register page from register success page by clicking Register button on top right corner", function () {
+    it("should open register page from register success page by clicking Register button on top right corner", function () {
         p.helper.register();
 
         p.openRegisterButton.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.htmlBody.getText()).toContain('Welcome to Nx Cloud');
+        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
     });
 
     it("should activate registration with a registration code sent to an email", function () {
@@ -43,7 +39,7 @@ describe('Registration step2', function () {
             p.helper.logout();
         });
     });
-    
+
     it("should allow to enter more than 256 symbols in First and Last names and cut it to 256", function () {
         var userEmail = p.helper.getRandomEmail();
     
