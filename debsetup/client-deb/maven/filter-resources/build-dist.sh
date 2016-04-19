@@ -119,7 +119,7 @@ do
     SONAME=libQt5${lib}.so.${qt.version}
     cp ${qt.dir}/lib/$SONAME $LIBSTAGE
     LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -sf $LIBSTAGE/$SONAME $LIBSTAGE/$LINK_TARGET
+    ln -sf $SONAME $LIBSTAGE/$LINK_TARGET
 done
 
 cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
