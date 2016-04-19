@@ -109,7 +109,7 @@ describe('Restore password suite', function () {
         p.helper.logout();
     });
 
-    fit("should log user out if he visits restore password link from email", function () {
+    it("should log user out if he visits restore password link from email", function () {
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
         p.get(p.url);
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {
@@ -128,30 +128,3 @@ describe('Restore password suite', function () {
         expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
