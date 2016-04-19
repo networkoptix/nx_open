@@ -140,6 +140,8 @@ namespace {
     /** Maximal number of lines in a time slider. */
     const int maxLines = 2;
 
+    const int lastMinuteStripeWidth = 9;
+
     const int lineLabelFontHeight = 14;
     const int lineLabelFontWeight = QFont::DemiBold;
 
@@ -601,10 +603,10 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             5,      60,     sSuffix,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             10,     60,     sSuffix,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             30,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      60,     mFormat,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      60,     mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     60,     mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     60,     mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      24*60,  mFormat,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      24*60,  mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     24*60,  mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     24*60,  mFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   1,      24,     hFormat,        ampm ? dateHoursApFormat : dateHoursFormat, false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     hFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     hFormat,        QString(),          false) <<
@@ -1069,37 +1071,44 @@ qint64 QnTimeSlider::animationEnd()
 
 void QnTimeSlider::generateProgressPatterns()
 {
-    const qreal stripeWidth = 8.0;
+    static const qreal d0 = 0.0;
+    static const qreal d1 = lastMinuteStripeWidth;
+    static const qreal d2 = lastMinuteStripeWidth * 2;
+    static const qreal d3 = lastMinuteStripeWidth * 3;
+    static const qreal d4 = lastMinuteStripeWidth * 4;
 
     QPainterPath path;
-    path.moveTo(0.0, 0.0);
-    path.lineTo(stripeWidth, 0.0);
-    path.lineTo(0.0, stripeWidth * 2);
+    path.moveTo(d0, d1);
+    path.lineTo(d1, d0);
+    path.lineTo(d0, d0);
     path.closeSubpath();
 
-    path.moveTo(stripeWidth * 2, 0.0);
-    path.lineTo(stripeWidth * 3, 0.0);
-    path.lineTo(stripeWidth, stripeWidth * 4);
-    path.lineTo(0.0, stripeWidth * 4);
+    path.moveTo(d0, d2);
+    path.lineTo(d0, d3);
+    path.lineTo(d3, d0);
+    path.lineTo(d2, d0);
     path.closeSubpath();
 
-    path.moveTo(stripeWidth * 4, 0.0);
-    path.lineTo(stripeWidth * 4, stripeWidth * 2);
-    path.lineTo(stripeWidth * 3, stripeWidth * 4);
-    path.lineTo(stripeWidth * 2, stripeWidth * 4);
+    path.moveTo(d0, d4);
+    path.lineTo(d1, d4);
+    path.lineTo(d4, d1);
+    path.lineTo(d4, d0);
     path.closeSubpath();
 
-    m_progressPastPattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
-    m_progressPastPattern.fill(Qt::transparent);
+    path.moveTo(d2, d4);
+    path.lineTo(d3, d4);
+    path.lineTo(d4, d3);
+    path.lineTo(d4, d2);
+    path.closeSubpath();
 
+    m_progressPastPattern = QPixmap(d4, d4);
+    m_progressPastPattern.fill(m_colors.pastLastMinute);
     QPainter pastPainter(&m_progressPastPattern);
     pastPainter.setRenderHint(QPainter::Antialiasing);
     pastPainter.fillPath(path, m_colors.pastLastMinute);
 
-
-    m_progressFuturePattern = QPixmap(stripeWidth * 4, stripeWidth * 4);
-    m_progressFuturePattern.fill(Qt::transparent);
-
+    m_progressFuturePattern = QPixmap(d4, d4);
+    m_progressFuturePattern.fill(m_colors.futureLastMinute);
     QPainter futurePainter(&m_progressFuturePattern);
     futurePainter.setRenderHint(QPainter::Antialiasing);
     futurePainter.fillPath(path, m_colors.futureLastMinute);

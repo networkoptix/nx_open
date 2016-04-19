@@ -44,7 +44,7 @@ namespace
 // -------------------------------------------------------------------------- //
 QnNotificationToolTipWidget::QnNotificationToolTipWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_thumbnailLabel(NULL)
+    m_thumbnailLabel(nullptr)
 {
     setClickableButtons(Qt::RightButton);
 
@@ -163,7 +163,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlag
     base_type(parent, flags),
     m_defaultActionIdx(-1),
     m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
-    m_imageProvider(NULL),
+    m_imageProvider(nullptr),
     m_inToolTipPositionUpdate(false)
 {
     m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
@@ -283,16 +283,17 @@ void QnNotificationWidget::setGeometry(const QRectF &geometry) {
 void QnNotificationWidget::addActionButton(const QIcon &icon, const QString &tooltip, QnActions::IDType actionId,
                                          const QnActionParameters &parameters, bool defaultAction)
 {
-    qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
-
     QnImageButtonWidget *button = new QnImageButtonWidget(
         getFullAlias(QnLexical::serialized(actionId)), this);
 
     button->setIcon(icon);
     button->setToolTip(tooltip);
     button->setCached(true);
-    button->setFixedSize(buttonSize);
     button->setProperty(actionIndexPropertyName, m_actions.size());
+
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+    button->setFixedSize(icon.actualSize(QSize(maxIconSize, maxIconSize)));
+
     if (m_defaultActionIdx < 0 || defaultAction)
         m_defaultActionIdx = m_actions.size();
 

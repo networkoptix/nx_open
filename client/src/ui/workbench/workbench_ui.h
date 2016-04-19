@@ -433,7 +433,6 @@ private:
 
     VariantAnimator *m_dayTimeSizeAnimator;
 
-    qreal m_pinOffset;
     QPoint m_calendarPinOffset;
     QPoint m_dayTimeOffset;
 };

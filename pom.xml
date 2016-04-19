@@ -117,6 +117,7 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <liteMode>false</liteMode>
+        <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
@@ -712,8 +713,9 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
-                <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
+                <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
+                <quazip.version>0.7.2</quazip.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
                 <rdep.target>isd</rdep.target>

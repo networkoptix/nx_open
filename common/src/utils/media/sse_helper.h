@@ -1,5 +1,4 @@
-#ifndef QN_SSE_HELPER_H
-#define QN_SSE_HELPER_H
+#pragma once
 
 #include <QtCore/QString>
 
@@ -176,8 +175,6 @@ static inline bool useSSE42()
 #endif
 }
 
-QString getCPUString();
-
 #endif  // not arm
 
-#endif // QN_SSE_HELPER_H
+QString getCPUString();
