@@ -184,7 +184,10 @@ public:
 
     ~UdtPollSetConstIteratorImpl()
     {
-        NX_ASSERT(m_pollSetImpl->iterators.erase(this) == 1);
+        if (m_pollSetImpl->iterators.erase(this) != 1)
+        {
+            NX_ASSERT(false);
+        }
     }
 
     void next()

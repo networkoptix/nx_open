@@ -27,6 +27,18 @@ QString toString(const AddressType& type)
     return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
+TypedAddress::TypedAddress(HostAddress address_, AddressType type_)
+:
+    address(std::move(address_)),
+    type(std::move(type_))
+{
+}
+
+QString TypedAddress::toString() const
+{
+    return lm("%1(%2)").str(address).str(type);
+}
+
 AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
     : type( type_ )
     , value( value_ )
@@ -179,7 +191,7 @@ void AddressResolver::resolveDomain(
                 result.emplace_back(std::move(address), AddressType::cloud);
             }
 
-            NX_LOGX(lm("Domain %1 is resolvet to: %2")
+            NX_LOGX(lm("Domain %1 is resolved to: %2")
                 .arg(domain.toString()).container(result), cl_logDEBUG1);
 
             handler(std::move(result));
