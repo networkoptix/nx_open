@@ -318,7 +318,7 @@ void visitIfValueImpl(ApiCommand::Value value, F f, const std::tuple<Args...> &t
     DescriptorsByValueVisitor<(int)sizeof...(Args) - 1, F>::apply(value, f, tuple);
 }
 
-/* Visit TransactionDescriptor with specified ApiCommand::Value tag in runtime implementation*/
+/* Visit TransactionDescriptor with specified ApiCommand name in runtime implementation*/
 template<int I, typename F>
 struct DescriptorsByNameVisitor
 {
