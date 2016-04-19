@@ -601,10 +601,10 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             5,      60,     sSuffix,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             10,     60,     sSuffix,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Seconds,         1000ll,                             30,     60,     sSuffix,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      60,     mFormat,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      60,     mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     60,     mFormat,        QString(),          false) <<
-        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     60,     mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        1,      24*60,  mFormat,        ampm ? dateMinsApFormat : dateMinsFormat, false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        5,      24*60,  mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        10,     24*60,  mFormat,        QString(),          false) <<
+        QnTimeStep(QnTimeStep::Minutes,         1000ll * 60,                        30,     24*60,  mFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   1,      24,     hFormat,        ampm ? dateHoursApFormat : dateHoursFormat, false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   3,      24,     hFormat,        QString(),          false) <<
         QnTimeStep(QnTimeStep::Hours,           1000ll * 60 * 60,                   12,     24,     hFormat,        QString(),          false) <<
