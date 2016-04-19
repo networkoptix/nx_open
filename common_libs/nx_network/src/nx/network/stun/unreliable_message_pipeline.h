@@ -214,23 +214,26 @@ private:
             return;
         }
 
-        //reading and parsing message
-        size_t bytesParsed = 0;
-        MessageType msg;
-        m_messageParser.setMessage(&msg);
-        if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
+        if (bytesRead > 0)  //zero-sized UDP datagramm is OK
         {
-            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
-            m_customPipeline->messageReceived(
-                std::move(sourceAddress),
-                std::move(msg));
-            if (watcher.objectDestroyed())
-                return; //this has been freed
-        }
-        else
-        {
-            NX_LOGX(lm("Failed to parse UDP datagram of size %1").
-                arg((unsigned int)bytesRead), cl_logDEBUG1);
+            //reading and parsing message
+            size_t bytesParsed = 0;
+            MessageType msg;
+            m_messageParser.setMessage(&msg);
+            if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
+            {
+                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
+                m_customPipeline->messageReceived(
+                    std::move(sourceAddress),
+                    std::move(msg));
+                if (watcher.objectDestroyed())
+                    return; //this has been freed
+            }
+            else
+            {
+                NX_LOGX(lm("Failed to parse UDP datagram of size %1").
+                    arg((unsigned int)bytesRead), cl_logDEBUG1);
+            }
         }
 
         m_readBuffer.resize(0);
