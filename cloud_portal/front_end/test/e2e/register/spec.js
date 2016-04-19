@@ -7,6 +7,10 @@ describe('Registration suite', function () {
         p.helper.get(p.url);
     });
 
+    afterAll(function() {
+        browser.controlFlow().wait(p.helper.readPrevEmails());
+    });
+
     it("should open register page in anonymous state by clicking Register button on top right corner", function () {
         p.helper.get('/');
     
