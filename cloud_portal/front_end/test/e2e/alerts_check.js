@@ -28,7 +28,7 @@ var AlertSuite = function () {
     this.alertCloseButton = this.alert.element(by.css('button.close'));
 
     function waitAlert(){
-        browser.sleep(1500);
+        browser.sleep(1700);
         browser.ignoreSynchronization = true;
         expect(self.alert.isDisplayed()).toBe(true);
     }
@@ -38,17 +38,13 @@ var AlertSuite = function () {
         expect(self.alert.getAttribute('class')).toContain(type);
     }
 
-    function closeAlert(){
+    function closeAlert(shouldCloseOnTimeout){
         // Alerts that have close button do not close by clicking on alert.
         // Thus, the following code decides, how to close it
-        self.alertCloseButton.isDisplayed().then(function(isDisplayed) {
-            if (isDisplayed) {
-                self.alertCloseButton.click();
-            }
-            else {
-                self.alert.click();
-            }
-        });
+        if (!shouldCloseOnTimeout) {
+            self.alertCloseButton.click();}
+        else {
+            self.alert.click();}
         browser.sleep(300);
         expect(self.alert.isPresent()).toBe(false);
     }
@@ -84,7 +80,7 @@ var AlertSuite = function () {
             callAlert().then(function(){
                 waitAlert();
                 checkAlertContent(message, type);
-                closeAlert();
+                closeAlert(shouldCloseOnTimeout);
                 finishAlertCheck();
             });
         });
