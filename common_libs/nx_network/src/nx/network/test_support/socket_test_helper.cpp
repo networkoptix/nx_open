@@ -616,7 +616,26 @@ ConnectionsGenerator::ConnectionsGenerator(
     size_t maxTotalConnections,
     TestTransmissionMode transmissionMode)
 :
-    m_remoteAddress( remoteAddress ),
+    ConnectionsGenerator(
+        std::vector<SocketAddress>(1, std::move(remoteAddress)),
+        maxSimultaneousConnectionsCount,
+        limitType,
+        trafficLimit,
+        maxTotalConnections,
+        transmissionMode)
+{
+}
+
+ConnectionsGenerator::ConnectionsGenerator(
+    std::vector<SocketAddress> remoteAddresses,
+    size_t maxSimultaneousConnectionsCount,
+    TestTrafficLimitType limitType,
+    size_t trafficLimit,
+    size_t maxTotalConnections,
+    TestTransmissionMode transmissionMode)
+:
+    m_remoteAddresses( remoteAddresses ),
+    m_remoteAddressesIterator( m_remoteAddresses.begin() ),
     m_maxSimultaneousConnectionsCount( maxSimultaneousConnectionsCount ),
     m_limitType( limitType ),
     m_trafficLimit( trafficLimit ),
@@ -631,6 +650,7 @@ ConnectionsGenerator::ConnectionsGenerator(
     m_errorEmulationDistribution(1, 100),
     m_errorEmulationPercent(0)
 {
+    NX_CRITICAL(m_remoteAddresses.size());
 }
 
 ConnectionsGenerator::~ConnectionsGenerator()
@@ -683,10 +703,13 @@ void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
     m_localAddress = std::move(addr);
 }
 
-void ConnectionsGenerator::setRemoteAddress(SocketAddress remoteAddress)
+void ConnectionsGenerator::resetRemoteAddresses(
+    std::vector<SocketAddress> remoteAddresses)
 {
+    NX_CRITICAL(remoteAddresses.size());
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_remoteAddress = std::move(remoteAddress);
+    m_remoteAddresses = std::move(remoteAddresses);
+    m_remoteAddressesIterator = m_remoteAddresses.begin();
 }
 
 void ConnectionsGenerator::start()
@@ -697,7 +720,7 @@ void ConnectionsGenerator::start()
 
         std::unique_ptr<TestConnection> connection(
             new TestConnection(
-                m_remoteAddress,
+                nextAddress(),
                 m_limitType,
                 m_trafficLimit,
                 m_transmissionMode));
@@ -757,6 +780,16 @@ const std::map<SystemError::ErrorCode, size_t>&
     return m_returnCodes;
 }
 
+const SocketAddress& ConnectionsGenerator::nextAddress()
+{
+    const auto current = m_remoteAddressesIterator;
+
+    if (++m_remoteAddressesIterator == m_remoteAddresses.end())
+        m_remoteAddressesIterator = m_remoteAddresses.begin();
+
+    return *current;
+}
+
 void ConnectionsGenerator::onConnectionFinished(
     int id,
     SystemError::ErrorCode code)
@@ -806,7 +839,7 @@ void ConnectionsGenerator::addNewConnections(
     while (m_connections.size() < m_maxSimultaneousConnectionsCount)
     {
         auto connection = std::make_unique<TestConnection>(
-            m_remoteAddress,
+            nextAddress(),
             m_limitType,
             m_trafficLimit,
             m_transmissionMode);

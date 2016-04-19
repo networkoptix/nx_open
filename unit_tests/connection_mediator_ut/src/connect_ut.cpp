@@ -43,7 +43,7 @@ protected:
             &stunMessageDispatcher,
             &listeningPeerPool);
         server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
-            stunMessageDispatcher,
+            &stunMessageDispatcher,
             false,
             SocketFactory::NatTraversalType::nttDisabled);
 

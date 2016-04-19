@@ -15,6 +15,7 @@
 #include <utils/serialization/lexical.h>
 
 #include <libconnection_mediator_app_info.h>
+#include <nx/network/cloud/data/connection_parameters.h>
 #include <utils/common/app_info.h>
 
 
@@ -65,6 +66,20 @@ namespace
     const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
 
     const QString kModuleName = lit("connection_mediator");
+
+
+    //CloudConnect
+    const QLatin1String kRendezvousConnectTimeout("cloudConnect/rendezvousConnectTimeout");
+    constexpr const std::chrono::seconds kDefaultRendezvousConnectTimeout =
+        nx::hpm::api::kRendezvousConnectTimeoutDefault;
+
+    const QLatin1String kUdpTunnelKeepAliveInterval("cloudConnect/udpTunnelKeepAliveInterval");
+    constexpr const std::chrono::seconds kDefaultUdpTunnelKeepAliveInterval =
+        nx::hpm::api::kUdpTunnelKeepAliveIntervalDefault;
+
+    const QLatin1String kUdpTunnelKeepAliveRetries("cloudConnect/udpTunnelKeepAliveRetries");
+    constexpr const int kDefaultUdpTunnelKeepAliveRetries = 
+        nx::hpm::api::kUdpTunnelKeepAliveRetriesDefault;
 }
 
 
@@ -112,6 +127,11 @@ const Stun& Settings::stun() const
 const Http& Settings::http() const
 {
     return m_http;
+}
+
+const api::ConnectionParameters& Settings::connectionParameters() const
+{
+    return m_connectionParameters;
 }
 
 const Logging& Settings::logging() const
@@ -172,6 +192,19 @@ void Settings::loadConfiguration()
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
+
+    m_connectionParameters.rendezvousConnectTimeout =
+        nx::utils::parseTimerDuration(m_settings.value(
+            kRendezvousConnectTimeout,
+            static_cast<qulonglong>(kDefaultRendezvousConnectTimeout.count())).toString());
+    m_connectionParameters.udpTunnelKeepAliveInterval =
+        nx::utils::parseTimerDuration(m_settings.value(
+            kUdpTunnelKeepAliveInterval,
+            static_cast<qulonglong>(kDefaultUdpTunnelKeepAliveInterval.count())).toString());
+    m_connectionParameters.udpTunnelKeepAliveRetries = m_settings.value(
+        kUdpTunnelKeepAliveRetries,
+        kDefaultUdpTunnelKeepAliveRetries).toInt();
+
 
     //analyzing values
     if (m_general.dataDir.isEmpty())

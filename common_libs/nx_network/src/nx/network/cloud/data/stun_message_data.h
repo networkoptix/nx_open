@@ -67,7 +67,44 @@ protected:
                 stun::cc::attrs::toString(AttributeType::TYPE));
             return false;
         }
+        //TODO #ak why getString???
         *value = attribute->getString().toInt();
+        return true;
+    }
+
+    bool readAttributeValue(
+        const nx::stun::Message& message,
+        const int type,
+        int* const value)
+    {
+        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        if (!attribute)
+        {
+            setErrorText(nx::String("Missing required attribute ") +
+                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+            return false;
+        }
+        *value = attribute->value();
+        return true;
+    }
+
+    /** read attribute value as a std::chrono::duration.
+        \note Currently, maximum value of period is limited to max value of int
+    */
+    template<typename Rep, typename Period>
+    bool readAttributeValue(
+        const nx::stun::Message& message,
+        const int type,
+        std::chrono::duration<Rep, Period>* const value)
+    {
+        const auto attribute = message.getAttribute< stun::attrs::IntAttribute >(type);
+        if (!attribute)
+        {
+            setErrorText(nx::String("Missing required attribute ") +
+                stun::cc::attrs::toString(static_cast<stun::cc::attrs::AttributeType>(type)));
+            return false;
+        }
+        *value = std::chrono::duration<Rep, Period>(attribute->value());
         return true;
     }
 

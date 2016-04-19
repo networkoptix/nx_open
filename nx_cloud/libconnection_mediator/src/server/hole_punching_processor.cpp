@@ -10,17 +10,20 @@
 #include <nx/utils/thread/barrier_handler.h>
 
 #include "listening_peer_pool.h"
+#include "settings.h"
 
 
 namespace nx {
 namespace hpm {
 
 HolePunchingProcessor::HolePunchingProcessor(
+    const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool)
 :
     RequestProcessor(cloudData),
+    m_settings(settings),
     m_listeningPeerPool(listeningPeerPool)
 {
     dispatcher->registerRequestProcessor(
@@ -123,7 +126,8 @@ void HolePunchingProcessor::connect(
                 &HolePunchingProcessor::connectSessionFinished,
                 this,
                 std::move(connectionFsmIterAndFlag.first),
-                std::placeholders::_1));
+                std::placeholders::_1),
+            m_settings);
 
     //launching connect FSM
     connectionFsmIterAndFlag.first->second->onConnectRequest(

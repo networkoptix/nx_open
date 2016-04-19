@@ -25,6 +25,10 @@ class MessageDispatcher;
 
 namespace hpm {
 
+namespace conf {
+    class Settings;
+}
+
 class ListeningPeerPool;
 
 /** Handles requests used to establish hole punching connection. 
@@ -36,6 +40,7 @@ class HolePunchingProcessor
 {
 public:
     HolePunchingProcessor(
+        const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool);
@@ -63,6 +68,7 @@ private:
         std::unique_ptr<UDPHolePunchingConnectionInitiationFsm>
     > ConnectSessionsDictionary;
 
+    const conf::Settings& m_settings;
     ListeningPeerPool* const m_listeningPeerPool;
     QnMutex m_mutex;
     //map<id, connection initiation>

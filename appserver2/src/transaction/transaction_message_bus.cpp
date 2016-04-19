@@ -190,7 +190,7 @@ namespace ec2
 
         case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-    case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
