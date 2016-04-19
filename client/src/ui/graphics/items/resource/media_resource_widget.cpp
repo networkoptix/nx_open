@@ -68,6 +68,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/collection.h>
 #include <utils/common/string.h>
+#include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
 #include <api/common_message_processor.h>
@@ -227,9 +228,28 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
+    /* TODO: #GDM if (m_camera)? */
+    {
+        m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
+        addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
 
-    m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-    addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
+        static int i = 0;
+        auto updateContentsMargins = [this]()
+        {
+            i++;
+            auto positionOverlayGeometry = overlayWidgets().positionOverlay->contentSize();
+            auto margins = m_compositeTextOverlay->contentsMargins();
+            qDebug() << i << "positionOverlayGeometry" << positionOverlayGeometry;
+            margins.setBottom(positionOverlayGeometry.height() + 4);
+            m_compositeTextOverlay->setContentsMargins(margins);
+        };
+
+        connect(overlayWidgets().positionOverlay, &GraphicsWidget::geometryChanged, this, updateContentsMargins);
+        connect(overlayWidgets().positionOverlay, &QnScrollableOverlayWidget::contentSizeChanged, this, updateContentsMargins);
+        updateContentsMargins();
+        executeDelayed(updateContentsMargins);
+    }
+
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))

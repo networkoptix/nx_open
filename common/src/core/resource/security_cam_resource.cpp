@@ -462,7 +462,8 @@ int QnSecurityCamResource::motionSensWindowCount() const
 
 bool QnSecurityCamResource::hasTwoWayAudio() const
 {
-    return true;
+    return true; //TODO: #GDM replace by correct implementation after development complete
+    return getCameraCapabilities().testFlag(Qn::AudioTransmitCapability);
 }
 
 bool QnSecurityCamResource::isAudioSupported() const {

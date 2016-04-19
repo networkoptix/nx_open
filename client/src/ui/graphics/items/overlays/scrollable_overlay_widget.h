@@ -36,6 +36,11 @@ public:
     QSizeF maxFillCoeff() const;
     void setMaxFillCoeff(const QSizeF &coeff);
 
+    QSizeF contentSize() const;
+
+signals:
+    void contentSizeChanged();
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
 

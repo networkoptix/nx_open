@@ -177,6 +177,11 @@ QSizeF QnScrollableOverlayWidgetPrivate::minimumSize() const {
     return QSizeF(maxWidth / m_maxFillCoeff.width(), maxHeight / m_maxFillCoeff.height());
 }
 
+QSizeF QnScrollableOverlayWidgetPrivate::contentSize() const
+{
+    return m_contentWidget->size();
+}
+
 QSizeF QnScrollableOverlayWidgetPrivate::maxFillCoeff() const {
     return m_maxFillCoeff;
 }
