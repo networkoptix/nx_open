@@ -1,27 +1,26 @@
 #pragma once
 
-#include "abstract_incoming_tunnel_connection.h"
+#include "../abstract_incoming_tunnel_connection.h"
 
-#include <nx/network/udt/udt_socket.h>
+#include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/stun/message_parser.h>
+#include <nx/network/udt/udt_socket.h>
+
 
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 class NX_NETWORK_API IncomingTunnelUdtConnection
 :
     public AbstractIncomingTunnelConnection
 {
 public:
-    /**
-        @param maxKeepAliveInterval If zero, default timeout is applied (see cloud_config.h)
-    */
     IncomingTunnelUdtConnection(
         String connectionId,
         std::unique_ptr<UdtStreamSocket> connectionSocket,
-        std::chrono::milliseconds maxKeepAliveInterval
-            = std::chrono::milliseconds::zero());
+        const nx::hpm::api::ConnectionParameters& connectionParameters);
 
     void accept(std::function<void(
         SystemError::ErrorCode,
@@ -36,7 +35,7 @@ private:
     void writeResponse();
     void connectionSocketError(SystemError::ErrorCode code);
 
-    std::chrono::milliseconds m_maxKeepAliveInterval;
+    const std::chrono::milliseconds m_maxKeepAliveInterval;
     std::chrono::steady_clock::time_point m_lastKeepAlive;
     SystemError::ErrorCode m_state;
 
@@ -51,6 +50,7 @@ private:
         std::unique_ptr<AbstractStreamSocket>)> m_acceptHandler;
 };
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

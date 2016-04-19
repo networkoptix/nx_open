@@ -21,6 +21,10 @@
 namespace nx {
 namespace hpm {
 
+namespace conf {
+    class Settings;
+}   // namespace conf
+
 /**
     \note Object can be safely freed while in \a onFsmFinishedEventHandler handler.
         Otherwise, one has to stop it with \a QnStoppableAsync::pleaseStop
@@ -37,7 +41,8 @@ public:
     UDPHolePunchingConnectionInitiationFsm(
         nx::String connectionID,
         const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
-        std::function<void(api::ResultCode)> onFsmFinishedEventHandler);
+        std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
+        const conf::Settings& settings);
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
@@ -67,6 +72,7 @@ private:
     State m_state;
     nx::String m_connectionID;
     std::function<void(api::ResultCode)> m_onFsmFinishedEventHandler;
+    const conf::Settings& m_settings;
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
     std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;

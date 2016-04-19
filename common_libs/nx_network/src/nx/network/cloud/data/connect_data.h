@@ -12,6 +12,7 @@
 #include <nx/utils/uuid.h>
 
 #include "connection_method.h"
+#include "connection_parameters.h"
 #include "stun_message_data.h"
 
 
@@ -44,6 +45,7 @@ class NX_NETWORK_API ConnectResponse
 public:
     std::list<SocketAddress> publicTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
+    ConnectionParameters params;
 
     ConnectResponse();
 

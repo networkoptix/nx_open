@@ -15,6 +15,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
 OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
     nx::String connectionId,
@@ -293,6 +294,7 @@ void OutgoingTunnelUdtConnection::onKeepAliveTimeout()
     closeConnection(SystemError::notConnected, m_controlConnection.get());
 }
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

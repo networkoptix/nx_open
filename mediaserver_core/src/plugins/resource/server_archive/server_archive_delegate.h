@@ -41,7 +41,8 @@ public:
 private:
     bool switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
-    bool getNextChunk(DeviceFileCatalog::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
+    bool getNextChunk(DeviceFileCatalog::TruncableChunk& chunk, DeviceFileCatalogPtr& chunkCatalog,
+                      DeviceFileCatalog::UniqueChunkCont &ignoreChunks);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
     void setCatalogs() const;
 
@@ -90,6 +91,8 @@ private:
 
     mutable QnMutex m_mutex;
     QnServer::ChunksCatalog m_lastChunkQuality;
+    QnServer::StoragePool m_currentChunkStoragePool;
+    QnServer::StoragePool m_newQualityChunkStoragePool;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;

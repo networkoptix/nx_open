@@ -10,7 +10,7 @@
 
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_connector.h>
+#include <nx/network/cloud/tunnel/udp/connector.h>
 #include <nx/network/socket_global.h>
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
@@ -18,16 +18,19 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 namespace test {
 
 using nx::hpm::MediaServerEmulator;
 
-class UdpHolePunchingTunnelConnector
+constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
+
+class TunnelConnector
 :
     public ::testing::Test
 {
 public:
-    ~UdpHolePunchingTunnelConnector()
+    ~TunnelConnector()
     {
         if (m_oldFactoryFunc)
             ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
@@ -117,7 +120,7 @@ private:
         ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
 
         std::promise<ConnectResult> connectedPromise;
-        cloud::UdpHolePunchingTunnelConnector connector(
+        udp::TunnelConnector connector(
             SocketAddress((server->serverId() + "." + system.id).constData()),
             mediatorAddressForConnector);
 
@@ -133,7 +136,14 @@ private:
                 result.connection = std::move(connection);
                 connectedPromise.set_value(std::move(result));
             });
-        *connectResult = connectedPromise.get_future().get();
+        auto connectedFuture = connectedPromise.get_future();
+        ASSERT_EQ(
+            std::future_status::ready,
+            connectedFuture.wait_for(
+                connectTimeout == std::chrono::milliseconds::zero()
+                ? kDefaultTestTimeout
+                : connectTimeout*2));
+        *connectResult = connectedFuture.get();
         connectResult->executionTime = 
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - t1);
@@ -142,7 +152,7 @@ private:
     }
 };
 
-TEST_F(UdpHolePunchingTunnelConnector, general)
+TEST_F(TunnelConnector, general)
 {
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -157,7 +167,48 @@ TEST_F(UdpHolePunchingTunnelConnector, general)
     connectResult.connection->pleaseStopSync();
 }
 
-TEST_F(UdpHolePunchingTunnelConnector, timeout)
+TEST_F(TunnelConnector, noSynAck)
+{
+    //starting mediator
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds(5),
+        MediaServerEmulator::ActionToTake::ignoreSyn);
+
+    ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
+}
+
+TEST_F(TunnelConnector, badSynAck)
+{
+    //starting mediator
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds::zero(),   //no timeout
+        MediaServerEmulator::ActionToTake::sendBadSynAck);
+
+    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
+}
+
+//currently, this test requires hack in UnreliableMessagePipeline::messageSent:
+//  errorCode have to be set to SystemError::connectionReset
+//TEST_F(TunnelConnector, remotePeerUdpPortNotAccessible)
+//{
+//    //starting mediator
+//    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+//
+//    const auto connectResult = doSimpleConnectTest(
+//        std::chrono::seconds::zero(),   //no timeout
+//        MediaServerEmulator::ActionToTake::proceedWithConnection);
+//
+//    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+//    ASSERT_EQ(nullptr, connectResult.connection);
+//}
+
+TEST_F(TunnelConnector, timeout)
 {
     //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
@@ -193,7 +244,7 @@ TEST_F(UdpHolePunchingTunnelConnector, timeout)
     }
 }
 
-TEST_F(UdpHolePunchingTunnelConnector, target_host_not_found)
+TEST_F(TunnelConnector, target_host_not_found)
 {
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
@@ -213,7 +264,7 @@ TEST_F(UdpHolePunchingTunnelConnector, target_host_not_found)
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 
-TEST_F(UdpHolePunchingTunnelConnector, cancellation)
+TEST_F(TunnelConnector, cancellation)
 {
     const std::chrono::seconds totalTestTime(10);
 
@@ -227,7 +278,7 @@ TEST_F(UdpHolePunchingTunnelConnector, cancellation)
     const auto t1 = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - t1 < totalTestTime)
     {
-        cloud::UdpHolePunchingTunnelConnector connector(
+        udp::TunnelConnector connector(
             SocketAddress((server->serverId() + "." + system.id).constData()));
 
         connector.connect(
@@ -246,6 +297,7 @@ TEST_F(UdpHolePunchingTunnelConnector, cancellation)
 }
 
 }   //namespace test
+}   //namespace udp
 }   //namespace cloud
 }   //namespace network
 }   //namespace nx

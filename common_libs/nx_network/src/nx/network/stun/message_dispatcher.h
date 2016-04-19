@@ -29,6 +29,10 @@ public:
         void(std::shared_ptr< AbstractServerConnection >, stun::Message)
     > MessageProcessor;
 
+    MessageDispatcher();
+    MessageDispatcher(const MessageDispatcher&) = delete;
+    MessageDispatcher& operator=(const MessageDispatcher&) = delete;
+
     virtual ~MessageDispatcher();
 
     /**

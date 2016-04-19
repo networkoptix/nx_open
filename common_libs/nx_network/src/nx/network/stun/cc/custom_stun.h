@@ -105,7 +105,11 @@ namespace attrs
         connectionMethods,
 
         udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
-        systemErrorCode,
+        rendezvousConnectTimeout,
+        udpTunnelKeepAliveInterval,
+        udpTunnelKeepAliveRetries,
+
+        systemErrorCode = stun::attrs::userDefined + 0x500,
     };
 
     NX_NETWORK_API const char* toString(AttributeType val);

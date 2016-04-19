@@ -1,41 +1,39 @@
-#include "udp_hole_punching_acceptor.h"
 
-#include <nx/network/cloud/cloud_config.h>
-#include <nx/network/cloud/tunnel/incoming_tunnel_udt_connection.h>
+#include "acceptor.h"
+
 #include <utils/serialization/lexical.h>
+
+#include "incoming_tunnel_udt_connection.h"
+
 
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 
-UdpHolePunchingTunnelAcceptor::UdpHolePunchingTunnelAcceptor(
-    SocketAddress peerAddress)
+TunnelAcceptor::TunnelAcceptor(
+    SocketAddress peerAddress,
+    nx::hpm::api::ConnectionParameters connectionParametes)
 :
     m_peerAddress(std::move(peerAddress)),
-    m_udtConnectTimeout(kHpUdtConnectTimeout),
+    m_connectionParameters(std::move(connectionParametes)),
     m_udpRetransmissionTimeout(stun::UDPClient::kDefaultRetransmissionTimeOut),
     m_udpMaxRetransmissions(stun::UDPClient::kDefaultMaxRetransmissions)
 {
 }
 
-void UdpHolePunchingTunnelAcceptor::setUdtConnectTimeout(
-    std::chrono::milliseconds timeout)
-{
-    m_udtConnectTimeout = timeout;
-}
-
-void UdpHolePunchingTunnelAcceptor::setUdpRetransmissionTimeout(
+void TunnelAcceptor::setUdpRetransmissionTimeout(
     std::chrono::milliseconds timeout)
 {
     m_udpRetransmissionTimeout = timeout;
 }
 
-void UdpHolePunchingTunnelAcceptor::setUdpMaxRetransmissions(int count)
+void TunnelAcceptor::setUdpMaxRetransmissions(int count)
 {
     m_udpMaxRetransmissions = count;
 }
 
-void UdpHolePunchingTunnelAcceptor::accept(std::function<void(
+void TunnelAcceptor::accept(std::function<void(
     SystemError::ErrorCode,
     std::unique_ptr<AbstractIncomingTunnelConnection>)> handler)
 {
@@ -62,7 +60,7 @@ void UdpHolePunchingTunnelAcceptor::accept(std::function<void(
         [this](nx::hpm::api::ResultCode code) { connectionAckResult(code); });
 }
 
-void UdpHolePunchingTunnelAcceptor::pleaseStop(
+void TunnelAcceptor::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     {
@@ -86,7 +84,7 @@ void UdpHolePunchingTunnelAcceptor::pleaseStop(
     m_udpMediatorConnection->pleaseStop(std::move(stopUdtConnection));
 }
 
-void UdpHolePunchingTunnelAcceptor::connectionAckResult(
+void TunnelAcceptor::connectionAckResult(
     nx::hpm::api::ResultCode code)
 {
     if (code != hpm::api::ResultCode::ok)
@@ -110,7 +108,7 @@ void UdpHolePunchingTunnelAcceptor::connectionAckResult(
         if (!m_udtConnectionSocket->bindToUdpSocket(std::move(*socket)) ||
             !m_udtConnectionSocket->setRendezvous(true) ||
             !m_udtConnectionSocket->setSendTimeout(
-                m_udtConnectTimeout.count()) ||
+                m_connectionParameters.rendezvousConnectTimeout.count()) ||
             !m_udtConnectionSocket->setNonBlockingMode(true))
         {
             return executeAcceptHandler(
@@ -121,7 +119,7 @@ void UdpHolePunchingTunnelAcceptor::connectionAckResult(
     initiateUdtConnection();
 }
 
-void UdpHolePunchingTunnelAcceptor::initiateUdtConnection()
+void TunnelAcceptor::initiateUdtConnection()
 {
     NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
@@ -152,11 +150,13 @@ void UdpHolePunchingTunnelAcceptor::initiateUdtConnection()
             executeAcceptHandler(
                 SystemError::noError,
                 std::make_unique<IncomingTunnelUdtConnection>(
-                    m_connectionId, std::move(socket)));
+                    m_connectionId,
+                    std::move(socket),
+                    m_connectionParameters));
         });
 }
 
-void UdpHolePunchingTunnelAcceptor::executeAcceptHandler(
+void TunnelAcceptor::executeAcceptHandler(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
@@ -167,6 +167,7 @@ void UdpHolePunchingTunnelAcceptor::executeAcceptHandler(
     return handler(code, std::move(connection));
 }
 
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

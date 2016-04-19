@@ -6,12 +6,13 @@
 #ifndef STUN_MESSAGE_H
 #define STUN_MESSAGE_H
 
+#include <array>
+#include <chrono>
 #include <cstdint>
-#include <nx/network/buffer.h>
+#include <limits>
 #include <memory>
 #include <map>
 #include <vector>
-#include <array>
 
 #ifdef _DEBUG
 	#include <map>
@@ -19,7 +20,10 @@
 	#include <unordered_map>
 #endif
 
+#include <nx/network/buffer.h>
+#include <nx/utils/log/assert.h>
 #include <utils/common/cpp14.h>
+
 
 //!Implementation of STUN protocol (rfc5389)
 namespace nx {
@@ -237,12 +241,12 @@ namespace attrs
 
         int value() const;
     };
-
 }
 
 class NX_NETWORK_API Message
 {
 public:
+    //TODO #ak is std::shared_ptr really needed here?
 	typedef std::shared_ptr< attrs::Attribute > AttributePtr;
 
 	#ifdef _DEBUG
@@ -254,55 +258,57 @@ public:
     Header header;
     AttributesMap attributes;
 
-    explicit Message( Header header_ = Header(),
-                      AttributesMap attributes_ = AttributesMap() );
+    explicit Message(
+        Header header_ = Header(),
+        AttributesMap attributes_ = AttributesMap());
 
     void clear();
-    void addAttribute( AttributePtr&& attribute );
+    void addAttribute(AttributePtr&& attribute);
 
-    template< typename T >
-    const T* getAttribute( int type = 0, size_t index = 0 ) const;
-
-    // TODO: variadic template when possible
-    template< typename T >
-    void newAttribute()
-    { addAttribute( std::make_unique<T>() ); }
-
-    template< typename T, typename A1 >
-    void newAttribute( A1 a1 )
-    { addAttribute( AttributePtr( new T( std::move(a1) ) ) ); }
-
-    template< typename T, typename A1, typename A2 >
-    void newAttribute( A1 a1, A2 a2 )
-    { addAttribute( AttributePtr( new T( std::move(a1), std::move(a2) ) ) ); }
-
-    template< typename T, typename A1, typename A2, typename A3 >
-    void newAttribute( A1 a1, A2 a2, A3 a3 )
-    { addAttribute( AttributePtr( new T( std::move(a1), std::move(a2), std::move(a3) ) ) ); }
-
-    void insertIntegrity( const String& userName, const String& key );
-    bool verifyIntegrity( const String& userName, const String& key );
-};
-
-template< typename T >
-const T* Message::getAttribute( int type, size_t index ) const
-{
-    const auto aType = type ? type : T::TYPE;
-
-    auto it = attributes.find( aType );
-    if( it == attributes.end() )
-        return nullptr;
-
-    while( index )
+    /** Adds integer attribute */
+    void addAttribute(int type, int value)
     {
-        ++it;
-        --index;
-        if( it == attributes.end() || it->first != aType )
-            return nullptr;
+        addAttribute(std::make_shared<attrs::IntAttribute>(type, value));
     }
 
-    return static_cast< const T* >( it->second.get() );
-}
+    /** Add std::chrono::duration attribute.
+        \warning \a value.count() MUST NOT be greater than \a std::numeric_limits<int>::max()
+    */
+    template<typename Rep, typename Period>
+    void addAttribute(int type, std::chrono::duration<Rep, Period> value)
+    {
+        NX_ASSERT(value.count() <= std::numeric_limits<int>::max());
+        addAttribute(std::make_shared<attrs::IntAttribute>(type, value.count()));
+    }
+
+    /** Add attribute of composite type.
+        Attribute MUST be represented as a structure. E.g, \a MessageIntegrity
+    */
+    template<typename T, typename... Args>
+    void newAttribute(Args... args)
+    {
+        addAttribute(std::make_shared<T>(std::move(args)...));
+    }
+
+    template< typename T >
+    const T* getAttribute(int type) const
+    {
+        auto it = attributes.find(type);
+        if (it == attributes.end())
+            return nullptr;
+
+        return static_cast<const T*>(it->second.get());
+    }
+
+    template< typename T >
+    const T* getAttribute() const
+    {
+        return getAttribute<T>(T::TYPE);
+    }
+
+    void insertIntegrity(const String& userName, const String& key);
+    bool verifyIntegrity(const String& userName, const String& key);
+};
 
 } // namespase stun
 } // namespase nx
