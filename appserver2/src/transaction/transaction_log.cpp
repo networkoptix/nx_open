@@ -156,7 +156,7 @@ QnTransactionLog* QnTransactionLog::instance()
     return globalInstance;
 }
 
-QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2) const
+QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(data1);
@@ -174,7 +174,8 @@ QnUuid QnTransactionLog::transactionHash(const ApiResourceParamWithRefData& para
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnTransactionLog::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data) const {
+QnUuid QnTransactionLog::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data)
+{
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData);
     hash.addData(data.url.toUtf8());

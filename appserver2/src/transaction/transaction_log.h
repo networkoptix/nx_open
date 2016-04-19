@@ -65,19 +65,20 @@ namespace ec2
             template<typename Descriptor>
             void operator ()(const Descriptor &d)
             {
-                m_errorCode = d.save(m_tran, m_tlog);
+                m_errorCode = d.saveFunc(m_tran, &m_tlog);
             }
 
-            GenericTransactionDescriptorSaveVisitor(const QnTransaction<Param> &tran, const QnTransactionLog &tlog)
+            GenericTransactionDescriptorSaveVisitor(const QnTransaction<Param> &tran, QnTransactionLog &tlog)
                 : m_tran(tran),
-                  m_tlog(tlog)
+                  m_tlog(tlog),
+                  m_errorCode(ErrorCode::notImplemented)
             {}
 
             ErrorCode getError() const { return m_errorCode; }
         private:
             const QnTransaction<Param> &m_tran;
             QnTransactionLog &m_tlog;
-            const ErrorCode m_errorCode;
+            ErrorCode m_errorCode;
         };
 
         template<typename Param>
@@ -86,21 +87,22 @@ namespace ec2
             template<typename Descriptor>
             void operator ()(const Descriptor &d)
             {
-                m_errorCode = d.save(m_tran, m_serializedTran, m_tlog);
+                m_errorCode = d.saveSerializedFunc(m_tran, m_serializedTran, &m_tlog);
             }
 
-            GenericTransactionDescriptorSaveSerializedVisitor(const QnTransaction<Param> &tran, const QByteArray &serializedTran, const QnTransactionLog &tlog)
+            GenericTransactionDescriptorSaveSerializedVisitor(const QnTransaction<Param> &tran, const QByteArray &serializedTran, QnTransactionLog &tlog)
                 : m_tran(tran),
                   m_serializedTran(serializedTran),
-                  m_tlog(tlog)
+                  m_tlog(tlog),
+                  m_errorCode(ErrorCode::notImplemented)
             {}
 
             ErrorCode getError() const { return m_errorCode; }
         private:
             const QnTransaction<Param> &m_tran;
-            QnTransactionLog &m_tlog;
             const QByteArray &m_serializedTran;
-            const ErrorCode m_errorCode;
+            QnTransactionLog &m_tlog;
+            ErrorCode m_errorCode;
         };
 
         template <class T>
@@ -198,8 +200,8 @@ namespace ec2
         bool init();
 
         int getLatestSequence(const QnTranStateKey& key) const;
-        QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
-        QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data) const;
+        static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
+        static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
          /**
          *  Semantics of the transactionHash() function is following:

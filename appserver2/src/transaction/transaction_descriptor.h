@@ -8,6 +8,7 @@
 #include <type_traits>
 
 #include "transaction.h"
+#include "nx_ec/data/api_connection_data.h"
 
 namespace ec2
 {
@@ -57,7 +58,7 @@ struct NotificationParams
     QnBusinessEventNotificationManager *businessEventNotificationManager;
     QnLayoutNotificationManager *layoutNotificationManager;
     QnVideowallNotificationManager *videowallNotificationManager;
-    QnWebPageNotificationManager *webPagerNotificationManager;
+    QnWebPageNotificationManager *webPageNotificationManager;
     QnStoredFileNotificationManager *storedFileNotificationManager;
     QnUpdatesNotificationManager *updatesNotificationManager;
     QnMiscNotificationManager *miscNotificationManager;
@@ -109,7 +110,39 @@ extern std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
                TransactionDescriptor<ApiCommand::tranSyncDone, ApiTranSyncDoneData>,
                TransactionDescriptor<ApiCommand::testConnection, ApiLoginData>,
                TransactionDescriptor<ApiCommand::connect, ApiLoginData>,
-               TransactionDescriptor<ApiCommand::openReverseConnection, ApiReverseConnectionData>
+               TransactionDescriptor<ApiCommand::openReverseConnection, ApiReverseConnectionData>,
+               TransactionDescriptor<ApiCommand::removeResource, ApiIdData>,
+
+               TransactionDescriptor<ApiCommand::setResourceStatus, ApiResourceStatusData>,
+               TransactionDescriptor<ApiCommand::setResourceParams, ApiResourceParamDataList>,
+               TransactionDescriptor<ApiCommand::getResourceTypes, ApiResourceTypeDataList>,
+               TransactionDescriptor<ApiCommand::getFullInfo, ApiFullInfoData>,
+               TransactionDescriptor<ApiCommand::setResourceParam, ApiResourceParamWithRefData>,
+               TransactionDescriptor<ApiCommand::removeResourceParam, ApiResourceParamWithRefData>,
+               TransactionDescriptor<ApiCommand::removeResourceParams, ApiResourceParamWithRefDataList>,
+               TransactionDescriptor<ApiCommand::getStatusList, ApiResourceStatusDataList>,
+               TransactionDescriptor<ApiCommand::removeResources, ApiIdDataList>,
+               TransactionDescriptor<ApiCommand::getCameras, ApiCameraDataList>,
+
+               TransactionDescriptor<ApiCommand::saveCamera, ApiCameraData>,
+               TransactionDescriptor<ApiCommand::saveCameras, ApiCameraDataList>,
+               TransactionDescriptor<ApiCommand::removeCamera, ApiIdData>,
+               TransactionDescriptor<ApiCommand::getCameraHistoryItems, ApiServerFootageDataList>,
+               TransactionDescriptor<ApiCommand::addCameraHistoryItem, ApiServerFootageData>,
+               TransactionDescriptor<ApiCommand::removeCameraHistoryItem, ApiServerFootageData>,
+               TransactionDescriptor<ApiCommand::saveCameraUserAttributes, ApiCameraAttributesData>,
+               TransactionDescriptor<ApiCommand::saveCameraUserAttributesList, ApiCameraAttributesDataList>,
+               TransactionDescriptor<ApiCommand::getCameraUserAttributes, ApiCameraAttributesDataList>,
+               TransactionDescriptor<ApiCommand::getCamerasEx, ApiCameraDataExList>,
+
+               TransactionDescriptor<ApiCommand::getMediaServers, ApiMediaServerDataList>,
+               TransactionDescriptor<ApiCommand::saveMediaServer, ApiMediaServerData>,
+               TransactionDescriptor<ApiCommand::removeMediaServer, ApiIdData>,
+               TransactionDescriptor<ApiCommand::saveServerUserAttributes, ApiMediaServerUserAttributesData>,
+               TransactionDescriptor<ApiCommand::saveServerUserAttributesList, ApiMediaServerUserAttributesDataList>,
+               TransactionDescriptor<ApiCommand::getServerUserAttributes, ApiMediaServerUserAttributesDataList>,
+               TransactionDescriptor<ApiCommand::removeServerUserAttributes, ApiIdData>,
+               TransactionDescriptor<ApiCommand::saveStorage, ApiStorageData>
 > transactionDescriptors;
 
 /* Compile-time IndexSequence implementation (since stdc++lib shipped with g++ 4.8.2 doesn't have it) */
