@@ -33,7 +33,8 @@ describe('Restore password suite', function () {
 
     p.passwordField.check(function(){
         var deferred = protractor.promise.defer();
-        p.getRestorePassPage(p.helper.userEmail).then(function(){
+        p.getRestorePassLink(p.helper.userEmail).then(function(url){
+            p.helper.get(url);
             browser.sleep(500);
             deferred.fulfill();
         });
@@ -61,19 +62,20 @@ describe('Restore password suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.restorePassWrongEmail, p.alert.alertTypes.danger, false);
 
-    // TODO: Write correct test to see that link works only once
-    //p.alert.checkAlert(function(){
-    //    var deferred = protractor.promise.defer();
-    //    p.getRestorePassPage(p.helper.userEmail).then(function(){
-    //        p.setNewPassword(p.helper.userPassword);
-    //        p.verifySecondAttemptFails(p.helper.userPassword);
-    //        deferred.fulfill();
-    //    });
-    //    return deferred.promise;
-    //}, p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger, false);
+    p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+        p.getRestorePassLink(p.helper.userEmail).then( function(url) {
+            p.helper.get(url);
+            p.setNewPassword(p.helper.userPassword);
+            p.verifySecondAttemptFails(url, p.helper.userPassword);
+            deferred.fulfill();
+        });
+        return deferred.promise;
+    }, p.alert.alertMessages.restorePassWrongCode, p.alert.alertTypes.danger, false);
 
     it("should set new password, login with new password", function () {
-        p.getRestorePassPage(p.helper.userEmail).then(function() {
+        p.getRestorePassLink(p.helper.userEmail).then(function(url) {
+            p.helper.get(url);
             p.setNewPassword(p.helper.userPasswordNew);
             p.helper.login(p.helper.userEmail, p.helper.userPasswordNew);
             p.helper.logout();
@@ -81,17 +83,19 @@ describe('Restore password suite', function () {
         });
     });
 
-    //xit("should not allow to use one restore link twice", function () {
-    //    p.getRestorePassPage(p.helper.userEmail).then(function() {
-    //        p.setNewPassword(p.helper.userPassword);
-    //        p.verifySecondAttemptFails(p.helper.userPassword);
-    //    });
-    //});
+    it("should not allow to use one restore link twice", function () {
+        p.getRestorePassLink(p.helper.userEmail).then(function(url) {
+            p.helper.get(url);
+            p.setNewPassword(p.helper.userPassword);
+            p.verifySecondAttemptFails(url, p.helper.userPassword);
+        });
+    });
 
     it("should make not-activated user active by restoring password", function () {
         var userEmail = p.helper.register();
         p.get(p.url);
-        p.getRestorePassPage(userEmail).then(function() {
+        p.getRestorePassLink(userEmail).then(function(url) {
+            p.helper.get(url);
             p.setNewPassword(p.helper.userPasswordNew);
             p.helper.login(userEmail, p.helper.userPasswordNew);
             p.helper.logout();
@@ -105,13 +109,49 @@ describe('Restore password suite', function () {
         p.helper.logout();
     });
 
-    xit("should log user out if he visits restore password link from email", function () {
-        p.helper.login(p.helper.userEmail, p.helper.basePassword);
+    fit("should log user out if he visits restore password link from email", function () {
+        p.helper.login(p.helper.userEmail, p.helper.userPassword);
         p.get(p.url);
-        p.getRestorePassPage(p.helper.userEmail).then(function() {
-            p.setNewPassword(p.helper.basePassword); // due to current bug in portal, this fails
-            p.get("/");
-            expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        p.getRestorePassLink(p.helper.userEmail).then(function(url) {
+            /* Please leave then() in browser.get(url).then(function(){});
+            * Otherwise, exception is sometimes thrown
+            * The problem is: inside .then() browser.wait()/ .sleep() / .pause() do not work.
+            * Thus, this hack is used to avoid UNCAUGHT_EXCEPTION
+            * (see info about exception here
+            * http://definitelytyped.org/docs/selenium-webdriver--selenium-webdriver/classes/webdriver.promise.controlflow.html#static-eventtype )
+            */
+            browser.get(url).then(function(){});
         });
+        browser.sleep(1000);
+        p.setNewPassword(p.helper.userPassword);
+        p.get("/");
+        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

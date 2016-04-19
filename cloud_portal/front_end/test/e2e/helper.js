@@ -290,7 +290,8 @@ var Helper = function () {
         var password = newPassword || self.userPassword;
         browser.get('/#/restore_password/');
         browser.waitForAngular();
-        this.restorePassObj.getRestorePassPage(userEmail).then(function() {
+        this.restorePassObj.getRestorePassLink(userEmail).then(function(url) {
+            self.get(url);
             self.restorePassObj.setNewPassword(password);
         });
     };
@@ -298,12 +299,6 @@ var Helper = function () {
     this.isSubstr = function(string, substring) {
         if (string.indexOf(substring) > -1) return true;
     };
-
-    //this.whyException = function(reason) {
-    //    expect(reason.name).toBe("");
-    //    expect(reason.message).toBe("");
-    //    expect(reason.stack).toBe("");
-    //};
 };
 
 module.exports = Helper;

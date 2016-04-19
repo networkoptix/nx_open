@@ -73,21 +73,20 @@ RestorePasswordPage = function () {
 
     };
 
-    //this.verifySecondAttemptFails = function(newPassword) {
-    //    browser.refresh();
-    //    this.passwordInput.sendKeys(newPassword);
-    //    this.savePasswordButton.click();
-    //    this.alert.catchAlert( this.alert.alertMessages.restorePassWrongCode, this.alert.alertTypes.danger);
-    //};
+    this.verifySecondAttemptFails = function(restorePassUrl, newPassword) {
+        this.helper.get(restorePassUrl);
+        this.passwordInput.sendKeys(newPassword);
+        this.savePasswordButton.click();
+        this.alert.catchAlert( this.alert.alertMessages.restorePassWrongCode, this.alert.alertTypes.danger);
+    };
 
-    this.getRestorePassPage = function(userEmail) {
+    this.getRestorePassLink = function(userEmail) {
         var deferred = protractor.promise.defer();
         this.sendLinkToEmail(userEmail);
 
         browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.emailSubject).then(function (email) {
             var regCode = self.getTokenFromEmail(email, userEmail);
-            self.get(self.url + regCode);
-            deferred.fulfill();
+            deferred.fulfill(self.url + regCode);
         }));
 
         return deferred.promise;
