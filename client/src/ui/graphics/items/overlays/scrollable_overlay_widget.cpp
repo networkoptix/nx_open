@@ -16,38 +16,50 @@ QnScrollableOverlayWidget::QnScrollableOverlayWidget(Qt::Alignment alignment, QG
 QnScrollableOverlayWidget::~QnScrollableOverlayWidget() {
 }
 
-QnUuid QnScrollableOverlayWidget::addItem( QGraphicsWidget *item, const QnUuid &externalId) {
+QnUuid QnScrollableOverlayWidget::addItem( QGraphicsWidget *item, const QnUuid &externalId)
+{
     Q_D(QnScrollableOverlayWidget);
-    return d->addItem(item, externalId);
+    auto result = d->addItem(item, externalId);
+    emit contentSizeChanged();
+    return result;
 }
 
 QnUuid QnScrollableOverlayWidget::insertItem(int index, QGraphicsWidget *item, const QnUuid &externalId /*= QnUuid()*/)
 {
     Q_D(QnScrollableOverlayWidget);
-    return d->insertItem(index, item, externalId);
+    auto result = d->insertItem(index, item, externalId);
+    emit contentSizeChanged();
+    return result;
 }
 
-void QnScrollableOverlayWidget::removeItem( const QnUuid &id ) {
+void QnScrollableOverlayWidget::removeItem( const QnUuid &id )
+{
     Q_D(QnScrollableOverlayWidget);
     d->removeItem(id);
+    emit contentSizeChanged();
 }
 
-void QnScrollableOverlayWidget::clear() {
+void QnScrollableOverlayWidget::clear()
+{
     Q_D(QnScrollableOverlayWidget);
     d->clear();
+    emit contentSizeChanged();
 }
 
-int QnScrollableOverlayWidget::overlayWidth() const {
+int QnScrollableOverlayWidget::overlayWidth() const
+{
     Q_D(const QnScrollableOverlayWidget);
     return d->overlayWidth();
 }
 
-void QnScrollableOverlayWidget::setOverlayWidth( int width ) {
+void QnScrollableOverlayWidget::setOverlayWidth( int width )
+{
     Q_D(QnScrollableOverlayWidget);
     d->setOverlayWidth(width);
 }
 
-QSizeF QnScrollableOverlayWidget::sizeHint( Qt::SizeHint which, const QSizeF &constraint /*= QSizeF()*/ ) const {
+QSizeF QnScrollableOverlayWidget::sizeHint( Qt::SizeHint which, const QSizeF &constraint /*= QSizeF()*/ ) const
+{
     if (which != Qt::MinimumSize)
         return base_type::sizeHint(which, constraint);
 
@@ -55,12 +67,20 @@ QSizeF QnScrollableOverlayWidget::sizeHint( Qt::SizeHint which, const QSizeF &co
     return d->minimumSize();
 }
 
-QSizeF QnScrollableOverlayWidget::maxFillCoeff() const {
+QSizeF QnScrollableOverlayWidget::maxFillCoeff() const
+{
     Q_D(const QnScrollableOverlayWidget);
     return d->maxFillCoeff();
 }
 
-void QnScrollableOverlayWidget::setMaxFillCoeff( const QSizeF &coeff ) {
+void QnScrollableOverlayWidget::setMaxFillCoeff( const QSizeF &coeff )
+{
     Q_D(QnScrollableOverlayWidget);
     d->setMaxFillCoeff(coeff);
+}
+
+QSizeF QnScrollableOverlayWidget::contentSize() const
+{
+    Q_D(const QnScrollableOverlayWidget);
+    return d->contentSize();
 }
