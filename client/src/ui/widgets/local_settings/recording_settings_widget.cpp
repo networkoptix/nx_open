@@ -6,8 +6,8 @@
 
 #include <QtMultimedia/QAudioDeviceInfo>
 
-#include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>

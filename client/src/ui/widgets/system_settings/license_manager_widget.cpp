@@ -24,7 +24,6 @@
 #include <ui/style/custom_style.h>
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <utils/license_usage_helper.h>

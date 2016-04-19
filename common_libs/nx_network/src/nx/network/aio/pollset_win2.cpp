@@ -203,7 +203,7 @@ namespace aio {
         }
     };
 
-    class ConstIteratorImpl
+    class ConstIteratorImplOld
     {
     public:
         Pollable* sock;
@@ -215,7 +215,7 @@ namespace aio {
         //!Index in \a curFdSet.fd_array
         size_t fdIndex;
 
-        ConstIteratorImpl()
+        ConstIteratorImplOld()
         :
             sock( nullptr ),
             userData( nullptr ),
@@ -294,13 +294,13 @@ namespace aio {
     //////////////////////////////////////////////////////////
     PollSet::const_iterator::const_iterator()
     :
-        m_impl( new ConstIteratorImpl() )
+        m_impl( new ConstIteratorImplOld() )
     {
     }
 
     PollSet::const_iterator::const_iterator( const PollSet::const_iterator& right )
     :
-        m_impl( new ConstIteratorImpl( *right.m_impl ) )
+        m_impl( new ConstIteratorImplOld( *right.m_impl ) )
     {
     }
 

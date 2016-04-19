@@ -16,6 +16,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <utils/common/scoped_value_rollback.h>
+
 #include <common/common_module.h>
 
 QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject *parent):
@@ -61,6 +63,14 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     }
 
     QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
+
+    /* Draw background to the left of item, to get entire row selection/hover markers. */
+    {
+        QnScopedValueRollback<QRect> rectRollback(&optionV4.rect);
+        optionV4.rect.setWidth(optionV4.rect.left());
+        optionV4.rect.moveLeft(0);
+        style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
+    }
 
     /* Highlight currently raised/zoomed item. */
     QnWorkbenchItem *raisedItem = NULL;

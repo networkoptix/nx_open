@@ -3,9 +3,12 @@
 * akolesnikov
 ***********************************************************/
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
+#include <utils/common/cpp14.h>
 
 #include "functional_tests/test_setup.h"
 #include "functional_tests/system_ut.h"
@@ -35,7 +38,7 @@ TEST_F(CdbLoadTest, manyConnections)
             //ASSERT_EQ(SystemError::noError, errorCode);
             if (errorCode == SystemError::noError)
                 ++connectionsSucceeded;
-            else 
+            else
                 ++connectionsFailed;
         };
 

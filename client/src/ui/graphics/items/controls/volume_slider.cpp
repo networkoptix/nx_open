@@ -2,14 +2,18 @@
 
 #include <openal/qtvaudiodevice.h>
 
+#include <ui/style/helper.h>
+
 #include <utils/common/scoped_value_rollback.h>
 
-QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent): 
+QnVolumeSlider::QnVolumeSlider(QGraphicsItem *parent):
     base_type(parent),
     m_updating(false)
 {
     /* Supress QtvAudioDevice reset from constructor. */
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
+    setProperty(style::Properties::kSliderFeatures, static_cast<int>(style::SliderFeature::FillingUp));
 
     setRange(0, 100);
     setSliderPosition(QtvAudioDevice::instance()->volume() * 100);
@@ -35,7 +39,7 @@ void QnVolumeSlider::setMute(bool mute) {
     QtvAudioDevice::instance()->setMute(mute);
 
     setSliderPosition(qMax(
-        static_cast<int>(QtvAudioDevice::instance()->volume() * 100), 
+        static_cast<int>(QtvAudioDevice::instance()->volume() * 100),
         mute ? 0 : 1 /* So that switching mute -> non-mute will result in non-zero volume. */
     ));
 }
@@ -54,7 +58,7 @@ void QnVolumeSlider::stepForward() {
 // -------------------------------------------------------------------------- //
 void QnVolumeSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
-  
+
     if(change == SliderValueChange) {
         qint64 value = this->value();
 

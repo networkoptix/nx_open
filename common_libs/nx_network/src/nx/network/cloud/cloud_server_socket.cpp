@@ -5,8 +5,9 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
 #include <utils/serialization/lexical.h>
+
+#include "tunnel/udp/acceptor.h"
 
 
 namespace nx {
@@ -31,8 +32,9 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
                 if (!event.udpEndpointList.size())
                     return std::unique_ptr<AbstractTunnelAcceptor>();
 
-                auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
-                    std::move(event.udpEndpointList.front()));
+                auto acceptor = std::make_unique<udp::TunnelAcceptor>(
+                    std::move(event.udpEndpointList.front()),
+                    event.params);
 
                 return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
             }

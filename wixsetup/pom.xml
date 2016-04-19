@@ -18,13 +18,14 @@
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
+        <DbSync22Dir>${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2</DbSync22Dir>
         <nxtool>false</nxtool>
         <final.artifact.name>${installer.name}</final.artifact.name>
         <NxtoolQuickControlsDir>${libdir}\${arch}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
         <ClientFontsDir>${libdir}\${arch}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\${arch}\bin\${build.configuration}\qml</ClientQmlDir>
         <Vs2015crtDir>${environment.dir}\wix\vs2015crt\${arch}</Vs2015crtDir>
+        <rdep.packages>appserver-2.2.1 vcredist-2012 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
@@ -138,9 +139,6 @@
                         <configuration>
                             <encoding>utf-8</encoding>
                             <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
-                            <!-- <excludes>
-										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->	
                             <ignoreMissingFile>true</ignoreMissingFile>                                    
                             <replacements>
                                 <replacement>

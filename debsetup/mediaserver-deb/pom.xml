@@ -23,6 +23,7 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
+        <rdep.packages>appserver-2.2.1</rdep.packages>
     </properties>
 	
 	<build>

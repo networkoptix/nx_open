@@ -17,7 +17,7 @@
 #include <ui/common/grid_widget_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>

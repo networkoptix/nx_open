@@ -22,7 +22,8 @@ public:
             kContrast,
             kBlue,
             kGreen,
-            kBrang
+            kBrand,
+            kRed
         };
 
         static QString paletteName(Palette palette);

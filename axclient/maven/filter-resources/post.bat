@@ -14,7 +14,7 @@ set bebin_path=%AXHDW%\..\..\build_environment\target\%ARCH%\bin
 set PATH=%bebin_path%\%CONFIG%;%PATH%
 set IDC=${qt.dir}\bin\idc.exe
 
-set LIBNAME=Ax${ax.className}2
+set LIBNAME=Ax${ax.className}${parsedVersion.majorVersion}
 
 %IDC% %bebin_path%\%CONFIG%\%LIBNAME%.dll /idl %bebin_path%\%CONFIG%\%LIBNAME%.idl -version ${nxec.ec2ProtoVersion}
 midl %bebin_path%\%CONFIG%\%LIBNAME%.idl /nologo /tlb %bebin_path%\%CONFIG%\%LIBNAME%.tlb

@@ -47,6 +47,7 @@ void ConnectResponse::serialize(nx::stun::Message* const message)
         std::move(publicTcpEndpointList));
     message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
+    params.serialize(message);
 }
 
 bool ConnectResponse::parse(const nx::stun::Message& message)
@@ -55,7 +56,8 @@ bool ConnectResponse::parse(const nx::stun::Message& message)
         readAttributeValue<stun::cc::attrs::PublicEndpointList>(
             message, &publicTcpEndpointList) &&
         readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(
-            message, &udpEndpointList);
+            message, &udpEndpointList) &&
+        params.parse(message);
 }
 
 }   //api

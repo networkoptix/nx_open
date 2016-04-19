@@ -11,6 +11,8 @@
 #include <nx/network/cloud/data/connection_requested_event_data.h>
 #include <nx/utils/log/log.h>
 
+#include "settings.h"
+
 
 namespace nx {
 namespace hpm {
@@ -21,11 +23,13 @@ const std::chrono::seconds kConnectionResultWaitTimeout(15);
 UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
     const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
-    std::function<void(api::ResultCode)> onFsmFinishedEventHandler)
+    std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
+    const conf::Settings& settings)
 :
     m_state(State::init),
     m_connectionID(std::move(connectionID)),
     m_onFsmFinishedEventHandler(std::move(onFsmFinishedEventHandler)),
+    m_settings(settings),
     m_serverConnectionWeakRef(serverPeerDataLocker.value().peerConnection)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
@@ -63,6 +67,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
                 originatingPeerConnection->getSourceAddress());
             connectionRequestedEvent.connectionMethods =
                 api::ConnectionMethod::udpHolePunching;
+            connectionRequestedEvent.params = m_settings.connectionParameters();
             nx::stun::Message indication(
                 stun::Header(
                     stun::MessageClass::indication,
@@ -128,6 +133,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             auto connectResponseSender = std::move(m_connectResponseSender);
 
             api::ConnectResponse connectResponse;
+            connectResponse.params = m_settings.connectionParameters();
             connectResponse.udpEndpointList = std::move(request.udpEndpointList);
 
             connectResponseSender(

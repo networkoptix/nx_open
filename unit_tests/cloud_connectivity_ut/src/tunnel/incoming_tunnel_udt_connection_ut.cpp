@@ -1,13 +1,16 @@
+
 #include <gtest/gtest.h>
 
-#include <utils/thread/sync_queue.h>
-#include <nx/network/cloud/tunnel/incoming_tunnel_udt_connection.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
+#include <nx/network/cloud/tunnel/udp/incoming_tunnel_udt_connection.h>
+#include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <utils/thread/sync_queue.h>
+
 
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 namespace test {
 
 static const size_t kTestConnections = 10;
@@ -36,10 +39,13 @@ protected:
         ASSERT_EQ(results.pop(), SystemError::noError);
         ASSERT_EQ(results.pop(), SystemError::noError);
 
+        nx::hpm::api::ConnectionParameters connectionParameters;
+        connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
+        connectionParameters.udpTunnelKeepAliveRetries = 1;
         connection = std::make_unique<IncomingTunnelUdtConnection>(
             kConnectionId.toUtf8(),
             std::move(tmpSocket),
-            kMaxKeepAliveInterval);
+            std::move(connectionParameters));
         acceptForever();
     }
 
@@ -263,6 +269,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
 }
 
 } // namespace test
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

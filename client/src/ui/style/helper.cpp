@@ -20,10 +20,12 @@ namespace style
     const int Metrics::kSortIndicatorSize = dp(14);
     const int Metrics::kRounding = dp(1);
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
+    const int Metrics::kSwitchMargin = dp(4);
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";
     const char *Properties::kSliderLength = "_qn_sliderLength";
+    const char *Properties::kSliderFeatures = "_qn_sliderFeatures";
     const char *Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
     const char *Properties::kTabShape = "_qn_tabShape";
 

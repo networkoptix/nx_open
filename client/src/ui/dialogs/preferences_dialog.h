@@ -4,7 +4,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/dialogs/generic_tabbed_dialog.h>
+#include <ui/dialogs/common/generic_tabbed_dialog.h>
 
 namespace Ui {
     class PreferencesDialog;

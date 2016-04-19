@@ -1069,7 +1069,6 @@ namespace nx_spl
         }
         return "";
     }
-
 #undef PRINT_ERROR
 #undef ERROR_LIST
 

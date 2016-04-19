@@ -28,6 +28,15 @@ enum class AddressType
 
 QString toString(const AddressType& type);
 
+struct TypedAddress
+{
+    HostAddress address;
+    AddressType type;
+
+    TypedAddress(HostAddress address_, AddressType type_);
+    QString toString() const;
+};
+
 enum class AddressAttributeType
 {
     unknown,
@@ -99,10 +108,6 @@ public:
     void removeFixedAddress(
         const HostAddress& hostName, const SocketAddress& hostAddress);
 
-    typedef std::pair<HostAddress, AddressType> TypedAddres;
-
-    static QString toString(const TypedAddres& address);
-
     //!Resolves domain address to the list of subdomains
     /*!
         \example resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
@@ -112,7 +117,7 @@ public:
      */
     void resolveDomain(
         const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler );
+        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler );
 
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::vector<AddressEntry>)> ResolveHandler;

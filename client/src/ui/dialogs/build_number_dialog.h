@@ -1,7 +1,7 @@
 #ifndef BUILD_NUMBER_DIALOG_H
 #define BUILD_NUMBER_DIALOG_H
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui {
 class QnBuildNumberDialog;

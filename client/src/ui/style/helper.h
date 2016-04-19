@@ -23,6 +23,7 @@ namespace style
         static const int kSortIndicatorSize;
         static const int kRounding;
         static const QSize kSwitchSize;
+        static const int kSwitchMargin;   /**< Margin between switch subcontrol and right side of a control, eg. push button */
     };
 
     class Properties
@@ -30,10 +31,19 @@ namespace style
     public:
         static const char *kHoveredRowProperty;
         static const char *kAccentStyleProperty;
-        static const char *kSliderLength; /**< Name of a property to change default width of the slider handle. */
+        static const char *kSliderLength;           /**< Name of a property to change default width of the slider handle. */
+        static const char *kSliderFeatures;         /**< Name of a property to add extra slider features. */
         static const char *kDontPolishFontProperty;
         static const char *kTabShape;
     };
+
+    /** Flags of additional slider features */
+    enum class SliderFeature
+    {
+        FillingUp   = 0x01  /**< Slider groove from the beginning to the current position is highlighted */
+    };
+
+    Q_DECLARE_FLAGS(SliderFeatures, SliderFeature)
 
     qreal dpr(qreal value);
     int dp(qreal value);

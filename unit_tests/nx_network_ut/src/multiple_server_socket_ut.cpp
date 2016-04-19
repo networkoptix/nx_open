@@ -68,7 +68,8 @@ TEST(MultipleServerSocket, add_remove)
         ASSERT_TRUE(udtServerSocket->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(udtServerSocket->listen());
 
-        connectionGenerator.setRemoteAddress(udtServerSocket->getLocalAddress());
+        connectionGenerator.resetRemoteAddresses(
+            {udtServerSocket->getLocalAddress()});
 
         sock.addSocket(std::move(udtServerSocket));
         std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 100));

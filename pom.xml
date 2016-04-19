@@ -117,6 +117,7 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <liteMode>false</liteMode>
+        <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
@@ -131,6 +132,7 @@
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
+        <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
@@ -141,16 +143,22 @@
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
+        <gtest.version>1.7.0</gtest.version>
+        <gmock.version>1.7.0</gmock.version>
         <ffmpeg.version>0.11.4</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
-        <openldap.version>2.4.42-SNAPSHOT</openldap.version>
-        <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
+        <openldap.version>2.4.42</openldap.version>
+        <sasl2.version>2.1.26</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
-        <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
+        <onvif.version>2.1.2-io</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
-        <boost.version>1.56-SNAPSHOT</boost.version>
+        <boost.version>1.56.0</boost.version>
         <quazip.version>0.7.1</quazip.version>
+        <openal.version>1.16</openal.version>
+        <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
+        <libcreateprocess.version>0.1</libcreateprocess.version>
+        <vmux.version>1.0.0</vmux.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
 
@@ -162,7 +170,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines>QN_DEMO_SHOW</global.defines>
+        <global.defines></global.defines>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
@@ -196,9 +204,11 @@
         <rdep.packages/>
         <rdep.windows.packages/>
         <rdep.linux.packages/>
+        <rdep.linux.arm.packages/>
         <rdep.mac.packages/>
         <rdep.android.packages/>
         <rdep.ios.packages/>
+        <rdep.global.packages/>
 
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -282,6 +292,10 @@
                                     <filtering>true</filtering>
                                 </resource>
                                 <resource>
+                                    <directory>${root.dir}/build_utils/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
                                 </resource>
@@ -305,50 +319,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>get_dependencies.py</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
+                            </environmentVariables>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
-        <profile>
-            <id>android</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>true</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/android.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>android-client/protobuf-classes</module>
-                <module>android-client/android-main</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>ios</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>mac</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>true</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/ios.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>ios-client</module>
-            </modules>
-        </profile>
-
         <profile>
             <id>quicksync</id>
             <activation>
@@ -715,8 +713,9 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
-                <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
+                <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
+                <quazip.version>0.7.2</quazip.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
                 <rdep.target>isd</rdep.target>
@@ -1008,6 +1007,7 @@
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <qt.version>5.5.1</qt.version>
+                <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
@@ -1056,7 +1056,10 @@
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
+                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.1i</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
+                <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>
@@ -1077,5 +1080,22 @@
                 <module>webadmin</module>
             </modules>
         </profile>
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>test</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <modules>
+                <module>unit_tests</module>
+            </modules>
+        </profile>        
     </profiles>
 </project>

@@ -135,7 +135,7 @@ void QnCloudSystemsFinder::onCloudError(QnCloudStatusWatcher::ErrorCode error)
 void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &system)
 {
     using namespace nx::network;
-    typedef std::vector<cloud::AddressResolver::TypedAddres> AddressVector;
+    typedef std::vector<cloud::TypedAddress> AddressVector;
 
     auto &resolver = nx::network::SocketGlobals::addressResolver();
     const QPointer<QnCloudSystemsFinder> guard(this);
@@ -154,8 +154,8 @@ void QnCloudSystemsFinder::updateSystemInternal(const QnSystemDescriptionPtr &sy
 
         for (const auto &host : hosts)
         {
-            pingServerInternal(host.first.toString()
-                , static_cast<int>(host.second), systemId);
+            pingServerInternal(host.address.toString()
+                , static_cast<int>(host.type), systemId);
         }
     };
 

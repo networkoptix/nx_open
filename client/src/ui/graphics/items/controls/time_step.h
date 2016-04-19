@@ -5,10 +5,14 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 
-class QnTimeStep {
+class QnTimeStep
+{
 public:
-    enum Type {
+    enum Type
+    {
         Milliseconds,
+        Seconds,
+        Minutes,
         Hours,
         Days,
         Months,
@@ -43,14 +47,14 @@ public:
 
     /** Number of units for a wrap-around. */
     int wrapUnits;
-        
+
     /** Format string for the step value. */
     QString format;
 
     /** Format string for the interval comment. */
     QString longFormat;
 
-    /** Whether this time step is to be used for relative times (e.g. time intervals), 
+    /** Whether this time step is to be used for relative times (e.g. time intervals),
      * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
     bool isRelative;
 
