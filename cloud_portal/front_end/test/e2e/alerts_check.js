@@ -39,14 +39,23 @@ var AlertSuite = function () {
     }
 
     function closeAlert(){
-        self.alert.click();
+        // Alerts that have close button do not close by clicking on alert.
+        // Thus, the following code decides, how to close it
+        self.alertCloseButton.isDisplayed().then(function(isDisplayed) {
+            if (isDisplayed) {
+                self.alertCloseButton.click();
+            }
+            else {
+                self.alert.click();
+            }
+        });
         browser.sleep(300);
         expect(self.alert.isPresent()).toBe(false);
     }
 
     function closeAlertByButton(){
         self.alertCloseButton.click();
-        browser.sleep(500);
+        browser.sleep(300);
 
         expect(self.alert.isPresent()).toBe(false);
     }
