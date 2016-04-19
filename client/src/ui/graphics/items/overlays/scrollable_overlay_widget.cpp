@@ -21,6 +21,12 @@ QnUuid QnScrollableOverlayWidget::addItem( QGraphicsWidget *item, const QnUuid &
     return d->addItem(item, externalId);
 }
 
+QnUuid QnScrollableOverlayWidget::insertItem(int index, QGraphicsWidget *item, const QnUuid &externalId /*= QnUuid()*/)
+{
+    Q_D(QnScrollableOverlayWidget);
+    return d->insertItem(index, item, externalId);
+}
+
 void QnScrollableOverlayWidget::removeItem( const QnUuid &id ) {
     Q_D(QnScrollableOverlayWidget);
     d->removeItem(id);

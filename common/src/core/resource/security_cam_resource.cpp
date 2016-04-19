@@ -459,6 +459,12 @@ int QnSecurityCamResource::motionSensWindowCount() const
     return val.toInt();
 }
 
+
+bool QnSecurityCamResource::hasTwoWayAudio() const
+{
+    return true;
+}
+
 bool QnSecurityCamResource::isAudioSupported() const {
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
     if (val.toInt() > 0)

@@ -15,6 +15,8 @@ public:
     virtual ~QnScrollableOverlayWidgetPrivate();
 
     QnUuid addItem(QGraphicsWidget *item, const QnUuid &externalId = QnUuid());
+    QnUuid insertItem(int index, QGraphicsWidget *item, const QnUuid &externalId = QnUuid());
+
     void removeItem(const QnUuid &id);
     void clear();
 
@@ -34,7 +36,16 @@ private:
     QnGraphicsScrollArea * const m_scrollArea;
     QGraphicsLinearLayout * const m_mainLayout;
 
-    QHash<QnUuid, QGraphicsWidget*> m_items;
+    struct ItemData
+    {
+        QnUuid id;
+        QGraphicsWidget* item;
+        ItemData();
+        ItemData(const QnUuid& id, QGraphicsWidget* item);
+    };
+
+    /* Order is more important than fast lookup. */
+    QList<ItemData> m_items;
     Qt::Alignment m_alignment;
 
     bool m_updating;

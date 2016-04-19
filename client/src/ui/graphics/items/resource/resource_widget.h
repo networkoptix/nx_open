@@ -33,6 +33,7 @@ class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
 class QnHtmlTextItem;
+class QnScrollableOverlayWidget;
 
 class GraphicsLabel;
 
@@ -348,6 +349,27 @@ protected:
     Q_SLOT virtual void at_itemDataChanged(int role);
 
     float defaultAspectRatio() const;
+
+protected:
+    struct OverlayWidgets {
+        GraphicsWidget *cameraNameOnlyOverlay;
+        GraphicsLabel  *cameraNameOnlyLabel;
+
+        GraphicsWidget *cameraNameWithButtonsOverlay;
+        GraphicsLabel  *mainNameLabel;
+        GraphicsLabel  *mainExtrasLabel;
+
+        QnScrollableOverlayWidget *detailsOverlay;      /**< Overlay containing info item. */
+        QnHtmlTextItem *detailsItem;                    /**< Detailed camera info (resolution, stream, etc). */
+
+        QnScrollableOverlayWidget *positionOverlay;     /**< Overlay containing position item. */
+        QnHtmlTextItem *positionItem;                   /**< Current camera position. */
+
+        OverlayWidgets();
+    };
+
+    const OverlayWidgets& overlayWidgets() const;
+
 private:
     void createButtons();
     void createHeaderOverlay();
@@ -416,23 +438,6 @@ private:
 
 
     QnStatusOverlayWidget *m_statusOverlayWidget;
-
-    struct OverlayWidgets {
-        GraphicsWidget *cameraNameOnlyOverlay;
-        GraphicsLabel  *cameraNameOnlyLabel;
-
-        GraphicsWidget *cameraNameWithButtonsOverlay;
-        GraphicsLabel  *mainNameLabel;
-        GraphicsLabel  *mainExtrasLabel;
-
-        GraphicsWidget *detailsOverlay;     /**< Overlay containing info item. */
-        QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
-
-        GraphicsWidget *positionOverlay;    /**< Overlay containing position item. */
-        QnHtmlTextItem *positionItem;       /**< Current camera position. */
-
-        OverlayWidgets();
-    };
 
     OverlayWidgets m_overlayWidgets;
 

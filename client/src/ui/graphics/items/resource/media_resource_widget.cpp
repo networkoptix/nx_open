@@ -42,6 +42,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
@@ -75,6 +76,8 @@
 namespace
 {
     enum { kMicroInMilliSeconds = 1000 };
+
+    const qreal kTwoWayAudioButtonSize = 44.0;
 
     bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
     {
@@ -242,6 +245,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
+    }
+
+    if (m_camera && m_camera->hasTwoWayAudio() )
+    {
+        auto twoWayAudioItem = new QnTwoWayAudioWidget();
+        twoWayAudioItem->setCamera(m_camera);
+        twoWayAudioItem->setFixedSize(kTwoWayAudioButtonSize);
+
+        /* Items are ordered left-to-right and top-to bottom, so we adding position item below the two-way audio. */
+        overlayWidgets().positionOverlay->insertItem(0, twoWayAudioItem);
     }
 
     /* Set up buttons. */

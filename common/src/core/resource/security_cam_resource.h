@@ -43,7 +43,7 @@ public:
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
-
+    bool hasTwoWayAudio() const;
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
