@@ -16,9 +16,9 @@ angular.module('webadminApp', [
 }).config(function ($routeProvider) {
 
     var universalResolves = {
-        currentUser: function(mediaserver){
+        currentUser: ['mediaserver',function(mediaserver){
             return mediaserver.getCurrentUser();
-        }
+        }]
     };
 
     var customRouteProvider = angular.extend({}, $routeProvider, {
