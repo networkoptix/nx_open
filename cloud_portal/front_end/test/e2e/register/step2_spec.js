@@ -19,7 +19,8 @@ describe('Registration step2', function () {
     it("should activate registration with a registration code sent to an email", function () {
         var userEmail = p.helper.register();
 
-        p.getActivationPage(userEmail).then( function() {
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
 
             p.helper.login(userEmail, p.helper.userPassword);
@@ -27,10 +28,35 @@ describe('Registration step2', function () {
         });
     });
 
+    it("should show error if same link is used twice", function () {
+        var userEmail = p.helper.register();
+
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            browser.get(url);
+            p.alert.catchAlert(p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger);
+        });
+    });
+
+    p.alert.checkAlert(function(){
+        var deferred = protractor.promise.defer();
+        var userEmail = p.helper.register();
+
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            browser.get(url);
+            deferred.fulfill();
+        });
+        return deferred.promise;
+    }, p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger, true);
+
     it("should save user data to user account correctly", function () {
         var userEmail = p.helper.register();
     
-        p.getActivationPage(userEmail).then( function() {
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             p.helper.login(userEmail, p.helper.userPassword);
             p.helper.get('/#/account');
@@ -39,7 +65,7 @@ describe('Registration step2', function () {
             p.helper.logout();
         });
     });
-
+    
     it("should allow to enter more than 256 symbols in First and Last names and cut it to 256", function () {
         var userEmail = p.helper.getRandomEmail();
     
@@ -50,7 +76,8 @@ describe('Registration step2', function () {
     
         p.submitButton.click();
     
-        p.getActivationPage(userEmail).then( function() {
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             p.helper.login(userEmail, p.helper.userPassword);
             p.helper.get('/#/account');
@@ -70,7 +97,8 @@ describe('Registration step2', function () {
     
         p.submitButton.click();
     
-        p.getActivationPage(userEmail).then( function() {
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             p.helper.login(userEmail, p.helper.userPassword);
             p.helper.get('/#/account');
