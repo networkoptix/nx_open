@@ -117,6 +117,7 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <liteMode>false</liteMode>
+        <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
