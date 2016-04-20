@@ -81,7 +81,7 @@ void PeerRegistrator::bind(
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode = 
-        getMediaserverData(requestMessage, &mediaserverData, &errorMessage);
+        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(
@@ -123,7 +123,7 @@ void PeerRegistrator::listen(
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode =
-        getMediaserverData(requestMessage, &mediaserverData, &errorMessage);
+        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(
