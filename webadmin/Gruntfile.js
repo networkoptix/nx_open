@@ -223,11 +223,19 @@ module.exports = function (grunt) {
 
 
                 //Dell - Burbank
-                {context: '/api/',      host: '10.1.5.130', port: 7001},
+                /*{context: '/api/',      host: '10.1.5.130', port: 7001},
                  {context: '/ec2/',      host: '10.1.5.130', port: 7001},
                  {context: '/hls/',      host: '10.1.5.130', port: 7001},
                  {context: '/media/',    host: '10.1.5.130', port: 7001},
                  {context: '/proxy/',    host: '10.1.5.130', port: 7001}/**/
+
+
+                //Parallels - Burbank
+                {context: '/api/',      host: '10.1.5.104', port: 7001},
+                {context: '/ec2/',      host: '10.1.5.104', port: 7001},
+                {context: '/hls/',      host: '10.1.5.104', port: 7001},
+                {context: '/media/',    host: '10.1.5.104', port: 7001},
+                {context: '/proxy/',    host: '10.1.5.104', port: 7001}/**/
 
             ],
             livereload: {
@@ -606,7 +614,7 @@ module.exports = function (grunt) {
         },
         shell: {
             deploy: {
-                command: 'cd ~/develop/' + package_dir + '; python ~/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+                command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
             },
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
