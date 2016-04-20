@@ -11,17 +11,17 @@
 
 namespace Ui
 {
-    class UserSettingsWidget;
+    class UserProfileWidget;
 }
 
-class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnUserProfileWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnUserSettingsWidget(QWidget* parent = 0);
-    virtual ~QnUserSettingsWidget();
+    QnUserProfileWidget(QWidget* parent = 0);
+    virtual ~QnUserProfileWidget();
 
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
@@ -57,7 +57,7 @@ private:
     Qn::GlobalPermissions selectedPermissions() const;
     QnUuid selectedUserGroup() const;
 private:
-    QScopedPointer<Ui::UserSettingsWidget> ui;
+    QScopedPointer<Ui::UserProfileWidget> ui;
     Mode m_mode;
     QnUserResourcePtr m_user;
 };

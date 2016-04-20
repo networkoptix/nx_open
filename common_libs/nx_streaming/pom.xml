@@ -25,6 +25,7 @@
         <guid>${nx_streaming.guid}</guid>
         <product.title>${company.name} nx_streaming</product.title>
 
+        <template>lib</template>
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>

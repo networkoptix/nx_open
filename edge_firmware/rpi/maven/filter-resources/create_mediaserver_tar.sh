@@ -20,7 +20,7 @@ set -e
 #     echo "$h"
 # }
 
-TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-4.8.3
+TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
@@ -132,6 +132,7 @@ popd
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+cp $BINS_DIR/external.dat $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
   $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
@@ -174,7 +175,7 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    #cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
     cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 

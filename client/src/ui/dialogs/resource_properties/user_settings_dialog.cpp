@@ -2,10 +2,14 @@
 #include "ui_user_settings_dialog.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/delegates/abstract_permissions_delegate.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/widgets/properties/user_profile_widget.h>
 #include <ui/widgets/properties/user_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
 #include <ui/widgets/properties/permissions_widget.h>
@@ -13,42 +17,92 @@
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+namespace
+{
+    class UserSettingsPermissionsDelegate : public QnAbstractPermissionsDelegate
+    {
+    public:
+        UserSettingsPermissionsDelegate(QnUserSettingsDialog* owner) :
+            m_owner(owner)
+        {};
+
+        virtual Qn::GlobalPermissions permissions() const override
+        {
+            if (!m_owner->user())
+                return Qn::NoGlobalPermissions;
+
+            return m_owner->user()->getPermissions();
+        }
+
+        virtual void setPermissions(Qn::GlobalPermissions value) override
+        {
+            if (!m_owner->user())
+                return;
+
+            m_owner->user()->setPermissions(value);
+        }
+
+        virtual QSet<QnUuid> accessibleResources() const override
+        {
+            if (!m_owner->user())
+                return QSet<QnUuid>();
+
+            return qnResourceAccessManager->accessibleResources(m_owner->user()->getId());
+        }
+
+        virtual void setAccessibleResources(const QSet<QnUuid>& value) override
+        {
+            if (!m_owner->user())
+                return;
+
+            qnResourceAccessManager->setAccessibleResources(m_owner->user()->getId(), value);
+        }
+
+    private:
+        QnUserSettingsDialog* m_owner;
+    };
+
+
+
+}
+
 QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
+    m_permissionsDelegate(new UserSettingsPermissionsDelegate(this)),
     m_user(),
+    m_profilePage(new QnUserProfileWidget(this)),
     m_settingsPage(new QnUserSettingsWidget(this)),
-    m_permissionsPage(new QnPermissionsWidget(this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(QnAccessibleResourcesWidget::CamerasFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(QnAccessibleResourcesWidget::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(QnAccessibleResourcesWidget::ServersFilter, this))
+    m_permissionsPage(new QnPermissionsWidget(m_permissionsDelegate.data(), this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(m_permissionsDelegate.data(), QnAccessibleResourcesWidget::CamerasFilter, this)),
+    m_layoutsPage(new QnAccessibleResourcesWidget(m_permissionsDelegate.data(), QnAccessibleResourcesWidget::LayoutsFilter, this)),
+    m_serversPage(new QnAccessibleResourcesWidget(m_permissionsDelegate.data(), QnAccessibleResourcesWidget::ServersFilter, this))
 {
     ui->setupUi(this);
 
+    addPage(ProfilePage, m_profilePage, tr("Profile"));
     addPage(SettingsPage, m_settingsPage, tr("User Information"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
+    setPageVisible(SettingsPage, false);
     setPageVisible(PermissionsPage, false);
     setPageVisible(CamerasPage, false);
     setPageVisible(LayoutsPage, false);
     setPageVisible(ServersPage, false);
 
-    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]
-    {
-        bool customAccessRights = m_settingsPage->isCustomAccessRights();
-        setPageVisible(PermissionsPage, customAccessRights);
-        setPageVisible(CamerasPage, customAccessRights);
-        setPageVisible(LayoutsPage, customAccessRights);
-        setPageVisible(ServersPage, customAccessRights);
-    });
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
     {
         if (isHidden())
+            return;
+
+        /* Do not automatically switch if we are creating a new user. */
+        if (m_user && m_user->flags().testFlag(Qn::local))
             return;
 
         auto users = resources.filtered<QnUserResource>();
@@ -70,8 +124,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
     safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
-
-    //TODO: #GDM #access connect to resource pool to check if user was deleted
 
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
@@ -95,10 +147,6 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
         return;
 
     m_settingsPage->setUser(user);
-    m_permissionsPage->setTargetUser(user);
-    m_camerasPage->setTargetUser(user);
-    m_layoutsPage->setTargetUser(user);
-    m_serversPage->setTargetUser(user);
 
     m_user = user;
 
@@ -130,7 +178,15 @@ QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
 void QnUserSettingsDialog::retranslateUi()
 {
     base_type::retranslateUi();
-    if (m_user)
+    if (!m_user)
+        return;
+
+    if (m_user->flags().testFlag(Qn::local))
+    {
+        setWindowTitle(tr("New User..."));
+        setHelpTopic(this, Qn::NewUser_Help);
+    }
+    else
     {
         bool readOnly = !accessController()->hasPermissions(m_user, Qn::WritePermission | Qn::SavePermission);
         setWindowTitle(readOnly
@@ -139,20 +195,48 @@ void QnUserSettingsDialog::retranslateUi()
             );
         setHelpTopic(this, Qn::UserSettings_Help);
     }
-    else
-    {
-        setWindowTitle(tr("New User..."));
-        setHelpTopic(this, Qn::NewUser_Help);
-    }
 }
 
 void QnUserSettingsDialog::applyChanges()
 {
-    base_type::applyChanges();
+    //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
+
+    qnResourcesChangesManager->saveUser(m_user, [this](const QnUserResourcePtr &user)
+    {
+        /* Workaround against gcc issue. We cannot call protected method from lambda. */
+        applyChangesInternal();
+    });
+
     if (m_user && m_user->flags().testFlag(Qn::local))
     {
         /* New User was created, clear dialog. */
         setUser(QnUserResourcePtr());
     }
+}
+
+void QnUserSettingsDialog::updatePagesVisibility()
+{
+    if (!m_user)
+    {
+        for (const auto& page : allPages())
+            setPageVisible(page.key, false);
+        return;
+    }
+
+    /* We are displaying profile for ourself and for users, that we cannot edit. */
+    bool showOnlyProfile = !accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission);
+    bool customAccessRights = !showOnlyProfile && m_settingsPage->isCustomAccessRights();
+
+    setPageVisible(ProfilePage, showOnlyProfile);
+    setPageVisible(SettingsPage, !showOnlyProfile);
+    setPageVisible(PermissionsPage, customAccessRights);
+    setPageVisible(CamerasPage, customAccessRights);
+    setPageVisible(LayoutsPage, customAccessRights);
+    setPageVisible(ServersPage, customAccessRights);
+}
+
+void QnUserSettingsDialog::applyChangesInternal()
+{
+    base_type::applyChanges();
 }
 

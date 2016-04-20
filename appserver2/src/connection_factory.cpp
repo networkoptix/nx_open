@@ -733,7 +733,6 @@ namespace ec2
          *     %value GlobalOwnerPermission Root, can edit admins.
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
          *     %value GlobalEditLayoutsPermission Can create and edit layouts.
-         *     %value GlobalEditUsersPermission Can create and edit users.
          *     %value GlobalEditServersPermissions Can edit server settings.
          *     %value GlobalViewLivePermission Can view live stream of available cameras.
          *     %value GlobalViewArchivePermission Can view archives of available cameras.
@@ -789,7 +788,6 @@ namespace ec2
         * %param name Group name.
         * %param permissions Combination (via "|") of the following flags:
         *     %value GlobalEditLayoutsPermission Can create and edit layouts.
-        *     %value GlobalEditUsersPermission Can create and edit users.
         *     %value GlobalEditServersPermissions Can edit server settings.
         *     %value GlobalViewLivePermission Can view live stream of available cameras.
         *     %value GlobalViewArchivePermission Can view archives of available cameras.

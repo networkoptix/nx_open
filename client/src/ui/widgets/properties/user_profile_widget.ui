@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UserProfileWidget</class>
+ <widget class="QWidget" name="UserProfileWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>463</width>
+    <height>403</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>16</number>
+   </property>
+   <item>
+    <widget class="QPushButton" name="enabledButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Enabled</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="propertiesLayout">
+     <property name="verticalSpacing">
+      <number>0</number>
+     </property>
+     <item row="0" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="loginLabel">
+       <property name="text">
+        <string>&amp;Login</string>
+       </property>
+       <property name="margin">
+        <number>12</number>
+       </property>
+       <property name="buddy">
+        <cstring>loginEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="loginEdit"/>
+     </item>
+     <item row="1" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="emailLabel">
+       <property name="text">
+        <string>E&amp;mail</string>
+       </property>
+       <property name="margin">
+        <number>12</number>
+       </property>
+       <property name="buddy">
+        <cstring>emailEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="emailEdit"/>
+     </item>
+     <item row="2" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="currentPasswordLabel">
+       <property name="text">
+        <string>C&amp;urrent Password</string>
+       </property>
+       <property name="margin">
+        <number>12</number>
+       </property>
+       <property name="buddy">
+        <cstring>currentPasswordEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="currentPasswordEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="passwordLabel">
+       <property name="text">
+        <string>&amp;Password</string>
+       </property>
+       <property name="margin">
+        <number>12</number>
+       </property>
+       <property name="buddy">
+        <cstring>passwordEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="passwordEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="confirmPasswordLabel">
+       <property name="text">
+        <string>&amp;Confirm Password</string>
+       </property>
+       <property name="margin">
+        <number>12</number>
+       </property>
+       <property name="buddy">
+        <cstring>confirmPasswordEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="confirmPasswordEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+     <item row="0" column="0">
+      <widget class="QLabel" name="groupLabel">
+       <property name="text">
+        <string>Group</string>
+       </property>
+       <property name="buddy">
+        <cstring>groupComboBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" alignment="Qt::AlignTop">
+      <widget class="QComboBox" name="groupComboBox"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="permissionsLabel">
+       <property name="text">
+        <string notr="true">&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;&lt;b&gt;3&lt;/b&gt; / 6&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Permissions&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;b&gt;18&lt;/b&gt; / 91&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Cameras&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;b&gt;2&lt;/b&gt; / 8&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Layouts&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;b&gt;0&lt;/b&gt; / 3&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Servers&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" alignment="Qt::AlignRight">
+      <widget class="QPushButton" name="editGroupButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Edit Group...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

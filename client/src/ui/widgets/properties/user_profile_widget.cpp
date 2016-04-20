@@ -1,5 +1,5 @@
-#include "user_settings_widget.h"
-#include "ui_user_settings_widget.h"
+#include "user_profile_widget.h"
+#include "ui_user_profile_widget.h"
 
 #include <api/app_server_connection.h>
 
@@ -22,10 +22,10 @@ namespace
     const int kPermissionsRole = Qt::UserRole + 2;
 }
 
-QnUserSettingsWidget::QnUserSettingsWidget(QWidget* parent /*= 0*/):
+QnUserProfileWidget::QnUserProfileWidget(QWidget* parent /*= 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::UserSettingsWidget()),
+    ui(new Ui::UserProfileWidget()),
     m_mode(Mode::Invalid),
     m_user()
 {
@@ -35,31 +35,31 @@ QnUserSettingsWidget::QnUserSettingsWidget(QWidget* parent /*= 0*/):
 //    setHelpTopic(ui->accessRightsGroupbox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
-    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateLogin);
-    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->currentPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->currentPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateEmail);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::updateLogin);
+    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->currentPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::updatePassword);
+    connect(ui->currentPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserProfileWidget::updatePassword);
+    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::updatePassword);
+    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::updateEmail);
+    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserProfileWidget::hasChangesChanged);
+    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserProfileWidget::hasChangesChanged);
 
     //setWarningStyle(ui->hintLabel);
 }
 
-QnUserSettingsWidget::~QnUserSettingsWidget()
+QnUserProfileWidget::~QnUserProfileWidget()
 {}
 
-QnUserResourcePtr QnUserSettingsWidget::user() const
+QnUserResourcePtr QnUserProfileWidget::user() const
 {
     return m_user;
 }
 
-void QnUserSettingsWidget::setUser(const QnUserResourcePtr &user)
+void QnUserProfileWidget::setUser(const QnUserResourcePtr &user)
 {
     if (m_user == user)
         return;
@@ -75,7 +75,7 @@ void QnUserSettingsWidget::setUser(const QnUserResourcePtr &user)
         : Mode::OtherUser;
 }
 
-bool QnUserSettingsWidget::hasChanges() const
+bool QnUserProfileWidget::hasChanges() const
 {
     if (!m_user)
         return false;
@@ -120,7 +120,7 @@ bool QnUserSettingsWidget::hasChanges() const
     return false;
 }
 
-void QnUserSettingsWidget::loadDataToUi()
+void QnUserProfileWidget::loadDataToUi()
 {
     updateAccessRightsPresets();
     updateControlsAccess();
@@ -165,7 +165,7 @@ void QnUserSettingsWidget::loadDataToUi()
     updateEmail();
 }
 
-void QnUserSettingsWidget::applyChanges()
+void QnUserProfileWidget::applyChanges()
 {
     if (!m_user)
         return;
@@ -239,14 +239,14 @@ void QnUserSettingsWidget::applyChanges()
         m_user->setEnabled(ui->enabledButton->isChecked());
 }
 
-bool QnUserSettingsWidget::isCustomAccessRights() const
+bool QnUserProfileWidget::isCustomAccessRights() const
 {
     int index = ui->groupComboBox->currentIndex();
     return selectedPermissions() == Qn::NoGlobalPermissions
         && selectedUserGroup().isNull();
 }
 
-void QnUserSettingsWidget::updateLogin()
+void QnUserProfileWidget::updateLogin()
 {
     QString proposedLogin = ui->loginEdit->text().trimmed().toLower();
 
@@ -285,7 +285,7 @@ void QnUserSettingsWidget::updateLogin()
         updatePassword();
 }
 
-void QnUserSettingsWidget::updatePassword()
+void QnUserProfileWidget::updatePassword()
 {
     bool valid = true;
     QString hint;
@@ -329,7 +329,7 @@ void QnUserSettingsWidget::updatePassword()
 
 }
 
-void QnUserSettingsWidget::updateEmail()
+void QnUserProfileWidget::updateEmail()
 {
     bool valid = true;
     QString hint;
@@ -348,7 +348,7 @@ void QnUserSettingsWidget::updateEmail()
     ui->emailEdit->setPalette(palette);
 }
 
-void QnUserSettingsWidget::updateControlsAccess()
+void QnUserProfileWidget::updateControlsAccess()
 {
     Qn::Permissions permissions = m_user
         ? accessController()->permissions(m_user)
@@ -372,7 +372,7 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 
-void QnUserSettingsWidget::updateAccessRightsPresets()
+void QnUserProfileWidget::updateAccessRightsPresets()
 {
     ui->groupComboBox->clear();
 
@@ -419,12 +419,12 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
     addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
 }
 
-Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
+Qn::GlobalPermissions QnUserProfileWidget::selectedPermissions() const
 {
     return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
 }
 
-QnUuid QnUserSettingsWidget::selectedUserGroup() const
+QnUuid QnUserProfileWidget::selectedUserGroup() const
 {
     return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
 }
