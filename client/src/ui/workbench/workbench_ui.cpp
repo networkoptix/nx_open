@@ -1264,7 +1264,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     m_treeXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_treeXAnimator->setTargetObject(m_treeItem);
     m_treeXAnimator->setAccessor(new PropertyAccessor("x"));
-    m_treeXAnimator->setSpeed(m_treeItem->size().width() * 2.0);
+    m_treeXAnimator->setSpeed(qMax(1.0, m_treeItem->size().width() * 2.0));
     m_treeXAnimator->setTimeLimit(500);
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -1517,7 +1517,7 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate)
     qreal newX = m_controlsWidgetRect.right() + (opened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */);
     if (animate)
     {
-        m_notificationsXAnimator->setSpeed(m_notificationsItem->size().width() * 2.0);
+        m_notificationsXAnimator->setSpeed(qMax(1.0, m_notificationsItem->size().width() * 2.0));
         m_notificationsXAnimator->animateTo(newX);
     }
     else
