@@ -45,6 +45,9 @@ protected:
     virtual void applyChanges() override;
 
 private:
+    void applyChangesInternal();
+
+private:
     Q_DISABLE_COPY(QnUserSettingsDialog)
 
     QScopedPointer<Ui::UserSettingsDialog> ui;

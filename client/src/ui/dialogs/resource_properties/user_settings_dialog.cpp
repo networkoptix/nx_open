@@ -206,7 +206,8 @@ void QnUserSettingsDialog::applyChanges()
 
     qnResourcesChangesManager->saveUser(m_user, [this](const QnUserResourcePtr &user)
     {
-        base_type::applyChanges();
+        /* Workaround against gcc issue. We cannot call protected method from lambda. */
+        applyChangesInternal();
     });
 
     if (m_user && m_user->flags().testFlag(Qn::local))
@@ -214,5 +215,10 @@ void QnUserSettingsDialog::applyChanges()
         /* New User was created, clear dialog. */
         setUser(QnUserResourcePtr());
     }
+}
+
+void QnUserSettingsDialog::applyChangesInternal()
+{
+    base_type::applyChanges();
 }
 
