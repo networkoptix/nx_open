@@ -22,13 +22,13 @@ public:
     virtual bool existMoreData() const override;
 private:
     quint8* m_audioEncodingBuffer;
-    quint8* m_resampleBuffer;
     AVCodecContext* m_encoderCtx;
     AVCodecContext* m_decoderContext;
     qint64 m_firstEncodedPts;
 
-    quint8* m_decodedBuffer;
-    int m_decodedBufferSize;
+    QnByteArray m_unresampledData;
+    QnByteArray m_resampledData;
+
     qint64 m_lastTimestamp;
     QnMediaContextPtr m_context;
     
