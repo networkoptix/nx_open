@@ -13,6 +13,12 @@ public:
     virtual bool processAudioData(QnConstAbstractMediaDataPtr &data) = 0;
     virtual bool canAcceptData() const override;
     virtual void putData( const QnAbstractDataPacketPtr& data );
+
+    /**
+     * A bit hack here: if open desktop camera without configuration then only audio stream is opened.
+     * Otherwise (default) video + audio is opened
+     */
+    virtual bool needConfigureProvider() const { return false; }
 };
 
 #endif // AUDIO_DATA_TRANSMITTER_H

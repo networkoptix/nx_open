@@ -17,9 +17,15 @@ public:
     QnDesktopCameraStreamReader(const QnResourcePtr& res);
     virtual ~QnDesktopCameraStreamReader();
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
-
+    void setNeedVideoData(bool value);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
+
+    /*
+     * isCameraControlRequired param using for DesktopCamera as:
+     * - value 'false' means open audio stream only
+     * - value 'true' means audio + video
+     */
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;

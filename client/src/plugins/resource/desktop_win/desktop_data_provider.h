@@ -55,21 +55,19 @@ public:
 
 protected:
     virtual void run() override;
-
-private:
-    bool init();
-
 private:
     friend class CaptureAudioStream;
 
+    bool init();
     virtual void closeStream();
 
     qint64 currentTime() const;
     int calculateBitrate();
     int processData(bool flush);
+    void putAudioData();
     void stopCapturing();
     SpeexPreprocessState* createSpeexPreprocess();
-
+    bool needVideoData() const;
 private:
     class EncodedAudioInfo
     {
