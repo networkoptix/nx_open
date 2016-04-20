@@ -51,6 +51,9 @@ private:
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
     bool bindedToCloud(QnMutexLockerBase* const lk) const;
+    void monitorForCloudEvents();
+    void stopMonitoringCloudEvents();
+    void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
 
 private slots:
     void cloudSettingsChanged();

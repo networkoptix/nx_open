@@ -32,7 +32,9 @@ CloudConnectionManager::CloudConnectionManager()
         }
     }
 
-    Qn::directConnect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &CloudConnectionManager::cloudSettingsChanged);
+    Qn::directConnect(
+        qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &CloudConnectionManager::cloudSettingsChanged);
 }
 
 CloudConnectionManager::~CloudConnectionManager()
@@ -100,6 +102,43 @@ bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const /*lk*/) cons
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 }
 
+void CloudConnectionManager::monitorForCloudEvents()
+{
+    QnMutexLocker lk(&m_mutex);
+
+    auto eventConnection = 
+        m_cdbConnectionFactory->createEventConnection(
+            m_cloudSystemID.toStdString(),
+            m_cloudAuthKey.toStdString());
+
+    using namespace std::placeholders;
+    nx::cdb::api::SystemEventHandlers systemEventHandlers;
+    systemEventHandlers.setOnSystemAccessListUpdated(
+        std::bind(&CloudConnectionManager::onSystemAccessListUpdated, this, _1));
+    eventConnection->start(
+        std::move(systemEventHandlers),
+        [](nx::cdb::api::ResultCode /*resultCode*/){ /* TODO #ak retry on failure */ });
+    m_eventConnection = std::move(eventConnection);
+}
+
+void CloudConnectionManager::stopMonitoringCloudEvents()
+{
+    QnMutexLocker lk(&m_mutex);
+
+    //closing event connection
+    NX_ASSERT(m_eventConnection);
+    auto eventConnection = std::move(m_eventConnection);
+    lk.unlock();
+
+    eventConnection->pleaseStopSync();
+}
+
+void CloudConnectionManager::onSystemAccessListUpdated(
+    nx::cdb::api::SystemAccessListModifiedEvent event)
+{
+    //TODO #ak
+}
+
 void CloudConnectionManager::cloudSettingsChanged()
 {
     const auto cloudSystemId = qnGlobalSettings->cloudSystemID();
@@ -134,11 +173,14 @@ void CloudConnectionManager::cloudSettingsChanged()
 
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(std::move(credentials));
+
+        monitorForCloudEvents();
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
+        stopMonitoringCloudEvents();
     }
 
     emit cloudBindingStatusChanged(bindedToCloud);
