@@ -274,7 +274,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             return m_rootNodes[Qn::BastardNode];
 
         //TODO: #GDM non-admin scope?
-        if (!accessController()->hasGlobalPermission(Qn::GlobalEditUsersPermission))
+        if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
             return m_rootNodes[Qn::RootNode];
 
         QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>();
