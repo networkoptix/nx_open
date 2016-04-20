@@ -39,7 +39,6 @@ ICONSTAGE=$STAGE$ICONTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
-CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
 CLIENT_PLATFORMINPUTCONTEXTS_PATH=$CLIENT_BIN_PATH/platforminputcontexts
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
@@ -68,16 +67,13 @@ QT_LIBS=\
     Sql \
     Xml \
     XmlPatterns \
-    Sensors \
-    PrintSupport \
-    Positioning
+    PrintSupport
 )
 
 #. $CLIENT_BIN_PATH/env.sh
 
 # Prepare stage dir
 rm -rf $STAGEBASE
-mkdir -p $BINSTAGE/styles
 mkdir -p $BINSTAGE/imageformats
 mkdir -p $BINSTAGE/platforminputcontexts
 mkdir -p $HELPSTAGE
@@ -100,14 +96,13 @@ cp -P -Rf $ICONS_PATH $ICONSTAGE
 for f in `find $ICONSTAGE -name *.png`; do mv $f `dirname $f`/`basename $f .png`-${customization}.png; done
 
 # Copy help
-cp -r $CLIENT_HELP_PATH/** $HELPSTAGE
+cp -r $CLIENT_HELP_PATH/* $HELPSTAGE
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
 
-# Copy libraries, styles, imageformats
+# Copy libraries, imageformats
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
-cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
 cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -r $CLIENT_VOX_PATH $BINSTAGE

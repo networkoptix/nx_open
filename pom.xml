@@ -137,8 +137,8 @@
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
-        <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
-        <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
+        <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
@@ -194,12 +194,6 @@
             XmlPatterns, XcbQpa
         </qtlibs>
         <additional.qtlibs/>
-
-        <!--QT plugins used-->
-        <qtplugins>
-            imageformats, platforms, xcbglintegrations
-        </qtplugins>
-        <additional.qtplugins/>
 
         <!-- List of commonly used RDep packages -->
         <rdep.packages/>
@@ -444,7 +438,6 @@
             </activation>
             <properties>
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
-                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>applauncher</module>
@@ -484,6 +477,8 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
+                <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
+                <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
@@ -605,7 +600,6 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <additional.qtplugins>audio, platforminputcontexts</additional.qtplugins>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -971,7 +965,6 @@
             </activation>
             <properties>
                 <compile.options/>
-                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>client.core</module>
