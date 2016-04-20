@@ -99,7 +99,7 @@ angular.module('webadminApp')
 
             mediaserver.getModuleInformation(reload).then(function(r){
                 $scope.serverInfo = r.data.reply;
-                $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
+                $scope.hasInternetOnServer = true || $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
 
                 $log.log("internet on server: " + $scope.hasInternetOnServer + ", flags: " + $scope.serverInfo.serverFlags);
             },function(error){
