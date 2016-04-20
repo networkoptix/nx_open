@@ -119,6 +119,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
+        <template>lib</template>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -634,11 +635,13 @@
             <properties>
                 <platform>macosx</platform>
                 <arch>x64</arch>
-                <qt.spec>macx-clang-libc++</qt.spec>
+                <quazip.version>0.7.2</quazip.version>
+                <qt.spec/>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
             <modules>
+                <module>common_libs/nx_email</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
