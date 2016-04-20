@@ -14,56 +14,68 @@
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
-namespace {
+namespace
+{
     const QString customKeyProperty = lit("customIconCacheKey");
+
+    QIcon loadIcon(const QString& name)
+    {
+        static const QVector<QPair<QIcon::Mode, QString> > kResourceIconModes({
+            qMakePair(QnIcon::Active,   lit("accented")),
+            qMakePair(QnIcon::Disabled, lit("disabled")),
+            qMakePair(QnIcon::Selected, lit("selected")),
+        });
+
+        return qnSkin->icon(name, QString(), kResourceIconModes.size(), &kResourceIconModes.front());
+    }
 }
 
-QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
+QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent)
+{
     m_cache.insert(Unknown,                 QIcon());
-    m_cache.insert(LocalServer,             qnSkin->icon("tree/home.png"));
-    m_cache.insert(Server,                  qnSkin->icon("tree/server.png"));
-    m_cache.insert(Servers,                 qnSkin->icon("tree/servers.png"));
-    m_cache.insert(Layout,                  qnSkin->icon("tree/layout.png"));
-    m_cache.insert(Camera,                  qnSkin->icon("tree/camera.png"));
-    m_cache.insert(IOModule,                qnSkin->icon("tree/io.png"));
-    m_cache.insert(Recorder,                qnSkin->icon("tree/recorder.png"));
-    m_cache.insert(Image,                   qnSkin->icon("tree/snapshot.png"));
-    m_cache.insert(Media,                   qnSkin->icon("tree/media.png"));
-    m_cache.insert(User,                    qnSkin->icon("tree/user.png"));
-    m_cache.insert(Users,                   qnSkin->icon("tree/users.png"));
-    m_cache.insert(VideoWall,               qnSkin->icon("tree/videowall.png"));
-    m_cache.insert(VideoWallItem,           qnSkin->icon("tree/screen.png"));
-    m_cache.insert(VideoWallMatrix,         qnSkin->icon("tree/matrix.png"));
-    m_cache.insert(OtherSystem,             qnSkin->icon("tree/system.png"));
-    m_cache.insert(OtherSystems,            qnSkin->icon("tree/other_systems.png"));
-    m_cache.insert(WebPage,                 qnSkin->icon("tree/webpage.png"));
-    m_cache.insert(WebPages,                qnSkin->icon("tree/webpages.png"));
+    m_cache.insert(LocalServer,             loadIcon(lit("tree/home.png")));
+    m_cache.insert(Server,                  loadIcon(lit("tree/server.png")));
+    m_cache.insert(Servers,                 loadIcon(lit("tree/servers.png")));
+    m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
+    m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
+    m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
+    m_cache.insert(Recorder,                loadIcon(lit("tree/recorder.png")));
+    m_cache.insert(Image,                   loadIcon(lit("tree/snapshot.png")));
+    m_cache.insert(Media,                   loadIcon(lit("tree/media.png")));
+    m_cache.insert(User,                    loadIcon(lit("tree/user.png")));
+    m_cache.insert(Users,                   loadIcon(lit("tree/users.png")));
+    m_cache.insert(VideoWall,               loadIcon(lit("tree/videowall.png")));
+    m_cache.insert(VideoWallItem,           loadIcon(lit("tree/screen.png")));
+    m_cache.insert(VideoWallMatrix,         loadIcon(lit("tree/matrix.png")));
+    m_cache.insert(OtherSystem,             loadIcon(lit("tree/system.png")));
+    m_cache.insert(OtherSystems,            loadIcon(lit("tree/other_systems.png")));
+    m_cache.insert(WebPage,                 loadIcon(lit("tree/webpage.png")));
+    m_cache.insert(WebPages,                loadIcon(lit("tree/webpages.png")));
 
-    m_cache.insert(Media | Offline,         qnSkin->icon("tree/media_offline.png"));
-    m_cache.insert(Image | Offline,         qnSkin->icon("tree/snapshot_offline.png"));
-    m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
-    m_cache.insert(Server | Incompatible,   qnSkin->icon("tree/server_incompatible.png"));
-    m_cache.insert(Server | Control,        qnSkin->icon("tree/server_current.png"));
-    m_cache.insert(Server | Unauthorized,   qnSkin->icon("tree/server_unauthorized.png"));
-    m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
-    m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
-    m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
-    m_cache.insert(VideoWallItem | Locked,  qnSkin->icon("tree/screen_locked.png"));
-    m_cache.insert(VideoWallItem | Control, qnSkin->icon("tree/screen_controlled.png"));
-    m_cache.insert(VideoWallItem | Offline, qnSkin->icon("tree/screen_offline.png"));
-    m_cache.insert(IOModule | Offline,      qnSkin->icon("tree/io_offline.png"));
-    m_cache.insert(IOModule | Unauthorized, qnSkin->icon("tree/io_unauthorized.png"));
-    m_cache.insert(WebPage | Offline,       qnSkin->icon("tree/webpage_offline.png"));
+    m_cache.insert(Media | Offline,         loadIcon(lit("tree/media_offline.png")));
+    m_cache.insert(Image | Offline,         loadIcon(lit("tree/snapshot_offline.png")));
+    m_cache.insert(Server | Offline,        loadIcon(lit("tree/server_offline.png")));
+    m_cache.insert(Server | Incompatible,   loadIcon(lit("tree/server_incompatible.png")));
+    m_cache.insert(Server | Control,        loadIcon(lit("tree/server_current.png")));
+    m_cache.insert(Server | Unauthorized,   loadIcon(lit("tree/server_unauthorized.png")));
+    m_cache.insert(Camera | Offline,        loadIcon(lit("tree/camera_offline.png")));
+    m_cache.insert(Camera | Unauthorized,   loadIcon(lit("tree/camera_unauthorized.png")));
+    m_cache.insert(Layout | Locked,         loadIcon(lit("tree/layout_locked.png")));
+    m_cache.insert(VideoWallItem | Locked,  loadIcon(lit("tree/screen_locked.png")));
+    m_cache.insert(VideoWallItem | Control, loadIcon(lit("tree/screen_controlled.png")));
+    m_cache.insert(VideoWallItem | Offline, loadIcon(lit("tree/screen_offline.png")));
+    m_cache.insert(IOModule | Offline,      loadIcon(lit("tree/io_offline.png")));
+    m_cache.insert(IOModule | Unauthorized, loadIcon(lit("tree/io_unauthorized.png")));
+    m_cache.insert(WebPage | Offline,       loadIcon(lit("tree/webpage_offline.png")));
 
     /* Read-only server that is auto-discovered. */
-    m_cache.insert(Server | Incompatible | ReadOnly,    qnSkin->icon("tree/server_incompatible_readonly.png"));
-
+    m_cache.insert(Server | Incompatible | ReadOnly,    loadIcon(lit("tree/server_incompatible_readonly.png")));
     /* Read-only server we are connected to. */
-    m_cache.insert(Server | Control | ReadOnly,         qnSkin->icon("tree/server_readonly.png"));
+    m_cache.insert(Server | Control | ReadOnly,         loadIcon(lit("tree/server_readonly.png")));
 
     /* Overlays. Should not be used. */
-    m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
-    m_cache.insert(Unauthorized,            qnSkin->icon("tree/unauthorized.png"));
+    m_cache.insert(Offline,                 loadIcon(lit("tree/offline.png")));
+    m_cache.insert(Unauthorized,            loadIcon(lit("tree/unauthorized.png")));
 }
 
 QnResourceIconCache::~QnResourceIconCache() {
