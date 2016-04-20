@@ -185,8 +185,8 @@ namespace detail
         }
     };
 
-#define TRANSACTION_DESCRIPTOR(Key, ParamType, isPersistent, isSystem, getHashFunc, saveFunc, saveSerializedFunc, triggerNotificationFunc) \
-    TransactionDescriptor<Key, ParamType>(isPersistent, isSystem, #Key, getHashFunc, saveFunc, saveSerializedFunc, \
+#define TRANSACTION_DESCRIPTOR(Key, ParamType, isPersistent, isSystem, getHashFunc, triggerNotificationFunc) \
+    TransactionDescriptor<Key, ParamType>(isPersistent, isSystem, #Key, getHashFunc, createDefaultSaveTransactionHelper(getHashFunc), createDefaultSaveSerializedTransactionHelper(getHashFunc), \
                                           [](const QnAbstractTransaction &tran) { return QnTransaction<ParamType>(tran); }, triggerNotificationFunc)
 
     std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
@@ -237,8 +237,6 @@ namespace detail
                                true, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               [] (const QnTransaction<NotDefinedType> &, QnTransactionLog *) { return ErrorCode::notImplemented; }, // save
-                               [] (const QnTransaction<NotDefinedType> &, const QByteArray &, QnTransactionLog *) { return ErrorCode::notImplemented; }, // save serialized
                                [] (const QnTransaction<NotDefinedType> &, NotificationParams &)  // trigger notification
                                   {
                                       NX_ASSERT(0, Q_FUNC_INFO, "No notification for this transaction");
@@ -248,72 +246,54 @@ namespace detail
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::lockRequest, ApiLockData,
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::lockResponse, ApiLockData,
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::unlockRequest, ApiLockData,
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::peerAliveInfo, ApiPeerAliveData,
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::tranSyncDone, ApiTranSyncDoneData,
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::testConnection, ApiLoginData,
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::connect, ApiLoginData,
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper() // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::openReverseConnection, ApiReverseConnectionData,
                                false, // persistent
                                true, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                [](const QnTransaction<ApiReverseConnectionData> &tran, NotificationParams &notificationParams)
                                {
                                     NX_ASSERT(tran.command == ApiCommand::openReverseConnection);
@@ -324,48 +304,36 @@ namespace detail
                                true, // persistent
                                false, // system
                                CreateHashByIdHelper(), // getHash
-                               createDefaultSaveTransactionHelper(CreateHashByIdHelper()), // save
-                               createDefaultSaveSerializedTransactionHelper(CreateHashByIdHelper()), // save serialized
                                &apiIdDataTriggerNotificationHelper // trigger notification
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::setResourceStatus, ApiResourceStatusData,
                                true, // persistent
                                false, // system
                                CreateHashByIdRfc4122Helper(), // getHash
-                               createDefaultSaveTransactionHelper(CreateHashByIdRfc4122Helper()), // save
-                               createDefaultSaveSerializedTransactionHelper(CreateHashByIdRfc4122Helper()), // save serialized
                                ResourceNotificationManagerHelper()
                               ),
-        TRANSACTION_DESCRIPTOR(ApiCommand::getResourceParams, ApiResourceParamDataList,
+        TRANSACTION_DESCRIPTOR(ApiCommand::getResourceParams, ApiResourceParamWithRefDataList,
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
-                               InvalidTriggerNotificationHelper()
+                               ResourceNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::setResourceParams, ApiResourceParamWithRefDataList,
                                true, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                ResourceNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::getResourceTypes, ApiResourceTypeDataList,
                                false, // persistent
-                               false, // systemhttps://blogs.msdn.microsoft.com/vcblog/2014/11/17/c111417-features-in-vs-2015-preview/
+                               false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::getFullInfo, ApiFullInfoData,
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                [] (const QnTransaction<ApiFullInfoData> & tran, NotificationParams &notificationParams)
                                {
                                    emit notificationParams.ecConnection->initNotification(tran.params);
@@ -377,40 +345,30 @@ namespace detail
                                true, // persistent
                                false, // system
                                CreateHashForResourceParamWithRefDataHelper(), // getHash
-                               createDefaultSaveTransactionHelper(CreateHashForResourceParamWithRefDataHelper()), // save
-                               createDefaultSaveSerializedTransactionHelper(CreateHashForResourceParamWithRefDataHelper()), // save serialized
                                ResourceNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::removeResourceParam, ApiResourceParamWithRefData,
                                true, // persistent
                                false, // system
                                CreateHashForResourceParamWithRefDataHelper(), // getHash
-                               createDefaultSaveTransactionHelper(CreateHashForResourceParamWithRefDataHelper()), // save
-                               createDefaultSaveSerializedTransactionHelper(CreateHashForResourceParamWithRefDataHelper()), // save serialized
                                ResourceNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::removeResourceParams, ApiResourceParamWithRefDataList,
                                true, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                ResourceNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::getStatusList, ApiResourceStatusDataList,
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::removeResources, ApiIdDataList,
                                true, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                [] (const QnTransaction<ApiIdDataList> &tran, NotificationParams &notificationParams)
                                  {
                                      switch( tran.command )
@@ -428,24 +386,18 @@ namespace detail
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                CameraNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::saveCamera, ApiCameraData,
                                false, // persistent
                                false, // system
                                CreateHashByIdHelper(), // getHash
-                               createDefaultSaveTransactionHelper(CreateHashByIdHelper()), // save
-                               createDefaultSaveSerializedTransactionHelper(CreateHashByIdHelper()), // save serialized
                                CameraNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::saveCameras, ApiCameraDataList,
                                true, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                [] (const QnTransaction<ApiCameraDataList> &tran, NotificationParams &notificationParams)
                                  {
                                     notificationParams.cameraNotificationManager->triggerNotification(tran);
@@ -455,32 +407,24 @@ namespace detail
                                true, // persistent
                                false, // system
                                CreateHashByIdHelper(), // getHash
-                               createDefaultSaveTransactionHelper(CreateHashByIdHelper()), // save
-                               createDefaultSaveSerializedTransactionHelper(CreateHashByIdHelper()), // save serialized
                                &apiIdDataTriggerNotificationHelper
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::getCameraHistoryItems, ApiServerFootageDataList,
                                false, // persistent
                                false, // system
                                InvalidGetHashHelper(), // getHash
-                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
-                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                InvalidTriggerNotificationHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::addCameraHistoryItem, ApiServerFootageData,
                                true, // persistent
                                false, // system
                                &createHashForServerFootageDataHelper, // getHash
-                               createDefaultSaveTransactionHelper(&createHashForServerFootageDataHelper), // save
-                               createDefaultSaveSerializedTransactionHelper(&createHashForServerFootageDataHelper), // save serialized
                                CameraNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::removeCameraHistoryItem, ApiServerFootageData,
                                true, // persistent
                                false, // system
                                &createHashForServerFootageDataHelper, // getHash
-                               createDefaultSaveTransactionHelper(&createHashForServerFootageDataHelper), // save
-                               createDefaultSaveSerializedTransactionHelper(&createHashForServerFootageDataHelper), // save serialized
                                CameraNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::saveCameraUserAttributes, ApiCameraAttributesData,
@@ -577,6 +521,22 @@ namespace detail
                                CreateHashByIdHelper(), // getHash
                                createDefaultSaveTransactionHelper(CreateHashByIdHelper()), // save
                                createDefaultSaveSerializedTransactionHelper(CreateHashByIdHelper()), // save serialized
+                               MediaServerNotificationManagerHelper()
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::saveStorages, ApiStorageDataList,
+                               true, // persistent
+                               false, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
+                               MediaServerNotificationManagerHelper()
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::saveStorages, ApiStorageDataList,
+                               true, // persistent
+                               false, // system
+                               InvalidGetHashHelper(), // getHash
+                               createDefaultSaveTransactionHelper(InvalidGetHashHelper()), // save
+                               InvalidSaveSerializedTransactionHelper(), // save serialized
                                MediaServerNotificationManagerHelper()
                               )
   );

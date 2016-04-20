@@ -344,7 +344,7 @@ struct DescriptorsByNameVisitor<-1, F>
     template<typename... Args>
     static void apply(const char *, F, const std::tuple<Args...> &)
     {
-        NX_ASSERT(0, "Unknown ApiCommand value");
+        NX_ASSERT(0, "Unknown ApiCommand name");
     }
 };
 
