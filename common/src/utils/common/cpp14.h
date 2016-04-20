@@ -45,6 +45,7 @@ template<
 #endif  //USE_OWN_MAKE_UNIQUE
 }   //std
 
+#endif // __clang__
 
 /** TODO #ak following methods are inappropriate here. Find a better place for them */
 template<typename ResultType, typename InitialType, typename DeleterType>
@@ -64,7 +65,5 @@ std::unique_ptr<ResultType, std::default_delete<ResultType>>
     return std::unique_ptr<ResultType>(
         static_cast<ResultType*>(sourcePtr.release()));
 }
-
-#endif // __clang__
 
 #endif  //libcommon_cpp14_h
