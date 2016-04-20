@@ -91,7 +91,7 @@ angular.module('webadminApp')
         function checkInternet(reload){
 
             $log.log("check internet connection");
-            if(debugMode){
+            if(true || debugMode){ // Temporary skip all internet checks
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
                 return;
@@ -99,7 +99,7 @@ angular.module('webadminApp')
 
             mediaserver.getModuleInformation(reload).then(function(r){
                 $scope.serverInfo = r.data.reply;
-                $scope.hasInternetOnServer = true || $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
+                $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
 
                 $log.log("internet on server: " + $scope.hasInternetOnServer + ", flags: " + $scope.serverInfo.serverFlags);
             },function(error){
