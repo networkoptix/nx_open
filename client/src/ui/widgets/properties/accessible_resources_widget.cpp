@@ -4,7 +4,7 @@
 #include <client/client_globals.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_access_manager.h>
+
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -12,6 +12,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 
+#include <ui/delegates/abstract_permissions_delegate.h>
 #include <ui/models/resource_list_model.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -54,21 +55,35 @@ namespace
 
 }
 
-QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(Filter filter, QWidget* parent /*= 0*/):
+QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsDelegate* delegate, Filter filter, QWidget* parent /*= 0*/):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::AccessibleResourcesWidget()),
+    m_delegate(delegate),
     m_filter(filter),
-    m_targetGroupId(),
-    m_targetUser(),
     m_model(new QnResourceListModel())
 {
     ui->setupUi(this);
-    ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on this layouts."));
+
+    switch (m_filter)
+    {
+    case CamerasFilter:
+        ui->allResourcesCheckBox->setText(tr("All Cameras"));
+        break;
+    case LayoutsFilter:
+        ui->allResourcesCheckBox->setText(tr("All Global Layouts"));
+        ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts."));
+        break;
+    case ServersFilter:
+        ui->allResourcesCheckBox->setText(tr("All Servers"));
+        ui->descriptionLabel->setText(tr("Giving access to some server you give access to view server statistics."));
+        break;
+    default:
+        break;
+    }
 
     m_model->setCheckable(true);
     m_model->setResources(filteredResources(m_filter, qnResPool->getResources()));
-    connect(m_model, &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+    connect(m_model.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {
         if (roles.contains(Qt::CheckStateRole)
             && topLeft.column() <= QnResourceListModel::CheckColumn
@@ -102,6 +117,12 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(Filter filter, QWidget*
     };
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, updateThumbnail);
+    connect(ui->allResourcesCheckBox, &QCheckBox::clicked, this, [this]
+    {
+        ui->resourcesTreeView->setEnabled(!ui->allResourcesCheckBox->isChecked());
+        emit hasChangesChanged();
+    });
+
     updateThumbnail(QModelIndex());
 }
 
@@ -110,90 +131,74 @@ QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
 
 }
 
-
-QnUuid QnAccessibleResourcesWidget::targetGroupId() const
-{
-    return m_targetGroupId;
-}
-
-void QnAccessibleResourcesWidget::setTargetGroupId(const QnUuid& id)
-{
-    NX_ASSERT(m_targetUser.isNull());
-    m_targetGroupId = id;
-    NX_ASSERT(m_targetGroupId.isNull() || targetIsValid());
-}
-
-QnUserResourcePtr QnAccessibleResourcesWidget::targetUser() const
-{
-    return m_targetUser;
-}
-
-void QnAccessibleResourcesWidget::setTargetUser(const QnUserResourcePtr& user)
-{
-    NX_ASSERT(m_targetGroupId.isNull());
-    m_targetUser = user;
-    NX_ASSERT(!user || targetIsValid());
-}
-
 bool QnAccessibleResourcesWidget::hasChanges() const
 {
-    /* Validate target. */
-    if (!targetIsValid())
-        return false;
+    if (m_delegate->permissions().testFlag(allResourcesPermission()) != ui->allResourcesCheckBox->isChecked())
+        return true;
 
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(targetId());
-    return m_model->checkedResources() != filteredResources(m_filter, accessibleResources);
+    return m_model->checkedResources() != filteredResources(m_filter, m_delegate->accessibleResources());
 }
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    /* Validate target. */
-    if (!targetIsValid())
-        return;
-
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(targetId());
-    m_model->setCheckedResources(filteredResources(m_filter, accessibleResources));
+    ui->allResourcesCheckBox->setChecked(m_delegate->permissions().testFlag(allResourcesPermission()));
+    m_model->setCheckedResources(filteredResources(m_filter, m_delegate->accessibleResources()));
 }
 
 void QnAccessibleResourcesWidget::applyChanges()
 {
-    /* Validate target. */
-    if (!targetIsValid())
-        return;
-
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(targetId());
+    auto accessibleResources = m_delegate->accessibleResources();
     auto oldFiltered = filteredResources(m_filter, accessibleResources);
     auto newFiltered = m_model->checkedResources();
     accessibleResources.subtract(oldFiltered);
     accessibleResources.unite(newFiltered);
-    qnResourceAccessManager->setAccessibleResources(targetId(), accessibleResources);
+    m_delegate->setAccessibleResources(accessibleResources);
+
+    Qn::GlobalPermissions permissions = m_delegate->permissions();
+    if (ui->allResourcesCheckBox->isChecked())
+        permissions |= allResourcesPermission();
+    else
+        permissions &= ~allResourcesPermission();
+    m_delegate->setPermissions(permissions);
 }
 
-bool QnAccessibleResourcesWidget::targetIsValid() const
+Qn::GlobalPermission QnAccessibleResourcesWidget::allResourcesPermission() const
 {
-    /* Check if it is valid user id and we have access rights to edit it. */
-    if (m_targetUser)
+    switch (m_filter)
     {
-        Qn::Permissions permissions = accessController()->permissions(m_targetUser);
-        return permissions.testFlag(Qn::WriteAccessRightsPermission);
+    case CamerasFilter:
+        return Qn::GlobalAccessAllCamerasPermission;
+    case LayoutsFilter:
+        return Qn::GlobalAccessAllLayoutsPermission;
+    case ServersFilter:
+        return Qn::GlobalAccessAllServersPermission;
+
+    default:
+        break;
     }
-
-    if (m_targetGroupId.isNull())
-        return false;
-
-    /* Only admins can edit groups. */
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return false;
-
-    /* Check if it is valid user group id. */
-    const auto& userGroups = qnResourceAccessManager->userGroups();
-    return boost::algorithm::any_of(userGroups, [this](const ec2::ApiUserGroupData& group) { return group.id == m_targetGroupId; });
+    NX_ASSERT(false);
+    return Qn::NoGlobalPermissions;
 }
 
-QnUuid QnAccessibleResourcesWidget::targetId() const
-{
-    return m_targetUser
-        ? m_targetUser->getId()
-        : m_targetGroupId;
-}
+//
+//bool QnAccessibleResourcesWidget::targetIsValid() const
+//{
+//    /* Check if it is valid user id and we have access rights to edit it. */
+//    if (m_targetUser)
+//    {
+//        Qn::Permissions permissions = accessController()->permissions(m_targetUser);
+//        return permissions.testFlag(Qn::WriteAccessRightsPermission);
+//    }
+//
+//    if (m_targetGroupId.isNull())
+//        return false;
+//
+//    /* Only admins can edit groups. */
+//    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+//        return false;
+//
+//    /* Check if it is valid user group id. */
+//    const auto& userGroups = qnResourceAccessManager->userGroups();
+//    return boost::algorithm::any_of(userGroups, [this](const ec2::ApiUserGroupData& group) { return group.id == m_targetGroupId; });
+//}
 

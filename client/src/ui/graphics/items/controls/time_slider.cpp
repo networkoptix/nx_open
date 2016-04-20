@@ -70,98 +70,98 @@ namespace {
     /* Tickmark bar. */
 
     /** Maximal number of simultaneously shown tickmark levels. */
-    const int numTickmarkLevels = 4;
+    const int kNumTickmarkLevels = 4;
 
     /** Last displayed text level. */
-    const int maxDisplayedTextLevel = 2;
+    const int kMaxDisplayedTextLevel = 2;
 
     /** Tickmark lengths for all levels. */
-    const std::array<int, numTickmarkLevels + 1> tickmarkLengthPixels = { 15, 10, 5, 5, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkLengthPixels = { 15, 10, 5, 5, 0 };
 
     /** Font pixel heights for all tickmark levels. */
-    const std::array<int, numTickmarkLevels + 1> tickmarkFontHeights = { 12, 12, 11, 11, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontHeights = { 12, 12, 11, 11, 0 };
 
     /** Tickmark text pixel heights for all levels. */
-    const std::array<int, numTickmarkLevels + 1> tickmarkTextHeightPixels = { 20, 20, 20, 20, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkTextHeightPixels = { 20, 20, 20, 20, 0 };
 
     /** Font weights for all tickmark levels. */
-    const std::array<int, numTickmarkLevels + 1> tickmarkFontWeights = { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontWeights = { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
 
     /** Minimal distance between tickmarks from the same group for this group to be visible.
      * Note that because of the fact that tickmarks do not disappear instantly, in some cases
      * step may become smaller that this value. */
-    const qreal minTickmarkLineStepPixels = 5.0;
+    const qreal kMinTickmarkLineStepPixels = 5.0;
 
     /** Minimal distance between tickmark labels from the same group. */
-    const qreal minTickmarkTextSpacingPixels = 5.0;
+    const qreal kMinTickmarkTextSpacingPixels = 5.0;
 
     /** Estimated maximal size of tickmark text label. */
-    const qreal maxTickmarkTextSizePixels = 80.0;
+    const qreal kMaxTickmarkTextSizePixels = 80.0;
 
     /* Tickmark animation parameters. */
-    const qreal tickmarkHeightAnimationMs = 500.0;
-    const qreal tickmarkOpacityAnimationMs = 500.0;
+    const qreal kTickmarkHeightAnimationMs = 500.0;
+    const qreal kTickmarkOpacityAnimationMs = 500.0;
 
 
     /* Dates bar. */
 
-    const qreal dateTextFontHeight = 12;
-    const qreal dateTextFontWeight = QFont::DemiBold;
+    const qreal kDateTextFontHeight = 12;
+    const qreal kDateTextFontWeight = QFont::DemiBold;
 
-    const qreal minDateSpanFraction = 0.15;
-    const qreal minDateSpanPixels = 160;
+    const qreal kMinDateSpanFraction = 0.15;
+    const qreal kMinDateSpanPixels = 160;
 
 
     /* Lines bar. */
 
     /** Minimal color coefficient for the most noticeable chunk color in range */
-    const qreal lineBarMinNoticeableFraction = 0.5;
+    const qreal kLineBarMinNoticeableFraction = 0.5;
 
 
     /* Thumbnails bar. */
 
-    const qreal thumbnailHeightForDrawing = 10.0;
+    const qreal kThumbnailHeightForDrawing = 10.0;
 
 
     /* Global */
 
     /** Top-level metrics. */
-    const qreal dateBarHeightPixels = 16;
-    const qreal lineBarHeightPixels = 20;
-    const qreal tickBarHeightPixels = 36;
+    const qreal kDateBarHeightPixels = 16;
+    const qreal kLineBarHeightPixels = 20;
+    const qreal kTickBarHeightPixels = 36;
 
     /** Minimal relative change of msecs-per-pixel value of a time slider for animation parameters to be recalculated.
      * This value was introduced so that the parameters are not recalculated constantly when changes are small. */
-    const qreal msecsPerPixelChangeThreshold = 1.0e-4;
+    const qreal kPerPixelChangeThresholdMs = 1.0e-4;
 
     /** Lower limit on time slider scale. */
-    const qreal minMSecsPerPixel = 2.0;
+    const qreal kMinTimePerPixelMs = 2.0;
 
     /** Maximal number of lines in a time slider. */
-    const int maxLines = 2;
+    const int kMaxLines = 2;
 
-    const int lastMinuteStripeWidth = 9;
+    const int kLastMinuteStripeWidth = 9;
 
-    const int lineLabelFontHeight = 14;
-    const int lineLabelFontWeight = QFont::DemiBold;
+    const int kLineLabelFontHeight = 14;
+    const int kLineLabelFontWeight = QFont::DemiBold;
 
-    const qreal degreesFor2x = 180.0;
+    const qreal kDegreesFor2x = 180.0;
 
-    const qreal zoomSideSnapDistance = 0.075;
+    const qreal kZoomSideSnapDistance = 0.075;
 
-    const qreal hoverEffectDistance = 5.0;
+    const qreal kHoverEffectDistance = 5.0;
 
-    const int startDragDistance = 5;
+    const int kStartDragDistance = 5;
 
-    const int bookmarkFontHeight = 11;
-    const int bookmarkFontWeight = QFont::DemiBold;
-    const int bookmarkTextPadding = 6;
-    const int minBookmarkTextCharsVisible = 6;
+    const int kBookmarkFontHeight = 11;
+    const int kBookmarkFontWeight = QFont::DemiBold;
+    const int kBookmarkTextPadding = 6;
+    const int kMinBookmarkTextCharsVisible = 6;
 
 
     bool checkLine(int line)
     {
-        if (line < 0 || line >= maxLines)
+        if (line < 0 || line >= kMaxLines)
         {
             qnWarning("Invalid line number '%1'.", line);
             return false;
@@ -361,16 +361,16 @@ private:
         {
             /* Make sure motion is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum. */
-            rc = rc * (1.0 - lineBarMinNoticeableFraction);
-            mc = sum * lineBarMinNoticeableFraction + mc * (1.0 - lineBarMinNoticeableFraction);
-            nc = nc * (1.0 - lineBarMinNoticeableFraction);
+            rc = rc * (1.0 - kLineBarMinNoticeableFraction);
+            mc = sum * kLineBarMinNoticeableFraction + mc * (1.0 - kLineBarMinNoticeableFraction);
+            nc = nc * (1.0 - kLineBarMinNoticeableFraction);
         }
-        else if (!qFuzzyIsNull(rc) && rc < sum * lineBarMinNoticeableFraction)
+        else if (!qFuzzyIsNull(rc) && rc < sum * kLineBarMinNoticeableFraction)
         {
             /* Make sure recording content is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum because mc == 0. */
-            rc = sum * lineBarMinNoticeableFraction;// + rc * (1.0 - lineBarMinNoticeableFraction);
-            nc = sum * (1.0 - lineBarMinNoticeableFraction);
+            rc = sum * kLineBarMinNoticeableFraction;// + rc * (1.0 - kLineBarMinNoticeableFraction);
+            nc = sum * (1.0 - kLineBarMinNoticeableFraction);
         }
 
         return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));
@@ -456,9 +456,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastThumbnailsUpdateTime(0),
     m_lastHoverThumbnail(-1),
     m_thumbnailsVisible(false),
-    m_rulerHeight(dateBarHeightPixels + tickBarHeightPixels + lineBarHeightPixels),
+    m_rulerHeight(kDateBarHeightPixels + kTickBarHeightPixels + kLineBarHeightPixels),
     m_lastMinuteAnimationDelta(0),
-    m_pixmapCache(new QnTimeSliderPixmapCache(numTickmarkLevels, this)),
+    m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
     m_currentRulerRectMousePos(),
     m_lastLineBarValue(),
@@ -471,8 +471,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     connect(m_thumbnailsUpdateTimer, SIGNAL(timeout()), this, SLOT(updateThumbnailsStepSizeTimer()));
 
     /* Set default vector sizes. */
-    m_lineData.resize(maxLines);
-    m_lastMinuteIndicatorVisible.fill(true, maxLines);
+    m_lineData.resize(kMaxLines);
+    m_lastMinuteIndicatorVisible.fill(true, kMaxLines);
 
     generateProgressPatterns();
 
@@ -486,7 +486,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     DragProcessor* dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(this);
     dragProcessor->setFlags(DragProcessor::DontCompress);
-    dragProcessor->setStartDragDistance(startDragDistance);
+    dragProcessor->setStartDragDistance(kStartDragDistance);
     dragProcessor->setStartDragTime(-1); /* No drag on timeout. */
 
     /* Prepare animation timer listener. */
@@ -657,7 +657,7 @@ void QnTimeSlider::setLineCount(int lineCount)
     if (m_lineCount == lineCount)
         return;
 
-    if (lineCount < 0 || lineCount > maxLines)
+    if (lineCount < 0 || lineCount > kMaxLines)
     {
         qnWarning("Invalid line count '%1'.", lineCount);
         return;
@@ -1072,10 +1072,10 @@ qint64 QnTimeSlider::animationEnd()
 void QnTimeSlider::generateProgressPatterns()
 {
     static const qreal d0 = 0.0;
-    static const qreal d1 = lastMinuteStripeWidth;
-    static const qreal d2 = lastMinuteStripeWidth * 2;
-    static const qreal d3 = lastMinuteStripeWidth * 3;
-    static const qreal d4 = lastMinuteStripeWidth * 4;
+    static const qreal d1 = kLastMinuteStripeWidth;
+    static const qreal d2 = kLastMinuteStripeWidth * 2;
+    static const qreal d3 = kLastMinuteStripeWidth * 3;
+    static const qreal d4 = kLastMinuteStripeWidth * 4;
 
     QPainterPath path;
     path.moveTo(d0, d1);
@@ -1102,16 +1102,16 @@ void QnTimeSlider::generateProgressPatterns()
     path.closeSubpath();
 
     m_progressPastPattern = QPixmap(d4, d4);
-    m_progressPastPattern.fill(m_colors.pastLastMinute);
+    m_progressPastPattern.fill(Qt::transparent);
     QPainter pastPainter(&m_progressPastPattern);
     pastPainter.setRenderHint(QPainter::Antialiasing);
-    pastPainter.fillPath(path, m_colors.pastLastMinute);
+    pastPainter.fillPath(path, m_colors.pastLastMinuteStripe);
 
     m_progressFuturePattern = QPixmap(d4, d4);
-    m_progressFuturePattern.fill(m_colors.futureLastMinute);
+    m_progressFuturePattern.fill(Qt::transparent);
     QPainter futurePainter(&m_progressFuturePattern);
     futurePainter.setRenderHint(QPainter::Antialiasing);
-    futurePainter.fillPath(path, m_colors.futureLastMinute);
+    futurePainter.fillPath(path, m_colors.futureLastMinuteStripe);
 }
 
 bool QnTimeSlider::isAnimatingWindow() const
@@ -1122,8 +1122,8 @@ bool QnTimeSlider::isAnimatingWindow() const
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor)
 {
     qreal targetMSecsPerPixel = m_msecsPerPixel * factor;
-    if (targetMSecsPerPixel < minMSecsPerPixel) {
-        factor = minMSecsPerPixel / m_msecsPerPixel;
+    if (targetMSecsPerPixel < kMinTimePerPixelMs) {
+        factor = kMinTimePerPixelMs / m_msecsPerPixel;
         if (qFuzzyCompare(factor, 1.0))
             return false; /* We've reached the min scale. */
     }
@@ -1203,7 +1203,7 @@ qreal QnTimeSlider::effectiveLineStretch(int line) const
 
 int QnTimeSlider::tickmarkLevel(int stepIndex) const
 {
-    return qBound(0, m_maxStepIndex - stepIndex, numTickmarkLevels);
+    return qBound(0, m_maxStepIndex - stepIndex, kNumTickmarkLevels);
 }
 
 QColor QnTimeSlider::tickmarkLineColor(int level) const
@@ -1237,19 +1237,19 @@ QRectF QnTimeSlider::rulerRect() const
 QRectF QnTimeSlider::dateBarRect() const
 {
     QRectF r(rect());
-    return QRectF(r.left(), thumbnailsHeight(), r.width(), dateBarHeightPixels);
+    return QRectF(r.left(), thumbnailsHeight(), r.width(), kDateBarHeightPixels);
 }
 
 QRectF QnTimeSlider::tickmarkBarRect() const
 {
     QRectF r(rect());
-    return QRectF(r.left(), thumbnailsHeight() + dateBarHeightPixels, r.width(), tickBarHeightPixels);
+    return QRectF(r.left(), thumbnailsHeight() + kDateBarHeightPixels, r.width(), kTickBarHeightPixels);
 }
 
 QRectF QnTimeSlider::lineBarRect() const
 {
     QRectF r(rect());
-    return QRectF(r.left(), thumbnailsHeight() + dateBarHeightPixels + tickBarHeightPixels, r.width(), lineBarHeightPixels);
+    return QRectF(r.left(), thumbnailsHeight() + kDateBarHeightPixels + kTickBarHeightPixels, r.width(), kLineBarHeightPixels);
 }
 
 bool QnTimeSlider::isThumbnailsVisible() const
@@ -1346,7 +1346,7 @@ void QnTimeSlider::setColors(const QnTimeSliderColors& colors)
 
 void QnTimeSlider::setLastMinuteIndicatorVisible(int line, bool visible)
 {
-    if (line >= maxLines)
+    if (line >= kMaxLines)
         return;
 
     m_lastMinuteIndicatorVisible[line] = visible;
@@ -1354,7 +1354,7 @@ void QnTimeSlider::setLastMinuteIndicatorVisible(int line, bool visible)
 
 bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const
 {
-    if (line >= maxLines)
+    if (line >= kMaxLines)
         return false;
 
     return m_lastMinuteIndicatorVisible[line];
@@ -1419,15 +1419,15 @@ void QnTimeSlider::updatePixmapCache()
     m_pixmapCache->setDefaultFont(localFont);
     m_pixmapCache->setDefaultColor(palette().color(QPalette::BrightText));
 
-    localFont.setWeight(dateTextFontWeight);
+    localFont.setWeight(kDateTextFontWeight);
     m_pixmapCache->setDateFont(localFont);
     m_pixmapCache->setDateColor(m_colors.dateBarText);
 
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16);
 
-    for (int i = 0; i < numTickmarkLevels; ++i)
+    for (int i = 0; i < kNumTickmarkLevels; ++i)
     {
-        localFont.setWeight(tickmarkFontWeights[i]);
+        localFont.setWeight(kTickmarkFontWeights[i]);
         m_pixmapCache->setTickmarkColor(i, tickmarkTextColor(i));
         m_pixmapCache->setTickmarkFont(i, localFont);
     }
@@ -1443,17 +1443,17 @@ void QnTimeSlider::updateKineticProcessor()
     if (m_kineticsHurried)
     {
         kineticProcessor->setMaxShiftInterval(0.4);
-        kineticProcessor->setFriction(degreesFor2x * 2.0);
-        kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
-        kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
+        kineticProcessor->setFriction(kDegreesFor2x * 2.0);
+        kineticProcessor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
+        kineticProcessor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
         kineticProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
     }
     else
     {
         kineticProcessor->setMaxShiftInterval(0.4);
-        kineticProcessor->setFriction(degreesFor2x / 2);
-        kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
-        kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
+        kineticProcessor->setFriction(kDegreesFor2x / 2);
+        kineticProcessor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
+        kineticProcessor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
         kineticProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
     }
 }
@@ -1482,13 +1482,13 @@ void QnTimeSlider::updateToolTipText()
 
 void QnTimeSlider::updateLineCommentPixmap(int line)
 {
-    int maxHeight = qFloor((lineBarHeightPixels - 2.0) * m_lineData[line].stretch / m_totalLineStretch);
+    int maxHeight = qFloor((kLineBarHeightPixels - 2.0) * m_lineData[line].stretch / m_totalLineStretch);
     if (maxHeight <= 0)
         return;
 
     QFont font(m_pixmapCache->defaultFont());
-    font.setPixelSize(qMin(maxHeight, lineLabelFontHeight));
-    font.setWeight(lineLabelFontWeight);
+    font.setPixelSize(qMin(maxHeight, kLineLabelFontHeight));
+    font.setWeight(kLineLabelFontWeight);
 
     m_lineData[line].commentPixmap = m_pixmapCache->textPixmap(m_lineData[line].comment, m_pixmapCache->defaultColor(), font);
 }
@@ -1514,7 +1514,7 @@ void QnTimeSlider::updateTickmarkTextSteps()
 
     for (int i = 0; i < m_steps.size(); i++)
     {
-        static const int referenceHeight = tickmarkFontHeights[0];
+        static const int referenceHeight = kTickmarkFontHeights[0];
         QString text = toLongestShortString(m_steps[i]);
         QPixmap pixmap = m_pixmapCache->textPixmap(text, referenceHeight);
         m_stepData[i].textWidthToHeight = static_cast<qreal>(pixmap.width()) / referenceHeight;
@@ -1546,7 +1546,7 @@ void QnTimeSlider::updateMSecsPerPixel()
 
 void QnTimeSlider::updateMinimalWindow()
 {
-    qint64 minimalWindow = size().width() * minMSecsPerPixel;
+    qint64 minimalWindow = size().width() * kMinTimePerPixelMs;
     if (minimalWindow == m_minimalWindow)
         return;
 
@@ -1579,25 +1579,25 @@ int QnTimeSlider::findTopLevelStepIndex() const
         }
 
         /* Check against minimal allowed tickmark line distance: */
-        if (separationPixels <= minTickmarkLineStepPixels)
+        if (separationPixels <= kMinTickmarkLineStepPixels)
             break;
 
         /* If extra levels didn't start yet: */
         if (extraLevelsAllowed < 0)
         {
-            qreal labelWidth = m_stepData[minStepIndex].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel];
-            if ((minStepIndex < maxStepIndexLimit) && maxDisplayedTextLevel)
+            qreal labelWidth = m_stepData[minStepIndex].textWidthToHeight * kTickmarkFontHeights[kMaxDisplayedTextLevel];
+            if ((minStepIndex < maxStepIndexLimit) && kMaxDisplayedTextLevel)
             {
-                qreal prevLabelWidth = m_stepData[minStepIndex + 1].textWidthToHeight * tickmarkFontHeights[maxDisplayedTextLevel - 1];
+                qreal prevLabelWidth = m_stepData[minStepIndex + 1].textWidthToHeight * kTickmarkFontHeights[kMaxDisplayedTextLevel - 1];
                 labelWidth = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0);
             }
 
-            qreal minTextStepPixels = labelWidth + minTickmarkTextSpacingPixels;
+            qreal minTextStepPixels = labelWidth + kMinTickmarkTextSpacingPixels;
 
             /* Check against minimal allowed tickmark text distance: */
             if (separationPixels < minTextStepPixels)
             {
-                extraLevelsAllowed = numTickmarkLevels - maxDisplayedTextLevel - 1;
+                extraLevelsAllowed = kNumTickmarkLevels - kMaxDisplayedTextLevel - 1;
                 if (extraLevelsAllowed <= 0)
                     break;
             }
@@ -1616,12 +1616,12 @@ int QnTimeSlider::findTopLevelStepIndex() const
     maxStepIndexLimit = qMax(maxStepIndexLimit, 1);
 
     /* Correct max step index: */
-    return qMin(minStepIndex + numTickmarkLevels - 1, maxStepIndexLimit);
+    return qMin(minStepIndex + kNumTickmarkLevels - 1, maxStepIndexLimit);
 }
 
 void QnTimeSlider::updateStepAnimationTargets()
 {
-    bool updateNeeded = (qAbs(m_msecsPerPixel - m_animationUpdateMSecsPerPixel) / qMin(m_msecsPerPixel, m_animationUpdateMSecsPerPixel)) > msecsPerPixelChangeThreshold;
+    bool updateNeeded = (qAbs(m_msecsPerPixel - m_animationUpdateMSecsPerPixel) / qMin(m_msecsPerPixel, m_animationUpdateMSecsPerPixel)) > kPerPixelChangeThresholdMs;
     if (!updateNeeded || m_steps.empty())
         return;
 
@@ -1630,7 +1630,7 @@ void QnTimeSlider::updateStepAnimationTargets()
     /* Adjust target tickmark heights and opacities. */
     qreal prevTextVisible = 1.0; /* - "boolean" 0.0 or 1.0, used as multiplier */
     qreal prevLabelWidth = 0.0; /* - we track previous level text label widths to avoid overlapping with them */
-    int minLevelStepIndexMinusOne = qMax(0, m_maxStepIndex - numTickmarkLevels);
+    int minLevelStepIndexMinusOne = qMax(0, m_maxStepIndex - kNumTickmarkLevels);
 
     for (int i = m_steps.size() - 1; i >= minLevelStepIndexMinusOne; --i)
     {
@@ -1638,17 +1638,17 @@ void QnTimeSlider::updateStepAnimationTargets()
         qreal separationPixels = m_steps[i].stepMSecs / m_msecsPerPixel;
 
         int level = tickmarkLevel(i);
-        data.targetHeight = separationPixels >= minTickmarkLineStepPixels ? tickmarkLengthPixels[level] : 0.0;
+        data.targetHeight = separationPixels >= kMinTickmarkLineStepPixels ? kTickmarkLengthPixels[level] : 0.0;
 
-        qreal labelWidth = data.textWidthToHeight * tickmarkFontHeights[level];
-        if (level > maxDisplayedTextLevel)
+        qreal labelWidth = data.textWidthToHeight * kTickmarkFontHeights[level];
+        if (level > kMaxDisplayedTextLevel)
         {
             data.targetHeight *= prevTextVisible;
             data.targetTextOpacity = 0.0;
         }
         else
         {
-            qreal minTextStepPixels = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0) + minTickmarkTextSpacingPixels;
+            qreal minTextStepPixels = qMax(labelWidth, (labelWidth + prevLabelWidth) / 2.0) + kMinTickmarkTextSpacingPixels;
             data.targetTextOpacity = separationPixels < minTextStepPixels ? 0.0 : 1.0;
             data.targetTextOpacity *= prevTextVisible;
             prevLabelWidth = labelWidth;
@@ -1658,9 +1658,9 @@ void QnTimeSlider::updateStepAnimationTargets()
         prevTextVisible = data.targetTextOpacity;
 
         /* Compute speeds. */
-        data.heightSpeed = qMax(data.heightSpeed, speed(data.currentHeight, data.targetHeight, tickmarkHeightAnimationMs));
-        data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speed(data.currentLineOpacity, data.targetLineOpacity, tickmarkOpacityAnimationMs));
-        data.textOpacitySpeed = qMax(data.textOpacitySpeed, speed(data.currentTextOpacity, data.targetTextOpacity, tickmarkOpacityAnimationMs));
+        data.heightSpeed = qMax(data.heightSpeed, speed(data.currentHeight, data.targetHeight, kTickmarkHeightAnimationMs));
+        data.lineOpacitySpeed = qMax(data.lineOpacitySpeed, speed(data.currentLineOpacity, data.targetLineOpacity, kTickmarkOpacityAnimationMs));
+        data.textOpacitySpeed = qMax(data.textOpacitySpeed, speed(data.currentTextOpacity, data.targetTextOpacity, kTickmarkOpacityAnimationMs));
     }
 
     /* Clean up remaining steps. */
@@ -1802,7 +1802,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
 
     /* Calculate new bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
-    if (boundingHeigth < thumbnailHeightForDrawing)
+    if (boundingHeigth < kThumbnailHeightForDrawing)
         boundingHeigth = 0;
 
     QSize boundingSize = QSize(boundingHeigth * 256, boundingHeigth);
@@ -1877,7 +1877,7 @@ void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
 
 void QnTimeSlider::updateThumbnailsVisibility()
 {
-    bool visible = thumbnailsHeight() >= thumbnailHeightForDrawing;
+    bool visible = thumbnailsHeight() >= kThumbnailHeightForDrawing;
     if (m_thumbnailsVisible == visible)
         return;
 
@@ -2019,16 +2019,20 @@ void QnTimeSlider::drawLastMinute(QPainter* painter, const QRectF& rect)
 
     if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos))
     {
+        QRectF pastRect(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom()));
         QBrush brush(m_progressPastPattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom())), brush);
+        painter->fillRect(pastRect, m_colors.pastLastMinuteBackground);
+        painter->fillRect(pastRect, brush);
     }
 
     if (!qFuzzyEquals(rect.right(), sliderPos))
     {
+        QRectF futureRect(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight());
         QBrush brush(m_progressFuturePattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(futureRect, m_colors.futureLastMinuteBackground);
+        painter->fillRect(futureRect, brush);
     }
 }
 
@@ -2172,7 +2176,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
     int stepCount = m_steps.size();
 
     /* Find minimal tickmark step index. */
-    int minStepIndex = qMax(m_maxStepIndex - numTickmarkLevels, 0); /* min level step index minus one */
+    int minStepIndex = qMax(m_maxStepIndex - kNumTickmarkLevels, 0); /* min level step index minus one */
     for (; minStepIndex < stepCount; minStepIndex++)
         if (!qFuzzyIsNull(m_stepData[minStepIndex].currentHeight))
             break;
@@ -2181,7 +2185,7 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
         minStepIndex = stepCount - 1; /* Tests show that we can actually get here. */
 
     /* Find initial and maximal positions. */
-    QPointF overlap(maxTickmarkTextSizePixels / 2.0, 0.0);
+    QPointF overlap(kMaxTickmarkTextSizePixels / 2.0, 0.0);
     qint64 startPos = qMax(minimum() + 1, valueFromPosition(positionFromValue(m_windowStart) - overlap, false)) + m_localOffset;
     qint64 endPos = qMin(maximum() - 1, valueFromPosition(positionFromValue(m_windowEnd) + overlap, false)) + m_localOffset;
 
@@ -2216,11 +2220,11 @@ void QnTimeSlider::drawTickmarks(QPainter* painter, const QRectF& rect)
 
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentHeight;
-        if (!qFuzzyIsNull(m_stepData[index].currentTextOpacity) && tickmarkFontHeights[level])
+        if (!qFuzzyIsNull(m_stepData[index].currentTextOpacity) && kTickmarkFontHeights[level])
         {
-            QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos, tickmarkFontHeights[level], m_steps[index]);
+            QPixmap pixmap = m_pixmapCache->tickmarkTextPixmap(level, pos, kTickmarkFontHeights[level], m_steps[index]);
 
-            qreal topMargin = qFloor((tickmarkTextHeightPixels[level] - pixmap.height()) * 0.5);
+            qreal topMargin = qFloor((kTickmarkTextHeightPixels[level] - pixmap.height()) * 0.5);
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight + topMargin, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -2263,7 +2267,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
 
     /* Find index of the highlight time step. */
     int highlightIndex = 0;
-    qreal highlightSpanPixels = qMax(size().width() * minDateSpanFraction, minDateSpanPixels);
+    qreal highlightSpanPixels = qMax(size().width() * kMinDateSpanFraction, kMinDateSpanPixels);
     for (; highlightIndex < stepCount; highlightIndex++)
         if (!m_steps[highlightIndex].longFormat.isEmpty() && m_steps[highlightIndex].stepMSecs / m_msecsPerPixel >= highlightSpanPixels)
             break;
@@ -2271,7 +2275,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
     highlightIndex = qMin(highlightIndex, stepCount - 1); //TODO: #Elric remove this line.
     const QnTimeStep& highlightStep = m_steps[highlightIndex];
 
-    qreal topMargin = qFloor((rect.height() - dateTextFontHeight) * 0.5);
+    qreal topMargin = qFloor((rect.height() - kDateTextFontHeight) * 0.5);
 
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
@@ -2289,7 +2293,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
         painter->setBrush(backgroundColor(number));
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->dateTextPixmap(pos0, dateTextFontHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->dateTextPixmap(pos0, kDateTextFontHeight, highlightStep);
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + topMargin, pixmap.width(), pixmap.height());
         if (textRect.left() < rect.left())
@@ -2311,7 +2315,7 @@ void QnTimeSlider::drawDates(QPainter* painter, const QRectF& rect)
 
 void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
 {
-    if (rect.height() < thumbnailHeightForDrawing)
+    if (rect.height() < kThumbnailHeightForDrawing)
         return;
 
     m_thumbnailsPaintRect = rect;
@@ -2432,7 +2436,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QBrush futureBrush(m_colors.futureBookmarkBound);
 
     QFont font(m_pixmapCache->defaultFont());
-    font.setWeight(bookmarkFontWeight);
+    font.setWeight(kBookmarkFontWeight);
 
     for (int i = 0; i < bookmarks.size(); ++i)
     {
@@ -2476,14 +2480,14 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         QRectF textRect = bookmarkRect;
         if (i < bookmarks.size() - 1)
             textRect.setRight(qMin(bookmarkRect.right(), quickPositionFromValue(bookmarks[i + 1].startTimeMs())));
-        textRect.adjust(bookmarkTextPadding, 0, -bookmarkTextPadding, 0);
+        textRect.adjust(kBookmarkTextPadding, 0, -kBookmarkTextPadding, 0);
 
         QString text = fontMetrics.elidedText(bookmark.name, Qt::ElideRight, textRect.width());
         static const int elideStringLength = 3; /* "..." */
-        if (text != bookmark.name && text.length() - elideStringLength < minBookmarkTextCharsVisible)
+        if (text != bookmark.name && text.length() - elideStringLength < kMinBookmarkTextCharsVisible)
             continue;
 
-        QPixmap pixmap = m_pixmapCache->textPixmap(text, bookmarkFontHeight, palette().color(QPalette::BrightText), font);
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, kBookmarkFontHeight, palette().color(QPalette::BrightText), font);
         qreal textY = qRound(bookmarkRect.top() + (bookmarkRect.height() - pixmap.height() + 1.0) / 2.0);
         painter->drawPixmap(textRect.left(), textY, pixmap);
     }
@@ -2651,9 +2655,9 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
     if (m_options & SnapZoomToSides)
     {
         qreal windowRange = m_windowEnd - m_windowStart;
-        if ((m_zoomAnchor - m_windowStart) / windowRange < zoomSideSnapDistance)
+        if ((m_zoomAnchor - m_windowStart) / windowRange < kZoomSideSnapDistance)
             m_zoomAnchor = m_windowStart;
-        else if ((m_windowEnd - m_zoomAnchor) / windowRange < zoomSideSnapDistance)
+        else if ((m_windowEnd - m_zoomAnchor) / windowRange < kZoomSideSnapDistance)
             m_zoomAnchor = m_windowEnd;
     }
 
@@ -2676,7 +2680,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent* event)
 
 void QnTimeSlider::kineticMove(const QVariant& degrees)
 {
-    qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
+    qreal factor = std::pow(2.0, -degrees.toReal() / kDegreesFor2x);
 
     if (!scaleWindow(factor, m_zoomAnchor))
         kineticProcessor()->reset();
@@ -2754,7 +2758,7 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverMoveEvent(event);
 
-    switch(markerFromPosition(event->pos(), hoverEffectDistance))
+    switch(markerFromPosition(event->pos(), kHoverEffectDistance))
     {
     case SelectionStartMarker:
     case SelectionEndMarker:
@@ -2808,7 +2812,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        m_dragMarker = markerFromPosition(event->pos(), hoverEffectDistance);
+        m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
     }
     else if (event->button() == Qt::RightButton)
     {

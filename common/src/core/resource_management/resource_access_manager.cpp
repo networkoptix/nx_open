@@ -368,7 +368,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
-    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalEditUsersPermission))
+    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalAdminPermission))
     {
         result |= Qn::ReadPermission;
         if (m_readOnlyMode)
@@ -422,10 +422,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr &user
         if (resource.dynamicCast<QnWebPageResource>())
             return Qn::GlobalAccessAllCamerasPermission;
 
-        if (resource.dynamicCast<QnUserResource>())
-            return Qn::GlobalEditUsersPermission;
-
-        /* Default value. */
+        /* Default value (e.g. for users). */
         return Qn::GlobalAdminPermission;
     };
 

@@ -119,6 +119,7 @@
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
+        <template>lib</template>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -137,8 +138,8 @@
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
-        <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
-        <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
+        <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
@@ -161,6 +162,7 @@
         <vmux.version>1.0.0</vmux.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
+        <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
         <global.libs/>
@@ -193,12 +195,6 @@
             XmlPatterns, XcbQpa
         </qtlibs>
         <additional.qtlibs/>
-
-        <!--QT plugins used-->
-        <qtplugins>
-            imageformats, platforms, xcbglintegrations
-        </qtplugins>
-        <additional.qtplugins/>
 
         <!-- List of commonly used RDep packages -->
         <rdep.packages/>
@@ -443,7 +439,6 @@
             </activation>
             <properties>
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
-                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>applauncher</module>
@@ -483,6 +478,8 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
+                <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
+                <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
@@ -604,7 +601,6 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <additional.qtplugins>audio, platforminputcontexts</additional.qtplugins>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -632,18 +628,20 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
-                    <value>!true</value>
+                    <name>box</name>
+                    <value>!ios</value>
                 </property>
             </activation>
             <properties>
                 <platform>macosx</platform>
                 <arch>x64</arch>
-                <qt.spec>macx-clang-libc++</qt.spec>
+                <quazip.version>0.7.2</quazip.version>
+                <qt.spec/>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
             <modules>
+                <module>common_libs/nx_email</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -970,7 +968,6 @@
             </activation>
             <properties>
                 <compile.options/>
-                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>client.core</module>

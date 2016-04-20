@@ -15,7 +15,7 @@ if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ]; then
 fi    
 
 if [ "${box}" == "rpi" ] || [ "${box}" == "bpi" ]; then
-     QTCHECK_ARM=`${environment.dir}/packages/${box}/gcc-4.8.3/bin/arm-linux-gnueabihf-ldd --root ${libdir}/lib/${build.configuration} ${qt.dir}/lib/libQt5Core.so | grep libglib-2.0.so.0`
+     QTCHECK_ARM=`readelf -d ${qt.dir}/lib/libQt5Core.so | grep libglib-2.0.so.0`
      if [ -z "$QTCHECK_ARM" ]; then
          echo '+++++++++++++ Invalid QT - does not support libglib. Compilation terminated +++++++++++++'
          exit 1

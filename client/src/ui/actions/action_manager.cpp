@@ -664,7 +664,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewUserAction).
             flags(Qn::Main | Qn::Tree).
-            requiredGlobalPermission(Qn::GlobalEditUsersPermission).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("User...")).
             pulledText(tr("New User...")).
             condition(new QnConjunctionActionCondition(
@@ -876,7 +876,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::UserManagementAction).
         flags(Qn::Main | Qn::Tree).
-        requiredGlobalPermission(Qn::GlobalEditUsersPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("User Management...")).
         condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
 
