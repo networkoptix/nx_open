@@ -20,7 +20,7 @@ set -e
 #     echo "$h"
 # }
 
-TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-4.8.3
+TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
