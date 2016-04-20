@@ -122,6 +122,7 @@ cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
 cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644

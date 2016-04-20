@@ -75,6 +75,7 @@ cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 rm -f $LIBSTAGE/*.debug
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 
 for lib in "${QT_LIBS[@]}"
 do
