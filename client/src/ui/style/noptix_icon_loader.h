@@ -6,16 +6,17 @@
 
 class QnSkin;
 
-class QnNoptixIconLoader: public QObject {
+class QnNoptixIconLoader: public QObject
+{
     Q_OBJECT
     typedef QObject base_type;
 
 public:
-    QnNoptixIconLoader(QObject *parent = NULL);
+    QnNoptixIconLoader(QObject* parent = nullptr);
     virtual ~QnNoptixIconLoader();
 
-    QIcon polish(const QIcon &icon);
-    QIcon load(const QString &name, const QString &checkedName = QString());
+    QIcon polish(const QIcon& icon);
+    QIcon load(const QString& name, const QString& checkedName = QString(), int numModes = -1, const QPair<QIcon::Mode, QString>* modes = nullptr);
 
 private:
     QHash<QString, QIcon> m_iconByKey;
