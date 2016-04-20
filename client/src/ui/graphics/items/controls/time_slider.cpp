@@ -1102,16 +1102,16 @@ void QnTimeSlider::generateProgressPatterns()
     path.closeSubpath();
 
     m_progressPastPattern = QPixmap(d4, d4);
-    m_progressPastPattern.fill(m_colors.pastLastMinute);
+    m_progressPastPattern.fill(Qt::transparent);
     QPainter pastPainter(&m_progressPastPattern);
     pastPainter.setRenderHint(QPainter::Antialiasing);
-    pastPainter.fillPath(path, m_colors.pastLastMinute);
+    pastPainter.fillPath(path, m_colors.pastLastMinuteStripe);
 
     m_progressFuturePattern = QPixmap(d4, d4);
-    m_progressFuturePattern.fill(m_colors.futureLastMinute);
+    m_progressFuturePattern.fill(Qt::transparent);
     QPainter futurePainter(&m_progressFuturePattern);
     futurePainter.setRenderHint(QPainter::Antialiasing);
-    futurePainter.fillPath(path, m_colors.futureLastMinute);
+    futurePainter.fillPath(path, m_colors.futureLastMinuteStripe);
 }
 
 bool QnTimeSlider::isAnimatingWindow() const
@@ -2019,16 +2019,20 @@ void QnTimeSlider::drawLastMinute(QPainter* painter, const QRectF& rect)
 
     if (sliderPos > startPos && !qFuzzyEquals(startPos, sliderPos))
     {
+        QRectF pastRect(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom()));
         QBrush brush(m_progressPastPattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(startPos, rect.top()), QPointF(sliderPos, rect.bottom())), brush);
+        painter->fillRect(pastRect, m_colors.pastLastMinuteBackground);
+        painter->fillRect(pastRect, brush);
     }
 
     if (!qFuzzyEquals(rect.right(), sliderPos))
     {
+        QRectF futureRect(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight());
         QBrush brush(m_progressFuturePattern);
         brush.setTransform(brushTransform);
-        painter->fillRect(QRectF(QPointF(qMax(startPos, sliderPos), rect.top()), rect.bottomRight()), brush);
+        painter->fillRect(futureRect, m_colors.futureLastMinuteBackground);
+        painter->fillRect(futureRect, brush);
     }
 }
 

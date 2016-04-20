@@ -35,8 +35,10 @@ QnTimeSliderColors::QnTimeSliderColors() {
     dateBarBackgrounds.push_back(QColor(255, 255, 255, 48));
     dateBarText = QColor(255, 255, 255, 255);
 
-    pastLastMinute = QColor(24, 24, 24, 255);
-    futureLastMinute = QColor(0, 0, 0, 255);
+    pastLastMinuteBackground = QColor(24, 24, 24, 127);
+    futureLastMinuteBackground = QColor(0, 0, 0, 127);
+    pastLastMinuteStripe = QColor(24, 24, 24, 38);
+    futureLastMinuteStripe = QColor(0, 0, 0, 38);
 
     tickmarkLines.push_back(QColor(255, 255, 255, 255));
     tickmarkText.push_back(QColor(255, 255, 255, 255));

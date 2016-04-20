@@ -227,8 +227,10 @@
             "dateBarBackgrounds": [ "dark11", "dark9" ],
             "dateBarText": "light4",
 
-            "pastLastMinute": "dark6.setAlpha(38)",
-            "futureLastMinute": "dark6.setAlpha(38)",
+            "pastLastMinuteBackground": "dark6.setAlpha(127)",
+            "futureLastMinuteBackground": "dark6.setAlpha(127)",
+            "pastLastMinuteStripe": "dark6.setAlpha(38)",
+            "futureLastMinuteStripe": "dark6.setAlpha(38)",
 
             "pastBookmark": "blue12.setAlpha(204)",
             "futureBookmark": "blue12.setAlpha(204)",

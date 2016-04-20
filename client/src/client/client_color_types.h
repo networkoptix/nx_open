@@ -37,16 +37,18 @@ public:
     std::vector<QColor> dateBarBackgrounds;
     QColor dateBarText;
 
-    QColor pastLastMinute;
-    QColor futureLastMinute;
+    QColor pastLastMinuteBackground;
+    QColor futureLastMinuteBackground;
+    QColor pastLastMinuteStripe;
+    QColor futureLastMinuteStripe;
 
     std::vector<QColor> tickmarkLines;
     std::vector<QColor> tickmarkText;
 };
 #define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
-    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
-    (separator)(dateBarBackgrounds)(dateBarText)(pastLastMinute)(futureLastMinute)\
-    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)(separator)\
+    (dateBarBackgrounds)(dateBarText)(pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
     (tickmarkLines)(tickmarkText)
 
 struct QnTimeScrollBarColors {
