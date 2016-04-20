@@ -9,6 +9,7 @@
 #include <ui/delegates/abstract_permissions_delegate.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/widgets/properties/user_profile_widget.h>
 #include <ui/widgets/properties/user_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
 #include <ui/widgets/properties/permissions_widget.h>
@@ -70,6 +71,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     ui(new Ui::UserSettingsDialog()),
     m_permissionsDelegate(new UserSettingsPermissionsDelegate(this)),
     m_user(),
+    m_profilePage(new QnUserProfileWidget(this)),
     m_settingsPage(new QnUserSettingsWidget(this)),
     m_permissionsPage(new QnPermissionsWidget(m_permissionsDelegate.data(), this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_permissionsDelegate.data(), QnAccessibleResourcesWidget::CamerasFilter, this)),
@@ -78,25 +80,20 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
+    addPage(ProfilePage, m_profilePage, tr("Profile"));
     addPage(SettingsPage, m_settingsPage, tr("User Information"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
+    setPageVisible(SettingsPage, false);
     setPageVisible(PermissionsPage, false);
     setPageVisible(CamerasPage, false);
     setPageVisible(LayoutsPage, false);
     setPageVisible(ServersPage, false);
 
-    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this]
-    {
-        bool customAccessRights = m_settingsPage->isCustomAccessRights();
-        setPageVisible(PermissionsPage, customAccessRights);
-        setPageVisible(CamerasPage, customAccessRights);
-        setPageVisible(LayoutsPage, customAccessRights);
-        setPageVisible(ServersPage, customAccessRights);
-    });
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -215,6 +212,27 @@ void QnUserSettingsDialog::applyChanges()
         /* New User was created, clear dialog. */
         setUser(QnUserResourcePtr());
     }
+}
+
+void QnUserSettingsDialog::updatePagesVisibility()
+{
+    if (!m_user)
+    {
+        for (const auto& page : allPages())
+            setPageVisible(page.key, false);
+        return;
+    }
+
+    /* We are displaying profile for ourself and for users, that we cannot edit. */
+    bool showOnlyProfile = !accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission);
+    bool customAccessRights = !showOnlyProfile && m_settingsPage->isCustomAccessRights();
+
+    setPageVisible(ProfilePage, showOnlyProfile);
+    setPageVisible(SettingsPage, !showOnlyProfile);
+    setPageVisible(PermissionsPage, customAccessRights);
+    setPageVisible(CamerasPage, customAccessRights);
+    setPageVisible(LayoutsPage, customAccessRights);
+    setPageVisible(ServersPage, customAccessRights);
 }
 
 void QnUserSettingsDialog::applyChangesInternal()
