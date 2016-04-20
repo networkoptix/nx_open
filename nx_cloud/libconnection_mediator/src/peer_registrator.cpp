@@ -212,10 +212,9 @@ void PeerRegistrator::resolvePeer(
             api::ConnectionMethod::udpHolePunching |
             api::ConnectionMethod::proxy;
 
-    NX_LOGX(lm("Successfully resolved host %1 (requested from %2), endpoints=%3")
-        .arg(requestData.hostName).arg(connection->getSourceAddress().toString())
-        .arg(containerString(peerDataLocker->value().endpoints)),
-        cl_logDEBUG2);
+    NX_LOGX(lm("Successfully resolved host %1 (requested from %2)")
+        .str(peerDataLocker->value())
+        .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
 
     completionHandler(api::ResultCode::ok, std::move(responseData));
 }
