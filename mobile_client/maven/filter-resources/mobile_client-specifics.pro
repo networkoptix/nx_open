@@ -4,7 +4,7 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src \
     ${root.dir}/client.core/src \
 
-unix: !ios {
+unix: !mac {
     LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
     LIBS += "-Wl,-rpath-link,$$OPENSSL_DIR/lib"
 }
