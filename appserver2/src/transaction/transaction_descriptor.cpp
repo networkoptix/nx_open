@@ -431,8 +431,6 @@ namespace detail
                                true, // persistent
                                false, // system
                                &createHashForApiCameraAttributesDataHelper, // getHash
-                               createDefaultSaveTransactionHelper(&createHashForApiCameraAttributesDataHelper), // save
-                               createDefaultSaveSerializedTransactionHelper(&createHashForApiCameraAttributesDataHelper), // save serialized
                                CameraNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::saveCameraUserAttributesList, ApiCameraAttributesDataList,
