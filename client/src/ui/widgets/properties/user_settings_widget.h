@@ -36,7 +36,6 @@ private:
     void updateLogin();
     void updatePassword();
     void updateEmail();
-    void updateAccessRights();
 
 private:
     /* Mode of the dialog. */
@@ -54,11 +53,6 @@ private:
 
     void updateControlsAccess();
     void updateAccessRightsPresets();
-
-    void createAccessRightsAdvanced();
-    QCheckBox *createAccessRightCheckBox(QString text, int right, QWidget *previous);
-    void selectAccessRightsPreset(int rights);
-    void fillAccessRightsAdvanced(int rights);
 
     Qn::GlobalPermissions selectedPermissions() const;
     QnUuid selectedUserGroup() const;

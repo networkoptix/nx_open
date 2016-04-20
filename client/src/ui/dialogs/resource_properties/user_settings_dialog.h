@@ -7,6 +7,7 @@
 class QnUserSettingsWidget;
 class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
+class QnAbstractPermissionsDelegate;
 
 namespace Ui
 {
@@ -47,6 +48,8 @@ private:
     Q_DISABLE_COPY(QnUserSettingsDialog)
 
     QScopedPointer<Ui::UserSettingsDialog> ui;
+    QScopedPointer<QnAbstractPermissionsDelegate> m_permissionsDelegate;
+
     QnUserResourcePtr m_user;
 
     QnUserSettingsWidget* m_settingsPage;

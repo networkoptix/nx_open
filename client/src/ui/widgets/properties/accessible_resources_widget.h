@@ -2,12 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/resource/resource_fwd.h>
-
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
-
-#include <utils/common/connective.h>
 
 namespace Ui
 {
@@ -15,13 +10,14 @@ namespace Ui
 }
 
 class QnResourceListModel;
+class QnAbstractPermissionsDelegate;
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
-class QnAccessibleResourcesWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget
 {
     Q_OBJECT
 
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 public:
     enum Filter
     {
@@ -30,29 +26,20 @@ public:
         ServersFilter
     };
 
-    QnAccessibleResourcesWidget(Filter filter, QWidget* parent = 0);
+    QnAccessibleResourcesWidget(QnAbstractPermissionsDelegate* delegate, Filter filter, QWidget* parent = 0);
     virtual ~QnAccessibleResourcesWidget();
-
-    /** Id of the target . */
-    QnUuid targetGroupId() const;
-    /** Set if of the group. */
-    void setTargetGroupId(const QnUuid& id);
-
-    QnUserResourcePtr targetUser() const;
-    void setTargetUser(const QnUserResourcePtr& user);
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
 private:
-    bool targetIsValid() const;
-    QnUuid targetId() const;
+    Qn::GlobalPermission allResourcesPermission() const;
 
 private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
+    QnAbstractPermissionsDelegate* const m_delegate;
     const Filter m_filter;
-    QnUuid m_targetGroupId;
-    QnUserResourcePtr m_targetUser;
+
     QScopedPointer<QnResourceListModel> m_model;
 };

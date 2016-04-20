@@ -5,7 +5,6 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/help/help_topics.h>
@@ -47,7 +46,6 @@ QnUserSettingsWidget::QnUserSettingsWidget(QWidget* parent /*= 0*/):
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateEmail);
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserSettingsWidget::updateAccessRights);
     connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserSettingsWidget::hasChangesChanged);
 
     //setWarningStyle(ui->hintLabel);
@@ -107,12 +105,12 @@ bool QnUserSettingsWidget::hasChanges() const
         }
         else
         {
+            /* Check if we have selected a predefined internal group. */
             Qn::GlobalPermissions permissions = selectedPermissions();
-            if (permissions != m_user->getPermissions())
+            if (permissions != Qn::NoGlobalPermissions
+                && permissions != m_user->getPermissions())
                 return true;
         }
-
-
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -165,7 +163,6 @@ void QnUserSettingsWidget::loadDataToUi()
     updateLogin();
     updatePassword();
     updateEmail();
-    updateAccessRights();
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -176,77 +173,70 @@ void QnUserSettingsWidget::applyChanges()
     if (isReadOnly())
         return;
 
-    //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
-    qnResourcesChangesManager->saveUser(m_user, [this](const QnUserResourcePtr &user)
+    Qn::Permissions permissions = accessController()->permissions(m_user);
+
+    if (permissions.testFlag(Qn::WriteNamePermission))
+        m_user->setName(ui->loginEdit->text().trimmed());
+
+    //empty text means 'no change'
+    const QString newPassword = ui->passwordEdit->text().trimmed();
+    if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
     {
-        Qn::Permissions permissions = accessController()->permissions(user);
-
-        if (permissions.testFlag(Qn::WriteNamePermission))
-            user->setName(ui->loginEdit->text().trimmed());
-
-        //empty text means 'no change'
-        const QString newPassword = ui->passwordEdit->text().trimmed();
-        if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
+        m_user->setPassword(newPassword);
+        m_user->generateHash();
+        if (m_mode == Mode::OwnUser)
         {
-            user->setPassword(newPassword);
-            user->generateHash();
-            if (m_mode == Mode::OwnUser)
-            {
-                /* Password was changed. Change it in global settings and hope for the best. */
-                QUrl url = QnAppServerConnectionFactory::url();
-                url.setPassword(newPassword);
-                //// TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-                //context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
-                QnAppServerConnectionFactory::setUrl(url);
+            /* Password was changed. Change it in global settings and hope for the best. */
+            QUrl url = QnAppServerConnectionFactory::url();
+            url.setPassword(newPassword);
+            //// TODO #elric: This is a totally evil hack. Store password hash/salt in user.
+            //context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
+            QnAppServerConnectionFactory::setUrl(url);
 
-                //QnConnectionDataList savedConnections = qnSettings->customConnections();
-                //if (!savedConnections.isEmpty()
-                //    && !savedConnections.first().url.password().isEmpty()
-                //    && qnUrlEqual(savedConnections.first().url, url))
-                //{
-                //    QnConnectionData current = savedConnections.takeFirst();
-                //    current.url = url;
-                //    savedConnections.prepend(current);
-                //    qnSettings->setCustomConnections(savedConnections);
-                //}
+            //QnConnectionDataList savedConnections = qnSettings->customConnections();
+            //if (!savedConnections.isEmpty()
+            //    && !savedConnections.first().url.password().isEmpty()
+            //    && qnUrlEqual(savedConnections.first().url, url))
+            //{
+            //    QnConnectionData current = savedConnections.takeFirst();
+            //    current.url = url;
+            //    savedConnections.prepend(current);
+            //    qnSettings->setCustomConnections(savedConnections);
+            //}
 
-                //QnConnectionData lastUsed = qnSettings->lastUsedConnection();
-                //if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
-                //    lastUsed.url = url;
-                //    qnSettings->setLastUsedConnection(lastUsed);
-                //}
-
-            }
-
-            user->setPassword(QString());
-        }
-
-        if (permissions.testFlag(Qn::WriteAccessRightsPermission))
-        {
-            QnUuid groupId = selectedUserGroup();
-            if (!groupId.isNull())
-            {
-                user->setUserGroup(groupId);
-            }
-            else
-            {
-                Qn::GlobalPermissions permissions = selectedPermissions();
-                if (permissions != Qn::NoGlobalPermissions)
-                    user->setPermissions(permissions);
-                /* Otherwise permissions must be loaded from custom tabs. */
-            }
+            //QnConnectionData lastUsed = qnSettings->lastUsedConnection();
+            //if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
+            //    lastUsed.url = url;
+            //    qnSettings->setLastUsedConnection(lastUsed);
+            //}
 
         }
 
-        if (permissions.testFlag(Qn::WriteEmailPermission))
-            user->setEmail(ui->emailEdit->text());
+        m_user->setPassword(QString());
+    }
 
-        if (permissions.testFlag(Qn::WriteAccessRightsPermission))
-            user->setEnabled(ui->enabledButton->isChecked());
+    if (permissions.testFlag(Qn::WriteAccessRightsPermission))
+    {
+        QnUuid groupId = selectedUserGroup();
+        if (!groupId.isNull())
+        {
+            m_user->setUserGroup(groupId);
+        }
+        else
+        {
+            Qn::GlobalPermissions permissions = selectedPermissions();
+            if (permissions != Qn::NoGlobalPermissions)
+                m_user->setPermissions(permissions);
+            /* Otherwise permissions must be loaded from custom tabs. */
+        }
 
+    }
 
-    });
+    if (permissions.testFlag(Qn::WriteEmailPermission))
+        m_user->setEmail(ui->emailEdit->text());
 
+    if (permissions.testFlag(Qn::WriteAccessRightsPermission))
+        m_user->setEnabled(ui->enabledButton->isChecked());
 }
 
 bool QnUserSettingsWidget::isCustomAccessRights() const
@@ -358,19 +348,6 @@ void QnUserSettingsWidget::updateEmail()
     ui->emailEdit->setPalette(palette);
 }
 
-void QnUserSettingsWidget::updateAccessRights()
-{
-    if (isCustomAccessRights())
-    {
-
-    }
-    else
-    {
-
-
-    }
-}
-
 void QnUserSettingsWidget::updateControlsAccess()
 {
     Qn::Permissions permissions = m_user
@@ -442,84 +419,6 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
     addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
 }
 
-void QnUserSettingsWidget::createAccessRightsAdvanced()
-{
-  /*  if (!m_user)
-        return;
-
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
-    QWidget* previous = ui->advancedButton;
-
-    if (permissions.testFlag(Qn::GlobalOwnerPermission))
-        previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalOwnerPermission, previous);
-
-    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
-        previous = createAccessRightCheckBox(tr("Administrator"),
-            Qn::GlobalAdminPermission,
-            previous);
-
-    previous = createAccessRightCheckBox(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Can adjust devices settings"),
-        tr("Can adjust cameras settings")
-        ), Qn::GlobalEditCamerasPermission, previous);
-    previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
-    previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
-    previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
-    createAccessRightCheckBox(tr("Can edit Video Walls"), Qn::GlobalEditVideoWallPermission, previous);
-
-    updateDependantPermissions();*/
-}
-
-QCheckBox *QnUserSettingsWidget::createAccessRightCheckBox(QString text, int right, QWidget *previous)
-{
-    return nullptr;
-  /*  QCheckBox *checkBox = new QCheckBox(text, this);
-    ui->accessRightsGroupbox->layout()->addWidget(checkBox);
-    m_advancedRights.insert(right, checkBox);
-    setTabOrder(previous, checkBox);
-
-    if (isReadOnly(ui->accessRightsGroupbox))
-        setReadOnly(checkBox, true);
-    else
-        connect(checkBox, &QCheckBox::clicked, this, &QnUserSettingsWidget::at_customCheckBox_clicked);
-    return checkBox;*/
-}
-
-void QnUserSettingsWidget::selectAccessRightsPreset(int rights)
-{
-  /*  bool custom = true;
-    for (int i = 0; i < ui->groupComboBox->count(); i++)
-    {
-        if (ui->groupComboBox->itemData(i).toULongLong() == rights)
-        {
-            ui->groupComboBox->setCurrentIndex(i);
-            custom = false;
-            break;
-        }
-    }
-
-    if (custom)
-    {
-        ui->advancedButton->setChecked(true);
-        ui->groupComboBox->setCurrentIndex(ui->groupComboBox->count() - 1);
-    }*/
-}
-
-void QnUserSettingsWidget::fillAccessRightsAdvanced(int rights)
-{
-    //if (m_inUpdateDependensies)
-    //    return; //just in case
-
-    //m_inUpdateDependensies = true;
-
-    //for (auto pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
-    //    if (pos.value())
-    //        pos.value()->setChecked((pos.key() & rights) == pos.key());
-    //m_inUpdateDependensies = false;
-
-    //updateDependantPermissions(); // TODO: #GDM #Common rename to something more sane, connect properly
-}
-
 Qn::GlobalPermissions QnUserSettingsWidget::selectedPermissions() const
 {
     return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
@@ -529,21 +428,3 @@ QnUuid QnUserSettingsWidget::selectedUserGroup() const
 {
     return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
 }
-
-// Utility functions
-//
-//bool QnUserSettingsWidget::isCheckboxChecked(int right) {
-//    return m_advancedRights[right] ? m_advancedRights[right]->isChecked() : false;
-//}
-//
-//void QnUserSettingsWidget::setCheckboxChecked(int right, bool checked) {
-//    if (QCheckBox *targetCheckBox = m_advancedRights[right]) {
-//        targetCheckBox->setChecked(checked);
-//    }
-//}
-//
-//void QnUserSettingsWidget::setCheckboxEnabled(int right, bool enabled) {
-//    if (QCheckBox *targetCheckBox = m_advancedRights[right]) {
-//        targetCheckBox->setEnabled(enabled);
-//    }
-//}
