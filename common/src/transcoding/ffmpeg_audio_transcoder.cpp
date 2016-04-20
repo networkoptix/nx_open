@@ -6,8 +6,33 @@
 #include "utils/media/audio_processor.h"
 #include "utils/media/ffmpeg_helper.h"
 
+namespace
+{
+    static const int MAX_AUDIO_JITTER = 1000 * 200;
 
-static const int MAX_AUDIO_JITTER = 1000 * 200;
+    int calcBits(quint64 value)
+    {
+        int result = 0;
+        while (value)
+        {
+            if (value & 1)
+                ++result;
+            value >>= 1;
+        }
+        return result;
+    }
+        
+    int getMaxAudioChannels(AVCodec* avCodec)
+    {
+        if (!avCodec->channel_layouts)
+            return 1; // default value if unknown
+
+        int result = 0;
+        for (const uint64_t* layout = avCodec->channel_layouts; *layout; ++layout)
+            result = qMax(result, calcBits(*layout));
+        return result;
+    }
+}
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
     QnAudioTranscoder(codecId),
@@ -67,11 +92,15 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
     m_encoderCtx->sample_fmt = avCodec->sample_fmts[0] != AV_SAMPLE_FMT_NONE ? avCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
 
     m_encoderCtx->channels = codecCtx->ctx()->channels;
-    if (m_encoderCtx->channels > 2 && (m_codecId == CODEC_ID_MP3 || m_codecId == CODEC_ID_MP2))
+    int maxEncoderChannels = getMaxAudioChannels(avCodec);
+
+    if (m_encoderCtx->channels > maxEncoderChannels)
     {
-        m_downmixAudio = true;
-        m_encoderCtx->channels = 2;
+        if (maxEncoderChannels == 2)
+            m_downmixAudio = true; //< downmix to stereo inplace before ffmpeg based resample (just not change behaviour, keep as in the previous version)
+        m_encoderCtx->channels = maxEncoderChannels;
     }
+    
     m_encoderCtx->sample_rate = codecCtx->ctx()->sample_rate;
     if (m_encoderCtx->sample_rate < 16000) {
         m_encoderCtx->sample_rate = 16000;
