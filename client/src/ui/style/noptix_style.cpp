@@ -155,15 +155,10 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
 
-    // TODO: #Elric #2.3 remove this line in 2.3, looks like it's not needed.
-    if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18));
-
-        /* QWidget::scroll method has caching issues leading to some garbage drawn in the updated areas.
-           As a workaround we force it to repaint all contents. */
-        if(QHeaderView *headerView = dynamic_cast<QHeaderView *>(itemView))
-            headerView->viewport()->setAutoFillBackground(false);
-    }
+    /* QWidget::scroll method has caching issues leading to some garbage drawn in the updated areas.
+        As a workaround we force it to repaint all contents. */
+    if(QHeaderView *headerView = dynamic_cast<QHeaderView *>(widget))
+        headerView->viewport()->setAutoFillBackground(false);
 
     if(QAbstractButton *button = dynamic_cast<QAbstractButton *>(widget))
         button->setIcon(m_skin->icon(button->icon()));

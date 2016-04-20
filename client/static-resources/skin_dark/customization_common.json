@@ -173,6 +173,17 @@
         }
     },
 
+    "QTreeView": {
+        "palette": {
+            "default": {
+                "midlight":         "dark8.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light12",
+                "highlightedText":  "light4",
+                "brightText":       "brand_core"
+            }
+        }
+    },
 
     "QnPanel": {
         "palette": {
