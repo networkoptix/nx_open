@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # Some build dependent variables, usable for auto.py and other python scripts 
-ARCH="{arch}"
-BOX="{box}"
-CONFIGURATION="{build.configuration}"
-TARGET="{rdep.target}"
-PACKAGES_DIR="{packages.dir}"
-TARGET_DIR="{libdir}"
-QT_DIR="{qt.dir}"
-QT_LIB="{qt.dir}/lib"
+ARCH="${arch}"
+BOX="${box}"
+CONFIGURATION="${build.configuration}"
+TARGET="${rdep.target}"
+PACKAGES_DIR="${packages.dir}"
+TARGET_DIR="${libdir}"
+QT_DIR="${qt.dir}"
+QT_LIB="${qt.dir}/lib"
 # for win - add QT_LIB to PATH
 # for linux - add QT_LIB to LD_LIBRARY_PATH
 
