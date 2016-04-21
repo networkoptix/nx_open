@@ -10,6 +10,7 @@
 #include <core/resource/user_resource.h>
 
 #include <ui/common/read_only.h>
+#include <ui/common/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/user_settings_model.h>
@@ -27,6 +28,9 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 {
     ui->setupUi(this);
 
+
+
+
     ::setReadOnly(ui->loginLineEdit, true);
     ::setReadOnly(ui->groupLineEdit, true);
 
@@ -40,14 +44,14 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     });
 
     ui->newPasswordInputField->setTitle(tr("New Password"));
-    ui->newPasswordInputField->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
     ui->newPasswordInputField->setValidator([](const QString& text)
     {
         return QnInputField::ValidateResult(true, QString());
     });
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
-    ui->confirmPasswordInputField->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
     ui->confirmPasswordInputField->setValidator([this](const QString& text)
     {
         if (ui->newPasswordInputField->text().isEmpty())
@@ -60,7 +64,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     });
 
     ui->currentPasswordInputField->setTitle(tr("Current Password"));
-    ui->currentPasswordInputField->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);
     ui->currentPasswordInputField->setValidator([this](const QString& text)
     {
         if (ui->newPasswordInputField->text().isEmpty())
@@ -77,6 +81,15 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 
     for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField, ui->emailInputField })
         connect(field, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->addWidget(ui->loginLabel);
+    aligner->addWidget(ui->groupLabel);
+    aligner->addWidget(ui->emailInputField->titleLabel());
+    aligner->addWidget(ui->newPasswordInputField->titleLabel());
+    aligner->addWidget(ui->confirmPasswordInputField->titleLabel());
+    aligner->addWidget(ui->currentPasswordInputField->titleLabel());
+    aligner->start();
 
     //setWarningStyle(ui->hintLabel);
 }

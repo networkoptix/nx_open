@@ -21,6 +21,8 @@ public:
     QnInputField(QWidget* parent = nullptr);
     virtual ~QnInputField();
 
+    QLabel* titleLabel() const;
+
     QString title() const;
     void setTitle(const QString& value);
 

@@ -66,6 +66,12 @@ QnInputField::~QnInputField()
 
 }
 
+QLabel* QnInputField::titleLabel() const
+{
+    Q_D(const QnInputField);
+    return d->title;
+}
+
 QString QnInputField::title() const
 {
     Q_D(const QnInputField);
