@@ -15,9 +15,12 @@ namespace
 {
     enum 
     {
-        kCloudSystemsRefreshPeriodMs = 7 * 1000          // 7 seconds
-        , kCloudServerOutdateTimeoutMs = 10 * 1000        // 10 seconds
+        kCloudSystemsRefreshPeriodMs = 7 * 1000         // 7 seconds
+        , kCloudServerOutdateTimeoutMs = 10 * 1000      // 10 seconds
     };
+
+    constexpr static const std::chrono::seconds kSystemConnectTimeout = 
+        std::chrono::seconds(15);
 }
 
 QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
@@ -191,9 +194,8 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
     const auto onModuleInformationCompleted = [this, guard, systemId, host, serverPriority]
         (SystemError::ErrorCode errorCode, int httpCode, nx_http::BufferType buffer)
     {
-        enum { kHttpSuccess = 200 };
         if (!guard || (errorCode != SystemError::noError)
-            || (httpCode != kHttpSuccess))
+            || (httpCode != nx_http::StatusCode::ok))
         {
             return;
         }
@@ -227,7 +229,17 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
         systemDescription->setServerHost(serverId, host);
     };
 
-    nx_http::downloadFileAsync(apiUrl, onModuleInformationCompleted);
+    nx_http::AsyncHttpClient::Timeouts httpRequestTimeouts;
+    //first connect to a cloud (and not cloud) system may take a long time
+    //  since it may require hole punching
+    httpRequestTimeouts.sendTimeout = kSystemConnectTimeout;
+    httpRequestTimeouts.responseReadTimeout = kSystemConnectTimeout;
+    nx_http::downloadFileAsync(
+        apiUrl,
+        onModuleInformationCompleted,
+        nx_http::HttpHeaders(),
+        nx_http::AsyncHttpClient::authBasicAndDigest,
+        httpRequestTimeouts);
 }
 
 void QnCloudSystemsFinder::checkOutdatedServersInternal(const QnSystemDescriptionPtr &system)
