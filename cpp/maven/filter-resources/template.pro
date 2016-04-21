@@ -256,6 +256,7 @@ macx {
   QMAKE_INFO_PLIST = Info.plist
   QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c

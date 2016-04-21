@@ -23,7 +23,6 @@
     <properties>
         <guid>${common.guid}</guid>
         <!--Global libs-->
-        <template>lib</template>
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
@@ -86,7 +85,7 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core network xml sql</qt.libs>
+                <qt.libs>core core-private network xml sql</qt.libs>
                 <rdep.linux.packages>gcc-4.9.3</rdep.linux.packages>
                 <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
             </properties>
@@ -142,7 +141,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
+                <rdep.linux.packages>gcc-${gcc.version} quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
 

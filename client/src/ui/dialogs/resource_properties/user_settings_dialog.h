@@ -4,9 +4,11 @@
 
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
+class QnUserProfileWidget;
 class QnUserSettingsWidget;
 class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
+class QnAbstractPermissionsDelegate;
 
 namespace Ui
 {
@@ -22,6 +24,7 @@ class QnUserSettingsDialog: public QnWorkbenchStateDependentTabbedDialog
 public:
     enum DialogPage
     {
+        ProfilePage,
         SettingsPage,
         PermissionsPage,
         CamerasPage,
@@ -44,11 +47,18 @@ protected:
     virtual void applyChanges() override;
 
 private:
+    void updatePagesVisibility();
+    void applyChangesInternal();
+
+private:
     Q_DISABLE_COPY(QnUserSettingsDialog)
 
     QScopedPointer<Ui::UserSettingsDialog> ui;
+    QScopedPointer<QnAbstractPermissionsDelegate> m_permissionsDelegate;
+
     QnUserResourcePtr m_user;
 
+    QnUserProfileWidget* m_profilePage;
     QnUserSettingsWidget* m_settingsPage;
     QnPermissionsWidget* m_permissionsPage;
     QnAccessibleResourcesWidget* m_camerasPage;

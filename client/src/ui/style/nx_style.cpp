@@ -2021,7 +2021,7 @@ int QnNxStyle::pixelMetric(
         return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
     case PM_ToolBarIconSize:
-        return dp(18);
+        return dp(32); // TODO #vkutin Remove dp() from all places where it's not needed
 
     case PM_TabCloseIndicatorWidth:
     case PM_TabCloseIndicatorHeight:

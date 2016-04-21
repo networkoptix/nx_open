@@ -51,7 +51,7 @@ def get_packages(target):
         packages += """ ${rdep.linux.packages}"""
         if target in [ "bpi", "rpi", "isd", "isd_s2" ]:
             packages += """ ${rdep.linux.arm.packages}"""
-    elif target_platform == "macos":
+    elif target_platform == "macosx":
         packages += """ ${rdep.mac.packages}"""
     elif target_platform == "android":
         packages += """ ${rdep.android.packages}"""

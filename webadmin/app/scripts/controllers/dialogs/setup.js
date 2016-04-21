@@ -91,7 +91,7 @@ angular.module('webadminApp')
         function checkInternet(reload){
 
             $log.log("check internet connection");
-            if(debugMode){
+            if(true || debugMode){ // Temporary skip all internet checks
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
                 return;
