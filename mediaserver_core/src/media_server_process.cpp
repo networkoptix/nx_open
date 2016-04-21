@@ -52,6 +52,7 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
 
 #include <events/mserver_business_rule_processor.h>

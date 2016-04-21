@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
+    <width>439</width>
     <height>403</height>
    </rect>
   </property>
@@ -27,181 +27,71 @@
     <number>16</number>
    </property>
    <item>
-    <widget class="QPushButton" name="enabledButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string>Enabled</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line_3">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QGridLayout" name="propertiesLayout">
      <property name="verticalSpacing">
-      <number>0</number>
+      <number>8</number>
      </property>
      <item row="0" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="loginLabel">
        <property name="text">
-        <string>&amp;Login</string>
+        <string>Login</string>
        </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>loginEdit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="loginEdit"/>
-     </item>
-     <item row="1" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="emailLabel">
-       <property name="text">
-        <string>E&amp;mail</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>emailEdit</cstring>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="emailEdit"/>
+      <widget class="QLineEdit" name="groupLineEdit"/>
      </item>
-     <item row="2" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="currentPasswordLabel">
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="loginLineEdit"/>
+     </item>
+     <item row="1" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="groupLabel">
        <property name="text">
-        <string>C&amp;urrent Password</string>
+        <string>Group</string>
        </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>currentPasswordEdit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="currentPasswordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="passwordLabel">
-       <property name="text">
-        <string>&amp;Password</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>passwordEdit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="passwordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="confirmPasswordLabel">
-       <property name="text">
-        <string>&amp;Confirm Password</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>confirmPasswordEdit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="confirmPasswordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="Line" name="line_2">
+    <widget class="QnInputField" name="emailInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="newPasswordInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="currentPasswordInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
-     <item row="0" column="0">
-      <widget class="QLabel" name="groupLabel">
-       <property name="text">
-        <string>Group</string>
-       </property>
-       <property name="buddy">
-        <cstring>groupComboBox</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0" alignment="Qt::AlignTop">
-      <widget class="QComboBox" name="groupComboBox"/>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="permissionsLabel">
-       <property name="text">
-        <string notr="true">&lt;table&gt;
+    <widget class="QLabel" name="permissionsLabel">
+     <property name="text">
+      <string notr="true">&lt;table&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;3&lt;/b&gt; / 6&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Permissions&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;18&lt;/b&gt; / 91&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Cameras&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;2&lt;/b&gt; / 8&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Layouts&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;0&lt;/b&gt; / 3&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Servers&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::RichText</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" alignment="Qt::AlignRight">
-      <widget class="QPushButton" name="editGroupButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Edit Group...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -218,6 +108,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnInputField</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

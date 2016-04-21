@@ -184,7 +184,7 @@ def get_rsync_command(source,
     if show_progress:
         command.append("--progress")
 
-    if RSYNC_CHMOD_ARG:
+    if RSYNC_CHMOD_ARG and not ":" in destination:
         command.append(RSYNC_CHMOD_ARG)
 
     command.append(source)

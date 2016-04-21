@@ -29,7 +29,7 @@
 #include <QMutexLocker>
 
 #include <plugins/resource/third_party/motion_data_picture.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
 #include "ilp_video_packet.h"

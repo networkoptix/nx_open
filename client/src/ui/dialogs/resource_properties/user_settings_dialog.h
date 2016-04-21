@@ -9,6 +9,7 @@ class QnUserSettingsWidget;
 class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
 class QnAbstractPermissionsDelegate;
+class QnUserSettingsModel;
 
 namespace Ui
 {
@@ -48,13 +49,14 @@ protected:
 
 private:
     void updatePagesVisibility();
-    void applyChangesInternal();
 
 private:
     Q_DISABLE_COPY(QnUserSettingsDialog)
 
     QScopedPointer<Ui::UserSettingsDialog> ui;
-    QScopedPointer<QnAbstractPermissionsDelegate> m_permissionsDelegate;
+
+    /** Common model for all sub-widgets, owned by the dialog. */
+    QnUserSettingsModel* m_model;
 
     QnUserResourcePtr m_user;
 

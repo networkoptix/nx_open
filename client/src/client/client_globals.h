@@ -1,5 +1,4 @@
-#ifndef QN_CLIENT_GLOBALS_H
-#define QN_CLIENT_GLOBALS_H
+#pragma once
 
 #include <QtCore/QMetaType>
 
@@ -318,4 +317,3 @@ inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value)
     return stream;
 }
 
-#endif // QN_CLIENT_GLOBALS_H
