@@ -1,6 +1,6 @@
 'use strict';
 var AccountPage = require('./po.js');
-describe('Change password suite', function () {
+describe('On change password page,', function () {
 
     var p = new AccountPage();
 
@@ -16,7 +16,7 @@ describe('Change password suite', function () {
         p.get(p.passwordUrl);
     });
 
-    it("should open change password page", function () {
+    it("url should be #/account/password", function () {
         p.get(p.homePageUrl);
 
         expect(p.userAccountDropdownToggle.isDisplayed()).toBe(true);
@@ -35,7 +35,7 @@ describe('Change password suite', function () {
         return deferred.promise;
     }, p);
 
-    it("should allow to change password (and change it back)", function () {
+    it("password can be changed", function () {
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
         p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.submitButton.click();
@@ -51,7 +51,7 @@ describe('Change password suite', function () {
         p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
-    it("should save new password correctly (and change it back)", function () {
+    it("password is actually changed, so login works with new password", function () {
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
         p.passwordInput.sendKeys(p.helper.userPasswordNew);
         p.submitButton.click();
@@ -95,7 +95,7 @@ describe('Change password suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success, true);
 
-    it("should not allow to change password if old password is wrong", function () {
+    it("password change is not possible if old password is wrong", function () {
         p.currentPasswordInput.sendKeys(p.helper.userPasswordWrong);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
@@ -103,21 +103,21 @@ describe('Change password suite', function () {
         p.alert.catchAlert( p.alert.alertMessages.changePassWrongCurrent, p.alert.alertTypes.danger);
     });
 
-    it("should allow to enter more than 256 symbols in new password field; change password back using 0-255 symbols of that new long password", function () {
+    it("more than 256 symbols can be entered in new password field and then are cut to 256", function () {
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
         p.passwordInput.sendKeys(p.helper.inputLong300);
         p.submitButton.click();
         p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
 
         p.refresh();
-
+        //Change password back using 0-255 symbols of that new long password
         p.currentPasswordInput.sendKeys(p.helper.inputLongCut);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.submitButton.click();
         p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
-    it("should respond to Enter key and save data", function () {
+    it("pressing Enter key saves data", function () {
         p.currentPasswordInput.sendKeys(p.helper.userPassword);
         // Save form using Enter key
         p.passwordInput.sendKeys(p.helper.userPassword).sendKeys(protractor.Key.ENTER);
@@ -125,13 +125,13 @@ describe('Change password suite', function () {
         p.alert.catchAlert( p.alert.alertMessages.changePassSuccess, p.alert.alertTypes.success);
     });
 
-    it("should respond to Tab key", function () {
+    it("pressing Tab key moves focus to the next element", function () {
         // Navigate to next field using TAB key
         p.currentPasswordInput.sendKeys(protractor.Key.TAB);
         p.helper.checkElementFocusedBy(p.passwordInput, 'id');
     });
 
     xit("should not allow to change password if new password is the same as old password", function () {
-        expect('test').toBe('written');
+        expect('functionality').toBe('implemented');
     });
 });

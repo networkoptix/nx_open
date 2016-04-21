@@ -1,6 +1,6 @@
 'use strict';
 var AccountPage = require('./po.js');
-describe('Account suite', function () {
+describe('On account page,', function () {
 
     var p = new AccountPage();
 
@@ -23,7 +23,7 @@ describe('Account suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success, true);
 
-    it("should display dropdown in right top corner: Account settings, Change password, Logout", function () {
+    it("dropdown in top right corner has links: Account settings, Change password, Logout", function () {
         p.get(p.homePageUrl);
         expect(p.userAccountDropdownToggle.getText()).toContain(p.helper.userEmail);
 
@@ -33,20 +33,20 @@ describe('Account suite', function () {
         expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
     });
 
-    it("should allow to log out", function () {
+    it("it is possible to log out", function () {
         p.get(p.homePageUrl);
         p.helper.logout();
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
 
-    it("should show email, first name, last name, subscribe", function () {
+    it("there are fields: email, first name, last name, subscribe checkbox", function () {
         expect(p.emailField.getAttribute('value')).toContain(p.helper.userEmail);
         expect(p.firstNameInput.isDisplayed()).toBe(true);
         expect(p.lastNameInput.isDisplayed()).toBe(true);
         expect(p.subscribeCheckbox.isDisplayed()).toBe(true);
     });
 
-    it("should allow to edit first name, last name, subscribe, and save it", function () {
+    it("first name, last name, subscribe are editable and can be saved", function () {
         p.firstNameInput.clear().sendKeys(p.helper.userFirstName);
         p.lastNameInput.clear().sendKeys(p.helper.userLastName);
 
@@ -60,7 +60,7 @@ describe('Account suite', function () {
         expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userLastName);
     });
 
-    it("should not allow to save empty First and Last name", function () {
+    it("First name and Last name are required", function () {
         p.firstNameInput.clear();
         p.lastNameInput.clear();
 
@@ -70,7 +70,7 @@ describe('Account suite', function () {
         p.checkInputInvalid(p.lastNameInput, p.invalidClassRequired);
     });
 
-    it("should not allow to save empty First name", function () {
+    it("First name is required", function () {
         p.firstNameInput.clear();
         p.lastNameInput.clear().sendKeys(p.helper.userLastName);
 
@@ -78,7 +78,7 @@ describe('Account suite', function () {
         p.checkInputInvalid(p.firstNameInput, p.invalidClassRequired);
     });
 
-    it("should not allow to save empty Last name", function () {
+    it("Last name is required", function () {
         p.firstNameInput.clear().sendKeys(p.helper.userFirstName);
         p.lastNameInput.clear();
 
@@ -86,7 +86,7 @@ describe('Account suite', function () {
         p.checkInputInvalid(p.lastNameInput, p.invalidClassRequired);
     });
 
-    it("should allow cyrillic First and Last names, and save it", function () {
+    it("cyrillic First and Last names are allowed and correctly saved", function () {
         p.firstNameInput.clear().sendKeys(p.helper.userNameCyrillic);
         p.lastNameInput.clear().sendKeys(p.helper.userNameCyrillic);
 
@@ -100,7 +100,7 @@ describe('Account suite', function () {
         expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userNameCyrillic);
     });
 
-    it("should allow smile symbols in First and Last name fields, and save it", function () {
+    it("smile symbols in First and Last name fields are allowed and correctly saved", function () {
         p.firstNameInput.clear().sendKeys(p.helper.userNameSmile);
         p.lastNameInput.clear().sendKeys(p.helper.userNameSmile);
 
@@ -114,7 +114,7 @@ describe('Account suite', function () {
         expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userNameSmile);
     });
 
-    it("should allow hieroglyphic symbols in First and Last name fields, and save it", function () {
+    it("hieroglyphic symbols in First and Last name fields are allowed and correctly saved", function () {
         p.firstNameInput.clear().sendKeys(p.helper.userNameHierog);
         p.lastNameInput.clear().sendKeys(p.helper.userNameHierog);
 
@@ -128,7 +128,7 @@ describe('Account suite', function () {
         expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.userNameHierog);
     });
 
-    it("should allow to enter more than 256 symbols in each field and cut it to 256", function () {
+    it("more than 256 symbols can be entered in each field and then are cut to 256", function () {
         p.firstNameInput.clear().sendKeys(p.helper.inputLong300);
         p.lastNameInput.clear().sendKeys(p.helper.inputLong300);
         p.saveButton.click();
@@ -139,14 +139,14 @@ describe('Account suite', function () {
         expect(p.lastNameInput.getAttribute('value')).toMatch(p.helper.inputLongCut);
     });
 
-    it("should respond to Enter key and save data", function () {
+    it("pressing Enter key saves data", function () {
         p.firstNameInput.clear().sendKeys(p.helper.userFirstName);
         p.lastNameInput.clear().sendKeys(p.helper.userLastName).sendKeys(protractor.Key.ENTER);
 
         p.alert.catchAlert( p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success);
     });
 
-    it("should respond to Tab key", function () {
+    it("pressing Tab key moves focus to the next element", function () {
         // Navigate to next field using TAB key
         p.firstNameInput.sendKeys(protractor.Key.TAB);
         p.helper.checkElementFocusedBy(p.lastNameInput, 'id');
