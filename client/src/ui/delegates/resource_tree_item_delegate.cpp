@@ -6,17 +6,21 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource_name.h>
 
 #include <client/client_meta_types.h>
+#include <client/client_settings.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
+#include <ui/style/helper.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include <common/common_module.h>
 
@@ -39,7 +43,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
         return;
     }
 
-    if (index.column() == Qn::CheckColumn)
+    if (index.column() == Qn::CheckColumn) // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
     {
         base_type::paint(painter, option, index);
         return;
@@ -59,13 +63,13 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
             raisedItem = workbench()->item(Qn::ZoomedRole);
     }
 
-    QColor baseColor = option.palette.color(QPalette::Text);
+    QPalette::ColorRole actualRole = QPalette::Text;
     QIcon::Mode iconMode = QIcon::Normal;
 
     if (raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId())))
     {
         /* Brighten raised/zoomed item. */
-        baseColor = option.palette.color(QPalette::BrightText);
+        actualRole = QPalette::BrightText;
         iconMode = QIcon::Active;
     }
     else if (!resource.isNull() && !currentLayoutResource.isNull())
@@ -76,7 +80,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
             /* Highlight current layout if we aren't in videowall control mode or current videowall if we are. */
             if (videoWallControlMode != uuid.isNull())
             {
-                baseColor = option.palette.color(QPalette::HighlightedText);
+                actualRole = QPalette::HighlightedText;
                 iconMode = QIcon::Selected;
             }
         }
@@ -84,36 +88,72 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
             (uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()))
         {
             /* Highlight Brighten items on current layout. */
-            baseColor = option.palette.color(QPalette::HighlightedText);
+            actualRole = QPalette::HighlightedText;
             iconMode = QIcon::Selected;
         }
     }
 
-    option.palette.setColor(QPalette::Text, baseColor);
-    option.palette.setColor(QPalette::HighlightedText, baseColor); /* No color change for selection */
-
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
-    /* Draw background to the left of item, to get entire row selection/hover markers. */
+    /* Obtain sub-element rectangles: */
+    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
+    QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
+
+    /* Check indicators in this implementation are handled elsewhere: */
+    NX_ASSERT(!option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator));
+
+    /* Paint background: */
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
+
+    /* Draw icon: */
+    if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
+        option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
+
+    /* Draw text: */
+    bool extraResourceInfo = qnSettings->isIpShownInTree() && !resource.isNull();
+    if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
     {
-        QnScopedValueRollback<QRect> rectRollback(&option.rect);
-        option.rect.setWidth(option.rect.left());
-        option.rect.moveLeft(0);
-        style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
+        option.font.setWeight(QFont::DemiBold);
+
+        QnScopedPainterFontRollback fontRollback(painter, option.font);
+        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Normal, actualRole));
+
+        QFontMetrics metrics(option.font);
+        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
+        const int kTextPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
+        textRect.adjust(kTextPadding, 0, -kTextPadding, 0);
+
+        if (extraResourceInfo)
+        {
+            QString name, host;
+            getResourceDisplayInformation(resource, name, host);
+
+            QRect actualRect;
+            QString elidedName = metrics.elidedText(name, option.textElideMode, textRect.width(), kTextFlags);
+
+            painter->drawText(textRect, kTextFlags, elidedName, &actualRect);
+
+            if (elidedName == name && !host.isEmpty())
+            {
+                option.font.setWeight(QFont::Normal);
+                QFontMetrics extraMetrics(option.font);
+
+                textRect.setLeft(actualRect.right() + kTextPadding*2);
+                QString elidedHost = extraMetrics.elidedText(host, option.textElideMode, textRect.width(), kTextFlags);
+
+                painter->setFont(option.font);
+                painter->setPen(option.palette.color(QPalette::Inactive, actualRole));
+                painter->drawText(textRect, kTextFlags, elidedHost);
+            }
+        }
+        else
+        {
+            QString elidedText = metrics.elidedText(option.text, option.textElideMode, textRect.width(), kTextFlags);
+            painter->drawText(textRect, kTextFlags, elidedText);
+        }
     }
 
-    /* Strip option of icon. We will draw it later. */
-    QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
-    QIcon icon(option.icon);
-    option.icon = QIcon();
-
-    /* Draw item. */
-    style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
-
-    /* Draw icon. */
-    icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
-
-    /* Draw "recording" or "scheduled" icon. */
+    /* Draw "recording" or "scheduled" icon: */
     QRect extraIconRect = iconRect.adjusted(-4, 0, -4, 0);
     extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
 
@@ -131,7 +171,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
     if (recording || scheduled)
         (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, extraIconRect);
 
-    /* Draw "problems" icon. */
+    /* Draw "problems" icon: */
     extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
     if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
         if (camera->statusFlags() & Qn::CSF_HasIssuesFlag)

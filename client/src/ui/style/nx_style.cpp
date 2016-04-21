@@ -326,7 +326,9 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
+    case PE_PanelItemViewRow:
     case PE_PanelItemViewItem:
+        // TODO #vkutin When revamping table views figure out how to ensure correct item-over-row blending
         if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
             bool selected = item->state.testFlag(State_Selected);
@@ -339,10 +341,9 @@ void QnNxStyle::drawPrimitive(
                     hoveredRow = value.toInt();
             }
 
-            bool hovered = item->state.testFlag(State_MouseOver) || item->index.row() == hoveredRow;
+            bool hovered = item->state.testFlag(State_MouseOver) || (item->index.row() == hoveredRow && hoveredRow >= 0);
 
             QnPaletteColor fillColor;
-
             if (selected)
             {
                 fillColor = findColor(option->palette.highlight().color());
@@ -353,22 +354,15 @@ void QnNxStyle::drawPrimitive(
             {
                 fillColor = findColor(option->palette.midlight().color()).darker(1);
             }
-
-            if (fillColor.isValid())
+            else if (element == PE_PanelItemViewRow)
             {
-                fillColor.setAlphaF(0.4);
-                painter->fillRect(item->rect, fillColor.color());
+                fillColor = item->features.testFlag(QStyleOptionViewItem::Alternate) ?
+                    findColor(option->palette.alternateBase().color()) :
+                    findColor(option->palette.base().color());
             }
 
-            return;
-        }
-        break;
-
-    case PE_PanelItemViewRow:
-        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
-        {
-            if (item->features.testFlag(QStyleOptionViewItem::Alternate))
-                painter->fillRect(option->rect, option->palette.alternateBase());
+            if (fillColor.isValid())
+                painter->fillRect(item->rect, fillColor.color());
 
             return;
         }

@@ -352,11 +352,6 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags) {
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
 
-    if (flags & Qn::BackgroundOpacity)
-        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
-    else
-        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, QVariant());
-
     if (flags & Qn::BypassGraphicsProxy) {
         ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
         ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);

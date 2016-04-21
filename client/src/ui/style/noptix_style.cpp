@@ -247,22 +247,18 @@ bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *pa
     return true;
 }
 
-bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    QN_UNUSED(element);
+    QN_UNUSED(painter);
+
     if(!widget)
         return false;
 
     if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
         return true; /* Draw nothing. */
 
-    qreal itemOpacity = qvariant_cast<qreal>(widget->property(Qn::ItemViewItemBackgroundOpacity), 1.0);
-    if(qFuzzyCompare(itemOpacity, 1.0))
-        return false; /* Let the default implementation handle it. */
-
-    qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * itemOpacity);
-    base_type::drawPrimitive(element, option, painter, widget);
-    painter->setOpacity(opacity);
-    return true;
+    return false; /* Let the default implementation handle it. */
 }
 
 // -------------------------------------------------------------------------- //
