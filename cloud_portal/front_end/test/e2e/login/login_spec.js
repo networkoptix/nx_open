@@ -1,16 +1,16 @@
 'use strict';
 var LoginPage = require('./po.js');
-describe('Login suite', function () {
+describe('Login dialog', function () {
 
     var p = new LoginPage();
 
-    it("should open login dialog in anonymous state", function () {
+    it("can be opened in anonymous state", function () {
         browser.sleep(1000);
         p.get();
         expect((p.dialogLoginButton).isDisplayed()).toBe(true);
     });
 
-    it("should close login dialog after clicking on background", function () {
+    it("can be closed after clicking on background", function () {
         p.get();
         expect((p.dialogLoginButton).isDisplayed()).toBe(true);
 
@@ -18,7 +18,7 @@ describe('Login suite', function () {
         expect((p.loginDialog).isPresent()).toBe(false);
     });
 
-    it("should allow to log in with existing credentials and to log out", function () {
+    it("allows to log in with existing credentials and to log out", function () {
 
         browser.ignoreSynchronization = false;
         p.get();
@@ -28,7 +28,7 @@ describe('Login suite', function () {
         p.logout();
     });
 
-    it("should go to Systems after login; then log out", function () {
+    it("redirects to Systems after login", function () {
         p.get();
 
         p.emailInput.sendKeys(p.helper.userEmail);
@@ -42,7 +42,7 @@ describe('Login suite', function () {
         p.logout();
     });
 
-    it("should show user's email and menu in top right corner; then log out", function () {
+    it("; after login, display user's email and menu in top right corner", function () {
         p.get();
 
         var email = p.helper.userEmail;
@@ -74,7 +74,7 @@ describe('Login suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.loginIncorrect, p.alert.alertTypes.danger, true);
 
-    it("should not log in with wrong email", function () {
+    it("rejects log in with wrong email", function () {
         p.get();
 
         p.emailInput.sendKeys(p.helper.userEmailWrong);
@@ -86,7 +86,7 @@ describe('Login suite', function () {
         p.dialogCloseButton.click();
     });
 
-    it("should not allow to log in with existing email in uppercase", function () {
+    it("rejects log in with existing email in uppercase", function () {
         p.get();
 
         p.emailInput.sendKeys(p.helper.userEmail.toUpperCase());
@@ -97,7 +97,7 @@ describe('Login suite', function () {
         p.dialogCloseButton.click();
     });
 
-    it("should not log in with wrong password", function () {
+    it("rejects log in with wrong password", function () {
         p.get();
 
         p.emailInput.sendKeys(p.helper.userEmail);
@@ -109,7 +109,7 @@ describe('Login suite', function () {
         p.dialogCloseButton.click();
     });
 
-    it("should not log in without password", function () {
+    it("rejects log in without password", function () {
         p.get();
 
         p.emailInput.sendKeys(p.helper.userEmail);
@@ -123,7 +123,7 @@ describe('Login suite', function () {
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
-    it("should not log in without email but with password", function () {
+    it("rejects log in without email but with password", function () {
         p.get();
 
         p.passwordInput.sendKeys(p.helper.userPassword);
@@ -137,7 +137,7 @@ describe('Login suite', function () {
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
-    it("should not log in without both email and password", function () {
+    it("rejects log in without both email and password", function () {
         p.get();
 
         p.dialogLoginButton.click();
@@ -151,7 +151,7 @@ describe('Login suite', function () {
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
-    it("should not log in with email in non-email format but with password", function () {
+    it("rejects log in with email in non-email format but with password", function () {
         p.get();
 
         p.emailInput.sendKeys('vert546 464w6345');
@@ -166,7 +166,7 @@ describe('Login suite', function () {
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
-    it("should show red outline if field is wrong/empty after blur", function () {
+    it("shows red outline if field is wrong/empty after blur", function () {
         p.get();
 
         p.emailInput.sendKeys('vert546 464w6345');
@@ -185,7 +185,7 @@ describe('Login suite', function () {
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
-    it("should log in with Remember Me checkmark switched off", function () {
+    it("allows log in with \'Remember Me checkmark\' switched off", function () {
         p.get();
 
         p.emailInput.sendKeys(p.helper.userEmail2);
@@ -200,7 +200,7 @@ describe('Login suite', function () {
         p.logout();
     });
 
-    it("should have I forgot password link to restore pass page with pre-filled email from login form", function () {
+    it("contains \'I forgot password\' link that leads to Restore Password page with pre-filled email from login form", function () {
         p.get();
 
         var currentEmail = p.helper.userEmail;
@@ -217,7 +217,7 @@ describe('Login suite', function () {
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
-    it("should test I forgot password link without attempt to log in first", function () {
+    it("passes email from email input to Restore password page, even without clicking \'Log in\' button", function () {
         p.get();
 
         var currentEmail = p.helper.userEmail2; // keep it different from previous case "should test I forgot password link" !!!
@@ -231,7 +231,7 @@ describe('Login suite', function () {
         expect(p.restoreEmailInput.getAttribute('value')).toContain(currentEmail);
     });
 
-    it("should not log in and show error for inactivated user", function () {
+    it("rejects log in and shows error for inactivated user", function () {
         var userEmail = p.helper.register();
 
         p.get();
@@ -255,25 +255,79 @@ describe('Login suite', function () {
         return deferred.promise;
     }, p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger, true);
 
-    xit("should log in with Remember Me checkmark switched on, close browser, open browser and enter same session", function () {
+    xit("logs in with Remember Me checkmark switched on; after close browser, open browser enters same session", function () {
         //check remember me function by closing browser instance and opening it again
         expect("test").toBe("written");
     });
 
-    xit("should display password masked", function () {
+    xit("displays password masked", function () {
         expect("test").toBe("written with screenshot");
     });
 
-    xit("should copy password masked", function () {
+    xit("allows to copy password masked", function () {
         expect("test").toBe("written with screenshot");
     });
 
-    xit("should lock account after several failed attempts", function () {
+    xit("locks account after several failed attempts", function () {
+        expect("functionality").toBe("implemented");
+    });
+
+    xit("rejects log in, if the user just logged out and pressed back button in browser", function () {
         expect("test").toBe("written");
     });
 
-    xit("should not log in, if the user just logged out and pressed back button in browser", function () {
-        expect("test").toBe("written");
+    xit("handles more than 256 symbols email and password", function() {
+        /*
+         Use email with 256 symbols
+         Use email with more than 256 symbols
+         Use password with 256 symbols
+         Use password with much more than 256 symbols
+         */
     });
+    xit(": logout refreshes page", function() {
+    });
+    xit("can be opened in new tab", function() {
+    });
+    xit("allows copy-paste in input fields", function() {
+    });
+    xit("supports hotkeys", function() {
+    });
+    xit("handles two tabs, updates second tab state if logout is done on first", function() {
+    });
+    xit("works at each possible page at each state - with correct credentials", function() {
+        /*
+         Homepage
 
+         Registration page - before submit
+         Registration page - after submit success
+         Registration page - after submit with alert error message
+         Registration page - on account activation success
+         Registration page - on account activation error
+
+         Restore password page with email input - before submit
+         Restore password page with email input - after submit error
+         Restore password page with email input - after submit success
+         Restore password page with password input - before submit
+         Restore password page with password input - after submit error
+         Restore password page with password input - after submit success
+         */
+    });
+    xit("works at each possible page at each state - with incorrect credentials", function() {
+        /*
+         Homepage
+
+         Registration page - before submit
+         Registration page - after submit success
+         Registration page - after submit with alert error message
+         Registration page - on account activation success
+         Registration page - on account activation error
+
+         Restore password page with email input - before submit
+         Restore password page with email input - after submit error
+         Restore password page with email input - after submit success
+         Restore password page with password input - before submit
+         Restore password page with password input - after submit error
+         Restore password page with password input - after submit success
+         */
+    });
 });
