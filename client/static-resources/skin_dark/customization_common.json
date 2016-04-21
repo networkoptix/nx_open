@@ -173,7 +173,7 @@
         }
     },
 
-    "QnTreeView": {
+    "QnResourceTreeWidget": {
         "palette": {
             "default": {
                 "midlight":         "dark8.setAlpha(102)",
