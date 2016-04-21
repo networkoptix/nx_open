@@ -27,7 +27,10 @@
     <number>16</number>
    </property>
    <item>
-    <layout class="QGridLayout" name="propertiesLayout">
+    <layout class="QGridLayout" name="propertiesLayout" columnminimumwidth="120,0">
+     <property name="verticalSpacing">
+      <number>8</number>
+     </property>
      <item row="0" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="loginLabel">
        <property name="text">
@@ -45,48 +48,6 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="emailEdit"/>
      </item>
-     <item row="2" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="currentPasswordLabel">
-       <property name="text">
-        <string>Current Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="currentPasswordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="passwordLabel">
-       <property name="text">
-        <string>Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="passwordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="confirmPasswordLabel">
-       <property name="text">
-        <string>Confirm Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="confirmPasswordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
      <item row="5" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="groupLabel">
        <property name="text">
@@ -99,6 +60,48 @@
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="loginLineEdit"/>
+     </item>
+     <item row="2" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="passwordLabel">
+       <property name="text">
+        <string>New Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="confirmPasswordLabel">
+       <property name="text">
+        <string>Confirm Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" alignment="Qt::AlignRight">
+      <widget class="QLabel" name="currentPasswordLabel">
+       <property name="text">
+        <string>Current Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="passwordEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="confirmPasswordEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLineEdit" name="currentPasswordEdit">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

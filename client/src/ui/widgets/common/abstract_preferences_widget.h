@@ -29,18 +29,23 @@ public:
     virtual void applyChanges() = 0;
 
     /**
+    * @brief discardChanges                    Discard changes if needed. Called only on force closing.
+    */
+    virtual void discardChanges();
+
+    /**
      * @brief canApplyChanges                   Check that all values are correct so saving is possible.
      *                                          This method is optional, usually it shouldn't be reimplemented.
      * @return                                  False if saving should be aborted, true otherwise.
      */
-    virtual bool canApplyChanges();
+    virtual bool canApplyChanges() const;
 
     /**
      * @brief canDiscardChanges                 Check that all values can be discarded safely.
      *                                          This method is optional, usually it shouldn't be reimplemented.
      * @return                                  False if discarding should be aborted, true otherwise.
      */
-    virtual bool canDiscardChanges();
+    virtual bool canDiscardChanges() const;
 
     /**
      * @brief retranslateUi                     Update ui strings (if required).
