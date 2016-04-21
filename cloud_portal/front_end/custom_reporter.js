@@ -6,7 +6,7 @@ var customReporter = {
         console.log('\n' + result.description + ' start\n');
     },
     specStarted: function(result) {
-        console.log('\n' + result.description);
+        console.log('\n' + result.fullName);
     },
     specDone: function(result) {
         for(var i = 0; i < result.failedExpectations.length; i++) {
