@@ -7,7 +7,7 @@ from api.helpers.exceptions import validate_response
 
 @validate_response
 def ping():
-    request = settings.CLOUD_CONNECT['url'] + "/cdb/ping"
+    request = settings.CLOUD_CONNECT['url'] + "/ping"
     return requests.get(request)
 
 
