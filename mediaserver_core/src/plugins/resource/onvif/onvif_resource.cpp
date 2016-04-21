@@ -566,17 +566,17 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     fetchRelayInputInfo( capabilitiesResponse );
 
     const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.contains(lit("relayInputCountForced")))
+    if (resourceData.contains(QString("relayInputCountForced")))
     {
         setCameraCapability(
             Qn::RelayInputCapability,
-            resourceData.value<int>(lit("relayInputCountForced"), 0) > 0);
+            resourceData.value<int>(QString("relayInputCountForced"), 0) > 0);
     }
-    if (resourceData.contains(lit("relayOutputCountForced")))
+    if (resourceData.contains(QString("relayOutputCountForced")))
     {
         setCameraCapability(
             Qn::RelayOutputCapability,
-            resourceData.value<int>(lit("relayOutputCountForced"), 0) > 0);
+            resourceData.value<int>(QString("relayOutputCountForced"), 0) > 0);
     }
 
     QnIOPortDataList allPorts = getRelayOutputList();
@@ -612,14 +612,14 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
-        bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
+        bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
         if (forcedAR && m_primaryResolution.height() > 0) 
         {
             qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
             setCustomAspectRatio(ar);
         }
         
-        QString defaultAR = resourceData.value<QString>(lit("defaultAR"));
+        QString defaultAR = resourceData.value<QString>(QString("defaultAR"));
         QStringList parts = defaultAR.split(L'x');
         if (parts.size() == 2) {
             qreal ar = parts[0].toFloat() / parts[1].toFloat();
@@ -631,9 +631,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (customInitResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return customInitResult;
 
-    m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
+    m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
 
-    m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
+    m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
 
     saveParams();
 
@@ -1672,7 +1672,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
 bool QnPlOnvifResource::trustMaxFPS()
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    bool result = resourceData.value<bool>(lit("trustMaxFPS"), false);
+    bool result = resourceData.value<bool>(QString("trustMaxFPS"), false);
     return result;
 }
 
@@ -1725,7 +1725,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 {
 
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    QnOnvifConfigDataPtr forcedParams = resourceData.value<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
+    QnOnvifConfigDataPtr forcedParams = resourceData.value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
     QStringList videoEncodersTokens;
     VideoConfigsResp confResponse;
 
