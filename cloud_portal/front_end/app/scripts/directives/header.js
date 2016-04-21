@@ -1,13 +1,11 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header',['dialogs', 'cloudApi', '$localStorage', 'account', '$location',function (dialogs, cloudApi, $localStorage, account, $location) {
+    .directive('header',['dialogs', 'cloudApi', 'account', '$location',function (dialogs, cloudApi, account, $location) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/header.html',
             link:function(scope/*,element,attrs*/){
-                scope.session = $localStorage;
-
                 scope.inline = typeof($location.search().inline) != 'undefined';
 
                 if(scope.inline){

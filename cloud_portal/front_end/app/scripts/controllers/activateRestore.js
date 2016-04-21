@@ -9,7 +9,7 @@ angular.module('cloudApp')
 
         $scope.data = {
             newPassword: '',
-            email: $scope.session.email,
+            email: account.getEmail(),
             restoreCode: $routeParams.restoreCode,
             activateCode: $routeParams.activateCode
         };

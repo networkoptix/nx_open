@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('urlProtocol', ['$base64','$localStorage','$location',function ($base64,$localStorage,$location) {
+    .factory('urlProtocol', ['$base64', '$location',function ($base64, $location) {
 
         function parseSource() {
             var search = $location.search();
@@ -22,9 +22,8 @@ angular.module('cloudApp')
 
                 var params = {};
 
-                var storage = $localStorage;
-                var username = storage.email;
-                var password = storage.password;
+                var username = account.getEmail();
+                var password = account.getPassword();
                 if (username && password){
                     params.auth = $base64.encode(username + ':' + password);
                 }

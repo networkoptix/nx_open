@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$localStorage', '$routeParams', 'account', function ($scope, cloudApi, process, $localStorage, $routeParams, account) {
+    .controller('AccountCtrl', ['$scope', 'cloudApi', 'process', '$routeParams', 'account', function ($scope, cloudApi, process, $routeParams, account) {
 
         account.requireLogin().then(function(account){
             $scope.account = account;
@@ -9,8 +9,6 @@ angular.module('cloudApp')
 
         $scope.accountMode = $routeParams.accountMode;
         $scope.passwordMode =  $routeParams.passwordMode;
-
-        $scope.session = $localStorage;
 
         $scope.pass = {
             password: '',
@@ -32,7 +30,7 @@ angular.module('cloudApp')
             successMessage:'Your password was successfully changed.',
             errorPrefix:'Couldn\'t change your password:'
         }).then(function(){
-            $scope.session.password = $scope.newPassword;
+            account.setPassword($scope.newPassword);
         });
 
     }]);
