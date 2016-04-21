@@ -742,9 +742,12 @@
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>

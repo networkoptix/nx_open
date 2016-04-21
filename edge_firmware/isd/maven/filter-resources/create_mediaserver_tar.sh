@@ -45,7 +45,7 @@ PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
-STRIP="`find ${root.dir}/mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
+STRIP=${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip
 
 
 for i in "$@"
