@@ -43,12 +43,12 @@ QnPermissionsWidget::~QnPermissionsWidget()
 
 bool QnPermissionsWidget::hasChanges() const
 {
-    return m_delegate->permissions() != calculatePermissions();
+    return m_delegate->rawPermissions() != calculatePermissions();
 }
 
 void QnPermissionsWidget::loadDataToUi()
 {
-    Qn::GlobalPermissions value = m_delegate->permissions();
+    Qn::GlobalPermissions value = m_delegate->rawPermissions();
 
     for (QCheckBox* checkbox : m_checkboxes)
     {
@@ -59,12 +59,12 @@ void QnPermissionsWidget::loadDataToUi()
 
 void QnPermissionsWidget::applyChanges()
 {
-    m_delegate->setPermissions(calculatePermissions());
+    m_delegate->setRawPermissions(calculatePermissions());
 }
 
 Qn::GlobalPermissions QnPermissionsWidget::calculatePermissions() const
 {
-    Qn::GlobalPermissions value = m_delegate->permissions();
+    Qn::GlobalPermissions value = m_delegate->rawPermissions();
 
     for (QCheckBox* checkbox : m_checkboxes)
     {
@@ -84,7 +84,7 @@ Qn::GlobalPermissions QnPermissionsWidget::calculatePermissions() const
 //    /* Check if it is valid user id and we have access rights to edit it. */
 //    if (m_targetUser)
 //    {
-//        Qn::Permissions permissions = accessController()->permissions(m_targetUser);
+//        Qn::Permissions permissions = accessController()->rawPermissions(m_targetUser);
 //        return permissions.testFlag(Qn::WriteAccessRightsPermission);
 //    }
 //

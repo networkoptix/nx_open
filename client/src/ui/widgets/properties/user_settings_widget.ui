@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>463</width>
-    <height>403</height>
+    <height>370</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -54,19 +54,10 @@
    </item>
    <item>
     <layout class="QGridLayout" name="propertiesLayout">
-     <property name="verticalSpacing">
-      <number>0</number>
-     </property>
      <item row="0" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="loginLabel">
        <property name="text">
-        <string>&amp;Login</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>loginEdit</cstring>
+        <string>Login</string>
        </property>
       </widget>
      </item>
@@ -76,13 +67,7 @@
      <item row="1" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="emailLabel">
        <property name="text">
-        <string>E&amp;mail</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>emailEdit</cstring>
+        <string>Email</string>
        </property>
       </widget>
      </item>
@@ -90,59 +75,27 @@
       <widget class="QLineEdit" name="emailEdit"/>
      </item>
      <item row="2" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="currentPasswordLabel">
+      <widget class="QLabel" name="passwordLabel">
        <property name="text">
-        <string>C&amp;urrent Password</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>currentPasswordEdit</cstring>
+        <string>Password</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="currentPasswordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="passwordLabel">
-       <property name="text">
-        <string>&amp;Password</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>passwordEdit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
       <widget class="QLineEdit" name="passwordEdit">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
        </property>
       </widget>
      </item>
-     <item row="4" column="0" alignment="Qt::AlignRight">
+     <item row="3" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="confirmPasswordLabel">
        <property name="text">
-        <string>&amp;Confirm Password</string>
-       </property>
-       <property name="margin">
-        <number>12</number>
-       </property>
-       <property name="buddy">
-        <cstring>confirmPasswordEdit</cstring>
+        <string>Confirm Password</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="3" column="1">
       <widget class="QLineEdit" name="confirmPasswordEdit">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
@@ -171,7 +124,11 @@
       </widget>
      </item>
      <item row="1" column="0" alignment="Qt::AlignTop">
-      <widget class="QComboBox" name="groupComboBox"/>
+      <widget class="QComboBox" name="groupComboBox">
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLabel" name="permissionsLabel">
