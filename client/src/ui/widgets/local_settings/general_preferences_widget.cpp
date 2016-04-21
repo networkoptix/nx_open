@@ -159,9 +159,9 @@ bool QnGeneralPreferencesWidget::hasChanges() const
     return true;
 }
 
-bool QnGeneralPreferencesWidget::canApplyChanges()
+bool QnGeneralPreferencesWidget::isRestartRequired() const
 {
-    /* These changes can be applied only after reboot. */
+    /* These changes can be applied only after client restart. */
     return m_oldDownmix == ui->downmixAudioCheckBox->isChecked()
         && m_oldDoubleBuffering == ui->doubleBufferCheckbox->isChecked();
 }

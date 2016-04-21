@@ -53,7 +53,10 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="propertiesLayout">
+    <layout class="QGridLayout" name="propertiesLayout" columnminimumwidth="120,0">
+     <property name="verticalSpacing">
+      <number>8</number>
+     </property>
      <item row="0" column="0" alignment="Qt::AlignRight">
       <widget class="QLabel" name="loginLabel">
        <property name="text">

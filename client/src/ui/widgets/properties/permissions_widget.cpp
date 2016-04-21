@@ -25,6 +25,7 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsDelegate* delegate
         m_checkboxes << checkbox;
 
         connect(checkbox, &QCheckBox::clicked, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+        return checkbox;
     };
 
     createCheckBox(Qn::GlobalEditLayoutsPermission,     tr("Can create and edit global layouts"));
@@ -43,7 +44,7 @@ QnPermissionsWidget::~QnPermissionsWidget()
 
 bool QnPermissionsWidget::hasChanges() const
 {
-    return m_delegate->rawPermissions() != calculatePermissions();
+    return m_delegate->rawPermissions() != rawPermissions();
 }
 
 void QnPermissionsWidget::loadDataToUi()
@@ -59,10 +60,10 @@ void QnPermissionsWidget::loadDataToUi()
 
 void QnPermissionsWidget::applyChanges()
 {
-    m_delegate->setRawPermissions(calculatePermissions());
+    m_delegate->setRawPermissions(rawPermissions());
 }
 
-Qn::GlobalPermissions QnPermissionsWidget::calculatePermissions() const
+Qn::GlobalPermissions QnPermissionsWidget::rawPermissions() const
 {
     Qn::GlobalPermissions value = m_delegate->rawPermissions();
 
@@ -77,26 +78,3 @@ Qn::GlobalPermissions QnPermissionsWidget::calculatePermissions() const
     }
     return value;
 }
-
-//
-//bool QnPermissionsWidget::targetIsValid() const
-//{
-//    /* Check if it is valid user id and we have access rights to edit it. */
-//    if (m_targetUser)
-//    {
-//        Qn::Permissions permissions = accessController()->rawPermissions(m_targetUser);
-//        return permissions.testFlag(Qn::WriteAccessRightsPermission);
-//    }
-//
-//    if (m_targetGroupId.isNull())
-//        return false;
-//
-//    /* Only admins can edit groups. */
-//    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-//        return false;
-//
-//    /* Check if it is valid user group id. */
-//    const auto& userGroups = qnResourceAccessManager->userGroups();
-//    return boost::algorithm::any_of(userGroups, [this](const ec2::ApiUserGroupData& group) { return group.id == m_targetGroupId; });
-//}
-

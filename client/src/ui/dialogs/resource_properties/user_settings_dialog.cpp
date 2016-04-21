@@ -39,7 +39,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
-    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
+    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
+    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -172,7 +173,11 @@ void QnUserSettingsDialog::applyChanges()
             NX_ASSERT(mode == QnUserSettingsModel::NewUser || mode == QnUserSettingsModel::OtherSettings);
             allowedPages << SettingsPage;
             if (m_settingsPage->isCustomAccessRights())
-                allowedPages << PermissionsPage << CamerasPage << LayoutsPage << ServersPage;
+            {
+                allowedPages << PermissionsPage << CamerasPage << LayoutsPage;
+                if (m_permissionsPage->rawPermissions().testFlag(Qn::GlobalEditServersPermissions))
+                    allowedPages << ServersPage;
+            }
         }
 
         for (const auto& page : allPages())
@@ -195,6 +200,8 @@ void QnUserSettingsDialog::applyChanges()
         /* New User was created, clear dialog. */
         setUser(QnUserResourcePtr());
     }
+
+    updateButtonBox();
 }
 
 void QnUserSettingsDialog::updatePagesVisibility()
@@ -202,13 +209,23 @@ void QnUserSettingsDialog::updatePagesVisibility()
     auto mode = m_model->mode();
 
     /* We are displaying profile for ourself and for users, that we cannot edit. */
-    bool settingsPageVisible = mode == QnUserSettingsModel::NewUser || mode == QnUserSettingsModel::OtherSettings;
+    bool profilePageVisible = mode == QnUserSettingsModel::OwnProfile
+        || mode == QnUserSettingsModel::OtherProfile;
+
+    bool settingsPageVisible = mode == QnUserSettingsModel::NewUser
+        || mode == QnUserSettingsModel::OtherSettings;
+
     bool customAccessRights = settingsPageVisible && m_settingsPage->isCustomAccessRights();
 
-    setPageVisible(ProfilePage,     mode == QnUserSettingsModel::OwnProfile || mode == QnUserSettingsModel::OtherProfile);
+    setPageVisible(ProfilePage,     profilePageVisible);
+
     setPageVisible(SettingsPage,    settingsPageVisible);
     setPageVisible(PermissionsPage, customAccessRights);
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
-    setPageVisible(ServersPage,     customAccessRights);
+
+    bool serverPagesVisible = customAccessRights
+        && m_permissionsPage->rawPermissions().testFlag(Qn::GlobalEditServersPermissions);
+
+    setPageVisible(ServersPage,     serverPagesVisible);
 }

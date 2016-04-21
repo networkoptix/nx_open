@@ -82,6 +82,7 @@ bool QnGenericTabbedDialog::forcefullyClose()
     if (!canDiscardChanges())
         return false;
 
+    discardChanges();
     loadDataToUi();
     hide();
     return true;
@@ -110,6 +111,13 @@ void QnGenericTabbedDialog::applyChanges()
         if (page.enabled && page.visible)
             page.widget->applyChanges();
     updateButtonBox();
+}
+
+void QnGenericTabbedDialog::discardChanges()
+{
+    for (const Page &page : m_pages)
+        if (page.enabled && page.visible)
+            page.widget->discardChanges();
 }
 
 void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, const QString &title)
@@ -238,7 +246,7 @@ void QnGenericTabbedDialog::initializeTabWidget()
     setTabWidget(tabWidgets[0]);
 }
 
-bool QnGenericTabbedDialog::canApplyChanges()
+bool QnGenericTabbedDialog::canApplyChanges() const
 {
     if (m_readOnly)
         return false;
@@ -249,7 +257,7 @@ bool QnGenericTabbedDialog::canApplyChanges()
     });
 }
 
-bool QnGenericTabbedDialog::canDiscardChanges()
+bool QnGenericTabbedDialog::canDiscardChanges() const
 {
     if (m_readOnly)
         return true;

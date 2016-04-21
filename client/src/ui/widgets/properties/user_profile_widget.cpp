@@ -128,13 +128,38 @@ void QnUserProfileWidget::applyChanges()
         m_model->user()->setEmail(ui->emailEdit->text());
 }
 
+bool QnUserProfileWidget::canApplyChanges() const
+{
+    if (m_model->mode() != QnUserSettingsModel::OwnProfile)
+        return true;
+
+    QString email = ui->emailEdit->text().trimmed();
+    if (!email.isEmpty() && !QnEmailAddress::isValid(email))
+        return false;
+
+    /* Change password. */
+    QString password = ui->passwordEdit->text();
+    if (!password.isEmpty())
+    {
+        /* Invalid current password */
+        if (!m_model->user()->checkPassword(ui->currentPasswordEdit->text()))
+            return false;
+
+        /* Invalid confirmation */
+        if (password != ui->confirmPasswordEdit->text())
+            return false;
+    }
+
+    return true;
+}
+
 void QnUserProfileWidget::updatePassword()
 {
     bool valid = true;
     QString hint;
 
     /* Current password should be checked only if the user editing himself. */
-    if (m_model->mode() == QnUserSettingsModel::OwnProfile && !ui->passwordEdit->text().isEmpty())
+    if (m_model->mode() == QnUserSettingsModel::OwnProfile && !ui->passwordEdit->text().trimmed().isEmpty())
     {
         if (ui->currentPasswordEdit->text().isEmpty()) {
             hint = tr("To modify your password, please enter existing one.");
@@ -151,6 +176,8 @@ void QnUserProfileWidget::updatePassword()
             valid = false;
         }
     }
+
+
 
 }
 
