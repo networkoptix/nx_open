@@ -332,8 +332,14 @@ void QnGenericTabbedDialog::updateButtonBox()
     if (m_updating || !buttonBox())
         return;
 
+    bool changesPresent = hasChanges();
+    bool canApply = !changesPresent || canApplyChanges();
+
     if (QPushButton *applyButton = buttonBox()->button(QDialogButtonBox::Apply))
-        applyButton->setEnabled(!m_readOnly && hasChanges());
+        applyButton->setEnabled(!m_readOnly && changesPresent && canApply);
+
+    if (QPushButton *okButton = buttonBox()->button(QDialogButtonBox::Ok))
+        okButton->setEnabled(m_readOnly || canApply);
 }
 
 

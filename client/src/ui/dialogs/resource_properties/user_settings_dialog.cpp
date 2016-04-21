@@ -120,6 +120,9 @@ QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
     if (m_model->mode() != QnUserSettingsModel::OwnProfile && m_model->mode() != QnUserSettingsModel::OtherSettings)
         return QDialogButtonBox::No;
 
+    if (!canApplyChanges())
+        return QDialogButtonBox::No;
+
     return QnMessageBox::question(
         this,
         tr("User not saved"),

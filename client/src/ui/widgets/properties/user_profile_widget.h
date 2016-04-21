@@ -30,9 +30,6 @@ public:
     virtual void applyChanges() override;
 
     virtual bool canApplyChanges() const override;
-private:
-    void updatePassword();
-    void updateEmail();
 
 private:
     void updateControlsAccess();
