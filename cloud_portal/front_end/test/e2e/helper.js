@@ -28,7 +28,9 @@ var Helper = function () {
         homepage: '/',
         account: '/#/account',
         password_change: '/#/account/password',
-        systems: '/#/systems'
+        systems: '/#/systems',
+        register: '/#/register',
+        restore_password: '/#/restore_password'
     };
     this.navigateBack = function (){
         browser.navigate().back();
@@ -168,7 +170,8 @@ var Helper = function () {
         var userEmail = email || this.getRandomEmail();
         var userPassword = password || this.userPassword;
 
-        browser.get('/#/register');
+        this.get(this.urls.register);
+        expect(firstNameInput.isPresent()).toBe(true);
 
         firstNameInput.sendKeys(userFistName);
         lastNameInput.sendKeys(userLastName);
