@@ -22,7 +22,7 @@ DEP = $(addsuffix .d,$(basename $(SRC)))
 #MODULEDIR = $(shell pkg-config --variable=moduledir vdpau)
 
 ifeq ($(MODULEDIR),)
-MODULEDIR=/usr/lib/vdpau
+MODULEDIR=/usr/lib/arm-linux-gnueabihf/vdpau
 endif
 
 .PHONY: clean all install uninstall
