@@ -87,7 +87,7 @@ int MediatorProcess::executeApplication()
         return 2;
     }
 
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     std::unique_ptr<AbstractCloudDataProvider> cloudDataProvider;
     if (settings.cloudDB().runWithCloud)
     {
@@ -111,13 +111,14 @@ int MediatorProcess::executeApplication()
         &stunMessageDispatcher,
         &listeningPeerPool);
     HolePunchingProcessor cloudConnectProcessor(
+        settings,
         cloudDataProvider.get(),
         &stunMessageDispatcher,
         &listeningPeerPool);
 
     //accepting STUN requests by both tcp and udt
     MultiAddressServer<stun::SocketServer> tcpStunServer(
-        stunMessageDispatcher,
+        &stunMessageDispatcher,
         false,
         SocketFactory::NatTraversalType::nttDisabled);
     if (!tcpStunServer.bind(settings.stun().addrToListenList))
@@ -127,7 +128,7 @@ int MediatorProcess::executeApplication()
         return 3;
     }
 
-    MultiAddressServer<stun::UDPServer> udpStunServer(stunMessageDispatcher);
+    MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
     if (!udpStunServer.bind(settings.stun().addrToListenList))
     {
         NX_LOG(lit("Can not bind to UDP addresses: %1")

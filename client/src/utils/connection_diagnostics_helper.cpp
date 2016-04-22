@@ -9,7 +9,6 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 

@@ -12,7 +12,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include "utils/common/id.h"
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/http/httptypes.h>
@@ -57,6 +57,20 @@ public:
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
+    QByteArray generateNonce() const;
+
+    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+
+    /*!
+    \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
+    */
+    Qn::AuthResult authenticateByUrl(
+        const QByteArray& authRecord,
+        const QByteArray& method,
+        nx_http::Response& response,
+        QnUuid* authUserId,
+        QnUserResourcePtr* const outUserResource = nullptr) const;
+
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
@@ -65,12 +79,11 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
 #endif
-
 private:
     class TempAuthenticationKeyCtx
     {
     public:
-        TimerManager::TimerGuard timeGuard;
+        nx::utils::TimerManager::TimerGuard timeGuard;
         QString path;
 
         TempAuthenticationKeyCtx() {}
@@ -125,7 +138,6 @@ private:
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         QnUuid* authUserId);
-    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QnMutex m_mutex;
 #ifndef USE_USER_RESOURCE_PROVIDER
@@ -138,15 +150,6 @@ private:
     std::unique_ptr<AbstractUserDataProvider> m_userDataProvider;
 
     void authenticationExpired( const QString& path, quint64 timerID );
-    /*!
-        \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
-    */
-    Qn::AuthResult authenticateByUrl(
-        const QByteArray& authRecord,
-        const QByteArray& method,
-        nx_http::Response& response,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
     void applyClientCalculatedPasswordHashToResource(
         const QnUserResourcePtr& userResource,

@@ -1,7 +1,7 @@
 #ifndef STUN_ASYNC_CLIENT_MOCK_H
 #define STUN_ASYNC_CLIENT_MOCK_H
 
-#include <gmock.h>
+#include <gmock/gmock.h>
 #include <nx/network/stun/async_client.h>
 
 namespace nx {

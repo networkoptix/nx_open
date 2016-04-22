@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <nx/utils/singleton.h>
 
@@ -20,11 +21,15 @@ class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnR
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
-    void reset(const ec2::ApiAccessRightsDataList& accessRights);
+    void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights);
+
+    void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
 
     /** List of resources ids, the given user has access to. */
     QSet<QnUuid> accessibleResources(const QnUuid& userId) const;
     void setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources);
+
+    ec2::ApiUserGroupDataList userGroups() const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -35,7 +40,7 @@ public:
 
     /**
     * \param user                      User to get global permissions for.
-    * \param requiredPermissions       Global permissions to check.
+    * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const QnUserResourcePtr &user, Qn::GlobalPermission requiredPermission) const;
@@ -45,8 +50,15 @@ public:
     * \param resource                  Resource to get permissions for.
     * \returns                         Permissions that user have for the given resource.
     */
-    Qn::Permissions permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource);
+    Qn::Permissions permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
 
+    /**
+    * \param user                      User that should have permissions.
+    * \param resource                  Resource to get permissions for.
+    * \param requiredPermission        Permission to check.
+    * \returns                         Whether actual permissions include required permission.
+    */
+    bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const;
 private:
     /**
     * \param permissions               Permission flags containing some deprecated values.
@@ -76,6 +88,8 @@ private:
     bool m_readOnlyMode;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
+    ec2::ApiUserGroupDataList m_userGroups;
+
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 
     struct PermissionKey

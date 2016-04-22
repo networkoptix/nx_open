@@ -25,7 +25,9 @@ PortMapper::PortMapper( quint64 checkMappingsInterval,
     , m_description( description )
     , m_checkMappingsInterval( checkMappingsInterval )
 {
-    m_timerId = TimerManager::instance()->addTimer( this, m_checkMappingsInterval );
+    m_timerId = nx::utils::TimerManager::instance()->addTimer(
+        this,
+        std::chrono::milliseconds(m_checkMappingsInterval) );
 }
 
 PortMapper::~PortMapper()
@@ -37,7 +39,7 @@ PortMapper::~PortMapper()
         m_timerId = 0;
     }
 
-    TimerManager::instance()->joinAndDeleteTimer( timerId );
+    nx::utils::TimerManager::instance()->joinAndDeleteTimer( timerId );
     m_upnpClient.reset();
 }
 
@@ -184,8 +186,8 @@ void PortMapper::onTimer( const quint64& /*timerID*/ )
 
     if (m_timerId)
     {
-        m_timerId = TimerManager::instance()->addTimer(
-            this, m_checkMappingsInterval);
+        m_timerId = nx::utils::TimerManager::instance()->addTimer(
+            this, std::chrono::milliseconds(m_checkMappingsInterval));
     }
 }
 

@@ -40,7 +40,9 @@ DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false )
 {
-    m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
+    m_timerID = nx::utils::TimerManager::instance()->addTimer(
+        this,
+        std::chrono::milliseconds(m_discoverTryTimeoutMS));
     m_cacheTimer.start();
 
     NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
@@ -66,7 +68,7 @@ void DeviceSearcher::pleaseStop()
     }
     //m_timerID cannot be changed after m_terminated set to true
     if( m_timerID )
-        TimerManager::instance()->joinAndDeleteTimer( m_timerID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
     for( std::map<QString, SocketReadCtx>::const_iterator
@@ -187,7 +189,8 @@ void DeviceSearcher::onTimer( const quint64& /*timerID*/ )
     //adding new timer task
     QMutexLocker lk( &m_mutex );
     if( !m_terminated )
-        m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+            this, std::chrono::milliseconds(m_discoverTryTimeoutMS) );
 }
 
 void DeviceSearcher::onSomeBytesRead(

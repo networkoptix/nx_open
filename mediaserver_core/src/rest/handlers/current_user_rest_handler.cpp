@@ -7,11 +7,18 @@
 #include "rest/server/rest_connection_processor.h"
 
 #include <nx/network/http/httptypes.h>
+#include <network/authenticate_helper.h>
 
-int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     ec2::ApiUserData user;
+
     QnUuid userId  = owner->authUserId();
+    if (userId.isNull())
+    {
+        const QString& cookie = QLatin1String(nx_http::getHeaderValue(owner->request().headers, "Cookie"));
+        QnAuthHelper::instance()->doCookieAuthorization("GET", cookie.toUtf8(), *owner->response(), &userId);
+    }
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2::ApiUserDataList users;
@@ -29,7 +36,7 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams 
     if (iter == users.cend())
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't determine current user"));
-        return nx_http::StatusCode::internalServerError;
+        return nx_http::StatusCode::unauthorized;
     }
 
     result.setReply(*iter);

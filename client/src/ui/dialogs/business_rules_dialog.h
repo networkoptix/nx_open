@@ -13,7 +13,7 @@
 
 #include <business/business_event_rule.h>
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 #include <ui/models/business_rules_actual_model.h>
 #include <ui/widgets/business/business_rule_widget.h>

@@ -166,6 +166,26 @@ public:
         m_aioThreadBinder.pleaseStop(std::move(completionHandler));
     }
 
+    virtual aio::AbstractAioThread* getAioThread() override
+    {
+        return m_aioThreadBinder.getAioThread();
+    }
+    
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        m_aioThreadBinder.bindToAioThread(aioThread);
+    }
+    
+    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override
+    {
+        m_aioThreadBinder.post(std::move(func));
+    }
+    
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override
+    {
+        m_aioThreadBinder.dispatch(std::move(func));
+    }
+
     virtual int getPriority() const override
     {
         return 0;

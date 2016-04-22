@@ -26,7 +26,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg qtsinglecoreapplication qtservice</rdep.packages>
     </properties>
 
     <dependencies>
@@ -37,6 +37,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>udt</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/udt/pom.xml</systemPath>
         </dependency>
 
         <dependency>
@@ -54,7 +63,16 @@
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloud_db_client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

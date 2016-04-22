@@ -29,7 +29,7 @@ protected:
         , mediaserverApi(&cloudData, &stunMessageDispatcher)
         , listeningPeerRegistrator(&cloudData, &stunMessageDispatcher, &listeningPeerPool)
         , server(
-            stunMessageDispatcher,
+            &stunMessageDispatcher,
             false,
             SocketFactory::NatTraversalType::nttDisabled)
     {

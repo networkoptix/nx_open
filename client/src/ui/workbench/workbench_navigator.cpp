@@ -382,7 +382,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
 
     m_timeSlider->setLineCount(SliderLineCount);
-    m_timeSlider->setLineStretch(CurrentLine, 1.5);
+    m_timeSlider->setLineStretch(CurrentLine, 4.0);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
     m_timeSlider->setRange(0, 1000ll * 60 * 60 * 24);
     m_timeSlider->setWindow(m_timeSlider->minimum(), m_timeSlider->maximum());
@@ -1270,13 +1270,6 @@ void QnWorkbenchNavigator::updateLines() {
         };
 
         m_timeSlider->setLineComment(CurrentLine, elideString(m_currentWidget->resource()->getName(), kMaxNameLength));
-        m_timeSlider->setLineComment(SyncedLine, QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("All Devices"),
-                tr("All Cameras"),
-                tr("All I/O Modules")
-                ), syncedCameras
-            ));
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);

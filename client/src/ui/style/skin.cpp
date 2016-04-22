@@ -19,20 +19,20 @@
 #include "noptix_icon_loader.h"
 #include "nx_style.h"
 
-QnSkin::QnSkin(QObject *parent):
-    QObject(parent)
+QnSkin::QnSkin(QObject* parent): QObject(parent)
 {
     init(QStringList());
 }
-       
-QnSkin::QnSkin(const QStringList &paths, QObject *parent):
-    QObject(parent)
+
+QnSkin::QnSkin(const QStringList& paths, QObject* parent): QObject(parent)
 {
     init(paths);
 }
 
-void QnSkin::init(const QStringList &paths) {
-    if(paths.isEmpty()) {
+void QnSkin::init(const QStringList& paths)
+{
+    if (paths.isEmpty())
+    {
         init(QStringList() << lit(":/skin"));
         return;
     }
@@ -40,71 +40,86 @@ void QnSkin::init(const QStringList &paths) {
     m_iconLoader = new QnNoptixIconLoader(this);
 
     m_paths = paths;
-    for(int i = 0; i < m_paths.size(); i++) {
+    for (int i = 0; i < m_paths.size(); i++)
+    {
         m_paths[i] = QDir::toNativeSeparators(m_paths[i]);
 
-        if(!m_paths[i].endsWith(QDir::separator()))
+        if (!m_paths[i].endsWith(QDir::separator()))
             m_paths[i] += QDir::separator();
     }
 
     int cacheLimit = 64 * 1024; // 64 MB
-    if(QPixmapCache::cacheLimit() < cacheLimit)
+    if (QPixmapCache::cacheLimit() < cacheLimit)
         QPixmapCache::setCacheLimit(cacheLimit);
 }
 
-QnSkin::~QnSkin() {
-    return;
+QnSkin::~QnSkin()
+{
 }
 
-const QStringList &QnSkin::paths() const {
+const QStringList& QnSkin::paths() const
+{
     return m_paths;
 }
 
-QString QnSkin::path(const QString &name) const {
-    for(int i = m_paths.size() - 1; i >= 0; i--) {
+QString QnSkin::path(const QString& name) const
+{
+    for (int i = m_paths.size() - 1; i >= 0; i--)
+    {
         QString path = m_paths[i] + name;
-        if(QFile::exists(path))
+        if (QFile::exists(path))
             return path;
     }
     return QString();
 }
 
-QString QnSkin::path(const char *name) const {
+QString QnSkin::path(const char* name) const
+{
     return path(QLatin1String(name));
 }
 
-bool QnSkin::hasFile(const QString &name) const {
+bool QnSkin::hasFile(const QString& name) const
+{
     return !path(name).isEmpty();
 }
 
-bool QnSkin::hasFile(const char *name) const {
+bool QnSkin::hasFile(const char* name) const
+{
     return hasFile(QLatin1String(name));
 }
 
-QIcon QnSkin::icon(const QString &name, const QString &checkedName) {
-    return m_iconLoader->load(name, checkedName);
+QIcon QnSkin::icon(const QString& name, const QString& checkedName, int numModes, const QPair<QIcon::Mode, QString>* modes)
+{
+    return m_iconLoader->load(name, checkedName, numModes, modes);
 }
 
-QIcon QnSkin::icon(const char *name, const char *checkedName) { 
-    return icon(QLatin1String(name), QLatin1String(checkedName)); 
+QIcon QnSkin::icon(const char* name, const char* checkedName)
+{
+    return icon(QLatin1String(name), QLatin1String(checkedName));
 }
 
-QIcon QnSkin::icon(const QIcon &icon) {
+QIcon QnSkin::icon(const QIcon& icon)
+{
     return m_iconLoader->polish(icon);
 }
 
-QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode) {
+QPixmap QnSkin::pixmap(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
+{
     QString key = name;
     if (!size.isEmpty())
         key += QString(QLatin1String("_%1x%2_%3_%4")).arg(int(size.width())).arg(int(size.height())).arg(int(aspectMode)).arg(int(mode));
 
     QPixmap pixmap;
-    if (!QPixmapCache::find(key, &pixmap)) {
+    if (!QPixmapCache::find(key, &pixmap))
+    {
         pixmap = QPixmap::fromImage(QImage(path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
-        if (!pixmap.isNull()) {
+        if (!pixmap.isNull())
+        {
             if (!size.isEmpty() && size != pixmap.size())
                 pixmap = pixmap.scaled(size, aspectMode, mode);
-        } else {
+        }
+        else
+        {
             qnWarning("Cannot load image '%1'", name);
         }
 
@@ -114,20 +129,24 @@ QPixmap QnSkin::pixmap(const QString &name, const QSize &size, Qt::AspectRatioMo
     return pixmap;
 }
 
-QPixmap QnSkin::pixmap(const char *name, const QSize &size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode) { 
-    return pixmap(QLatin1String(name), size, aspectMode, mode); 
+QPixmap QnSkin::pixmap(const char* name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
+{
+    return pixmap(QLatin1String(name), size, aspectMode, mode);
 }
 
-QStyle *QnSkin::newStyle(const QnGenericPalette &genericPalette) {
-    QnNxStyle *style = new QnNxStyle();
+QStyle* QnSkin::newStyle(const QnGenericPalette& genericPalette)
+{
+    QnNxStyle* style = new QnNxStyle();
     style->setGenericPalette(genericPalette);
     return new QnNoptixStyle(style);
 }
 
-QMovie *QnSkin::newMovie(const QString &name, QObject *parent) {
+QMovie* QnSkin::newMovie(const QString& name, QObject* parent)
+{
     return new QMovie(path(name), QByteArray(), parent);
 }
 
-QMovie *QnSkin::newMovie(const char *name, QObject* parent) {
+QMovie* QnSkin::newMovie(const char* name, QObject* parent)
+{
     return newMovie(QLatin1String(name), parent);
 }

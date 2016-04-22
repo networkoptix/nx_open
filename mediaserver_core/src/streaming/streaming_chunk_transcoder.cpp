@@ -13,7 +13,7 @@
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "ondemand_media_data_provider.h"
 #include "live_media_cache_reader.h"
@@ -72,7 +72,7 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
     }
 
     for( auto val: m_taskIDToTranscode )
-        TimerManager::instance()->joinAndDeleteTimer( val.first );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( val.first );
 
     std::for_each(
         m_transcodeThreads.begin(),
@@ -314,9 +314,9 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
     const int transcodeID,
     int delayMSec )
 {
-    const quint64 taskID = TimerManager::instance()->addTimer(
+    const quint64 taskID = nx::utils::TimerManager::instance()->addTimer(
         this,
-        delayMSec );
+        std::chrono::milliseconds(delayMSec));
 
     QnMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;

@@ -6,7 +6,9 @@
 #include "mediaserver_emulator.h"
 
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/utils/thread/barrier_handler.h>
+
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
@@ -31,7 +33,8 @@ MediaServerEmulator::MediaServerEmulator(
     m_mediatorUdpClient(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
             mediatorEndpoint,
-            m_mediatorConnector.get()))
+            m_mediatorConnector.get())),
+    m_action(ActionToTake::proceedWithConnection)
 {
     m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
 
@@ -46,7 +49,24 @@ MediaServerEmulator::MediaServerEmulator(
 
 MediaServerEmulator::~MediaServerEmulator()
 {
+    if (m_mediatorConnector)
+    {
+        m_mediatorConnector->pleaseStopSync();
+        m_mediatorConnector.reset();
+    }
+    if (m_serverClient)
+    {
+        m_serverClient->pleaseStopSync();
+        m_serverClient.reset();
+    }
+    if (m_mediatorUdpClient)
+    {
+        m_mediatorUdpClient->pleaseStopSync();
+        m_mediatorUdpClient.reset();
+    }
+
     pleaseStopSync();
+    m_httpServer.pleaseStop();
 }
 
 bool MediaServerEmulator::start()
@@ -175,14 +195,16 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     if (m_connectionAckResponseHandler)
         action = m_connectionAckResponseHandler(resultCode);
 
-    if (action != ActionToTake::proceedWithConnection)
+    if (action < ActionToTake::establishUdtConnection)
         return;
+    m_action = action;
 
     if (m_connectionRequestedData.udpEndpointList.empty())
         return;
 
     //connecting to the originating peer
     auto udtStreamSocket = std::make_unique<nx::network::UdtStreamSocket>();
+    udtStreamSocket->bindToAioThread(m_timer.getAioThread());
     auto mediatorUdpClientSocket = m_mediatorUdpClient->takeSocket();
     m_mediatorUdpClient.reset();
     if (!udtStreamSocket->bindToUdpSocket(std::move(*mediatorUdpClientSocket)) ||
@@ -193,6 +215,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     }
 
     auto udtStreamServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
+    udtStreamServerSocket->bindToAioThread(m_timer.getAioThread());
     if (!udtStreamServerSocket->setReuseAddrFlag(true) ||
         !udtStreamServerSocket->bind(udtStreamSocket->getLocalAddress()) ||
         !udtStreamServerSocket->setNonBlockingMode(true))
@@ -211,9 +234,19 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
         std::bind(&MediaServerEmulator::onUdtConnectionAccepted, this, _1, _2));
 }
 
-void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode /*errorCode*/)
+void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
 {
-    //TODO #ak
+    if (errorCode != SystemError::noError)
+        return;
+
+    m_stunPipeline = std::make_unique<stun::MessagePipeline>(
+        this,
+        std::move(m_udtStreamSocket));
+    m_udtStreamSocket.reset();
+    using namespace std::placeholders;
+    m_stunPipeline->setMessageHandler(
+        std::bind(&MediaServerEmulator::onMessageReceived, this, _1));
+    m_stunPipeline->startReadingConnection();
 }
 
 void MediaServerEmulator::onUdtConnectionAccepted(
@@ -221,6 +254,38 @@ void MediaServerEmulator::onUdtConnectionAccepted(
     AbstractStreamSocket* acceptedSocket)
 {
     delete acceptedSocket;
+}
+
+void MediaServerEmulator::onMessageReceived(
+    nx::stun::Message message)
+{
+    if (m_action <= ActionToTake::ignoreSyn)
+        return;
+
+    if (message.header.messageClass != stun::MessageClass::request)
+        return;
+    if (message.header.method != stun::cc::methods::udpHolePunchingSyn)
+        return;
+
+    hpm::api::UdpHolePunchingSynAck synAckResponse;
+    if (m_action <= ActionToTake::sendBadSynAck)
+        synAckResponse.connectSessionId = "hren";
+    else
+        synAckResponse.connectSessionId = m_connectionRequestedData.connectSessionId;
+    stun::Message synAckMessage(
+        nx::stun::Header(
+            nx::stun::MessageClass::successResponse,
+            stun::cc::methods::udpHolePunchingSynAck,
+            message.header.transactionId));
+    synAckResponse.serialize(&synAckMessage);
+    m_stunPipeline->sendMessage(std::move(synAckMessage));
+}
+
+void MediaServerEmulator::closeConnection(
+    SystemError::ErrorCode /*closeReason*/,
+    stun::MessagePipeline* connection)
+{
+    NX_ASSERT(connection == m_stunPipeline.get());
 }
 
 void MediaServerEmulator::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -231,16 +296,15 @@ void MediaServerEmulator::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionH
             if (m_mediatorUdpClient)
                 m_mediatorUdpClient.reset();
 
-            if (!m_serverClient && !m_udtStreamSocket)
-                return completionHandler();
-
             nx::BarrierHandler barrier(std::move(completionHandler));
             if (m_serverClient)
                 m_serverClient->pleaseStop(barrier.fork());
+            if (m_stunPipeline)
+                m_stunPipeline.reset();
             if (m_udtStreamSocket)
-                m_udtStreamSocket->pleaseStop(barrier.fork());
+                m_udtStreamSocket.reset();
             if (m_udtStreamServerSocket)
-                m_udtStreamServerSocket->pleaseStop(barrier.fork());
+                m_udtStreamServerSocket.reset();
         });
 }
 

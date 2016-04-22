@@ -7,9 +7,10 @@ uint qHash(const QColor &color)
     return qHash(color.name());
 }
 
-QnPaletteColor::QnPaletteColor()
+QnPaletteColor::QnPaletteColor(QColor fallbackColor)
     : m_index(-1)
     , m_alpha(kMaxAlpha)
+    , m_fallbackColor(fallbackColor)
 {
 }
 
@@ -41,7 +42,7 @@ int QnPaletteColor::index() const
 QColor QnPaletteColor::color() const
 {
     if (!isValid())
-        return QColor();
+        return m_fallbackColor;
 
     QColor result = m_palette[m_index];
     result.setAlpha(m_alpha);
@@ -63,6 +64,11 @@ void QnPaletteColor::setAlphaF(qreal alpha)
     setAlpha(kMaxAlpha * alpha);
 }
 
+void QnPaletteColor::setFallbackColor(QColor fallbackColor)
+{
+    m_fallbackColor = fallbackColor;
+}
+
 bool QnPaletteColor::isValid() const
 {
     return m_index >= 0;
@@ -70,10 +76,14 @@ bool QnPaletteColor::isValid() const
 
 QnPaletteColor QnPaletteColor::darker(int shift) const
 {
-    if (!isValid())
-        return QnPaletteColor();
-
-    return QnPaletteColor(m_group, qBound(0, m_index - shift, m_palette.size() - 1), m_palette, m_alpha);
+    if (isValid())
+        return QnPaletteColor(m_group, qBound(0, m_index - shift, m_palette.size() - 1), m_palette, m_alpha);
+    /*
+    Multiplicative coefficient for scaling fallback color brightness when shift == 1
+    Full coefficient is qPow(kFallbackScaleFactor, shift)
+    */
+    static const qreal kFallbackScaleFactor = 1.04;
+    return QnPaletteColor(m_fallbackColor.darker(qRound(100.0 * qPow(kFallbackScaleFactor, shift))));
 }
 
 QnPaletteColor QnPaletteColor::lighter(int shift) const
@@ -112,6 +122,8 @@ QnPaletteColor QnGenericPalette::color(const QColor &color) const
     searchColor.setAlpha(QnPaletteColor::kMaxAlpha);
 
     QnPaletteColor result = m_colorByQColor.value(searchColor);
+    result.setFallbackColor(color);
+
     result.setAlpha(color.alpha());
     return result;
 }

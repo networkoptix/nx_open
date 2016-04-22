@@ -22,13 +22,14 @@
 
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
         <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg quazip festival festival-vox</rdep.packages>
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox qtsingleapplication</rdep.packages>
+        <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
     </properties>
 
     <dependencies>
@@ -86,4 +87,25 @@
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>           
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- cut off festival -->
+                <rdep.packages>openssl ffmpeg quazip</rdep.packages>
+            </properties>
+        </profile>
+    </profiles>
 </project>

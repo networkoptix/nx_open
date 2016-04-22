@@ -28,7 +28,7 @@ namespace {
             if(QGraphicsObject *childObject = childItem->toGraphicsObject())
                 if(QGraphicsObject *result = findGraphicsChild(childObject, name))
                     return result;
-        
+
         return NULL;
     }
 
@@ -83,7 +83,7 @@ public:
 
         if(name == lit("palette"))
             return QVariant::fromValue(static_cast<const QApplication *>(object)->palette());
-        
+
         return QVariant();
     }
 
@@ -195,7 +195,7 @@ bool deserialize(QnJsonContext *, const QJsonValue &value, QnCustomizationData *
 }
 
 void serialize(QnJsonContext *, const QnCustomizationData &, QJsonValue *) {
-    NX_ASSERT(false); /* We'll never get here. */ 
+    NX_ASSERT(false); /* We'll never get here. */
 }
 
 
@@ -212,7 +212,7 @@ QVariant eval_skin(const Qee::ParameterPack &args) {
 
 QVariant eval_QnSkin_icon(const Qee::ParameterPack &args) {
     args.requireSize(2, 3);
-    
+
     QnSkin *skin = args.get<QnSkin *>(0);
     if(!skin)
         throw Qee::NullPointerException(QObject::tr("Parameter 1 is null."));
@@ -226,7 +226,7 @@ QVariant eval_QnSkin_icon(const Qee::ParameterPack &args) {
 
 class QnCustomizationSerializer: public QObject, public QnJsonSerializer, public Qee::Resolver {
 public:
-    QnCustomizationSerializer(int type, QObject *parent = NULL): 
+    QnCustomizationSerializer(int type, QObject *parent = NULL):
         QObject(parent),
         QnJsonSerializer(type)
     {
@@ -254,7 +254,7 @@ protected:
     }
 
     virtual bool deserializeInternal(QnJsonContext *ctx, const QJsonValue &value, void *target) const override {
-        // TODO: #Elric use the easy way only for color codes. 
+        // TODO: #Elric use the easy way only for color codes.
         // We want to be able to override standard color names!
 
         if(QJson::deserialize(value, static_cast<QColor *>(target)))
@@ -356,7 +356,7 @@ public:
     QnCustomizer *q;
 
     int customizationHashType;
-    
+
     QnCustomization customization;
     QList<QByteArray> classNames;
     QHash<QLatin1String, QnCustomizationData> dataByClassName;
@@ -378,7 +378,7 @@ QnCustomizerPrivate::QnCustomizerPrivate() {
     defaultAccessor.reset(new QnCustomizationAccessorWrapper<QnObjectCustomizationAccessor>());
     colorSerializer.reset(new QnCustomizationSerializer(QMetaType::QColor));
     customizationHashSerializer.reset(new QnDefaultJsonSerializer<QnCustomizationDataHash>());
-    
+
     accessorByClassName.insert(QLatin1String("QApplication"), new QnCustomizationAccessorWrapper<QnApplicationCustomizationAccessor>());
     accessorByClassName.insert(QLatin1String("QnPropertyStorage"), new QnCustomizationAccessorWrapper<QnStorageCustomizationAccessor>());
     accessorByClassName.insert(QLatin1String("QGraphicsObject"), new QnCustomizationAccessorWrapper<QnGraphicsObjectCustomizationAccessor>());
@@ -403,7 +403,7 @@ QnCustomizationAccessor *QnCustomizerPrivate::accessor(QObject *object) const {
             return result;
         metaObject = metaObject->superClass();
     }
-    
+
     return defaultAccessor.data();
 }
 
@@ -492,10 +492,10 @@ void QnCustomizerPrivate::customize(QObject *object, const QString &key, QnCusto
 
     /* This can happen if an error has occurred during deserialization.
      * Note that normally this check would not be needed, but there is a bug
-     * in QObject::setProperty --- it could crash for user-defined types if 
+     * in QObject::setProperty --- it could crash for user-defined types if
      * supplied the wrong type inside the variant. */ // TODO: #Elric #QTBUG write bugreport.
     if(data->value.userType() == QMetaType::UnknownType)
-        return; 
+        return;
 
     if(!accessor->write(object, key, data->value))
         qnWarning("Could not customize property '%1' of class '%2'. Property writing has failed.", key, className);
@@ -560,6 +560,7 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
             d->genericPalette.setColors(lit("blue"), extractColors(lit("blue"), *d->colorSerializer));
             d->genericPalette.setColors(lit("green"), extractColors(lit("green"), *d->colorSerializer));
             d->genericPalette.setColors(lit("brand"), extractColors(lit("brand"), *d->colorSerializer));
+            d->genericPalette.setColors(lit("red"), extractColors(lit("red"), *d->colorSerializer));
         }
     }
 

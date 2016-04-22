@@ -197,8 +197,9 @@ private:
     {
         QnMutexLocker lk(&m_mutex);
         m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        auto thisClient = client.get();
         client->get(
-            [completionHandler, this, thisClient = client.get()](
+            [completionHandler, this, thisClient](
                 SystemError::ErrorCode errCode,
                 const nx_http::Response* response,
                 OutputData ... data)
@@ -228,7 +229,8 @@ private:
                 if (resultCodeStrIter != response->headers.end())
                 {
                     resultCode = QnLexical::deserialized<api::ResultCode>(
-                        resultCodeStrIter->second);
+                        resultCodeStrIter->second,
+                        api::ResultCode::unknownError);
                 }
                 else
                 {
@@ -242,8 +244,8 @@ private:
     }
 };
 
-}   //cl
-}   //cdb
-}   //nx
+}   //namespace cl
+}   //namespace cdb
+}   //namespace nx
 
 #endif	//NX_CDB_CL_ASYNC_REQUESTS_EXECUTOR_H

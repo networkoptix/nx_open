@@ -59,7 +59,8 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourceList &r
     return result;
 }
 
-bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const {
+bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const
+{
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
@@ -99,6 +100,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     /* No other resources must be available while we are logged out. */
     if (!m_user)
         return Qn::NoPermissions;
+
+    if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
+    {
+        /* Check if we are creating new user */
+        if (user->flags().testFlag(Qn::local))
+            return hasGlobalPermission(Qn::GlobalAdminPermission) ? Qn::FullUserPermissions : Qn::NoPermissions;
+    }
 
     return qnResourceAccessManager->permissions(m_user, resource);
 }
@@ -205,6 +213,12 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     {
         connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnWorkbenchAccessController::updatePermissions);
         connect(layout, &QnLayoutResource::lockedChanged,       this, &QnWorkbenchAccessController::updatePermissions);
+    }
+
+    if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
+    {
+        connect(user, &QnUserResource::permissionsChanged,  this, &QnWorkbenchAccessController::updatePermissions);
+        connect(user, &QnUserResource::userGroupChanged,    this, &QnWorkbenchAccessController::updatePermissions);
     }
 
     updatePermissions(resource);

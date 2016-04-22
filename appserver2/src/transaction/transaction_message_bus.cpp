@@ -147,6 +147,7 @@ namespace ec2
         case ApiCommand::removeBusinessRule:
         case ApiCommand::removeResource:
         case ApiCommand::removeUser:
+        case ApiCommand::removeUserGroup:
         case ApiCommand::removeLayout:
         case ApiCommand::removeVideowall:
         case ApiCommand::removeWebPage:
@@ -158,6 +159,7 @@ namespace ec2
         case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::saveUserGroup:         return handleTransactionParams<ApiUserGroupData>        (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::setAccessRights:       return handleTransactionParams<ApiAccessRightsData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
@@ -188,7 +190,7 @@ namespace ec2
 
         case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-    case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:
@@ -272,7 +274,7 @@ namespace ec2
     }
 
     QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
-        :
+    :
         m_localPeerType(peerType),
         //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
         m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -305,7 +307,7 @@ namespace ec2
 
         connect(
             QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
-            this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+            this, &QnTransactionMessageBus::onEc2ConnectionSettingsChanged);
     }
 
     void QnTransactionMessageBus::start()
@@ -1764,6 +1766,29 @@ namespace ec2
         QnMutexLocker lock( &m_mutex );
         if (!m_alivePeers.contains(id))
             emit remotePeerUnauthorized( id );
+    }
+
+    void QnTransactionMessageBus::onEc2ConnectionSettingsChanged()
+    {
+        //we need break connection only if following settings have been changed:
+        //  connectionKeepAliveTimeout
+        //  keepAliveProbeCount
+        const auto connectionKeepAliveTimeout = 
+            QnGlobalSettings::instance()->connectionKeepAliveTimeout();
+        const auto keepAliveProbeCount =
+            QnGlobalSettings::instance()->keepAliveProbeCount();
+
+        QnMutexLocker lock(&m_mutex);
+
+        for (QnTransactionTransport* transport : m_connections)
+        {
+            if (transport->connectionKeepAliveTimeout() != connectionKeepAliveTimeout ||
+                transport->keepAliveProbeCount() != keepAliveProbeCount)
+            {
+                //resetting connection
+                transport->setState(ec2::QnTransactionTransport::Error);
+            }
+        }
     }
 
     void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {

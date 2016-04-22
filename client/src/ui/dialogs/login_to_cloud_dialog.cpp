@@ -6,7 +6,6 @@
 #include <common/common_module.h>
 #include <utils/common/string.h>
 #include <client/client_settings.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

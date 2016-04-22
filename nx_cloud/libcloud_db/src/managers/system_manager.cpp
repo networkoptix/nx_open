@@ -29,7 +29,7 @@ namespace cdb {
 
 SystemManager::SystemManager(
     const conf::Settings& settings,
-    TimerManager* const timerManager,
+    nx::utils::TimerManager* const timerManager,
     const AccountManager& accountManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
 :
@@ -182,7 +182,7 @@ void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
 {
     //always providing only activated systems
-    filter.rc().put(attr::systemStatus, api::SystemStatus::ssActivated);
+    filter.resources().put(attr::systemStatus, api::SystemStatus::ssActivated);
 
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 

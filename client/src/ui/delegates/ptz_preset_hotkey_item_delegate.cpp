@@ -4,7 +4,6 @@
 
 #include <ui/widgets/common/char_combo_box.h>
 #include <ui/models/ptz_manage_model.h>
-#include <ui/dialogs/message_box.h>
 
 // -------------------------------------------------------------------------- //
 // QnComboBoxContainerEventFilter

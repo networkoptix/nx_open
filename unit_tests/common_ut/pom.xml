@@ -23,13 +23,13 @@
         <master.project.directory>common</master.project.directory>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lonvif -ludt</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport) _VARIADIC_MAX=10</windows.defines>
 
-        <rdep.packages>openssl ffmpeg quazip</rdep.packages>
+        <rdep.packages>gtest gmock openssl ffmpeg quazip</rdep.packages>
     </properties>
 
     <dependencies>

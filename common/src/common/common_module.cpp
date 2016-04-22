@@ -28,7 +28,7 @@
 
 #include <nx/network/socket_global.h>
 
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
@@ -42,7 +42,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
 
     /* Init statics. */
     qnProductFeatures();
-    store<TimerManager>(new TimerManager());
+    store<nx::utils::TimerManager>(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);

@@ -10,7 +10,7 @@
 
 #include <nx_ec/ec_proto_version.h>
 #include <utils/bsf/sized_data_decoder.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/media/custom_output_stream.h>
@@ -264,7 +264,7 @@ QnTransactionTransport::~QnTransactionTransport()
         m_sendKeepAliveTask = 0;    //no new task can be added
     }
     if( sendKeepAliveTaskLocal )
-        TimerManager::instance()->joinAndDeleteTimer( sendKeepAliveTaskLocal );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( sendKeepAliveTaskLocal );
 
     {
         auto httpClientLocal = m_httpClient;
@@ -294,6 +294,16 @@ QnTransactionTransport::~QnTransactionTransport()
 
     if (m_ttFinishCallback)
         m_ttFinishCallback();
+}
+
+std::chrono::milliseconds QnTransactionTransport::connectionKeepAliveTimeout() const
+{
+    return m_tcpKeepAliveTimeout;
+}
+
+int QnTransactionTransport::keepAliveProbeCount() const
+{
+    return m_keepAliveProbeCount;
 }
 
 void QnTransactionTransport::addData(QByteArray data)
@@ -918,9 +928,9 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
     else
     {
         //we using http client to send transactions
-        m_sendKeepAliveTask = TimerManager::instance()->addTimer(
+        m_sendKeepAliveTask = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, std::placeholders::_1),
-            m_tcpKeepAliveTimeout.count());
+            m_tcpKeepAliveTimeout);
     }
 }
 

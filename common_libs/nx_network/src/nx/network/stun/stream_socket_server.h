@@ -23,7 +23,7 @@ class SocketServer
 
 public:
     SocketServer(
-        const MessageDispatcher& dispatcher,
+        const MessageDispatcher* dispatcher,
         bool sslRequired,
         SocketFactory::NatTraversalType natTraversalRequired
             = SocketFactory::NatTraversalType::nttAuto )
@@ -45,11 +45,11 @@ protected:
         return std::make_shared<ServerConnection>(
             this,
             std::move(_socket),
-            m_dispatcher);
+            *m_dispatcher);
     }
 
 private:
-    const MessageDispatcher& m_dispatcher;
+    const MessageDispatcher* m_dispatcher;
 };
 
 } // namespace stun

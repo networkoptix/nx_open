@@ -29,12 +29,12 @@ bool DataFilter::empty() const
     return m_rc.empty();
 }
 
-stree::ResourceContainer& DataFilter::rc()
+stree::ResourceContainer& DataFilter::resources()
 {
     return m_rc;
 }
 
-const stree::ResourceContainer& DataFilter::rc() const
+const stree::ResourceContainer& DataFilter::resources() const
 {
     return m_rc;
 }

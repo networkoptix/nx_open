@@ -240,6 +240,13 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
+        QIcon icon = m_resourceProxyModel->index(0, 0).data(Qt::DecorationRole).value<QIcon>();
+        if (!icon.isNull())
+        {
+            static const QSize kMaxDeviceIndependentSize(128, 128);
+            ui->resourcesTreeView->setIconSize(icon.actualSize(kMaxDeviceIndependentSize));
+        }
+
         connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)),   this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this, &QnResourceTreeWidget::beforeRecursiveOperation);
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
@@ -344,11 +351,6 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags) {
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
-
-    if (flags & Qn::BackgroundOpacity)
-        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
-    else
-        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, QVariant());
 
     if (flags & Qn::BypassGraphicsProxy) {
         ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);

@@ -3,6 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
+#include "system_ut.h"
+
 #include <gtest/gtest.h>
 
 #include <nx/network/http/httpclient.h>
@@ -116,33 +118,31 @@ TEST_F(CdbFunctionalTest, system_unbind)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_get)
+void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
         api::ResultCode::ok,
-        addActivatedAccount(&account1, &account1Password));
+        testSetup->addActivatedAccount(&account1, &account1Password));
 
     api::AccountData account2;
     std::string account2Password;
     ASSERT_EQ(
         api::ResultCode::ok,
-        addActivatedAccount(&account2, &account2Password));
+        testSetup->addActivatedAccount(&account2, &account2Password));
 
     //adding system2 to account1
     api::SystemData system1;
     ASSERT_EQ(
         api::ResultCode::ok,
-        bindRandomSystem(account1.email, account1Password, &system1));
+        testSetup->bindRandomSystem(account1.email, account1Password, &system1));
 
     {
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystem(account1.email, account1Password, system1.id, &systems));
+            testSetup->getSystem(account1.email, account1Password, system1.id, &systems));
         ASSERT_EQ(1, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
@@ -153,7 +153,7 @@ TEST_F(CdbFunctionalTest, system_get)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::forbidden,
-            getSystem(account2.email, account2Password, system1.id, &systems));
+            testSetup->getSystem(account2.email, account2Password, system1.id, &systems));
     }
 
     {
@@ -161,13 +161,13 @@ TEST_F(CdbFunctionalTest, system_get)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::forbidden,
-            getSystem(account1.email, account1Password, "unknown_system_id", &systems));
+            testSetup->getSystem(account1.email, account1Password, "unknown_system_id", &systems));
         ASSERT_TRUE(systems.empty());
     }
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=1").arg(endpoint().port));
+        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=1").arg(testSetup->endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
@@ -176,7 +176,7 @@ TEST_F(CdbFunctionalTest, system_get)
     {
         nx_http::HttpClient client;
         QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
-            arg(endpoint().port).arg(QString::fromStdString(system1.id)));
+            arg(testSetup->endpoint().port).arg(QString::fromStdString(system1.id)));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
@@ -188,7 +188,7 @@ TEST_F(CdbFunctionalTest, system_get)
         nx_http::HttpClient client;
         QString urlStr(
             lm("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
-                arg(endpoint().port).arg(QUrl::toPercentEncoding(QString::fromStdString(system1.id))));
+                arg(testSetup->endpoint().port).arg(QUrl::toPercentEncoding(QString::fromStdString(system1.id))));
         urlStr.replace(lit("{"), lit("%7B"));
         urlStr.replace(lit("}"), lit("%7D"));
         QUrl url(urlStr);
@@ -198,6 +198,12 @@ TEST_F(CdbFunctionalTest, system_get)
         const auto msgBody = client.fetchMessageBodyBuffer();
         ASSERT_NE(-1, msgBody.indexOf(QByteArray(system1.id.c_str())));
     }
+}
+
+TEST_F(CdbFunctionalTest, system_get)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+    cdbFunctionalTestSystemGet(this);
 }
 
 TEST_F(CdbFunctionalTest, system_activation)

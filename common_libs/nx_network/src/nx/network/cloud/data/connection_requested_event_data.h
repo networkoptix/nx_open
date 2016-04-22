@@ -6,6 +6,7 @@
 #pragma once
 
 #include "connection_method.h"
+#include "connection_parameters.h"
 #include "stun_message_data.h"
 
 
@@ -22,6 +23,7 @@ public:
     nx::String originatingPeerID;
     std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
     ConnectionMethods connectionMethods;        ///< All requestd connection types
+    ConnectionParameters params;
 
     ConnectionRequestedEvent();
 

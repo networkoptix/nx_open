@@ -78,22 +78,19 @@ public:
         hasError(SystemError::ErrorCode code, const Message& message);
 };
 
+typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+    Message,
+    MessageParser,
+    MessageSerializer> MessagePipeline;
+
 //!Connects to STUN server, sends requests, receives responses and indications
-class NX_NETWORK_API AsyncClient:
+class NX_NETWORK_API AsyncClient
+:
     public AbstractAsyncClient,
-    public StreamConnectionHolder<
-		nx_api::BaseStreamProtocolConnectionEmbeddable<
-			Message,
-			MessageParser,
-			MessageSerializer
-		>>
+    public StreamConnectionHolder<MessagePipeline>
 {
 public:
-    typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
-        Message,
-        MessageParser,
-        MessageSerializer
-    > BaseConnectionType;
+    typedef MessagePipeline BaseConnectionType;
 
     typedef BaseConnectionType ConnectionType;
 

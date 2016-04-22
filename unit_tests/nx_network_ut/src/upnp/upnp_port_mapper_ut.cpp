@@ -54,7 +54,7 @@ static SocketAddress popAddress( TestSyncQueue< SocketAddress >* queue7001 )
 
 TEST( UpnpPortMapper, NormalUsage )
 {
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher;
     PortMapperMocked portMapper( lit( "192.168.0.10" ), lit( "12.34.56.78" ) );
     AsyncClientMock& clientMock = portMapper.clientMock();
@@ -96,7 +96,7 @@ TEST( UpnpPortMapper, NormalUsage )
 
 TEST( UpnpPortMapper, ReuseExisting )
 {
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher;
     PortMapperMocked portMapper( lit( "192.168.0.10" ), lit( "12.34.56.78" ) );
     AsyncClientMock& clientMock = portMapper.clientMock();
@@ -123,7 +123,7 @@ TEST( UpnpPortMapper, ReuseExisting )
 
 TEST( UpnpPortMapper, CheckMappings )
 {
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher;
     PortMapperMocked portMapper( lit( "192.168.0.10" ), lit( "12.34.56.78" ), 500 );
     AsyncClientMock& clientMock = portMapper.clientMock();
@@ -153,7 +153,7 @@ TEST( UpnpPortMapper, CheckMappings )
 
 TEST( UpnpPortMapper, DISABLED_RealRouter )
 {
-    TimerManager timerManager;
+    nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher;
     PortMapper portMapper( 10000 );
 

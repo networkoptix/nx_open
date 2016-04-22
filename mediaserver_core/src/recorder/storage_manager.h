@@ -25,6 +25,7 @@
 #include <set>
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
+#include <nx_ec/managers/abstract_camera_manager.h>
 
 #include <atomic>
 #include <future>
@@ -136,6 +137,7 @@ public:
     void initDone();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
 
+    static void migrateSqliteDatabase(const QnStorageResourcePtr & storage);
     /*
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
@@ -175,7 +177,12 @@ private:
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
-    void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, std::function<void(int current, int total)> progressCallback = nullptr);
+
+    void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
+                                      ec2::ApiCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
+
+    void loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ec2::ApiCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const;
+
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();

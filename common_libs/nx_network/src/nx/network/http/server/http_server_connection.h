@@ -19,7 +19,7 @@
 namespace stree
 {
     class ResourceContainer;
-}   //stree
+}   //namespace stree
 
 namespace nx_http
 {
@@ -76,6 +76,6 @@ namespace nx_http
     };
 
     typedef std::weak_ptr<HttpServerConnection> HttpServerConnectionPtr;
-}   //nx_http
+}   //namespace nx_http
 
 #endif  //HTTP_SERVER_CONNECTION_H

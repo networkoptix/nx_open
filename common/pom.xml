@@ -23,7 +23,6 @@
     <properties>
         <guid>${common.guid}</guid>
         <!--Global libs-->
-        <template>lib</template>
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
@@ -31,7 +30,7 @@
         <android.oslibs>-lz</android.oslibs>
         <!--Specific os defines-->
         <windows.defines>_USING_V110_SDK71_</windows.defines>
-        <rdep.packages>qt openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.mac.packages>quazip</rdep.mac.packages>
@@ -71,6 +70,7 @@
                 <buildLib>sharedlib</buildLib>
             </properties>
         </profile>
+
         <profile>
             <id>linux-arm-isd</id>
             <activation>
@@ -85,7 +85,28 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core network xml sql</qt.libs>
+                <qt.libs>core core-private network xml sql</qt.libs>
+                <rdep.linux.packages>gcc-4.9.3</rdep.linux.packages>
+                <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-isd-s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.libs>core core-private network xml sql</qt.libs>
+                <rdep.linux.packages>gcc-4.9.3 quazip</rdep.linux.packages>
             </properties>
         </profile>
 
@@ -103,7 +124,7 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core network xml sql</qt.libs>
+                <qt.libs>core core-private network xml sql</qt.libs>
             </properties>
         </profile>
 
@@ -121,7 +142,25 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
+                <rdep.linux.packages>gcc-${gcc.version} quazip opengl-es-mali</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>gcc-4.8.4 sysroot quazip</rdep.linux.packages>
             </properties>
         </profile>
 

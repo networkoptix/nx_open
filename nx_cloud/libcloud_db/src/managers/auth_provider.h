@@ -18,6 +18,10 @@
 namespace nx {
 namespace cdb {
 
+namespace conf
+{
+    class Settings;
+}
 class AccountManager;
 class SystemManager;
 
@@ -29,6 +33,7 @@ class AuthenticationProvider
 {
 public:
     AuthenticationProvider(
+        const conf::Settings& settings,
         const AccountManager& accountManager,
         const SystemManager& systemManager);
 
@@ -46,6 +51,7 @@ public:
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler);
 
 private:
+    const conf::Settings& m_settings;
     const AccountManager& m_accountManager;
     const SystemManager& m_systemManager;
 

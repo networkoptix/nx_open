@@ -29,12 +29,18 @@ CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultG
 {
     m_monotonicClock.restart();
 
+    QnMutexLocker lk(&m_mutex);
+
     Qn::directConnect(
         CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
         this, &CdbNonceFetcher::cloudBindingStatusChanged);
-    m_timerID = TimerManager::instance()->addTimer(
-        std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-        0);
+
+    m_bindedToCloud = CloudConnectionManager::instance()->bindedToCloud();
+
+    if (m_bindedToCloud)
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+            std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
+            std::chrono::milliseconds::zero());
 }
 
 CdbNonceFetcher::~CdbNonceFetcher()
@@ -52,9 +58,10 @@ CdbNonceFetcher::~CdbNonceFetcher()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-    {
-        QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lk(&m_mutex);
 
+    if (m_bindedToCloud)
+    {
         const qint64 curClock = m_monotonicClock.elapsed();
         removeInvalidNonce(&m_cdbNonceQueue, curClock);
 
@@ -70,9 +77,20 @@ QByteArray CdbNonceFetcher::generateNonce()
                 nonceTrailer.data()+nonceTrailer.size(),
                 [&]{return m_nonceTrailerRandomGenerator(m_randomEngine);});
             const auto nonce = m_cdbNonceQueue.back().nonce + nonceTrailer;
+
+            NX_LOGX(lm("Returning cloud nonce %1. Valid for another %2 sec")
+                .arg(nonce).arg((m_cdbNonceQueue.back().expirationTime - curClock)/1000),
+                cl_logDEBUG2);
+
             return nonce;
         }
+        else
+        {
+            NX_LOGX(lit("No valid cloud nonce available..."), cl_logDEBUG2);
+        }
     }
+
+    lk.unlock();
 
     return m_defaultGenerator->generateNonce();
 }
@@ -126,14 +144,19 @@ bool CdbNonceFetcher::parseCloudNonce(
 
 void CdbNonceFetcher::fetchCdbNonceAsync()
 {
+    NX_LOGX(lm("Trying to fetch new cloud nonce"), cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     m_timerID.release();
+
+    if (!m_bindedToCloud)
+        return;
 
     m_connection = CloudConnectionManager::instance()->getCloudConnection();
     if (!m_connection)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
-        m_timerID = TimerManager::instance()->addTimer(
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
             kGetNonceRetryTimeout);
         return;
@@ -150,30 +173,39 @@ void CdbNonceFetcher::gotNonce(
 {
     QnMutexLocker lk(&m_mutex);
 
+    if (!m_bindedToCloud)
+        return;
+
     if (resCode != nx::cdb::api::ResultCode::ok)
     {
-        NX_LOG(lit("CdbNonceFetcher. Failed to fetch nonce from cdb: %1").
+        NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
         CloudConnectionManager::instance()->processCloudErrorCode(resCode);
-        m_timerID = TimerManager::instance()->addTimer(
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
             kGetNonceRetryTimeout);
         return;
     }
+
+    using namespace std::chrono;
 
     const auto curTime = m_monotonicClock.elapsed();
     NonceCtx nonceCtx;
     nonceCtx.nonce = nonce.nonce.c_str();
     nonceCtx.validityTime =
         curTime +
-        std::chrono::duration_cast<std::chrono::milliseconds>(nonce.validPeriod).count();
+        duration_cast<milliseconds>(nonce.validPeriod).count();
     nonceCtx.expirationTime =
         curTime +
-        std::chrono::duration_cast<std::chrono::milliseconds>(nonce.validPeriod).count() / 2;
-        
+        duration_cast<milliseconds>(nonce.validPeriod).count() / 2;
+
+    NX_LOGX(lm("Got new cloud nonce %1, valid for another %2 sec")
+        .arg(nonceCtx.nonce).arg((nonceCtx.expirationTime - curTime)/1000),
+        cl_logDEBUG2);
+
     m_cdbNonceQueue.emplace_back(std::move(nonceCtx));
 
-    m_timerID = TimerManager::instance()->addTimer(
+    m_timerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
         nonce.validPeriod/2);
 }
@@ -191,14 +223,23 @@ void CdbNonceFetcher::removeInvalidNonce(
 
 void CdbNonceFetcher::cloudBindingStatusChanged(bool bindedToCloud)
 {
-    if (!bindedToCloud)
-        return;
+    NX_LOGX(lm("Cloud binding status changed: %1").arg(bindedToCloud), cl_logDEBUG1);
 
     QnMutexLocker lk(&m_mutex);
+
+    m_bindedToCloud = bindedToCloud;
+    if (!bindedToCloud)
+    {
+        m_cdbNonceQueue.clear();
+        return;
+    }
+
     if (m_timerID)
-        TimerManager::instance()->modifyTimerDelay(m_timerID.get(), 0);
+        nx::utils::TimerManager::instance()->modifyTimerDelay(
+            m_timerID.get(),
+            std::chrono::milliseconds::zero());
     else
-        m_timerID = TimerManager::instance()->addTimer(
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-            0);
+            std::chrono::milliseconds::zero());
 }

@@ -16,7 +16,7 @@
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <streaming/ondemand_media_data_provider.h>
 #include <nx/utils/singleton.h>
-#include <nx/utils/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "data_source_cache.h"
 #include "streaming_chunk.h"
@@ -35,7 +35,7 @@ class QnTranscoder;
 class StreamingChunkTranscoder
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public Singleton<StreamingChunkTranscoder>,
     public Qn::EnableSafeDirectConnection
 {

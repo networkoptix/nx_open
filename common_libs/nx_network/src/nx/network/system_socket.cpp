@@ -170,12 +170,14 @@ bool Socket<InterfaceToImplement>::close()
     //checking that socket is not registered in aio
     NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
 
-#ifdef WIN32
-    return ::closesocket(m_fd) == 0;
-#else
-    return ::close(m_fd) == 0;
-#endif
+    auto fd = m_fd;
     m_fd = -1;
+
+#ifdef WIN32
+    return ::closesocket(fd) == 0;
+#else
+    return ::close(fd) == 0;
+#endif
 }
 
 template<typename InterfaceToImplement>
@@ -1255,11 +1257,11 @@ TCPServerSocket::TCPServerSocket()
 
 TCPServerSocket::~TCPServerSocket()
 {
-    //checking that socket is not registered in aio
-    NX_ASSERT(
-        !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)),
-        Q_FUNC_INFO,
-        "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");
+    NX_CRITICAL(
+        !nx::network::SocketGlobals::aioService()
+            .isSocketBeingWatched(static_cast<Pollable*>(this)),
+        "You MUST cancel running async socket operation before "
+        "deleting socket if you delete socket from non-aio thread");
 }
 
 int TCPServerSocket::accept(int sockDesc)
@@ -1632,6 +1634,11 @@ int UDPSocket::recvFrom(
     }
     return rtn;
 }
+
+template class Socket<AbstractStreamServerSocket>;
+template class Socket<AbstractStreamSocket>;
+template class CommunicatingSocket<AbstractStreamSocket>;
+template class CommunicatingSocket<AbstractDatagramSocket>;
 
 }   //network
 }   //nx
