@@ -144,33 +144,38 @@ bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resoluti
     return true;
 }
 
-int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+int FfmpegVideoDecoder::decode(
+    const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {
     Q_D(FfmpegVideoDecoder);
 
     if (!d->codecContext)
     {
-        d->initContext(frame);
+        d->initContext(compressedVideoData);
         if (!d->codecContext)
             return -1;
     }
 
     AVPacket avpkt;
     av_init_packet(&avpkt);
-    if (frame)
+    if (compressedVideoData)
     {
-        avpkt.data = (unsigned char*) frame->data();
-        avpkt.size = static_cast<int>(frame->dataSize());
-        avpkt.dts = avpkt.pts = frame->timestamp;
-        if (frame->flags & QnAbstractMediaData::MediaFlags_AVKey)
+        avpkt.data = (unsigned char*) compressedVideoData->data();
+        avpkt.size = static_cast<int>(compressedVideoData->dataSize());
+        avpkt.dts = avpkt.pts = compressedVideoData->timestamp;
+        if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
         // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
+        {
+            static_assert(QN_BYTE_ARRAY_PADDING >= FF_INPUT_BUFFER_PADDING_SIZE,
+                "FfmpegVideoDecoder: Insufficient padding size");
             memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+        }
 
-        d->lastPts = frame->timestamp;
+        d->lastPts = compressedVideoData->timestamp;
     }
     else
     {
@@ -182,12 +187,12 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVide
         avpkt.size = 0;
     }
 
-    int gotData = 0;
-    avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
-    if (gotData <= 0)
-        return gotData; //< Negative value means error. Zero value means buffering.
+    int gotPicture = 0;
+    int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
+    if (res <= 0 || !gotPicture)
+        return res; //< Negative value means error, zero means buffering.
 
-    ffmpegToQtVideoFrame(result);
+    ffmpegToQtVideoFrame(outDecodedFrame);
     return d->frame->coded_picture_number;
 }
 
