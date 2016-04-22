@@ -28,9 +28,6 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
 {
     ui->setupUi(this);
 
-
-
-
     ::setReadOnly(ui->loginLineEdit, true);
     ::setReadOnly(ui->groupLineEdit, true);
 
@@ -83,12 +80,16 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         connect(field, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
 
     QnAligner* aligner = new QnAligner(this);
-    aligner->addWidget(ui->loginLabel);
-    aligner->addWidget(ui->groupLabel);
-    aligner->addWidget(ui->emailInputField->titleLabel());
-    aligner->addWidget(ui->newPasswordInputField->titleLabel());
-    aligner->addWidget(ui->confirmPasswordInputField->titleLabel());
-    aligner->addWidget(ui->currentPasswordInputField->titleLabel());
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+
+    aligner->addWidgets({
+        ui->loginLabel,
+        ui->groupLabel,
+        ui->emailInputField,
+        ui->newPasswordInputField,
+        ui->confirmPasswordInputField,
+        ui->currentPasswordInputField
+    });
     aligner->start();
 
     //setWarningStyle(ui->hintLabel);

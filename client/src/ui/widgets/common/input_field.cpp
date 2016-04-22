@@ -1,6 +1,9 @@
 #include "input_field.h"
 
+#include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
+
+QLatin1String QnInputField::className("QnInputField");
 
 class QnInputFieldPrivate : public QObject
 {
@@ -43,6 +46,29 @@ public:
 
 };
 
+class LabelWidthAccessor : public AbstractAccessor
+{
+public:
+    LabelWidthAccessor() {}
+
+    virtual QVariant get(const QObject *object) const override
+    {
+        const QnInputField* w = qobject_cast<const QnInputField*>(object);
+        if (!w)
+            return 0;
+        return w->d_ptr->title->sizeHint().width();
+    }
+
+    virtual void set(QObject *object, const QVariant &value) const override
+    {
+        QnInputField* w = qobject_cast<QnInputField*>(object);
+        if (!w)
+            return;
+        w->d_ptr->title->setFixedWidth(value.toInt());
+    }
+
+};
+
 QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     base_type(parent),
     d_ptr(new QnInputFieldPrivate(this))
@@ -64,12 +90,6 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
 QnInputField::~QnInputField()
 {
 
-}
-
-QLabel* QnInputField::titleLabel() const
-{
-    Q_D(const QnInputField);
-    return d->title;
 }
 
 QString QnInputField::title() const
@@ -158,4 +178,9 @@ void QnInputField::setValidator(ValidateFunction validator)
     d->validator = validator;
     d->validatorConnection = connect(d->input, &QLineEdit::editingFinished, d, &QnInputFieldPrivate::validate);
     d->validate();
+}
+
+AbstractAccessor* QnInputField::createLabelWidthAccessor()
+{
+    return new LabelWidthAccessor();
 }
