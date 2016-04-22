@@ -167,7 +167,7 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Q
 
     std::map<Filter, QString> nameByFilter{
         {CamerasFilter, tr("Cameras")},
-        {LayoutsFilter, tr("Layouts")},
+        {LayoutsFilter, tr("Global Layouts")},
         {ServersFilter, tr("Servers")},
     };
 
@@ -176,7 +176,8 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Q
         auto flag = accessPermission(filter);
         if (permissions.testFlag(flag))
         {
-            tableRows << accessPermissionText(filter);
+            QString row = lit("<td colspan=2><b>%1</b></td>").arg(accessPermissionText(filter));
+            tableRows << kHtmlTableRowTemplate.arg(row);
         }
         else
         {
@@ -184,8 +185,8 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Q
             auto accessibleFiltered = filteredResources(filter, accessibleResources);
 
             QString row = hasAccessToSystem
-                ? lit("<td><b>%1</b> / %2</td><td></td><td>%3</td>").arg(accessibleFiltered.size()).arg(allFiltered.size()).arg(nameByFilter[filter])
-                : lit("<td><b>%1</b></td><td></td><td>%2</td>").arg(accessibleFiltered.size()).arg(nameByFilter[filter]);
+                ? lit("<td><b>%1</b> / %2</td><td>%3</td>").arg(accessibleFiltered.size()).arg(allFiltered.size()).arg(nameByFilter[filter])
+                : lit("<td><b>%1</b></td><td>%2</td>").arg(accessibleFiltered.size()).arg(nameByFilter[filter]);
             tableRows << kHtmlTableRowTemplate.arg(row);
         }
     }
