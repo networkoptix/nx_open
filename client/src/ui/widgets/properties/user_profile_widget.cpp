@@ -11,6 +11,7 @@
 
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
+#include <ui/dialogs/resource_properties/change_user_password_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/user_settings_model.h>
@@ -25,12 +26,17 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserProfileWidget()),
-    m_model(model)
+    m_model(model),
+    m_newPassword()
 {
     ui->setupUi(this);
 
-    ::setReadOnly(ui->loginLineEdit, true);
-    ::setReadOnly(ui->groupLineEdit, true);
+    ::setReadOnly(ui->loginInputField, true);
+    ::setReadOnly(ui->groupInputField, true);
+
+    ui->loginInputField->setTitle(tr("Login"));
+    ui->nameInputField->setTitle(tr("Name"));
+    ui->groupInputField->setTitle(tr("Group"));
 
     ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator([](const QString& text)
@@ -41,58 +47,35 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         return QnInputField::ValidateResult(true, QString());
     });
 
-    ui->newPasswordInputField->setTitle(tr("New Password"));
-    ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->newPasswordInputField->setValidator([](const QString& text)
+    connect(ui->emailInputField, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
+
+    connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
     {
-        if (text.trimmed() != text)
-            return QnInputField::ValidateResult(false, tr("Avoid leading and trailing spaces."));
+        if (!validMode())
+            return;
 
-        return QnInputField::ValidateResult(true, QString());
+        Qn::Permissions permissions = accessController()->permissions(m_model->user());
+        if (!permissions.testFlag(Qn::WritePasswordPermission))
+            return;
+
+        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog());
+        dialog->initializeContext(this);
+        dialog->setWindowModality(Qt::ApplicationModal);
+        if (dialog->exec() != QDialog::Accepted)
+            return;
+        m_newPassword = dialog->newPassword();
     });
-
-    ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
-    ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setValidator([this](const QString& text)
-    {
-        if (ui->newPasswordInputField->text().isEmpty())
-            return QnInputField::ValidateResult(true, QString());
-
-        if (ui->newPasswordInputField->text() != text)
-            return QnInputField::ValidateResult(false, tr("Passwords do not match."));
-
-        return QnInputField::ValidateResult(true, QString());
-    });
-
-    ui->currentPasswordInputField->setTitle(tr("Current Password"));
-    ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->currentPasswordInputField->setValidator([this](const QString& text)
-    {
-        if (ui->newPasswordInputField->text().isEmpty())
-            return QnInputField::ValidateResult(true, QString());
-
-        if (text.isEmpty())
-            return QnInputField::ValidateResult(false, tr("To modify your password, please enter existing one."));
-
-        if (!m_model->user()->checkPassword(text))
-            return QnInputField::ValidateResult(false, tr("Invalid current password."));
-
-        return QnInputField::ValidateResult(true, QString());
-    });
-
-    for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField, ui->emailInputField })
-        connect(field, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
 
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
 
     aligner->addWidgets({
-        ui->loginLabel,
-        ui->groupLabel,
-        ui->emailInputField,
-        ui->newPasswordInputField,
-        ui->confirmPasswordInputField,
-        ui->currentPasswordInputField
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->groupInputField,
+        ui->changePasswordSpacerLabel,
+        ui->permissionsSpacerLabel,
+        ui->emailInputField
     });
 }
 
@@ -106,7 +89,7 @@ bool QnUserProfileWidget::hasChanges() const
 
     Qn::Permissions permissions = accessController()->permissions(m_model->user());
 
-    if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->newPasswordInputField->text().isEmpty()) //TODO: #GDM #access implement correct check
+    if (permissions.testFlag(Qn::WritePasswordPermission) && !m_newPassword.isEmpty())
         return true;
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -123,14 +106,11 @@ void QnUserProfileWidget::loadDataToUi()
 
     updateControlsAccess();
 
-    ui->loginLineEdit->setText(m_model->user()->getName());
-    ui->groupLineEdit->setText(m_model->groupName());
+    ui->loginInputField->setText(m_model->user()->getName());
+    ui->groupInputField->setText(m_model->groupName());
     ui->permissionsLabel->setText(m_model->groupDescription());
-
     ui->emailInputField->setText(m_model->user()->getEmail());
-    ui->newPasswordInputField->clear();
-    ui->confirmPasswordInputField->clear();
-    ui->currentPasswordInputField->clear();
+    m_newPassword.clear();
 }
 
 void QnUserProfileWidget::applyChanges()
@@ -144,17 +124,16 @@ void QnUserProfileWidget::applyChanges()
     Qn::Permissions permissions = accessController()->permissions(m_model->user());
 
     //empty text means 'no change'
-    const QString newPassword = ui->newPasswordInputField->text().trimmed();
-    if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty())
+    if (permissions.testFlag(Qn::WritePasswordPermission) && !m_newPassword.isEmpty())
     {
-        m_model->user()->setPassword(newPassword);
+        m_model->user()->setPassword(m_newPassword);
         m_model->user()->generateHash();
         m_model->user()->setPassword(QString());
         if (m_model->mode() == QnUserSettingsModel::OwnProfile)
         {
             /* Password was changed. Change it in global settings and hope for the best. */
             QUrl url = QnAppServerConnectionFactory::url();
-            url.setPassword(newPassword);
+            url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
             QnConnectionDataList savedConnections = qnSettings->customConnections();
@@ -187,9 +166,8 @@ bool QnUserProfileWidget::canApplyChanges() const
     if (m_model->mode() != QnUserSettingsModel::OwnProfile)
         return true;
 
-    for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField, ui->emailInputField })
-        if (!field->isValid())
-            return false;
+    if (!ui->emailInputField->isValid())
+        return false;
     return true;
 }
 
@@ -200,9 +178,7 @@ void QnUserProfileWidget::updateControlsAccess()
         : Qn::NoPermissions;
 
     /* User must confirm current password to change own password. */
-    bool canChangePassword = permissions.testFlag(Qn::WritePasswordPermission);
-    for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField })
-        field->setVisible(canChangePassword);
+    ui->changePasswordWidget->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
 
     ::setReadOnly(ui->emailInputField, !permissions.testFlag(Qn::WriteEmailPermission));
 }

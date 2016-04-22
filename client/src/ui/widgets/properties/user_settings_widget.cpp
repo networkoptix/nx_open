@@ -37,10 +37,10 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateLogin);
     connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->passwordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::updatePassword);
+    connect(ui->passwordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->confirmPasswordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::updatePassword);
+    connect(ui->confirmPasswordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateEmail);
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserSettingsWidget::hasChangesChanged);

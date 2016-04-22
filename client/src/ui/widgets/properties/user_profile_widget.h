@@ -39,4 +39,5 @@ private:
 private:
     QScopedPointer<Ui::UserProfileWidget> ui;
     QnUserSettingsModel* const m_model;
+    QString m_newPassword;
 };
