@@ -14,6 +14,7 @@
 #include <QDateTime>
 
 #include <nx/network/aio/aioservice.h>
+#include <nx/network/socket_global.h>
 
 #include "stream_time_sync_data.h"
 
@@ -22,6 +23,8 @@ static const int MS_PER_SEC = 1000;
 static const int USEC_PER_MSEC = 1000;
 static const int AUDIO_ENCODER_ID = 10;
 static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
+
+using namespace nx::network;
 
 AudioStreamReader::AudioStreamReader()
 :
@@ -36,7 +39,7 @@ AudioStreamReader::AudioStreamReader()
 AudioStreamReader::~AudioStreamReader()
 {
     if( m_pollable )
-        aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
+        SocketGlobals::aioService().removeFromWatch( m_pollable.get(), aio::etRead, true );
 
     closeAmux();
 }
@@ -56,7 +59,8 @@ bool AudioStreamReader::initializeIfNeeded()
         return true;
     if( !initializeAmux() )
         return false;
-    m_initializedInitially = aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
+    SocketGlobals::aioService().watchSocket( m_pollable.get(), aio::etRead, this );
+    m_initializedInitially = true;
     return m_initializedInitially;
 }
 
@@ -94,7 +98,7 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
             return; //listening futher
     }
 
-    aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead );
+    SocketGlobals::aioService().removeFromWatch( m_pollable.get(), aio::etRead );
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         //re-initializing audio
@@ -104,10 +108,7 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
         if( m_packetReceivers.empty() )
             return;
     }
-    if( !aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this ) )
-    {
-        //TODO
-    }
+    SocketGlobals::aioService().watchSocket( m_pollable.get(), aio::etRead, this );
 }
 
 int AudioStreamReader::readAudioData()

@@ -25,14 +25,14 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class UdpHolePunchingTimeouts
+class Timeouts
 {
 public:
     std::chrono::seconds keepAlivePeriod;
     /** Number of missing keep-alives before connection can be treated as closed */
     int keepAliveProbeCount;
 
-    UdpHolePunchingTimeouts()
+    Timeouts()
     :
         keepAlivePeriod(std::chrono::hours(2)),
         keepAliveProbeCount(3)
@@ -47,10 +47,10 @@ public:
 
 /** Creates connections (UDT) after UDP hole punching has been successfully done.
     Also, makes some efforts to keep UDP hole opened
-    \note \a OutgoingTunnelUdtConnection instance 
+    \note \a OutgoingTunnelConnection instance 
         can be safely freed while in aio thread (e.g., in any handler)
 */
-class NX_NETWORK_API OutgoingTunnelUdtConnection
+class NX_NETWORK_API OutgoingTunnelConnection
 :
     public AbstractOutgoingTunnelConnection,
     public StreamConnectionHolder<
@@ -64,14 +64,14 @@ public:
         \param connectionId unique id of connection established
         \param udtConnection already established connection to the target host
     */
-    OutgoingTunnelUdtConnection(
+    OutgoingTunnelConnection(
         nx::String connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection,
-        UdpHolePunchingTimeouts timeouts);
-    OutgoingTunnelUdtConnection(
+        Timeouts timeouts);
+    OutgoingTunnelConnection(
         nx::String connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection);
-    ~OutgoingTunnelUdtConnection();
+    ~OutgoingTunnelConnection();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
@@ -101,7 +101,7 @@ private:
     const SocketAddress m_localPunchedAddress;
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
-    const UdpHolePunchingTimeouts m_timeouts;
+    const Timeouts m_timeouts;
     aio::Timer m_aioTimer;
     std::map<UdtStreamSocket*, ConnectionContext> m_ongoingConnections;
     QnMutex m_mutex;

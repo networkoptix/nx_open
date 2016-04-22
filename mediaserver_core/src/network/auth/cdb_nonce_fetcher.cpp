@@ -23,7 +23,7 @@ namespace {
 CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultGenerator)
 :
     m_defaultGenerator(std::move(defaultGenerator)),
-    m_bindedToCloud(false),
+    m_boundToCloud(false),
     m_randomEngine(m_rd()),
     m_nonceTrailerRandomGenerator('a', 'z')
 {
@@ -35,9 +35,9 @@ CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultG
         CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
         this, &CdbNonceFetcher::cloudBindingStatusChanged);
 
-    m_bindedToCloud = CloudConnectionManager::instance()->bindedToCloud();
+    m_boundToCloud = CloudConnectionManager::instance()->boundToCloud();
 
-    if (m_bindedToCloud)
+    if (m_boundToCloud)
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
             std::chrono::milliseconds::zero());
@@ -60,7 +60,7 @@ QByteArray CdbNonceFetcher::generateNonce()
 {
     QnMutexLocker lk(&m_mutex);
 
-    if (m_bindedToCloud)
+    if (m_boundToCloud)
     {
         const qint64 curClock = m_monotonicClock.elapsed();
         removeInvalidNonce(&m_cdbNonceQueue, curClock);
@@ -149,7 +149,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     QnMutexLocker lk(&m_mutex);
     m_timerID.release();
 
-    if (!m_bindedToCloud)
+    if (!m_boundToCloud)
         return;
 
     m_connection = CloudConnectionManager::instance()->getCloudConnection();
@@ -173,7 +173,7 @@ void CdbNonceFetcher::gotNonce(
 {
     QnMutexLocker lk(&m_mutex);
 
-    if (!m_bindedToCloud)
+    if (!m_boundToCloud)
         return;
 
     if (resCode != nx::cdb::api::ResultCode::ok)
@@ -221,14 +221,14 @@ void CdbNonceFetcher::removeInvalidNonce(
     }
 }
 
-void CdbNonceFetcher::cloudBindingStatusChanged(bool bindedToCloud)
+void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
 {
-    NX_LOGX(lm("Cloud binding status changed: %1").arg(bindedToCloud), cl_logDEBUG1);
+    NX_LOGX(lm("Cloud binding status changed: %1").arg(boundToCloud), cl_logDEBUG1);
 
     QnMutexLocker lk(&m_mutex);
 
-    m_bindedToCloud = bindedToCloud;
-    if (!bindedToCloud)
+    m_boundToCloud = boundToCloud;
+    if (!boundToCloud)
     {
         m_cdbNonceQueue.clear();
         return;

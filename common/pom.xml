@@ -86,7 +86,7 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>gcc-4.9.3</rdep.linux.packages>
+                <rdep.linux.packages>gcc-4.9.3 quazip openldap</rdep.linux.packages>
                 <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>

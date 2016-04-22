@@ -37,17 +37,22 @@ QnLogMessage QnLogMessage::arg(const QString& a, int fieldWidth, QChar fillChar)
 
 QnLogMessage QnLogMessage::arg(char a, int fieldWidth, QChar fillChar) const
 {
-    return m_str.arg(a, fieldWidth, fillChar);
+    return m_str.arg(QChar::fromLatin1(a), fieldWidth, fillChar);
 }
 
 QnLogMessage QnLogMessage::arg(const char* a, int fieldWidth, QChar fillChar) const
 {
-    return m_str.arg(a, fieldWidth, fillChar);
+    return m_str.arg(QString::fromUtf8(a), fieldWidth, fillChar);
 }
 
 QnLogMessage QnLogMessage::arg(QChar a, int fieldWidth, QChar fillChar) const
 {
     return m_str.arg(a, fieldWidth, fillChar);
+}
+
+QnLogMessage QnLogMessage::arg(double a, int fieldWidth, char format, int precision, QChar fillChar) const
+{
+    return m_str.arg(a, fieldWidth, format, precision, fillChar);
 }
 
 QnLogMessage QnLogMessage::arg(const QByteArray& a, int fieldWidth, QChar fillChar) const
