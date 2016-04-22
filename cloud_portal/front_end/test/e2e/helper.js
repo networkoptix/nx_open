@@ -48,16 +48,16 @@ var Helper = function () {
     this.forms = {
         login: {
             dialog: element(by.css('.modal-dialog')),
-            emailInput: h.forms.dialog.element(by.model('auth.email')),
-            passwordInput: h.forms.dialog.element(by.model('auth.password')),
-            submitButton: h.forms.dialog.element(by.buttonText('Login'))
+            emailInput: element(by.css('.modal-dialog')).element(by.model('auth.email')),
+            passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
+            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Login'))
         },
         register: {
             firstNameInput: element(by.model('account.firstName')),
             lastNameInput: element(by.model('account.lastName')),
             emailInput: element(by.model('account.email')),
             passwordGroup: element(by.css('password-input')),
-            passwordInput: h.forms.register.passwordGroup.element(by.css('input[type=password]')),
+            passwordInput: element(by.css('password-input')).element(by.css('input[type=password]')),
             submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Register'))
         },
         account: {
@@ -73,9 +73,9 @@ var Helper = function () {
         },
         logout: {
             navbar: element(by.css('header')).element(by.css('.navbar')),
-            dropdownToggle: h.forms.logout.navbar.element(by.css('a[uib-dropdown-toggle]')),
-            dropdownMenu: h.forms.logout.navbar.element(by.css('[uib-dropdown-menu]')),
-            logoutLink: h.forms.logout.userAccountDropdownMenu.element(by.linkText('Logout'))
+            dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('a[uib-dropdown-toggle]')),
+            dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
+            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Logout'))
         }
     };
 
@@ -189,7 +189,7 @@ var Helper = function () {
         var userPassword = password || this.userPassword;
 
         this.get(this.urls.register);
-        expect(firstNameInput.isPresent()).toBe(true);
+        expect(h.forms.register.firstNameInput.isPresent()).toBe(true);
 
         h.forms.register.firstNameInput.sendKeys(userFistName);
         h.forms.register.lastNameInput.sendKeys(userLastName);
