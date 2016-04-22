@@ -219,11 +219,12 @@ var Helper = function () {
         return deferred.promise;
     };
 
-    this.createUser = function(firstName, lastName, password, email) {
-        var userEmail = this.register(firstName, lastName, password, email);
+    this.createUser = function(firstName, lastName, email, password) {
         var deferred = protractor.promise.defer();
+        var userEmail = email || h.getRandomEmail();
 
-        this.getActivationLink(userEmail).then( function(url) {
+        h.register(firstName, lastName, userEmail, password);
+        h.getActivationLink(userEmail).then( function(url) {
             h.get(url);
             expect(h.htmlBody.getText()).toContain(h.alert.alertMessages.registerConfirmSuccess);
             deferred.fulfill(userEmail);
@@ -243,7 +244,7 @@ var Helper = function () {
     this.shareSystemWith = function(email, role, systemLink) {
         var sharedRole = role || 'admin';
         var systemLinkCode = systemLink || '/a74840da-f135-4522-abd9-5a8c6fb8591f';
-        var roleOption = roleField.element(by.css(sharedRole));
+        var roleOption = h.forms.share.roleField.element(by.css(sharedRole));
 
         this.getSysPage(systemLinkCode);
 
