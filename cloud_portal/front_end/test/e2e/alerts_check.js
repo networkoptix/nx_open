@@ -26,6 +26,7 @@ var AlertSuite = function () {
     this.submitButton = element(by.css('process-button')).element(by.css('button'));
     this.alert = element(by.css('.ng-toast__message')).element(by.css('.alert'));
     this.alertCloseButton = this.alert.element(by.css('button.close'));
+    this.successMessageElem = element(by.css('.process-success'));
 
     function waitAlert(timeout){
         var waitMs = timeout || 1700;

@@ -16,7 +16,7 @@ var Helper = function () {
     var AlertSuite = require('./alerts_check.js');
     this.alert = new AlertSuite();
 
-    var self = this;
+    var h = this;
 
     this.basePassword = 'qweasd123';
 
@@ -45,12 +45,46 @@ var Helper = function () {
         return field.element(by.xpath('..'));
     };
 
-    // Get valid email with random number between 100 and 1000
+    this.forms = {
+        login: {
+            dialog: element(by.css('.modal-dialog')),
+            emailInput: h.forms.dialog.element(by.model('auth.email')),
+            passwordInput: h.forms.dialog.element(by.model('auth.password')),
+            submitButton: h.forms.dialog.element(by.buttonText('Login'))
+        },
+        register: {
+            firstNameInput: element(by.model('account.firstName')),
+            lastNameInput: element(by.model('account.lastName')),
+            emailInput: element(by.model('account.email')),
+            passwordGroup: element(by.css('password-input')),
+            passwordInput: h.forms.register.passwordGroup.element(by.css('input[type=password]')),
+            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Register'))
+        },
+        account: {
+            firstNameInput: element(by.model('account.first_name')),
+            lastNameInput: element(by.model('account.last_name')),
+            submitButton: element(by.css('[form=accountForm]')).element(by.buttonText('Save'))
+        },
+        share: {
+            shareButton: element(by.partialButtonText('Share')),
+            emailField: element(by.model('share.accountEmail')),
+            roleField: element(by.model('share.accessRole')),
+            submitButton: element(by.css('process-button')).element(by.buttonText('Share'))
+        },
+        logout: {
+            navbar: element(by.css('header')).element(by.css('.navbar')),
+            dropdownToggle: h.forms.logout.navbar.element(by.css('a[uib-dropdown-toggle]')),
+            dropdownMenu: h.forms.logout.navbar.element(by.css('[uib-dropdown-menu]')),
+            logoutLink: h.forms.logout.userAccountDropdownMenu.element(by.linkText('Logout'))
+        }
+    };
+
+    // Get valid email with random number between 10000 and 100000
     this.getRandomEmail = function() {
         var randomNumber = Math.floor((Math.random() * 100000)+10000); // Random number between 1000 and 10000
         return 'noptixqa+' + randomNumber + '@gmail.com';
     };
-    // Get valid email with random number between 100 and 1000
+    // Get valid email with random number between 10000 and 100000
     this.getRandomEmailWith = function(addition) {
         var randomNumber = Math.floor((Math.random() * 100000)+10000); // Random number between 1000 and 10000
         var email = 'noptixqa+'+ addition + randomNumber + '@gmail.com';
@@ -127,44 +161,28 @@ var Helper = function () {
         var usrEmail = email || this.userEmail;
         var usrPassword = password || this.userPassword;
 
-        var loginDialog = element(by.css('.modal-dialog'));
-        var emailInput = loginDialog.element(by.model('auth.email'));
-        var passwordInput = loginDialog.element(by.model('auth.password'));
-        var dialogLoginButton = loginDialog.element(by.buttonText('Login'));
-
-        emailInput.sendKeys(usrEmail);
-        passwordInput.sendKeys(usrPassword);
-        dialogLoginButton.click();
+        h.forms.login.emailInput.sendKeys(usrEmail);
+        h.forms.login.passwordInput.sendKeys(usrPassword);
+        h.forms.login.submitButton.click();
         browser.sleep(2000); // such a shame, but I can't solve it right now
     };
 
     this.logout = function() {
-        var navbar = element(by.css('header')).element(by.css('.navbar'));
-        var userAccountDropdownToggle = navbar.element(by.css('a[uib-dropdown-toggle]'));
-        var userAccountDropdownMenu = navbar.element(by.css('[uib-dropdown-menu]'));
-        var logoutLink = userAccountDropdownMenu.element(by.linkText('Logout'));
 
-        expect(userAccountDropdownToggle.isPresent()).toBe(true);
-        userAccountDropdownToggle.getText().then(function(text) {
-            if(self.isSubstr(text, 'noptixqa')) {
-                userAccountDropdownToggle.click();
-                logoutLink.click();
+        expect(h.forms.logout.dropdownToggle.isPresent()).toBe(true);
+        h.forms.logout.dropdownToggle.getText().then(function(text) {
+            if(h.isSubstr(text, 'noptixqa')) {
+                h.forms.logout.dropdownToggle.click();
+                h.forms.logout.logoutLink.click();
                 browser.sleep(500); // such a shame, but I can't solve it right now
 
                 // Check that element that is visible only for authorized user is NOT displayed on page
-                expect(self.loginSuccessElement.isDisplayed()).toBe(false);
+                expect(h.loginSuccessElement.isDisplayed()).toBe(false);
             }
         });
     };
 
     this.register = function(firstName, lastName, email, password) {
-        var firstNameInput = element(by.model('account.firstName'));
-        var lastNameInput = element(by.model('account.lastName'));
-        var emailInput = element(by.model('account.email'));
-        var passwordGroup = element(by.css('password-input'));
-        var passwordInput = passwordGroup.element(by.css('input[type=password]'));
-        var submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
-
         var userFistName = firstName || this.userFirstName;
         var userLastName = lastName || this.userLastName;
         var userEmail = email || this.getRandomEmail();
@@ -173,14 +191,14 @@ var Helper = function () {
         this.get(this.urls.register);
         expect(firstNameInput.isPresent()).toBe(true);
 
-        firstNameInput.sendKeys(userFistName);
-        lastNameInput.sendKeys(userLastName);
-        emailInput.sendKeys(userEmail);
-        passwordInput.sendKeys(userPassword);
+        h.forms.register.firstNameInput.sendKeys(userFistName);
+        h.forms.register.lastNameInput.sendKeys(userLastName);
+        h.forms.register.emailInput.sendKeys(userEmail);
+        h.forms.register.passwordInput.sendKeys(userPassword);
 
-        submitButton.click();
-        expect(element(by.css('.process-success')).isDisplayed()).toBe(true);
-        expect(element(by.css('.process-success')).getText()).toContain(this.alert.alertMessages.registerSuccess);
+        h.forms.register.submitButton.click();
+        expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
+        expect(h.alert.successMessageElem.getText()).toContain(this.alert.alertMessages.registerSuccess);
     };
 
     this.getActivationLink = function(userEmail) {
@@ -206,42 +224,34 @@ var Helper = function () {
         var deferred = protractor.promise.defer();
 
         this.getActivationLink(userEmail).then( function(url) {
-            self.get(url);
-            expect(self.htmlBody.getText()).toContain(self.alert.alertMessages.registerConfirmSuccess);
+            h.get(url);
+            expect(h.htmlBody.getText()).toContain(h.alert.alertMessages.registerConfirmSuccess);
             deferred.fulfill(userEmail);
         });
         return deferred.promise;
     };
 
     this.changeAccountNames = function(firstName, lastName) {
-        var firstNameInput = element(by.model('account.first_name'));
-        var lastNameInput = element(by.model('account.last_name'));
-        var saveButton = element(by.css('[form=accountForm]')).element(by.buttonText('Save'));
+        h.get(h.urls.account);
+        h.forms.account.firstNameInput.clear().sendKeys(firstName);
+        h.forms.account.lastNameInput.clear().sendKeys(lastName);
+        h.forms.account.submitButton.click();
 
-        this.get('/#/account');
-        firstNameInput.clear().sendKeys(firstName);
-        lastNameInput.clear().sendKeys(lastName);
-        saveButton.click();
-
-        this.alert.catchAlert( this.alert.alertMessages.accountSuccess, this.alert.alertTypes.success);
+        h.alert.catchAlert( h.alert.alertMessages.accountSuccess, h.alert.alertTypes.success);
     };
 
     this.shareSystemWith = function(email, role, systemLink) {
         var sharedRole = role || 'admin';
         var systemLinkCode = systemLink || '/a74840da-f135-4522-abd9-5a8c6fb8591f';
-        var shareButton = element(by.partialButtonText('Share'));
-        var emailField = element(by.model('share.accountEmail'));
-        var roleField = element(by.model('share.accessRole'));
         var roleOption = roleField.element(by.css(sharedRole));
-        var submitShareButton = element(by.css('process-button')).element(by.buttonText('Share'));
 
         this.getSysPage(systemLinkCode);
 
-        shareButton.click();
-        emailField.sendKeys(email);
-        roleField.click();
+        h.forms.share.shareButton.click();
+        h.forms.share.emailField.sendKeys(email);
+        h.forms.share.roleField.click();
         roleOption.click();
-        submitShareButton.click();
+        h.forms.share.submitButton.click();
         expect(element(by.cssContainingText('td', email)).isPresent()).toBe(true);
     };
 
@@ -289,12 +299,12 @@ var Helper = function () {
     var RestorePassObject = require('./restore_pass/po.js');
     this.restorePassword = function(userEmail, newPassword) {
         this.restorePassObj = new RestorePassObject();
-        var password = newPassword || self.userPassword;
+        var password = newPassword || h.userPassword;
         browser.get('/#/restore_password/');
         browser.waitForAngular();
         this.restorePassObj.getRestorePassLink(userEmail).then(function(url) {
-            self.get(url);
-            self.restorePassObj.setNewPassword(password);
+            h.get(url);
+            h.restorePassObj.setNewPassword(password);
         });
     };
 
