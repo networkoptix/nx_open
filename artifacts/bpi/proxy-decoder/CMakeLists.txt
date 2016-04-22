@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.3)
+project(proxy_decoder)
+
+# ATTENTION: This cmake file is not intended for building but rather just for IDE convenience.
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+set(SOURCE_FILES
+    proxy_decoder.h
+    conf.h
+    conf.cpp
+    vdpau_helper.h
+    vdpau_helper.cpp
+    proxy_decoder_utils.h
+    proxy_decoder_utils.cpp
+    proxy_decoder_impl.cpp
+    proxy_decoder_stub.cpp
+)
+
+# Directory containing all necessary headers from the libraries used.
+include_directories(
+    ../../../bpi/src/include
+)
+
+add_executable(proxy_decoder ${SOURCE_FILES})
