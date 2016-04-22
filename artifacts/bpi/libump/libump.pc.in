@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libump
+Description: ARMs unified memory provider library
+Version: @PACKAGE_VERSION@
+Cflags: -I${includedir}/ump
+Libs: -L${libdir} -lUMP
