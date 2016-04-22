@@ -326,13 +326,39 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
+    /**
+     * Hover marker is drawn in PE_PanelItemViewRow.
+     * Selection marker is drawn over later in PE_PanelItemViewItem,
+     *  except selection marker in tree view branch area which is drawn in PE_PanelItemViewRow as well.
+     */
     case PE_PanelItemViewRow:
+        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+        {
+            /* Markers can be semi-transparent, so we draw all layers on top of each other. */
+
+            /* Draw alternate row background if requested: */
+            if (item->features.testFlag(QStyleOptionViewItem::Alternate))
+                painter->fillRect(item->rect, option->palette.alternateBase());
+
+            /* Draw hover marker if needed: */
+            if (item->state.testFlag(State_MouseOver))
+                painter->fillRect(item->rect, option->palette.midlight());
+
+            /* Draw selection marker if needed: */
+            if (item->state.testFlag(State_Selected))
+                painter->fillRect(item->rect, option->palette.highlight());
+
+            return;
+        }
+        break;
+
     case PE_PanelItemViewItem:
-        // TODO #vkutin When revamping table views figure out how to ensure correct item-over-row blending
+        //TODO #vkutin Complete refinement of this code when restyling table views
         if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
             bool selected = item->state.testFlag(State_Selected);
 
+            /* Handle here entire row hovering in table views: */
             int hoveredRow = -1;
             if (widget)
             {
@@ -341,7 +367,7 @@ void QnNxStyle::drawPrimitive(
                     hoveredRow = value.toInt();
             }
 
-            bool hovered = item->state.testFlag(State_MouseOver) || (item->index.row() == hoveredRow && hoveredRow >= 0);
+            bool hovered = item->index.row() == hoveredRow;
 
             QnPaletteColor fillColor;
             if (selected)
@@ -353,12 +379,6 @@ void QnNxStyle::drawPrimitive(
             else if (hovered)
             {
                 fillColor = findColor(option->palette.midlight().color()).darker(1);
-            }
-            else if (element == PE_PanelItemViewRow)
-            {
-                fillColor = item->features.testFlag(QStyleOptionViewItem::Alternate) ?
-                    findColor(option->palette.alternateBase().color()) :
-                    findColor(option->palette.base().color());
             }
 
             if (fillColor.isValid())
