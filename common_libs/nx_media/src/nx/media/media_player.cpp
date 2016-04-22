@@ -394,14 +394,20 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& fram
 qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
+    const qint64 ptsDelta = pts - ptsTimerBase;
     FrameMetadata metadata = FrameMetadata::deserialize(frame);
 
     // Calculate time to present next frame
     qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
-    const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
+    const auto elapsed = ptsTimer.elapsed();
+    const int frameDelayMs = ptsDelta - elapsed;
     bool liveBufferUnderflow =
         liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
     bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
+
+    // TODO: REMOVE
+    if (frameDelayMs < 0)
+        qWarning() << "pts: " << pts << ", ptsDelta: " << ptsDelta << ", frameDelayMs: " << frameDelayMs;
 
     if (liveMode)
     {

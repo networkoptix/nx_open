@@ -5,29 +5,33 @@
 
 QT_BEGIN_NAMESPACE
 
-
+/**
+ * This definition is needed because we inherit QAbstractVideoBufferPrivate class declared in a private Qt header.
+ */
 int QAbstractVideoBufferPrivate::map(
     QAbstractVideoBuffer::MapMode mode,
     int *numBytes,
     int bytesPerLine[4],
     uchar *data[4])
 {
+    Q_UNUSED(mode);
+    Q_UNUSED(numBytes);
+    Q_UNUSED(bytesPerLine);
+    Q_UNUSED(data);
     assert(false);
     return 0;
 }
 
 QT_END_NAMESPACE
 
-namespace nx
-{
-namespace media
-{
-
+namespace nx {
+namespace media {
 
 class AlignedMemVideoBufferPrivate: public QAbstractVideoBufferPrivate
 {
 public:
-    AlignedMemVideoBufferPrivate():
+    AlignedMemVideoBufferPrivate()
+    :
         QAbstractVideoBufferPrivate(),
         mapMode(QAbstractVideoBuffer::NotMapped),
         dataSize(0),
@@ -38,9 +42,7 @@ public:
         memset(bytesPerLine, 0, sizeof(bytesPerLine));
     }
 
-    virtual ~AlignedMemVideoBufferPrivate() {
-        int gg = 4;
-    }
+    virtual ~AlignedMemVideoBufferPrivate() = default; 
 
     virtual int map(
         QAbstractVideoBuffer::MapMode mode,
@@ -48,6 +50,8 @@ public:
         int bytesPerLine[4],
         uchar *data[4]) override
     {
+        Q_UNUSED(mode);
+
         for (int i = 0; i < 4; ++i)
         {
             data[i] = this->data[i];
@@ -65,7 +69,8 @@ public:
     bool ownBuffer;
 };
 
-AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine):
+AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine)
+:
     QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
 {
     Q_D(AlignedMemVideoBuffer);
@@ -77,6 +82,7 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int byte
 }
 
 AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount):
+:
     QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
 {
     Q_D(AlignedMemVideoBuffer);
@@ -115,9 +121,10 @@ uchar *AlignedMemVideoBuffer::map(MapMode mode, int *numBytes, int *bytesPerLine
         if (bytesPerLine)
             *bytesPerLine = d->bytesPerLine[0];
 
-        return reinterpret_cast<uchar *>(d->data);
+        return reinterpret_cast<uchar*>(d->data);
     }
-    else {
+    else
+    {
         return nullptr;
     }
 }
@@ -127,5 +134,5 @@ void AlignedMemVideoBuffer::unmap()
     d_func()->mapMode = NotMapped;
 }
 
-}
-}
+} // namespace media
+} // namespace nx
