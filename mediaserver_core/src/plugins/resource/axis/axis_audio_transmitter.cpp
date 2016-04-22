@@ -6,12 +6,13 @@
 namespace
 {
     const QString kAxisAudioTransmitUrl("/axis-cgi/audio/transmit.cgi");
-    const QSet<CodecID> kSupportedCodecs = {CodecID::CODEC_ID_PCM_MULAW};
 }
 
 QSet<CodecID> QnAxisAudioTransmitter::getSupportedAudioCodecs()
 {
-    return kSupportedCodecs;
+    QSet<CodecID> result;
+    result << CodecID::CODEC_ID_PCM_MULAW;
+    return result;
 }
 
 QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res, CodecID codecId) :
