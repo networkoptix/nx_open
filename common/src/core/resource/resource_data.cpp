@@ -1,5 +1,5 @@
 #include "resource_data.h"
-
+#include "param.h"
 #include <cassert>
 
 #include <core/ptz/ptz_mapper.h>
@@ -17,6 +17,7 @@ public:
         registerKey<Qn::PtzCapabilities>(lit("ptzCapabilities"));
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
+        registerKey<QList<QMap<QString, QString>>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
     }
 
 protected:

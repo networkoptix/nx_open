@@ -12,6 +12,8 @@
 
 extern QString getValueFromString(const QString& line);
 
+typedef QList<QMap<QString, QString>> DefaultCredentialsList;
+
 QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
@@ -58,13 +60,46 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
+    bool needRecheck =
+        authOriginal.user().isEmpty() &&
+        authOriginal.password().isEmpty();
+
+    if (!needRecheck)
+    {
+        return checkHostAddrInternal(url, authOriginal);
+    }
+    else
+    {
+        QList<QnResourcePtr> resList;
+        auto resData = qnCommon->dataPool()->data(manufacture(), lit("*"));
+        auto possibleCreds = resData.value<DefaultCredentialsList>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+        for (const auto& creds: possibleCreds)
+        {
+            if ( creds["user"].isEmpty() || creds["password"].isEmpty())
+                continue;
+
+            QAuthenticator auth;
+            auth.setUser(creds["user"]);
+            auth.setPassword(creds["password"]);
+
+            resList = checkHostAddrInternal(url, auth);
+            if (!resList.isEmpty())
+                break;
+        }
+
+        return resList;
+    }
+
+}
+
+
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
+    const QUrl &url,
+    const QAuthenticator &authOriginal)
+{
+
     QAuthenticator auth( authOriginal );
-
-    if( auth.user().isEmpty() )
-        auth.setUser( DEFAULT_ISD_USERNAME );
-    if( auth.password().isEmpty() )
-        auth.setPassword( DEFAULT_ISD_PASSWORD );
-
 
     QString host = url.host();
     int port = url.port( nx_http::DEFAULT_HTTP_PORT );
@@ -78,6 +113,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
     CLHttpStatus status;
     QByteArray data = downloadFile(status, QLatin1String("/api/param.cgi?req=General.Brand.CompanyName&req=General.Brand.ModelName"), host, port, timeout, auth);
+
     for (const QByteArray& line: data.split(L'\n'))
     {
         if (line.startsWith("General.Brand.ModelName")) {
@@ -92,7 +128,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
             vendor = getValueFromString(QString::fromUtf8(line)).trimmed();
         }
     }
-    
+
     // 'Digital Watchdog' (with space) is actually ISD cameras. Without space it's old DW cameras
     if (name.isEmpty() || (vendor != lit("Innovative Security Designs") && vendor != lit("Digital Watchdog")))
         return QList<QnResourcePtr>();
@@ -317,6 +353,11 @@ void QnPlISDResourceSearcher::createResource(
     }
 
     result << resource;
+}\
+
+bool QnPlISDResourceSearcher::testCredentials(const QUrl &url, const QAuthenticator &auth)
+{
+    return false;
 }
 
 #endif // #ifdef ENABLE_ISD

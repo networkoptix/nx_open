@@ -7,6 +7,7 @@ namespace Qn
 {
     //dynamic parameters of resource
 
+    static const QString POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME = lit("possibleDefaultCredentials");
     static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
     static const QString DTS_PARAM_NAME = lit("dts");
     static const QString ANALOG_PARAM_NAME = lit("analog");
@@ -44,7 +45,7 @@ namespace Qn
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
-    static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
+    static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");    
 
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");

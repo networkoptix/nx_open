@@ -19,6 +19,21 @@
     "data": [
         {
             "keys": [
+                "ISD|*","DW|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "root",
+                    "password": "admin"
+                },
+                {
+                    "user": "admin",
+                    "password": "admin"
+                }
+            ]
+        },
+        {
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
