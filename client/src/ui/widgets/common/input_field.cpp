@@ -3,8 +3,6 @@
 #include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
 
-QLatin1String QnInputField::className("QnInputField");
-
 class QnInputFieldPrivate : public QObject
 {
 public:
@@ -16,7 +14,20 @@ public:
         input(new QLineEdit(parent)),
         validator()
     {
+        input->installEventFilter(this);
+    }
 
+    virtual bool eventFilter(QObject* watched, QEvent* event)
+    {
+        /* On focus make input look usual even if there is error. Hint will be visible though. */
+        if (event->type() == QEvent::FocusIn && watched == input)
+        {
+            validate();
+            input->setPalette(parent->palette());
+        }
+
+        /* Always pass event further */
+        return false;
     }
 
     void validate()
@@ -85,6 +96,8 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     d->hint->setVisible(false);
 
     connect(d->input, &QLineEdit::textChanged, this, &QnInputField::textChanged);
+
+
 }
 
 QnInputField::~QnInputField()

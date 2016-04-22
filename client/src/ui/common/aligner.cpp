@@ -46,23 +46,20 @@ QnAligner::~QnAligner()
 void QnAligner::addWidget(QWidget* widget)
 {
     m_widgets << widget;
+    align();
 }
 
 void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
 {
     for (QWidget* w : widgets)
         m_widgets << w;
+    align();
 }
 
 void QnAligner::registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor)
 {
     NX_ASSERT(!m_accessorByClassName.contains(className));
     m_accessorByClassName[className] = accessor;
-}
-
-void QnAligner::start()
-{
-    align();
 }
 
 void QnAligner::align()

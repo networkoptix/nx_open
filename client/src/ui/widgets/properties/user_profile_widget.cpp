@@ -1,9 +1,9 @@
 #include "user_profile_widget.h"
 #include "ui_user_profile_widget.h"
 
-#include <tuple>
-
 #include <api/app_server_connection.h>
+
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
@@ -19,6 +19,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/email/email.h>
+#include <utils/common/url.h>
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
     base_type(parent),
@@ -44,6 +45,9 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
     ui->newPasswordInputField->setValidator([](const QString& text)
     {
+        if (text.trimmed() != text)
+            return QnInputField::ValidateResult(false, tr("Avoid leading and trailing spaces."));
+
         return QnInputField::ValidateResult(true, QString());
     });
 
@@ -90,9 +94,6 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         ui->confirmPasswordInputField,
         ui->currentPasswordInputField
     });
-    aligner->start();
-
-    //setWarningStyle(ui->hintLabel);
 }
 
 QnUserProfileWidget::~QnUserProfileWidget()
@@ -143,39 +144,37 @@ void QnUserProfileWidget::applyChanges()
 
     //empty text means 'no change'
     const QString newPassword = ui->newPasswordInputField->text().trimmed();
-    if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
+    if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty())
     {
         m_model->user()->setPassword(newPassword);
         m_model->user()->generateHash();
+        m_model->user()->setPassword(QString());
         if (m_model->mode() == QnUserSettingsModel::OwnProfile)
         {
             /* Password was changed. Change it in global settings and hope for the best. */
             QUrl url = QnAppServerConnectionFactory::url();
             url.setPassword(newPassword);
-            //// TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-            //context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
-            //QnConnectionDataList savedConnections = qnSettings->customConnections();
-            //if (!savedConnections.isEmpty()
-            //    && !savedConnections.first().url.password().isEmpty()
-            //    && qnUrlEqual(savedConnections.first().url, url))
-            //{
-            //    QnConnectionData current = savedConnections.takeFirst();
-            //    current.url = url;
-            //    savedConnections.prepend(current);
-            //    qnSettings->setCustomConnections(savedConnections);
-            //}
+            QnConnectionDataList savedConnections = qnSettings->customConnections();
+            if (!savedConnections.isEmpty()
+                && !savedConnections.first().url.password().isEmpty()
+                && qnUrlEqual(savedConnections.first().url, url))
+            {
+                QnConnectionData current = savedConnections.takeFirst();
+                current.url = url;
+                savedConnections.prepend(current);
+                qnSettings->setCustomConnections(savedConnections);
+            }
 
-            //QnConnectionData lastUsed = qnSettings->lastUsedConnection();
-            //if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
-            //    lastUsed.url = url;
-            //    qnSettings->setLastUsedConnection(lastUsed);
-            //}
+            QnConnectionData lastUsed = qnSettings->lastUsedConnection();
+            if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))
+            {
+                lastUsed.url = url;
+                qnSettings->setLastUsedConnection(lastUsed);
+            }
 
         }
-
-        m_model->user()->setPassword(QString());
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))

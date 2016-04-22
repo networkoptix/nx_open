@@ -28,11 +28,9 @@ public:
         registerTypeAccessor(QLatin1String(T::staticMetaObject.className()), accessor);
     }
 
-    void start();
-
-private:
     void align();
 
+private:
     AbstractAccessor* accessor(QWidget* widget) const;
 
 private:
