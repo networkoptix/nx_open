@@ -6,30 +6,6 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "transaction_descriptor.h"
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_camera_attributes_data.h"
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_tran_state_data.h"
-#include "nx_ec/data/api_layout_data.h"
-#include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_camera_history_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
-#include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_update_data.h"
-#include "nx_ec/data/api_discovery_data.h"
-#include "nx_ec/data/api_routing_data.h"
-#include "nx_ec/data/api_system_name_data.h"
-#include "nx_ec/data/api_runtime_data.h"
-#include "nx_ec/data/api_license_overflow_data.h"
-#include "nx_ec/data/api_peer_system_time_data.h"
-#include "nx_ec/data/api_webpage_data.h"
-#include "utils/db/db_helper.h"
-#include "binary_transaction_serializer.h"
-#include "ubjson_transaction_serializer.h"
 
 namespace ec2
 {
