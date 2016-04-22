@@ -17,7 +17,7 @@ WIN_PATH="${libdir}/${arch}/bin/${build.configuration}"
 
 from os import _pathsep
 
-def _add_path(env, var, path)
+def _add_path(env, var, path):
     if env.get(var,'') not in ('', None):
         env[var] += _pathsep + path
     else:
