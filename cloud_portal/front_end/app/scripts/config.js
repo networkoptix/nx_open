@@ -1,6 +1,7 @@
 'use strict';
 
 var Config = {
+    googleAnalyticsCode: 'UA-71145034-2',
     apiBase: '/api',
     clientProtocol: 'nx-vms://',
     cacheTimeout: 30*1000, // Cache lives for 30 seconds
