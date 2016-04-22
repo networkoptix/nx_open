@@ -74,10 +74,6 @@ angular.module('cloudApp')
             errorPrefix:'Couldn\'t activate your account:'
         }).then(function(){
             $location.path("/activate/success", false); // Change url, do not reload
-
-            if($scope.session.fromClient){
-                urlProtocol.open();
-            }
         });
 
 

@@ -33,6 +33,6 @@ angular.module('cloudApp')
                 //window.open(url);
             },
             getSource: parseSource,
-            source:parseSource()
+            source: parseSource()
         }
     }]);
