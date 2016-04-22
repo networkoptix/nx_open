@@ -15,8 +15,7 @@ QnAudioStreamerPool::QnAudioStreamerPool()
 
 QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& clientId) const
 {
-    auto sourceCamResources = qnResPool->getResourcesWithTypeId(
-        qnResTypePool->desktopCameraResourceType()->getId());
+    auto sourceCamResources = qnResPool->getResourcesWithFlag(Qn::desktop_camera);
 
     QnVideoCameraPtr sourceCam;
     for (const auto& res: sourceCamResources)
@@ -33,18 +32,13 @@ QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& clientId)
 
 QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QString& resourceId) const
 {
-    auto res = qnResPool->getResourceById(QnUuid::fromStringSafe(resourceId));
-    if (!res)
-    {
-        return QnSecurityCamResourcePtr(0);
-    }
+    auto resource = qnResPool->getResourceById<QnSecurityCamResource>(QnUuid::fromStringSafe(resourceId));
 
-    auto resource = res.dynamicCast<QnSecurityCamResource>();
+    if (!resource)
+        return QnSecurityCamResourcePtr(0);
 
     if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-    {
         return QnSecurityCamResourcePtr(0);
-    }
 
     return resource;
 }

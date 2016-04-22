@@ -1043,7 +1043,7 @@ bool QnSecurityCamResource::isIOModule() const
 }
 
 
-AudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
+QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 {
     return nullptr;
 }

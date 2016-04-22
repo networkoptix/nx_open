@@ -1373,7 +1373,7 @@ QSet<CodecID> QnPlAxisResource::getSupportedAudioCodecs() const
     return m_supportedAudioCodecs;
 }
 
-AudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
+QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
 {
     QnMutexLocker lk(&m_audioTransmitterMutex);
 

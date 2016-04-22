@@ -21,7 +21,7 @@
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
-typedef std::shared_ptr<QnAbstractAudioTransmitter> AudioTransmitterPtr;
+typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
@@ -261,7 +261,7 @@ public:
     bool isCameraInfoSavedToDisk(int pool) const;
     void setCameraInfoSavedToDisk(int pool);
 
-    virtual AudioTransmitterPtr getAudioTransmitter();
+    virtual QnAudioTransmitterPtr getAudioTransmitter();
 
 public slots:
     virtual void inputPortListenerAttached();

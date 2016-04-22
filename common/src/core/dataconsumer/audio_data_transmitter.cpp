@@ -13,10 +13,8 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data
     QnConstAbstractDataPacketPtr constData(data);
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(constData);
 
-    if(media->dataType == QnAbstractMediaData::AUDIO)
-    {
+    if (media->dataType == QnAbstractMediaData::AUDIO)
         return processAudioData(media);
-    }
 
     return true;
 }
