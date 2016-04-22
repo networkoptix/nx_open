@@ -15,7 +15,7 @@ LIB_PATH="${libdir}/lib/${build.configuration}"
 BIN_PATH="${libdir}/bin/${build.configuration}"
 WIN_PATH="${libdir}/${arch}/bin/${build.configuration}"
 
-from os import _pathsep
+from os import pathsep as _pathsep
 
 def _add_path(env, var, path):
     if env.get(var,'') not in ('', None):
@@ -28,10 +28,10 @@ def add_lib_path(env):
     if target.startswith('windows'):
          _add_path(Env, 'PATH', QT_LIB)
     else:
-        libs = _pathsep.join((LIB_PATH, QT_LIB)
+        libs = _pathsep.join((LIB_PATH, QT_LIB))
         if target.startswith('macosx'):
-            _add_path(Env, 'DYLD_LIBRARY_PATH', libs)
-            _add_path(Env, 'DYLD_FRAMEWORK_PATH', libs)
+            _add_path(env, 'DYLD_LIBRARY_PATH', libs)
+            _add_path(env, 'DYLD_FRAMEWORK_PATH', libs)
         else:
-            _add_path(Env, 'LD_LIBRARY_PATH', libs)
+            _add_path(env, 'LD_LIBRARY_PATH', libs)
 
