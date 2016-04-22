@@ -882,6 +882,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
         GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
 
+        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
+
         /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
         DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */

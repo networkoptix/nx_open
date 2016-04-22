@@ -1,15 +1,23 @@
 #include "user_settings_model.h"
 
-#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/user_resource.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+namespace
+{
+    const QString kHtmlTableTemplate(lit("<table>%1</table>"));
+    const QString kHtmlTableRowTemplate(lit("<tr>%1</tr>"));
+
+
+}
+
 QnUserSettingsModel::QnUserSettingsModel(QObject* parent /*= nullptr*/) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    QnAbstractPermissionsDelegate(),
     m_mode(Invalid),
     m_user()
 {
@@ -88,4 +96,99 @@ void QnUserSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
         return;
 
     qnResourceAccessManager->setAccessibleResources(m_user->getId(), value);
+}
+
+QString QnUserSettingsModel::groupName() const
+{
+    if (!m_user)
+        return QString();
+
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
+
+    if (permissions == Qn::GlobalOwnerPermissionsSet)
+        return tr("Owner");
+
+    if (permissions == Qn::GlobalAdminPermissionsSet)
+        return tr("Administrator");
+
+    for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+        if (group.id == m_user->userGroup())
+            return group.name;
+
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Advanced Viewer");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Viewer");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Live Viewer");
+
+    return tr("Custom Permissions");
+}
+
+QString QnUserSettingsModel::groupDescription() const
+{
+    if (!m_user)
+        return QString();
+
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
+
+    if (permissions == Qn::GlobalOwnerPermissionsSet)
+        return tr("Has access to whole system and can do everything.");
+
+    if (permissions == Qn::GlobalAdminPermissionsSet)
+        return tr("Has access to whole system and can manage it. Can create users.");
+
+    for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
+        if (group.id == m_user->userGroup())
+            return getCustomPermissionsDescription(group.id, group.permissions);
+
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Can manage all cameras and bookmarks.");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Can view all cameras and export video.");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Can view live video from all cameras.");
+
+    return getCustomPermissionsDescription(m_user->getId(), m_user->getRawPermissions());
+}
+
+QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const
+{
+    const bool hasAccessToSystem = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+
+    QStringList tableRows;
+
+    auto allResources = qnResPool->getResources();
+    auto accessibleResources = qnResourceAccessManager->accessibleResources(id);
+
+    std::map<Filter, QString> nameByFilter{
+        {CamerasFilter, tr("Cameras")},
+        {LayoutsFilter, tr("Layouts")},
+        {ServersFilter, tr("Servers")},
+    };
+
+    for (auto filter : allFilters())
+    {
+        auto flag = accessPermission(filter);
+        if (permissions.testFlag(flag))
+        {
+            tableRows << accessPermissionText(filter);
+        }
+        else
+        {
+            auto allFiltered = filteredResources(filter, allResources);
+            auto accessibleFiltered = filteredResources(filter, accessibleResources);
+
+            QString row = hasAccessToSystem
+                ? lit("<td><b>%1</b> / %2</td><td></td><td>%3</td>").arg(accessibleFiltered.size()).arg(allFiltered.size()).arg(nameByFilter[filter])
+                : lit("<td><b>%1</b></td><td></td><td>%2</td>").arg(accessibleFiltered.size()).arg(nameByFilter[filter]);
+            tableRows << kHtmlTableRowTemplate.arg(row);
+        }
+    }
+
+    return kHtmlTableTemplate.arg(tableRows.join(QString()));
 }

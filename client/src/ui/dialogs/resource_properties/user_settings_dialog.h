@@ -8,7 +8,7 @@ class QnUserProfileWidget;
 class QnUserSettingsWidget;
 class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
-class QnAbstractPermissionsDelegate;
+class QnAbstractPermissionsModel;
 class QnUserSettingsModel;
 
 namespace Ui
@@ -45,6 +45,7 @@ protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
 
+    virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 
 private:

@@ -124,7 +124,8 @@ void QnUserProfileWidget::loadDataToUi()
     updateControlsAccess();
 
     ui->loginLineEdit->setText(m_model->user()->getName());
-    ui->groupLineEdit->setText(getUserGroup());
+    ui->groupLineEdit->setText(m_model->groupName());
+    ui->permissionsLabel->setText(m_model->groupDescription());
 
     ui->emailInputField->setText(m_model->user()->getEmail());
     ui->newPasswordInputField->clear();
@@ -204,32 +205,6 @@ void QnUserProfileWidget::updateControlsAccess()
         field->setVisible(canChangePassword);
 
     ::setReadOnly(ui->emailInputField, !permissions.testFlag(Qn::WriteEmailPermission));
-}
-
-QString QnUserProfileWidget::getUserGroup() const
-{
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
-
-    if (permissions == Qn::GlobalOwnerPermissionsSet)
-        return tr("Owner");
-
-    if (permissions == Qn::GlobalAdminPermissionsSet)
-        return tr("Administrator");
-
-    for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
-        if (group.id == m_model->user()->userGroup())
-            return group.name;
-
-    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
-        return tr("Advanced Viewer");
-
-    if (permissions == Qn::GlobalViewerPermissionSet)
-        return tr("Viewer");
-
-    if (permissions == Qn::GlobalLiveViewerPermissionSet)
-        return tr("Live Viewer");
-
-    return tr("Custom Permissions");
 }
 
 bool QnUserProfileWidget::validMode() const
