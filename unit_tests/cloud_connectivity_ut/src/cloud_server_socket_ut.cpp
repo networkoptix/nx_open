@@ -30,8 +30,8 @@ public:
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
-        NX_ASSERT(m_server->setNonBlockingMode(true));
-        NX_ASSERT(m_server->setReuseAddrFlag(true));
+        NX_CRITICAL(m_server->setNonBlockingMode(true));
+        NX_CRITICAL(m_server->setReuseAddrFlag(true));
         if (!m_server->bind(address) || !m_server->listen())
             m_sockets = 0;
 

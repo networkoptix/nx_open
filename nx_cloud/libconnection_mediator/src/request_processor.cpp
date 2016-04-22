@@ -18,6 +18,7 @@ RequestProcessor::~RequestProcessor()
 }
 
 api::ResultCode RequestProcessor::getMediaserverData(
+    const ConnectionStrongRef& connection,
     stun::Message& request,
     MediaserverData* const foundData,
     nx::String* errorMessage)
@@ -61,8 +62,9 @@ api::ResultCode RequestProcessor::getMediaserverData(
 
     if (!request.verifyIntegrity(data.systemId, system->authKey))
     {
-        NX_LOGX( lm( "Ignore request from %1 with wrong message integrity" )
-                 .arg( data.systemId ), cl_logWARNING );
+        NX_LOGX( lm( "Ignoring request (method %1) from %2 with wrong message integrity. Found credentials: %3:%4" )
+                 .arg(request.header.method).arg(connection->getSourceAddress().toString()).arg(data.systemId).arg(system->authKey),
+                 cl_logDEBUG1 );
         *errorMessage = "Wrong message integrity";
         return api::ResultCode::notAuthorized;
     }

@@ -26,9 +26,8 @@ public:
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
-private:
-    Qn::GlobalPermissions calculatePermissions() const;
 
+    Qn::GlobalPermissions rawPermissions() const;
 private:
     QScopedPointer<Ui::PermissionsWidget> ui;
 

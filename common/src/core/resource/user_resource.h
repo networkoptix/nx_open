@@ -36,8 +36,8 @@ public:
 
     // Do not use this method directly.
     // Use qnResourceAccessManager::globalPermissions(user) instead
-    Qn::GlobalPermissions getPermissions() const;
-    void setPermissions(Qn::GlobalPermissions permissions);
+    Qn::GlobalPermissions getRawPermissions() const;
+    void setRawPermissions(Qn::GlobalPermissions permissions);
 
     bool isOwner() const;
     void setOwner(bool isOwner);

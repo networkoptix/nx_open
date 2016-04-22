@@ -99,17 +99,22 @@ protected:
     virtual void applyChanges();
 
     /**
+    * @brief discardChanges                     Discard unsaved changes. Called on force close only.
+    */
+    virtual void discardChanges();
+
+    /**
      * @brief canApplyChanges                   Check that all values are correct so saving is possible.
      * @return                                  False if saving must be aborted, true otherwise.
      */
-    virtual bool canApplyChanges();
+    virtual bool canApplyChanges() const;
 
     /**
      * @brief canDiscardChanges                 Check that all changes can be discarded safely.
      *                                          Usually is called before dialog is closed by "Cancel" button.
      * @return                                  False if closing must be aborted, true otherwise.
      */
-    virtual bool canDiscardChanges();
+    virtual bool canDiscardChanges() const;
 
     /**
      * @brief hasChanges                        Check if there are any unsaved changes in the dialog.

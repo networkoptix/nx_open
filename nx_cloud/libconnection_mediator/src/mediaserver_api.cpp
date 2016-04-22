@@ -46,7 +46,7 @@ void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
     MediaserverData mediaserverData;
     nx::String errorMessage;
     const api::ResultCode resultCode =
-        getMediaserverData(message, &mediaserverData, &errorMessage);
+        getMediaserverData(connection, message, &mediaserverData, &errorMessage);
     if (resultCode != api::ResultCode::ok)
     {
         sendErrorResponse(

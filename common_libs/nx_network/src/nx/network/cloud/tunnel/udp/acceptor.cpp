@@ -3,7 +3,7 @@
 
 #include <utils/serialization/lexical.h>
 
-#include "incoming_tunnel_udt_connection.h"
+#include "incoming_tunnel_connection.h"
 
 
 namespace nx {
@@ -149,7 +149,7 @@ void TunnelAcceptor::initiateUdtConnection()
 
             executeAcceptHandler(
                 SystemError::noError,
-                std::make_unique<IncomingTunnelUdtConnection>(
+                std::make_unique<IncomingTunnelConnection>(
                     m_connectionId,
                     std::move(socket),
                     m_connectionParameters));

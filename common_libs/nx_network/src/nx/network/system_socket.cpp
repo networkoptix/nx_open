@@ -1635,5 +1635,10 @@ int UDPSocket::recvFrom(
     return rtn;
 }
 
+template class Socket<AbstractStreamServerSocket>;
+template class Socket<AbstractStreamSocket>;
+template class CommunicatingSocket<AbstractStreamSocket>;
+template class CommunicatingSocket<AbstractDatagramSocket>;
+
 }   //network
 }   //nx

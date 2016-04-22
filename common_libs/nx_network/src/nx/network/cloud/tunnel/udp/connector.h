@@ -34,7 +34,8 @@ class RendezvousConnector;
  */
 class NX_NETWORK_API TunnelConnector
 :
-    public AbstractTunnelConnector
+    public AbstractTunnelConnector,
+    public stun::UnreliableMessagePipelineEventHandler
 {
 public:
     /**
@@ -63,6 +64,12 @@ public:
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
+protected:
+    virtual void messageReceived(
+        SocketAddress sourceAddress,
+        stun::Message msg) override;
+    virtual void ioFailure(SystemError::ErrorCode errorCode) override;
+
 private:
     const AddressEntry m_targetHostAddress;
     const nx::String m_connectSessionId;
@@ -76,6 +83,7 @@ private:
     bool m_done;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
     std::deque<std::unique_ptr<RendezvousConnector>> m_rendezvousConnectors;
+    std::unique_ptr<stun::UnreliableMessagePipeline> m_connectResultReportSender;
 
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,
@@ -89,8 +97,7 @@ private:
     void holePunchingDone(
         nx::hpm::api::UdpHolePunchingResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
-    void connectSessionReportSent(
-        SystemError::ErrorCode /*errorCode*/);
+    void connectSessionReportSent(SystemError::ErrorCode errorCode);
 };
 
 } // namespace udp

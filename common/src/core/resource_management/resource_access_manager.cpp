@@ -101,7 +101,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
     /* Handle just-created user situation. */
     if (user->flags().testFlag(Qn::local))
-        return user->getPermissions();
+        return user->getRawPermissions();
 
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
@@ -111,7 +111,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     if (iter != m_globalPermissionsCache.cend())
         return *iter;
 
-    Qn::GlobalPermissions result = user->getPermissions();
+    Qn::GlobalPermissions result = user->getRawPermissions();
 
     if (user->isOwner() || result.testFlag(Qn::GlobalOwnerPermission))
         result |= Qn::GlobalOwnerPermissionsSet;
@@ -168,6 +168,9 @@ Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions
         result &= ~Qn::DeprecatedViewExportArchivePermission;
         result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
     }
+
+    if (result.testFlag(Qn::DeprecatedGlobalEditUsersPermission))
+        result &= ~Qn::DeprecatedGlobalEditUsersPermission;
 
     return result;
 }

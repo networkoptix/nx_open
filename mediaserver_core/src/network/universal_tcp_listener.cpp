@@ -42,7 +42,7 @@ QnUniversalTcpListener::QnUniversalTcpListener(
     Qn::directConnect(
         &cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this,
-        [this, &cloudConnectionManager](bool /*bindedToCloud*/)
+        [this, &cloudConnectionManager](bool /*boundToCloud*/)
         {
             onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
         });

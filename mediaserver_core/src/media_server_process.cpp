@@ -52,7 +52,9 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <events/mserver_business_rule_processor.h>
 
@@ -212,6 +214,7 @@
 #include "server/host_system_password_synchronizer.h"
 
 #include "core/resource_management/resource_properties.h"
+#include "core/resource/network_resource.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include <nx/network/nettools.h>
