@@ -1,52 +1,95 @@
 #include "user_profile_widget.h"
 #include "ui_user_profile_widget.h"
 
+#include <tuple>
+
 #include <api/app_server_connection.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/common/read_only.h>
+#include <ui/common/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/models/user_settings_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/email/email.h>
 
-namespace
-{
-    const int kUserGroupIdRole = Qt::UserRole + 1;
-    const int kPermissionsRole = Qt::UserRole + 2;
-}
-
-QnUserProfileWidget::QnUserProfileWidget(QWidget* parent /*= 0*/):
+QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserProfileWidget()),
-    m_mode(Mode::Invalid),
-    m_user()
+    m_model(model)
 {
     ui->setupUi(this);
 
-    setHelpTopic(ui->groupLabel, ui->groupComboBox, Qn::UserSettings_UserRoles_Help);
-//    setHelpTopic(ui->accessRightsGroupbox, Qn::UserSettings_UserRoles_Help);
-    setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
-    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::updateLogin);
-    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->currentPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::updatePassword);
-    connect(ui->currentPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserProfileWidget::updatePassword);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::updatePassword);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::updateEmail);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserProfileWidget::hasChangesChanged);
+
+
+    ::setReadOnly(ui->loginLineEdit, true);
+    ::setReadOnly(ui->groupLineEdit, true);
+
+    ui->emailInputField->setTitle(tr("Email"));
+    ui->emailInputField->setValidator([](const QString& text)
+    {
+        if (!text.trimmed().isEmpty() && !QnEmailAddress::isValid(text))
+            return QnInputField::ValidateResult(false, tr("Invalid email address."));
+
+        return QnInputField::ValidateResult(true, QString());
+    });
+
+    ui->newPasswordInputField->setTitle(tr("New Password"));
+    ui->newPasswordInputField->setEchoMode(QLineEdit::Password);
+    ui->newPasswordInputField->setValidator([](const QString& text)
+    {
+        return QnInputField::ValidateResult(true, QString());
+    });
+
+    ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
+    ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
+    ui->confirmPasswordInputField->setValidator([this](const QString& text)
+    {
+        if (ui->newPasswordInputField->text().isEmpty())
+            return QnInputField::ValidateResult(true, QString());
+
+        if (ui->newPasswordInputField->text() != text)
+            return QnInputField::ValidateResult(false, tr("Passwords do not match."));
+
+        return QnInputField::ValidateResult(true, QString());
+    });
+
+    ui->currentPasswordInputField->setTitle(tr("Current Password"));
+    ui->currentPasswordInputField->setEchoMode(QLineEdit::Password);
+    ui->currentPasswordInputField->setValidator([this](const QString& text)
+    {
+        if (ui->newPasswordInputField->text().isEmpty())
+            return QnInputField::ValidateResult(true, QString());
+
+        if (text.isEmpty())
+            return QnInputField::ValidateResult(false, tr("To modify your password, please enter existing one."));
+
+        if (!m_model->user()->checkPassword(text))
+            return QnInputField::ValidateResult(false, tr("Invalid current password."));
+
+        return QnInputField::ValidateResult(true, QString());
+    });
+
+    for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField, ui->emailInputField })
+        connect(field, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->addWidget(ui->loginLabel);
+    aligner->addWidget(ui->groupLabel);
+    aligner->addWidget(ui->emailInputField->titleLabel());
+    aligner->addWidget(ui->newPasswordInputField->titleLabel());
+    aligner->addWidget(ui->confirmPasswordInputField->titleLabel());
+    aligner->addWidget(ui->currentPasswordInputField->titleLabel());
+    aligner->start();
 
     //setWarningStyle(ui->hintLabel);
 }
@@ -54,67 +97,18 @@ QnUserProfileWidget::QnUserProfileWidget(QWidget* parent /*= 0*/):
 QnUserProfileWidget::~QnUserProfileWidget()
 {}
 
-QnUserResourcePtr QnUserProfileWidget::user() const
-{
-    return m_user;
-}
-
-void QnUserProfileWidget::setUser(const QnUserResourcePtr &user)
-{
-    if (m_user == user)
-        return;
-
-    m_user = user;
-
-    m_mode = !m_user
-        ? Mode::Invalid
-        : m_user->flags().testFlag(Qn::local)
-        ? Mode::NewUser
-        : m_user == context()->user()
-        ? Mode::OwnUser
-        : Mode::OtherUser;
-}
-
 bool QnUserProfileWidget::hasChanges() const
 {
-    if (!m_user)
+    if (!validMode())
         return false;
 
-    if (m_mode == Mode::NewUser)
+    Qn::Permissions permissions = accessController()->permissions(m_model->user());
+
+    if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->newPasswordInputField->text().isEmpty()) //TODO: #GDM #access implement correct check
         return true;
-
-    Qn::Permissions permissions = accessController()->permissions(m_user);
-
-    if (permissions.testFlag(Qn::WriteNamePermission))
-        if (m_user->getName() != ui->loginEdit->text().trimmed())
-            return true;
-
-    if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->passwordEdit->text().isEmpty()) //TODO: #GDM #access implement correct check
-        return true;
-
-    if (permissions.testFlag(Qn::WriteAccessRightsPermission))
-    {
-        if (m_user->isEnabled() != ui->enabledButton->isChecked())
-            return true;
-
-        QnUuid groupId = selectedUserGroup();
-        if (!groupId.isNull())
-        {
-            if (m_user->userGroup() != groupId)
-                return true;
-        }
-        else
-        {
-            /* Check if we have selected a predefined internal group. */
-            Qn::GlobalPermissions permissions = selectedPermissions();
-            if (permissions != Qn::NoGlobalPermissions
-                && permissions != m_user->getPermissions())
-                return true;
-        }
-    }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        if (m_user->getEmail() != ui->emailEdit->text())
+        if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
 
     return false;
@@ -122,69 +116,37 @@ bool QnUserProfileWidget::hasChanges() const
 
 void QnUserProfileWidget::loadDataToUi()
 {
-    updateAccessRightsPresets();
-    updateControlsAccess();
-
-    if (!m_user)
+    if (!validMode())
         return;
 
-    ui->loginEdit->setText(m_user->getName());
-    ui->emailEdit->setText(m_user->getEmail());
-    ui->passwordEdit->clear();
-    ui->confirmPasswordEdit->clear();
-    ui->currentPasswordEdit->clear();
-    ui->enabledButton->setChecked(m_user->isEnabled());
+    updateControlsAccess();
 
-    /* If there is only one entry in permissions combobox, this check doesn't matter. */
-    int customPermissionsIndex = ui->groupComboBox->count() - 1;
-    NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->groupComboBox->itemData(customPermissionsIndex, kPermissionsRole).value<Qn::GlobalPermissions>() == Qn::NoGlobalPermissions);
-    NX_ASSERT(customPermissionsIndex == 0 ||
-        ui->groupComboBox->itemData(customPermissionsIndex, kUserGroupIdRole).value<QnUuid>().isNull());
+    ui->loginLineEdit->setText(m_model->user()->getName());
+    ui->groupLineEdit->setText(getUserGroup());
 
-    int permissionsIndex = customPermissionsIndex;
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
-
-    if (!m_user->userGroup().isNull())
-    {
-        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(m_user->userGroup()), kUserGroupIdRole, Qt::MatchExactly);
-    }
-    else if (permissions != Qn::NoGlobalPermissions)
-    {
-        permissionsIndex = ui->groupComboBox->findData(qVariantFromValue(permissions), kPermissionsRole, Qt::MatchExactly);
-    }
-
-
-    if (permissionsIndex < 0)
-        permissionsIndex = customPermissionsIndex;
-    ui->groupComboBox->setCurrentIndex(permissionsIndex);
-
-
-    updateLogin();
-    updatePassword();
-    updateEmail();
+    ui->emailInputField->setText(m_model->user()->getEmail());
+    ui->newPasswordInputField->clear();
+    ui->confirmPasswordInputField->clear();
+    ui->currentPasswordInputField->clear();
 }
 
 void QnUserProfileWidget::applyChanges()
 {
-    if (!m_user)
+    if (!validMode())
         return;
 
     if (isReadOnly())
         return;
 
-    Qn::Permissions permissions = accessController()->permissions(m_user);
-
-    if (permissions.testFlag(Qn::WriteNamePermission))
-        m_user->setName(ui->loginEdit->text().trimmed());
+    Qn::Permissions permissions = accessController()->permissions(m_model->user());
 
     //empty text means 'no change'
-    const QString newPassword = ui->passwordEdit->text().trimmed();
+    const QString newPassword = ui->newPasswordInputField->text().trimmed();
     if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
     {
-        m_user->setPassword(newPassword);
-        m_user->generateHash();
-        if (m_mode == Mode::OwnUser)
+        m_model->user()->setPassword(newPassword);
+        m_model->user()->generateHash();
+        if (m_model->mode() == QnUserSettingsModel::OwnProfile)
         {
             /* Password was changed. Change it in global settings and hope for the best. */
             QUrl url = QnAppServerConnectionFactory::url();
@@ -212,219 +174,66 @@ void QnUserProfileWidget::applyChanges()
 
         }
 
-        m_user->setPassword(QString());
-    }
-
-    if (permissions.testFlag(Qn::WriteAccessRightsPermission))
-    {
-        QnUuid groupId = selectedUserGroup();
-        if (!groupId.isNull())
-        {
-            m_user->setUserGroup(groupId);
-        }
-        else
-        {
-            Qn::GlobalPermissions permissions = selectedPermissions();
-            if (permissions != Qn::NoGlobalPermissions)
-                m_user->setPermissions(permissions);
-            /* Otherwise permissions must be loaded from custom tabs. */
-        }
-
+        m_model->user()->setPassword(QString());
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        m_user->setEmail(ui->emailEdit->text());
-
-    if (permissions.testFlag(Qn::WriteAccessRightsPermission))
-        m_user->setEnabled(ui->enabledButton->isChecked());
+        m_model->user()->setEmail(ui->emailInputField->text());
 }
 
-bool QnUserProfileWidget::isCustomAccessRights() const
+bool QnUserProfileWidget::canApplyChanges() const
 {
-    int index = ui->groupComboBox->currentIndex();
-    return selectedPermissions() == Qn::NoGlobalPermissions
-        && selectedUserGroup().isNull();
-}
+    if (m_model->mode() != QnUserSettingsModel::OwnProfile)
+        return true;
 
-void QnUserProfileWidget::updateLogin()
-{
-    QString proposedLogin = ui->loginEdit->text().trimmed().toLower();
-
-    bool valid = true;
-    QString hint;
-    if (proposedLogin.isEmpty())
-    {
-        hint = tr("Login cannot be empty.");
-        valid = false;
-    }
-    else
-    {
-        for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
-        {
-            if (user == m_user)
-                continue;
-
-            if (user->getName().toLower() != proposedLogin)
-                continue;
-
-            hint = tr("User with specified login already exists.");
-            valid = false;
-            break;
-        }
-    }
-
-    QPalette palette = this->palette();
-    if (!valid)
-        setWarningStyle(&palette);
-
-    ui->loginLabel->setPalette(palette);
-    ui->loginEdit->setPalette(palette);
-
-    /* Show warning message if we have renamed an existing user */
-    if (m_mode == Mode::OtherUser)
-        updatePassword();
-}
-
-void QnUserProfileWidget::updatePassword()
-{
-    bool valid = true;
-    QString hint;
-
-    /* Current password should be checked only if the user editing himself. */
-    if (m_mode == Mode::OwnUser && !ui->passwordEdit->text().isEmpty())
-    {
-        if (ui->currentPasswordEdit->text().isEmpty()) {
-            hint = tr("To modify your password, please enter existing one.");
-            valid = false;
-        }
-        else if (!m_user->checkPassword(ui->currentPasswordEdit->text()))
-        {
-            hint = tr("Invalid current password.");
-            valid = false;
-        }
-        else if (ui->passwordEdit->text() != ui->confirmPasswordEdit->text())
-        {
-            hint = tr("Passwords do not match.");
-            valid = false;
-        }
-    }
-
-    /* Show warning message if we have renamed an existing user.. */
-    if (m_mode == Mode::OtherUser && ui->loginEdit->text().trimmed() != m_user->getName())
-    {
-        /* ..and have not entered new password. */
-        if (ui->passwordEdit->text().isEmpty())
-        {
-            hint = tr("User has been renamed. Password must be updated.");
-            valid = false;
-        }
-    }
-
-    /* Show warning if have not entered password for the new user. */
-    if (m_mode == Mode::NewUser && ui->passwordEdit->text().isEmpty())
-    {
-        hint = tr("Password cannot be empty.");
-        valid = false;
-    }
-
-}
-
-void QnUserProfileWidget::updateEmail()
-{
-    bool valid = true;
-    QString hint;
-
-    if (!ui->emailEdit->text().trimmed().isEmpty() && !QnEmailAddress::isValid(ui->emailEdit->text()))
-    {
-        hint = tr("Invalid email address.");
-        valid = false;
-    }
-
-    QPalette palette = this->palette();
-    if (!valid)
-        setWarningStyle(&palette);
-
-    ui->emailLabel->setPalette(palette);
-    ui->emailEdit->setPalette(palette);
+    for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField, ui->emailInputField })
+        if (!field->isValid())
+            return false;
+    return true;
 }
 
 void QnUserProfileWidget::updateControlsAccess()
 {
-    Qn::Permissions permissions = m_user
-        ? accessController()->permissions(m_user)
+    Qn::Permissions permissions = m_model->user()
+        ? accessController()->permissions(m_model->user())
         : Qn::NoPermissions;
 
-    ui->loginEdit->setReadOnly(!permissions.testFlag(Qn::WriteNamePermission));
-
     /* User must confirm current password to change own password. */
-    bool requirePasswordConfirmation = permissions.testFlag(Qn::WritePasswordPermission)
-        && !permissions.testFlag(Qn::WriteAccessRightsPermission);
-    ui->currentPasswordEdit->setVisible(requirePasswordConfirmation);
-    ui->currentPasswordLabel->setVisible(requirePasswordConfirmation);
+    bool canChangePassword = permissions.testFlag(Qn::WritePasswordPermission);
+    for (QnInputField* field : { ui->currentPasswordInputField, ui->newPasswordInputField, ui->confirmPasswordInputField })
+        field->setVisible(canChangePassword);
 
-    ui->passwordLabel->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-    ui->passwordEdit->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-    ui->confirmPasswordEdit->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-    ui->confirmPasswordLabel->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-
-    ui->emailEdit->setReadOnly(!permissions.testFlag(Qn::WriteEmailPermission));
-
-    ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
+    ::setReadOnly(ui->emailInputField, !permissions.testFlag(Qn::WriteEmailPermission));
 }
 
-void QnUserProfileWidget::updateAccessRightsPresets()
+QString QnUserProfileWidget::getUserGroup() const
 {
-    ui->groupComboBox->clear();
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
 
-    if (!m_user)
-        return;
+    if (permissions == Qn::GlobalOwnerPermissionsSet)
+        return tr("Owner");
 
-    auto addBuiltInGroup = [this](const QString &name, Qn::GlobalPermissions permissions)
-    {
-        int index = ui->groupComboBox->count();
-        ui->groupComboBox->insertItem(index, name);
-        ui->groupComboBox->setItemData(index,   qVariantFromValue(QnUuid()),    kUserGroupIdRole);
-        ui->groupComboBox->setItemData(index,   qVariantFromValue(permissions), kPermissionsRole);
-    };
+    if (permissions == Qn::GlobalAdminPermissionsSet)
+        return tr("Administrator");
 
-    auto addCustomGroup = [this](const ec2::ApiUserGroupData &group)
-    {
-        int index = ui->groupComboBox->count();
-        ui->groupComboBox->insertItem(index, group.name);
-        ui->groupComboBox->setItemData(index, qVariantFromValue(group.id),      kUserGroupIdRole);
-    };
-
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
-
-    // show only for view of owner
-    if (permissions.testFlag(Qn::GlobalOwnerPermission))
-        addBuiltInGroup(tr("Owner"), Qn::GlobalOwnerPermissionsSet);
-
-    // show for an admin or for anyone opened by owner
-    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
-        addBuiltInGroup(tr("Administrator"), Qn::GlobalAdminPermissionsSet);
-
-    addBuiltInGroup(tr("Advanced Viewer"),   Qn::GlobalAdvancedViewerPermissionSet);
-    addBuiltInGroup(tr("Viewer"),            Qn::GlobalViewerPermissionSet);
-    addBuiltInGroup(tr("Live Viewer"),       Qn::GlobalLiveViewerPermissionSet);
-
-    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
-    {
-        if (isAdmin || group.id == m_user->userGroup())
-            addCustomGroup(group);
-    }
+        if (group.id == m_model->user()->userGroup())
+            return group.name;
 
-    addBuiltInGroup(tr("New Group..."), Qn::NoGlobalPermissions);
-    addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
+    if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
+        return tr("Advanced Viewer");
+
+    if (permissions == Qn::GlobalViewerPermissionSet)
+        return tr("Viewer");
+
+    if (permissions == Qn::GlobalLiveViewerPermissionSet)
+        return tr("Live Viewer");
+
+    return tr("Custom Permissions");
 }
 
-Qn::GlobalPermissions QnUserProfileWidget::selectedPermissions() const
+bool QnUserProfileWidget::validMode() const
 {
-    return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kPermissionsRole).value<Qn::GlobalPermissions>();
-}
-
-QnUuid QnUserProfileWidget::selectedUserGroup() const
-{
-    return ui->groupComboBox->itemData(ui->groupComboBox->currentIndex(), kUserGroupIdRole).value<QnUuid>();
+    return m_model->mode() == QnUserSettingsModel::OwnProfile
+        || m_model->mode() == QnUserSettingsModel::OtherProfile;
 }

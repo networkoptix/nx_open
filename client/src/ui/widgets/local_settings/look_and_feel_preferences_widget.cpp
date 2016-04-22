@@ -132,14 +132,14 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
 }
 
 
-bool QnLookAndFeelPreferencesWidget::canApplyChanges()
+bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 {
-    /* These changes can be applied only after reboot. */
+    /* These changes can be applied only after client restart. */
     return m_oldLanguage == ui->languageComboBox->currentIndex()
         && m_oldSkin == ui->skinComboBox->currentIndex();
 }
 
-bool QnLookAndFeelPreferencesWidget::canDiscardChanges()
+bool QnLookAndFeelPreferencesWidget::canDiscardChanges() const
 {
     //TODO: #GDM restoring changes does not belongs here
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);

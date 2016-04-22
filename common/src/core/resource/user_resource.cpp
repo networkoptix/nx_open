@@ -179,13 +179,13 @@ void QnUserResource::setRealm( const QString& realm )
     m_realm = realm;
 }
 
-Qn::GlobalPermissions QnUserResource::getPermissions() const
+Qn::GlobalPermissions QnUserResource::getRawPermissions() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_permissions;
 }
 
-void QnUserResource::setPermissions(Qn::GlobalPermissions permissions)
+void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
 {
     {
         QnMutexLocker locker( &m_mutex );

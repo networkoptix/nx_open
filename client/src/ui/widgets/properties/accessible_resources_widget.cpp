@@ -133,7 +133,7 @@ QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
 
 bool QnAccessibleResourcesWidget::hasChanges() const
 {
-    if (m_delegate->permissions().testFlag(allResourcesPermission()) != ui->allResourcesCheckBox->isChecked())
+    if (m_delegate->rawPermissions().testFlag(allResourcesPermission()) != ui->allResourcesCheckBox->isChecked())
         return true;
 
     return m_model->checkedResources() != filteredResources(m_filter, m_delegate->accessibleResources());
@@ -141,7 +141,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    ui->allResourcesCheckBox->setChecked(m_delegate->permissions().testFlag(allResourcesPermission()));
+    ui->allResourcesCheckBox->setChecked(m_delegate->rawPermissions().testFlag(allResourcesPermission()));
     m_model->setCheckedResources(filteredResources(m_filter, m_delegate->accessibleResources()));
 }
 
@@ -154,12 +154,12 @@ void QnAccessibleResourcesWidget::applyChanges()
     accessibleResources.unite(newFiltered);
     m_delegate->setAccessibleResources(accessibleResources);
 
-    Qn::GlobalPermissions permissions = m_delegate->permissions();
+    Qn::GlobalPermissions permissions = m_delegate->rawPermissions();
     if (ui->allResourcesCheckBox->isChecked())
         permissions |= allResourcesPermission();
     else
         permissions &= ~allResourcesPermission();
-    m_delegate->setPermissions(permissions);
+    m_delegate->setRawPermissions(permissions);
 }
 
 Qn::GlobalPermission QnAccessibleResourcesWidget::allResourcesPermission() const
@@ -186,7 +186,7 @@ Qn::GlobalPermission QnAccessibleResourcesWidget::allResourcesPermission() const
 //    /* Check if it is valid user id and we have access rights to edit it. */
 //    if (m_targetUser)
 //    {
-//        Qn::Permissions permissions = accessController()->permissions(m_targetUser);
+//        Qn::Permissions permissions = accessController()->rawPermissions(m_targetUser);
 //        return permissions.testFlag(Qn::WriteAccessRightsPermission);
 //    }
 //
