@@ -11,6 +11,8 @@
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
 
+#include <ui/common/palette.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/helper.h>
@@ -49,51 +51,32 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
         return;
     }
 
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
-    QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-    QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+    /* Select icon and text color by item state: */
+    QPalette::ColorRole actualRole;
+    QIcon::Mode iconMode;
 
-    /* Determine currently raised/zoomed item. */
-    QnWorkbenchItem* raisedItem = nullptr;
-    if (workbench())
+    switch (itemState(index))
     {
-        raisedItem = workbench()->item(Qn::RaisedRole);
-        if (!raisedItem)
-            raisedItem = workbench()->item(Qn::ZoomedRole);
-    }
+    case ItemState::Selected:
+        actualRole = QPalette::HighlightedText;
+        iconMode = QIcon::Selected;
+        break;
 
-    QPalette::ColorRole actualRole = QPalette::Text;
-    QIcon::Mode iconMode = QIcon::Normal;
-
-    if (raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId())))
-    {
-        /* Brighten raised/zoomed item. */
+    case ItemState::Accented:
         actualRole = QPalette::BrightText;
         iconMode = QIcon::Active;
-    }
-    else if (!resource.isNull() && !currentLayoutResource.isNull())
-    {
-        bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).isNull() : false;
-        if (resource == currentLayoutResource)
-        {
-            /* Highlight current layout if we aren't in videowall control mode or current videowall if we are. */
-            if (videoWallControlMode != uuid.isNull())
-            {
-                actualRole = QPalette::HighlightedText;
-                iconMode = QIcon::Selected;
-            }
-        }
-        else if (parentResource == currentLayoutResource ||
-            (uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()))
-        {
-            /* Highlight Brighten items on current layout. */
-            actualRole = QPalette::HighlightedText;
-            iconMode = QIcon::Selected;
-        }
+        break;
+
+    default:
+        actualRole = QPalette::Text;
+        iconMode = QIcon::Normal;
     }
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
+
+    /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */
+    const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget);
+    bool editing = view && view->indexWidget(option.index);
 
     /* Obtain sub-element rectangles: */
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
@@ -109,9 +92,12 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
-    /* Draw text: */
+    /* Get resource from the model: */
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     bool extraResourceInfo = qnSettings->isIpShownInTree() && !resource.isNull();
-    if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
+
+    /* Draw text: */
+    if (option.features.testFlag(QStyleOptionViewItem::HasDisplay) && !editing)
     {
         option.font.setWeight(QFont::DemiBold);
 
@@ -194,6 +180,30 @@ QSize QnResourceTreeItemDelegate::sizeHint(const QStyleOptionViewItem& styleOpti
     return (textRect | iconRect | checkRect).size();
 }
 
+QWidget* QnResourceTreeItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    /* Create editor: */
+    QWidget* editor = base_type::createEditor(parent, option, index);
+
+    /* Change editor font: */
+    QFont font(editor->font());
+    font.setWeight(QFont::DemiBold);
+    editor->setFont(font);
+
+    /* Set editor text color by item state: */
+    switch (itemState(index))
+    {
+    case ItemState::Selected:
+        setPaletteColor(editor, QPalette::Text, editor->palette().color(QPalette::HighlightedText));
+        break;
+    case ItemState::Accented:
+        setPaletteColor(editor, QPalette::Text, editor->palette().color(QPalette::BrightText));
+        break;
+    }
+
+    return editor;
+}
+
 void QnResourceTreeItemDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
 {
     // TODO: #QTBUG If focus is not cleared, we get crashes. Should be fixed in QWidget.
@@ -209,3 +219,45 @@ bool QnResourceTreeItemDelegate::eventFilter(QObject* object, QEvent* event)
     return base_type::eventFilter(object, event);
 }
 
+QnResourceTreeItemDelegate::ItemState QnResourceTreeItemDelegate::itemState(const QModelIndex& index) const
+{
+    /* Fetch information from model: */
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
+    QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
+    QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+
+    /* Determine currently raised/zoomed item: */
+    QnWorkbenchItem* raisedItem = nullptr;
+    if (workbench())
+    {
+        raisedItem = workbench()->item(Qn::RaisedRole);
+        if (!raisedItem)
+            raisedItem = workbench()->item(Qn::ZoomedRole);
+    }
+
+    if (raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId())))
+    {
+        /* Raised/zoomed item: */
+        return ItemState::Accented;
+    }
+    else if (!resource.isNull() && !currentLayoutResource.isNull())
+    {
+        bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).isNull() : false;
+        if (resource == currentLayoutResource)
+        {
+            /* Current layout if we aren't in videowall control mode or current videowall if we are: */
+            if (videoWallControlMode != uuid.isNull())
+                return ItemState::Selected;
+        }
+        else if (parentResource == currentLayoutResource ||
+            (uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()))
+        {
+            /* Item on current layout. */
+            return ItemState::Selected;
+        }
+    }
+
+    /* Normal item: */
+    return ItemState::Normal;
+}

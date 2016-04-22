@@ -1807,7 +1807,10 @@ QRect QnNxStyle::subElementRect(
     switch (subElement)
     {
     case SE_LineEditContents:
-        return base_type::subElementRect(subElement, option, widget).adjusted(dp(6), 0, 0, 0);
+        if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
+            //TODO #vkutin See why this ugly "dp(6)" is here and not somewhere else
+            return base_type::subElementRect(subElement, option, widget).adjusted(dp(6), 0, 0, 0);
+        break;
 
     case SE_PushButtonLayoutItem:
         if (qobject_cast<const QDialogButtonBox *>(widget))
