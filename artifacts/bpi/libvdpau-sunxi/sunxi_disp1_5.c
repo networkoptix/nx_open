@@ -51,7 +51,10 @@ struct sunxi_disp *sunxi_disp1_5_open(int osd_enabled)
 
 	disp->fd = open("/dev/disp", O_RDWR);
 	if (disp->fd == -1)
+	{
+		VDPAU_DBG("[disp1.5] ERROR: Cannot open /dev/disp");
 		goto err_open;
+	}
 
 	unsigned long args[4] = { 0, 0, (unsigned long) &disp->video_info };
 
@@ -67,10 +70,16 @@ struct sunxi_disp *sunxi_disp1_5_open(int osd_enabled)
 	disp->video_info.zorder = 1;
 
 	if (ioctl(disp->fd, DISP_CMD_LAYER_DISABLE, args))
+	{
+		VDPAU_DBG("[disp1.5] ERROR: Unable to disable Video layer");
 		goto err_video_layer;
+	}
 
 	if (ioctl(disp->fd, DISP_CMD_LAYER_SET_INFO, args))
+	{
+		VDPAU_DBG("[disp1.5] ERROR: Unable to set info for Video layer");
 		goto err_video_layer;
+	}
 
 	if (osd_enabled)
 	{
@@ -87,10 +96,16 @@ struct sunxi_disp *sunxi_disp1_5_open(int osd_enabled)
 		disp->osd_info.zorder = 2;
 
 		if (ioctl(disp->fd, DISP_CMD_LAYER_DISABLE, args))
+		{
+			VDPAU_DBG("[disp1.5] ERROR: Unable to disable OSD layer");
 			goto err_video_layer;
+		}
 
 		if (ioctl(disp->fd, DISP_CMD_LAYER_SET_INFO, args))
+		{
+			VDPAU_DBG("[disp1.5] ERROR: Unable to set info for OSD layer");
 			goto err_video_layer;
+		}
 	}
 
 	disp->screen_width = ioctl(disp->fd, DISP_CMD_GET_SCN_WIDTH, args);

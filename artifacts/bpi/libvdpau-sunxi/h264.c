@@ -262,6 +262,7 @@ static void ref_pic_list_modification(h264_context_t *c)
 				{
 					VDPAU_DBG("NOT IMPLEMENTED: modification_of_pic_nums_idc == 2");
 					unsigned int long_term_pic_num = get_ue(c->regs);
+					(void) long_term_pic_num;
 				}
 			} while (modification_of_pic_nums_idc != 3);
 		}
@@ -280,10 +281,12 @@ static void ref_pic_list_modification(h264_context_t *c)
 				if (modification_of_pic_nums_idc == 0 || modification_of_pic_nums_idc == 1)
 				{
 					unsigned int abs_diff_pic_num_minus1 = get_ue(c->regs);
+					(void) abs_diff_pic_num_minus1;
 				}
 				else if (modification_of_pic_nums_idc == 2)
 				{
 					unsigned int long_term_pic_num = get_ue(c->regs);
+					(void) long_term_pic_num;
 				}
 			} while (modification_of_pic_nums_idc != 3);
 		}

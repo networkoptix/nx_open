@@ -20,6 +20,8 @@
 #ifndef __SUNXI_DISP_IOCTL_H__
 #define __SUNXI_DISP_IOCTL_H__
 
+#include <stdint.h>
+
 #define __bool signed char
 #define __u32 uint32_t
 #define __u8 uint8_t

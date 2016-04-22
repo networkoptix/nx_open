@@ -98,7 +98,8 @@ VdpStatus vdp_output_surface_get_bits_native(VdpOutputSurface surface,
 	if (!out)
 		return VDP_STATUS_INVALID_HANDLE;
 
-
+    // ATTENTION: Output Surface in this impl of vdpau does not contain actual RGB values,
+    // but rather contains a ref to YUV data.
 
 	return VDP_STATUS_ERROR;
 }

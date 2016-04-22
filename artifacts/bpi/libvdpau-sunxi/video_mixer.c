@@ -18,9 +18,7 @@
  */
 
 #include <math.h>
-#include <cedrus/cedrus.h>
 #include "vdpau_private.h"
-#include "rgba.h"
 
 VdpStatus vdp_video_mixer_create(VdpDevice device,
                                  uint32_t feature_count,
@@ -74,27 +72,33 @@ VdpStatus vdp_video_mixer_render(VdpVideoMixer mixer,
 {
 	mixer_ctx_t *mix = handle_get(mixer);
 	if (!mix)
+	{
+		VDPAU_DBG("Invalid mixer");
 		return VDP_STATUS_INVALID_HANDLE;
+	}
 
 	if (background_surface != VDP_INVALID_HANDLE)
 		VDPAU_DBG_ONCE("Requested unimplemented background_surface");
 
-
 	if (current_picture_structure != VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME)
 		VDPAU_DBG_ONCE("Requested unimplemented picture_structure");
 
-
-
 	output_surface_ctx_t *os = handle_get(destination_surface);
 	if (!os)
+	{
+		VDPAU_DBG("Invalid destination_surface");
 		return VDP_STATUS_INVALID_HANDLE;
+	}
 
 	if (os->yuv)
 		yuv_unref(os->yuv);
 
 	os->vs = handle_get(video_surface_current);
 	if (!(os->vs))
+	{
+		VDPAU_DBG("Invalid video_surface_current");
 		return VDP_STATUS_INVALID_HANDLE;
+	}
 
 	os->yuv = yuv_ref(os->vs->yuv);
 

@@ -28,20 +28,29 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
                                     VdpDevice *device,
                                     VdpGetProcAddress **get_proc_address)
 {
-	if (!display || !device || !get_proc_address)
+	if (!device || !get_proc_address)
 		return VDP_STATUS_INVALID_POINTER;
 
 	device_ctx_t *dev = handle_create(sizeof(*dev), device);
 	if (!dev)
 		return VDP_STATUS_RESOURCES;
 
-	dev->display = XOpenDisplay(XDisplayString(display));
-	dev->screen = screen;
+	if (display)
+	{
+		dev->display = XOpenDisplay(XDisplayString(display));
+		dev->screen = screen;
+	}
+	else
+	{
+		dev->display = NULL;
+		dev->screen = -1;
+	}
 
 	dev->cedrus = cedrus_open();
 	if (!dev->cedrus)
 	{
-		XCloseDisplay(dev->display);
+		if (dev->display)
+		    XCloseDisplay(dev->display);
 		handle_destroy(*device);
 		return VDP_STATUS_ERROR;
 	}
@@ -84,7 +93,9 @@ VdpStatus vdp_device_destroy(VdpDevice device)
 	if (dev->g2d_enabled)
 		close(dev->g2d_fd);
 	cedrus_close(dev->cedrus);
-	XCloseDisplay(dev->display);
+
+	if (dev->display)
+	    XCloseDisplay(dev->display);
 
 	handle_destroy(device);
 

@@ -177,6 +177,43 @@ VdpStatus vdp_video_surface_get_parameters(VdpVideoSurface surface,
 	return VDP_STATUS_OK;
 }
 
+/**
+ * Nx extension to VDPAU: If destination_pitches is null, destinationData array is assumed to
+ * contain an array of pointers to the following out params:
+ * [0]: void *virt; // user-space memory chunk with the existing surface bits data
+ * [1]: size_t size; // user-space memory chunk size
+ * [2]: uint32_t width;
+ * [3]: uint32_t height;
+ * [4]: VdpChromaType chroma_type;
+ * [5]: VdpYCbCrFormat source_format;
+ * [6]: int luma_size;
+ * [7]: int chroma_size;
+ */
+static VdpStatus nx_video_surface_get_native_data(const video_surface_ctx_t *vs,
+    										  void *const *destination_data)
+{
+	// HACK: Direct access to libcedrus private structure defined in libcedrus/cedrus_mem.h
+	struct cedrus_mem
+	{
+		void *virt;
+		uint32_t phys;
+		size_t size;
+	};
+
+	const struct cedrus_mem *const mem = (const struct cedrus_mem *) vs->yuv->data;
+
+	*((void **) (destination_data[0])) = cedrus_mem_get_pointer(vs->yuv->data);
+	*((size_t *) (destination_data[1])) = mem->size;
+	*((uint32_t *) (destination_data[2])) = vs->width;
+	*((uint32_t *) (destination_data[3])) = vs->height;
+	*((VdpChromaType *) (destination_data[4])) = vs->chroma_type;
+	*((VdpYCbCrFormat *) (destination_data[5])) = vs->source_format;
+	*((int *) (destination_data[6])) = vs->luma_size;
+	*((int *) (destination_data[7])) = vs->chroma_size;
+
+	return VDP_STATUS_OK;
+}
+
 VdpStatus vdp_video_surface_get_bits_y_cb_cr(VdpVideoSurface surface,
                                              VdpYCbCrFormat destination_ycbcr_format,
                                              void *const *destination_data,
@@ -188,6 +225,15 @@ VdpStatus vdp_video_surface_get_bits_y_cb_cr(VdpVideoSurface surface,
 
 	if (vs->chroma_type != VDP_CHROMA_TYPE_420 || vs->source_format != INTERNAL_YCBCR_FORMAT)
 		return VDP_STATUS_INVALID_Y_CB_CR_FORMAT;
+
+	if (destination_pitches == NULL)
+	{
+		// Nx extension to VDPAU.
+		//return VDP_STATUS_INVALID_POINTER;
+		if (destination_data == NULL)
+			return VDP_STATUS_INVALID_POINTER;
+		return nx_video_surface_get_native_data(vs, destination_data);
+	}
 
 	if (destination_pitches[0] < vs->width || destination_pitches[1] < vs->width / 2)
 		return VDP_STATUS_ERROR;

@@ -19,9 +19,10 @@
 
 #include <fcntl.h>
 #include <stdlib.h>
-#include <stdint.h>
+#include <stdint.h> //< For kernel-headers
 #include <unistd.h>
 #include <sys/ioctl.h>
+
 #include "kernel-headers/sunxi_disp_ioctl.h"
 #include "vdpau_private.h"
 #include "sunxi_disp.h"
@@ -49,18 +50,27 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 
 	disp->fd = open("/dev/disp", O_RDWR);
 	if (disp->fd == -1)
+	{
+		VDPAU_DBG("[disp1] ERROR: Cannot open /dev/disp");
 		goto err_open;
+	}
 
 	int tmp = SUNXI_DISP_VERSION;
 	if (ioctl(disp->fd, DISP_CMD_VERSION, &tmp) < 0)
+	{
+		VDPAU_DBG("[disp1] ERROR: Invalid /dev/disp driver version");
 		goto err_version;
+	}
 
 	uint32_t args[4] = { 0, DISP_LAYER_WORK_MODE_SCALER, 0, 0 };
 	disp->video_layer = ioctl(disp->fd, DISP_CMD_LAYER_REQUEST, args);
 	if (disp->video_layer == 0)
+	{
+		VDPAU_DBG("[disp1] ERROR: Unable to request Video layer");
 		goto err_video_layer;
+	}
 
-	args[1] = disp->video_layer;
+	args[1] = (uint32_t) disp->video_layer;
 	ioctl(disp->fd, osd_enabled ? DISP_CMD_LAYER_TOP : DISP_CMD_LAYER_BOTTOM, args);
 
 	if (osd_enabled)
@@ -68,7 +78,10 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 		args[1] = DISP_LAYER_WORK_MODE_NORMAL;
 		disp->osd_layer = ioctl(disp->fd, DISP_CMD_LAYER_REQUEST, args);
 		if (disp->osd_layer == 0)
+		{
+			VDPAU_DBG("[disp1] ERROR: Unable to request OSD layer");
 			goto err_osd_layer;
+		}
 
 		args[1] = disp->osd_layer;
 		ioctl(disp->fd, DISP_CMD_LAYER_TOP, args);

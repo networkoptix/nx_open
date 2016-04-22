@@ -20,12 +20,7 @@
 #include "vdpau_private.h"
 #include <time.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <cedrus/cedrus.h>
-#include <sys/ioctl.h>
 #include "rgba.h"
-#include "sunxi_disp.h"
 
 static uint64_t get_time(void)
 {
@@ -41,30 +36,43 @@ VdpStatus vdp_presentation_queue_target_create_x11(VdpDevice device,
                                                    Drawable drawable,
                                                    VdpPresentationQueueTarget *target)
 {
-	if (!target || !drawable)
-		return VDP_STATUS_INVALID_POINTER;
+    if (!target)
+        return VDP_STATUS_INVALID_POINTER;
 
-	device_ctx_t *dev = handle_get(device);
-	if (!dev)
-		return VDP_STATUS_INVALID_HANDLE;
+    device_ctx_t *dev = handle_get(device);
+    if (!dev)
+        return VDP_STATUS_INVALID_HANDLE;
 
-	queue_target_ctx_t *qt = handle_create(sizeof(*qt), target);
-	if (!qt)
-		return VDP_STATUS_RESOURCES;
+    queue_target_ctx_t *qt = handle_create(sizeof(*qt), target);
+    if (!qt)
+        return VDP_STATUS_RESOURCES;
 
-	qt->drawable = drawable;
-	XSetWindowBackground(dev->display, drawable, 0x000102);
+    qt->drawable = 0;
+    if (dev->display)
+    {
+        if (!drawable)
+            return VDP_STATUS_INVALID_POINTER;
+        qt->drawable = drawable;
+        XSetWindowBackground(dev->display, drawable, 0x000102);
+    }
 
-	qt->disp = sunxi_disp_open(dev->osd_enabled);
+    VDPAU_DBG("Trying to open /dev/disp v1");
+    qt->disp = sunxi_disp_open(dev->osd_enabled);
+
+    if (!qt->disp)
+    {
+        VDPAU_DBG("Trying to open /dev/disp v2");
+        qt->disp = sunxi_disp2_open(dev->osd_enabled);
+    }
 
 	if (!qt->disp)
-		qt->disp = sunxi_disp2_open(dev->osd_enabled);
+    {
+        VDPAU_DBG("Trying to open /dev/disp v1.5");
+        qt->disp = sunxi_disp1_5_open(dev->osd_enabled);
+    }
 
 	if (!qt->disp)
-		qt->disp = sunxi_disp1_5_open(dev->osd_enabled);
-
-	if (!qt->disp)
-		return VDP_STATUS_ERROR;
+        return VDP_STATUS_ERROR;
 
 	return VDP_STATUS_OK;
 }
@@ -183,9 +191,14 @@ VdpStatus vdp_presentation_queue_display(VdpPresentationQueue presentation_queue
 		VDPAU_DBG_ONCE("Presentation time not supported");
 
 	Window c;
-	int x,y;
-	XTranslateCoordinates(q->device->display, q->target->drawable, RootWindow(q->device->display, q->device->screen), 0, 0, &x, &y, &c);
-	XClearWindow(q->device->display, q->target->drawable);
+    int x = 0;
+    int y = 0;
+	if (q->device->display)
+	{
+		XTranslateCoordinates(q->device->display, q->target->drawable,
+    	    RootWindow(q->device->display, q->device->screen), 0, 0, &x, &y, &c);
+		XClearWindow(q->device->display, q->target->drawable);
+	}
 
 	if (os->vs)
 		q->target->disp->set_video_layer(q->target->disp, x, y, clip_width, clip_height, os);

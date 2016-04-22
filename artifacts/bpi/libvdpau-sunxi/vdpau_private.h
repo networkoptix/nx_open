@@ -172,11 +172,12 @@ typedef struct
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
-VdpStatus new_decoder_mpeg12(decoder_ctx_t *decoder);
-VdpStatus new_decoder_h264(decoder_ctx_t *decoder);
-VdpStatus new_decoder_mpeg4(decoder_ctx_t *decoder);
-VdpStatus new_decoder_h265(decoder_ctx_t *decoder);
+VdpStatus new_decoder_mpeg12(decoder_ctx_t *decoder); //< mpeg12.c
+VdpStatus new_decoder_h264(decoder_ctx_t *decoder); //< h264.c
+VdpStatus new_decoder_mpeg4(decoder_ctx_t *decoder); //< mpeg4.c
+VdpStatus new_decoder_h265(decoder_ctx_t *decoder); //< h265.c
 
+// surface_video.c
 void yuv_unref(yuv_data_t *yuv);
 yuv_data_t *yuv_ref(yuv_data_t *yuv);
 VdpStatus yuv_prepare(video_surface_ctx_t *video_surface);
@@ -184,20 +185,21 @@ VdpStatus rec_prepare(video_surface_ctx_t *video_surface);
 
 typedef uint32_t VdpHandle;
 
+// handles.c
 void *handle_create(size_t size, VdpHandle *handle);
 void *handle_get(VdpHandle handle);
 void handle_destroy(VdpHandle handle);
 
+// device.c
 EXPORT VdpDeviceCreateX11 vdp_imp_device_create_x11;
 VdpDeviceDestroy vdp_device_destroy;
 VdpPreemptionCallbackRegister vdp_preemption_callback_register;
-
 VdpGetProcAddress vdp_get_proc_address;
-
 VdpGetErrorString vdp_get_error_string;
 VdpGetApiVersion vdp_get_api_version;
 VdpGetInformationString vdp_get_information_string;
 
+// presentation_queue.c
 VdpPresentationQueueTargetCreateX11 vdp_presentation_queue_target_create_x11;
 VdpPresentationQueueTargetDestroy vdp_presentation_queue_target_destroy;
 VdpPresentationQueueCreate vdp_presentation_queue_create;
@@ -209,6 +211,7 @@ VdpPresentationQueueDisplay vdp_presentation_queue_display;
 VdpPresentationQueueBlockUntilSurfaceIdle vdp_presentation_queue_block_until_surface_idle;
 VdpPresentationQueueQuerySurfaceStatus vdp_presentation_queue_query_surface_status;
 
+// video_surface.c
 VdpVideoSurfaceCreate vdp_video_surface_create;
 VdpVideoSurfaceDestroy vdp_video_surface_destroy;
 VdpVideoSurfaceGetParameters vdp_video_surface_get_parameters;
@@ -217,6 +220,7 @@ VdpVideoSurfacePutBitsYCbCr vdp_video_surface_put_bits_y_cb_cr;
 VdpVideoSurfaceQueryCapabilities vdp_video_surface_query_capabilities;
 VdpVideoSurfaceQueryGetPutBitsYCbCrCapabilities vdp_video_surface_query_get_put_bits_y_cb_cr_capabilities;
 
+// output_surface.c
 VdpOutputSurfaceCreate vdp_output_surface_create;
 VdpOutputSurfaceDestroy vdp_output_surface_destroy;
 VdpOutputSurfaceGetParameters vdp_output_surface_get_parameters;
@@ -231,6 +235,7 @@ VdpOutputSurfaceQueryGetPutBitsNativeCapabilities vdp_output_surface_query_get_p
 VdpOutputSurfaceQueryPutBitsIndexedCapabilities vdp_output_surface_query_put_bits_indexed_capabilities;
 VdpOutputSurfaceQueryPutBitsYCbCrCapabilities vdp_output_surface_query_put_bits_y_cb_cr_capabilities;
 
+// video_mixer.c
 VdpVideoMixerCreate vdp_video_mixer_create;
 VdpVideoMixerDestroy vdp_video_mixer_destroy;
 VdpVideoMixerRender vdp_video_mixer_render;
@@ -247,12 +252,14 @@ VdpVideoMixerQueryAttributeSupport vdp_video_mixer_query_attribute_support;
 VdpVideoMixerQueryAttributeValueRange vdp_video_mixer_query_attribute_value_range;
 VdpGenerateCSCMatrix vdp_generate_csc_matrix;
 
+// decoder.c
 VdpDecoderCreate vdp_decoder_create;
 VdpDecoderDestroy vdp_decoder_destroy;
 VdpDecoderGetParameters vdp_decoder_get_parameters;
 VdpDecoderRender vdp_decoder_render;
 VdpDecoderQueryCapabilities vdp_decoder_query_capabilities;
 
+// bitmap_surface.c
 VdpBitmapSurfaceCreate vdp_bitmap_surface_create;
 VdpBitmapSurfaceDestroy vdp_bitmap_surface_destroy;
 VdpBitmapSurfaceGetParameters vdp_bitmap_surface_get_parameters;

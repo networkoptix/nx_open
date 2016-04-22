@@ -49,7 +49,10 @@ struct sunxi_disp *sunxi_disp2_open(int osd_enabled)
 
 	disp->fd = open("/dev/disp", O_RDWR);
 	if (disp->fd == -1)
+	{
+		VDPAU_DBG("[disp2] ERROR: Cannot open /dev/disp");
 		goto err_open;
+	}
 
 	unsigned long args[4] = { 0, (unsigned long)(&disp->video_config), 1, 0 };
 
@@ -63,7 +66,10 @@ struct sunxi_disp *sunxi_disp2_open(int osd_enabled)
 	disp->video_config.info.zorder = 1;
 
 	if (ioctl(disp->fd, DISP_LAYER_SET_CONFIG, args))
+	{
+		VDPAU_DBG("[disp2] ERROR: Unable to configure Video layer");
 		goto err_video_layer;
+	}
 
 	if (osd_enabled)
 	{
@@ -78,7 +84,10 @@ struct sunxi_disp *sunxi_disp2_open(int osd_enabled)
 
 		args[1] = (unsigned long)(&disp->osd_config);
 		if (ioctl(disp->fd, DISP_LAYER_SET_CONFIG, args))
+		{
+			VDPAU_DBG("[disp2] ERROR: Unable to configure OSD layer");
 			goto err_video_layer;
+		}
 	}
 
 	disp->screen_width = ioctl(disp->fd, DISP_GET_SCN_WIDTH, args);
