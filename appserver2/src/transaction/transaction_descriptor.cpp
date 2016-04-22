@@ -570,7 +570,7 @@ namespace detail
                                CameraNotificationManagerHelper()
                               ),
         TRANSACTION_DESCRIPTOR(ApiCommand::saveCamera, ApiCameraData,
-                               false, // persistent
+                               true, // persistent
                                false, // system
                                CreateHashByIdHelper(), // getHash
                                CameraNotificationManagerHelper()
