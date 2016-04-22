@@ -80,7 +80,7 @@ QnPaletteColor QnPaletteColor::darker(int shift) const
         return QnPaletteColor(m_group, qBound(0, m_index - shift, m_palette.size() - 1), m_palette, m_alpha);
     /*
     Multiplicative coefficient for scaling fallback color brightness when shift == 1
-    Full coefficient is qpow(kFallbackScaleFactor, shift)
+    Full coefficient is qPow(kFallbackScaleFactor, shift)
     */
     static const qreal kFallbackScaleFactor = 1.04;
     return QnPaletteColor(m_fallbackColor.darker(qRound(100.0 * qPow(kFallbackScaleFactor, shift))));
