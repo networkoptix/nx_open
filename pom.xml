@@ -774,6 +774,9 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
+                <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
             </properties>
