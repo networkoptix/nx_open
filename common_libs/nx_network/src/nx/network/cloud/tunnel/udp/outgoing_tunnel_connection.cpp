@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "outgoing_tunnel_udt_connection.h"
+#include "outgoing_tunnel_connection.h"
 
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/socket_global.h>
@@ -17,10 +17,10 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
+OutgoingTunnelConnection::OutgoingTunnelConnection(
     nx::String connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection,
-    UdpHolePunchingTimeouts timeouts)
+    Timeouts timeouts)
 :
     m_connectionId(std::move(connectionId)),
     m_localPunchedAddress(udtConnection->getLocalAddress()),
@@ -32,11 +32,11 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
     m_pleaseStopCompleted(false)
 {
     m_controlConnection->setMessageHandler(
-        std::bind(&OutgoingTunnelUdtConnection::onStunMessageReceived,
+        std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
     m_controlConnection->socket()->registerTimer(
         m_timeouts.maxConnectionInactivityPeriod(),
-        std::bind(&OutgoingTunnelUdtConnection::onKeepAliveTimeout, this));
+        std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
     m_aioTimer.bindToAioThread(m_controlConnection->socket()->getAioThread());
 
     hpm::api::UdpHolePunchingSyn syn;
@@ -45,24 +45,24 @@ OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
     m_controlConnection->sendMessage(std::move(message));
 }
 
-OutgoingTunnelUdtConnection::OutgoingTunnelUdtConnection(
+OutgoingTunnelConnection::OutgoingTunnelConnection(
     nx::String connectionId,
     std::unique_ptr<UdtStreamSocket> udtConnection)
 :
-    OutgoingTunnelUdtConnection(
+    OutgoingTunnelConnection(
         std::move(connectionId),
         std::move(udtConnection),
-        UdpHolePunchingTimeouts())
+        Timeouts())
 {
 }
 
-OutgoingTunnelUdtConnection::~OutgoingTunnelUdtConnection()
+OutgoingTunnelConnection::~OutgoingTunnelConnection()
 {
     //all internal sockets live in same aio thread, 
-        //so it is allowed to free OutgoingTunnelUdtConnection while in aio thread
+        //so it is allowed to free OutgoingTunnelConnection while in aio thread
 }
 
-void OutgoingTunnelUdtConnection::pleaseStop(
+void OutgoingTunnelConnection::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> userCompletionHandler)
 {
     //caller MUST guarantee that no calls to establishNewConnection can follow 
@@ -114,7 +114,7 @@ void OutgoingTunnelUdtConnection::pleaseStop(
         });
 }
 
-void OutgoingTunnelUdtConnection::establishNewConnection(
+void OutgoingTunnelConnection::establishNewConnection(
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,
     OnNewConnectionHandler handler)
@@ -159,19 +159,19 @@ void OutgoingTunnelUdtConnection::establishNewConnection(
         //So, switching to newConnection's aio thread
     connectionPtr->post(
         std::bind(
-            &OutgoingTunnelUdtConnection::proceedWithConnection, this,
+            &OutgoingTunnelConnection::proceedWithConnection, this,
             connectionPtr, timeout));
 
     NX_ASSERT(!m_pleaseStopHasBeenCalled);
 }
 
-void OutgoingTunnelUdtConnection::setControlConnectionClosedHandler(
+void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_controlConnectionClosedHandler = std::move(handler);
 }
 
-void OutgoingTunnelUdtConnection::proceedWithConnection(
+void OutgoingTunnelConnection::proceedWithConnection(
     UdtStreamSocket* connectionPtr,
     std::chrono::milliseconds timeout)
 {
@@ -214,7 +214,7 @@ void OutgoingTunnelUdtConnection::proceedWithConnection(
             });
 }
 
-void OutgoingTunnelUdtConnection::onConnectCompleted(
+void OutgoingTunnelConnection::onConnectCompleted(
     UdtStreamSocket* connectionPtr,
     SystemError::ErrorCode errorCode)
 {
@@ -227,11 +227,11 @@ void OutgoingTunnelUdtConnection::onConnectCompleted(
     //ensuring connectionPtr can be safely freed in any thread
     connectionPtr->post(
         std::bind(
-            &OutgoingTunnelUdtConnection::reportConnectResult, this,
+            &OutgoingTunnelConnection::reportConnectResult, this,
             connectionPtr, errorCode));
 }
 
-void OutgoingTunnelUdtConnection::reportConnectResult(
+void OutgoingTunnelConnection::reportConnectResult(
     UdtStreamSocket* connectionPtr,
     SystemError::ErrorCode errorCode)
 {
@@ -244,7 +244,7 @@ void OutgoingTunnelUdtConnection::reportConnectResult(
     QnMutexLocker lk(&m_mutex);
     auto connectionIter = m_ongoingConnections.find(connectionPtr);
     if (connectionIter == m_ongoingConnections.end())
-        return; //this can happen after OutgoingTunnelUdtConnection::pleaseStop has been called
+        return; //this can happen after OutgoingTunnelConnection::pleaseStop has been called
 
     ConnectionContext connectionContext = std::move(connectionIter->second);
     m_ongoingConnections.erase(connectionIter);
@@ -267,7 +267,7 @@ void OutgoingTunnelUdtConnection::reportConnectResult(
         m_controlConnection != nullptr);
 }
 
-void OutgoingTunnelUdtConnection::closeConnection(
+void OutgoingTunnelConnection::closeConnection(
     SystemError::ErrorCode closeReason,
     ConnectionType* connection)
 {
@@ -290,7 +290,7 @@ void OutgoingTunnelUdtConnection::closeConnection(
     NX_ASSERT(connection == controlConnection.get());
 }
 
-void OutgoingTunnelUdtConnection::onStunMessageReceived(
+void OutgoingTunnelConnection::onStunMessageReceived(
     nx::stun::Message message)
 {
     hpm::api::UdpHolePunchingSynAck synAck;
@@ -304,7 +304,7 @@ void OutgoingTunnelUdtConnection::onStunMessageReceived(
         .arg(m_connectionId), cl_logDEBUG1);
 }
 
-void OutgoingTunnelUdtConnection::onKeepAliveTimeout()
+void OutgoingTunnelConnection::onKeepAliveTimeout()
 {
     closeConnection(SystemError::notConnected, m_controlConnection.get());
 }

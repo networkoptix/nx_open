@@ -12,7 +12,7 @@
 
 #include <utils/serialization/lexical.h>
 
-#include "outgoing_tunnel_udt_connection.h"
+#include "outgoing_tunnel_connection.h"
 #include "rendezvous_connector_with_verification.h"
 
 
@@ -403,7 +403,7 @@ void TunnelConnector::connectSessionReportSent(
     }
     else
     {
-        tunnelConnection = std::make_unique<OutgoingTunnelUdtConnection>(
+        tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
             m_connectSessionId,
             std::move(m_udtConnection));
     }

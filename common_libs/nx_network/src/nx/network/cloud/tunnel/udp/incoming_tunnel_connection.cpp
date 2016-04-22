@@ -1,4 +1,5 @@
-#include "incoming_tunnel_udt_connection.h"
+
+#include "incoming_tunnel_connection.h"
 
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/stun/message_serializer.h>
@@ -10,7 +11,7 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
+IncomingTunnelConnection::IncomingTunnelConnection(
     String connectionId,
     std::unique_ptr<UdtStreamSocket> connectionSocket,
     const nx::hpm::api::ConnectionParameters& connectionParameters)
@@ -46,7 +47,7 @@ IncomingTunnelUdtConnection::IncomingTunnelUdtConnection(
     }
 }
 
-void IncomingTunnelUdtConnection::accept(std::function<void(
+void IncomingTunnelConnection::accept(std::function<void(
     SystemError::ErrorCode,
     std::unique_ptr<AbstractStreamSocket>)> handler)
 {
@@ -81,7 +82,7 @@ void IncomingTunnelUdtConnection::accept(std::function<void(
         });
 }
 
-void IncomingTunnelUdtConnection::pleaseStop(
+void IncomingTunnelConnection::pleaseStop(
     nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_connectionSocket->pleaseStop(
@@ -94,7 +95,7 @@ void IncomingTunnelUdtConnection::pleaseStop(
         });
 }
 
-void IncomingTunnelUdtConnection::monitorKeepAlive()
+void IncomingTunnelConnection::monitorKeepAlive()
 {
     using namespace std::chrono;
     auto timePassed = steady_clock::now() - m_lastKeepAlive;
@@ -105,13 +106,13 @@ void IncomingTunnelUdtConnection::monitorKeepAlive()
     m_connectionSocket->registerTimer(next, [this](){ monitorKeepAlive(); });
 }
 
-void IncomingTunnelUdtConnection::readConnectionRequest()
+void IncomingTunnelConnection::readConnectionRequest()
 {
     m_connectionParser.reset();
     readRequest();
 }
 
-void IncomingTunnelUdtConnection::readRequest()
+void IncomingTunnelConnection::readRequest()
 {
     m_connectionBuffer.resize(0);
     m_connectionSocket->readSomeAsync(
@@ -150,7 +151,7 @@ void IncomingTunnelUdtConnection::readRequest()
 }
 
 
-void IncomingTunnelUdtConnection::writeResponse()
+void IncomingTunnelConnection::writeResponse()
 {
     NX_LOGX(lm("Send SYN+ACK for connection %1")
         .arg(m_connectionId), cl_logDEBUG1);
@@ -184,7 +185,7 @@ void IncomingTunnelUdtConnection::writeResponse()
         });
 }
 
-void IncomingTunnelUdtConnection::connectionSocketError(
+void IncomingTunnelConnection::connectionSocketError(
     SystemError::ErrorCode code)
 {
     NX_LOGX(lm("Connection socket error (%1), closing tunnel...")
