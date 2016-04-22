@@ -165,15 +165,6 @@ QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& dat
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnTransactionLog::transactionHash(const ApiResourceParamWithRefData& param) const
-{
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData("res_params");
-    hash.addData(param.resourceId.toRfc4122());
-    hash.addData(param.name.toUtf8());
-    return QnUuid::fromRfc4122(hash.result());
-}
-
 QnUuid QnTransactionLog::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);

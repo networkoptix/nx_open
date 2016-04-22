@@ -9,12 +9,66 @@
 #include <cstring>
 
 #include "transaction.h"
+#include "nx_ec/ec_api.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_camera_attributes_data.h"
+#include "nx_ec/data/api_media_server_data.h"
+#include "nx_ec/data/api_user_data.h"
+#include "nx_ec/data/api_tran_state_data.h"
+#include "nx_ec/data/api_layout_data.h"
+#include "nx_ec/data/api_videowall_data.h"
+#include "nx_ec/data/api_camera_history_data.h"
+#include "nx_ec/data/api_stored_file_data.h"
+#include "nx_ec/data/api_full_info_data.h"
+#include "nx_ec/data/api_license_data.h"
+#include "nx_ec/data/api_update_data.h"
+#include "nx_ec/data/api_discovery_data.h"
+#include "nx_ec/data/api_routing_data.h"
+#include "nx_ec/data/api_system_name_data.h"
+#include "nx_ec/data/api_runtime_data.h"
+#include "nx_ec/data/api_license_overflow_data.h"
+#include "nx_ec/data/api_peer_system_time_data.h"
+#include "nx_ec/data/api_webpage_data.h"
 #include "nx_ec/data/api_connection_data.h"
+#include "nx_ec/data/api_statistics.h"
+#include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_lock_data.h"
+
+#include "managers/business_event_manager.h"
+#include "managers/camera_manager.h"
+#include "managers/discovery_manager.h"
+#include "managers/layout_manager.h"
+#include "managers/license_manager.h"
+#include "managers/media_server_manager.h"
+#include "managers/misc_manager.h"
+#include "managers/resource_manager.h"
+#include "managers/stored_file_manager.h"
+#include "managers/time_manager.h"
+#include "managers/updates_manager.h"
+#include "managers/user_manager.h"
+#include "managers/videowall_manager.h"
+#include "managers/webpage_manager.h"
 
 namespace ec2
 {
 class QnTransactionLog;
 typedef std::function<bool (Qn::SerializationFormat, const QByteArray&)> FastFunctionType;
+
+class AbstractECConnection;
+class QnLicenseNotificationManager;
+class QnResourceNotificationManager;
+class QnMediaServerNotificationManager;
+class QnCameraNotificationManager;
+class QnUserNotificationManager;
+class QnBusinessEventNotificationManager;
+class QnLayoutNotificationManager;
+class QnVideowallNotificationManager;
+class QnWebPageNotificationManager;
+class QnStoredFileNotificationManager;
+class QnUpdatesNotificationManager;
+class QnMiscNotificationManager;
+class QnDiscoveryNotificationManager;
 
 namespace detail
 {
@@ -31,22 +85,6 @@ using SaveSerializedTranFuncType = std::function<ErrorCode(const QnTransaction<P
 
 template<typename ParamType>
 using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction &tran)>;
-
-
-class AbstractECConnection;
-class QnLicenseNotificationManager;
-class QnResourceNotificationManager;
-class QnMediaServerNotificationManager;
-class QnCameraNotificationManager;
-class QnUserNotificationManager;
-class QnBusinessEventNotificationManager;
-class QnLayoutNotificationManager;
-class QnVideowallNotificationManager;
-class QnWebPageNotificationManager;
-class QnStoredFileNotificationManager;
-class QnUpdatesNotificationManager;
-class QnMiscNotificationManager;
-class QnDiscoveryNotificationManager;
 
 struct NotificationParams
 {
@@ -67,7 +105,7 @@ struct NotificationParams
 };
 
 template<typename ParamType>
-using TriggerNotificationFuncType = std::function<void(const QnTransaction<ParamType> &, NotificationParams &)>;
+using TriggerNotificationFuncType = std::function<void(const QnTransaction<ParamType> &, const NotificationParams &)>;
 
 template<ApiCommand::Value value, typename ParamType>
 struct TransactionDescriptor
@@ -84,25 +122,26 @@ struct TransactionDescriptor
     CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
 
+    template<typename GetHashF, typename SaveF, typename SaveSerializedF, typename CreateTranF, typename TriggerNotificationF>
     TransactionDescriptor(bool isPersistent, bool isSystem, const char *name,
-                          GetHashFuncType<ParamType> getHashFunc, SaveTranFuncType<ParamType> saveFunc,
-                          SaveSerializedTranFuncType<ParamType> saveSerializedFunc,
-                          CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc,
-                          TriggerNotificationFuncType<ParamType> triggerNotificationFunc)
+                          GetHashF&& getHashFunc, SaveF&& saveFunc,
+                          SaveSerializedF&& saveSerializedFunc,
+                          CreateTranF&& createTransactionFromAbstractTransactionFunc,
+                          TriggerNotificationF&& triggerNotificationFunc)
         : isPersistent(isPersistent),
           isSystem(isSystem),
           name(name),
-          getHashFunc(getHashFunc),
-          saveFunc(saveFunc),
-          saveSerializedFunc(saveSerializedFunc),
-          createTransactionFromAbstractTransactionFunc(createTransactionFromAbstractTransactionFunc),
-          triggerNotificationFunc(triggerNotificationFunc)
+          getHashFunc(std::forward<GetHashF>(getHashFunc)),
+          saveFunc(std::forward<SaveF>(saveFunc)),
+          saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
+          createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
+          triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc))
     {}
 };
 
 struct NotDefinedType {};
 
-extern std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
+extern std::tuple<
                TransactionDescriptor<ApiCommand::tranSyncRequest, ApiSyncRequestData>,
                TransactionDescriptor<ApiCommand::lockRequest, ApiLockData>,
                TransactionDescriptor<ApiCommand::lockResponse, ApiLockData>,
@@ -115,7 +154,8 @@ extern std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
                TransactionDescriptor<ApiCommand::removeResource, ApiIdData>,
 
                TransactionDescriptor<ApiCommand::setResourceStatus, ApiResourceStatusData>,
-               TransactionDescriptor<ApiCommand::setResourceParams, ApiResourceParamDataList>,
+               TransactionDescriptor<ApiCommand::setResourceParams, ApiResourceParamWithRefDataList>,
+               TransactionDescriptor<ApiCommand::getResourceParams, ApiResourceParamWithRefDataList>,
                TransactionDescriptor<ApiCommand::getResourceTypes, ApiResourceTypeDataList>,
                TransactionDescriptor<ApiCommand::getFullInfo, ApiFullInfoData>,
                TransactionDescriptor<ApiCommand::setResourceParam, ApiResourceParamWithRefData>,
@@ -143,7 +183,78 @@ extern std::tuple<TransactionDescriptor<ApiCommand::NotDefined, NotDefinedType>,
                TransactionDescriptor<ApiCommand::saveServerUserAttributesList, ApiMediaServerUserAttributesDataList>,
                TransactionDescriptor<ApiCommand::getServerUserAttributes, ApiMediaServerUserAttributesDataList>,
                TransactionDescriptor<ApiCommand::removeServerUserAttributes, ApiIdData>,
-               TransactionDescriptor<ApiCommand::saveStorage, ApiStorageData>
+               TransactionDescriptor<ApiCommand::saveStorage, ApiStorageData>,
+
+               TransactionDescriptor<ApiCommand::saveStorages, ApiStorageDataList>,
+               TransactionDescriptor<ApiCommand::removeStorage, ApiIdData>,
+               TransactionDescriptor<ApiCommand::removeStorages, ApiIdDataList>,
+               TransactionDescriptor<ApiCommand::getMediaServersEx, ApiMediaServerDataExList>,
+               TransactionDescriptor<ApiCommand::getStorages, ApiStorageDataList>,
+               TransactionDescriptor<ApiCommand::getUsers, ApiUserDataList>,
+               TransactionDescriptor<ApiCommand::saveUser, ApiUserData>,
+               TransactionDescriptor<ApiCommand::removeUser, ApiIdData>,
+
+               TransactionDescriptor<ApiCommand::getAccessRights, ApiAccessRightsDataList>,
+               TransactionDescriptor<ApiCommand::setAccessRights, ApiAccessRightsData>,
+               TransactionDescriptor<ApiCommand::getLayouts, ApiLayoutDataList>,
+               TransactionDescriptor<ApiCommand::saveLayout, ApiLayoutData>,
+               TransactionDescriptor<ApiCommand::saveLayouts, ApiLayoutDataList>,
+               TransactionDescriptor<ApiCommand::removeLayout, ApiIdData>,
+               TransactionDescriptor<ApiCommand::getVideowalls, ApiVideowallDataList>,
+               TransactionDescriptor<ApiCommand::saveVideowall, ApiVideowallData>,
+
+               TransactionDescriptor<ApiCommand::removeVideowall, ApiIdData>,
+               TransactionDescriptor<ApiCommand::videowallControl, ApiVideowallControlMessageData>,
+               TransactionDescriptor<ApiCommand::getBusinessRules, ApiBusinessRuleDataList>,
+               TransactionDescriptor<ApiCommand::saveBusinessRule, ApiBusinessRuleData>,
+               TransactionDescriptor<ApiCommand::removeBusinessRule, ApiIdData>,
+               TransactionDescriptor<ApiCommand::resetBusinessRules, ApiResetBusinessRuleData>,
+               TransactionDescriptor<ApiCommand::broadcastBusinessAction, ApiBusinessActionData>,
+               TransactionDescriptor<ApiCommand::execBusinessAction, ApiBusinessActionData>,
+
+               TransactionDescriptor<ApiCommand::removeStoredFile, ApiStoredFilePath>,
+               TransactionDescriptor<ApiCommand::getStoredFile, ApiStoredFileData>,
+               TransactionDescriptor<ApiCommand::addStoredFile, ApiStoredFileData>,
+               TransactionDescriptor<ApiCommand::updateStoredFile, ApiStoredFileData>,
+               TransactionDescriptor<ApiCommand::listDirectory, ApiStoredDirContents>,
+               TransactionDescriptor<ApiCommand::getStoredFiles, ApiStoredFileDataList>,
+               TransactionDescriptor<ApiCommand::getLicenses, ApiLicenseDataList>,
+               TransactionDescriptor<ApiCommand::addLicense, ApiLicenseData>,
+
+               TransactionDescriptor<ApiCommand::addLicenses, ApiLicenseDataList>,
+               TransactionDescriptor<ApiCommand::removeLicense, ApiLicenseData>,
+               TransactionDescriptor<ApiCommand::uploadUpdate, ApiUpdateUploadData>,
+               TransactionDescriptor<ApiCommand::uploadUpdateResponce, ApiUpdateUploadResponceData>,
+               TransactionDescriptor<ApiCommand::installUpdate, ApiUpdateInstallData>,
+               TransactionDescriptor<ApiCommand::discoveredServerChanged, ApiDiscoveredServerData>,
+               TransactionDescriptor<ApiCommand::discoveredServersList, ApiDiscoveredServerDataList>,
+               TransactionDescriptor<ApiCommand::discoverPeer, ApiDiscoverPeerData>,
+
+               TransactionDescriptor<ApiCommand::addDiscoveryInformation, ApiDiscoveryData>,
+               TransactionDescriptor<ApiCommand::removeDiscoveryInformation, ApiDiscoveryData>,
+               TransactionDescriptor<ApiCommand::getDiscoveryData, ApiDiscoveryDataList>,
+               TransactionDescriptor<ApiCommand::getWebPages, ApiWebPageDataList>,
+               TransactionDescriptor<ApiCommand::saveWebPage, ApiWebPageData>,
+               TransactionDescriptor<ApiCommand::removeWebPage, ApiIdData>,
+               TransactionDescriptor<ApiCommand::forcePrimaryTimeServer, ApiIdData>,
+               TransactionDescriptor<ApiCommand::broadcastPeerSystemTime, ApiPeerSystemTimeData>,
+
+               TransactionDescriptor<ApiCommand::getCurrentTime, ApiTimeData>,
+               TransactionDescriptor<ApiCommand::changeSystemName, ApiSystemNameData>,
+               TransactionDescriptor<ApiCommand::getKnownPeersSystemTime, ApiPeerSystemTimeDataList>,
+               TransactionDescriptor<ApiCommand::markLicenseOverflow, ApiLicenseOverflowData>,
+               TransactionDescriptor<ApiCommand::getSettings, ApiResourceParamDataList>,
+               TransactionDescriptor<ApiCommand::getClientInfos, ApiClientInfoDataList>,
+               TransactionDescriptor<ApiCommand::saveClientInfo, ApiClientInfoData>,
+               TransactionDescriptor<ApiCommand::getStatisticsReport, ApiSystemStatistics>,
+
+               TransactionDescriptor<ApiCommand::triggerStatisticsReport, ApiStatisticsServerInfo>,
+               TransactionDescriptor<ApiCommand::runtimeInfoChanged, ApiRuntimeData>,
+               TransactionDescriptor<ApiCommand::dumpDatabase, ApiDatabaseDumpData>,
+               TransactionDescriptor<ApiCommand::restoreDatabase, ApiDatabaseDumpData>,
+               TransactionDescriptor<ApiCommand::updatePersistentSequence, ApiUpdateSequenceData>,
+               TransactionDescriptor<ApiCommand::dumpDatabaseToFile, ApiDatabaseDumpToFileData>,
+               TransactionDescriptor<ApiCommand::getTransactionLog, ApiTransactionDataList>
 > transactionDescriptors;
 
 /* Compile-time IndexSequence implementation (since stdc++lib shipped with g++ 4.8.2 doesn't have it) */

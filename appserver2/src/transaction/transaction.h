@@ -262,6 +262,12 @@ namespace ec2
         QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
         QnTransaction(ApiCommand::Value command, const T& params = T()): QnAbstractTransaction(command), params(params) {}
 
+        template<typename U>
+        QnTransaction(const QnTransaction<U>&)
+        {
+            NX_ASSERT(0, "Constructing from transaction with another Params type is disallowed");
+        }
+
         T params;
     };
 

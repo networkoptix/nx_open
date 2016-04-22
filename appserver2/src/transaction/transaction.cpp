@@ -14,39 +14,39 @@ namespace ec2
 
     namespace ApiCommand
     {
+        struct GetNameByValueDescriptorVisitor
+        {
+            template<typename Descriptor>
+            void operator ()(const Descriptor &d) { result = d.name; }
+
+            GetNameByValueDescriptorVisitor() : result(nullptr) {}
+
+            const char *result;
+        };
+
         QString toString(Value val)
         {
-            struct GetNameByValueDescriptorVisitor
-            {
-                template<typename Descriptor>
-                void operator ()(const Descriptor &d) { result = d.name; }
-
-                GetNameByValueDescriptorVisitor() : result(nullptr) {}
-
-                const char *result;
-            };
-
             GetNameByValueDescriptorVisitor visitor;
             visitTransactionDescriptorIfValue(val, visitor);
 
             if (visitor.result)
-                return result;
+                return visitor.result;
             else
                 return "unknown " + QString::number((int)val);
         }
 
+        struct GetValueByNameDescriptorVisitor
+        {
+            template<typename Descriptor>
+            void operator ()(const Descriptor &d) { result = d.tag; }
+
+            GetValueByNameDescriptorVisitor() : result(ApiCommand::NotDefined) {}
+
+            ApiCommand::Value result;
+        };
+
         Value fromString(const QString& val)
         {
-            struct GetValueByNameDescriptorVisitor
-            {
-                template<typename Descriptor>
-                void operator ()(const Descriptor &d) { result = d.tag; }
-
-                GetValueByNameDescriptorVisitor() : result(ApiCommand::NotDefined) {}
-
-                ApiCommand::Value result;
-            };
-
             GetValueByNameDescriptorVisitor visitor;
             visitTransactionDescriptorIfName(val.toLatin1().constData(), visitor);
 

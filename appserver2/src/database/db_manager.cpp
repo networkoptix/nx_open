@@ -3863,7 +3863,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& dumpFileSize)
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -3877,7 +3877,7 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
     //TODO #ak add license db to backup
 
     QFileInfo dumpFileInfo( dumpFilePath.path );
-    dumpFileSize = dumpFileInfo.size();
+    databaseDumpToFileData.size = dumpFileInfo.size();
 
     if( !m_sdb.open() )
     {
