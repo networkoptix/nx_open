@@ -54,16 +54,16 @@ boost::optional<nx::hpm::api::SystemCredentials>
     return cloudCredentials;
 }
 
-bool CloudConnectionManager::bindedToCloud() const
+bool CloudConnectionManager::boundToCloud() const
 {
     QnMutexLocker lk(&m_mutex);
-    return bindedToCloud(&lk);
+    return boundToCloud(&lk);
 }
 
 std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnection()
 {
     QnMutexLocker lk(&m_mutex);
-    if (!bindedToCloud(&lk))
+    if (!boundToCloud(&lk))
         return nullptr;
     return m_cdbConnectionFactory->createConnection(
         m_cloudSystemID.toStdString(),
@@ -95,7 +95,7 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
-bool CloudConnectionManager::bindedToCloud(QnMutexLockerBase* const /*lk*/) const
+bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 {
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 }
@@ -114,7 +114,7 @@ void CloudConnectionManager::cloudSettingsChanged()
 
     m_cloudSystemID = cloudSystemId;
     m_cloudAuthKey = cloudAuthKey;
-    const bool bindedToCloud = !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
+    const bool boundToCloud = !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
 
     lk.unlock();
 
@@ -125,7 +125,7 @@ void CloudConnectionManager::cloudSettingsChanged()
         qnCommon->setModuleInformation(info);
     }
 
-    if (bindedToCloud)
+    if (boundToCloud)
     {
         nx::hpm::api::SystemCredentials credentials(
             cloudSystemId.toUtf8(),
@@ -141,5 +141,5 @@ void CloudConnectionManager::cloudSettingsChanged()
             .setSystemCredentials(boost::none);
     }
 
-    emit cloudBindingStatusChanged(bindedToCloud);
+    emit cloudBindingStatusChanged(boundToCloud);
 }
