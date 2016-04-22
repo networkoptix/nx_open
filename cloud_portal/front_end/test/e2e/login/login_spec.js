@@ -238,7 +238,8 @@ describe('Login dialog', function () {
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
-        p.alert.catchAlert(p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger)
+        p.alert.catchAlert(p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger);
+        browser.pause();
     });
 
     p.alert.checkAlert(function(){
@@ -294,24 +295,69 @@ describe('Login dialog', function () {
     });
     xit("handles two tabs, updates second tab state if logout is done on first", function() {
     });
-    xit("works at each possible page at each state - with correct credentials", function() {
-        /*
-         Homepage
-
-         Registration page - before submit
-         Registration page - after submit success
-         Registration page - after submit with alert error message
-         Registration page - on account activation success
-         Registration page - on account activation error
-
-         Restore password page with email input - before submit
-         Restore password page with email input - after submit error
-         Restore password page with email input - after submit success
-         Restore password page with password input - before submit
-         Restore password page with password input - after submit error
-         Restore password page with password input - after submit success
-         */
+    it("works at registration page before submit - with correct credentials", function() {
+        p.helper.get( p.helper.urls.register );
+        p.loginButton.click();
+        p.helper.loginFromCurrPage();
     });
+
+    it("works at registration page after submit success - with correct credentials", function() {
+        p.helper.register();
+        p.loginButton.click();
+        p.helper.loginFromCurrPage();
+    });
+
+    it("works at registration page after submit with alert error message - with correct credentials", function() {
+        p.helper.register(null, null, p.helper.userEmailViewer);
+        p.loginButton.click();
+        p.helper.loginFromCurrPage();
+    });
+
+    it("works at registration page on account activation success - with correct credentials", function() {
+        p.helper.createUser();
+        p.loginButton.click();
+        p.helper.loginFromCurrPage();
+    });
+
+    it("works at registration page on account activation error - with correct credentials", function() {
+        var userEmail = p.helper.register();
+
+        p.helper.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            p.helper.get(url);
+
+            p.loginButton.click();
+            p.helper.loginFromCurrPage();
+        });
+    });
+
+    xit("works at restore password page with email input - before submit - with correct credentials", function() {
+
+    });
+
+    xit("works at restore password page with email input - after submit error - with correct credentials", function() {
+
+    });
+
+    xit("works at restore password page with email input - after submit success - with correct credentials", function() {
+
+    });
+
+    xit("works at restore password page with password input - before submit - with correct credentials", function() {
+        p.helper.register(null, null, p.helper.userEmailViewer);
+        p.loginButton.click();
+        p.helper.loginFromCurrPage();
+    });
+
+    xit("works at restore password page with password input - after submit error - with correct credentials", function() {
+
+    });
+
+    xit("works at restore password page with password input - after submit success - with correct credentials", function() {
+
+    });
+
     xit("works at each possible page at each state - with incorrect credentials", function() {
         /*
          Homepage
