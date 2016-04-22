@@ -1093,24 +1093,5 @@ namespace detail
                               )
       );
     #undef TRANSACTION_DESCRIPTOR
-    } // namespace detail
-    } // namespace ec2
-
-    struct GenericVisitor
-    {
-        template<typename Desc>
-        void operator()(const Desc &desc)
-        {
-            std::cout << desc.isPersistent;
-        }
-    };
-
-    int foo()
-    {
-//        std::cout << ec2::getTransactionDescriptorByValue<ec2::ApiCommand::Value::NotDefined>().isPersistent;
-        std::cout << ec2::getTransactionDescriptorByTransactionParams<ec2::ApiSyncRequestData>().isPersistent;
-        auto tuple = ec2::getTransactionDescriptorsFilteredByTransactionParams<ec2::ApiSyncRequestData>();
-        ec2::visitTransactionDescriptorIfValue(ec2::ApiCommand::addLicense, GenericVisitor(), tuple);
-//        ec2::visitTransactionDescriptorIfValue(ec2::ApiCommand::NotDefined, GenericVisitor());
-        return 1;
-    }
+} // namespace detail
+} // namespace ec2

@@ -402,7 +402,7 @@ template<int I, typename F>
 struct DescriptorsByValueVisitor
 {
     template<typename... Args>
-    static void apply(ApiCommand::Value value, F f, const std::tuple<Args...> &tuple)
+    static void apply(ApiCommand::Value value, F &f, const std::tuple<Args...> &tuple)
     {
         const auto &cur = std::get<I>(tuple);
         if (cur.tag == value)
@@ -421,14 +421,14 @@ template<typename F>
 struct DescriptorsByValueVisitor<-1, F>
 {
     template<typename... Args>
-    static void apply(ApiCommand::Value, F, const std::tuple<Args...> &)
+    static void apply(ApiCommand::Value, F &, const std::tuple<Args...> &)
     {
         NX_ASSERT(0, "Unknown ApiCommand value");
     }
 };
 
 template<typename F, typename... Args>
-void visitIfValueImpl(ApiCommand::Value value, F f, const std::tuple<Args...> &tuple)
+void visitIfValueImpl(ApiCommand::Value value, F &f, const std::tuple<Args...> &tuple)
 {
     DescriptorsByValueVisitor<(int)sizeof...(Args) - 1, F>::apply(value, f, tuple);
 }
@@ -438,7 +438,7 @@ template<int I, typename F>
 struct DescriptorsByNameVisitor
 {
     template<typename... Args>
-    static void apply(const char *name, F f, const std::tuple<Args...> &tuple)
+    static void apply(const char *name, F &f, const std::tuple<Args...> &tuple)
     {
         const auto &cur = std::get<I>(tuple);
         if (std::strcmp(cur.name, name) == 0)
@@ -457,14 +457,14 @@ template<typename F>
 struct DescriptorsByNameVisitor<-1, F>
 {
     template<typename... Args>
-    static void apply(const char *, F, const std::tuple<Args...> &)
+    static void apply(const char *, F &, const std::tuple<Args...> &)
     {
         NX_ASSERT(0, "Unknown ApiCommand name");
     }
 };
 
 template<typename F, typename... Args>
-void visitIfNameImpl(const char *name, F f, const std::tuple<Args...> &tuple)
+void visitIfNameImpl(const char *name, F &f, const std::tuple<Args...> &tuple)
 {
     DescriptorsByNameVisitor<(int)sizeof...(Args) - 1, F>::apply(name, f, tuple);
 }
@@ -490,25 +490,25 @@ constexpr auto getTransactionDescriptorsFilteredByTransactionParams()
 }
 
 template<typename F, typename... Args>
-void visitTransactionDescriptorIfValue(ApiCommand::Value value, F f)
+void visitTransactionDescriptorIfValue(ApiCommand::Value value, F &f)
 {
     return detail::visitIfValueImpl(value, f, detail::transactionDescriptors);
 }
 
 template<typename F, typename... Args>
-void visitTransactionDescriptorIfValue(ApiCommand::Value value, F f, const std::tuple<Args...> &tuple)
+void visitTransactionDescriptorIfValue(ApiCommand::Value value, F &f, const std::tuple<Args...> &tuple)
 {
     return detail::visitIfValueImpl(value, f, tuple);
 }
 
 template<typename F, typename... Args>
-void visitTransactionDescriptorIfName(const char *name, F f)
+void visitTransactionDescriptorIfName(const char *name, F &f)
 {
     return detail::visitIfNameImpl(name, f, detail::transactionDescriptors);
 }
 
 template<typename F, typename... Args>
-void visitTransactionDescriptorIfName(const char *name, F f, const std::tuple<Args...> &tuple)
+void visitTransactionDescriptorIfName(const char *name, F &f, const std::tuple<Args...> &tuple)
 {
     return detail::visitIfNameImpl(name, f, tuple);
 }
