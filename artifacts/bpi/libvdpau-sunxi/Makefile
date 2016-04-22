@@ -19,7 +19,7 @@ LIB_LDFLAGS = -shared -Wl,-soname,$(TARGET)
 OBJ = $(addsuffix .o,$(basename $(SRC)))
 DEP = $(addsuffix .d,$(basename $(SRC)))
 
-MODULEDIR = $(shell pkg-config --variable=moduledir vdpau)
+#MODULEDIR = $(shell pkg-config --variable=moduledir vdpau)
 
 ifeq ($(MODULEDIR),)
 MODULEDIR=/usr/lib/vdpau
