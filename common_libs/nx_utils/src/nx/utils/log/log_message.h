@@ -16,6 +16,8 @@
 #include <QtCore/QStringList>
 #include <nx/utils/uuid.h>
 
+inline
+QString toString( const QString& t) { return t; }
 
 template<typename First, typename Second>
 QString toString(
@@ -112,15 +114,16 @@ public:
         return m_str.arg(a, fieldWidth, format, precision, fillChar);
     }
 
-    template<typename T>
-    QnLogMessage container(const T& a)
+    template<typename T, typename ... Args>
+    QnLogMessage str(const T& a, Args ... args)
     {
-        return arg(
-            containerString(
-                a,
-                QLatin1String(", "),
-                QLatin1String(""),
-                QLatin1String("") ));
+        return arg(toString(a, std::forward(args) ...));
+    }
+
+    template<typename T, typename ... Args>
+    QnLogMessage container(const T& a, Args ... args)
+    {
+        return arg(containerString(a, std::forward(args) ...));
     }
 
     operator QString() const; 

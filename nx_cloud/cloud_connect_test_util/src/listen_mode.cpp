@@ -1,18 +1,88 @@
-/**********************************************************
-* mar 29, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "listen_mode.h"
 
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/multiple_server_socket.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/udt/udt_socket.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
 
+namespace nx {
+namespace cctu {
+
+void printListenOptions(std::ostream* const outStream)
+{
+    *outStream<<
+    "Listen mode (can listen on local or cloud address):\n"
+    "  --listen                     Enable listen mode\n"
+    "  --echo                       Makes server to mirror data instead of spaming\n"
+    "  --cloud-credentials={system_id}:{authentication_key}\n"
+    "                               Specify credentials to use to connect to mediator\n"
+    "  --server-id={server_id}      Id used when registering on mediator (optional)\n"
+    "  --server-count=N             Random generated server Ids (to emulate several servers)\n"
+    "  --local-address={ip:port}    Local address to listen\n"
+    "  --udt                        Use udt instead of tcp. Only if listening local address\n";
+}
+
+class CloudServerSocketGenerator
+{
+public:
+    std::unique_ptr<AbstractStreamServerSocket> make(
+        String systemId, String authKey, std::vector<String> serverIds)
+    {
+        auto multipleServerSocket = std::make_unique<network::MultipleServerSocket>();
+        for (auto& id : serverIds)
+        {
+            auto socket = make(systemId, authKey, id);
+            if (!socket)
+                return nullptr;
+
+            if (!multipleServerSocket->addSocket(std::move(socket)))
+                return nullptr;
+        }
+
+        return std::move(multipleServerSocket);
+    }
+
+    std::unique_ptr<AbstractStreamServerSocket> make(
+        String systemId, String authKey, String serverId)
+    {
+        m_mediatorConnectors.emplace_back(new hpm::api::MediatorConnector);
+
+        auto& mc = m_mediatorConnectors.back();
+        mc->mockupAddress(&network::SocketGlobals::mediatorConnector());
+        mc->setSystemCredentials(hpm::api::SystemCredentials(systemId, serverId, authKey));
+        mc->enable(true);
+
+        auto cloudServerSocket = std::make_unique<network::cloud::CloudServerSocket>(
+            mc->systemConnection());
+        /*
+        if (!cloudServerSocket->registerOnMediatorSync())
+        {
+            std::cerr << "error. Failed to listen on mediator. Reason: " <<
+                SystemError::getLastOSErrorText().toStdString() << std::endl;
+            return nullptr;
+        }
+        */
+
+        std::cout << "listening on mediator. Address "
+            << serverId.toStdString() << "." << systemId.toStdString()
+            << std::endl;
+
+        return std::move(cloudServerSocket);
+    }
+
+    ~CloudServerSocketGenerator()
+    {
+        for (auto& mc : m_mediatorConnectors)
+            mc->pleaseStopSync();
+    }
+
+private:
+    std::vector<std::unique_ptr<hpm::api::MediatorConnector>> m_mediatorConnectors;
+};
 
 int runInListenMode(const std::multimap<QString, QString>& args)
 {
@@ -22,6 +92,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     if (args.find("echo") != args.end())
         transmissionMode = nx::network::test::TestTransmissionMode::echo;
 
+    CloudServerSocketGenerator cloudServerSocketGenerator;
     test::RandomDataTcpServer server(
         test::TestTrafficLimitType::none, 0, transmissionMode);
 
@@ -34,34 +105,30 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         cloudCredentials = credentialsIter->second.split(":");
         if (cloudCredentials.size() != 2)
         {
-            std::cerr << "error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
+            std::cerr << "Error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
             return 1;
         }
 
-        QString serverId = generateRandomName(7);
-        readArg(args, "server-id", &serverId);
-
-        SocketGlobals::mediatorConnector().setSystemCredentials(
-            nx::hpm::api::SystemCredentials(
-                cloudCredentials[0].toUtf8(),
-                serverId.toUtf8(),
-                cloudCredentials[1].toUtf8()));
-        SocketGlobals::mediatorConnector().enable(true);
-
-        auto cloudServerSocket = std::make_unique<cloud::CloudServerSocket>(
-            SocketGlobals::mediatorConnector().systemConnection());
-        if (!cloudServerSocket->registerOnMediatorSync())
+        std::vector<String> serverIds;
         {
-            std::cerr << "error. Failed to listen on mediator. Reason: " <<
-                SystemError::getLastOSErrorText().toStdString() << std::endl;
-            return 1;
+            QString serverId = generateRandomName(7);
+            readArg(args, "server-id", &serverId);
+            serverIds.push_back(serverId.toUtf8());
+
+            int serverCount = 1;
+            readArg(args, "server-count", &serverCount);
+            for (int i = serverIds.size(); i < serverCount; i++)
+                serverIds.push_back((serverId + QString::number(i)).toUtf8());
         }
-        serverSocket = std::move(cloudServerSocket);
-        std::cout << "listening on mediator. Address "
-            << serverId.toStdString() << "." << cloudCredentials[0].toStdString()
-            << std::endl;
+
+        serverSocket = cloudServerSocketGenerator.make(
+            cloudCredentials[0].toUtf8(), cloudCredentials[1].toUtf8(), serverIds);
+
+        if (!serverSocket)
+            return 2;
     }
-    else if (localAddressIter != args.end())
+    else
+    if (localAddressIter != args.end())
     {
         const bool isUdt = args.find("udt") != args.end();
 
@@ -76,7 +143,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     else
     {
         std::cerr << "error. You have to specifiy --cloud-credentials or --local-address " << std::endl;
-        return 1;
+        return 3;
     }
 
     server.setServerSocket(std::move(serverSocket));
@@ -85,7 +152,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         auto osErrorText = SystemError::getLastOSErrorText().toStdString();
         std::cerr << "error. Failed to start accepting connections. Reason: "
             << osErrorText << std::endl;
-        return 1;
+        return 4;
     }
 
     const int result = printStatsAndWaitForCompletion(
@@ -93,19 +160,6 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         nx::utils::MoveOnlyFunc<bool()>());
     server.pleaseStopSync();
     return result;
-}
-
-void printListenOptions(std::ostream* const outStream)
-{
-    *outStream<<
-    "Listen mode (can listen on local or cloud address):\n"
-    "  --listen                         Enable listen mode\n"
-    "  --echo                           Makes server to mirror data instead of spaming\n"
-    "  --cloud-credentials={system_id}:{authentication_key}\n"
-    "                                   Specify credentials to use to connect to mediator\n"
-    "  --server-id={server_id}          Id used when registering on mediator\n"
-    "  --local-address={ip:port}        Local address to listen\n"
-    "  --udt                            Use udt instead of tcp. Only if listening local address\n";
 }
 
 int printStatsAndWaitForCompletion(
@@ -176,3 +230,6 @@ int printStatsAndWaitForCompletion(
 
     return 0;
 }
+
+} // namespace cctu
+} // namespace nx

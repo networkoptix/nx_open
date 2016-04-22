@@ -9,6 +9,10 @@
 namespace nx {
 namespace stun {
 
+MessageDispatcher::MessageDispatcher()
+{
+}
+
 MessageDispatcher::~MessageDispatcher()
 {
 }

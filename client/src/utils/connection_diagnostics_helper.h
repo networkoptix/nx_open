@@ -35,11 +35,7 @@ public:
     };
 
     /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
-    static Result validateConnectionLight(
-        const QString &brand,
-        const QnSoftwareVersion &version,
-        int protoVersion,
-        const QList<QnCompatibilityItem> &compatibilityItems = QList<QnCompatibilityItem>());
+    static Result validateConnectionLight(const QString &brand, int protoVersion);
 
     /** Light check of connection validity. Returns Success if we can connect without problems, Failure otherwise. */
     static Result validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode);

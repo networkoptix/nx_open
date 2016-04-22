@@ -6,6 +6,7 @@
 #ifndef ASYNCHTTPCLIENT_H
 #define ASYNCHTTPCLIENT_H
 
+#include <chrono>
 #include <map>
 #include <memory>
 
@@ -64,6 +65,24 @@ namespace nx_http
             sReadingMessageBody,
             sFailed,
             sDone
+        };
+
+        /** 0 means infinity for any timeout */
+        class NX_NETWORK_API Timeouts
+        {
+        public:
+            constexpr static const std::chrono::seconds kDefaultSendTimeout =
+                std::chrono::seconds(3);
+            constexpr static const std::chrono::seconds kDefaultResponseReadTimeout =
+                std::chrono::seconds(3);
+            constexpr static const std::chrono::seconds kDefaultMessageBodyReadTimeout =
+                std::chrono::seconds::zero();  //no timeout
+
+            std::chrono::milliseconds sendTimeout;
+            std::chrono::milliseconds responseReadTimeout;
+            std::chrono::milliseconds messageBodyReadTimeout;
+
+            Timeouts();
         };
 
         static const int UNLIMITED_RECONNECT_TRIES = -1;
@@ -127,7 +146,7 @@ namespace nx_http
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
 
-        //!Set socket send timeout
+        //!Set socket connect/send timeout
         void setSendTimeoutMs( unsigned int sendTimeoutMs );
         /*!
             \param responseReadTimeoutMs 0 means infinity
@@ -358,7 +377,8 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+        AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
     //!Calls previous function and waits for completion
     SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
@@ -371,9 +391,10 @@ namespace nx_http
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
-        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
+        AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
-    void NX_NETWORK_API downloadFileAsyncEx(
+    void downloadFileAsyncEx(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
         nx_http::AsyncHttpClientPtr httpClientCaptured);

@@ -4,11 +4,14 @@
 #include <QtCore/QScopedPointer>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/dialogs/generic_tabbed_dialog.h>
+#include <ui/dialogs/common/generic_tabbed_dialog.h>
 
 namespace Ui {
     class PreferencesDialog;
 }
+
+class QnGeneralPreferencesWidget;
+class QnLookAndFeelPreferencesWidget;
 
 class QnPreferencesDialog: public QnGenericTabbedDialog, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -31,12 +34,12 @@ protected:
 
     virtual void applyChanges() override;
 
-    virtual bool canApplyChanges() override;
-
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 
     QScopedPointer<Ui::PreferencesDialog> ui;
+    QnGeneralPreferencesWidget* m_generalWidget;
+    QnLookAndFeelPreferencesWidget* m_lookAndFeelWidget;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

@@ -835,6 +835,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
+        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
+                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
 
         /* Media-specific permissions. */
         ExportPermission                = 0x2000,   /**< Permission to export video parts. */
@@ -863,7 +865,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalOwnerPermission                   = 0x00000001,   /**< Root, can edit admins. */
         GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
         GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
-        GlobalEditUsersPermission               = 0x00000008,   /**< Can create and edit users. */
+        /* DeprecatedGlobalEditUsersPermission  = 0x00000008 */
         /*DeprecatedEditCamerasPermission       = 0x00000010 */
         GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
         /*DeprecatedViewExportArchivePermission = 0x00000040 */
@@ -881,25 +883,29 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
 
         /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
+        DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */
         DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Deprecated. Can view and export archives of available cameras. */
         DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
 
         /* Shortcuts. */
-        GlobalLiveViewerPermissions         = GlobalViewLivePermission,
 
-        GlobalViewerPermissions             = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission,
+        /* Live viewer has access to all cameras by default */
+        GlobalLiveViewerPermissionSet       = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+
+        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalPtzControlPermission,
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalPtzControlPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalLiveViewerPermissions | GlobalViewArchivePermission | GlobalExportPermission | GlobalPtzControlPermission,
+        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalPtzControlPermission,
 
-        GlobalAdvancedViewerPermissions     = GlobalViewerPermissions | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission       | GlobalEditUsersPermission         |
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalEditCamerasPermission | GlobalPtzControlPermission,
+
+        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
                                               GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessAllCamerasPermission  | GlobalAccessAllLayoutsPermission  | GlobalAccessAllServersPermission  ,
+                                              GlobalAccessAllServersPermission  ,
         GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
     };
 
@@ -978,7 +984,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
-    (Qn::Permissions)(Qn::GlobalPermissions)
+    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
     ,
     (metatype)(numeric)(lexical)
 )

@@ -1,17 +1,20 @@
+
 #include <gtest/gtest.h>
 
 #include <random>
 #include <thread>
 
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
+#include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_server.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <utils/thread/sync_queue.h>
 
+
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 namespace test {
 
 const SocketAddress kMediatorAddress("127.0.0.1:12345");
@@ -46,7 +49,7 @@ protected:
     :
         stunClientMock(std::make_shared<network::test::StunAsyncClientMock>()),
         manualAcceptorStop(false),
-        udpStunServer(stunMessageDispatcher),
+        udpStunServer(&stunMessageDispatcher),
         isUdpServerEnabled(true),
         connectionRequests(0)
     {
@@ -75,10 +78,11 @@ protected:
         mediatorConnection.reset(new hpm::api::MediatorServerTcpConnection(
             stunClientMock, &dummyCloudSystemCredentialsProvider));
 
-        tunnelAcceptor.reset(new UdpHolePunchingTunnelAcceptor(k2ndPeerAddress));
+        nx::hpm::api::ConnectionParameters connectionParameters;
+        connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
+        tunnelAcceptor.reset(new TunnelAcceptor(k2ndPeerAddress, connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
         tunnelAcceptor->setMediatorConnection(mediatorConnection);
-        tunnelAcceptor->setUdtConnectTimeout(kSocketTimeout);
         tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);
         tunnelAcceptor->setUdpMaxRetransmissions(1);
 
@@ -210,7 +214,7 @@ protected:
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
 
     bool manualAcceptorStop;
-    std::unique_ptr<UdpHolePunchingTunnelAcceptor> tunnelAcceptor;
+    std::unique_ptr<TunnelAcceptor> tunnelAcceptor;
     stun::MessageDispatcher stunMessageDispatcher;
     stun::UDPServer udpStunServer;
 
@@ -287,6 +291,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, MultiUdtConnect)
 }
 
 } // namespace test
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

@@ -8,72 +8,50 @@
 #include <client/client_runtime_settings.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/ec_proto_version.h>
 
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/software_version.h>
-
-#include "compatibility.h"
 #include <utils/common/app_info.h>
 
-namespace {
-    QnSoftwareVersion minSupportedVersion("1.4"); 
+namespace
+{
+    QnSoftwareVersion kMinSupportedVersion("1.4");
 }
 
 
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(
-    const QString &brand, 
-    const QnSoftwareVersion &version, 
-    int protoVersion, 
-    const QList<QnCompatibilityItem> &compatibilityItems)
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QString &brand, int protoVersion)
 {
-    //checking brand compatibility
-    bool success = qnRuntime->isDevMode() || brand.isEmpty() || brand == QnAppInfo::productNameShort();
-
-    if(!success)
-        return Result::IncompatibleBrand;
-
-    if (protoVersion != nx_ec::EC2_PROTO_VERSION)
+    if (protoVersion != QnAppInfo::ec2ProtoVersion())
         return Result::IncompatibleProtocol;
 
-    QnCompatibilityChecker remoteChecker(compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker *compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size()) {
-        compatibilityChecker = &remoteChecker;
-    } else {
-        compatibilityChecker = &localChecker;
-    }
-
-    return (compatibilityChecker->isCompatible(lit("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), lit("ECS"), version))
+    //checking brand compatibility
+    bool compatibleBrand = qnRuntime->isDevMode() || brand.isEmpty() || brand == QnAppInfo::productNameShort();
+    return compatibleBrand
         ? Result::Success
-        : Result::IncompatibleVersion;
+        : Result::IncompatibleBrand;
 }
 
 
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode)
+{
     if (errorCode == ec2::ErrorCode::unauthorized)
         return Result::Unauthorized;
-    
+
     if (errorCode == ec2::ErrorCode::temporary_unauthorized)
         return Result::TemporaryUnauthorized;
 
     if (errorCode != ec2::ErrorCode::ok)
         return Result::ServerError;
 
-    return validateConnectionLight(connectionInfo.brand, 
-        connectionInfo.version,
-        connectionInfo.nxClusterProtoVersion,
-        connectionInfo.compatibilityItems);
+    return validateConnectionLight(connectionInfo.brand, connectionInfo.nxClusterProtoVersion);
 }
 
 
-QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnection(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode, const QUrl &url, QWidget* parentWidget) {
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnection(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode, const QUrl &url, QWidget* parentWidget)
+{
     QnConnectionDiagnosticsHelper::Result result = validateConnectionLight(connectionInfo, errorCode);
     if (result == Result::Success)
         return result;
@@ -82,11 +60,11 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     if (result == Result::Unauthorized) {
         detail = tr("The username or password you have entered is incorrect. Please try again.");
     } else if (result == Result::TemporaryUnauthorized) {
-        detail = tr("LDAP Server connection timed out.") + L'\n' 
+        detail = tr("LDAP Server connection timed out.") + L'\n'
             + strings(ErrorStrings::ContactAdministrator);
     } else if (result == Result::ServerError) {
-        detail = tr("Connection to the Server could not be established.") + L'\n' 
-               + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
+        detail = tr("Connection to the Server could not be established.") + L'\n'
+               + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
                + strings(ErrorStrings::ContactAdministrator);
     } else if (result == Result::IncompatibleBrand) { //brand incompatible
         detail = tr("You are trying to connect to incompatible Server.");
@@ -102,25 +80,16 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         return result;
     }
 
-    QString versionDetails =                             
-          tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n' 
+    QString versionDetails =
+          tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
         + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
-
-    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker *compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size()) {
-        compatibilityChecker = &remoteChecker;
-    } else {
-        compatibilityChecker = &localChecker;
-    }
 
     bool haveExactVersion = false;
     bool needExactVersion = false;
 
-    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version)) {
-        if (connectionInfo.nxClusterProtoVersion == nx_ec::EC2_PROTO_VERSION)
+    if (qnCommon->engineVersion().isCompatible(connectionInfo.version))
+    {
+        if (connectionInfo.nxClusterProtoVersion == QnAppInfo::ec2ProtoVersion())
             return Result::Success;
 
         needExactVersion = true;
@@ -128,14 +97,14 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         if (applauncher::getInstalledVersions(&versions) == applauncher::api::ResultType::ok) {
             haveExactVersion = versions.contains(connectionInfo.version);
         } else {
-            QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
+            QString olderComponent = connectionInfo.nxClusterProtoVersion < QnAppInfo::ec2ProtoVersion()
                 ? tr("Server")
                 : tr("Client");
-            QString message = tr("You are about to connect to Server which has a different version:") + L'\n' 
+            QString message = tr("You are about to connect to Server which has a different version:") + L'\n'
                             + versionDetails
                             + tr("These versions are not compatible. Please update your %1.").arg(olderComponent);
 #ifdef _DEBUG
-            message += lit("\nClient Proto: %1\nServer Proto: %2").arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
+            message += lit("\nClient Proto: %1\nServer Proto: %2").arg(QnAppInfo::ec2ProtoVersion()).arg(connectionInfo.nxClusterProtoVersion);
 #endif
             QnMessageBox::warning(
                 parentWidget,
@@ -148,14 +117,15 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         }
     }
 
-    if (connectionInfo.version < minSupportedVersion) {
+    if (connectionInfo.version < kMinSupportedVersion)
+    {
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
             strings(ErrorStrings::UnableConnect),
             tr("You are about to connect to Server which has a different version:") + L'\n'
             + versionDetails
-            + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString()),
+            + tr("Compatibility mode for versions lower than %1 is not supported.").arg(kMinSupportedVersion.toString()),
             QDialogButtonBox::Ok
             );
         return Result::IncompatibleVersion;
@@ -215,11 +185,11 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 Qn::VersionMismatch_Help,
                 strings(ErrorStrings::UnableConnect),
                 tr("You are about to connect to Server which has a different version:") + L'\n'
-                + tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n' 
+                + tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
                 + tr(" - Server version: %1.").arg(versionString) + L'\n'
-                + tr("Client version %1 is required to connect to this Server.").arg(versionString) + L'\n' 
+                + tr("Client version %1 is required to connect to this Server.").arg(versionString) + L'\n'
                 + tr("Download version %1?").arg(versionString),
-                
+
                 QDialogButtonBox::StandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::Cancel),
                 QDialogButtonBox::Cancel
                 );
@@ -259,7 +229,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QnMessageBox::critical(
                 parentWidget,
                 tr("Launcher process not found."),
-                tr("Cannot restart the Client in compatibility mode.") + L'\n' 
+                tr("Cannot restart the Client in compatibility mode.") + L'\n'
               + tr("Please close the application and start it again using the shortcut in the start menu.")
                 );
             return Result::IncompatibleVersion;
@@ -271,7 +241,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                     parentWidget,
                     Qn::VersionMismatch_Help,
                     tr("Failure"),
-                    tr("Failed to launch compatibility version %1").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)) + L'\n' 
+                    tr("Failed to launch compatibility version %1").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)) + L'\n'
                   + tr("Try to restore version %1?").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
                     QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
                     QDialogButtonBox::Cancel
@@ -297,70 +267,74 @@ QnConnectionDiagnosticsHelper::TestConnectionResult QnConnectionDiagnosticsHelpe
 {
     QnConnectionDiagnosticsHelper::TestConnectionResult result;
 
-    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker* compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size())
-        compatibilityChecker = &remoteChecker;
-    else
-        compatibilityChecker = &localChecker;
-
     //TODO #GDM almost same code exists in QnConnectionDiagnosticsHelper::validateConnection
 
     result.result = Result::Success;
     result.helpTopicId = Qn::Empty_Help;
 
-    QString versionDetails =                             
-        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n' 
+    QString versionDetails =
+        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
       + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
 
     bool compatibleProduct = qnRuntime->isDevMode() || connectionInfo.brand.isEmpty()
         || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (errorCode == ec2::ErrorCode::unauthorized) {
+    if (errorCode == ec2::ErrorCode::unauthorized)
+    {
         result.result = Result::Unauthorized;
         result.details = tr("The username or password you have entered is incorrect. Please try again.");
         result.helpTopicId = Qn::Login_Help;
-    } else if (errorCode == ec2::ErrorCode::temporary_unauthorized) {
+    }
+    else if (errorCode == ec2::ErrorCode::temporary_unauthorized)
+    {
         result.result = Result::TemporaryUnauthorized;
-        result.details = tr("LDAP Server connection timed out.") + L'\n' 
+        result.details = tr("LDAP Server connection timed out.") + L'\n'
             + strings(ErrorStrings::ContactAdministrator);
         result.helpTopicId = Qn::Login_Help;
-    } else if (errorCode != ec2::ErrorCode::ok) {
+    }
+    else if (errorCode != ec2::ErrorCode::ok)
+    {
         result.result = Result::ServerError;
-        result.details = tr("Connection to the Server could not be established.") + L'\n' 
-            + tr("Connection details that you have entered are incorrect, please try again.") + L'\n' 
+        result.details = tr("Connection to the Server could not be established.") + L'\n'
+            + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
             + strings(ErrorStrings::ContactAdministrator);
         result.helpTopicId = Qn::Login_Help;
-    } else if (!compatibleProduct) {
+    }
+    else if (!compatibleProduct)
+    {
         result.result = Result::IncompatibleBrand;
         result.details = tr("You are trying to connect to incompatible Server.");
         result.helpTopicId = Qn::Login_Help;
-    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo.version)) {
+    }
+    else if (!qnCommon->engineVersion().isCompatible(connectionInfo.version))
+    {
         result.helpTopicId = Qn::VersionMismatch_Help;
-        QnSoftwareVersion minSupportedVersion("1.4");
 
-        if (connectionInfo.version < minSupportedVersion) {
-            result.details = tr("Server has a different version:") + L'\n' 
+        if (connectionInfo.version < kMinSupportedVersion)
+        {
+            result.details = tr("Server has a different version:") + L'\n'
                 + versionDetails
-                + tr("Compatibility mode for versions lower than %1 is not supported.").arg(minSupportedVersion.toString());
+                + tr("Compatibility mode for versions lower than %1 is not supported.").arg(kMinSupportedVersion.toString());
             result.result = Result::IncompatibleVersion;
 
-        } else {
-            result.details = tr("Server has a different version:") + L'\n' 
+        }
+        else
+        {
+            result.details = tr("Server has a different version:") + L'\n'
                 + versionDetails
                 + tr("You will be asked to restart the client in compatibility mode.");
         }
-    } else if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
-        QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
+    }
+    else if (connectionInfo.nxClusterProtoVersion != QnAppInfo::ec2ProtoVersion())
+    {
+        result.helpTopicId = Qn::VersionMismatch_Help;
+        QString olderComponent = connectionInfo.nxClusterProtoVersion < QnAppInfo::ec2ProtoVersion()
             ? tr("Server")
             : tr("Client");
-        result.details = tr("Server has a different version:") + L'\n' 
+        result.details = tr("Server has a different version:") + L'\n'
             + versionDetails
             + tr("You will be asked to update your %1").arg(olderComponent);
     }
-
 
     return result;
 }

@@ -11,11 +11,9 @@ import rdep
 import platform_detection
 
 REPOSITORY_PATH = os.path.join(os.getenv("environment"), "packages")
-SYNC_URL = "rsync://hdw.mx/buildenv/rdep/packages"
+SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 if time.timezone == 28800:
     SYNC_URL = "rsync://la.hdw.mx/buildenv/rdep/packages"
-elif time.timezone == -10800:
-    SYNC_URL = "rsync://enk.me/buildenv/rdep/packages"
 SYNC_FILE = ".sync"
 INSTALL_FILE = ".install"
 

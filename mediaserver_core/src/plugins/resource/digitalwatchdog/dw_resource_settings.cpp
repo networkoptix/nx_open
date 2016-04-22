@@ -1,3 +1,5 @@
+#ifdef ENABLE_ONVIF
+
 #include "dw_resource_settings.h"
 
 #include <core/resource/camera_advanced_param.h>
@@ -332,3 +334,5 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
 
     return resultOK;
 }
+
+#endif  // ENABLE_ONVIF

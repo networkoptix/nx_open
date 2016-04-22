@@ -39,9 +39,10 @@ Yunhong Gu, last updated 01/01/2011
 *****************************************************************************/
 
 #ifdef __linux__
-#include <sys/epoll.h>
 #include <unistd.h>
+#include <sys/epoll.h>
 #elif __APPLE__
+#include <unistd.h>
 #include <sys/event.h>
 #endif
 #include <algorithm>
@@ -328,10 +329,12 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
     if (::epoll_ctl(p->second->m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
         throw CUDTException();
 #elif __APPLE__
-    struct kevent ev[2];
-    EV_SET(&(ev[0]), s, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-    EV_SET(&(ev[1]), s, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-    kevent(p->second->m_iLocalID, ev, 2, NULL, 0, NULL);  //ignoring return code, since event is removed in any case
+    //not calling kevent with two events since if one of them is not being listened, whole kevent call fails
+    struct kevent ev;
+    EV_SET(&ev, s, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+    kevent(p->second->m_iLocalID, &ev, 1, NULL, 0, NULL);
+    EV_SET(&ev, s, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+    kevent(p->second->m_iLocalID, &ev, 1, NULL, 0, NULL);  //ignoring return code, since event is removed in any case
 #elif _WIN32
 #endif
 
@@ -592,6 +595,7 @@ int CEPoll::doSystemPoll(
 
     memset(ev, 0, sizeof(ev));
     struct timespec timeout;
+    int msTimeOut = 0;
     if (msTimeOut >= 0)
     {
         memset(&timeout, 0, sizeof(timeout));

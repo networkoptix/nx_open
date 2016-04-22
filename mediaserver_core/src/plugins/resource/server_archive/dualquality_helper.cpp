@@ -130,13 +130,15 @@ void QnDualQualityHelper::findDataForTimeHelper(
         if (currentChunk.startTimeMs == -1)
             break;
 
-        auto ignoreIt = ignoreChunks.find(
+        DeviceFileCatalog::UniqueChunk chunkToFind = 
             DeviceFileCatalog::UniqueChunk(
                 currentChunk,
                 currentCatalog->cameraUniqueId(),
-                currentCatalog->getRole()
-            )
-        );
+                currentCatalog->getRole(),
+                currentCatalog->getStoragePool() == QnServer::StoragePool::Backup
+            );
+
+        auto ignoreIt = ignoreChunks.find(chunkToFind);
 
         if (ignoreIt == ignoreChunks.cend())
             break;

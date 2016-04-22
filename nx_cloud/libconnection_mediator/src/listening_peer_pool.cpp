@@ -12,6 +12,18 @@ namespace nx {
 namespace hpm {
 
 
+QString ListeningPeerData::toString() const
+{
+    QStringList opts;
+    if (isLocal) opts << lm("local");
+    if (isListening) opts << lm("listening");
+    if (endpoints.size()) opts << lm("endpoints=%1").container(endpoints);
+    if (connectionMethods) opts << lm("methods=%1")
+        .arg(api::ConnectionMethod::toString(connectionMethods));
+
+    return lm("%1<%2>").arg(hostName).container(opts);
+}
+
 ////////////////////////////////////////////////////////////
 //// class ConstDataLocker
 ////////////////////////////////////////////////////////////

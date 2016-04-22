@@ -197,8 +197,9 @@ private:
     {
         QnMutexLocker lk(&m_mutex);
         m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        auto thisClient = client.get();
         client->get(
-            [completionHandler, this, thisClient = client.get()](
+            [completionHandler, this, thisClient](
                 SystemError::ErrorCode errCode,
                 const nx_http::Response* response,
                 OutputData ... data)

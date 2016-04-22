@@ -17,7 +17,6 @@
 #include <utils/common/string.h>
 
 #include <ui/style/custom_style.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

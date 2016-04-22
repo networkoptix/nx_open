@@ -85,6 +85,9 @@ public:
     /** Check if layout is an exported file. */
     bool isFile() const;
 
+    /** Check if layout is global. */
+    bool isGlobal() const;
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

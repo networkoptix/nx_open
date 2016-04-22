@@ -83,7 +83,7 @@
     <form class="master-controls" name="cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="Email" required autofocus ng-change="clearCloudError()">
+                   type="email" placeholder="Email" autocomplete="new-password"  required autofocus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
@@ -195,9 +195,9 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
-    <h2>Connect your server to internet</h2>
+    <h2>Connect your server to the Internet</h2>
     <p class="master-description">
-        Set up internet connection and firewall settings on your server to be able <br> to connect to it anywhere using Nx Cloud.
+        Set up Internet connection on your server to be able <br> to connect to it anywhere using Nx Cloud.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
@@ -207,9 +207,9 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Connect to internet</h2>
+    <h2>Connect to the Internet</h2>
     <p class="master-description">
-        Connect to internet and configure firewall on your device to connect your system to Nx Cloud.
+        Connect your device to the Internet to connect your system to Nx Cloud.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>

@@ -9,7 +9,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnAbstractPtzHotkeyDelegate {

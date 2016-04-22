@@ -131,6 +131,7 @@ namespace detail
         case ApiCommand::removeStorage:
             return notificationParams.mediaServerNotificationManager->triggerNotification( tran );
         case ApiCommand::removeUser:
+        case ApiCommand::removeUserGroup:
             return notificationParams.userNotificationManager->triggerNotification( tran );
         case ApiCommand::removeBusinessRule:
             return notificationParams.businessEventNotificationManager->triggerNotification( tran );
@@ -417,7 +418,11 @@ namespace detail
                TransactionDescriptor<ApiCommand::restoreDatabase, ApiDatabaseDumpData>,
                TransactionDescriptor<ApiCommand::updatePersistentSequence, ApiUpdateSequenceData>,
                TransactionDescriptor<ApiCommand::dumpDatabaseToFile, ApiDatabaseDumpToFileData>,
-               TransactionDescriptor<ApiCommand::getTransactionLog, ApiTransactionDataList>
+               TransactionDescriptor<ApiCommand::getTransactionLog, ApiTransactionDataList>,
+
+               TransactionDescriptor<ApiCommand::saveUserGroup, ApiUserGroupData>,
+               TransactionDescriptor<ApiCommand::removeUserGroup, ApiIdData>,
+               TransactionDescriptor<ApiCommand::getUserGroups, ApiUserGroupDataList>
     > transactionDescriptors =
      std::make_tuple (
 //        TRANSACTION_DESCRIPTOR(ApiCommand::NotDefined, NotDefinedType,
@@ -1067,6 +1072,24 @@ namespace detail
                                false, // system
                                InvalidGetHashHelper(), // getHash
                                InvalidTriggerNotificationHelper()
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::saveUserGroup, ApiUserGroupData,
+                               true, // persistent
+                               false, // system
+                               CreateHashByIdHelper(), // getHash
+                               UserNotificationManagerHelper()
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::removeUserGroup, ApiIdData,
+                               true, // persistent
+                               false, // system
+                               CreateHashByIdHelper(), // getHash
+                               &apiIdDataTriggerNotificationHelper // trigger notification
+                              ),
+        TRANSACTION_DESCRIPTOR(ApiCommand::getUserGroups, ApiUserGroupDataList,
+                               false, // persistent
+                               false, // system
+                               InvalidGetHashHelper(), // getHash
+                               InvalidTriggerNotificationHelper()// trigger notification
                               )
       );
     #undef TRANSACTION_DESCRIPTOR

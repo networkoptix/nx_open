@@ -25,7 +25,7 @@
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>gtest gmock openssl quazip</rdep.packages>
     </properties>
 
     <dependencies>

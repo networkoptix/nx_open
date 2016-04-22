@@ -14,6 +14,7 @@
 #include <utils/common/settings.h>
 #include <utils/db/types.h>
 #include <utils/email/email.h>
+#include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 
 
@@ -80,6 +81,8 @@ public:
     const CloudDB& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
+    /** Properties for cloud connections */
+    const api::ConnectionParameters& connectionParameters() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
     void load(int argc, char **argv);
@@ -92,10 +95,11 @@ private:
     bool m_showHelp;
 
     General m_general;
+    Logging m_logging;
     CloudDB m_cloudDB;
     Stun m_stun;
     Http m_http;
-    Logging m_logging;
+    api::ConnectionParameters m_connectionParameters;
 
     void fillSupportedCmdParameters();
     void loadConfiguration();

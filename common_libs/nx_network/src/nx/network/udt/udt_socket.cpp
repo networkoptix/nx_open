@@ -124,8 +124,11 @@ UdtSocket<InterfaceToImplement>::~UdtSocket()
 {
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
-    NX_ASSERT(!nx::network::SocketGlobals::aioService()
-        .isSocketBeingWatched(static_cast<Pollable*>(this)));
+    NX_CRITICAL(
+        !nx::network::SocketGlobals::aioService()
+            .isSocketBeingWatched(static_cast<Pollable*>(this)),
+        "You MUST cancel running async socket operation before "
+        "deleting socket if you delete socket from non-aio thread");
 
     if (!isClosed())
         close();
@@ -409,7 +412,7 @@ bool UdtSocket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::getLastError(SystemError::ErrorCode* /*errorCode*/) const
 {
-    NX_ASSERT(!isClosed());
+    //NX_ASSERT(!isClosed());
     //*errorCode = static_cast<SystemError::ErrorCode>(UDT::getlasterror().getErrno());
     //TODO #ak
     SystemError::setLastErrorCode(SystemError::notImplemented);

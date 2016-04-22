@@ -19,7 +19,7 @@ class Pollable;
 namespace aio {
 
     class PollSetImpl;
-    class ConstIteratorImpl;
+    class ConstIteratorImplOld;
 
     static const int INFINITE_TIMEOUT = -1;
 
@@ -71,7 +71,7 @@ namespace aio {
             bool operator!=( const const_iterator& right ) const;
 
         private:
-            ConstIteratorImpl* m_impl;
+            ConstIteratorImplOld* m_impl;
         };
 
         PollSet();

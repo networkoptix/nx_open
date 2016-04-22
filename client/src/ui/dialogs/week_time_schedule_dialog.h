@@ -1,7 +1,7 @@
 #ifndef WEEK_TIME_SCHEDULE_DIALOG_H
 #define WEEK_TIME_SCHEDULE_DIALOG_H
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class WeekTimeScheduleDialog;

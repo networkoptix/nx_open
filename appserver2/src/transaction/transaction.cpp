@@ -18,7 +18,6 @@ namespace ec2
         {
             template<typename Descriptor>
             void operator ()(const Descriptor &d) { result = d.name; }
-
             GetNameByValueDescriptorVisitor() : result(nullptr) {}
 
             const char *result;
@@ -53,74 +52,38 @@ namespace ec2
             return visitor.result;
         }
 
+        struct IsSystemVisitor
+        {
+            template<typename Descriptor>
+            void operator ()(const Descriptor &d) { result = d.isSystem; }
+
+            IsSystemVisitor() : result(false) {}
+
+            bool result;
+        };
+
         bool isSystem( Value val )
         {
-            return  val == lockRequest   ||
-                    val == lockResponse  ||
-                    val == unlockRequest ||
-                    val == tranSyncRequest ||
-                    val == tranSyncResponse ||
-                    val == runtimeInfoChanged ||
-                    val == peerAliveInfo ||
-                    val == broadcastPeerSystemTime ||
-                    val == tranSyncDone ||
-                    val == uploadUpdate ||
-                    val == uploadUpdateResponce ||
-                    val == installUpdate ||
-                    val == openReverseConnection;
-
+            IsSystemVisitor visitor;
+            visitTransactionDescriptorIfValue(val, visitor);
+            return visitor.result;
         }
+
+        struct IsPersistentVisitor
+        {
+            template<typename Descriptor>
+            void operator ()(const Descriptor &d) { result = d.isPersistent; }
+
+            IsPersistentVisitor() : result(false) {}
+
+            bool result;
+        };
 
         bool isPersistent( Value val )
         {
-            return
-                val == removeResource  ||
-                val == removeResources  ||
-                val == setResourceStatus ||
-                val == setResourceParams ||
-                val == setResourceParam ||
-                val == removeResourceParam ||
-                val == removeResourceParams ||
-                val == saveCamera ||
-                val == saveCameraUserAttributes ||
-                val == saveCameraUserAttributesList ||
-                val == saveCameras ||
-                val == removeCamera ||
-                val == addCameraHistoryItem ||
-                val == removeCameraHistoryItem ||
-                val == saveMediaServer ||
-                val == saveServerUserAttributes ||
-                val == saveServerUserAttributesList ||
-                val == saveStorage ||
-                val == saveStorages ||
-                val == removeStorage ||
-                val == removeStorages ||
-                val == removeMediaServer ||
-                val == saveUser ||
-                val == removeUser ||
-                val == setAccessRights ||
-                val == saveLayout ||
-                val == saveLayouts ||
-                val == removeLayout ||
-                val == saveVideowall ||
-                val == removeVideowall ||
-                val == saveWebPage ||
-                val == removeWebPage ||
-                val == saveBusinessRule ||
-                val == removeBusinessRule ||
-                val == resetBusinessRules ||
-                val == addStoredFile ||
-                val == updateStoredFile ||
-                val == removeStoredFile ||
-                val == addDiscoveryInformation ||
-                val == removeDiscoveryInformation ||
-                val == getDiscoveryData ||
-                val == addLicense ||
-                val == addLicenses ||
-                val == removeLicense ||
-                val == restoreDatabase ||
-                val == markLicenseOverflow ||
-                val == saveClientInfo;
+            IsPersistentVisitor visitor;
+            visitTransactionDescriptorIfValue(val, visitor);
+            return visitor.result;
         }
 
     }

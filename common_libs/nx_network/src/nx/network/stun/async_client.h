@@ -78,22 +78,19 @@ public:
         hasError(SystemError::ErrorCode code, const Message& message);
 };
 
+typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+    Message,
+    MessageParser,
+    MessageSerializer> MessagePipeline;
+
 //!Connects to STUN server, sends requests, receives responses and indications
-class NX_NETWORK_API AsyncClient:
+class NX_NETWORK_API AsyncClient
+:
     public AbstractAsyncClient,
-    public StreamConnectionHolder<
-		nx_api::BaseStreamProtocolConnectionEmbeddable<
-			Message,
-			MessageParser,
-			MessageSerializer
-		>>
+    public StreamConnectionHolder<MessagePipeline>
 {
 public:
-    typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
-        Message,
-        MessageParser,
-        MessageSerializer
-    > BaseConnectionType;
+    typedef MessagePipeline BaseConnectionType;
 
     typedef BaseConnectionType ConnectionType;
 
@@ -143,13 +140,8 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 
     std::list<std::pair<Message, RequestHandler>> m_requestQueue;
-    #ifdef _DEBUG
-        std::map<int, IndicationHandler> m_indicationHandlers;
-        std::map<Buffer,RequestHandler> m_requestsInProgress;
-    #else
-        std::unordered_map<int, IndicationHandler> m_indicationHandlers;
-        std::unordered_map<Buffer, RequestHandler> m_requestsInProgress;
-    #endif
+    std::map<int, IndicationHandler> m_indicationHandlers;
+    std::map<Buffer,RequestHandler> m_requestsInProgress;
 };
 
 } // namespase stun

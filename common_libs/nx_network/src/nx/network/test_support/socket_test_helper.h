@@ -206,6 +206,14 @@ public:
         size_t maxTotalConnections,
         TestTransmissionMode transmissionMode);
 
+    ConnectionsGenerator(
+        std::vector<SocketAddress> remoteAddresses,
+        size_t maxSimultaneousConnectionsCount,
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        size_t maxTotalConnections,
+        TestTransmissionMode transmissionMode);
+
     virtual ~ConnectionsGenerator();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -213,7 +221,7 @@ public:
     void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
-    void setRemoteAddress(SocketAddress remoteAddress);
+    void resetRemoteAddresses(std::vector<SocketAddress> remoteAddress);
     void start();
 
     virtual ConnectionTestStatistics statistics() const override;
@@ -222,13 +230,16 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
     size_t totalIncompleteTasks() const;
-    QString returnCodes() const;
+    const std::map<SystemError::ErrorCode, size_t>& returnCodes() const;
 
 private:
+    const SocketAddress& nextAddress();
+
     /** map<connection id, connection> */
     typedef std::map<int, std::unique_ptr<TestConnection>> ConnectionsContainer;
 
-    SocketAddress m_remoteAddress;
+    std::vector<SocketAddress> m_remoteAddresses;
+    std::vector<SocketAddress>::const_iterator m_remoteAddressesIterator;
     size_t m_maxSimultaneousConnectionsCount;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;

@@ -254,7 +254,11 @@ extern std::tuple<
                TransactionDescriptor<ApiCommand::restoreDatabase, ApiDatabaseDumpData>,
                TransactionDescriptor<ApiCommand::updatePersistentSequence, ApiUpdateSequenceData>,
                TransactionDescriptor<ApiCommand::dumpDatabaseToFile, ApiDatabaseDumpToFileData>,
-               TransactionDescriptor<ApiCommand::getTransactionLog, ApiTransactionDataList>
+               TransactionDescriptor<ApiCommand::getTransactionLog, ApiTransactionDataList>,
+
+               TransactionDescriptor<ApiCommand::saveUserGroup, ApiUserGroupData>,
+               TransactionDescriptor<ApiCommand::removeUserGroup, ApiIdData>,
+               TransactionDescriptor<ApiCommand::getUserGroups, ApiUserGroupDataList>
 > transactionDescriptors;
 
 /* Compile-time IndexSequence implementation (since stdc++lib shipped with g++ 4.8.2 doesn't have it) */

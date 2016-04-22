@@ -9,6 +9,8 @@
 #include <atomic>
 #include <memory>
 
+#ifndef __clang__
+
 #ifdef __GNUC__
 #include <features.h>
 #endif
@@ -34,59 +36,34 @@ namespace std
 
 #ifdef USE_OWN_MAKE_UNIQUE
 template<
-    typename T>
-    std::unique_ptr<T> make_unique()
-{
-    return std::unique_ptr<T>( new T );
-}
-
-template<
     typename T,
-    typename Arg1>
-    std::unique_ptr<T> make_unique( Arg1&& arg1 )
+    typename... Args
+> std::unique_ptr<T> make_unique(Args&&... args)
 {
-    return std::unique_ptr<T>( new T( std::forward<Arg1>( arg1 ) ) );
-}
-
-template<
-    typename T,
-    typename Arg1,
-    typename Arg2>
-    std::unique_ptr<T> make_unique( Arg1&& arg1, Arg2&& arg2 )
-{
-    return std::unique_ptr<T>( new T(
-        std::forward<Arg1>( arg1 ),
-        std::forward<Arg2>( arg2 ) ) );
-}
-
-template<
-    typename T,
-    typename Arg1,
-    typename Arg2,
-    typename Arg3>
-    std::unique_ptr<T> make_unique( Arg1&& arg1, Arg2&& arg2, Arg3&& arg3 )
-{
-    return std::unique_ptr<T>( new T(
-        std::forward<Arg1>( arg1 ),
-        std::forward<Arg2>( arg2 ),
-        std::forward<Arg3>( arg3 ) ) );
-}
-
-template<
-    typename T,
-    typename Arg1,
-    typename Arg2,
-    typename Arg3,
-    typename Arg4>
-    std::unique_ptr<T> make_unique( Arg1&& arg1, Arg2&& arg2, Arg3&& arg3, Arg4&& arg4 )
-{
-    return std::unique_ptr<T>( new T(
-        std::forward<Arg1>( arg1 ),
-        std::forward<Arg2>( arg2 ),
-        std::forward<Arg3>( arg3 ),
-        std::forward<Arg4>( arg4 ) ) );
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 #endif  //USE_OWN_MAKE_UNIQUE
 }   //std
+
+#endif // __clang__
+
+/** TODO #ak following methods are inappropriate here. Find a better place for them */
+template<typename ResultType, typename InitialType, typename DeleterType>
+std::unique_ptr<ResultType, DeleterType>
+    static_unique_ptr_cast(std::unique_ptr<InitialType, DeleterType>&& sourcePtr)
+{
+    return std::unique_ptr<ResultType, DeleterType>(
+        static_cast<ResultType>(sourcePtr.release()),
+        sourcePtr.get_deleter());
+}
+
+template<typename ResultType, typename InitialType>
+std::unique_ptr<ResultType, std::default_delete<ResultType>>
+    static_unique_ptr_cast(
+        std::unique_ptr<InitialType, std::default_delete<InitialType>>&& sourcePtr)
+{
+    return std::unique_ptr<ResultType>(
+        static_cast<ResultType*>(sourcePtr.release()));
+}
 
 #endif  //libcommon_cpp14_h

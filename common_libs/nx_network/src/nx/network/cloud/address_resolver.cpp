@@ -27,6 +27,18 @@ QString toString(const AddressType& type)
     return lit( "undefined=%1" ).arg( static_cast< int >( type ) );
 }
 
+TypedAddress::TypedAddress(HostAddress address_, AddressType type_)
+:
+    address(std::move(address_)),
+    type(std::move(type_))
+{
+}
+
+QString TypedAddress::toString() const
+{
+    return lm("%1(%2)").str(address).str(type);
+}
+
 AddressAttribute::AddressAttribute(AddressAttributeType type_, quint64 value_)
     : type( type_ )
     , value( value_ )
@@ -148,7 +160,7 @@ void AddressResolver::removeFixedAddress(
 
 void AddressResolver::resolveDomain(
     const HostAddress& domain,
-    utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler)
+    utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler)
 {
     m_mediatorConnection->resolveDomain(
         nx::hpm::api::ResolveDomainRequest(domain.toString().toUtf8()),
@@ -160,7 +172,7 @@ void AddressResolver::resolveDomain(
                 .arg(domain.toString()).arg(QnLexical::serialized(resultCode)),
                 cl_logDEBUG2);
 
-            std::vector<TypedAddres> result;
+            std::vector<TypedAddress> result;
             const auto suffix = lit(".") + domain.toString();
             {
                 // TODO: #mux Think about better representation to increase performance
@@ -179,7 +191,7 @@ void AddressResolver::resolveDomain(
                 result.emplace_back(std::move(address), AddressType::cloud);
             }
 
-            NX_LOGX(lm("Domain %1 is resolvet to: %2")
+            NX_LOGX(lm("Domain %1 is resolved to: %2")
                 .arg(domain.toString()).container(result), cl_logDEBUG1);
 
             handler(std::move(result));

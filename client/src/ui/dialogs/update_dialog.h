@@ -4,7 +4,7 @@
 #include <QtWidgets/QDialog>
 
 #include <utils/common/id.h>
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {

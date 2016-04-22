@@ -112,7 +112,7 @@ public:
     */
     TimerId addNonStopTimer(
         MoveOnlyFunc<void(TimerId)> taskHandler,
-        std::chrono::milliseconds delay,
+        std::chrono::milliseconds repeatPeriod,
         std::chrono::milliseconds firstShotDelay);
     //!Modifies delay on existing timer
     /*!
@@ -148,12 +148,12 @@ private:
     {
         MoveOnlyFunc<void(TimerId)> func;
         bool singleShot;
-        std::chrono::milliseconds delay;
+        std::chrono::milliseconds repeatPeriod;
 
         TaskContext(MoveOnlyFunc<void(TimerId)> _func);
         TaskContext(
             MoveOnlyFunc<void(TimerId)> _func,
-            std::chrono::milliseconds _delay);
+            std::chrono::milliseconds _repeatPeriod);
     };
 
     QnWaitCondition m_cond;

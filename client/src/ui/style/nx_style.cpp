@@ -24,7 +24,6 @@
 #include <private/qfont_p.h>
 
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/variant.h>
 
 using namespace style;
 
@@ -109,6 +108,21 @@ namespace
             return TabShape::Default;
 
         return static_cast<TabShape>(widget->property(Properties::kTabShape).toInt());
+    }
+
+    bool isCheckableButton(const QStyleOption* option)
+    {
+        if (qstyleoption_cast<const QStyleOptionButton*>(option))
+        {
+            if (option->state.testFlag(QStyle::State_On) || option->state.testFlag(QStyle::State_Off))
+                return true;
+
+            const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
+            if (buttonWidget && buttonWidget->isCheckable())
+                return true;
+        }
+
+        return false;
     }
 }
 
@@ -587,11 +601,10 @@ void QnNxStyle::drawComplexControl(
         break;
 
     case CC_Slider:
-        if (const QStyleOptionSlider *slider =
-                qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
-            QRect grooveRect = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
-            QRect handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
+            QRectF grooveRect = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
+            QRectF handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
             const bool horizontal = slider->orientation == Qt::Horizontal;
             const bool hovered = slider->state.testFlag(State_MouseOver) ||
@@ -605,41 +618,50 @@ void QnNxStyle::drawComplexControl(
 
             if (slider->subControls.testFlag(SC_SliderGroove))
             {
+                QRectF grooveDrawRect = grooveRect.adjusted(0.5, 0.5, -0.5, -0.5); /* to include border, antialiased */
+                qreal radius = ((horizontal ? grooveDrawRect.height() : grooveDrawRect.width())) * 0.5 ;
+
                 painter->setPen(mainDark.darker(1));
                 painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
+                painter->drawRoundedRect(grooveDrawRect, radius, radius);
 
-                painter->drawRect(grooveRect.adjusted(0, 0, -1, -1));
-
-                QRect rect = grooveRect.adjusted(1, 1, -1, -1);
-
-                int pos = sliderPositionFromValue(
-                              slider->minimum,
-                              slider->maximum,
-                              slider->sliderPosition,
-                              horizontal ? rect.width() : rect.height(),
-                              slider->upsideDown);
-
-                if (horizontal)
+                SliderFeatures features = static_cast<SliderFeatures>(option->styleObject ? option->styleObject->property(Properties::kSliderFeatures).toInt() : 0);
+                if (features.testFlag(SliderFeature::FillingUp))
                 {
-                    if (slider->upsideDown)
-                        rect.setLeft(pos);
-                    else
-                        rect.setRight(pos);
-                }
-                else
-                {
-                    if (slider->upsideDown)
-                        rect.setTop(pos);
-                    else
-                        rect.setBottom(pos);
-                }
+                    QRectF fillDrawRect = grooveRect.adjusted(1, 1, -1, -1);
 
-                painter->fillRect(rect, mainLight);
+                    int pos = sliderPositionFromValue(
+                                  slider->minimum,
+                                  slider->maximum,
+                                  slider->sliderPosition,
+                                  horizontal ? fillDrawRect.width() : fillDrawRect.height(),
+                                  slider->upsideDown);
+
+                    if (horizontal)
+                    {
+                        if (slider->upsideDown)
+                            fillDrawRect.setLeft(pos);
+                        else
+                            fillDrawRect.setRight(pos);
+                    }
+                    else
+                    {
+                        if (slider->upsideDown)
+                            fillDrawRect.setTop(pos);
+                        else
+                            fillDrawRect.setBottom(pos);
+                    }
+
+                    radius = ((horizontal ? fillDrawRect.height() : fillDrawRect.width())) * 0.5;
+
+                    painter->setPen(Qt::NoPen);
+                    painter->setBrush(QBrush(mainLight));
+                    painter->drawRoundedRect(fillDrawRect, radius, radius);
+                }
             }
 
             if (slider->subControls.testFlag(SC_SliderTickmarks))
             {
-                bool horizontal = slider->orientation == Qt::Horizontal;
                 bool ticksAbove = slider->tickPosition & QSlider::TicksAbove;
                 bool ticksBelow = slider->tickPosition & QSlider::TicksBelow;
 
@@ -680,27 +702,21 @@ void QnNxStyle::drawComplexControl(
                     if (horizontal)
                     {
                         if (ticksAbove)
-                        {
-                            painter->drawLine(pos, slider->rect.top() + extra,
-                                              pos, slider->rect.top() + tickSize);
-                        }
+                            painter->drawLine(pos, slider->rect.top() + extra, pos, slider->rect.top() + tickSize);
+
                         if (ticksBelow)
-                        {
-                            painter->drawLine(pos, slider->rect.bottom() - extra,
-                                              pos, slider->rect.bottom() - tickSize);
-                        }
-                    } else {
-                        if (ticksAbove)
-                        {
-                            painter->drawLine(slider->rect.left() + extra, pos,
-                                              slider->rect.left() + tickSize, pos);
-                        }
-                        if (ticksBelow)
-                        {
-                            painter->drawLine(slider->rect.right() - extra, pos,
-                                              slider->rect.right() - tickSize, pos);
-                        }
+                            painter->drawLine(pos, slider->rect.bottom() - extra, pos, slider->rect.bottom() - tickSize);
+
                     }
+                    else
+                    {
+                        if (ticksAbove)
+                            painter->drawLine(slider->rect.left() + extra, pos, slider->rect.left() + tickSize, pos);
+
+                        if (ticksBelow)
+                            painter->drawLine(slider->rect.right() - extra, pos, slider->rect.right() - tickSize, pos);
+                    }
+
                     // in the case where maximum is max int
                     int nextInterval = v + interval;
                     if (nextInterval < v)
@@ -1456,6 +1472,32 @@ void QnNxStyle::drawControl(
         }
         break;
 
+    case CE_PushButtonLabel:
+        {
+            if (isCheckableButton(option))
+            {
+                /* Calculate minimal label width: */
+                const QStyleOptionButton* buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
+                int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
+                if (!buttonOption->icon.isNull())
+                    minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
+                if (!buttonOption->text.isEmpty())
+                    minLabelWidth += buttonOption->fontMetrics.size(Qt::TextShowMnemonic, buttonOption->text).width();
+
+                /* Draw standard button content left-aligned: */
+                QStyleOptionButton newOpt(*buttonOption);
+                newOpt.rect.setWidth(minLabelWidth);
+                base_type::drawControl(element, &newOpt, painter, widget);
+
+                /* Draw switch right-aligned: */
+                newOpt.rect.setWidth(Metrics::kSwitchSize.width());
+                newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                drawSwitch(painter, &newOpt, widget);
+                return;
+            }
+        }
+        break;
+
     case CE_Splitter:
         {
             painter->fillRect(option->rect, option->palette.shadow());
@@ -1959,8 +2001,9 @@ int QnNxStyle::pixelMetric(
     case PM_SliderLength:
         if (option && option->styleObject)
         {
-            int result = qvariant_cast<int>(option->styleObject->property(Properties::kSliderLength), -1);
-            if (result >= 0)
+            bool ok(false);
+            int result = option->styleObject->property(Properties::kSliderLength).toInt(&ok);
+            if (ok && result >= 0)
                 return result;
         }
         return dp(16);
@@ -1978,7 +2021,7 @@ int QnNxStyle::pixelMetric(
         return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
     case PM_ToolBarIconSize:
-        return dp(18);
+        return dp(32); // TODO #vkutin Remove dp() from all places where it's not needed
 
     case PM_TabCloseIndicatorWidth:
     case PM_TabCloseIndicatorHeight:
@@ -2003,8 +2046,14 @@ QSize QnNxStyle::sizeFromContents(
     switch (type)
     {
     case CT_PushButton:
-        return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
-                     qMax(size.height(), Metrics::kButtonHeight));
+        {
+            QSize switchSize;
+            if (isCheckableButton(option))
+                switchSize = Metrics::kSwitchSize + QSize(Metrics::kSwitchMargin, 0);
+
+            return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + switchSize.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
+                qMax(qMax(size.height(), switchSize.height()), Metrics::kButtonHeight));
+        }
 
     case CT_LineEdit:
         return QSize(size.width(), qMax(size.height(), Metrics::kButtonHeight));
@@ -2254,8 +2303,10 @@ QString QnNxStyle::Colors::paletteName(QnNxStyle::Colors::Palette palette)
         return lit("blue");
     case kGreen:
         return lit("green");
-    case kBrang:
+    case kBrand:
         return lit("brand");
+    case kRed:
+        return lit("red");
     }
 
     return QString();

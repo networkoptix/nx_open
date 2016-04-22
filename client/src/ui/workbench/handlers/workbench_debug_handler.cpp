@@ -8,7 +8,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/workaround/qtbug_workaround.h>
 

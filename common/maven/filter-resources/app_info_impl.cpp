@@ -3,6 +3,11 @@
 //
 #include <utils/common/app_info.h>
 
+int QnAppInfo::ec2ProtoVersion()
+{
+    return ${nxec.ec2ProtoVersion};
+}
+
 QString QnAppInfo::organizationName() {
     return QStringLiteral("${company.name}");
 }
@@ -182,7 +187,7 @@ QString QnAppInfo::oldAndroidClientLink() {
 }
 
 QString QnAppInfo::oldIosClientLink() {
-    return QStringLiteral("https://itunes.apple.com/ru/app/${ios.old_app_appstore_id}");
+    return QStringLiteral("https://itunes.apple.com/app/${ios.old_app_appstore_id}");
 }
 
 QString QnAppInfo::oldAndroidAppId() {

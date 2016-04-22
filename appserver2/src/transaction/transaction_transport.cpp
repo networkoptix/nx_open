@@ -296,6 +296,16 @@ QnTransactionTransport::~QnTransactionTransport()
         m_ttFinishCallback();
 }
 
+std::chrono::milliseconds QnTransactionTransport::connectionKeepAliveTimeout() const
+{
+    return m_tcpKeepAliveTimeout;
+}
+
+int QnTransactionTransport::keepAliveProbeCount() const
+{
+    return m_keepAliveProbeCount;
+}
+
 void QnTransactionTransport::addData(QByteArray data)
 {
     QnMutexLocker lock( &m_mutex );

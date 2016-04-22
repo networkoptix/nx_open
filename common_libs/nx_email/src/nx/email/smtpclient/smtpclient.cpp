@@ -48,7 +48,7 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
 :
     m_socket(nullptr),
     name(lit("localhost")),
-    authMethod(AuthPlain),
+    authMethod(AuthLogin),
     connectionTimeout(5000),
     responseTimeout(5000),
     sendMessageTimeout(60000),
@@ -448,7 +448,7 @@ void SmtpClient::waitForResponse()
 {
     QByteArray readBuffer;
     readBuffer.reserve( 4*1024 );
-    
+
     for( int bufPos = 0;; )
     {
         nx_http::ConstBufferRefType lineBufferRef;
@@ -490,7 +490,7 @@ void SmtpClient::waitForResponse()
 
         if( responseText[3] == QLatin1Char( ' ' ) ) { return; }
 
-        
+
 
         //if (!m_socket->waitForReadyRead(responseTimeout))
         //{

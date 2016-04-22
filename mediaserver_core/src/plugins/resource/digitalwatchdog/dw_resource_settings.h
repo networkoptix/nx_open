@@ -1,3 +1,5 @@
+#ifdef ENABLE_ONVIF
+
 #ifndef dw_resource_settings_h_1957
 #define dw_resource_settings_h_1957
 
@@ -60,3 +62,5 @@ private:
 
 
 #endif //dw_resource_settings_h_1957
+
+#endif  //ENABLE_ONVIF

@@ -90,7 +90,8 @@ public:
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
         m_natTraversalEnabled( _natTraversalEnabled ),
-        m_asyncSendIssued( false )
+        m_asyncSendIssued( false ),
+        m_addressResolverIsInUse( false )
     {
         NX_ASSERT( this->m_socket );
         NX_ASSERT( m_abstractSocketPtr );
@@ -131,11 +132,16 @@ public:
         }
         else
         {
-            //checking that socket is not registered in aio
-            NX_ASSERT(
-                !nx::network::SocketGlobals::aioService().isSocketBeingWatched(this->m_socket),
-                Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );
+            static const char* kFailureMessage =
+                "You MUST cancel running async socket operation before "
+                "deleting socket if you delete socket from non-aio thread";
+            NX_CRITICAL(
+                !(m_addressResolverIsInUse.load() &&
+                    nx::network::SocketGlobals::addressResolver()
+                        .isRequestIdKnown(this)), kFailureMessage);
+            NX_CRITICAL(
+                !nx::network::SocketGlobals::aioService()
+                    .isSocketBeingWatched(this->m_socket), kFailureMessage);
         }
     }
 
@@ -193,6 +199,7 @@ public:
             return;
         }
 
+        m_addressResolverIsInUse = true;
         nx::network::SocketGlobals::addressResolver().resolveAsync(
             addr.address,
             [this, addr]( SystemError::ErrorCode errorCode,
@@ -382,6 +389,7 @@ private:
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     const bool m_natTraversalEnabled;
     std::atomic<bool> m_asyncSendIssued;
+    std::atomic<bool> m_addressResolverIsInUse;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
