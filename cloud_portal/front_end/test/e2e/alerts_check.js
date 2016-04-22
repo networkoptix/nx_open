@@ -27,8 +27,9 @@ var AlertSuite = function () {
     this.alert = element(by.css('.ng-toast__message')).element(by.css('.alert'));
     this.alertCloseButton = this.alert.element(by.css('button.close'));
 
-    function waitAlert(){
-        browser.sleep(1700);
+    function waitAlert(timeout){
+        var waitMs = timeout || 1700;
+        browser.sleep(waitMs);
         browser.ignoreSynchronization = true;
         expect(self.alert.isDisplayed()).toBe(true);
     }
@@ -68,8 +69,8 @@ var AlertSuite = function () {
         expect(self.alert.isPresent()).toBe(!shouldCloseOnTimeout);
     }
 
-    this.catchAlert = function (message, type) {
-        waitAlert();
+    this.catchAlert = function (message, type, timeout) {
+        waitAlert(timeout);
         checkAlertContent(message, type);
         finishAlertCheck();
     };
