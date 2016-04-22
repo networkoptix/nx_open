@@ -101,7 +101,7 @@ void TunnelConnector::connect(
             SocketAddress(HostAddress::anyHost, 0)))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("session %1. Failed to bind to mediator udp client to local port. %2")
+        NX_LOGX(lm("cross-nat %1. Failed to bind to mediator udp client to local port. %2")
             .arg(m_connectSessionId).arg(SystemError::getLastOSErrorText()),
             cl_logWARNING);
         m_timer.post(
@@ -112,7 +112,7 @@ void TunnelConnector::connect(
         return;
     }
 
-    NX_LOGX(lm("session %1. connecting to %2 with timeout %3, from local port %4")
+    NX_LOGX(lm("cross-nat %1. connecting to %2 with timeout %3, from local port %4")
         .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString())
         .arg(timeout).arg(m_mediatorUdpClient->socket()->getLocalAddress().port),
         cl_logDEBUG2);
@@ -188,7 +188,7 @@ void TunnelConnector::onConnectResponse(
     //if failed, reporting error
     if (resultCode != api::ResultCode::ok)
     {
-        NX_LOGX(lm("session %1. mediator reported %2 error code on connect request to %3")
+        NX_LOGX(lm("cross-nat %1. mediator reported %2 error code on connect request to %3")
             .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
             .arg(m_targetHostAddress.host.toString().toUtf8()),
             cl_logDEBUG1);
@@ -203,7 +203,7 @@ void TunnelConnector::onConnectResponse(
     //extracting target address from response
     if (response.udpEndpointList.empty())
     {
-        NX_LOGX(lm("session %1. mediator reported empty UDP address list for host %2")
+        NX_LOGX(lm("cross-nat %1. mediator reported empty UDP address list for host %2")
             .arg(m_connectSessionId).arg(m_targetHostAddress.host.toString()),
             cl_logDEBUG1);
         return holePunchingDone(
@@ -234,7 +234,7 @@ void TunnelConnector::onConnectResponse(
     rendezvousConnector->bindToAioThread(m_timer.getAioThread());
 
     m_mediatorUdpClient.reset();
-    NX_LOGX(lm("session %1. Udt rendezvous connect to %2")
+    NX_LOGX(lm("cross-nat %1. Udt rendezvous connect to %2")
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
         cl_logDEBUG1);
 
@@ -275,7 +275,7 @@ void TunnelConnector::onUdtConnectionEstablished(
 
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("session %1. Failed to establish UDT connection to %2. %3")
+        NX_LOGX(lm("cross-nat %1. Failed to establish UDT cross-nat to %2. %3")
             .arg(m_connectSessionId)
             .arg(rendezvousConnector->remoteAddress().toString())
             .arg(SystemError::toString(errorCode)),
@@ -290,7 +290,7 @@ void TunnelConnector::onUdtConnectionEstablished(
     }
     
     //success!
-    NX_LOGX(lm("session %1. Udp hole punching to %2 is a success!")
+    NX_LOGX(lm("cross-nat %1. Udp hole punching to %2 is a success!")
         .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
         cl_logDEBUG2);
 
@@ -315,7 +315,7 @@ void TunnelConnector::onUdtConnectionEstablished(
 
 void TunnelConnector::onTimeout()
 {
-    NX_LOGX(lm("session %1 timed out. Result code %2")
+    NX_LOGX(lm("cross-nat %1 timed out. Result code %2")
         .arg(QnLexical::serialized(m_connectResultReport.resultCode)),
         cl_logDEBUG1);
 
@@ -331,6 +331,11 @@ void TunnelConnector::holePunchingDone(
     api::UdpHolePunchingResultCode resultCode,
     SystemError::ErrorCode sysErrorCode)
 {
+    NX_LOGX(lm("cross-nat %1. result: %2, system result code: %3")
+        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(SystemError::toString(sysErrorCode)),
+        cl_logDEBUG2);
+
     //we are in aio thread
     m_timer.cancelSync();
 
@@ -348,7 +353,9 @@ void TunnelConnector::holePunchingDone(
         //after message has been sent - reporting result to client
     m_connectResultReport.connectSessionId = m_connectSessionId;
     m_connectResultReport.resultCode = resultCode;
+
     using namespace std::placeholders;
+#if 1
     if (!m_mediatorUdpClient)
     {
         //m_mediatorUdpClient has given away his socket to udt socket
@@ -356,6 +363,7 @@ void TunnelConnector::holePunchingDone(
             *nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
         m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
     }
+
     m_mediatorUdpClient->connectionResult(
         m_connectResultReport,
         [](api::ResultCode){ /* ignoring result */ });
@@ -366,6 +374,9 @@ void TunnelConnector::holePunchingDone(
         &TunnelConnector::connectSessionReportSent,
         this,
         SystemError::noError));
+#else
+    nx::stun::UnreliableMessagePipeline stunMessagePipeline;
+#endif
 }
 
 void TunnelConnector::connectSessionReportSent(
@@ -373,7 +384,7 @@ void TunnelConnector::connectSessionReportSent(
 {
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("session %1. Failed to send report to mediator. %2")
+        NX_LOGX(lm("cross-nat %1. Failed to send report to mediator. %2")
             .arg(m_connectSessionId).arg(SystemError::toString(errorCode)),
             cl_logDEBUG1);
     }
@@ -395,6 +406,10 @@ void TunnelConnector::connectSessionReportSent(
             std::move(m_udtConnection));
     }
     auto completionHandler = std::move(m_completionHandler);
+    NX_LOGX(lm("cross-nat %1. report send result code: %2. Invoking handler with result: %3")
+        .arg(m_connectSessionId).arg(SystemError::toString(errorCode))
+        .arg(SystemError::toString(sysErrorCodeToReport)),
+        cl_logDEBUG2);
     completionHandler(sysErrorCodeToReport, std::move(tunnelConnection));
 }
 
