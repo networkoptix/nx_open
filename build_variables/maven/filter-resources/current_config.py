@@ -16,7 +16,7 @@ from sys import platform as _platform
 
 if _os_name == 'nt':
     BIN_PATH="${libdir}/${arch}/bin/${build.configuration}"
-else
+else:
     BIN_PATH="${libdir}/bin/${build.configuration}"
 
 def _add_path(env, var, path):
