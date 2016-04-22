@@ -24,6 +24,8 @@ void checkGlFramebufferStatus();
 void debugGlGetAttribsAndAbort(QSize frameSize);
 void debugTextureTest();
 
+void debugLogPrecision();
+
 //-------------------------------------------------------------------------------------------------
 
 static const char* glErrorStr(GLenum err)
@@ -345,4 +347,37 @@ void debugXXX()
 
     NX_CRITICAL(false);
 #endif // 0
+}
+
+void debugLogPrecision()
+{
+    int range[2], precision;
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision);
+
+    fprintf(stderr, "Fragment highp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_MEDIUM_FLOAT, range, &precision);
+    fprintf(stderr, "Fragment mediump float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_LOW_FLOAT, range, &precision);
+    fprintf(stderr, "Fragment lowp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_INT, range, &precision);
+    fprintf(stderr, "Fragment highp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_MEDIUM_INT, range, &precision);
+    fprintf(stderr, "Fragment mediump int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_LOW_INT, range, &precision);
+    fprintf(stderr, "Fragment lowp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+
+    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_HIGH_FLOAT, range, &precision);
+    fprintf(stderr, "Vertex highp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_MEDIUM_FLOAT, range, &precision);
+    fprintf(stderr, "Vertex mediump float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_LOW_FLOAT, range, &precision);
+    fprintf(stderr, "Vertex lowp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+
+    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_HIGH_INT, range, &precision);
+    fprintf(stderr, "Vertex highp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_MEDIUM_INT, range, &precision);
+    fprintf(stderr, "Vertex mediump int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_LOW_INT, range, &precision);
+    fprintf(stderr, "Vertex lowp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
 }

@@ -28,7 +28,7 @@ public:
     /**
     * If initialization fails, fail with 'assert'.
     */
-    void initialize(const QnConstCompressedVideoDataPtr& compressedVideoData);
+    void initialize(const QSize& frameSize);
 
     /**
     * @param compressedVideoData Has non-null data().
@@ -46,19 +46,14 @@ private:
     QSize m_frameSize;
 };
 
-void ProxyVideoDecoderPrivate::initialize(const QnConstCompressedVideoDataPtr& compressedVideoData)
+void ProxyVideoDecoderPrivate::initialize(const QSize& frameSize)
 {
     QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() BEGIN");
     NX_ASSERT(!m_initialized);
-    NX_CRITICAL(compressedVideoData);
-    NX_CRITICAL(compressedVideoData->data());
-    NX_CRITICAL(compressedVideoData->dataSize() > 0);
     m_initialized = true;
 
-    // TODO mike: Remove when frame size is passed from SeamlessVideoDecoder.
-    extractSpsPps(compressedVideoData, &m_frameSize, nullptr);
-
-    m_proxyDecoder.reset(new ProxyDecoder(m_frameSize.width(), m_frameSize.height()));
+    m_frameSize = frameSize;
+    m_proxyDecoder.reset(ProxyDecoder::create(m_frameSize.width(), m_frameSize.height()));
 
     QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() END");
 }

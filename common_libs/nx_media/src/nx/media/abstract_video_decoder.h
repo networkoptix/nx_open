@@ -18,25 +18,22 @@ class AbstractVideoDecoder: public QObject
 {
     Q_OBJECT
 public:
-    AbstractVideoDecoder()
-    {
-    }
+    virtual ~AbstractVideoDecoder() = default;
 
-    virtual ~AbstractVideoDecoder()
+    virtual void setAllocator(AbstractResourceAllocator* allocator)
     {
-    }
-
-    virtual void setAllocator(AbstractResourceAllocator* /*allocator*/)
-    {
+        (void) allocator;
     }
 
     /**
      * This function should be overridden despite static keyword. Otherwise it is a compile error.
      * @param context Codec context.
-     * @return True if the decoder is compatible with the provided context.
+     * @return True if the decoder is compatible with the provided parameters.
      */
-    static bool isCompatible(const CodecID /*codec*/, const QSize& /*resolution*/)
+    static bool isCompatible(const CodecID codec, const QSize& resolution)
     {
+        (void) codec;
+        (void) resolution;
         return false;
     }
 
@@ -50,7 +47,7 @@ public:
      * ATTENTION: compressedVideoData->data() is guaranteed to be non-null, have dataSize() > 0 and
      * have additional QN_BYTE_ARRAY_PADDING bytes allocated after frame->dataSize(), which is
      * needed by e.g. ffmpeg decoders and can be zeroed by this function.
-     * 
+     *
      * @param outDecodedFrame Decoded video data. If decoder still fills its internal buffer, then
      * outDecodedFrame should be set to null, and the function should return 0.
      *
@@ -59,8 +56,7 @@ public:
      * decoder is flushing its internal buffer (outDecodedFrame is not set to null).
      */
     virtual int decode(
-        const QnConstCompressedVideoDataPtr& compressedVideoData,
-        QVideoFramePtr* outDecodedFrame) = 0;
+        const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame) = 0;
 };
 
 } // namespace media

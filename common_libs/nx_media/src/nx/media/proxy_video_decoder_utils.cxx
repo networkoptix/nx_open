@@ -32,8 +32,10 @@ typedef std::shared_ptr<const YuvBuffer> ConstYuvBufferPtr;
 #include <chrono>
 #include <deque>
 
+#include <QElapsedTimer>
+
 // Log execution of a line - put double-L at the beginning of the line.
-#define LL qDebug() << "####### line " << __LINE__;
+#define LL qDebug().nospace() << "####### line " << __LINE__;
 
 #ifdef ENABLE_LOG
     #define QLOG(...) qDebug() << __VA_ARGS__
@@ -118,32 +120,21 @@ static void showFps()
     Q_UNUSED(showFps);
 
     static const int kFpsCount = 30;
-    static std::deque<double> fpsList;
+    static std::deque<int> deltaList;
     static std::chrono::milliseconds prevT(0);
 
     const std::chrono::milliseconds t = getCurrentTime();
     if (prevT.count() != 0)
     {
         const int delta = (t - prevT).count();
-        if (delta == 0)
-        {
-            qWarning() << "FPS: infinite";
-        }
-        else
-        {
-            double fps = 1000.0 / delta;
+        deltaList.push_back(delta);
+        if (deltaList.size() > kFpsCount)
+            deltaList.pop_front();
+        assert(!deltaList.empty());
+        double deltaAvg = std::accumulate(deltaList.begin(), deltaList.end(), 0.0) / deltaList.size();
 
-            fpsList.push_back(fps);
-            if (fpsList.size() > kFpsCount)
-                fpsList.pop_front();
-            double fpsAvg = 0;
-            if (!fpsList.empty())
-                fpsAvg = std::accumulate(fpsList.begin(), fpsList.end(), 0.0) / fpsList.size();
-
-            qWarning().nospace() << "FPS: Avg: " << qPrintable(QString::number(fpsAvg, 'f', 1)) 
-                << ", current: " << qPrintable(QString::number(fps, 'f', 1)) 
-                << ", ms: " << delta;
-        }
+        qWarning().nospace() << "FPS: Avg: " << qPrintable(QString::number(1000.0 / deltaAvg, 'f', 1))
+            << ", ms: " << delta << ", avg ms: " << deltaAvg;
     }
     prevT = t;
 }

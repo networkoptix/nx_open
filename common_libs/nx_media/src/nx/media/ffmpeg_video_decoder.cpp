@@ -173,10 +173,10 @@ int FfmpegVideoDecoder::decode(
         avpkt.size = 0;
     }
 
-    int gotData = 0;
-    avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
-    if (gotData <= 0)
-        return gotData; //< Negative value means error. Zero value means buffering.
+    int gotPicture = 0;
+    int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
+    if (res <= 0 || !gotPicture)
+        return res; //< Negative value means error, zero means buffering.
 
     ffmpegToQtVideoFrame(outDecodedFrame);
     return d->frame->coded_picture_number;

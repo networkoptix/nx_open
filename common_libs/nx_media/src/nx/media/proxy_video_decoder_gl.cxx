@@ -69,7 +69,7 @@ public:
     /**
      * If initialization fails, fail with 'assert'.
      */
-    void initialize(const QnConstCompressedVideoDataPtr& compressedVideoData);
+    void initialize(const QSize& frameSize);
 
     /**
      * @param compressedVideoData Has non-null data().
@@ -172,24 +172,20 @@ private:
     ConstYuvBufferPtr m_yuvBuffer;
 };
 
-void ProxyVideoDecoderPrivate::initialize(const QnConstCompressedVideoDataPtr& compressedVideoData)
+void ProxyVideoDecoderPrivate::initialize(const QSize& frameSize)
 {
-    QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() BEGIN");
+    QLOG("ProxyVideoDecoderPrivate<gl>::initialize() BEGIN");
     NX_ASSERT(!m_initialized);
     NX_CRITICAL(m_allocator);
-    NX_CRITICAL(compressedVideoData);
-    NX_CRITICAL(compressedVideoData->data());
-    NX_CRITICAL(compressedVideoData->dataSize() > 0);
     m_initialized = true;
 
-    // TODO mike: Remove when frame size is passed from SeamlessVideoDecoder.
-    extractSpsPps(compressedVideoData, &m_frameSize, nullptr);
+    m_frameSize = frameSize;
     // Currently, only even frame dimensions are supported due to UV having half-res.
     NX_CRITICAL(m_frameSize.width() % 2 == 0 || m_frameSize.height() % 2 == 0);
 
-    m_proxyDecoder.reset(new ProxyDecoder(m_frameSize.width(), m_frameSize.height()));
+    m_proxyDecoder.reset(ProxyDecoder::create(m_frameSize.width(), m_frameSize.height()));
 
-    QLOG("ProxyVideoDecoderPrivate<rgb>::initialize() END");
+    QLOG("ProxyVideoDecoderPrivate<gl>::initialize() END");
 }
 
 void ProxyVideoDecoderPrivate::createGlResources()
