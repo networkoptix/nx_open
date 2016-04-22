@@ -4,56 +4,56 @@ describe('System suite', function () {
 
     var p = new SystemPage();
 
-    //it("has system name, owner and OpenInNx button visible on every system page", function() {
-    //    p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
-    //
-    //    p.systemsList.map(function (elem, index) {
-    //        return {
-    //            index: index,
-    //            sysName: elem.element(by.css('h2')).getText(),
-    //            sysOwner: elem.element(by.css('.user-name')).getText()
-    //        }
-    //    }).then(function(systemsAttr) {
-    //        p.systemsList.count().then(function(count) {
-    //            for (var i= 0; i < count; i++) {
-    //                p.systemsList.get(i).click();
-    //                expect(browser.getCurrentUrl()).toContain('#/systems/');
-    //                expect(p.systemNameElem.getText()).toContain(systemsAttr[i].sysName);
-    //                expect(p.systemOwnElem.getText()).toContain(systemsAttr[i].sysOwner);
-    //                expect(p.openInNxButton.isDisplayed()).toBe(true);
-    //
-    //                p.helper.navigateBack();
-    //            }
-    //            p.helper.logout();
-    //        });
-    //    });
-    //});
-    //xit("has system status visible if system is not online", function() {
-    //});
-    //it("has OpenInNx button disabled if system is not online", function() {
-    //    p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
-    //    var offlineSystems = p.systemsList.filter(function(elem) {
-    //        // First filter systems that are not activated or offline
-    //        return elem.getInnerHtml().then(function(content) {
-    //            return (p.helper.isSubstr(content, 'not activated') || p.helper.isSubstr(content, 'offline'))
-    //        });
-    //    });
-    //    offlineSystems.count().then(function(count) {
-    //        for (var i= 0; i < count; i++) {
-    //            offlineSystems.get(i).click();
-    //            expect(p.openInNxButton.isEnabled()).toBe(false);
-    //
-    //            p.helper.navigateBack();
-    //        }
-    //        p.helper.logout();
-    //    });
-    //});
-    //xit("should confirm, if owner deletes system ( You are going to disconnect your system from cloud)", function() {
-    //
-    //});
-    //xit("should confirm, if not owner deletes system (You will loose access to this system)", function() {
-    //
-    //});
+    it("has system name, owner and OpenInNx button visible on every system page", function() {
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+
+        p.systemsList.map(function (elem, index) {
+            return {
+                index: index,
+                sysName: elem.element(by.css('h2')).getText(),
+                sysOwner: elem.element(by.css('.user-name')).getText()
+            }
+        }).then(function(systemsAttr) {
+            p.systemsList.count().then(function(count) {
+                for (var i= 0; i < count; i++) {
+                    p.systemsList.get(i).click();
+                    expect(browser.getCurrentUrl()).toContain('#/systems/');
+                    expect(p.systemNameElem.getText()).toContain(systemsAttr[i].sysName);
+                    expect(p.systemOwnElem.getText()).toContain(systemsAttr[i].sysOwner);
+                    expect(p.openInNxButton.isDisplayed()).toBe(true);
+
+                    p.helper.navigateBack();
+                }
+                p.helper.logout();
+            });
+        });
+    });
+    xit("has system status visible if system is not online", function() {
+    });
+    it("has OpenInNx button disabled if system is not online", function() {
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        var offlineSystems = p.systemsList.filter(function(elem) {
+            // First filter systems that are not activated or offline
+            return elem.getInnerHtml().then(function(content) {
+                return (p.helper.isSubstr(content, 'not activated') || p.helper.isSubstr(content, 'offline'))
+            });
+        });
+        offlineSystems.count().then(function(count) {
+            for (var i= 0; i < count; i++) {
+                offlineSystems.get(i).click();
+                expect(p.openInNxButton.isEnabled()).toBe(false);
+
+                p.helper.navigateBack();
+            }
+            p.helper.logout();
+        });
+    });
+    xit("should confirm, if owner deletes system ( You are going to disconnect your system from cloud)", function() {
+
+    });
+    xit("should confirm, if not owner deletes system (You will loose access to this system)", function() {
+
+    });
 
     it("has Share button, visible for admin and owner", function() {
         p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
