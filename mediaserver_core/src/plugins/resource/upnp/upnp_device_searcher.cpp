@@ -78,7 +78,7 @@ void UPNPDeviceSearcher::pleaseStop()
     m_socketList.clear();
 
     if(m_receiveSocket)
-        m_receiveSocket->terminateAsyncIO(true);
+        m_receiveSocket->pleaseStopSync();
 
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
