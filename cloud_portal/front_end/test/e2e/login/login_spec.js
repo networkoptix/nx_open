@@ -232,8 +232,9 @@ describe('Login dialog', function () {
     });
 
     it("rejects log in and shows error for inactivated user", function () {
-        var userEmail = p.helper.register();
+        var userEmail = p.helper.getRandomEmail();
 
+        p.helper.register(null, null, userEmail);
         p.get();
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
@@ -244,9 +245,9 @@ describe('Login dialog', function () {
 
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
+        var userEmail = p.helper.getRandomEmail();
 
-        var userEmail = p.helper.register();
-
+        p.helper.register(null, null, userEmail);
         p.get();
         p.emailInput.sendKeys(userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
@@ -320,8 +321,9 @@ describe('Login dialog', function () {
     });
 
     it("works at registration page on account activation error - with correct credentials", function() {
-        var userEmail = p.helper.register();
+        var userEmail = p.helper.getRandomEmail();
 
+        p.helper.register(null, null, userEmail);
         p.helper.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);

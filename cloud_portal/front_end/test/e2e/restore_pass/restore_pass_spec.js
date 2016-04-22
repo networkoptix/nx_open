@@ -92,7 +92,9 @@ describe('Restore password suite', function () {
     });
 
     it("should make not-activated user active by restoring password", function () {
-        var userEmail = p.helper.register();
+        var userEmail = p.helper.getRandomEmail();
+
+        p.helper.register(null, null, userEmail);
         p.get(p.url);
         p.getRestorePassLink(userEmail).then(function(url) {
             p.helper.get(url);

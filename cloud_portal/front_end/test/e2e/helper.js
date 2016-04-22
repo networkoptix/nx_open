@@ -181,8 +181,6 @@ var Helper = function () {
         submitButton.click();
         expect(element(by.css('.process-success')).isDisplayed()).toBe(true);
         expect(element(by.css('.process-success')).getText()).toContain(this.alert.alertMessages.registerSuccess);
-
-        return userEmail;
     };
 
     this.getActivationLink = function(userEmail) {

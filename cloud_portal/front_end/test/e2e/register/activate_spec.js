@@ -17,8 +17,9 @@ describe('Registration step2', function () {
     });
 
     it("should activate registration with a registration code sent to an email", function () {
-        var userEmail = p.helper.register();
+        var userEmail = p.helper.getRandomEmail();
 
+        p.helper.register(null, null, userEmail);
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
@@ -29,8 +30,9 @@ describe('Registration step2', function () {
     });
 
     it("should show error if same link is used twice", function () {
-        var userEmail = p.helper.register();
+        var userEmail = p.helper.getRandomEmail();
 
+        p.helper.register(null, null, userEmail);
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
@@ -41,8 +43,9 @@ describe('Registration step2', function () {
 
     p.alert.checkAlert(function(){
         var deferred = protractor.promise.defer();
-        var userEmail = p.helper.register();
+        var userEmail = p.helper.getRandomEmail();
 
+        p.helper.register(null, null, userEmail);
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
@@ -53,8 +56,9 @@ describe('Registration step2', function () {
     }, p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger, true);
 
     it("should save user data to user account correctly", function () {
-        var userEmail = p.helper.register();
-    
+        var userEmail = p.helper.getRandomEmail();
+
+        p.helper.register(null, null, userEmail);
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
