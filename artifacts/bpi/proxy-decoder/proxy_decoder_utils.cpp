@@ -12,9 +12,14 @@ bool ENABLE_LOG_VDPAU()
     return conf.ENABLE_LOG_VDPAU;
 }
 
-bool ENABLE_X11_LOG_VDPAU()
+bool ENABLE_X11_VDPAU()
 {
-    return conf.ENABLE_X11_LOG_VDPAU;
+    return conf.ENABLE_X11_VDPAU;
+}
+
+bool SUPPRESS_X11_LOG_VDPAU()
+{
+    return conf.SUPPRESS_X11_LOG_VDPAU;
 }
 
 long getTimeMs()

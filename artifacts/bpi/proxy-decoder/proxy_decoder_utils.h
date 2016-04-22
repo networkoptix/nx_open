@@ -10,8 +10,9 @@ public:
     FLAG(0, ENABLE_STUB);
 
     // vdpau_helper
-    FLAG(0, ENABLE_LOG_VDPAU);
-    FLAG(0, ENABLE_X11_LOG_VDPAU);
+    FLAG(0, ENABLE_LOG_VDPAU); //< Log each VDPAU call (errors are logged anyway).
+    FLAG(0, ENABLE_X11_VDPAU); //< Open X11 Display for VDPAU (otherwise, supply null for Display).
+    FLAG(0, SUPPRESS_X11_LOG_VDPAU); //< If ENABLE_X11_VDPAU, do not suppress X logging to stderr.
 
     // proxy_decoder_utils
     FLAG(0, ENABLE_LOG);

@@ -31,6 +31,8 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 	if (!device || !get_proc_address)
 		return VDP_STATUS_INVALID_POINTER;
 
+	*get_proc_address = vdp_get_proc_address;
+
 	device_ctx_t *dev = handle_create(sizeof(*dev), device);
 	if (!dev)
 		return VDP_STATUS_RESOURCES;
@@ -49,6 +51,7 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 	dev->cedrus = cedrus_open();
 	if (!dev->cedrus)
 	{
+		VDPAU_DBG("Failed to initialize libcedrus");
 		if (dev->display)
 		    XCloseDisplay(dev->display);
 		handle_destroy(*device);
@@ -56,7 +59,6 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 	}
 
 	VDPAU_DBG("VE version 0x%04x opened", cedrus_get_ve_version(dev->cedrus));
-	*get_proc_address = vdp_get_proc_address;
 
 	char *env_vdpau_osd = getenv("VDPAU_OSD");
 	char *env_vdpau_g2d = getenv("VDPAU_DISABLE_G2D");
@@ -191,9 +193,12 @@ VdpStatus vdp_get_proc_address(VdpDevice device_handle,
 	if (!function_pointer)
 		return VDP_STATUS_INVALID_POINTER;
 
-	device_ctx_t *device = handle_get(device_handle);
-	if (!device)
-		return VDP_STATUS_INVALID_HANDLE;
+	// Nx extension: Allow to use vdp_get_proc_address even if device initialization has failed.
+	#if 0
+		device_ctx_t *device = handle_get(device_handle);
+		if (!device)
+			return VDP_STATUS_INVALID_HANDLE;
+	#endif // 0
 
 	if (function_id < ARRAY_SIZE(functions))
 	{

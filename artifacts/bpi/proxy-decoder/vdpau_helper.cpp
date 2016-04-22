@@ -56,18 +56,9 @@ void vdpCheckHandle(uint32_t handle, const char* name)
     }
 }
 
-static VdpDevice getVdpDevice()
+static VdpDevice getVdpDeviceX11()
 {
-    VdpDevice vdpDevice = VDP_INVALID_HANDLE;
-
-    fprintf(stderr, "VDPAU: vdp_device_create_x11() without X11 (Nx extension to VDPAU)...\n");
-    VDP(vdp_device_create_x11(NULL, -1, &vdpDevice, &vdp_get_proc_address));
-    if (vdpDevice != VDP_INVALID_HANDLE && vdp_get_proc_address)
-    {
-        fprintf(stderr, "VDPAU: vdp_device_create_x11() without X11 OK\n");
-        return vdpDevice;
-    }
-
+    fprintf(stderr, "VDPAU: Opening X11 Display...\n");
     Display *pXDisplay = XOpenDisplay(0);
     if (pXDisplay == NULL)
     {
@@ -76,7 +67,7 @@ static VdpDevice getVdpDevice()
     }
 
     int stderrFile = -1;
-    if (!ENABLE_X11_LOG_VDPAU())
+    if (SUPPRESS_X11_LOG_VDPAU())
     {
         // Redirect stderr to /dev/null temporarily to prevent libvdpau console spam.
         int devNullFile = open("/dev/null", O_WRONLY);
@@ -85,10 +76,11 @@ static VdpDevice getVdpDevice()
     }
 
     fprintf(stderr, "VDPAU: vdp_device_create_x11() with X11...\n");
+    VdpDevice vdpDevice = VDP_INVALID_HANDLE;
     VDP(vdp_device_create_x11(
         pXDisplay,  DefaultScreen(pXDisplay), &vdpDevice, &vdp_get_proc_address));
 
-    if (!ENABLE_X11_LOG_VDPAU())
+    if (SUPPRESS_X11_LOG_VDPAU())
     {
         dup2(stderrFile, STDERR_FILENO);
         close(stderrFile);
@@ -98,6 +90,19 @@ static VdpDevice getVdpDevice()
     assert(vdp_get_proc_address);
 
     fprintf(stderr, "VDPAU: vdp_device_create_x11() with X11 OK\n");
+    return vdpDevice;
+}
+
+static VdpDevice getVdpDeviceWithoutX11()
+{
+    fprintf(stderr, "VDPAU: vdp_device_create_x11() without X11 (Nx extension to VDPAU)...\n");
+    VdpDevice vdpDevice = VDP_INVALID_HANDLE;
+    VDP(vdp_device_create_x11(NULL, -1, &vdpDevice, &vdp_get_proc_address));
+
+    vdpCheckHandle(vdpDevice, "Device");
+    assert(vdp_get_proc_address);
+
+    fprintf(stderr, "VDPAU: vdp_device_create_x11() without X11 OK\n");
     return vdpDevice;
 }
 
@@ -161,7 +166,7 @@ static void getProcAddresses(VdpDevice vdpDevice)
 
 VdpDevice createVdpDevice()
 {
-    VdpDevice vdpDevice = getVdpDevice();
+    VdpDevice vdpDevice = ENABLE_X11_VDPAU() ?  getVdpDeviceX11() : getVdpDeviceWithoutX11();
     getProcAddresses(vdpDevice);
     return vdpDevice;
 }

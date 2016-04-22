@@ -2,7 +2,8 @@
 
 // Configuration: should be defined elsewhere in the project which uses vdpau_helper.
 extern bool ENABLE_LOG_VDPAU();
-extern bool ENABLE_X11_LOG_VDPAU();
+extern bool ENABLE_X11_VDPAU();
+extern bool SUPPRESS_X11_LOG_VDPAU();
 
 #include <stdio.h>
 #include <stdint.h>
