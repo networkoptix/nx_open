@@ -16,6 +16,7 @@
 #include "utils/network/http/multipart_content_parser.h"
 
 class QnAxisPtzController;
+typedef std::shared_ptr<QnAbstractAudioTransmitter> AudioTransmitterPtr;
 
 class QnPlAxisResource : public QnPhysicalCameraResource
 {
@@ -72,7 +73,7 @@ public:
     AxisResolution getResolution( int encoderIndex ) const;
     virtual QnIOStateDataList ioStates() const override;
 
-    virtual QnAbstractAudioTransmitter* getAudioTransmitter() override;
+    virtual AudioTransmitterPtr getAudioTransmitter() override;
 public slots:
     void onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient );
     void onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
@@ -101,6 +102,7 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
     void asyncUpdateIOSettings(const QString & key);
     bool readCurrentIOStateAsync();
+    virtual QSet<CodecID> getSupportedAudioCodecs() const override;
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -113,6 +115,7 @@ private:
     QnIOPortDataList m_ioPorts;
     QnIOStateDataList m_ioStates;
     mutable QnMutex m_inputPortMutex;
+    mutable QnMutex m_audioTransmitterMutex;
     //!http client used to monitor input port(s) state
     
     struct IOMonitor {
@@ -129,6 +132,8 @@ private:
     nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
+    AudioTransmitterPtr m_audioTransmitter;
+    QSet<CodecID> m_supportedAudioCodecs;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(
@@ -155,7 +160,7 @@ private:
     bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
     void resetHttpClient(nx_http::AsyncHttpClientPtr& value);
 
-
+    CodecID getCodecIdByName(const QString&) const;
 
     /*!
         Convert port number to ID

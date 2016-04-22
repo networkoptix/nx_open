@@ -2,74 +2,127 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/unused.h"
 #include "core/resource_management/resource_pool.h"
-#include "camera/camera_pool.h"
 
-const QString QnAudioStreamerPool::kChooseClientAutomatically("auto");
+namespace
+{
+    const QString kChooseClientAutomatically("auto");
+}
 
 QnAudioStreamerPool::QnAudioStreamerPool()
 {
+
 }
 
-bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const QString& resourceId)
+QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& clientId) const
 {
-    auto res = qnResPool->getResourceById(QnUuid::fromStringSafe(resourceId));
-    if(!res)
-    {
-        qDebug() << "2WAY AUDIO: Resource Not found";
-        return false;
-    }
-
-    auto resource = res.dynamicCast<QnSecurityCamResource>();
-
-    if(!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-    {
-        qDebug() << "2WAY AUDIO: No capabilty to transmit audio";
-        return false;
-    }
-
     auto sourceCamResources = qnResPool->getResourcesWithTypeId(
         qnResTypePool->desktopCameraResourceType()->getId());
 
-    qDebug() << "2WAY AUDIO: Desktop cameras count" << sourceCamResources.size();
-    qDebug() << "2WAY AUDIO: Client id" << clientId;
-
     QnVideoCameraPtr sourceCam;
-    for(const auto& res: sourceCamResources)
+    for (const auto& res: sourceCamResources)
     {
-        qDebug() << "2WAY AUDIO: Desktop camera unique id:" << res->getUniqueId();
-        if((res->getUniqueId() == clientId) || clientId == kChooseClientAutomatically)
+        if ((res->getUniqueId() == clientId) || clientId == kChooseClientAutomatically)
         {
-            qDebug() << "2WAY AUDIO: Desktop camera found";
             sourceCam = qnCameraPool->getVideoCamera(res);
             break;
         }
     }
 
-    if(!sourceCam)
+    return sourceCam;
+}
+
+QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QString& resourceId) const
+{
+    auto res = qnResPool->getResourceById(QnUuid::fromStringSafe(resourceId));
+    if (!res)
     {
-        qDebug() << "2WAY AUDIO: No desktop camera has been found";
+        return QnSecurityCamResourcePtr(0);
+    }
+
+    auto resource = res.dynamicCast<QnSecurityCamResource>();
+
+    if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+    {
+        return QnSecurityCamResourcePtr(0);
+    }
+
+    return resource;
+}
+
+bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const QString& resourceId, QString& error)
+{
+    auto resource = getTransmitDestination(resourceId);
+    if (!resource)
+    {
+        error = lit("Can't find resource with id '%1'")
+            .arg(resourceId);
         return false;
     }
 
-    sourceCam->inUse(this);
-    auto reader = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
-    auto transmitter = resource->getAudioTransmitter();
-    if(!transmitter)
+    auto sourceCam = getTransmitSource(clientId);
+    if (!sourceCam)
+    {
+        error = lit("Can't find client with id '%1'")
+            .arg(clientId);
         return false;
+    }
 
-    qDebug() << "Setting up data transmitter";
-    reader->addDataProcessor(transmitter);
+    auto reader = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
+    if(!reader)
+    {
+        error = lit("Unable to obtaine live reader for client '%1'")
+            .arg(clientId);
+        return false;
+    }
+
+    auto transmitter = resource->getAudioTransmitter();
+    if (!transmitter)
+    {
+        error = lit("Unable to obtain audio transmitter for resource '%1'")
+            .arg(resourceId);
+        return false;
+    }
+
+    sourceCam->inUse(transmitter.get());
+    reader->addDataProcessor(transmitter.get());
+    if(transmitter->isRunning())
+        transmitter->stop();
     transmitter->start();
     reader->startIfNotRunning();
 
     return true;
 }
 
-bool QnAudioStreamerPool::stopStreamToResource(const QString& clientId, const QString& resourceId)
+bool QnAudioStreamerPool::stopStreamToResource(const QString& clientId, const QString& resourceId, QString &error)
 {
-    QN_UNUSED(clientId);
+    auto resource = getTransmitDestination(resourceId);
+    if (!resource)
+    {
+        error = lit("Can't find resource with id '%1'")
+            .arg(resourceId);
+        return false;
+    }
 
-    //auto resource = qnResPool->getResourceById(resourceId);
+    auto sourceCam = getTransmitSource(clientId);
+    if (!sourceCam)
+    {
+        error = lit("Can't find client with id '%1'")
+            .arg(clientId);
+        return false;
+    }
 
-    return false;
+    auto reader = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
+    auto transmitter = resource->getAudioTransmitter();
+    if (!transmitter)
+    {
+        error = lit("Unable to obtain audio transmitter for resource '%1'")
+            .arg(resourceId);
+        return false;
+    }
+
+    sourceCam->notInUse(transmitter.get());
+    transmitter->stop();
+    reader->removeDataProcessor(transmitter.get());
+
+    return true;
 }

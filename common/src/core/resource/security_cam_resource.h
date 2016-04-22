@@ -21,6 +21,8 @@
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
+typedef std::shared_ptr<QnAbstractAudioTransmitter> AudioTransmitterPtr;
+
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
 
@@ -44,6 +46,7 @@ public:
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
     bool hasTwoWayAudio() const;
+    virtual QSet<CodecID> getSupportedAudioCodecs() const;
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
@@ -258,7 +261,7 @@ public:
     bool isCameraInfoSavedToDisk(int pool) const;
     void setCameraInfoSavedToDisk(int pool);
 
-    virtual QnAbstractAudioTransmitter* getAudioTransmitter();
+    virtual AudioTransmitterPtr getAudioTransmitter();
 
 public slots:
     virtual void inputPortListenerAttached();

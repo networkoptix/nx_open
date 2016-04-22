@@ -1,5 +1,4 @@
-#ifndef AUDIO_DATA_TRANSMITTER_H
-#define AUDIO_DATA_TRANSMITTER_H
+#pragma once
 
 #include "core/dataconsumer/abstract_data_consumer.h"
 
@@ -11,14 +10,13 @@ public:
 
     virtual bool processData(const QnAbstractDataPacketPtr &data) override;
     virtual bool processAudioData(QnConstAbstractMediaDataPtr &data) = 0;
-    virtual bool canAcceptData() const override;
-    virtual void putData( const QnAbstractDataPacketPtr& data );
 
     /**
      * A bit hack here: if open desktop camera without configuration then only audio stream is opened.
      * Otherwise (default) video + audio is opened
      */
     virtual bool needConfigureProvider() const { return false; }
+
+    static QSet<CodecID> getSupportedAudioCodecs();
 };
 
-#endif // AUDIO_DATA_TRANSMITTER_H

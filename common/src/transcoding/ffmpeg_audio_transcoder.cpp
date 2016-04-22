@@ -135,8 +135,7 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
         m_lastErrMessage = tr("Could not initialize audio decoder.");
         return false;
     }
-    if (m_encoderCtx->frame_size == 0)
-        m_encoderCtx->frame_size = codecCtx->ctx()->frame_size;
+
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
     m_frameNum = 0;
     return true;
@@ -212,6 +211,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         quint8* decodedDataEndPtr = (quint8*) bufferToDecode.data() + bufferToDecode.size();
 
         int len = avcodec_decode_audio3(m_decoderContext, (short *)(decodedDataEndPtr), &decodedAudioSize, &avpkt);
+        if (m_encoderCtx->frame_size == 0)
+            m_encoderCtx->frame_size = m_decoderContext->frame_size;
+
         if (len < 0)
             return -3;
 

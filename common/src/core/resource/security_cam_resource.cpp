@@ -1042,7 +1042,13 @@ bool QnSecurityCamResource::isIOModule() const
     return m_cachedIsIOModule.get();
 }
 
-QnAbstractAudioTransmitter* QnSecurityCamResource::getAudioTransmitter()
+
+AudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 {
     return nullptr;
+}
+
+QSet<CodecID> QnSecurityCamResource::getSupportedAudioCodecs() const
+{
+    return QSet<CodecID>();
 }

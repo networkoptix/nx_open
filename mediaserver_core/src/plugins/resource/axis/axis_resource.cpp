@@ -25,10 +25,14 @@
 using namespace std;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
-static const float MAX_AR_EPS = 0.04f;
-static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-static const quint16 DEFAULT_AXIS_API_PORT = 80;
-static const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+
+namespace{
+    const float MAX_AR_EPS = 0.04f;
+    const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
+    const quint16 DEFAULT_AXIS_API_PORT = 80;
+    const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+    const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+}
 
 int QnPlAxisResource::portIdToIndex(const QString& id) const
 {
@@ -80,11 +84,12 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource()
+QnPlAxisResource::QnPlAxisResource() :
+    m_lastMotionReadTime(0),
+    m_audioTransmitter(nullptr)
 {
     setVendor(lit("Axis"));
     setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
-    m_lastMotionReadTime = 0;
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
 
@@ -833,7 +838,29 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
 
 bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
 {
-    setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+    QString value;
+    auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &value);
+
+    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+        return false;
+
+    if (value.isEmpty())
+        return true;
+\
+    auto supportedFormats = value.split(',');
+    auto codecsSupportedByTransmitter = QnAxisAudioTransmitter::getSupportedAudioCodecs();
+
+    for (const auto& format: supportedFormats)
+    {
+        auto codecId = getCodecIdByName(format);
+        if (codecId == CodecID::CODEC_ID_NONE)
+            continue;
+
+        m_supportedAudioCodecs << codecId;
+        if (codecsSupportedByTransmitter.contains(codecId))
+            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+    }
+
     return true;
 }
 
@@ -1331,9 +1358,44 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
 }
 
-QnAbstractAudioTransmitter* QnPlAxisResource::getAudioTransmitter()
+CodecID QnPlAxisResource::getCodecIdByName(const QString& codecName) const
 {
-    return new QnAxisAudioTransmitter();
+    if (codecName == lit("g711"))
+        return CodecID::CODEC_ID_PCM_MULAW;
+    else if (codecName == lit("g726"))
+        return CodecID::CODEC_ID_ADPCM_G726;
+    else
+        return CodecID::CODEC_ID_NONE;
+}
+
+QSet<CodecID> QnPlAxisResource::getSupportedAudioCodecs() const
+{
+    return m_supportedAudioCodecs;
+}
+
+AudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
+{
+    QnMutexLocker lk(&m_audioTransmitterMutex);
+
+    if (!isInitialized())
+        return nullptr;
+
+    if (!m_audioTransmitter)
+    {
+        const auto codecsSupportedByTransmitter = QnAxisAudioTransmitter::getSupportedAudioCodecs();
+
+        for (const auto codecSupportedByCamera: m_supportedAudioCodecs)
+        {
+            if (codecsSupportedByTransmitter.contains(codecSupportedByCamera))
+            {
+                qDebug() << "Creating axis audio transmitter";
+                m_audioTransmitter = std::make_shared<QnAxisAudioTransmitter>(this, codecSupportedByCamera);
+                break;
+            }
+        }
+    }
+
+    return m_audioTransmitter;
 }
 
 #endif // #ifdef ENABLE_AXIS
