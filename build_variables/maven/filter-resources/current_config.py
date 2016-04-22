@@ -27,8 +27,8 @@ def _add_path(env, var, path):
 
 def add_lib_path(env):
     if _platform == 'darwin': # Max OS X
-        _add_path(Env, 'DYLD_LIBRARY_PATH', LIB_PATH)
-        _add_path(Env, 'DYLD_FRAMEWORK_PATH', LIB_PATH)
+        _add_path(env, 'DYLD_LIBRARY_PATH', LIB_PATH)
+        _add_path(env, 'DYLD_FRAMEWORK_PATH', LIB_PATH)
     else:
-        _add_path(Env, 'LD_LIBRARY_PATH', LIB_PATH)
+        _add_path(env, 'LD_LIBRARY_PATH', LIB_PATH)
 
