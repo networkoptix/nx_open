@@ -44,9 +44,6 @@ TunnelConnector::TunnelConnector(
 TunnelConnector::~TunnelConnector()
 {
     //it is OK if called after pleaseStop or within aio thread after connect handler has been called
-    m_mediatorUdpClient.reset();
-    m_rendezvousConnectors.clear();
-    m_udtConnection.reset();
 }
 
 void TunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -59,6 +56,7 @@ void TunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
             m_timer.pleaseStopSync();
             m_rendezvousConnectors.clear();
             m_udtConnection.reset();    //we do not use this connection so can just remove it here
+            m_connectResultReportSender.reset();
             handler();
         });
 }
@@ -144,6 +142,20 @@ void TunnelConnector::connect(
 const AddressEntry& TunnelConnector::targetPeerAddress() const
 {
     return m_targetHostAddress;
+}
+
+void TunnelConnector::messageReceived(
+    SocketAddress sourceAddress,
+    stun::Message msg)
+{
+    //here we can receive response to connect result report. We just don't need it
+}
+
+void TunnelConnector::ioFailure(SystemError::ErrorCode errorCode)
+{
+    //if error happens when sending connect result report, 
+    //  it will be reported to TunnelConnector::connectSessionReportSent too
+    //  and we will handle error there
 }
 
 namespace {
@@ -355,28 +367,18 @@ void TunnelConnector::holePunchingDone(
     m_connectResultReport.resultCode = resultCode;
 
     using namespace std::placeholders;
-#if 1
-    if (!m_mediatorUdpClient)
-    {
-        //m_mediatorUdpClient has given away his socket to udt socket
-        m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
-            *nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
-        m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
-    }
-
-    m_mediatorUdpClient->connectionResult(
-        m_connectResultReport,
-        [](api::ResultCode){ /* ignoring result */ });
-    //currently, m_mediatorUdpClient does not provide a way to receive request send result
-        //so, just giving it a chance to send report
-        //TODO #ak send it reliably. But, we should not wait for mediator reply
-    m_timer.post(std::bind(
-        &TunnelConnector::connectSessionReportSent,
-        this,
-        SystemError::noError));
-#else
-    nx::stun::UnreliableMessagePipeline stunMessagePipeline;
-#endif
+    m_connectResultReportSender =
+        std::make_unique<stun::UnreliableMessagePipeline>(this);
+    m_connectResultReportSender->bindToAioThread(m_timer.getAioThread());
+    stun::Message connectResultReportMessage(
+        stun::Header(
+            stun::MessageClass::request,
+            stun::cc::methods::connectionResult));
+    m_connectResultReport.serialize(&connectResultReportMessage);
+    m_connectResultReportSender->sendMessage(
+        *SocketGlobals::mediatorConnector().mediatorAddress(),
+        std::move(connectResultReportMessage),
+        std::bind(&TunnelConnector::connectSessionReportSent, this, _1));
 }
 
 void TunnelConnector::connectSessionReportSent(
