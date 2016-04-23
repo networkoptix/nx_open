@@ -98,7 +98,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
+                <rdep.linux.packages>quazip opengl-es-mali proxy-decoder</rdep.linux.packages>
             </properties>
         </profile>
     </profiles> 
