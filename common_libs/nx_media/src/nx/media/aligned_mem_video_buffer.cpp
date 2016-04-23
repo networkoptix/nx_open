@@ -81,7 +81,7 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int byte
     d->ownBuffer = true;
 }
 
-AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount):
+AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount)
 :
     QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
 {
