@@ -27,6 +27,7 @@ public:
     virtual void setAllocator(AbstractResourceAllocator* allocator) override;
 private:
     std::shared_ptr<AndroidVideoDecoderPrivate> d;
+    // TODO: Fix: Q_DECLARE_PRIVATE requires QSharedPtr and d_ptr field.
     Q_DECLARE_PRIVATE(AndroidVideoDecoder);
 };
 

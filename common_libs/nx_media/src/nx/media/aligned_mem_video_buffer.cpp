@@ -97,9 +97,13 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4]
 
 AlignedMemVideoBuffer::~AlignedMemVideoBuffer()
 {
+  
     Q_D(AlignedMemVideoBuffer);
+  
     if (d->ownBuffer)
+    {
         qFreeAligned(d->data[0]);
+    }
 }
 
 AlignedMemVideoBuffer::MapMode AlignedMemVideoBuffer::mapMode() const

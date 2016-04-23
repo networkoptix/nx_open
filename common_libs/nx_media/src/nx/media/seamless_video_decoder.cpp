@@ -184,7 +184,8 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder.reset();
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, QSize(frame->width, frame->height));
+            // TODO mike: Pass frame size to ...VideoDecoder.
+            frame->compressionType, frameInfo.size);
         d->decoderFrameOffset = d->frameNumber;
         d->prevFrameInfo = frameInfo;
         d->clearMetadata();
