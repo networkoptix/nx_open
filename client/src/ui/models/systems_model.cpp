@@ -305,7 +305,7 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
         m_internalData.insert(insertPos, data);
     }
 
-    if (isMaximumNumber)
+    if (emitInsertSignal && isMaximumNumber)
     {
         beginRemoveRows(QModelIndex(), m_maxCount, m_maxCount);
         endRemoveRows();
@@ -339,7 +339,7 @@ void QnSystemsModel::removeSystem(const QString &systemId)
         m_internalData.erase(removeIt);
     }
 
-    if (moreThanMaximum)
+    if (emitRemoveSignal && moreThanMaximum)
     {
         beginInsertRows(QModelIndex(), m_maxCount - 1, m_maxCount - 1);
         endInsertRows();

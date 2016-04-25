@@ -48,8 +48,7 @@ Rectangle
             readonly property int horizontalOffset: 40;
             readonly property int tileWidth: 280;
             property int maxColumns: ((parent.width - 2 * horizontalOffset) / tileWidth)
-            property int desiredColumns:(itemsSource.count > 3
-                ? ((itemsSource.count + 1) / 2) : itemsSource.count);
+            property int desiredColumns: Math.min(itemsSource.count, 4);
 
             property QtObject watcher: SingleActiveItemSelector
             {
