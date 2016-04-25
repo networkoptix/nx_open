@@ -13,6 +13,7 @@
 #import "HDWECSViewController.h"
 
 #import "HDWECSConfig.h"
+#import "version.h"
 
 @interface HDWMasterViewController () {
     NSMutableArray *_objects;
@@ -26,7 +27,7 @@
 }
 
 
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskAll;
 }
 
@@ -54,6 +55,7 @@
 {
     [super viewDidLoad];
 
+    [self migrateSettings];
     [self loadSettings];
     
 	// Do any additional setup after loading the view, typically from a nib.
@@ -93,10 +95,25 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)loadSettings {
+- (void)migrateSettings {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults synchronize];
     
+    NSData *encodedObject = [defaults objectForKey:@"ecsconfigs"];
+    if (encodedObject) {
+        NSUserDefaults *shared = [[NSUserDefaults alloc] initWithSuiteName:@QN_IOS_SHARED_GROUP_ID];
+        [shared synchronize];
+
+        [shared setObject:encodedObject forKey:@"ecsconfigs"];
+        [defaults removeObjectForKey:@"ecsconfigs"];
+
+        [shared synchronize];
+        [defaults synchronize];
+    }
+}
+
+- (void)loadSettings {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@QN_IOS_SHARED_GROUP_ID];
     NSData *encodedObject = [defaults objectForKey:@"ecsconfigs"];
     if (encodedObject) {
         _objects = (NSMutableArray*)[NSKeyedUnarchiver unarchiveObjectWithData: encodedObject];
@@ -106,7 +123,7 @@
 }
 
 - (void)saveSettings {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@QN_IOS_SHARED_GROUP_ID];
     NSData *encodedObjects = [NSKeyedArchiver archivedDataWithRootObject:_objects];
     [defaults setObject:encodedObjects forKey:@"ecsconfigs"];
     [defaults synchronize];

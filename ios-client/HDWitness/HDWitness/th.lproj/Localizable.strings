@@ -41,3 +41,9 @@
 "Medium" = "ปานกลาง";
 "High" = "สูง";
 "Best" = "สูงมาก";
+"Please Upgrade to Continue" = "โปรดอัพเกรดเพื่อดำเนินการต่อไป";
+"This app is not compatible with this version of the software. Please download our new app." = "แอปนี้ไม่มีเข้ากันได้กับรุ่นของซอฟต์แวร์นี้ กรุณาดาวน์โหลด แอป ใหม่ของเรา.";
+"Not now" = "ยังไม่ตอนนี้";
+"Download" = "ดาวโหลด";
+"Upgrade Now!" = "อัพเกรดตอนนี้!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "คุณกำลังเชื่อมต่อกับระบบที่ใช้ v2.5 หรือใหม่กว่า ดาวน์โหลด app ใหม่ของเราสำหรับประสบการณ์การรับชมที่ดีกว่ามือถือ";

@@ -8,6 +8,7 @@ public class ServerInfo {
  
     public static final int PROTOCOL_2_3 = 1000;
     public static final int PROTOCOL_2_4 = 1026;
+    public static final int PROTOCOL_2_5 = 2500;
     
     /**
      * MediaProxy port

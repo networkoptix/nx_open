@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	android:installLocation="auto" android:versionCode="${project.version.code}"
-	android:versionName="${project.version.name}" package="${namespace.major}.${namespace.minor}.${namespace.additional}">
+	android:versionName="${project.version.name}" package="${old.android.packagename}">
 
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="21" />
 
@@ -9,13 +9,15 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<uses-permission android:name="android.permission.READ_LOGS" />
+    
+    <permission android:name="${old.android.packagename}.readLogonEntries" android:protectionLevel="normal" />
 
 	<application
 		android:name=".ui.HdwApplication"
 		android:allowBackup="true"
 		android:hardwareAccelerated="true"
 		android:icon="@drawable/ic_launcher"
-		android:label="${display.product.name}" 
+		android:label="${old.android.product.name}" 
 		android:theme="@style/AppTheme.Main"
 		android:description="@string/app_description"
         android:largeHeap="true">
@@ -49,7 +51,7 @@
 			<meta-data android:name="android.support.PARENT_ACTIVITY"
 				android:value=".ui.activities.VideoActivity" />
 		</activity>
-		<activity android:name=".ui.activities.SplashActivity" android:label="${display.product.name}"
+		<activity android:name=".ui.activities.SplashActivity" android:label="${old.android.product.name}"
 			android:excludeFromRecents="true" android:noHistory="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -62,6 +64,14 @@
                 android:value=".ui.activities.LogonActivity" />
         </activity>
 
+        <provider 
+            android:name=".ui.LogonDataContentProvider" 
+            android:authorities="${old.android.packagename}.LogonEntries"
+            android:exported="true"
+            android:permission="${old.android.packagename}.readLogonEntries"
+            >
+        </provider>        
+        
 	</application>
 
 </manifest>

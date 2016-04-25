@@ -41,3 +41,9 @@
 "Medium" = "中";
 "High" = "高";
 "Best" = "最佳";
+"Please Upgrade to Continue" = "请继续升级";
+"This app is not compatible with this version of the software. Please download our new app." = "App和当前软件服务版本不兼容，请下载最新APP.";
+"Not now" = "无法确认";
+"Download" = "下载";
+"Upgrade Now!" = "正在升级中!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "您正在连接到V2.5版本或者更新，请下载新app来获取更好的移动体验.";

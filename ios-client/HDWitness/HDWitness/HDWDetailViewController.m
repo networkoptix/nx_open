@@ -45,6 +45,7 @@ enum State {
     State_Connected,
     
     State_IncompatibleEcsVersion,
+    State_TooNewVersion,
     State_NetworkFailed,
     State_Disconnected
 };
@@ -60,6 +61,9 @@ enum State {
     NSTimer *_thumbnailUpdateTimer;
     NSString *_disconnectReason;
     int _thumbnailRefreshIndex;
+    
+    UIAlertView *_disconnectedAlertView;
+    UIAlertView *_goTo25AlertView;
 }
 
 @property(nonatomic) HDWECSModel *ecsModel;
@@ -171,7 +175,7 @@ enum State {
 }
 
 
-- (NSUInteger)supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskAll;
 }
 
@@ -349,16 +353,27 @@ enum State {
     }
     
     NSString *currentVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
-    
-    // 1.5.0 is not supported, we check it manually here as compatibility framework only checkes major and minor
-    if ([checker isCompatibleComponent:@"iOSClient" ofVersion:currentVersion withComponent:@"ECS" ofVersion:connectInfo.version]
-        && ![connectInfo.version hasPrefix:@"1.5.0"]) {
-        _state = State_Connected;
-    } else {
+
+    if (![checker isCompatibleComponent:@"iOSClient" ofVersion:currentVersion withComponent:@"ECS" ofVersion:connectInfo.version]
+        || [connectInfo.version hasPrefix:@"1.5.0"]) {
         DDLogInfo(@"Versions are incompatible: our is %@, EC is %@", currentVersion, connectInfo.version);
+        
         _state = State_IncompatibleEcsVersion;
+        [self performNextStep];
+        
+        return;
     }
     
+    NSComparisonResult v25Comparison = [connectInfo.version compare:@"2.5"];
+    if ((v25Comparison == NSOrderedDescending || v25Comparison == NSOrderedSame) && SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+        _state = State_TooNewVersion;
+        [self performNextStep];
+        
+        return;
+    }
+    
+    // 1.5.0 is not supported, we check it manually here as compatibility framework only checkes major and minor
+    _state = State_Connected;
     [self performNextStep];
 }
 
@@ -723,10 +738,25 @@ enum State {
             break;
         }
             
+        case State_TooNewVersion: {
+            _goTo25AlertView = [[UIAlertView alloc]
+                                initWithTitle:L(@"Upgrade Now!")
+                                message:L(@"You're connecting to a System running v2.5 or newer.\nDownload our new app for a better mobile viewing experience.")
+                                delegate:self
+                                cancelButtonTitle:L(@"Not now")
+                                otherButtonTitles:L(@"Download")
+                                , nil];
+            [_goTo25AlertView show];
+            
+            break;
+        }
+            
         case State_Disconnected: {
             [self freeResources];
             [self updateView];
-            [[[UIAlertView alloc] initWithTitle:L(@"Error") message:_disconnectReason delegate:self cancelButtonTitle:L(@"OK") otherButtonTitles:nil] show];
+            
+            _disconnectedAlertView = [[UIAlertView alloc] initWithTitle:L(@"Error") message:_disconnectReason delegate:self cancelButtonTitle:L(@"OK") otherButtonTitles:nil];
+            [_disconnectedAlertView show];
             break;
         }
             
@@ -916,6 +946,21 @@ enum State {
 #pragma mark - Alert view
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    if (alertView == _goTo25AlertView) {
+        if (buttonIndex == 1) {
+            NSString *urlString = [NSString stringWithFormat:@"%@%@",
+                                   @"http://itunes.apple.com/app/",
+                                   @QN_IOS_NEW_APP_APPSTORE_ID];
+            
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
+        }
+        
+        _state = State_Connected;
+        [self performNextStep];
+        
+        return;
+    }
+
     self.title = @"";
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self setMasterVisibleFixed];

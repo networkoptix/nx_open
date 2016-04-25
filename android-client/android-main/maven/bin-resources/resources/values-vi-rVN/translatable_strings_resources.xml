@@ -10,5 +10,8 @@
     <string name="resources_tree">Cây Display</string>
     <string name="resources_grid">Thumbnails</string>
     <string name="resources_logout">Thoát</string>
+    <string name="promote_title">Nâng cấp ngay bây giờ!</string>
+    <string name="promote">Bạn đang kết nối với một hệ thống chạy v2.5 hoặc mới hơn. Tải ứng dụng mới của chúng tôi cho một kinh nghiệm xem di động tốt hơn.</string>
+    <string name="download">Tải về</string>
 
 </resources>

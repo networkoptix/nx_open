@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.4.1-SNAPSHOT</version>
+		<version>2.5.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.4.1</version>
+	<version>2.5.1</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>ios-client</artifactId>
 	<packaging>pom</packaging>
@@ -22,8 +22,8 @@
 		<PROJECT_NAME>consolebuildtest</PROJECT_NAME>
 
         <VALID_ARCHS>armv7 armv7s arm64</VALID_ARCHS>
-        <DEVELOPER_NAME>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</DEVELOPER_NAME>
-        <PROVISIONING_PROFILE>../customization/default/ios-client/testing.mobileprovision</PROVISIONING_PROFILE>
+        <DEVELOPER_NAME>${ios.sign.identity}</DEVELOPER_NAME>
+        <PROVISIONING_PROFILE>../customization/${customization}/ios-client/testing.mobileprovision</PROVISIONING_PROFILE>
         <MAVEN_MINIMUM_IOS_VERSION>${ios.minimum_os_version}</MAVEN_MINIMUM_IOS_VERSION>
 
 		<ios.clean>false</ios.clean>
@@ -111,13 +111,13 @@
 							<workingDirectory>${basedir}</workingDirectory>		
 							<skip>${build.skip}</skip>
 							<environmentVariables>
-                                <DEVELOPER_NAME_BETA>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</DEVELOPER_NAME_BETA>
-                                <PROVISIONING_PROFILE_BETA>../customization/default/ios-client/testing.mobileprovision</PROVISIONING_PROFILE_BETA>
+                                <DEVELOPER_NAME_BETA>${ios.sign.identity}</DEVELOPER_NAME_BETA>
+                                <PROVISIONING_PROFILE_BETA>../customization/${customization}/ios-client/testing.mobileprovision</PROVISIONING_PROFILE_BETA>
                                 <DEVELOPER_NAME_RELEASE>${ios.sign.identity}</DEVELOPER_NAME_RELEASE>
                                 <PROVISIONING_PROFILE_RELEASE>../customization/${customization}/ios-client/production.mobileprovision</PROVISIONING_PROFILE_RELEASE>
 
 								<MAVEN_PRODUCT_NAME>${product.name}</MAVEN_PRODUCT_NAME>
-								<MAVEN_DISPLAY_PRODUCT_NAME>${display.product.name}</MAVEN_DISPLAY_PRODUCT_NAME>
+								<MAVEN_DISPLAY_PRODUCT_NAME>${old.ios.product.name}</MAVEN_DISPLAY_PRODUCT_NAME>
                                 <MAVEN_MINIMUM_IOS_VERSION>${MAVEN_MINIMUM_IOS_VERSION}</MAVEN_MINIMUM_IOS_VERSION>
                                 <MAVEN_VERSION>${release.version}</MAVEN_VERSION>
                                 <MAVEN_BUILD_NUMBER>${buildNumber}</MAVEN_BUILD_NUMBER>                                
@@ -150,13 +150,13 @@
 							<workingDirectory>${basedir}</workingDirectory>		
 							<skip>${build.skip}</skip>
 							<environmentVariables>
-                                <DEVELOPER_NAME_BETA>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</DEVELOPER_NAME_BETA>
-                                <PROVISIONING_PROFILE_BETA>../customization/default/ios-client/testing.mobileprovision</PROVISIONING_PROFILE_BETA>
+                                <DEVELOPER_NAME_BETA>${ios.sign.identity}</DEVELOPER_NAME_BETA>
+                                <PROVISIONING_PROFILE_BETA>../customization/${customization}/ios-client/testing.mobileprovision</PROVISIONING_PROFILE_BETA>
                                 <DEVELOPER_NAME_RELEASE>${ios.sign.identity}</DEVELOPER_NAME_RELEASE>
                                 <PROVISIONING_PROFILE_RELEASE>../customization/${customization}/ios-client/production.mobileprovision</PROVISIONING_PROFILE_RELEASE>
 
 								<MAVEN_PRODUCT_NAME>${product.name}</MAVEN_PRODUCT_NAME>
-								<MAVEN_DISPLAY_PRODUCT_NAME>${display.product.name}</MAVEN_DISPLAY_PRODUCT_NAME>
+								<MAVEN_DISPLAY_PRODUCT_NAME>${old.ios.product.name}</MAVEN_DISPLAY_PRODUCT_NAME>
                                 <MAVEN_MINIMUM_IOS_VERSION>${MAVEN_MINIMUM_IOS_VERSION}</MAVEN_MINIMUM_IOS_VERSION>
                                 <MAVEN_VERSION>${release.version}</MAVEN_VERSION>
                                 <MAVEN_BUILD_NUMBER>${buildNumber}</MAVEN_BUILD_NUMBER>                                

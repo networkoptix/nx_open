@@ -294,7 +294,7 @@
 		C718315C1AF16A500084AD5A /* HDWMultipartStreamParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HDWMultipartStreamParser.h; path = HDWitness/HDWMultipartStreamParser.h; sourceTree = "<group>"; };
 		C718315D1AF16A500084AD5A /* HDWMultipartStreamParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HDWMultipartStreamParser.m; path = HDWitness/HDWMultipartStreamParser.m; sourceTree = "<group>"; };
 		C718315F1AF1843B0084AD5A /* HDWStreamParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDWStreamParser.h; sourceTree = "<group>"; };
-		C71D5AF016ADBB9600C764B5 /* NxWitness.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NxWitness.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DWSpectrum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C71D5AF416ADBB9600C764B5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		C71D5AF616ADBB9600C764B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C71D5AF816ADBB9600C764B5 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -333,7 +333,9 @@
 		C79888CC1A7D239A00397179 /* HDWMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDWMap.h; sourceTree = "<group>"; };
 		C79888CD1A7D239A00397179 /* HDWMap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HDWMap.mm; sourceTree = "<group>"; };
 		C79888CF1A7D289000397179 /* HDWMapTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDWMapTest.m; sourceTree = "<group>"; };
+		C7AE94241C8A1D0300F32CBF /* tr-TR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "tr-TR"; path = "tr-TR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		C7BBA54B18324B8B00F842A2 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../target/version.h; sourceTree = "<group>"; };
+		C7D1CD241C28D46C00C99A84 /* NxWitness.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = NxWitness.entitlements; sourceTree = "<group>"; };
 		C7D765CD1925092700D9DB38 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		C7E75E601819857400071E80 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		C7ED775A1A7D824C002B8560 /* HDWCameraAccessor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDWCameraAccessor.h; sourceTree = "<group>"; };
@@ -477,6 +479,7 @@
 		B680D779F69A8418BAEDA145 /* HDWitness */ = {
 			isa = PBXGroup;
 			children = (
+				C7D1CD241C28D46C00C99A84 /* NxWitness.entitlements */,
 				C75E18841B43951D00A9CE78 /* Base.lproj/MainStoryboard_iPad.storyboard */,
 				C75E18851B43951D00A9CE78 /* Base.lproj/MainStoryboard_iPhone.storyboard */,
 				B680DE366FA3FF97622DBDF5 /* Settings.bundle */,
@@ -643,7 +646,7 @@
 		C71D5AF116ADBB9600C764B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C71D5AF016ADBB9600C764B5 /* NxWitness.app */,
+				C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */,
 				C71D5B1D16ADBB9600C764B5 /* HDWitnessTests.xctest */,
 			);
 			name = Products;
@@ -700,6 +703,7 @@
 				C71D5AEE16ADBB9600C764B5 /* Resources */,
 				AE62E7FD64E64EFF95E8EAA5 /* Copy Pods Resources */,
 				C7D38DB9171D8AEF00BDEFD3 /* ShellScript */,
+				44E6F67DDA1A8DCD7646A2FE /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 				C7C3E20A1720A5D500E44579 /* PBXBuildRule */,
@@ -708,7 +712,7 @@
 			);
 			name = HDWitness;
 			productName = HDWitness;
-			productReference = C71D5AF016ADBB9600C764B5 /* NxWitness.app */;
+			productReference = C71D5AF016ADBB9600C764B5 /* DWSpectrum.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C71D5B1C16ADBB9600C764B5 /* HDWitnessTests */ = {
@@ -737,8 +741,14 @@
 			attributes = {
 				CLASSPREFIX = HDW;
 				LastUpgradeCheck = 0600;
-				ORGANIZATIONNAME = "Ivan Vigasin";
 				TargetAttributes = {
+					C71D5AEF16ADBB9600C764B5 = {
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
 					C71D5B1C16ADBB9600C764B5 = {
 						TestTargetID = C71D5AEF16ADBB9600C764B5;
 					};
@@ -764,6 +774,7 @@
 				pl,
 				hu,
 				he,
+				"tr-TR",
 			);
 			mainGroup = C71D5AE516ADBB9600C764B5;
 			productRefGroup = C71D5AF116ADBB9600C764B5 /* Products */;
@@ -830,6 +841,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		44E6F67DDA1A8DCD7646A2FE /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		AE62E7FD64E64EFF95E8EAA5 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -963,6 +989,7 @@
 				C71282E01B5DFDAD00B7B4BC /* pl */,
 				C76FA6A91B9A55FE0094E6E0 /* hu */,
 				C764ABD21BCEE7CA00254334 /* he */,
+				C7AE94241C8A1D0300F32CBF /* tr-TR */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1032,6 +1059,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B680D32CCCE5398F918607DC /* HDWitness.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HDWitness/NxWitness.entitlements;
 				CODE_SIGN_RESOURCE_RULES_PATH = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1058,6 +1086,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B680D32CCCE5398F918607DC /* HDWitness.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = HDWitness/NxWitness.entitlements;
 				CODE_SIGN_RESOURCE_RULES_PATH = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

@@ -41,3 +41,9 @@
 "Medium" = "標準";
 "High" = "高い";
 "Best" = "最高";
+"Please Upgrade to Continue" = "継続して更新を行ってください";
+"This app is not compatible with this version of the software. Please download our new app." = "このバージョンでは互換性がありません 新しいアプリケーションをダウンロードしてください";
+"Not now" = "後日";
+"Download" = "ダウンロード";
+"Upgrade Now!" = "今すぐ更新!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "バージョン2.5以上のシステムに接続しています　新しいアプリケーションのダウンロードを推奨します";

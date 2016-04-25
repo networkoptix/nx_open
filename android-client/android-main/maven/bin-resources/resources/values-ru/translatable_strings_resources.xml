@@ -10,5 +10,8 @@
     <string name="resources_tree">Древо</string>
     <string name="resources_grid">Миниатюры</string>
     <string name="resources_logout">Выход</string>
-
+    <string name="promote_title">Обновитесь сейчас!</string>
+    <string name="promote">Вы пытаетесь соединиться с системой версии 2.5 или выше. Попробуйте новое более удобное приложение для просмотра видео</string>
+    <string name="download">ЗАГРУЗИТЬ СЕЙЧАС</string>
+    
 </resources>

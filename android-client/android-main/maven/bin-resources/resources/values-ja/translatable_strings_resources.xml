@@ -10,5 +10,8 @@
     <string name="resources_tree">ツリー表示</string>
     <string name="resources_grid">サムネイル</string>
     <string name="resources_logout">ログアウト</string>
+    <string name="promote_title">今すぐ更新!</string>
+    <string name="promote">v2.5以上のシステムに接続しています　新しいAppをダウンロードしてください</string>
+    <string name="download">ダウンロード</string>    
 
 </resources>

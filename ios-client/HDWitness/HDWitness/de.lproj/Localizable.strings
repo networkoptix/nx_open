@@ -41,3 +41,9 @@
 "Medium" = "Mittel";
 "High" = "Hoch";
 "Best" = "Sehr hoch";
+"Please Upgrade to Continue" = "Updaten Sie bitte um fortzufahren";
+"This app is not compatible with this version of the software. Please download our new app." = "Diese App ist nicht kompatibel mit dieser Softwareversion. Laden Sie bitte unsere neue App herunter.";
+"Not now" = "Nicht jetzt";
+"Download" = "Download";
+"Upgrade Now!" = "Jetzt updaten!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "Sie versuchen sich mit einem System mit Version 2.5 oder neuer zu verbinden. Laden Sie unsere neue App für bessere Handhabung herunter.";

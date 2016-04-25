@@ -10,5 +10,8 @@
     <string name="resources_tree">תצוגת עץ</string>
     <string name="resources_grid">תמונות ממוזערות</string>
     <string name="resources_logout">יציאה</string>
+    <string name="promote_title">שדרג עכשיו!</string>
+    <string name="promote">אתה מבצע חיבור למערכת המריצה גרסה 2.5 או חדשה יותר. יש להוריד את האפליקציה החדשה שלנו לשם חווית גלישה טובה יותר.</string>
+    <string name="download">הורדה</string>    
 
 </resources>

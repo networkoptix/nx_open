@@ -10,5 +10,8 @@
     <string name="resources_tree">树状预览</string>
     <string name="resources_grid">缩略图预览</string>
     <string name="resources_logout">注销</string>
+    <string name="promote_title">正在升级!</string>
+    <string name="promote">您正在连接到运行2.5或以上版本服务器,请下载最新app以获取软件功能</string>
+    <string name="download">下载</string>    
 
 </resources>

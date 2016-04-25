@@ -10,5 +10,8 @@
     <string name="resources_tree">목록 보기</string>
     <string name="resources_grid">썸네일</string>
     <string name="resources_logout">로그아웃</string>
+    <string name="promote_title">Upgrade Now!</string>
+    <string name="promote">You\'re connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience.</string>
+    <string name="download">Download</string>    
 
 </resources>

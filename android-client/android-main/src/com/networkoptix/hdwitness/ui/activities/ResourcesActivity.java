@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,8 @@ import android.widget.Toast;
 
 import com.networkoptix.hdwitness.BuildConfig;
 import com.networkoptix.hdwitness.R;
+import com.networkoptix.hdwitness.api.data.ServerInfo;
+import com.networkoptix.hdwitness.common.Utils;
 import com.networkoptix.hdwitness.ui.UiConsts;
 import com.networkoptix.hdwitness.ui.fragments.IndeterminateDialogFragment;
 import com.networkoptix.hdwitness.ui.fragments.ResourcesGridFragment;
@@ -123,18 +126,44 @@ public class ResourcesActivity extends HdwActivity {
         pager.setAdapter(adapter);
 
         // Watch for button clicks.
-        View button = findViewById(R.id.mode_tree);
-        button.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                pager.setCurrentItem(ResourcesPagerAdapter.MODE_TREE);
-            }
-        });
-        button = findViewById(R.id.mode_grid);
-        button.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                pager.setCurrentItem(ResourcesPagerAdapter.MODE_GRID);
-            }
-        });
+        {
+            View button = findViewById(R.id.mode_tree);
+        
+            button.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    pager.setCurrentItem(ResourcesPagerAdapter.MODE_TREE);
+                }
+            });
+        }
+        
+        {
+            View button = findViewById(R.id.mode_grid);
+            button.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    pager.setCurrentItem(ResourcesPagerAdapter.MODE_GRID);
+                }
+            });
+        }
+        
+        {
+            View button = findViewById(R.id.promoteLayout);
+            button.setOnClickListener(new OnClickListener() {
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(getString(R.string.promote_app_url)));
+                    startActivity(intent);
+                }
+            });
+        }
+        
+        {
+            View promoteView = findViewById(R.id.promoteLayout);
+            ServerInfo serverInfo = getApp().getServerInfo();
+            if (Utils.hasJellyBean() && serverInfo != null && serverInfo.ProtocolVersion >= ServerInfo.PROTOCOL_2_5)
+                promoteView.setVisibility(View.VISIBLE);
+            else
+                promoteView.setVisibility(View.GONE);
+        }
 
         if (getApp().getSessionInfo() == null)
             finish();

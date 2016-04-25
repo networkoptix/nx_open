@@ -24,7 +24,7 @@
 "The System is incompatible with the app" = "Système imcompatible avec l'app";
 "Show Offline" = "Afficher Hors-Ligne";
 "Hide Offline" = "Cacher Hors-Ligne";
-"Systems" = "Systemès";
+"Systems" = "Systèmes";
 "FPS: %d" = "IPS: %d";
 "Loading..." = "Chargement...";
 "No Signal..." = "Aucun Signal...";
@@ -41,3 +41,9 @@
 "Medium" = "Moyenne";
 "High" = "Haute";
 "Best" = "Meilleure";
+"Please Upgrade to Continue" = "S.V.P MàJ pour continuer";
+"This app is not compatible with this version of the software. Please download our new app." = "Cette app n'est pas compatible avec cette version de logiciel. S.V.P. télécharger notre nouvelle app.";
+"Not now" = "Pas maintenant";
+"Download" = "Télécharger";
+"Upgrade Now!" = "MàJ Maintenant!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "Vous connectez sur un système v2.5 ou plus récent. Télécharger notre nouvelle app pour une meilleure expérience de visionnement.";

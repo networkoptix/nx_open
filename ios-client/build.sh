@@ -77,7 +77,7 @@ then
     exit 0
 fi
 
-# Build release package
+# # Build release package
 DEVELOPER_NAME=${DEVELOPER_NAME_RELEASE}
 PROVISIONING_PROFILE=${PROVISIONING_PROFILE_RELEASE}
 SUFFIX=production

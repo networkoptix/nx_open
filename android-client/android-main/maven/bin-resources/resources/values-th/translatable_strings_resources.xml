@@ -5,10 +5,13 @@
     <string name="menu_hide_offline">ซ่อน ออฟไลน์</string>
     <string name="resources_logout_offer">กดกลับเพื่อออกจากระบบ</string>
     <string name="resources_loading_title">กำลังโหลด</string>
-    <string name="resources_loading_text">กำรับได้รับข้อมูล</string>
+    <string name="resources_loading_text">กำลังได้รับข้อมูล</string>
     <string name="menu_clear_cache">ล้างแคช</string>
     <string name="resources_tree">มุมมอง</string>
     <string name="resources_grid">ภาพขนาดย่อ</string>
     <string name="resources_logout">ออกจากระบบ</string>
+    <string name="promote_title">อัพเกรดเดี๋ยวนี้!</string>
+    <string name="promote">You\'re connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience.</string>
+    <string name="download">ดาวโหลด</string>
 
 </resources>

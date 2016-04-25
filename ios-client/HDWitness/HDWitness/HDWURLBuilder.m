@@ -26,7 +26,7 @@
 
 - (HDWURLBuilder *)init {
     if (self = [super init]) {
-        _additionalRequestParams = [NSString stringWithFormat:@"runtime-guid=%@", [[HDWGlobalData instance] runtimeGuid]];
+        _additionalRequestParams = [NSString stringWithFormat:@"X-runtime-guid=%@", [[HDWGlobalData instance] runtimeGuid]];
     }
     return self;
 }

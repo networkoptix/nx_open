@@ -40,3 +40,9 @@
 "Medium" = "בינוני";
 "High" = "גבוה";
 "Best" = "גבוה ביותר";
+"Please Upgrade to Continue" = "יש לשדרג בשביל להמשיך";
+"This app is not compatible with this version of the software. Please download our new app." = "אפליקציה זו אינה מתאימה לגרסה זו של התוכנה. יש להוריד אפליקציה חדשה.";
+"Not now" = "לא כרגע";
+"Download" = "הורדה";
+"Upgrade Now!" = "שדרג עכשיו!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "אתה מתחבר למערכת המריצה את גרסה 2.5 או חדשה יותר. הורד את האפליקציה החדשה שלנו לחווית צפייה טובה יותר.";
