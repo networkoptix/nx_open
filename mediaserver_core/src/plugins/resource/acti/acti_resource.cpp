@@ -721,7 +721,8 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
 
 bool QnActiResource::getParamPhysical(const QString& id, QString& value)
 {
-    QSet<QString> idList = {id};
+    QSet<QString> idList;
+    idList << id;
     QnCameraAdvancedParamValueList result;
     if(!getParamsPhysical(idList, result))
         return false;
@@ -739,7 +740,8 @@ bool QnActiResource::getParamPhysical(const QString& id, QString& value)
 
 bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
 {
-    QnCameraAdvancedParamValueList values = {QnCameraAdvancedParamValue(id, value)};
+    QnCameraAdvancedParamValueList values;
+    values << QnCameraAdvancedParamValue(id, value);
     QnCameraAdvancedParamValueList result;
 
     return setParamsPhysical(values, result);

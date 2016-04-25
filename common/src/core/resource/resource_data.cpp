@@ -74,8 +74,8 @@ Q_GLOBAL_STATIC(QnResourceDataJsonSerializer, qn_resourceDataJsonSerializer_inst
 
 
 bool QnResourceData::value(const QString &key, int type, void *value, const CopyFunction &copyFunction) const {
-    auto pos = m_dataByKey.find(key);
-    if(pos == m_dataByKey.end())
+    auto pos = m_dataByKey.constFind(key);
+    if(pos == m_dataByKey.constEnd())
         return false;
 
     /* Note: we're using type erasure here so that we don't have to include json
