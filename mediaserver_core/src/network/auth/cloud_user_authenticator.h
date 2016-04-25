@@ -98,7 +98,7 @@ private:
         const nx_http::header::Authorization& authorizationHeader) const;
 
 private slots:
-    void cloudBindingStatusChanged(bool bindedToCloud);
+    void cloudBindingStatusChanged(bool boundToCloud);
 };
 
 #endif  //NX_MS_CLOUD_USER_AUTHENTICATOR_H

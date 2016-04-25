@@ -118,10 +118,14 @@ QByteArray generateRandomName(int length);
 
 QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
 
+static const double kByteSuffixLimit = 1024;
+static const std::vector<char> kByteSuffexes = { 'K', 'M', 'G', 'T' };
+static const int kBytesPrecision = 4;
+
 /** Converts \a bytes to human-readable string like 10M or 67K.
     Rounds value to floor
 */
-QString bytesToString(uint64_t bytes);
+QString bytesToString(uint64_t bytes, int precision = kBytesPrecision);
 /** Converts bytes number string (e.g., 64K) to integer.
     K, M, G suffix are supported.
     @return On failure returns 0 and (if not null) sets \a *ok to \a false

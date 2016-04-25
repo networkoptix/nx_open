@@ -1,3 +1,5 @@
+#ifdef ENABLE_ONVIF
+
 #include "dw_resource_settings.h"
 
 #include <core/resource/camera_advanced_param.h>
@@ -234,9 +236,11 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             waitCond.wakeAll();
         };
 
-        nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
-        httpClient->setResponseReadTimeoutMs(kHttpReadTimeout);
-        nx_http::downloadFileAsyncEx(apiUrl, requestCompletionFunc, std::move(httpClient));
+        nx_http::AsyncHttpClient::Timeouts timeouts;
+        timeouts.responseReadTimeout = std::chrono::milliseconds(kHttpReadTimeout);
+        nx_http::downloadFileAsyncEx(
+            apiUrl, requestCompletionFunc, nx_http::HttpHeaders(),
+            nx_http::AsyncHttpClient::authBasicAndDigest, std::move(timeouts));
         ++workers;
     }
     while (workers > 0)
@@ -322,9 +326,11 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
             waitCond.wakeAll();
         };
 
-        nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
-        httpClient->setResponseReadTimeoutMs(kHttpReadTimeout);
-        nx_http::downloadFileAsyncEx(apiUrl, requestCompletionFunc, std::move(httpClient));
+        nx_http::AsyncHttpClient::Timeouts timeouts;
+        timeouts.responseReadTimeout = std::chrono::milliseconds(kHttpReadTimeout);
+        nx_http::downloadFileAsyncEx(
+            apiUrl, requestCompletionFunc, nx_http::HttpHeaders(),
+            nx_http::AsyncHttpClient::authBasicAndDigest, std::move(timeouts));
         ++workers;
     }
     while (workers > 0)
@@ -332,3 +338,5 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
 
     return resultOK;
 }
+
+#endif  // ENABLE_ONVIF

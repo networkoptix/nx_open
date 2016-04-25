@@ -1,6 +1,9 @@
+
 #include "stream_socket_wrapper.h"
 
-#include "nx/utils/thread/wait_condition.h"
+#include <nx/utils/future.h>
+#include <nx/utils/thread/wait_condition.h>
+
 
 namespace nx {
 namespace network {
@@ -52,7 +55,7 @@ int StreamSocketWrapper::recv(void* buffer, unsigned int bufferLen, int flags)
     Buffer recvBuffer;
     recvBuffer.reserve(static_cast<int>(bufferLen));
 
-    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     readSomeAsync(&recvBuffer, [this, &promise](
         SystemError::ErrorCode code, size_t size)
     {
@@ -77,7 +80,7 @@ int StreamSocketWrapper::send(const void* buffer, unsigned int bufferLen)
         return m_socket->send(buffer, bufferLen);
 
     Buffer sendBuffer(static_cast<const char*>(buffer), bufferLen);
-    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     sendAsync(sendBuffer, [this, &promise](
         SystemError::ErrorCode code, size_t size)
     {

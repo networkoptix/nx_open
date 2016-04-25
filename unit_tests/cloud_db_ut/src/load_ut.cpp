@@ -23,7 +23,7 @@ class CdbLoadTest
 {
 };
 
-TEST_F(CdbLoadTest, manyConnections)
+TEST_F(CdbLoadTest, DISABLED_manyConnections)
 {
     constexpr const int connectionCount = 10000;
     constexpr const int sendTimeoutMs = 3000;

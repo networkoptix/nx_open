@@ -385,12 +385,14 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/common_ut</module>
                 <module>unit_tests/cloud_connectivity_ut</module>
+                <module>unit_tests/cloud_db_ut</module>
+                <module>unit_tests/common_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
-                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <module>unit_tests/mediaserver_core_ut</module>
                 <module>unit_tests/nx_network_ut</module>
+                <module>unit_tests/utils_ut</module>
+                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
@@ -900,6 +902,7 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
+                <qt.spec>linux-g++-4.9-64</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -918,7 +921,8 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
+                <qt.spec>linux-g++-4.9-32</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -1103,11 +1107,11 @@
                 <property>
                     <name>test</name>
                     <value>true</value>
-                </property>                
+                </property>
             </activation>
             <modules>
                 <module>unit_tests</module>
             </modules>
-        </profile>        
+        </profile>
     </profiles>
 </project>

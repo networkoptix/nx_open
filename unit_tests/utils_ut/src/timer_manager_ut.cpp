@@ -46,14 +46,13 @@ TEST(TimerManager, nonStopTimer)
         delay,
         delay);
 
-    std::this_thread::sleep_for(delay * 5);
-
+    std::this_thread::sleep_for(delay * 7);
     timerManager.joinAndDeleteTimer(timerId);
 
     const auto eventCountSnapshot = eventCount.load();
     ASSERT_GT(eventCountSnapshot, 4);
 
-    std::this_thread::sleep_for(delay* 4);
+    std::this_thread::sleep_for(delay * 4);
     ASSERT_EQ(eventCountSnapshot, eventCount.load());
 
     timerManager.stop();
