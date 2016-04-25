@@ -12,6 +12,7 @@
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/future.h>
 
 
 namespace nx {
@@ -29,7 +30,7 @@ public:
         const String& /*remotePeerId*/,
         bool connectionShouldWorkFine,
         bool singleShot,
-        std::promise<std::chrono::milliseconds>* tunnelConnectionInvokedPromise = nullptr)
+        nx::utils::promise<std::chrono::milliseconds>* tunnelConnectionInvokedPromise = nullptr)
     :
         m_connectionShouldWorkFine(connectionShouldWorkFine),
         m_singleShot(singleShot),
@@ -79,7 +80,7 @@ private:
     UDPSocket m_aioThreadBinder;
     bool m_connectionShouldWorkFine;
     const bool m_singleShot;
-    std::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
+    nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
 };
 
 std::atomic<size_t> DummyConnection::instanceCount(0);
@@ -97,7 +98,7 @@ public:
         bool connectSuccessfully,
         bool connectionShouldWorkFine,
         bool singleShotConnection,
-        std::promise<void>* const canSucceedEvent,
+        nx::utils::promise<void>* const canSucceedEvent,
         boost::optional<std::chrono::milliseconds> connectTimeout)
     :
         m_targetPeerAddress(std::move(targetPeerAddress)),
@@ -129,7 +130,7 @@ public:
 
     DummyConnector(
         AddressEntry targetPeerAddress,
-        std::promise<void>* const canSucceedEvent)
+        nx::utils::promise<void>* const canSucceedEvent)
     :
         DummyConnector(
             std::move(targetPeerAddress),
@@ -144,7 +145,7 @@ public:
     DummyConnector(
         AddressEntry targetPeerAddress,
         std::chrono::milliseconds connectTimeout,
-        std::promise<void>* const canSucceedEvent = nullptr)
+        nx::utils::promise<void>* const canSucceedEvent = nullptr)
     :
         DummyConnector(
             std::move(targetPeerAddress),
@@ -216,7 +217,7 @@ public:
     }
 
     void setConnectionInvokedPromise(
-        std::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
+        nx::utils::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
     {
         m_tunnelConnectionInvokedPromise = tunnelConnectionInvokedPromise;
     }
@@ -227,9 +228,9 @@ private:
     const bool m_connectSuccessfully;
     const bool m_connectionShouldWorkFine;
     const bool m_singleShotConnection;
-    std::promise<void>* const m_canSucceedEvent;
+    nx::utils::promise<void>* const m_canSucceedEvent;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
-    std::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
+    nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
 
     void connectInternal(
         nx::utils::MoveOnlyFunc<void(
@@ -266,7 +267,7 @@ class OutgoingTunnelTest
     public ::testing::Test
 {
 public:
-    typedef std::promise<std::pair<
+    typedef nx::utils::promise<std::pair<
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket >> > ConnectionCompletedPromise;
 
@@ -442,7 +443,7 @@ TEST_F(OutgoingTunnelTest, handlersQueueingWhileInConnectingState)
     AddressEntry addressEntry("nx_test.com:12345");
     OutgoingTunnel tunnel(std::move(addressEntry));
 
-    std::promise<void> doConnectEvent;
+    nx::utils::promise<void> doConnectEvent;
 
     setConnectorFactoryFunc(
         [&doConnectEvent](
@@ -528,7 +529,7 @@ TEST_F(OutgoingTunnelTest, cancellation)
             if (waitConnectionCompletion)
                 connectedPromise.get_future().get();
 
-            std::promise<void> tunnelStoppedPromise;
+            nx::utils::promise<void> tunnelStoppedPromise;
             tunnel.pleaseStop(
                 [&tunnelStoppedPromise]()
                 { 
@@ -556,7 +557,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
             AddressEntry addressEntry("nx_test.com:12345");
             OutgoingTunnel tunnel(std::move(addressEntry));
 
-            std::promise<void> doConnectEvent;
+            nx::utils::promise<void> doConnectEvent;
 
             setConnectorFactoryFunc(
                 [connectorTimeout, &doConnectEvent](const AddressEntry& targetAddress) ->
@@ -628,7 +629,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout2)
     AddressEntry addressEntry("nx_test.com:12345");
     OutgoingTunnel tunnel(std::move(addressEntry));
 
-    std::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
+    nx::utils::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
 
     setConnectorFactoryFunc(
         [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
@@ -687,7 +688,7 @@ TEST_F(OutgoingTunnelTest, pool)
 
     AddressEntry addressEntry("nx_test.com:12345");
 
-    std::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
+    nx::utils::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
 
     setConnectorFactoryFunc(
         [/*connectorTimeout,*/ &tunnelConnectionInvokedPromise](
