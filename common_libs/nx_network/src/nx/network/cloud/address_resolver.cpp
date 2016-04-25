@@ -1,11 +1,15 @@
+
 #include "address_resolver.h"
 
 #include "common/common_globals.h"
+
+#include <nx/utils/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
 #include <utils/serialization/lexical.h>
+
 
 static const auto DNS_CACHE_TIME = std::chrono::seconds(10);
 static const auto MEDIATOR_CACHE_TIME = std::chrono::seconds(10);
@@ -244,7 +248,7 @@ void AddressResolver::resolveAsync(
 std::vector<AddressEntry> AddressResolver::resolveSync(
      const HostAddress& hostName, bool natTraversal = false)
 {
-    std::promise< std::vector< AddressEntry > > promise;
+    nx::utils::promise< std::vector< AddressEntry > > promise;
     auto handler = [ & ]( SystemError::ErrorCode code,
                           std::vector< AddressEntry > entries )
     {
@@ -263,11 +267,11 @@ std::vector<AddressEntry> AddressResolver::resolveSync(
 void AddressResolver::cancel(
     void* requestId, nx::utils::MoveOnlyFunc<void()> handler)
 {
-    boost::optional< std::promise< bool > > promise;
+    boost::optional< nx::utils::promise< bool > > promise;
     if( !handler )
     {
         // no handler means we have to wait for complete
-        promise = std::promise< bool >();
+        promise = nx::utils::promise< bool >();
         handler = [ & ](){ promise->set_value( true ); };
     }
 

@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/udp/incoming_tunnel_connection.h>
 #include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <nx/utils/future.h>
 #include <utils/thread/sync_queue.h>
 
 
@@ -164,7 +165,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
         serializer.setMessage(&request);
         serializer.serialize(&buffer, &processed);
 
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         freeSocket->sendAsync(
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
@@ -205,7 +206,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
 
     {
         Buffer buffer("someTrash");
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         freeSocket->sendAsync(
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
@@ -255,7 +256,7 @@ TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
             }));
     }
 
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     connection->pleaseStop(
         [this, &promise]()
         {

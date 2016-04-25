@@ -66,7 +66,7 @@ void CdbFunctionalTest::start()
     std::promise<void> cdbInstantiatedCreatedPromise;
     auto cdbInstantiatedCreatedFuture = cdbInstantiatedCreatedPromise.get_future();
 
-    m_cdbStartedPromise = std::make_unique<std::promise<bool>>();
+    m_cdbStartedPromise = std::make_unique<nx::utils::promise<bool>>();
 
     m_cdbProcessFuture = std::async(
         std::launch::async,

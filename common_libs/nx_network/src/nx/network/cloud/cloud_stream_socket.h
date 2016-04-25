@@ -8,6 +8,7 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/future.h>
 #include <utils/common/cpp14.h>
 
 #include "nx/network/abstract_socket.h"
@@ -81,7 +82,7 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
 private:
-    typedef std::promise<std::pair<SystemError::ErrorCode, size_t>>* SocketResultPrimisePtr;
+    typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>* SocketResultPrimisePtr;
 
     int recvImpl(nx::Buffer* const buf);
 

@@ -3,11 +3,10 @@
 * akolesnikov
 ***********************************************************/
 
-#include <future>
-
 #include <gtest/gtest.h>
 
 #include <nx/network/retry_timer.h>
+#include <nx/utils/future.h>
 
 
 namespace nx {
@@ -30,7 +29,7 @@ TEST(RetryTimer, tryCount)
             i < (retryCount == RetryPolicy::kInfiniteRetries ? 100 : retryCount);
             ++i)
         {
-            std::promise<void> doNextTryCalledPromise;
+            nx::utils::promise<void> doNextTryCalledPromise;
             ASSERT_TRUE(retryTimer.scheduleNextTry(
                 [&doNextTryCalledPromise] { doNextTryCalledPromise.set_value(); }));
             ASSERT_EQ(
@@ -64,7 +63,7 @@ TEST(RetryTimer, delayCalculation)
             std::vector<std::chrono::milliseconds> delays;
             for (int i = 0; i < testLoopSize; ++i)
             {
-                std::promise<void> doNextTryCalledPromise;
+                nx::utils::promise<void> doNextTryCalledPromise;
                 ASSERT_TRUE(retryTimer.scheduleNextTry(
                     [&doNextTryCalledPromise] { doNextTryCalledPromise.set_value(); }));
                 delays.push_back(retryTimer.currentDelay());
