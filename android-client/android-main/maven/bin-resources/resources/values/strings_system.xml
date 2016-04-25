@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources  xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="message_subject" translatable="false">Android device log</string>
+    <string name="device_info_fmt" translatable="false">
+Application version: <xliff:g id="application_version">%s</xliff:g>\n
+Device model: <xliff:g id="device_model">%s</xliff:g>\n
+Firmware version: <xliff:g id="firmware_revision">%s</xliff:g>\n
+Kernel version: <xliff:g id="kernel_version">%s</xliff:g>\n
+Build number: <xliff:g id="build_number">%s</xliff:g>\n
+    </string>    
+    <string name="device_info_user_agent" translatable="false">%s Android Client/%s (%s / %s)</string>    
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="calendar_missing_time">זמן חסר</string>
+    <string name="calendar_from">"מזמן: "</string>
+    <string name="calendar_to">"עד זמן: "</string>
+    <string name="calendar_not_recorded">תקופת הזמנה שנבחרה לא הוקלטה.</string>
+    <string name="calendar_offer_nearest">האם ברצונך לנגן את תקופת הזמן המוקלטת הקרובה ביותר?</string>
+    <string name="calendar_now">עכשיו</string>
+    <string name="calendar_future_time_selected">הזמן שנבחר הוא בעתיד.</string>
+    <string name="calendar_offer_last">האם ברצונך לצפות בתקופת הזמן האחרונה שהוקלטה במקום?</string>
+    <string name="use_24_hour_clock">השתמש בשעון 24 שעות</string>
+    <string name="advanced">מתקדם…</string>
+    <string name="archive_divider">" - "</string>
+    <string name="datetime_hours_format">kk:mm</string>
+    <string name="datetime_days_format">dd of MMM</string>
+    <string name="datetime_months_format">MMM yyyy</string>
+
+</resources>

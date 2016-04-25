@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accept">Bắt đầu kiếm</string>
+    <string name="error">lỗi</string>
+    <string name="save">cửa hàng</string>
+    <string name="edit">chỉnh sửa</string>
+    <string name="delete">xóa bỏ</string>
+    <string name="add">thêm vào</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">显示离线设备</string>
+    <string name="menu_hide_offline">隐藏离线设备</string>
+    <string name="resources_logout_offer">按返回注销登录</string>
+    <string name="resources_loading_title">加载中...</string>
+    <string name="resources_loading_text">正在接收数据...</string>
+    <string name="menu_clear_cache">清除内存</string>
+    <string name="resources_tree">树状预览</string>
+    <string name="resources_grid">缩略图预览</string>
+    <string name="resources_logout">注销</string>
+
+</resources>

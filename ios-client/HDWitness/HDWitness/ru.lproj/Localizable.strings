@@ -1,0 +1,43 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Это имя уже выбрано";
+"Please choose another name." = "Пожалуйста, выберите другое имя.";
+"OK" = "OK";
+"Name" = "Имя";
+"Host" = "Хост";
+"IP or hostname" = "IP адрес или имя хоста";
+"Port" = "Порт";
+"Login" = "Логин";
+"Password" = "Пароль";
+"Address: %@" = "Адрес: %@";
+"Error" = "Ошибка";
+"Connecting..." = "Соединяюсь...";
+"Can't connect to the System." = "Не могу подсоединиться к системе.";
+"Requesting cameras..." = "Запрашиваю камеры...";
+"Communication failure." = "Сетевая ошибка.";
+"The System is incompatible with the app" = "Это система не совместима с приложение";
+"Show Offline" = "Показать все";
+"Hide Offline" = "Скрыть оффлайн";
+"Systems" = "Системы";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Загружаю...";
+"No Signal..." = "Нет сигнала...";
+"Invalid Camera Credentials" = "Неправильные учётные данные для камеры";
+"Invalid Camera Credentials..." = "Неправильные учётные данные для камеры...";
+"Live" = "Сейчас";
+"Information" = "Информация";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "На выбранный момент времени архив отсутствует. Показать ближайшее?";
+"No" = "Нет";
+"Yes" = "Да";
+"Archive" = "Архив";
+"Go" = "Перейти";
+"Low" = "Низкое";
+"Medium" = "Среднее";
+"High" = "Хорошее";
+"Best" = "Лучшее";

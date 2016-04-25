@@ -1,0 +1,43 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "동일한 명칭이 존재 합니다.";
+"Please choose another name." = "다른 명칭을 선택해주세요.";
+"OK" = "OK";
+"Name" = "명칭";
+"Host" = "도메인";
+"IP or hostname" = "IP주소 또는 도메인명";
+"Port" = "포트";
+"Login" = "로그인";
+"Password" = "비밀번호";
+"Address: %@" = "주소: %@";
+"Error" = "오류";
+"Connecting..." = "접속 중...";
+"Can't connect to the System." = "시스템에 접속할 수 없습니다..";
+"Requesting cameras..." = "카메라 요청 중...";
+"Communication failure." = "연결 실패.";
+"The System is incompatible with the app" = "이 장비는 호환되지 않습니다.";
+"Show Offline" = "오프라인장비 보이기";
+"Hide Offline" = "오프라인장비 숨기기";
+"Systems" = "시스템";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "로딩 중...";
+"No Signal..." = "신호 없음...";
+"Invalid Camera Credentials" = "잘못된 사용자 정보입니다";
+"Invalid Camera Credentials..." = "잘못된 사용자 정보입니다...";
+"Live" = "라이브";
+"Information" = "정보";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "선택된 구간에 녹화 정보가 존재하지 않습니다. 다음 구간으로 검색 진행 할까요";
+"No" = "아니오";
+"Yes" = "네";
+"Archive" = "백업";
+"Go" = "이동";
+"Low" = "저화질";
+"Medium" = "중간화질";
+"High" = "고화질";
+"Best" = "최고화질";

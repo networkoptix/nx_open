@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_resources">カメラ</string>
+    <string name="title_activity_video">ビデオ</string>
+    <string name="title_activity_archive">アーカイブ</string>
+	<string name="title_activity_sendlog">ログ送信Collect and send log</string>
+</resources>
