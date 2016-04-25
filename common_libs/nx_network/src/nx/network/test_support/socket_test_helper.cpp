@@ -228,7 +228,7 @@ void TestConnection::startIO()
                 std::bind(&TestConnection::onDataSent, this, _1, _2));
             return;
 
-        case TestTransmissionMode::echo:
+        case TestTransmissionMode::pong:
             readAllAsync(
                 [this]()
                 {
@@ -245,7 +245,7 @@ void TestConnection::startIO()
                 });
             return;
 
-        case TestTransmissionMode::echoTest:
+        case TestTransmissionMode::ping:
             sendAllAsync(
                 [this]()
                 {

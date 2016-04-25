@@ -19,7 +19,7 @@ void printConnectOptions(std::ostream* const outStream)
     *outStream <<
         "Connect mode:\n"
         "  --connect            Enable connect mode\n"
-        "  --echo               Makes connections to verify server responses\n"
+        "  --ping               Makes connections to verify server responses\n"
         "  --target={endpoint}  Regular or cloud address of server\n"
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
@@ -57,8 +57,8 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("echo") != args.end())
-        transmissionMode = nx::network::test::TestTransmissionMode::echoTest;
+    if (args.find("ping") != args.end())
+        transmissionMode = nx::network::test::TestTransmissionMode::ping;
 
     if (args.find("udt") != args.end())
     {
