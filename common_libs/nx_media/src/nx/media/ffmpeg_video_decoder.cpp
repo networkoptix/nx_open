@@ -200,9 +200,9 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 
-#if 1
+#if 0
     // test data
-	const QVideoFrame::PixelFormat Format_Tiled32x32NV12 = QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
+    const QVideoFrame::PixelFormat Format_Tiled32x32NV12 = QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
 
     if (d->testData.isEmpty())
     {
@@ -242,19 +242,19 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
     dstData[0] = buffer;
     dstData[1] = buffer + lineSize * d->frame->height;
     dstData[2] = dstData[1] + lineSize * d->frame->height / 4;
-    
+
     for (int i = 0; i < 3; ++i)
     {
         const int k = (i == 0 ? 0 : 1);
         copyPlane(
-            dstData[i], 
-            d->frame->data[i], 
-            d->frame->width >> k, 
-            lineSize >> k, 
-            d->frame->linesize[i], 
+            dstData[i],
+            d->frame->data[i],
+            d->frame->width >> k,
+            lineSize >> k,
+            d->frame->linesize[i],
             d->frame->height >> k);
     }
-    
+
     videoFrame->unmap();
 #endif
 
