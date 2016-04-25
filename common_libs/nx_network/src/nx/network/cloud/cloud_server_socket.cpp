@@ -1,10 +1,9 @@
 
 #include "cloud_server_socket.h"
 
-#include <future>
-
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
+#include <nx/utils/future.h>
 #include <utils/serialization/lexical.h>
 
 #include "tunnel/udp/acceptor.h"
@@ -144,7 +143,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
         return nullptr;
     }
 
-    std::promise<SystemError::ErrorCode> promise;
+    nx::utils::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
     acceptAsync(
         [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
@@ -264,7 +263,7 @@ void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 void CloudServerSocket::cancelIOSync()
 {
     //we need dispatch here to avoid blocking if called within aio thread
-    std::promise<void> cancelledPromise;
+    nx::utils::promise<void> cancelledPromise;
     m_mediatorRegistrationRetryTimer.dispatch(
         [this, &cancelledPromise]
         {
@@ -306,7 +305,7 @@ bool CloudServerSocket::registerOnMediatorSync()
     listenRequestData.systemId = cloudCredentials->systemId;
     listenRequestData.serverId = cloudCredentials->serverId;
 
-    std::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
+    nx::utils::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
         [&listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
