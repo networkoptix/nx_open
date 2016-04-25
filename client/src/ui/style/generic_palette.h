@@ -12,7 +12,7 @@ class QnPaletteColor
 public:
     static const int kMaxAlpha;
 
-    QnPaletteColor(QColor fallbackColor = QColor());
+    explicit QnPaletteColor(QColor fallbackColor = QColor());
 
     QnPaletteColor(const QString &group,
                    const int index,
