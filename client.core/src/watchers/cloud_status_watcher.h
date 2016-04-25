@@ -11,6 +11,7 @@ struct QnCloudSystem
     QString id;
     QString name;
     QString ownerAccountEmail;
+    QString ownerFullName;
     std::string authKey;
 
     bool operator <(const QnCloudSystem &other) const;

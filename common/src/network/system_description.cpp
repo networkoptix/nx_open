@@ -32,10 +32,12 @@ QnSystemDescriptionPtr QnSystemDescription::createLocalSystem(const QString &sys
 
 QnSystemDescriptionPtr QnSystemDescription::createCloudSystem(const QString &systemId
     , const QString &systemName
-    , const QString &ownerAccountEmail)
+    , const QString &ownerAccountEmail
+    , const QString &ownerFullName)
 {
     return QnSystemDescriptionPtr(
-        new QnSystemDescription(systemId, systemName, ownerAccountEmail));
+        new QnSystemDescription(systemId, systemName
+            , ownerAccountEmail, ownerFullName));
 }
 
 QnSystemDescription::QnSystemDescription(const QString &systemId
@@ -43,6 +45,7 @@ QnSystemDescription::QnSystemDescription(const QString &systemId
     : m_id(systemId)
     , m_systemName(systemName)
     , m_ownerAccountEmail()
+    , m_ownerFullName()
     , m_isCloudSystem(false)
     , m_serverTimestamps()
     , m_servers()
@@ -52,10 +55,12 @@ QnSystemDescription::QnSystemDescription(const QString &systemId
 
 QnSystemDescription::QnSystemDescription(const QString &systemId
     , const QString &systemName
-    , const QString &cloudOwnerAccountEmail)
+    , const QString &cloudOwnerAccountEmail
+    , const QString &ownerFullName)
     : m_id(systemId)
     , m_systemName(systemName)
     , m_ownerAccountEmail(cloudOwnerAccountEmail)
+    , m_ownerFullName(ownerFullName)
     , m_isCloudSystem(true)
     , m_serverTimestamps()
     , m_servers()
@@ -79,6 +84,11 @@ QString QnSystemDescription::name() const
 QString QnSystemDescription::ownerAccountEmail() const
 {
     return m_ownerAccountEmail;
+}
+
+QString QnSystemDescription::ownerFullName() const
+{
+    return m_ownerFullName;
 }
 
 bool QnSystemDescription::isCloudSystem() const

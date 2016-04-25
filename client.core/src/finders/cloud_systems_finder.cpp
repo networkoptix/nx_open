@@ -99,7 +99,8 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     {
         updatedSystems.insert(system.id
             , QnSystemDescription::createCloudSystem(system.id
-                , system.name, system.ownerAccountEmail));
+                , system.name, system.ownerAccountEmail
+                , system.ownerFullName));
     }
 
     typedef QSet<QString> IdsSet;

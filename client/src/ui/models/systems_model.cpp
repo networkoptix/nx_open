@@ -20,7 +20,7 @@ namespace
         , SystemNameRoleId = FirstRoleId
         , SystemIdRoleId
 
-        , OwnerEmailRoleId
+        , OwnerDescriptionRoleId
         , LastPasswordRoleId
 
         , IsFactorySystemRoleId
@@ -47,7 +47,7 @@ namespace
         RoleNames result;
         result.insert(SystemNameRoleId, "systemName");
         result.insert(SystemIdRoleId, "systemId");
-        result.insert(OwnerEmailRoleId, "ownerEmail");
+        result.insert(OwnerDescriptionRoleId, "ownerDescription");
         result.insert(LastPasswordRoleId, "lastPassword");
 
         result.insert(IsFactorySystemRoleId, "isFactorySystem");
@@ -233,10 +233,15 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return systemDescription->name();
     case SystemIdRoleId:
         return systemDescription->id();
-    case OwnerEmailRoleId:
-        return (systemDescription->isCloudSystem() 
-            ?  systemDescription->ownerAccountEmail()
-            : lit("WRONG USER NAME! BUG"));
+    case OwnerDescriptionRoleId:
+    {
+        if (!systemDescription->isCloudSystem())
+            return lit("WRONG USER NAME! BUG");
+
+        const auto fullName = systemDescription->ownerFullName();
+        return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
+            : lit("%1's system").arg(fullName));
+    }
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
     case IsFactorySystemRoleId:
