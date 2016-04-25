@@ -140,13 +140,8 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 
     std::list<std::pair<Message, RequestHandler>> m_requestQueue;
-    #ifdef _DEBUG
-        std::map<int, IndicationHandler> m_indicationHandlers;
-        std::map<Buffer,RequestHandler> m_requestsInProgress;
-    #else
-        std::unordered_map<int, IndicationHandler> m_indicationHandlers;
-        std::unordered_map<Buffer, RequestHandler> m_requestsInProgress;
-    #endif
+    std::map<int, IndicationHandler> m_indicationHandlers;
+    std::map<Buffer,RequestHandler> m_requestsInProgress;
 };
 
 } // namespase stun

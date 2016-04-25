@@ -292,8 +292,9 @@ bool CloudServerSocket::registerOnMediatorSync()
     NX_ASSERT(m_state == State::readyToListen);
     m_state = State::registeringOnMediator;
 
-    const auto cloudCredentials =
-        SocketGlobals::mediatorConnector().getSystemCredentials();
+    const auto cloudCredentials = m_mediatorConnection
+        ->credentialsProvider()->getSystemCredentials();
+
     if (!cloudCredentials)
     {
         SystemError::setLastErrorCode(SystemError::invalidData);
@@ -450,8 +451,9 @@ void CloudServerSocket::acceptAsyncInternal(
 
 void CloudServerSocket::issueRegistrationRequest()
 {
-    const auto cloudCredentials =
-        SocketGlobals::mediatorConnector().getSystemCredentials();
+    const auto cloudCredentials = m_mediatorConnection
+        ->credentialsProvider()->getSystemCredentials();
+
     if (!cloudCredentials)  //TODO #ak this MUST be assert
     {
         //specially for unit tests

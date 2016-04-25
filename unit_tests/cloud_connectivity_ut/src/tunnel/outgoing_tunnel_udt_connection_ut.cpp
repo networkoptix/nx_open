@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/udp/outgoing_tunnel_udt_connection.h>
+#include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
 #include <nx/network/udt/udt_socket.h>
 #include <utils/common/cpp14.h>
 
@@ -13,19 +13,19 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class OutgoingTunnelUdtConnectionTest
+class OutgoingTunnelConnectionTest
 :
     public ::testing::Test
 {
 public:
-    OutgoingTunnelUdtConnectionTest()
+    OutgoingTunnelConnectionTest()
     :
         m_serverSocket(std::make_unique<UdtStreamServerSocket>()),
         m_first(true)
     {
     }
 
-    ~OutgoingTunnelUdtConnectionTest()
+    ~OutgoingTunnelConnectionTest()
     {
         if (m_serverSocket)
             m_serverSocket->pleaseStopSync();
@@ -43,7 +43,7 @@ public:
         }
         m_serverSocket->acceptAsync(
             std::bind(
-                &OutgoingTunnelUdtConnectionTest::onNewConnectionAccepted,
+                &OutgoingTunnelConnectionTest::onNewConnectionAccepted,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2));
@@ -79,7 +79,7 @@ protected:
     std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 
     std::vector<ConnectContext> startConnections(
-        udp::OutgoingTunnelUdtConnection* const tunnelConnection,
+        udp::OutgoingTunnelConnection* const tunnelConnection,
         size_t connectionsToCreate,
         boost::optional<int> minTimeoutMillis,
         boost::optional<int> maxTimeoutMillis)
@@ -111,7 +111,7 @@ protected:
     }
 
     std::vector<ConnectContext> startConnections(
-        OutgoingTunnelUdtConnection* const tunnelConnection,
+        OutgoingTunnelConnection* const tunnelConnection,
         size_t connectionsToCreate)
     {
         return startConnections(
@@ -155,14 +155,14 @@ private:
 
         m_serverSocket->acceptAsync(
             std::bind(
-                &OutgoingTunnelUdtConnectionTest::onNewConnectionAccepted,
+                &OutgoingTunnelConnectionTest::onNewConnectionAccepted,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2));
     }
 };
 
-TEST_F(OutgoingTunnelUdtConnectionTest, common)
+TEST_F(OutgoingTunnelConnectionTest, common)
 {
     const int connectionsToCreate = 100;
 
@@ -172,7 +172,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, common)
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
     const auto localAddress = udtConnection->getLocalAddress();
 
-    OutgoingTunnelUdtConnection tunnelConnection(
+    OutgoingTunnelConnection tunnelConnection(
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
 
@@ -199,7 +199,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, common)
     tunnelConnection.pleaseStopSync();
 }
 
-TEST_F(OutgoingTunnelUdtConnectionTest, timeout)
+TEST_F(OutgoingTunnelConnectionTest, timeout)
 {
     const int connectionsToCreate = 100;
     const int minTimeoutMillis = 50;
@@ -212,7 +212,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, timeout)
     auto udtConnection = std::make_unique<UdtStreamSocket>();
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
 
-    OutgoingTunnelUdtConnection tunnelConnection(
+    OutgoingTunnelConnection tunnelConnection(
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
 
@@ -248,7 +248,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, timeout)
     tunnelConnection.pleaseStopSync();
 }
 
-TEST_F(OutgoingTunnelUdtConnectionTest, cancellation)
+TEST_F(OutgoingTunnelConnectionTest, cancellation)
 {
     const int loopLength = 10;
     const int connectionsToCreate = 100;
@@ -261,7 +261,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, cancellation)
         ASSERT_TRUE(udtConnection->connect(serverEndpoint()))
             << SystemError::getLastOSErrorText().toStdString();
 
-        OutgoingTunnelUdtConnection tunnelConnection(
+        OutgoingTunnelConnection tunnelConnection(
             QnUuid::createUuid().toByteArray(),
             std::move(udtConnection));
 
@@ -281,7 +281,7 @@ TEST_F(OutgoingTunnelUdtConnectionTest, cancellation)
     }
 }
 
-TEST_F(OutgoingTunnelUdtConnectionTest, controlConnectionFailure)
+TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
 {
     const std::chrono::seconds controlConnectionEstablishedTimeout(1);
 
@@ -299,9 +299,9 @@ TEST_F(OutgoingTunnelUdtConnectionTest, controlConnectionFailure)
     ASSERT_TRUE(udtConnection->connect(serverAddress, 3000))
         << SystemError::getLastOSErrorText().toStdString();
 
-    UdpHolePunchingTimeouts udpTunnelKeepAlive;
+    Timeouts udpTunnelKeepAlive;
     udpTunnelKeepAlive.keepAlivePeriod = std::chrono::seconds(1);
-    OutgoingTunnelUdtConnection tunnelConnection(
+    OutgoingTunnelConnection tunnelConnection(
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection),
         udpTunnelKeepAlive);

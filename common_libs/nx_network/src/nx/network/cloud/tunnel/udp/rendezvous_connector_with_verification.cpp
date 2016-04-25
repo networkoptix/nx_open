@@ -62,7 +62,7 @@ void RendezvousConnectorWithVerification::closeConnection(
 {
     NX_ASSERT(connection == m_requestPipeline.get());
 
-    NX_LOGX(lm("connection %1 error: %2")
+    NX_LOGX(lm("cross-nat %1 error: %2")
         .arg(connectSessionId()).arg(SystemError::toString(closeReason)),
         cl_logDEBUG2);
     m_requestPipeline.reset();
@@ -72,7 +72,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     SystemError::ErrorCode errorCode,
     std::unique_ptr<UdtStreamSocket> connection)
 {
-    NX_LOGX(lm("connection %1 completed. result: %2")
+    NX_LOGX(lm("cross-nat %1 completed. result: %2")
         .arg(connectSessionId()).arg(SystemError::toString(errorCode)),
         cl_logDEBUG2);
 
@@ -113,7 +113,7 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 {
     if (message.header.messageClass != stun::MessageClass::successResponse)
     {
-        NX_LOGX(lm("session %1. Received error instead of syn-ack from %2")
+        NX_LOGX(lm("cross-nat %1. Received error instead of syn-ack from %2")
             .arg(connectSessionId()).arg(remoteAddress().toString()),
             cl_logDEBUG1);
         return processError(SystemError::connectionReset);
@@ -122,7 +122,7 @@ void RendezvousConnectorWithVerification::onMessageReceived(
     hpm::api::UdpHolePunchingSynAck synResponse;
     if (!synResponse.parse(message))
     {
-        NX_LOGX(lm("session %1. Error parsing syn-ack from %2: %3")
+        NX_LOGX(lm("cross-nat %1. Error parsing syn-ack from %2: %3")
             .arg(connectSessionId()).arg(remoteAddress().toString())
             .arg(synResponse.errorText()),
             cl_logDEBUG1);
@@ -131,14 +131,14 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 
     if (synResponse.connectSessionId != connectSessionId())
     {
-        NX_LOGX(lm("session %1. Error. Unexpected session id (%2) in syn-ack from %3")
+        NX_LOGX(lm("cross-nat %1. Error. Unexpected connection id (%2) in syn-ack from %3")
             .arg(connectSessionId()).arg(synResponse.connectSessionId)
             .arg(remoteAddress().toString()),
             cl_logDEBUG1);
         return processError(SystemError::connectionReset);
     }
 
-    NX_LOGX(lm("session %1. Successfully verified connection to %2")
+    NX_LOGX(lm("cross-nat %1. Successfully verified connection to %2")
         .arg(connectSessionId()).arg(remoteAddress().toString()),
         cl_logDEBUG2);
 
@@ -152,7 +152,7 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 
 void RendezvousConnectorWithVerification::onTimeout()
 {
-    NX_LOGX(lm("connection %1. Error. %2 timeout has expired "
+    NX_LOGX(lm("cross-nat %1. Error. %2 timeout has expired "
                "while waiting for UdpHolePunchingSynAck")
             .arg(connectSessionId()).arg(m_timeout),
         cl_logDEBUG1);

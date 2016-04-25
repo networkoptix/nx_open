@@ -22,6 +22,8 @@ typedef nx::network::UnreliableMessagePipeline<
     Message,
     MessageParser,
     MessageSerializer> UnreliableMessagePipeline;
+typedef nx::network::UnreliableMessagePipelineEventHandler<Message>
+    UnreliableMessagePipelineEventHandler;
 
 /** STUN protocol UDP client.
     Conforms to [rfc5389, 7.2.1]

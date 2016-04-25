@@ -79,6 +79,12 @@ void MediatorConnector::mockupAddress( SocketAddress address )
     m_promise->set_value( true );
 }
 
+void MediatorConnector::mockupAddress( const MediatorConnector* mc )
+{
+    if (auto address = mc->mediatorAddress())
+        mockupAddress(std::move(*address));
+}
+
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )
 {
     bool needToReconnect = false;

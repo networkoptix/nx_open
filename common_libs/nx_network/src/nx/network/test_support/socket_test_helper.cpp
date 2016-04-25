@@ -198,7 +198,7 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
-        NX_LOGX(lm("accepted %1. Receive error: %2")
+        NX_LOGX(lm("accepted %1. Connect error: %2")
             .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
 
         return reportFinish( errorCode );
@@ -421,7 +421,7 @@ void TestConnection::reportFinish( SystemError::ErrorCode code )
 
 QString toString(const ConnectionTestStatistics& data)
 {
-    return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4")
+    return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4.")
         .arg(data.onlineConnections).arg(data.totalConnections)
         .arg(bytesToString(data.bytesReceived))
         .arg(bytesToString(data.bytesSent));

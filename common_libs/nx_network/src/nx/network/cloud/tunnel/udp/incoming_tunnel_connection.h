@@ -12,12 +12,12 @@ namespace network {
 namespace cloud {
 namespace udp {
 
-class NX_NETWORK_API IncomingTunnelUdtConnection
+class NX_NETWORK_API IncomingTunnelConnection
 :
     public AbstractIncomingTunnelConnection
 {
 public:
-    IncomingTunnelUdtConnection(
+    IncomingTunnelConnection(
         String connectionId,
         std::unique_ptr<UdtStreamSocket> connectionSocket,
         const nx::hpm::api::ConnectionParameters& connectionParameters);

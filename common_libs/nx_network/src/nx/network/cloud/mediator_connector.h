@@ -37,6 +37,7 @@ public:
 
     /** Injects mediator address (tests only) */
     void mockupAddress( SocketAddress address );
+    void mockupAddress( const MediatorConnector* mc );
 
     void setSystemCredentials( boost::optional<SystemCredentials> value );
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;

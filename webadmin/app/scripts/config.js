@@ -13,6 +13,11 @@ var Config = {
     globalViewLivePermission:0x00000080,
 
     cloud:{
+        webadminSetupContext: '?from=webadmin&context=setup',
+        clientSetupContext: '?from=client&context=setup',
+        webadminContext:'?from=webadmin&context=settings',
+
+
         portalShortLink:'cloud-demo.hdw.mx',
         apiUrl: 'http://cloud-demo.hdw.mx/api',
         portalWhiteList:'http://cloud-demo.hdw.mx/**',

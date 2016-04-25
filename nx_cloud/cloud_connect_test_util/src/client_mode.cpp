@@ -54,7 +54,7 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     readArg(args, "bytes-to-receive", &trafficLimit);
 
     if (readArg(args, "bytes-to-send", &trafficLimit))
-        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing;
+        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
     if (args.find("echo") != args.end())
@@ -101,15 +101,27 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         promise.get_future().wait();
     }
 
-    std::cout << lm("Target(s): %1")
-        .arg(containerString(targetList)).toStdString() << std::endl;
+    if (targetList.empty())
+    {
+        std::cerr << "error. There are no targets to connect to!" << std::endl;
+        return 1;
+    }
 
-    const uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
+    uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
+    trafficLimitBytes = trafficLimitBytes ? trafficLimitBytes : kDefaultBytesToReceive;
+
+    std::cout
+        << lm("Target(s): %1\n").arg(containerString(targetList)).toStdString()
+        << lm("Limit(type=%1): %2").arg(static_cast<int>(trafficLimitType))
+           .arg(bytesToString(trafficLimitBytes))
+           .toStdString()
+        << std::endl;
+
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         std::move(targetList),
         maxConcurrentConnections,
         trafficLimitType,
-        trafficLimitBytes != 0 ? trafficLimitBytes : kDefaultBytesToReceive,
+        trafficLimitBytes,
         totalConnections,
         transmissionMode);
 

@@ -27,7 +27,7 @@
 
 class AudioStreamReader
 :
-    public aio::AIOEventHandler<Pollable>
+    public nx::network::aio::AIOEventHandler<nx::network::Pollable>
 {
 public:
     AudioStreamReader();
@@ -50,13 +50,13 @@ private:
     std::unique_ptr<Amux> m_amux;
     nxcip::AudioFormat m_audioFormat;
     size_t m_prevReceiverID;
-    std::unique_ptr<Pollable> m_pollable;
+    std::unique_ptr<nx::network::Pollable> m_pollable;
     bool m_initializedInitially;
     PtsToClockMapper m_ptsMapper;
     int m_framesSinceTimeResync;
     bool m_amuxStarted;
 
-    virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
+    virtual void eventTriggered( nx::network::Pollable* obj, nx::network::aio::EventType eventType ) throw();
 
     bool initializeAmux( bool getFormatOnly = false );
     void closeAmux();

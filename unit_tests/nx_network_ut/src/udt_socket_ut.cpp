@@ -288,15 +288,11 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
     std::unique_ptr<RandomDataTcpServer> server;
     serverSocket->connectAsync(
         clientSocket->getLocalAddress(),
-        [&](SystemError::ErrorCode code)
+        [&server, &serverSocket](
+            SystemError::ErrorCode code)
         {
             ASSERT_EQ(code, SystemError::noError)
                 << SystemError::toString(code).toStdString();
-            server.reset(new RandomDataTcpServer(
-                TestTrafficLimitType::none, 0, TestTransmissionMode::echo));
-
-            server->setLocalAddress(serverSocket->getLocalAddress());
-            ASSERT_TRUE(server->start());
 
             auto buffer = std::make_shared<Buffer>();
             buffer->reserve(100);
@@ -310,7 +306,7 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
         });
 
     std::this_thread::sleep_for(kConnectDelay);
-
+    
     std::unique_ptr<ConnectionsGenerator> generator;
     clientSocket->connectAsync(
         serverSocket->getLocalAddress(),
@@ -318,6 +314,12 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
         {
             ASSERT_EQ(code, SystemError::noError)
                 << SystemError::toString(code).toStdString();
+
+            server.reset(new RandomDataTcpServer(
+                TestTrafficLimitType::none, 0, TestTransmissionMode::echo));
+            server->setLocalAddress(serverSocket->getLocalAddress());
+            ASSERT_TRUE(server->start());
+
             SocketAddress serverAddress(
                 HostAddress::localhost, server->addressBeingListened().port);
             generator.reset(new ConnectionsGenerator(

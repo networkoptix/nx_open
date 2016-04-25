@@ -16,6 +16,8 @@
 #include <QtCore/QStringList>
 #include <nx/utils/uuid.h>
 
+inline
+QString toString( const QString& t) { return t; }
 
 template<typename First, typename Second>
 QString toString(
