@@ -1,14 +1,16 @@
 #pragma once
 
+#include <ui/customization/customized.h>
+#include <ui/graphics/items/standard/graphics_widget.h>
+
 #include <core/resource/resource_fwd.h>
-#include <ui/graphics/items/generic/image_button_widget.h>
 
 class QnTwoWayAudioWidgetPrivate;
 
-class QnTwoWayAudioWidget : public QnImageButtonWidget
+class QnTwoWayAudioWidget : public Customized<GraphicsWidget>
 {
     Q_OBJECT
-    typedef QnImageButtonWidget base_type;
+    typedef Customized<GraphicsWidget> base_type;
 
 public:
     QnTwoWayAudioWidget(QGraphicsWidget *parent = nullptr);
@@ -16,11 +18,9 @@ public:
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
 
+    void setFixedHeight(qreal height);
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
-    virtual void pressedNotify(QGraphicsSceneMouseEvent *event) override;
-    virtual void releasedNotify(QGraphicsSceneMouseEvent *event) override;
 
 private:
     QScopedPointer<QnTwoWayAudioWidgetPrivate> const d_ptr;

@@ -268,9 +268,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     {
         auto twoWayAudioItem = new QnTwoWayAudioWidget();
         twoWayAudioItem->setCamera(m_camera);
-        twoWayAudioItem->setFixedSize(kTwoWayAudioButtonSize);
+        twoWayAudioItem->setFixedHeight(kTwoWayAudioButtonSize);
 
-        /* Items are ordered left-to-right and top-to bottom, so we adding position item below the two-way audio. */
+
+        /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
         overlayWidgets().positionOverlay->insertItem(0, twoWayAudioItem);
     }
 

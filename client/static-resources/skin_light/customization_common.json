@@ -257,6 +257,15 @@
             "buttonBackground": "#cccccc"
         }
     },
+    
+    "QnTwoWayAudioWidget": {
+        "palette": { 
+            "default": {
+                "window": "#ffffff80",
+                "windowText": "#000000"
+            }
+        }
+    },
 
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(255, 255, 255, 192)",
