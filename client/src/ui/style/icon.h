@@ -3,7 +3,7 @@
 
 class QnIcon: public QIcon {
 public:
-    static const QIcon::Mode Pressed = static_cast<QIcon::Mode>(0xF);
+    static constexpr QIcon::Mode Pressed = static_cast<QIcon::Mode>(0xF);
 };
 
 #endif // QN_ICON_H
