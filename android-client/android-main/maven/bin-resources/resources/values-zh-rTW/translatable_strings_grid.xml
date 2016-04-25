@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="clear_cache_complete_toast">快取已清空</string>
+    <string name="no_network_connection_toast">找不到網路連線</string>    
+</resources>

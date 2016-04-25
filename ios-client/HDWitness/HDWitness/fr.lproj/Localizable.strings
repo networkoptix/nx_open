@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Ce nom existe déjà";
+"Please choose another name." = "S.V.P. choisir un autre nom.";
+"OK" = "OK";
+"Name" = "Nom";
+"Host" = "Hôte";
+"IP or hostname" = "IP ou nom d'hôte";
+"Port" = "Port";
+"Login" = "Identifiant";
+"Password" = "Mot de passe";
+"Address: %@" = "Adresse: %@";
+"Error" = "Erreur";
+"Connecting..." = "Connexion...";
+"Can't connect to the System." = "Ne peut pas connecter au Système";
+"Requesting cameras..." = "Demande de caméras...";
+"Communication failure." = "Échec de communication.";
+"The System is incompatible with the app" = "Système imcompatible avec l'app";
+"Show Offline" = "Afficher Hors-Ligne";
+"Hide Offline" = "Cacher Hors-Ligne";
+"Systems" = "Systèmes";
+"FPS: %d" = "IPS: %d";
+"Loading..." = "Chargement...";
+"No Signal..." = "Aucun Signal...";
+"Invalid Camera Credentials" = "Identifiants de caméra invalide";
+"Invalid Camera Credentials..." = "Identifiants de caméra invalide...";
+"Live" = "Direct";
+"Information" = "Information";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Il n'y a pas d'archives pour la date sélectionnée. Voulez-vous aller à l'emplacement le plus proche?";
+"No" = "Non";
+"Yes" = "Oui";
+"Archive" = "Archive";
+"Go" = "Go";
+"Low" = "Basse";
+"Medium" = "Moyenne";
+"High" = "Haute";
+"Best" = "Meilleure";
+"Please Upgrade to Continue" = "S.V.P MàJ pour continuer";
+"This app is not compatible with this version of the software. Please download our new app." = "Cette app n'est pas compatible avec cette version de logiciel. S.V.P. télécharger notre nouvelle app.";
+"Not now" = "Pas maintenant";
+"Download" = "Télécharger";
+"Upgrade Now!" = "MàJ Maintenant!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "Vous connectez sur un système v2.5 ou plus récent. Télécharger notre nouvelle app pour une meilleure expérience de visionnement.";

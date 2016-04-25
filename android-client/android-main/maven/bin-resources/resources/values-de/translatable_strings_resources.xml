@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">"Offline zeigen"</string>
+    <string name="menu_hide_offline">"Offline ausblenden"</string>
+    <string name="resources_logout_offer">"Drücken Sie Zurück erneut um sich abzumelden"</string>
+    <string name="resources_loading_title">"Wird geladen ..."</string>
+    <string name="resources_loading_text">"Empfangen von Daten ..."</string>
+    <string name="menu_clear_cache">"Cache löschen"</string>
+    <string name="resources_tree">"Objektleiste"</string>
+    <string name="resources_grid">"Raster"</string>
+    <string name="resources_logout">"Ausloggen"</string>
+    <string name="promote_title">Jetzt updaten!</string>
+    <string name="promote">Sie verbinden sich mit einem System mit Version 2.5 oder neuer. Laden Sie unsere neue App für bessere Nutzung herunter.</string>
+    <string name="download">GET NEW APP</string>    
+
+</resources>

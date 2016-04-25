@@ -1,0 +1,14 @@
+{
+    "globals": {
+        "custom_orange":            "QColor(255, 128, 80)",
+        "opaqueSelection":			"custom_orange"
+    },
+   
+    "QnGradientBackgroundPainter": {
+        "colors": {
+            "_": "Background gradient colors.",
+            
+            "normal": "custom_orange.setAlpha(48)"
+        }
+    }
+}
