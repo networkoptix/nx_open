@@ -32,13 +32,16 @@ public:
         , const QString &systemName);
 
     static QnSystemDescriptionPtr createCloudSystem(const QString &systemId
-        , const QString &systemName);
+        , const QString &systemName
+        , const QString &ownerAccountEmail);
 
     virtual ~QnSystemDescription();
 
     QString id() const;
 
     QString name() const;
+
+    QString ownerAccountEmail() const;
 
     bool isCloudSystem() const;
 
@@ -74,8 +77,11 @@ signals:
 
 private:
     QnSystemDescription(const QString &systemId
+        , const QString &systemName);
+
+    QnSystemDescription(const QString &systemId
         , const QString &systemName
-        , const bool isCloudSystem);
+        , const QString &cloudOwnerAccountEmail);
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
@@ -85,6 +91,7 @@ private:
 
     const QString m_id;
     const QString m_systemName;
+    const QString m_ownerAccountEmail;
     const bool m_isCloudSystem;
     ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;

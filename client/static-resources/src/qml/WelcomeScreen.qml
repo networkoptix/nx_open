@@ -161,7 +161,7 @@ Rectangle
                             property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
 
                             visualParent: screenHolder;
-                            userName: context.cloudUserName;
+                            userName: model.ownerEmail;
                             systemName: model.systemName;
                             isOnline: !hostsModel.isEmpty;
 
