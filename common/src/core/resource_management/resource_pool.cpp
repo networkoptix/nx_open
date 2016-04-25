@@ -73,8 +73,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     for (const QnResourcePtr &resource: resources)
     {
         assert(resource->toSharedPointer()); /* Getting an assert here? Did you forget to use QnSharedResourcePointer? */
-        assert(!resource->getId().isNull());
-
+        Q_ASSERT(!resource->getId().isNull());
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
         resource->setResourcePool(this);
@@ -84,6 +83,15 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     for (const QnResourcePtr &resource: resources)
     {
+        if (resource->getId().isNull())
+        {
+            // ignore invalid resource in release mode
+            qWarning() << "Got resource with empty ID. ignoring."
+                       << "type=" << resource->getTypeId().toString()
+                       << "name=" << resource->getName()
+                       << "url=" << resource->getUrl();
+            continue;
+        }
         bool fakeServer = QnMediaServerResource::isFakeServer(resource);
 
         if( insertOrUpdateResource(
