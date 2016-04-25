@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_server_died">กล้องไม่พร้อมใช้งาน</string>
+    <string name="error_already_connected">เชื่อมต่อกล้องแล้ว</string>
+    <string name="error_not_connected">ไม่สามารถเชื่อมต่อกล้องได้</string>
+    <string name="error_unknown_host">โฮสต์ที่ไม่รู้จัก</string>
+    <string name="error_cannot_connect">เชื่อมต่อกล้องไม่ได้</string>
+    <string name="error_io">ความผิดพลาด I/O</string>
+    <string name="error_connection_lost">การเชื่อมต่อล้มเหลว</string>
+    <string name="error_malformed_packet">แพ็คเก็ตไม่ถูกต้อง</string>
+    <string name="error_out_of_range">ขนาดยาวเกิน</string>
+    <string name="error_buffer_too_small">บัฟเฟอร์เล็กเกินไป</string>
+    <string name="error_unsupported_format">รูปแบบไม่สอดคล้อง</string>
+    <string name="error_end_of_stream">จบโวดีโอ</string>
+    <string name="error_unsupported_http_transport">Http เหมาะสมสำหรับระบบปฏิบัติการ Android 4.0 ขึ้นไป</string>
+    <string name="error_unsupported_rtsp_proxy">การเชื่อมต่อโดยตรงไปยัง มีเดียเซิร์ฟเวอร์ ไม่สามารถสร้างดูวิดีโอผ่านพร๊อกซี จะไใช้ได้เฉพาะระบบปฏิบัติการ Android 4.0 ขึ้นไป</string>
+    <string name="error_proxy_not_running">การเชื่อมต่อโดยตรงไปยังมีเดียเซิร์ฟเวอร์ ไม่สามารถสร้างให้บริการพร็อกซีที่เป็นแอพลิเคชันในการทำงานได้</string>
+    <string name="error_unsupported_rtsp_udp">วีดีโอจากเซิรฟ์เวอร์ไม่สามารถเข้าถึงอุปกรณ์ของคุณได้ กรุณาตรวจสอบให้แน่ใจว่าเครือข่าย UDP ของคุณใช้งานได้หรือไม่ </string>
+    <string name="error_native_codec">ตัวแปลงสัญญาณกล้องไม่ได้รับการสนับสนุนบนอุปกรณ์ของคุณ. ลองเปลี่ยนความละเอียดหน้าจอ.</string>
+    <string name="error_unknown">กล้องไม่พร้อมใช้งาน</string>
+
+</resources>

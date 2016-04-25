@@ -1,0 +1,43 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Taka nazwa już istnieje";
+"Please choose another name." = "Proszę wybrać inną nazwę.";
+"OK" = "OK";
+"Name" = "Nazwa";
+"Host" = "Host";
+"IP or hostname" = "Adres IP lub nazwa hosta";
+"Port" = "Port";
+"Login" = "Login";
+"Password" = "Hasło";
+"Address: %@" = "Addres: %@";
+"Error" = "Błąd";
+"Connecting..." = "Łączenie...";
+"Can't connect to the System." = "Nie można połączyć się z systemem.";
+"Requesting cameras..." = "Wyszukuję kamery...";
+"Communication failure." = "Brak komunikacji.";
+"The System is incompatible with the app" = "System jest niekompatybilny z aplikacją";
+"Show Offline" = "Pokaż odłączone";
+"Hide Offline" = "Ukryj odłączone";
+"Systems" = "Systemy";
+"FPS: %d" = "kl/s.: %d";
+"Loading..." = "Ładowanie...";
+"No Signal..." = "Brak sygnału...";
+"Invalid Camera Credentials" = "Błędne poświadczenia kamery";
+"Invalid Camera Credentials..." = "Błędne poświadczenia kamery...";
+"Live" = "Na żywo";
+"Information" = "Informacja";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Brak archiwum dla wybranej daty. Czy chcesz przejść do najbliższego archiwum?";
+"No" = "Nie";
+"Yes" = "Tak";
+"Archive" = "Archiwum";
+"Go" = "Idź";
+"Low" = "Niska";
+"Medium" = "Średnia";
+"High" = "Wysoka";
+"Best" = "Najlepsza";

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collect_log">Pobierz Logi</string>
+    <string name="acquiring_log_progress_dialog_message">Pobieranie logów systemu &#8230;</string>
+    <string name="chooser_title">"Wybierz program do wysłania logów."</string>
+    <string name="failed_to_get_log_message">"Nie można pobrać logów z systemu."</string>
+    <string name="main_dialog_text">"Ta plikacja będzie próbowała zebrać logi z urządzenia.
+Zebrane logi zostaną wysłąne za pomocą wybranego przez Ciebie programu.
+Będziesz miał możliwość wglądu do przesyłanych danych."
+    </string>  
+</resources>
