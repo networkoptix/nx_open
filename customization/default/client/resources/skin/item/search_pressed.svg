@@ -1,34 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   version="1.1"
-   width="24"
-   height="24"
-   id="svg2"
-   xml:space="preserve"><metadata
-     id="metadata8"><rdf:RDF><cc:Work
-         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs6"><clipPath
-       id="clipPath18"><path
-         d="M 0,256 256,256 256,0 0,0 0,256 z"
-         id="path20" /></clipPath></defs><g
-     transform="matrix(1.25,0,0,-1.25,0,24)"
-     id="g10"><path
-       d="m 0,0 19.2,0 0,19.2 L 0,19.2 0,0 z"
-       id="path12"
-       style="fill:#212a2f;fill-opacity:1;fill-rule:nonzero;stroke:none" /><path
-       d="m 17,9.75 a 6.25,6.25 0 1 1 -12.5,0 6.25,6.25 0 1 1 12.5,0 z"
-       transform="matrix(0.768,0,0,-0.768,0.544,18.688)"
-       id="path3003"
-       style="fill:none;stroke:#ffffff;stroke-width:2.08333325;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" /><path
-       d="m 1.542774,-15.635324 3.6000002,0 c 1.1079998,0 1.9999996,0.892 1.9999996,2 0,1.108 -0.8919998,2 -1.9999996,2 l -3.6000002,0 c -1.10799978,0 -0.96937796,-0.779664 -0.96937796,-1.887664 0,-1.108 -0.13862182,-2.112336 0.96937796,-2.112336 z"
-       transform="matrix(0.59605212,-0.80294575,-0.80294575,-0.59605212,0,0)"
-       id="rect3773"
-       style="fill:#ffffff;fill-opacity:1;stroke:none" /></g></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="48px"
+	 height="48px" viewBox="0 0 48 48" enable-background="new 0 0 48 48" xml:space="preserve">
+<g id="Layer_2">
+	<rect fill="#212A2F" width="48" height="48"/>
+</g>
+<g id="Layer_3">
+	<path fill="#FFFFFF" d="M40.768,37.232l-9.119-9.119c1.608-2.303,2.56-5.098,2.56-8.113c0-7.835-6.374-14.209-14.208-14.209
+		S5.792,12.165,5.792,20S12.166,34.209,20,34.209c3.016,0,5.811-0.951,8.113-2.561l9.119,9.119L40.768,37.232z M20,30.209
+		c-5.629,0-10.208-4.58-10.208-10.209S14.371,9.791,20,9.791S30.208,14.371,30.208,20S25.629,30.209,20,30.209z"/>
+</g>
+</svg>

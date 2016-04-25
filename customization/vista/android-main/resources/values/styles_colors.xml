@@ -29,4 +29,8 @@
 
     <!-- Background color for title rows (server or layout)  -->
     <color name="grid_title_background">#7733b5e5</color>
+    
+    <color name="promote_background">#a5ce39</color>
+    <color name="promote_font">#1a2400</color>
+    <color name="promote_link">#ffffff</color>    
 </resources>
