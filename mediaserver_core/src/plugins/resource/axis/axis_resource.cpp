@@ -32,6 +32,18 @@ namespace{
     const quint16 DEFAULT_AXIS_API_PORT = 80;
     const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
     const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+
+    QnOutputAudioFormat toAudioFormat(const QString& codecName)
+    {
+        if (codecName == lit("g711"))
+            return QnOutputAudioFormat(CODEC_ID_PCM_MULAW, 8000);
+        else if (codecName == lit("g726"))
+            return QnOutputAudioFormat(CODEC_ID_ADPCM_G726, 8000);
+        else if (codecName == lit("axis-mulaw-128"))
+            return QnOutputAudioFormat(CODEC_ID_PCM_MULAW, 16000);
+        else
+            return QnOutputAudioFormat();
+    }
 }
 
 int QnPlAxisResource::portIdToIndex(const QString& id) const
@@ -86,7 +98,7 @@ private:
 
 QnPlAxisResource::QnPlAxisResource() :
     m_lastMotionReadTime(0),
-    m_audioTransmitter(nullptr)
+    m_audioTransmitter(new QnAxisAudioTransmitter(this))
 {
     setVendor(lit("Axis"));
     setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
@@ -95,6 +107,7 @@ QnPlAxisResource::QnPlAxisResource() :
 
 QnPlAxisResource::~QnPlAxisResource()
 {
+    m_audioTransmitter.reset();
     stopInputPortMonitoringAsync();
 }
 
@@ -838,27 +851,19 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
 
 bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
 {
-    QString value;
-    auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &value);
-
+    QString outputFormats;
+    auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)
         return false;
 
-    if (value.isEmpty())
-        return true;
-\
-    auto supportedFormats = value.split(',');
-    auto codecsSupportedByTransmitter = QnAxisAudioTransmitter::getSupportedAudioCodecs();
-
-    for (const auto& format: supportedFormats)
+    for (const auto& formatStr: outputFormats.split(','))
     {
-        auto codecId = getCodecIdByName(format);
-        if (codecId == CodecID::CODEC_ID_NONE)
-            continue;
-
-        m_supportedAudioCodecs << codecId;
-        if (codecsSupportedByTransmitter.contains(codecId))
+        QnOutputAudioFormat outputFormat = toAudioFormat(formatStr);
+        if (m_audioTransmitter->isCompatible(outputFormat))
+        {
+            m_audioTransmitter->setOutputFormat(outputFormat);
             setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+        }
     }
 
     return true;
@@ -1358,42 +1363,10 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
 }
 
-CodecID QnPlAxisResource::getCodecIdByName(const QString& codecName) const
-{
-    if (codecName == lit("g711"))
-        return CodecID::CODEC_ID_PCM_MULAW;
-    else if (codecName == lit("g726"))
-        return CodecID::CODEC_ID_ADPCM_G726;
-    else
-        return CodecID::CODEC_ID_NONE;
-}
-
-QSet<CodecID> QnPlAxisResource::getSupportedAudioCodecs() const
-{
-    return m_supportedAudioCodecs;
-}
-
 QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
 {
-    QnMutexLocker lk(&m_audioTransmitterMutex);
-
-    if (!isInitialized())
+    if (!isInitialized() && !m_audioTransmitter->isInitialized())
         return nullptr;
-
-    if (!m_audioTransmitter)
-    {
-        const auto codecsSupportedByTransmitter = QnAxisAudioTransmitter::getSupportedAudioCodecs();
-
-        for (const auto codecSupportedByCamera: m_supportedAudioCodecs)
-        {
-            if (codecsSupportedByTransmitter.contains(codecSupportedByCamera))
-            {
-                qDebug() << "Creating axis audio transmitter";
-                m_audioTransmitter = std::make_shared<QnAxisAudioTransmitter>(this, codecSupportedByCamera);
-                break;
-            }
-        }
-    }
 
     return m_audioTransmitter;
 }

@@ -33,7 +33,7 @@ namespace
         return result;
     }
 
-    int strictDstSampleRate(int srcSampleRate, AVCodec* avCodec)
+    int getDefaultDstSampleRate(int srcSampleRate, AVCodec* avCodec)
     {
         int result = srcSampleRate;
         if (avCodec->id == CODEC_ID_ADPCM_G726 ||
@@ -61,7 +61,8 @@ QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
     m_lastTimestamp(AV_NOPTS_VALUE),
     m_downmixAudio(false),
     m_frameNum(0),
-    m_resampleCtx(0)
+    m_resampleCtx(0),
+    m_dstSampleRate(0)
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE, CL_MEDIA_ALIGNMENT);
@@ -114,7 +115,10 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
         m_encoderCtx->channels = maxEncoderChannels;
     }
     
-    m_encoderCtx->sample_rate = strictDstSampleRate(codecCtx->ctx()->sample_rate, avCodec);
+    if (m_dstSampleRate > 0)
+        m_encoderCtx->sample_rate = m_dstSampleRate;
+    else
+        m_encoderCtx->sample_rate = getDefaultDstSampleRate(codecCtx->ctx()->sample_rate, avCodec);
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
@@ -139,6 +143,11 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
     m_frameNum = 0;
     return true;
+}
+
+bool QnFfmpegAudioTranscoder::isOpened() const
+{
+    return m_context != nullptr;
 }
 
 int sampleSize(AVSampleFormat value)
@@ -290,6 +299,11 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()
 {
     return m_encoderCtx;
+}
+
+void QnFfmpegAudioTranscoder::setSampleRate(int value)
+{
+    m_dstSampleRate = value;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

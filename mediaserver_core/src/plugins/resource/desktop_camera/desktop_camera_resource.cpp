@@ -16,7 +16,6 @@ QString QnDesktopCameraResource::getDriverName() const
 
 QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource() {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
-    qDebug() << "Creating desktop camera <!---------------------0";
 }
 
 
@@ -24,12 +23,10 @@ QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhy
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
-    qDebug() << "Creating desktop camera <!---------------------1";
 }
 
 QnDesktopCameraResource::~QnDesktopCameraResource()
 {
-    qDebug() << "DESTROYING DESKTOP CAMERA RESOURCE";
 }
 
 bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)

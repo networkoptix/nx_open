@@ -6,6 +6,18 @@
 namespace
 {
     const QString kChooseClientAutomatically("auto");
+
+    QnMutex* getLock(const QString& key)
+    {
+        static QnMutex internalMutex;
+        static QMap<QString, std::shared_ptr<QnMutex>> locks;
+        
+        QnMutexLocker lock(&internalMutex);
+        std::shared_ptr<QnMutex>& value = locks[key];
+        if (value == nullptr)
+            value.reset(new QnMutex());
+        return value.get();
+    }
 }
 
 QnAudioStreamerPool::QnAudioStreamerPool()
@@ -43,7 +55,7 @@ QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QStri
     return resource;
 }
 
-bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const QString& resourceId, QString& error)
+bool QnAudioStreamerPool::startStopStreamToResource(const QString& clientId, const QString& resourceId, Action action, QString &error)
 {
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
@@ -77,46 +89,22 @@ bool QnAudioStreamerPool::startStreamToResource(const QString& clientId, const Q
         return false;
     }
 
-    sourceCam->inUse(transmitter.get());
-    reader->addDataProcessor(transmitter.get());
-    if(transmitter->isRunning())
-        transmitter->stop();
-    transmitter->start();
-    reader->startIfNotRunning();
-
-    return true;
-}
-
-bool QnAudioStreamerPool::stopStreamToResource(const QString& clientId, const QString& resourceId, QString &error)
-{
-    auto resource = getTransmitDestination(resourceId);
-    if (!resource)
+    // This lock avoid to start and stop same transmitter in the same time
+    QnMutexLocker lock(getLock(resourceId));
+    if (action == Action::Start)
     {
-        error = lit("Can't find resource with id '%1'")
-            .arg(resourceId);
-        return false;
+        transmitter->stop(); //< in case if still stopping from a previous call
+        sourceCam->inUse(transmitter.get());
+        reader->addDataProcessor(transmitter.get());
+        transmitter->start();
+        reader->startIfNotRunning();
     }
-
-    auto sourceCam = getTransmitSource(clientId);
-    if (!sourceCam)
+    else
     {
-        error = lit("Can't find client with id '%1'")
-            .arg(clientId);
-        return false;
+        sourceCam->notInUse(transmitter.get());
+        transmitter->pleaseStop();
+        reader->removeDataProcessor(transmitter.get());
     }
-
-    auto reader = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
-    auto transmitter = resource->getAudioTransmitter();
-    if (!transmitter)
-    {
-        error = lit("Unable to obtain audio transmitter for resource '%1'")
-            .arg(resourceId);
-        return false;
-    }
-
-    sourceCam->notInUse(transmitter.get());
-    transmitter->stop();
-    reader->removeDataProcessor(transmitter.get());
 
     return true;
 }

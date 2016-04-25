@@ -46,7 +46,6 @@ public:
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
     bool hasTwoWayAudio() const;
-    virtual QSet<CodecID> getSupportedAudioCodecs() const;
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;

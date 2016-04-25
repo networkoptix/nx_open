@@ -18,8 +18,10 @@ public:
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
     bool open(const QnMediaContextPtr& codecCtx);
+    bool isOpened() const;
     AVCodecContext* getCodecContext();
     virtual bool existMoreData() const override;
+    void setSampleRate(int value);
 private:
     quint8* m_audioEncodingBuffer;
     AVCodecContext* m_encoderCtx;
@@ -35,6 +37,7 @@ private:
     bool m_downmixAudio;
     int m_frameNum;
     ReSampleContext* m_resampleCtx;
+    int m_dstSampleRate;
 };
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;

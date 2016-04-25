@@ -102,7 +102,6 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
     void asyncUpdateIOSettings(const QString & key);
     bool readCurrentIOStateAsync();
-    virtual QSet<CodecID> getSupportedAudioCodecs() const override;
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -115,7 +114,6 @@ private:
     QnIOPortDataList m_ioPorts;
     QnIOStateDataList m_ioStates;
     mutable QnMutex m_inputPortMutex;
-    mutable QnMutex m_audioTransmitterMutex;
     //!http client used to monitor input port(s) state
     
     struct IOMonitor {
@@ -133,7 +131,6 @@ private:
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
     QnAudioTransmitterPtr m_audioTransmitter;
-    QSet<CodecID> m_supportedAudioCodecs;
 
     //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
     CLHttpStatus readAxisParameter(
@@ -159,8 +156,6 @@ private:
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
     bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
     void resetHttpClient(nx_http::AsyncHttpClientPtr& value);
-
-    CodecID getCodecIdByName(const QString&) const;
 
     /*!
         Convert port number to ID

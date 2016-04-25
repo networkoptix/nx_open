@@ -1,6 +1,6 @@
 #include "audio_transmission_rest_handler.h"
-#include "streaming/audio_streamer_pool.h"
-#include "utils/network/http/httptypes.h"
+#include <streaming/audio_streamer_pool.h>
+#include <utils/network/http/httptypes.h>
 
 namespace
 {
@@ -19,36 +19,22 @@ int QnAudioTransmissionRestHandler::executeGet(
 {
     QN_UNUSED(path);
 
-    QString error;
-
-    if (!validateParams(params, error))
+    QString errorStr;
+    if (!validateParams(params, errorStr))
     {
-        result.setError(QnJsonRestResult::InvalidParameter, error);
+        result.setError(QnJsonRestResult::InvalidParameter, errorStr);
         return nx_http::StatusCode::ok;
     }
 
     auto clientId = params[kClientIdParamName];
     auto resourceId = params[kResourceIdParamName];
-    auto action = params[kActionParamName];
+    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction) 
+        ? QnAudioStreamerPool::Action::Start 
+        : QnAudioStreamerPool::Action::Stop;
 
-    bool res = false;
-
-    if (action == kStartStreamAction)
-        res = QnAudioStreamerPool::instance()->startStreamToResource(clientId, resourceId, error);
-    else
-        res = QnAudioStreamerPool::instance()->stopStreamToResource(clientId, resourceId, error);
-
-
-    if (res)
-    {
-        return nx_http::StatusCode::ok;
-    }
-    else
-    {
-        result.setError(QnJsonRestResult::CantProcessRequest, error);
-        return nx_http::StatusCode::ok;
-    }
-
+    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(clientId, resourceId, action, errorStr))
+        result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
+    return nx_http::StatusCode::ok;
 }
 
 bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error) const

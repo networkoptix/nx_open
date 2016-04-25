@@ -5,48 +5,64 @@
 
 namespace
 {
-    const QString kAxisAudioTransmitUrl("/axis-cgi/audio/transmit.cgi");
+    static const QString kAxisAudioTransmitUrl("/axis-cgi/audio/transmit.cgi");
+    static const int kConnectionTimeoutMs = 3000;
 }
 
-QSet<CodecID> QnAxisAudioTransmitter::getSupportedAudioCodecs()
+bool QnAxisAudioTransmitter::isCompatible(const QnOutputAudioFormat& format) const
 {
-    QSet<CodecID> result;
-    result << CodecID::CODEC_ID_PCM_MULAW;
-    return result;
+    return
+        format.codec == CodecID::CODEC_ID_AAC ||
+        //format.codec == CodecID::CODEC_ID_ADPCM_G726 ||
+        format.codec == CodecID::CODEC_ID_PCM_MULAW;
 }
 
-QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res, CodecID codecId) :
+void QnAxisAudioTransmitter::setOutputFormat(const QnOutputAudioFormat& format)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_outputFormat = format;
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(format.codec));
+    if (format.sampleRate != QnOutputAudioFormat::kDefaultSampleRate)
+        m_transcoder->setSampleRate(format.sampleRate);
+}
+
+bool QnAxisAudioTransmitter::isInitialized() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_transcoder != nullptr;
+}
+
+QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
     QnAbstractAudioTransmitter(),
     m_resource(res),
-    m_codecId(codecId),
-    m_transcoder(codecId),
-    m_audioContextOpened(false),
     m_connectionEstablished(false),
-    m_canProcessData(false)
+    m_canProcessData(false),
+    m_socket(new TCPSocket())
 {
-    initSocket();
 }
 
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 {
-    qDebug() << "Destroying Axis audio transmitter";
-    pleaseStop();
+    stop();
 }
 
-bool QnAxisAudioTransmitter::initSocket()
+QString QnAxisAudioTransmitter::getAudioMimeType() const
 {
-    m_socket = std::make_shared<TCPSocket>();
-    return !!m_socket;
-}
-
-QString QnAxisAudioTransmitter::getAudioMimeType(CodecID codecId) const
-{
-    if (codecId == CodecID::CODEC_ID_PCM_MULAW)
-        return lit("audio/basic");
-    else if (codecId == CodecID::CODEC_ID_ADPCM_G726)
+    if (m_outputFormat.codec == CodecID::CODEC_ID_PCM_MULAW)
+    {
+        if (m_outputFormat.sampleRate == 8000)
+            return lit("audio/g711");
+        else
+            return lit("audio/axis-mulaw-%1").arg((m_outputFormat.sampleRate * 8) / 1000);
+    }
+    else if (m_outputFormat.codec == CodecID::CODEC_ID_ADPCM_G726)
+    {
         return lit("audio/G726-32");
-    else if (codecId == CodecID::CODEC_ID_AAC)
+    }
+    else if (m_outputFormat.codec == CodecID::CODEC_ID_AAC)
+    {
         return lit("audio/mpeg4-generic");
+    }
     else
         return lit("audio/basic");
 }
@@ -84,8 +100,8 @@ QByteArray QnAxisAudioTransmitter::buildTransmitRequest() const
         .append(lit("Host: %1\r\n")
             .arg(sockAddr.toString()))
         .append(lit("Content-Type: %1\r\n")
-            .arg(getAudioMimeType(m_codecId)))
-        .append(lit("Content-Length: 99999999\r\n"))
+            .arg(getAudioMimeType()))
+        .append(lit("Content-Length: 999999999\r\n"))
         .append(lit("Connection: Keep-Alive\r\n"))
         .append(lit("Cache-Control: no-cache\r\n"))
         .append(lit("Authorization: %1\r\n")
@@ -95,6 +111,20 @@ QByteArray QnAxisAudioTransmitter::buildTransmitRequest() const
     return transmitRequest;
 }
 
+int QnAxisAudioTransmitter::sendData(const char* data, int dataSize)
+{
+    int totalBytesSent = 0;
+    while (dataSize > 0 && !m_needStop)
+    {
+        auto bytesSent = m_socket->send(data + totalBytesSent, dataSize);
+        if (bytesSent <= 0)
+            break; //< error occurred
+        totalBytesSent += bytesSent;
+        dataSize -= bytesSent;
+    }
+    return totalBytesSent;
+}
+
 bool QnAxisAudioTransmitter::establishConnection()
 {
     const auto sockAddr = getSocketAddress();
@@ -102,7 +132,7 @@ bool QnAxisAudioTransmitter::establishConnection()
     qDebug() << "Axis audio transmitter, Connecting to " << sockAddr.toString();
 
     m_socket->reopen();
-    auto isConnected = m_socket->connect(sockAddr, 3000);
+    auto isConnected = m_socket->connect(sockAddr, kConnectionTimeoutMs);
     if (!isConnected)
         return false;
 
@@ -110,22 +140,10 @@ bool QnAxisAudioTransmitter::establishConnection()
 
     qDebug() << "Axis audio transmitter, sending post request" << QString(transmitRequest);
 
-    int totalBytesSent(0);
-    auto data = transmitRequest.constData();
-    auto dataSize = transmitRequest.size();
-
-    while (totalBytesSent < transmitRequest.size())
-    {
-        auto bytesSent = m_socket->send(data + totalBytesSent, dataSize - totalBytesSent);
-        if (bytesSent == -1)
-            break;
-        else
-            totalBytesSent += bytesSent;
-    }
-
-    m_connectionEstablished = totalBytesSent == transmitRequest.size();
-
-    if (!m_connectionEstablished)
+    int totalBytesSent = sendData(transmitRequest.constData(), transmitRequest.size());
+    m_connectionEstablished = (totalBytesSent == transmitRequest.size());
+    
+    if (!m_connectionEstablished && !m_needStop)
         qDebug() << "Axis audio transmitter, error occured during connection establishing: "
                 << SystemError::getLastOSErrorText();
 
@@ -134,67 +152,38 @@ bool QnAxisAudioTransmitter::establishConnection()
 
 bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
 {
-    {
-        QnMutexLocker lk(&m_connectionMutex);
-        if (!m_connectionEstablished)
-            establishConnection();
+    if (!m_connectionEstablished && !establishConnection())
+        return true; //< always return true. It means skip input data.
 
-        if (!m_connectionEstablished)
-            return false;
-    }
-
+    if (!m_transcoder->isOpened() && !m_transcoder->open(data->context))
+        return true; //< always return true. It means skip input data.
+    
     QnAbstractMediaDataPtr transcoded;
-
-    if (!m_audioContextOpened)
+    do 
     {
-        m_transcoder.open(data->context);
-        m_audioContextOpened = true;
-    }
-
-    bool inputDataDepleted = false;
-    do {
-
-        m_transcoder.transcodePacket(inputDataDepleted ? QnConstAbstractMediaDataPtr() : data, &transcoded);
-
-        if (transcoded && transcoded->dataSize() > 0)
+        m_transcoder->transcodePacket(data, &transcoded);
+        data.reset();
+        if (!transcoded)
+            break;
+        if (sendData(transcoded->data(), transcoded->dataSize()) != transcoded->dataSize())
         {
-            auto data = transcoded->data();
-            auto dataSize = transcoded->dataSize();
-            int totalBytesSent = 0;
-
-            while (totalBytesSent < dataSize)
+            if (!m_needStop)
             {
-                auto bytesSent = m_socket->send(data + totalBytesSent, dataSize - totalBytesSent);
-                if (bytesSent == -1)
-                {
-                    qDebug() << "Axis audio transmitter, error occured during audio data transmission:"
-                            << SystemError::getLastOSErrorText() << ", "
-                            << "Error code: "
-                            << SystemError::getLastOSErrorCode();
-
-                    if (establishConnection())
-                        continue;
-                    else
-                        break;
-                }
-                else
-                {
-                    totalBytesSent += bytesSent;
-                }
-            }
-
-            if (totalBytesSent < dataSize)
                 qDebug() << "Axis audio transmitter, error occured during audio data transmission:"
-                        << SystemError::getLastOSErrorText() << ", "
-                        << "Error code: "
-                        << SystemError::getLastOSErrorCode();
-
+                    << SystemError::getLastOSErrorText() << ", "
+                    << "Error code: "
+                    << SystemError::getLastOSErrorCode();
+            }
+            m_connectionEstablished = false;
         }
-
-        inputDataDepleted = true;
-    } while (transcoded);
+    } while (!m_needStop && transcoded);
 
     return true;
 }
 
-
+void QnAxisAudioTransmitter::pleaseStop()
+{
+    base_type::pleaseStop();
+    m_socket->shutdown();
+    m_connectionEstablished = false;
+}

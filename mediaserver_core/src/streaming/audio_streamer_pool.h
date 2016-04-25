@@ -11,13 +11,17 @@ class QnAudioStreamerPool : public Singleton<QnAudioStreamerPool>
 public:
     QnAudioStreamerPool();
 
-    bool startStreamToResource(const QString& clientId, const QString& resourceId, QString& error);
-    bool stopStreamToResource(const QString& clientId, const QString& resourceId, QString& error);
+    enum class Action
+    {
+        Start,
+        Stop
+    };
+
+    bool startStopStreamToResource(const QString& clientId, const QString& resourceId, Action action, QString& error);
 
 private:
     QnVideoCameraPtr getTransmitSource(const QString& clientId)const;
     QnSecurityCamResourcePtr getTransmitDestination(const QString& resourceId) const;
-
 };
 
 #endif // AUDIO_STREAMER_POOL_H

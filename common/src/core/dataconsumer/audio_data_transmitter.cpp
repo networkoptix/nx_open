@@ -18,8 +18,3 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data
 
     return true;
 }
-
-QSet<CodecID> QnAbstractAudioTransmitter::getSupportedAudioCodecs()
-{
-    return QSet<CodecID>();
-}

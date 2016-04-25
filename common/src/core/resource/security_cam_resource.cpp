@@ -1047,8 +1047,3 @@ QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 {
     return nullptr;
 }
-
-QSet<CodecID> QnSecurityCamResource::getSupportedAudioCodecs() const
-{
-    return QSet<CodecID>();
-}
