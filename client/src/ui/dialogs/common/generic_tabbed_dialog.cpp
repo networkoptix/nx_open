@@ -148,6 +148,16 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
 }
 
 
+bool QnGenericTabbedDialog::isPageVisible(int key) const
+{
+    for (const Page &page : m_pages)
+        if (page.key == key)
+            return page.visible;
+
+    NX_ASSERT(false);
+    return false;
+}
+
 void QnGenericTabbedDialog::setPageVisible(int key, bool visible)
 {
     NX_ASSERT(m_tabWidget, Q_FUNC_INFO, "tab widget must exist here");

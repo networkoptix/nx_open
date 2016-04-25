@@ -326,11 +326,39 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
+    /**
+     * Hover marker is drawn in PE_PanelItemViewRow.
+     * Selection marker is drawn over later in PE_PanelItemViewItem,
+     *  except selection marker in tree view branch area which is drawn in PE_PanelItemViewRow as well.
+     */
+    case PE_PanelItemViewRow:
+        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+        {
+            /* Markers can be semi-transparent, so we draw all layers on top of each other. */
+
+            /* Draw alternate row background if requested: */
+            if (item->features.testFlag(QStyleOptionViewItem::Alternate))
+                painter->fillRect(item->rect, option->palette.alternateBase());
+
+            /* Draw hover marker if needed: */
+            if (item->state.testFlag(State_MouseOver))
+                painter->fillRect(item->rect, option->palette.midlight());
+
+            /* Draw selection marker if needed: */
+            if (item->state.testFlag(State_Selected))
+                painter->fillRect(item->rect, option->palette.highlight());
+
+            return;
+        }
+        break;
+
     case PE_PanelItemViewItem:
+        //TODO #vkutin Complete refinement of this code when restyling table views
         if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
             bool selected = item->state.testFlag(State_Selected);
 
+            /* Handle here entire row hovering in table views: */
             int hoveredRow = -1;
             if (widget)
             {
@@ -339,10 +367,9 @@ void QnNxStyle::drawPrimitive(
                     hoveredRow = value.toInt();
             }
 
-            bool hovered = item->state.testFlag(State_MouseOver) || item->index.row() == hoveredRow;
+            bool hovered = item->index.row() == hoveredRow;
 
             QnPaletteColor fillColor;
-
             if (selected)
             {
                 fillColor = findColor(option->palette.highlight().color());
@@ -355,20 +382,7 @@ void QnNxStyle::drawPrimitive(
             }
 
             if (fillColor.isValid())
-            {
-                fillColor.setAlphaF(0.4);
                 painter->fillRect(item->rect, fillColor.color());
-            }
-
-            return;
-        }
-        break;
-
-    case PE_PanelItemViewRow:
-        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
-        {
-            if (item->features.testFlag(QStyleOptionViewItem::Alternate))
-                painter->fillRect(option->rect, option->palette.alternateBase());
 
             return;
         }
@@ -1793,7 +1807,10 @@ QRect QnNxStyle::subElementRect(
     switch (subElement)
     {
     case SE_LineEditContents:
-        return base_type::subElementRect(subElement, option, widget).adjusted(dp(6), 0, 0, 0);
+        if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
+            //TODO #vkutin See why this ugly "dp(6)" is here and not somewhere else
+            return base_type::subElementRect(subElement, option, widget).adjusted(dp(6), 0, 0, 0);
+        break;
 
     case SE_PushButtonLayoutItem:
         if (qobject_cast<const QDialogButtonBox *>(widget))

@@ -48,28 +48,6 @@ CLIENT_HELP_PATH=${ClientHelpSourceDir}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
-QT_LIBS=\
-( \
-    Core \
-    Gui \
-    Widgets \
-    Network \
-    Concurrent \
-    Multimedia \
-    OpenGL \
-    WebKit \
-    WebKitWidgets \
-    WebChannel \
-    Qml \
-    Quick \
-    QuickWidgets \
-    X11Extras \
-    Sql \
-    Xml \
-    XmlPatterns \
-    PrintSupport
-)
-
 #. $CLIENT_BIN_PATH/env.sh
 
 # Prepare stage dir
@@ -109,12 +87,11 @@ cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
-for lib in "${QT_LIBS[@]}"
+#copying qt libs
+QTLIBS=`readelf -d $CLIENT_BIN_PATH/client.bin $CLIENT_PLATFORMS_PATH/libqxcb.so | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/' | sort -u`
+for var in $QTLIBS
 do
-    SONAME=libQt5${lib}.so.${qt.version}
-    cp ${qt.dir}/lib/$SONAME $LIBSTAGE
-    LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -sf $SONAME $LIBSTAGE/$LINK_TARGET
+    cp -P ${qt.dir}/lib/$var* $LIBSTAGE
 done
 
 cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE

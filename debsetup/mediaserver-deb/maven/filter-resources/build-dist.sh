@@ -41,18 +41,6 @@ SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
 
-QT_LIBS=\
-( \
-    Core \
-    Gui \
-    Network \
-    Concurrent \
-    Multimedia \
-    Sql \
-    Xml \
-    XmlPatterns
-)
-
 # Prepare stage dir
 rm -rf $STAGE
 mkdir -p $BINSTAGE
@@ -77,12 +65,11 @@ rm -f $LIBSTAGE/*.debug
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
 cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 
-for lib in "${QT_LIBS[@]}"
+#copying qt libs
+QTLIBS=`readelf -d $CLIENT_BIN_PATH/client.bin $CLIENT_PLATFORMS_PATH/libqxcb.so | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/' | sort -u`
+for var in $QTLIBS
 do
-    SONAME=libQt5${lib}.so.${qt.version}
-    cp ${qt.dir}/lib/$SONAME $LIBSTAGE
-    LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -sf $SONAME $LIBSTAGE/$LINK_TARGET
+    cp -P ${qt.dir}/lib/$var* $LIBSTAGE
 done
 
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE

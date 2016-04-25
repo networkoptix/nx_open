@@ -1,0 +1,6 @@
+{
+    "globals": {
+        "custom_orange":            "QColor(255, 128, 80)",
+        "opaqueSelection":			"custom_orange"
+    }
+}

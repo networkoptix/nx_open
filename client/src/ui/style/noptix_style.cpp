@@ -155,15 +155,10 @@ void QnNoptixStyle::unpolish(QApplication *application) {
 void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
 
-    // TODO: #Elric #2.3 remove this line in 2.3, looks like it's not needed.
-    if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget)) {
-        itemView->setIconSize(QSize(18, 18));
-
-        /* QWidget::scroll method has caching issues leading to some garbage drawn in the updated areas.
-           As a workaround we force it to repaint all contents. */
-        if(QHeaderView *headerView = dynamic_cast<QHeaderView *>(itemView))
-            headerView->viewport()->setAutoFillBackground(false);
-    }
+    /* QWidget::scroll method has caching issues leading to some garbage drawn in the updated areas.
+        As a workaround we force it to repaint all contents. */
+    if(QHeaderView *headerView = dynamic_cast<QHeaderView *>(widget))
+        headerView->viewport()->setAutoFillBackground(false);
 
     if(QAbstractButton *button = dynamic_cast<QAbstractButton *>(widget))
         button->setIcon(m_skin->icon(button->icon()));
@@ -252,22 +247,18 @@ bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *pa
     return true;
 }
 
-bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+bool QnNoptixStyle::drawPanelItemViewPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    QN_UNUSED(element);
+    QN_UNUSED(painter);
+
     if(!widget)
         return false;
 
     if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
         return true; /* Draw nothing. */
 
-    qreal itemOpacity = qvariant_cast<qreal>(widget->property(Qn::ItemViewItemBackgroundOpacity), 1.0);
-    if(qFuzzyCompare(itemOpacity, 1.0))
-        return false; /* Let the default implementation handle it. */
-
-    qreal opacity = painter->opacity();
-    painter->setOpacity(opacity * itemOpacity);
-    base_type::drawPrimitive(element, option, painter, widget);
-    painter->setOpacity(opacity);
-    return true;
+    return false; /* Let the default implementation handle it. */
 }
 
 // -------------------------------------------------------------------------- //

@@ -26,9 +26,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     m_profilePage(new QnUserProfileWidget(m_model, this)),
     m_settingsPage(new QnUserSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnAccessibleResourcesWidget::CamerasFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnAccessibleResourcesWidget::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAccessibleResourcesWidget::ServersFilter, this))
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::CamerasFilter, this)),
+    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::LayoutsFilter, this)),
+    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::ServersFilter, this))
 {
     ui->setupUi(this);
 
@@ -156,6 +156,31 @@ void QnUserSettingsDialog::retranslateUi()
     }
 }
 
+bool QnUserSettingsDialog::hasChanges() const
+{
+    return base_type::hasChanges();
+
+    //if (base_type::hasChanges())
+    //    return true;
+
+    ///* Permissions are checked separately */
+    //if (isPageVisible(SettingsPage))
+    //{
+    //    if (!m_settingsPage->selectedUserGroup().isNull())
+    //        return false;
+
+    //    Qn::GlobalPermissions basePermissions = m_settingsPage->selectedPermissions();
+    //    if (basePermissions != Qn::NoGlobalPermissions)
+    //        /* Predefined group selected */
+    //        return basePermissions != qnResourceAccessManager->globalPermissions(m_user))
+
+
+    //}
+
+
+
+}
+
 void QnUserSettingsDialog::applyChanges()
 {
     auto mode = m_model->mode();
@@ -163,38 +188,13 @@ void QnUserSettingsDialog::applyChanges()
         return;
 
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
-
+    //TODO: #GDM #access SafeMode what to rollback if we were creating new user
     qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr &user)
     {
-        QSet<int> allowedPages;
-        if (mode == QnUserSettingsModel::OwnProfile)
-        {
-            allowedPages << ProfilePage;
-        }
-        else
-        {
-            NX_ASSERT(mode == QnUserSettingsModel::NewUser || mode == QnUserSettingsModel::OtherSettings);
-            allowedPages << SettingsPage;
-            if (m_settingsPage->isCustomAccessRights())
-            {
-                allowedPages << PermissionsPage << CamerasPage << LayoutsPage;
-                if (m_permissionsPage->rawPermissions().testFlag(Qn::GlobalEditServersPermissions))
-                    allowedPages << ServersPage;
-            }
-        }
-
         for (const auto& page : allPages())
         {
-            if (allowedPages.contains(page.key))
-            {
-                NX_ASSERT(page.enabled && page.visible);
+            if (page.enabled && page.visible)
                 page.widget->applyChanges();
-            }
-            else
-            {
-                NX_ASSERT(!page.enabled || !page.visible);
-                continue;
-            }
         }
     });
 
@@ -218,7 +218,9 @@ void QnUserSettingsDialog::updatePagesVisibility()
     bool settingsPageVisible = mode == QnUserSettingsModel::NewUser
         || mode == QnUserSettingsModel::OtherSettings;
 
-    bool customAccessRights = settingsPageVisible && m_settingsPage->isCustomAccessRights();
+    bool customAccessRights = settingsPageVisible
+        && m_settingsPage->selectedPermissions() == Qn::NoGlobalPermissions
+        && m_settingsPage->selectedUserGroup().isNull();
 
     setPageVisible(ProfilePage,     profilePageVisible);
 
@@ -228,7 +230,10 @@ void QnUserSettingsDialog::updatePagesVisibility()
     setPageVisible(LayoutsPage,     customAccessRights);
 
     bool serverPagesVisible = customAccessRights
-        && m_permissionsPage->rawPermissions().testFlag(Qn::GlobalEditServersPermissions);
+        && m_permissionsPage->selectedPermissions().testFlag(Qn::GlobalEditServersPermissions);
 
     setPageVisible(ServersPage,     serverPagesVisible);
+
+    /* Buttons state takes into account pages visibility, so we must recalculate it. */
+    updateButtonBox();
 }

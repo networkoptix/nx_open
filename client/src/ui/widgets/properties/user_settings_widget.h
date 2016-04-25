@@ -29,8 +29,9 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
-    /** Custom access rights are selected */
-    bool isCustomAccessRights() const;
+    QnUuid selectedUserGroup() const;
+    Qn::GlobalPermissions selectedPermissions() const;
+
 private:
     void updateLogin();
     void updatePassword();
@@ -40,8 +41,6 @@ private:
     void updateControlsAccess();
     void updateAccessRightsPresets();
 
-    Qn::GlobalPermissions selectedPermissions() const;
-    QnUuid selectedUserGroup() const;
 
     bool validMode() const;
 private:
