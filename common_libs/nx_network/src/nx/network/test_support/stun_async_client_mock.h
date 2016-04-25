@@ -22,21 +22,24 @@ public:
             .WillByDefault(::testing::Return(SocketAddress()));
     }
 
-    // gmock does not support move :(
-    void sendRequest(stun::Message message, RequestHandler handler) override
-    {
-        sendRequest(
-            std::move(message),
-            std::make_shared<RequestHandler>(std::move(handler)));
-    }
-
     MOCK_METHOD2(connect, void(SocketAddress, bool));
     MOCK_METHOD2(setIndicationHandler, bool(int, IndicationHandler));
     MOCK_METHOD1(ignoreIndications, bool(int));
-    MOCK_METHOD2(sendRequest, void(stun::Message, std::shared_ptr<RequestHandler>));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));
+
+    void sendRequest(stun::Message request, RequestHandler handler) override
+    {
+        QnMutexLocker lock(&m_mutex);
+        const auto it = m_requestHandlers.find(request.header.method);
+        ASSERT_EQ(request.header.messageClass, stun::MessageClass::request);
+        ASSERT_NE(it, m_requestHandlers.end());
+
+        const auto requestHandler = it->second; // copy
+        lock.unlock();
+        requestHandler(std::move(request), std::move(handler));
+    }
 
     void emulateIndication(stun::Message indication)
     {
@@ -51,6 +54,13 @@ public:
         handler(std::move(indication));
     }
 
+    typedef std::function<void(stun::Message, RequestHandler)> ServerRequestHandler;
+    void emulateRequestHandler(int message, ServerRequestHandler handler)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_requestHandlers.emplace(std::move(message), std::move(handler));
+    }
+
 private:
     bool setIndicationHandlerImpl(int type, IndicationHandler handler)
     {
@@ -59,6 +69,7 @@ private:
     }
 
     mutable QnMutex m_mutex;
+    std::map<int, ServerRequestHandler> m_requestHandlers;
     std::map<int, IndicationHandler> m_indicationHandlers;
 };
 
