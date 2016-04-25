@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="video_offline">camera ẩn</string>
+    <string name="video_loading">"kết nối..."</string>
+    <string name="video_no_signal">không có video</string>
+    <string name="video_stopped">ngưng</string>
+    <string name="video_button_rewind">Rewind</string>
+    <string name="video_live_detail">xem trực tiếp</string>
+    <string name="video_button_forward">nhanh về phía trước</string>
+    <string name="video_button_live">xem trực tiếp</string>
+    <string name="video_button_archive">LƯU TRỮ</string>
+    <string name="video_button_play_pause">Play/Pause</string>
+    <string name="datetime_full_format">MMM dd, yyyy kk:mm:ss</string>
+    <string name="datetime_live_format">Live video</string>
+    <string name="datetime_short_format">kk:mm:ss</string>
+    <string name="video_resolution">Nghị quyết</string>
+    <string name="video_transport">Giao thông vận tải</string>
+    <string name="video_live">xem trực tiếp</string>
+    <string name="video_archive">LƯU TRỮ</string>
+    <string name="video_actionbar_pin">Pin</string>
+
+</resources>

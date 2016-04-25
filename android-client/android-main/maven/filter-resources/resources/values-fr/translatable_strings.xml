@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_description">${display.product.name} est d\'une élégante simplicité à la fine pointe, avec une nouvelle approche à la gestion 
+	    de surveillance vidéo HD d\'entreprise. L\'architecture "Hyper"-Optimisée de cette nouvelle plateforme de gestion vidéo
+        fournit une évolutivité illimitée, détection et configuration automatique de nouveaux périphériques, une installation
+        simplifiée, une facilité d\'utilisation et un coût total de déploiement/possession le plus bas des solutions sur le marché
+        d\'aujourd\'hui.  Conçu par d\'éminents professionnels de l\'industrie de la vidéo IP mégapixels, ${display.product.name} répond aux 
+		principaux obstacles et limites de la gestion de vidéo HD en entreprise.</string>
+</resources>

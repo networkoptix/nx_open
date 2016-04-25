@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="video_offline">摄像机不在线</string>
+    <string name="video_loading">"连接中..."</string>
+    <string name="video_no_signal">无信号</string>
+    <string name="video_stopped">停止播放</string>
+    <string name="video_button_rewind">倒放</string>
+    <string name="video_live_detail">实时视频</string>
+    <string name="video_button_forward">快进</string>
+    <string name="video_button_live">实时</string>
+    <string name="video_button_archive">录像</string>
+    <string name="video_button_play_pause">播放/暂停</string>
+    <string name="datetime_full_format">yyyy年MM月dd日 kk:mm:ss</string>
+    <string name="datetime_live_format">实时预览</string>
+    <string name="datetime_short_format">kk:mm:ss</string>
+    <string name="video_resolution">分辨率</string>
+    <string name="video_transport">传输</string>
+    <string name="video_live">实时</string>
+    <string name="video_archive">录像</string>
+    <string name="video_actionbar_pin">锁定</string>
+
+</resources>

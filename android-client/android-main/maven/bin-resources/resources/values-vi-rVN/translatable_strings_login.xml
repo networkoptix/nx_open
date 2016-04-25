@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">lỗi không xác định</string>
+    <string name="login_error_path">Tên máy chủ không hợp lệ hoặc cổng</string>
+    <string name="login_error_protocol">Server không hỗ trợ giao thức này</string>
+    <string name="login_error_connection">Không thể kết nối đến máy chủ trên địa chỉ này</string>
+    <string name="login_error_credentials">Thông tin đăng nhập không hợp lệ</string>
+    <string name="login_error_port">cổng không hợp lệ</string>
+    <string name="login_error_brand">Máy chủ không tương thích</string>
+    <string name="login_hint">tài khoản đăng nhập</string>
+    <string name="login_caption">trương mục:</string>
+    <string name="password_caption">mật khẩu:</string>
+    <string name="password_hint">mật khẩu đăng nhập</string>
+    <string name="host_caption">tên máy chủ:</string>
+    <string name="host_hint">địa chỉ máy chủ</string>
+    <string name="port_caption">cổng:</string>
+    <string name="port_hint">cổng máy chủ</string>
+    <string name="login_progress_caption"> đăng nhập...</string>
+    <string name="login_connecting">kết nối...</string>
+    <string name="login_version_incompatible_title">Phiên bản không tương thích.</string>
+    <string name="login_version_incompatible_text">Phiên bản máy chủ là không tương thích với phiên bản này của khách hàng. Bạn có thể xem danh sách các máy ảnh nhưng không có đảm bảo rằng bạn có thể xem chúng.</string>
+	<string name="login_empty_host">Lĩnh vực máy chủ không thể để trống</string>
+	<string name="login_empty_port">Lĩnh vực cảng không thể để trống</string>
+	<string name="login_empty_login">Lĩnh vực đăng nhập không thể để trống</string>
+	<string name="login_empty_pass">Lĩnh vực mật khẩu không thể để trống</string>
+	<string name="login_title_caption">"tên đăng nhập: "</string>
+	<string name="login_title_hint">tên phiên</string>
+	<string name="login_saved_sessions">đã được lưu lại</string>
+	<string name="login_host_title">"địa chỉ máy chủ: "</string>
+	<string name="login_login_title">"tên đăng nhập: "</string>
+	<string name="login_connect">liên kết</string>
+	<string name="login_delete_confirm">xin vui lòng chắc chắn rằng nếu xóa máy chủ này từ danh sách:</string>
+</resources>

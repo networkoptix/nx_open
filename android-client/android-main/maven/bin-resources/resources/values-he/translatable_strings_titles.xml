@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_resources">מצלמות</string>
+    <string name="title_activity_video">וידאו</string>
+    <string name="title_activity_archive">ארכיון</string>
+	<string name="title_activity_sendlog">אסוף ושלח יומן</string>
+</resources>

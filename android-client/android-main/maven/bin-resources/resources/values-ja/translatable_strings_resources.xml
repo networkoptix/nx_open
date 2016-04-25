@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">オフライン表示</string>
+    <string name="menu_hide_offline">オフライン非表示</string>
+    <string name="resources_logout_offer">戻るを押してログアウトしてください</string>
+    <string name="resources_loading_title">ロード中…</string>
+    <string name="resources_loading_text">データ受信中…</string>
+    <string name="menu_clear_cache">キャッシュのクリア</string>
+    <string name="resources_tree">ツリー表示</string>
+    <string name="resources_grid">サムネイル</string>
+    <string name="resources_logout">ログアウト</string>
+
+</resources>

@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
+		<artifactId>hdwitness</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.4.1-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.4.1</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>ios-client</artifactId>
+	<packaging>pom</packaging>
+	<name>iOS Client</name>	
+
+	<properties>
+		<root.dir>..</root.dir>
+        <TARGET_SDK>iphoneos</TARGET_SDK>
+		<TARGET_NAME>consolebuildtest</TARGET_NAME>
+		<WORKSPACE>HDWitness.xcworkspace</WORKSPACE>
+		<PROJECT_NAME>consolebuildtest</PROJECT_NAME>
+
+        <VALID_ARCHS>armv7 armv7s arm64</VALID_ARCHS>
+        <DEVELOPER_NAME>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</DEVELOPER_NAME>
+        <PROVISIONING_PROFILE>../customization/default/ios-client/testing.mobileprovision</PROVISIONING_PROFILE>
+        <MAVEN_MINIMUM_IOS_VERSION>${ios.minimum_os_version}</MAVEN_MINIMUM_IOS_VERSION>
+
+		<ios.clean>false</ios.clean>
+	</properties>	
+
+	<build>
+        <plugins>	
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>auto-clean</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<excludeDefaultDirectories>true</excludeDefaultDirectories>
+							<filesets>
+								<fileset>
+									<directory>${project.build.directory}</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+								</fileset>								
+								<fileset>
+									<directory>stage/ios</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+								</fileset>	                                
+							</filesets>
+							<skip>${clean-skip}</skip>							
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>	
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>custom-resources</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>          
+								<resource>
+									<targetPath>${project.build.directory}/images</targetPath>
+									<directory>${customization.dir}/${project.artifactId}/images</directory>
+									<filtering>false</filtering>
+								</resource>		
+								<resource>
+									<targetPath>${basedir}</targetPath>
+									<directory>${basedir}/Resources</directory>
+									<filtering>true</filtering>
+								</resource>                                
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>
+            
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>prepare</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${basedir}/build.sh</executable>
+							<arguments>
+								<argument>${ios.clean}</argument>
+								<argument>prepare</argument>
+							</arguments>
+							<workingDirectory>${basedir}</workingDirectory>		
+							<skip>${build.skip}</skip>
+							<environmentVariables>
+                                <DEVELOPER_NAME_BETA>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</DEVELOPER_NAME_BETA>
+                                <PROVISIONING_PROFILE_BETA>../customization/default/ios-client/testing.mobileprovision</PROVISIONING_PROFILE_BETA>
+                                <DEVELOPER_NAME_RELEASE>${ios.sign.identity}</DEVELOPER_NAME_RELEASE>
+                                <PROVISIONING_PROFILE_RELEASE>../customization/${customization}/ios-client/production.mobileprovision</PROVISIONING_PROFILE_RELEASE>
+
+								<MAVEN_PRODUCT_NAME>${product.name}</MAVEN_PRODUCT_NAME>
+								<MAVEN_DISPLAY_PRODUCT_NAME>${display.product.name}</MAVEN_DISPLAY_PRODUCT_NAME>
+                                <MAVEN_MINIMUM_IOS_VERSION>${MAVEN_MINIMUM_IOS_VERSION}</MAVEN_MINIMUM_IOS_VERSION>
+                                <MAVEN_VERSION>${release.version}</MAVEN_VERSION>
+                                <MAVEN_BUILD_NUMBER>${buildNumber}</MAVEN_BUILD_NUMBER>                                
+								<MAVEN_PRODUCT_NAME>${product.name}</MAVEN_PRODUCT_NAME>
+                                <MAVEN_BUNDLE_IDENTIFIER>${ios.bundle_identifier}</MAVEN_BUNDLE_IDENTIFIER>
+                                <BUILD_CONFIGURATION>${build.configuration}</BUILD_CONFIGURATION>
+                                <PROJECT_BUILDDIR>${project.build.directory}</PROJECT_BUILDDIR>
+                                <BETA>${beta}</BETA>
+                                <VALID_ARCHS>${VALID_ARCHS}</VALID_ARCHS>
+
+                                <TARGET_SDK>${TARGET_SDK}</TARGET_SDK>
+                                <TARGET_NAME>${TARGET_NAME}</TARGET_NAME>
+                                <WORKSPACE>${WORKSPACE}</WORKSPACE>
+                                <PROJECT_NAME>${PROJECT_NAME}</PROJECT_NAME>
+                                <NAMESPACE_ADDITIONAL>${namespace.additional}</NAMESPACE_ADDITIONAL>
+							</environmentVariables>                 							
+						</configuration>
+					</execution>
+					<execution>
+						<id>xcode</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${basedir}/build.sh</executable>
+							<arguments>
+								<argument>${ios.clean}</argument>
+							</arguments>
+							<workingDirectory>${basedir}</workingDirectory>		
+							<skip>${build.skip}</skip>
+							<environmentVariables>
+                                <DEVELOPER_NAME_BETA>iPhone Distribution: Network Optix, Inc. (L6FE34GJWM)</DEVELOPER_NAME_BETA>
+                                <PROVISIONING_PROFILE_BETA>../customization/default/ios-client/testing.mobileprovision</PROVISIONING_PROFILE_BETA>
+                                <DEVELOPER_NAME_RELEASE>${ios.sign.identity}</DEVELOPER_NAME_RELEASE>
+                                <PROVISIONING_PROFILE_RELEASE>../customization/${customization}/ios-client/production.mobileprovision</PROVISIONING_PROFILE_RELEASE>
+
+								<MAVEN_PRODUCT_NAME>${product.name}</MAVEN_PRODUCT_NAME>
+								<MAVEN_DISPLAY_PRODUCT_NAME>${display.product.name}</MAVEN_DISPLAY_PRODUCT_NAME>
+                                <MAVEN_MINIMUM_IOS_VERSION>${MAVEN_MINIMUM_IOS_VERSION}</MAVEN_MINIMUM_IOS_VERSION>
+                                <MAVEN_VERSION>${release.version}</MAVEN_VERSION>
+                                <MAVEN_BUILD_NUMBER>${buildNumber}</MAVEN_BUILD_NUMBER>                                
+								<MAVEN_PRODUCT_NAME>${product.name}</MAVEN_PRODUCT_NAME>
+                                <MAVEN_BUNDLE_IDENTIFIER>${ios.bundle_identifier}</MAVEN_BUNDLE_IDENTIFIER>
+                                <BUILD_CONFIGURATION>${build.configuration}</BUILD_CONFIGURATION>
+                                <PROJECT_BUILDDIR>${project.build.directory}</PROJECT_BUILDDIR>
+                                <BETA>${beta}</BETA>
+                                <VALID_ARCHS>${VALID_ARCHS}</VALID_ARCHS>
+
+                                <TARGET_SDK>${TARGET_SDK}</TARGET_SDK>
+                                <TARGET_NAME>${TARGET_NAME}</TARGET_NAME>
+                                <WORKSPACE>${WORKSPACE}</WORKSPACE>
+                                <PROJECT_NAME>${PROJECT_NAME}</PROJECT_NAME>
+                                <NAMESPACE_ADDITIONAL>${namespace.additional}</NAMESPACE_ADDITIONAL>
+							</environmentVariables>                 							
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>			
+		</plugins>	
+	</build>		
+</project>
