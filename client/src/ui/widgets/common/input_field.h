@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 
 class QnInputFieldPrivate;
+class AbstractAccessor;
 
 /**
  * Common class for various input fields.
@@ -20,8 +21,6 @@ class QnInputField : public QWidget
 public:
     QnInputField(QWidget* parent = nullptr);
     virtual ~QnInputField();
-
-    QLabel* titleLabel() const;
 
     QString title() const;
     void setTitle(const QString& value);
@@ -47,10 +46,13 @@ public:
     bool isValid() const;
     void setValidator(ValidateFunction validator);
 
+    static AbstractAccessor* createLabelWidthAccessor();
+
 signals:
     void textChanged(const QString& text);
 
 private:
+    friend class LabelWidthAccessor;
     QScopedPointer<QnInputFieldPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnInputField)
     Q_DISABLE_COPY(QnInputField)

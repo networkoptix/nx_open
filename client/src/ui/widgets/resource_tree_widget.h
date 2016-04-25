@@ -27,9 +27,6 @@ namespace Qn {
         /** Last row is hidden if there is not enough space to fully show it. */
         HideLastRow = 0x1,
 
-        /** Set background opacity to items. */
-        BackgroundOpacity = 0x2,
-
         /** Set Qt::BypassGraphicsProxyWidget flag to items. */
         BypassGraphicsProxy = 0x4
     };
@@ -38,7 +35,7 @@ namespace Qn {
 
 class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
-    
+
     typedef QWidget base_type;
 
 public:

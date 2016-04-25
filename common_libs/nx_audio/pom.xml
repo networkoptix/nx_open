@@ -98,7 +98,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>bpi</value>
+                    <value>tx1</value>
                 </property>
             </activation>
             <properties>
