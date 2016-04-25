@@ -2,21 +2,44 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/unused.h"
 #include "core/resource_management/resource_pool.h"
+#include <camera/camera_pool.h>
 
 namespace
 {
-    const QString kChooseClientAutomatically("auto");
-
-    QnMutex* getLock(const QString& key)
+    QnMutex* getLock(const QnUuid& key)
     {
         static QnMutex internalMutex;
-        static QMap<QString, std::shared_ptr<QnMutex>> locks;
+        static QMap<QnUuid, std::shared_ptr<QnMutex>> locks;
         
         QnMutexLocker lock(&internalMutex);
         std::shared_ptr<QnMutex>& value = locks[key];
         if (value == nullptr)
             value.reset(new QnMutex());
         return value.get();
+    }
+
+    QnVideoCameraPtr getTransmitSource(const QnUuid& clientId)
+    {
+        for (const auto& res: qnResPool->getResourcesWithFlag(Qn::desktop_camera))
+        {
+            if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId || 
+                res->getId() == clientId ||
+                clientId.isNull())
+            {
+                return qnCameraPool->getVideoCamera(res);
+            }
+        }
+        return QnVideoCameraPtr();
+    }
+
+    QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId)
+    {
+        auto resource = qnResPool->getResourceById<QnSecurityCamResource>(resourceId);
+        if (!resource)
+            return QnSecurityCamResourcePtr();
+        if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+            return QnSecurityCamResourcePtr();
+        return resource;
     }
 }
 
@@ -25,43 +48,13 @@ QnAudioStreamerPool::QnAudioStreamerPool()
 
 }
 
-QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& clientId) const
-{
-    auto sourceCamResources = qnResPool->getResourcesWithFlag(Qn::desktop_camera);
-
-    QnVideoCameraPtr sourceCam;
-    for (const auto& res: sourceCamResources)
-    {
-        if ((res->getUniqueId() == clientId) || clientId == kChooseClientAutomatically)
-        {
-            sourceCam = qnCameraPool->getVideoCamera(res);
-            break;
-        }
-    }
-
-    return sourceCam;
-}
-
-QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QString& resourceId) const
-{
-    auto resource = qnResPool->getResourceById<QnSecurityCamResource>(QnUuid::fromStringSafe(resourceId));
-
-    if (!resource)
-        return QnSecurityCamResourcePtr(0);
-
-    if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-        return QnSecurityCamResourcePtr(0);
-
-    return resource;
-}
-
-bool QnAudioStreamerPool::startStopStreamToResource(const QString& clientId, const QString& resourceId, Action action, QString &error)
+bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error)
 {
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
     {
         error = lit("Can't find resource with id '%1'")
-            .arg(resourceId);
+            .arg(resourceId.toString());
         return false;
     }
 
@@ -69,42 +62,32 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QString& clientId, con
     if (!sourceCam)
     {
         error = lit("Can't find client with id '%1'")
-            .arg(clientId);
+            .arg(clientId.toString());
         return false;
     }
 
-    auto reader = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
-    if(!reader)
+    QnLiveStreamProviderPtr desktopDataProvider = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
+    if(!desktopDataProvider)
     {
         error = lit("Unable to obtaine live reader for client '%1'")
-            .arg(clientId);
+            .arg(clientId.toString());
         return false;
     }
 
-    auto transmitter = resource->getAudioTransmitter();
+    QnAudioTransmitterPtr transmitter = resource->getAudioTransmitter();
     if (!transmitter)
     {
         error = lit("Unable to obtain audio transmitter for resource '%1'")
-            .arg(resourceId);
+            .arg(resourceId.toString());
         return false;
     }
 
     // This lock avoid to start and stop same transmitter in the same time
     QnMutexLocker lock(getLock(resourceId));
     if (action == Action::Start)
-    {
-        transmitter->stop(); //< in case if still stopping from a previous call
-        sourceCam->inUse(transmitter.get());
-        reader->addDataProcessor(transmitter.get());
-        transmitter->start();
-        reader->startIfNotRunning();
-    }
+        transmitter->subscribe(desktopDataProvider);
     else
-    {
-        sourceCam->notInUse(transmitter.get());
-        transmitter->pleaseStop();
-        reader->removeDataProcessor(transmitter.get());
-    }
+        transmitter->unsubscribe(desktopDataProvider);
 
     return true;
 }

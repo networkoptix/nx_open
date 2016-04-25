@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/dataconsumer/abstract_data_consumer.h>
+#include <core/dataprovider/live_stream_provider.h>
 
 struct QnOutputAudioFormat
 {
@@ -55,6 +56,10 @@ public:
      * Returns true if transmitter is ready to use
      */
     virtual bool isInitialized() const = 0;
+
+    void unsubscribe(QnLiveStreamProviderPtr desktopDataProvider);
+    void subscribe(QnLiveStreamProviderPtr desktopDataProvider);
 private:
     QnMutex m_mutex;
+    QnLiveStreamProviderPtr m_dataProvider;
 };
