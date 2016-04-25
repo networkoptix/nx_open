@@ -48,6 +48,7 @@ private:
         const QUrl& url,
         const QAuthenticator& auth);
 
+    bool isDwOrIsd(const QString& vendorName) const;
 };
 
 #endif // #ifdef ENABLE_ISD

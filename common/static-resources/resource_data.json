@@ -19,19 +19,15 @@
     "data": [
         {
             "keys": [
-                "ISD|*","DW|*"
+                "DW|*","ISD|*"
             ],
             "possibleDefaultCredentials": [
-                {
-                    "user": "root",
-                    "password": "admin"
-                },
                 {
                     "user": "admin",
                     "password": "admin"
                 }
             ]
-        },
+        },       
         {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
@@ -116,9 +112,12 @@
         },
         {
             "keys": [
-                "ISD|XPM-FL72-48MP"
+                "ISD|XPM-FL72-48MP",
+                "DW|XPM-FL72-48MP",
+                "DW|DWC-PZV2M72T"
             ],
-            "isDW": true
+            "isDW": true,
+            "showUrl": true
         },
         {
             "keys": [
