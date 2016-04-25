@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>439</width>
-    <height>403</height>
+    <height>381</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -15,7 +15,7 @@
     <number>8</number>
    </property>
    <property name="leftMargin">
-    <number>16</number>
+    <number>40</number>
    </property>
    <property name="topMargin">
     <number>16</number>
@@ -27,49 +27,60 @@
     <number>16</number>
    </property>
    <item>
-    <layout class="QGridLayout" name="propertiesLayout">
-     <property name="verticalSpacing">
-      <number>8</number>
-     </property>
-     <item row="0" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="loginLabel">
-       <property name="text">
-        <string>Login</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="groupLineEdit"/>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="loginLineEdit"/>
-     </item>
-     <item row="1" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="groupLabel">
-       <property name="text">
-        <string>Group</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QnInputField" name="loginInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="nameInputField" native="true"/>
    </item>
    <item>
     <widget class="QnInputField" name="emailInputField" native="true"/>
    </item>
    <item>
-    <widget class="QnInputField" name="newPasswordInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
-   </item>
-   <item>
-    <widget class="QnInputField" name="currentPasswordInputField" native="true"/>
+    <widget class="QWidget" name="changePasswordWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="changePasswordSpacerLabel"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="changePasswordButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Change Password</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -79,19 +90,42 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="permissionsLabel">
-     <property name="text">
-      <string notr="true">&lt;table&gt;
+    <widget class="QnInputField" name="groupInputField" native="true"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="permissionsLayouyt">
+     <item>
+      <widget class="QLabel" name="permissionsSpacerLabel"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="permissionsLabel">
+       <property name="text">
+        <string notr="true">&lt;table&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;3&lt;/b&gt; / 6&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Permissions&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;18&lt;/b&gt; / 91&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Cameras&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;2&lt;/b&gt; / 8&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Layouts&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;b&gt;0&lt;/b&gt; / 3&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;Servers&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::RichText</enum>
-     </property>
-    </widget>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">

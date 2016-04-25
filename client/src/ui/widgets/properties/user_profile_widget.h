@@ -35,9 +35,9 @@ private:
     void updateControlsAccess();
     void updateAccessRightsPresets();
 
-    QString getUserGroup() const;
     bool validMode() const;
 private:
     QScopedPointer<Ui::UserProfileWidget> ui;
     QnUserSettingsModel* const m_model;
+    QString m_newPassword;
 };

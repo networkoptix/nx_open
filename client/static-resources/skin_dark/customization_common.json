@@ -173,6 +173,24 @@
         }
     },
 
+    "QnResourceTreeWidget": {
+        "palette": {
+            "default": {
+                "midlight":         "dark8.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light12",
+                "highlightedText":  "light4",
+                "brightText":       "brand_core"
+            },
+            "inactive": {
+                "midlight":         "dark8.setAlpha(102)",
+                "highlight":        "dark8.setAlpha(102)",
+                "text":             "dark17",
+                "highlightedText":  "light10",
+                "brightText":       "brand_d3"
+            }
+        }
+    },
 
     "QnPanel": {
         "palette": {
@@ -234,8 +252,8 @@
 
             "pastBookmark": "blue12.setAlpha(204)",
             "futureBookmark": "blue12.setAlpha(204)",
-            "pastBookmarkBound": "link",
-            "futureBookmarkBound": "link",
+            "pastBookmarkBound": "brand_core",
+            "futureBookmarkBound": "brand_core",
 
             "tickmarkLines": [ "light10", "dark17", "dark13", "dark9" ],
             "tickmarkText" : [ "light8", "light16", "dark15" ]

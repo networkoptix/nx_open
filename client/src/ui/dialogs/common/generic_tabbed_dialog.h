@@ -71,6 +71,11 @@ protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
     /**
+    * @brief isPageVisible                      Check if page is visible by its key.
+    */
+    bool isPageVisible(int key) const;
+
+    /**
     * @brief setPageVisible                    Show or hide the page by its key.
     */
     void setPageVisible(int key, bool visible);

@@ -2,14 +2,14 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/delegates/abstract_permissions_delegate.h>
+#include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserSettingsModel : public QObject, public QnWorkbenchContextAware, public QnAbstractPermissionsDelegate
+class QnUserSettingsModel : public QnAbstractPermissionsModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QObject base_type;
+    typedef QnAbstractPermissionsModel base_type;
 public:
     /** User editing mode */
     enum Mode
@@ -35,6 +35,13 @@ public:
 
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
+
+    QString groupName() const;
+    QString groupDescription() const;
+
+private:
+    QString getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const;
+
 private:
     Mode m_mode;
     QnUserResourcePtr m_user;

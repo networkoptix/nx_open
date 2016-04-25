@@ -506,7 +506,7 @@
             <properties>
                 <machine.type>X86</machine.type>
             </properties>
-        </profile>
+        </profile>        
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -776,6 +776,9 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
+                <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
             </properties>
@@ -891,6 +894,7 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
+                <qt.spec>linux-g++-4.9-64</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -909,7 +913,8 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
+                <qt.spec>linux-g++-4.9-32</qt.spec>
             </properties>
         </profile>
         <profile>

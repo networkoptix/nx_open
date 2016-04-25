@@ -1,0 +1,9 @@
+{ 
+    "QnGradientBackgroundPainter": {
+        "colors": {
+            "_": "Background gradient colors.",
+            
+            "normal": "black"
+        }
+    }
+}

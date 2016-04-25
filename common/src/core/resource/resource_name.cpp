@@ -6,7 +6,32 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
-QString extractHost(const QString &url)
+namespace
+{
+    void getResourceDisplayInformation(const QnResourcePtr& resource, bool queryHost, QString& name, QString& host)
+    {
+        if (!resource)
+        {
+            name = QString();
+            host = QString();
+            return;
+        }
+
+        name = resource->getName();
+        Qn::ResourceFlags flags = resource->flags();
+
+        if (flags.testFlag(Qn::live_cam)) /* Quick check */
+            if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
+                name = camera->getUserDefinedName();
+
+        if (queryHost && ((flags & Qn::network) || (flags & Qn::server && flags & Qn::remote)))
+            host = extractHost(resource->getUrl());
+        else
+            host = QString();
+    }
+};
+
+QString extractHost(const QString& url)
 {
     /* Don't go through QHostAddress/QUrl constructors as it is SLOW.
      * Speed is important for event log. */
@@ -16,27 +41,27 @@ QString extractHost(const QString &url)
     int endPos = url.indexOf(L':', startPos);
     if (endPos == -1)
         endPos = url.indexOf(L'/', startPos); /* No port, but we may still get '/' after address. */
+
     endPos = endPos == -1 ? url.size() : endPos;
 
     return url.mid(startPos, endPos - startPos);
 }
 
-QString getFullResourceName(const QnResourcePtr &resource, bool showIp) {
+void getResourceDisplayInformation(const QnResourcePtr& resource, QString& name, QString& host)
+{
+    getResourceDisplayInformation(resource, true, name, host);
+}
+
+QString getFullResourceName(const QnResourcePtr& resource, bool showIp)
+{
     if (!resource)
         return QString();
 
-    QString baseName = resource->getName();
-    Qn::ResourceFlags flags = resource->flags();
+    QString baseName, host;
+    getResourceDisplayInformation(resource, showIp, baseName, host);
 
-    if (flags.testFlag(Qn::live_cam)) /* Quick check */
-        if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
-            baseName = camera->getUserDefinedName();
+    if (!host.isEmpty())
+        return QString(lit("%1 (%2)")).arg(baseName, host);
 
-
-    if (showIp && ((flags & Qn::network) || (flags & Qn::server && flags & Qn::remote))) {
-        QString host = extractHost(resource->getUrl());
-        if(!host.isEmpty())
-            return QString(lit("%1 (%2)")).arg(baseName, host);
-    }
     return baseName;
 }
