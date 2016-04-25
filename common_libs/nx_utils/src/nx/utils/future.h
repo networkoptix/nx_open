@@ -160,22 +160,22 @@ public:
     template<class RRef>
     void set_value(RRef&& value)
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        if (m_satisfied)
+        std::unique_lock<std::mutex> lk(this->m_mutex);
+        if (this->m_satisfied)
             throw std::future_error(std::future_errc::promise_already_satisfied);
         m_value = std::forward<RRef>(value);
-        m_satisfied = true;
-        m_cond.notify_all();
+        this->m_satisfied = true;
+        this->m_cond.notify_all();
     }
 
     T get()
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        wait(lk);
-        if (m_exception)
+        std::unique_lock<std::mutex> lk(this->m_mutex);
+        this->wait(lk);
+        if (this->m_exception)
         {
-            auto except = std::move(*m_exception);
-            m_exception.reset();
+            auto except = std::move(*this->m_exception);
+            this->m_exception.reset();
             std::rethrow_exception(std::move(except));
         }
         auto value = std::move(*m_value);
@@ -380,16 +380,16 @@ public:
 
     void set_value(const R& value)
     {
-        if (!m_sharedState)
+        if (!this->m_sharedState)
             throw std::future_error(std::future_errc::no_state);
-        m_sharedState->set_value(value);
+        this->m_sharedState->set_value(value);
     }
 
     void set_value(R&& value)
     {
-        if (!m_sharedState)
+        if (!this->m_sharedState)
             throw std::future_error(std::future_errc::no_state);
-        m_sharedState->set_value(std::move(value));
+        this->m_sharedState->set_value(std::move(value));
     }
 };
 
@@ -405,9 +405,9 @@ public:
 
     void set_value()
     {
-        if (!m_sharedState)
+        if (!this->m_sharedState)
             throw std::future_error(std::future_errc::no_state);
-        m_sharedState->set_value();
+        this->m_sharedState->set_value();
     }
 };
 
