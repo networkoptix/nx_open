@@ -1,0 +1,14 @@
+{
+    "globals": {
+        "custom_blue":            "#00A1D4",
+        "opaqueSelection":			"custom_blue"
+    },
+   
+    "QnGradientBackgroundPainter": {
+        "colors": {
+            "_": "Background gradient colors.",
+            
+            "normal": "custom_blue.setAlpha(48)"
+        }
+    }
+}
