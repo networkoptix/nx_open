@@ -9,6 +9,7 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+#include <nx/utils/future.h>
 
 
 namespace nx {
@@ -220,7 +221,7 @@ static void testTunnelConnect(bool isSuccessExpected)
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(500));
 
-    std::promise<SystemError::ErrorCode> result;
+    nx::utils::promise<SystemError::ErrorCode> result;
     client->connectAsync(
         network::test::kServerAddress,
         [&](SystemError::ErrorCode c){ result.set_value(c); });
