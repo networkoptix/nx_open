@@ -124,7 +124,10 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
                 option.font.setWeight(QFont::Normal);
                 QFontMetrics extraMetrics(option.font);
 
-                textRect.setLeft(actualRect.right() + kTextPadding*2);
+                /* If name was empty, actualRect will be invalid: */
+                int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
+
+                textRect.setLeft(startPos + kTextPadding*2);
                 QString elidedHost = extraMetrics.elidedText(host, option.textElideMode, textRect.width(), kTextFlags);
 
                 painter->setFont(option.font);

@@ -819,6 +819,8 @@
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
                 <qt.spec/>
+                <!-- TODO get rid of this variable. We already have corresponding package name in common/pom.xml -->
+                <gcc.version>4.8.3</gcc.version>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->

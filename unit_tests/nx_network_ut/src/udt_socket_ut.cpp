@@ -316,7 +316,7 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
                 << SystemError::toString(code).toStdString();
 
             server.reset(new RandomDataTcpServer(
-                TestTrafficLimitType::none, 0, TestTransmissionMode::echo));
+                TestTrafficLimitType::none, 0, TestTransmissionMode::pong));
             server->setLocalAddress(serverSocket->getLocalAddress());
             ASSERT_TRUE(server->start());
 
@@ -326,7 +326,7 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
                 serverAddress, kMaxSimultaneousConnections,
                 TestTrafficLimitType::incoming, kBytesToEcho,
                 ConnectionsGenerator::kInfiniteConnectionCount,
-                TestTransmissionMode::echoTest));
+                TestTransmissionMode::ping));
 
             generator->setLocalAddress(clientSocket->getLocalAddress());
             generator->start();
