@@ -23,7 +23,7 @@ class ProxyVideoDecoder
     public AbstractVideoDecoder
 {
 public:
-    ProxyVideoDecoder();
+    ProxyVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
 
     virtual ~ProxyVideoDecoder();
 
@@ -32,8 +32,6 @@ public:
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
         QVideoFramePtr* outDecodedFrame) override;
-
-    virtual void setAllocator(AbstractResourceAllocator* allocator) override;
 
 private:
     std::shared_ptr<ProxyVideoDecoderPrivate> d;

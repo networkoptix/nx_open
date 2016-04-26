@@ -18,9 +18,6 @@ static const bool ENABLE_LARGE_ONLY = true; //< isCompatible() will allow only w
 #include "aligned_mem_video_buffer.h"
 #include "abstract_resource_allocator.h"
 
-// TODO mike: Remove when frame size is passed from SeamlessVideoDecoder.
-#include <utils/media/jpeg_utils.h>
-#include <utils/media/h264_utils.h>
 #include <nx/utils/log/log.h>
 
 #include "proxy_video_decoder_utils.cxx"
@@ -56,9 +53,10 @@ namespace media {
 //-------------------------------------------------------------------------------------------------
 // ProxyVideoDecoder
 
-ProxyVideoDecoder::ProxyVideoDecoder()
+ProxyVideoDecoder::ProxyVideoDecoder(
+    const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
-    d(new ProxyVideoDecoderPrivate(this))
+    d(new ProxyVideoDecoderPrivate(this, allocator, resolution))
 {
     static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
         "ProxyVideoDecoder: Insufficient padding size");
@@ -92,30 +90,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
 int ProxyVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* decodedFrame)
 {
-    decodedFrame->reset();
-
-    if (!compressedVideoData && !d->isInitialized())
-        return 0;
-
-    if (!d->isInitialized())
-    {
-        NX_CRITICAL(compressedVideoData);
-        NX_CRITICAL(compressedVideoData->data());
-        NX_CRITICAL(compressedVideoData->dataSize() > 0);
-
-        // TODO mike: Pass frame size from SeamlessVideoDecoder.
-        QSize frameSize;
-        extractSpsPps(compressedVideoData, &frameSize, nullptr);
-
-        d->initialize(frameSize);
-    }
-
     return d->decode(compressedVideoData, decodedFrame);
-}
-
-void ProxyVideoDecoder::setAllocator(AbstractResourceAllocator* allocator)
-{
-    d->setAllocator(allocator);
 }
 
 } // namespace media

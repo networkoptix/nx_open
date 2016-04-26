@@ -125,11 +125,14 @@ void FfmpegVideoDecoderPrivate::closeCodecContext()
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-FfmpegVideoDecoder::FfmpegVideoDecoder()
+FfmpegVideoDecoder::FfmpegVideoDecoder(
+    const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
 {
+    (void) allocator;
+    (void) resolution;
     static InitFfmpegLib init;
 }
 

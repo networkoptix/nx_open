@@ -7,62 +7,32 @@ private:
     ProxyVideoDecoder* q;
 
 public:
-    ProxyVideoDecoderPrivate(ProxyVideoDecoder* owner)
+    ProxyVideoDecoderPrivate(
+        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
     :
         q(owner),
-        m_initialized(false),
-        m_proxyDecoder(nullptr)
+        m_frameSize(resolution),
+        m_proxyDecoder(ProxyDecoder::create(resolution.width(), resolution.height()))
     {
+        (void) allocator;
     }
 
     ~ProxyVideoDecoderPrivate()
     {
     }
 
-    void setAllocator(AbstractResourceAllocator* /*allocator*/)
-    {
-    }
-
-    bool isInitialized()
-    {
-        return m_initialized;
-    }
-
     /**
-    * If initialization fails, fail with 'assert'.
-    */
-    void initialize(const QSize& frameSize);
-
-    /**
-    * @param compressedVideoData Has non-null data().
-    * @return Value with the same semantics as AbstractVideoDecoder::decode().
-    */
+     * @param compressedVideoData Has non-null data().
+     * @return Value with the same semantics as AbstractVideoDecoder::decode().
+     */
     int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
         QVideoFramePtr* outDecodedFrame);
 
 private:
-    bool m_initialized;
-
-    std::shared_ptr<ProxyDecoder> m_proxyDecoder;
-
     QSize m_frameSize;
-
-    // TODO mike: REMOVE
-    bool m_once = false;
+    std::shared_ptr<ProxyDecoder> m_proxyDecoder;
 };
-
-void ProxyVideoDecoderPrivate::initialize(const QSize& frameSize)
-{
-    QLOG("ProxyVideoDecoderPrivate<yuv>::initialize() BEGIN");
-    NX_ASSERT(!m_initialized);
-    m_initialized = true;
-
-    m_frameSize = frameSize;
-    m_proxyDecoder.reset(ProxyDecoder::create(m_frameSize.width(), m_frameSize.height()));
-
-    QLOG("ProxyVideoDecoderPrivate<yuv>::initialize() END");
-}
 
 int ProxyVideoDecoderPrivate::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
@@ -94,29 +64,15 @@ int ProxyVideoDecoderPrivate::decode(
         result = m_proxyDecoder->decodeToYuvNative(
             compressedFrame.get(), &outPts, &nativeBuffer, &nativeBufferSize);
         TIME_END
-        
+
         if (result > 0)
         {
             NX_CRITICAL(nativeBuffer);
             NX_CRITICAL(nativeBufferSize > 0);
 
-// TODO mike: REMOVE
-#if 0
-///memset(nativeBuffer, 0, nativeBufferSize);
-//for (int i = 0; i < nativeBufferSize; ++i)
-//    nativeBuffer[i] = rand();
-static uint8_t* tempBuf = (uint8_t*) malloc(1920 * 1080 * 4 + 1000);
-if (!m_once)
-{
-    m_once = true;
-    memcpy(tempBuf, nativeBuffer, nativeBufferSize);
-}
-nativeBuffer = tempBuf;
-#endif // 0
-
             const QVideoFrame::PixelFormat Format_Tiled32x32NV12 =
                 QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
-  
+
             quint8* srcData[4];
             srcData[0] = (quint8*) nativeBuffer;
             srcData[1] = srcData[0] + qPower2Ceil(
@@ -125,8 +81,8 @@ nativeBuffer = tempBuf;
             int srcLineSize[4];
             srcLineSize[0] = srcLineSize[1] = qPower2Ceil((unsigned) m_frameSize.width(), 32);
 
-            auto alignedBuffer = new AlignedMemVideoBuffer(srcData, srcLineSize, 2); //< two planes buffer
-            outDecodedFrame->reset(new QVideoFrame(alignedBuffer, m_frameSize, Format_Tiled32x32NV12));
+            auto buffer = new AlignedMemVideoBuffer(srcData, srcLineSize, /*planeCount */ 2);
+            outDecodedFrame->reset(new QVideoFrame(buffer, m_frameSize, Format_Tiled32x32NV12));
         }
     }
     else

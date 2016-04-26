@@ -40,8 +40,7 @@ public:
      */
     template <class Decoder>
     void addPlugin(
-        std::shared_ptr<AbstractResourceAllocator> allocator =
-        std::shared_ptr<AbstractResourceAllocator>(),
+        ResourceAllocatorPtr allocator = ResourceAllocatorPtr(),
         int maxUseCount = std::numeric_limits<int>::max())
     {
         m_plugins.push_back(MetadataImpl<Decoder>(allocator, maxUseCount));
@@ -50,15 +49,17 @@ public:
 private:
     struct Metadata
     {
-        Metadata():
+        Metadata()
+        :
             useCount(0),
             maxUseCount(std::numeric_limits<int>::max())
         {
         }
 
-        std::function<AbstractVideoDecoder* ()> instance;
-        std::function<bool(const CodecID codec, const QSize& resolution)> isCompatible;
-        std::shared_ptr<AbstractResourceAllocator> allocator;
+        std::function<AbstractVideoDecoder* (
+            const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
+        std::function<bool (const CodecID codec, const QSize& resolution)> isCompatible;
+        ResourceAllocatorPtr allocator;
         int useCount;
         int maxUseCount;
     };
@@ -66,12 +67,12 @@ private:
     template <class Decoder>
     struct MetadataImpl: public Metadata
     {
-        MetadataImpl(std::shared_ptr<AbstractResourceAllocator> allocator, int maxUseCount)
+        MetadataImpl(ResourceAllocatorPtr allocator, int maxUseCount)
         {
-            instance =
-                []()
+            createVideoDecoder =
+                [](const ResourceAllocatorPtr& allocator, const QSize& resolution)
                 {
-                    return new Decoder();
+                    return new Decoder(allocator, resolution);
                 };
             isCompatible = &Decoder::isCompatible;
             this->allocator = std::move(allocator);

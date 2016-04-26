@@ -6,31 +6,19 @@ private:
     ProxyVideoDecoder* q;
 
 public:
-    ProxyVideoDecoderPrivate(ProxyVideoDecoder* owner)
+    ProxyVideoDecoderPrivate(
+        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
     :
         q(owner),
-        m_initialized(false),
-        m_proxyDecoder(nullptr)
+        m_frameSize(resolution),
+        m_proxyDecoder(ProxyDecoder::create(resolution.width(), resolution.height()))
     {
+        (void) allocator;
     }
 
     ~ProxyVideoDecoderPrivate()
     {
     }
-
-    void setAllocator(AbstractResourceAllocator* /*allocator*/)
-    {
-    }
-
-    bool isInitialized()
-    {
-        return m_initialized;
-    }
-
-    /**
-     * If initialization fails, fail with 'assert'.
-     */
-    void initialize(const QSize& frameSize);
 
     /**
      * @param compressedVideoData Has non-null data().
@@ -44,14 +32,11 @@ private:
     class VideoBuffer;
 
 private:
-    bool m_initialized;
-
-    std::shared_ptr<ProxyDecoder> m_proxyDecoder;
-
-    QSize m_frameSize;
+    void displayDecodedFrame(void* frameHandle);
 
 private:
-    void displayDecodedFrame(void* frameHandle);
+    QSize m_frameSize;
+    std::shared_ptr<ProxyDecoder> m_proxyDecoder;
 };
 
 class ProxyVideoDecoderPrivate::VideoBuffer
@@ -105,18 +90,6 @@ private:
     void* m_frameHandle;
     std::weak_ptr<ProxyVideoDecoderPrivate> m_owner;
 };
-
-void ProxyVideoDecoderPrivate::initialize(const QSize& frameSize)
-{
-    QLOG("ProxyVideoDecoderPrivate<display>::initialize() BEGIN");
-    NX_ASSERT(!m_initialized);
-    m_initialized = true;
-
-    m_frameSize = frameSize;
-    m_proxyDecoder.reset(ProxyDecoder::create(m_frameSize.width(), m_frameSize.height()));
-
-    QLOG("ProxyVideoDecoderPrivate<display>::initialize() END");
-}
 
 int ProxyVideoDecoderPrivate::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)

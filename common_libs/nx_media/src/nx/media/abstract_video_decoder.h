@@ -4,6 +4,7 @@
 #include <QtMultimedia/QVideoFrame>
 #include <QtGui/QOpenGLContext>
 
+#include "abstract_resource_allocator.h"
 #include <nx/streaming/video_data_packet.h>
 
 #include "media_fwd.h"
@@ -11,19 +12,17 @@
 namespace nx {
 namespace media {
 
-/*
-* Interface for video decoder implementation.
-*/
+/**
+ * Interface for video decoder implementation. Each derived class should provide a constructor with
+ * the following signature:
+ * <pre> ...VideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution); </pre>
+ *
+ */
 class AbstractVideoDecoder: public QObject
 {
     Q_OBJECT
 public:
     virtual ~AbstractVideoDecoder() = default;
-
-    virtual void setAllocator(AbstractResourceAllocator* allocator)
-    {
-        (void) allocator;
-    }
 
     /**
      * This function should be overridden despite static keyword. Otherwise it is a compile error.

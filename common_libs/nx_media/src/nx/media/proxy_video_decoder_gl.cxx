@@ -12,17 +12,20 @@ private:
     ProxyVideoDecoder* q;
 
 public:
-    ProxyVideoDecoderPrivate(ProxyVideoDecoder* owner)
+    ProxyVideoDecoderPrivate(
+        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
     :
         q(owner),
-        m_allocator(nullptr),
-        m_initialized(false),
-        m_proxyDecoder(nullptr),
+        m_frameSize(resolution),
+        m_allocator(allocator),
+        m_proxyDecoder(ProxyDecoder::create(resolution.width(), resolution.height())),
         m_program(nullptr),
         m_yTex(QOpenGLTexture::Target2D),
         m_uTex(QOpenGLTexture::Target2D),
         m_vTex(QOpenGLTexture::Target2D)
     {
+        // Currently, only even frame dimensions are supported due to UV having half-res.
+        NX_CRITICAL(m_frameSize.width() % 2 == 0 || m_frameSize.height() % 2 == 0);
     }
 
     ~ProxyVideoDecoderPrivate()
@@ -52,26 +55,6 @@ public:
     }
 
     /**
-     * Should be called exactly once before initialize().
-     */
-    void setAllocator(AbstractResourceAllocator* allocator)
-    {
-        NX_ASSERT(allocator);
-        NX_ASSERT(!m_allocator);
-        m_allocator = allocator;
-    }
-
-    bool isInitialized()
-    {
-        return m_initialized;
-    }
-
-    /**
-     * If initialization fails, fail with 'assert'.
-     */
-    void initialize(const QSize& frameSize);
-
-    /**
      * @param compressedVideoData Has non-null data().
      * @return Value with the same semantics as AbstractVideoDecoder::decode().
      */
@@ -94,18 +77,16 @@ private:
     void renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo);
 
 private:
-    AbstractResourceAllocator* m_allocator;
-    bool m_initialized;
-
+    QSize m_frameSize;
+    ResourceAllocatorPtr m_allocator;
     std::unique_ptr<ProxyDecoder> m_proxyDecoder;
 
     std::unique_ptr<QOffscreenSurface> m_offscreenSurface;
+
     std::unique_ptr<QOpenGLContext> m_threadGlCtx;
-
     std::unique_ptr<QOpenGLShaderProgram> m_program;
-    std::unique_ptr<FboManager> m_fboManager;
 
-    QSize m_frameSize;
+    std::unique_ptr<FboManager> m_fboManager;
 
     QOpenGLTexture m_yTex;
     QOpenGLTexture m_uTex;
@@ -171,22 +152,6 @@ private:
     std::weak_ptr<ProxyVideoDecoderPrivate> m_owner;
     ConstYuvBufferPtr m_yuvBuffer;
 };
-
-void ProxyVideoDecoderPrivate::initialize(const QSize& frameSize)
-{
-    QLOG("ProxyVideoDecoderPrivate<gl>::initialize() BEGIN");
-    NX_ASSERT(!m_initialized);
-    NX_CRITICAL(m_allocator);
-    m_initialized = true;
-
-    m_frameSize = frameSize;
-    // Currently, only even frame dimensions are supported due to UV having half-res.
-    NX_CRITICAL(m_frameSize.width() % 2 == 0 || m_frameSize.height() % 2 == 0);
-
-    m_proxyDecoder.reset(ProxyDecoder::create(m_frameSize.width(), m_frameSize.height()));
-
-    QLOG("ProxyVideoDecoderPrivate<gl>::initialize() END");
-}
 
 void ProxyVideoDecoderPrivate::createGlResources()
 {
@@ -546,12 +511,13 @@ int ProxyVideoDecoderPrivate::decode(
         }
         else
         {
-            /*
+#if 0
             m_allocator->execAtGlThreadAsync(
             [yuvBuffer, &fboToRender, this]()
             {
             renderYuvBufferToFbo(yuvBuffer.get(), &fboToRender);
-            });*/
+            });
+#endif // 0
 
             textureBuffer = new TextureBuffer(FboPtr(nullptr), q->d, yuvBuffer);
 

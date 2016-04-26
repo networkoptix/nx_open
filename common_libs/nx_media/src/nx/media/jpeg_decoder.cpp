@@ -18,11 +18,12 @@ public:
 //-------------------------------------------------------------------------------------------------
 // JpegDecoder
 
-JpegDecoder::JpegDecoder()
+JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
-    AbstractVideoDecoder(),
     d_ptr(new JpegDecoderPrivate())
 {
+    (void) allocator;
+    (void) resolution;
 }
 
 bool JpegDecoder::isCompatible(const CodecID codec, const QSize& /*resolution*/)
