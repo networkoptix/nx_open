@@ -19,6 +19,7 @@
 
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
+#include <utils/media/spectrum_analizer.h>
 
 class CaptureAudioStream;
 class QnAbstractDataConsumer;
@@ -138,6 +139,7 @@ private:
 
     class QnDesktopAudioLayout;
     QSharedPointer<QnDesktopAudioLayout> m_audioLayout;
+    std::unique_ptr<QnSpectrumAnalizer> m_analizer;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };

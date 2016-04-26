@@ -677,6 +677,10 @@ void QnDesktopDataProvider::putAudioData()
             if (buffer2)
                 stereoAudioMux(buffer1, buffer2, stereoPacketSize / 2);
         }
+        if (!m_analizer)
+            m_analizer.reset(new QnSpectrumAnalizer(m_audioCodecCtx->sample_rate, m_audioCodecCtx->channels));
+        m_analizer->processData(buffer1, m_audioCodecCtx->frame_size);
+
         int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_encodedAudioBuf, FF_MIN_BUFFER_SIZE, buffer1);
         if (aEncoded > 0)
         {
