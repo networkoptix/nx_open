@@ -1,22 +1,31 @@
 #pragma once
 
 #include <api/server_rest_connection_fwd.h>
+
+#include <client/client_color_types.h>
+
 #include <core/resource/resource_fwd.h>
+
+#include <utils/media/spectrum_analizer.h>
 
 class QnTwoWayAudioWidget;
 class QnImageButtonWidget;
 class GraphicsLabel;
 class VariantAnimator;
 
+typedef decltype(QnSpectrumData::data) VisualizerData;
+
 class QnTwoWayAudioWidgetPrivate: public QObject
 {
     Q_OBJECT
+
 public:
     QnImageButtonWidget* button;
     GraphicsLabel* hint;
-
     QnVirtualCameraResourcePtr camera;
+    QnTwoWayAudioWidgetColors colors;
 
+public:
     QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
 
     void startStreaming();
@@ -52,5 +61,6 @@ private:
     qreal m_hintVisibility;       /**< Visibility of the hint. 0 - hidden, 1 - displayed. */
     QElapsedTimer m_stateTimer;
 
-    QVector<float> m_visualizerData;
+    VisualizerData m_visualizerData;
+    qint64 m_paintTimeStamp;
 };

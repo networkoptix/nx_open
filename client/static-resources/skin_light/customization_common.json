@@ -263,6 +263,10 @@
             "default": {
                 "window": "#ffffff80",
                 "windowText": "#000000"
+            },
+            "colors": {
+                "background": "#212a2f",
+                "visualizer": "#cf2727"
             }
         }
     },

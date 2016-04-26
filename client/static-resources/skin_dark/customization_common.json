@@ -241,6 +241,10 @@
             "window": "#00000080",
             "windowText": "#ffffff"
             }
+        },
+        "colors": {
+            "background": "#212a2f",
+            "visualizer": "#cf2727"
         }
     },
 

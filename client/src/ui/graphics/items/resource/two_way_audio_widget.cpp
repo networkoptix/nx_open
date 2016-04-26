@@ -67,6 +67,19 @@ void QnTwoWayAudioWidget::setFixedHeight(qreal height)
     d->setFixedHeight(height);
 }
 
+QnTwoWayAudioWidgetColors QnTwoWayAudioWidget::colors() const
+{
+    Q_D(const QnTwoWayAudioWidget);
+    return d->colors;
+}
+
+void QnTwoWayAudioWidget::setColors(const QnTwoWayAudioWidgetColors& value)
+{
+    Q_D(QnTwoWayAudioWidget);
+    d->colors = value;
+    update();
+}
+
 void QnTwoWayAudioWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     base_type::paint(painter, option, widget);
