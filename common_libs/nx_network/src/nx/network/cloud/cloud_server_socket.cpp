@@ -501,7 +501,7 @@ void CloudServerSocket::onConnectionRequested(
             }
 
             if (event.connectionMethods)
-                NX_LOG(lm("Unsupported ConnectionMethods: %1")
+                NX_LOGX(lm("Unsupported ConnectionMethods: %1")
                     .arg(event.connectionMethods), cl_logWARNING);
         });
 }
@@ -512,8 +512,8 @@ void CloudServerSocket::onMediatorConnectionRestored()
     m_mediatorRegistrationRetryTimer.dispatch(  //modifiyng state only in aio thread
         [this]
         {
-            NX_LOG(lm("Connection to mediator has been restored after failure. "
-                      "Re-sending listen request"), cl_logDEBUG1);
+            NX_LOGX(lm("Connection to mediator has been restored after failure. "
+                "Re-sending listen request"), cl_logDEBUG1);
 
             if (m_state == State::listening)
             {
