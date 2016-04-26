@@ -1,10 +1,9 @@
 
-#include <future>
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/utils/future.h>
 #include <utils/common/cpp14.h>
 
 
@@ -68,7 +67,7 @@ protected:
 
     struct ConnectContext
     {
-        std::promise<ConnectResult> connectedPromise;
+        nx::utils::promise<ConnectResult> connectedPromise;
         std::chrono::milliseconds timeout;
         std::chrono::steady_clock::time_point startTime;
         std::chrono::steady_clock::time_point endTime;
@@ -287,7 +286,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
 
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
-    std::promise<void> controlConnectionEstablishedPromise;
+    nx::utils::promise<void> controlConnectionEstablishedPromise;
     setControlConnectionEstablishedHander(
         [&controlConnectionEstablishedPromise]
         {
@@ -306,7 +305,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
         std::move(udtConnection),
         udpTunnelKeepAlive);
 
-    std::promise<void> controlConnectionClosedPromise;
+    nx::utils::promise<void> controlConnectionClosedPromise;
     tunnelConnection.setControlConnectionClosedHandler(
         [&controlConnectionClosedPromise]
         {
