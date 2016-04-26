@@ -10,6 +10,7 @@
 #include <nx/network/aio/pollset.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/future.h>
 
 
 namespace nx {
@@ -90,7 +91,7 @@ public:
 //TODO #ak find a way to mock PollSet instance to AioThread
 TEST(aio, pollsetError)
 {
-    std::promise<void> handlerCalledPromise;
+    nx::utils::promise<void> handlerCalledPromise;
     auto handlerCalledFuture = handlerCalledPromise.get_future();
 
     UDPSocket socket(false);

@@ -8,6 +8,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
+#include <nx/utils/future.h>
 
 #include "listening_peer_pool.h"
 #include "settings.h"
@@ -71,7 +72,7 @@ HolePunchingProcessor::~HolePunchingProcessor()
     if (localSessions.empty())
         return;
 
-    std::promise<void> allSessionsStoppedPromise;
+    nx::utils::promise<void> allSessionsStoppedPromise;
     {
         nx::BarrierHandler barrier(
             [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });

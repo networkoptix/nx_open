@@ -4,12 +4,12 @@
 ***********************************************************/
 
 #include <functional>
-#include <future>
 #include <vector>
 
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/random_online_endpoint_selector.h>
+#include <nx/utils/future.h>
 
 
 TEST(RandomOnlineEndpointSelector, common)
@@ -19,7 +19,7 @@ TEST(RandomOnlineEndpointSelector, common)
 
     for (int i = 0; i < 20; ++i)
     {
-        std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
+        nx::utils::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
         nx::network::cloud::RandomOnlineEndpointSelector selector;
 
         std::vector<SocketAddress> endpoints;
@@ -50,7 +50,7 @@ TEST(RandomOnlineEndpointSelector, earlyCancellation)
 {
     for (int i = 0; i < 20; ++i)
     {
-        std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
+        nx::utils::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
 
         nx::network::cloud::RandomOnlineEndpointSelector selector;
 
@@ -77,7 +77,7 @@ TEST(RandomOnlineEndpointSelector, selectError)
     {
         for (int i = 0; i < 20; ++i)
         {
-            std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
+            nx::utils::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
 
             nx::network::cloud::RandomOnlineEndpointSelector selector;
 

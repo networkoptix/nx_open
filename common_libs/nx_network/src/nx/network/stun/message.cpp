@@ -5,6 +5,7 @@
 
 #include "message.h"
 
+#include <mutex>
 #include <random>
 
 #include <openssl/hmac.h>
