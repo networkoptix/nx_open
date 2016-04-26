@@ -10,6 +10,7 @@
 #include <random>
 #include <chrono>
 #include <atomic>
+#include <thread>
 #include <boost/bimap.hpp>
 
 #include <QElapsedTimer>

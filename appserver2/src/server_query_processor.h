@@ -219,12 +219,18 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler )
         {
-            if(tran.command == ApiCommand::setResourceParams)
+            if (tran.command == ApiCommand::setResourceParams)
+            {
                 return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::setResourceParam);
-            else if(tran.command == ApiCommand::removeResourceParams)
+            }
+            else if (tran.command == ApiCommand::removeResourceParams)
+            {
                 return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::removeResourceParam);
+            }
             else
+            {
                 NX_ASSERT(0, "Not implemented!", Q_FUNC_INFO);
+            }
         }
 
         //!Asynchronously fetches data from DB
