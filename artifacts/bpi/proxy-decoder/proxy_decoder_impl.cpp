@@ -118,6 +118,9 @@ Impl::Impl(int frameWidth, int frameHeight)
 {
     static InitOnce initOnce;
 
+    assert(m_frameWidth > 0);
+    assert(m_frameHeight > 0);
+
     initializeVdpau();
     initializeFfmpeg();
 }
@@ -143,7 +146,7 @@ void Impl::initializeVdpau()
     m_vdpDevice = createVdpDevice();
 
     VDP(vdp_decoder_create(m_vdpDevice,
-        profile, m_frameWidth, m_frameHeight, /*max_references*/16, &m_vdpDecoder));
+        profile, m_frameWidth, m_frameHeight, /*max_references*/ 16, &m_vdpDecoder));
     vdpCheckHandle(m_vdpDecoder, "Decoder");
 
     // The following initializations are needed for decodeToDisplay().
@@ -154,7 +157,7 @@ void Impl::initializeVdpau()
         &m_vdpMixer));
     vdpCheckHandle(m_vdpMixer, "Mixer");
 
-    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, /*drawable*/0, &m_vdpTarget));
+    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, /*drawable*/ 0, &m_vdpTarget));
     vdpCheckHandle(m_vdpTarget, "Presentation Queue Target");
 
     VDP(vdp_presentation_queue_create(m_vdpDevice, m_vdpTarget, &m_vdpQueue));
@@ -181,7 +184,8 @@ void Impl::deinitializeVdpau()
 
     for (int i = 0; i < m_renderStates.size(); ++i)
     {
-        VDP(vdp_video_surface_destroy(m_renderStates[i]->surface));
+        if (m_renderStates[i]->surface != VDP_INVALID_HANDLE)
+            VDP(vdp_video_surface_destroy(m_renderStates[i]->surface));
         delete m_renderStates[i];
     }
 
@@ -335,6 +339,7 @@ void Impl::doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame)
     assert(pFrame);
     vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(pFrame->data[0]);
     assert(renderState);
+    assert(renderState->surface != VDP_INVALID_HANDLE);
 
     assert(m_vdpDecoder != VDP_INVALID_HANDLE);
 
@@ -531,6 +536,7 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
             void* const dest[3] = {yBuffer, vBuffer, uBuffer};
             const uint32_t pitches[3] = {
                 (uint32_t) yLineSize, (uint32_t) uVLineSize, (uint32_t) uVLineSize};
+            assert(renderState->surface != VDP_INVALID_HANDLE);
 
             TIME_BEGIN(vdp_video_surface_get_bits_y_cb_cr);
             VDP(vdp_video_surface_get_bits_y_cb_cr(renderState->surface,
@@ -566,6 +572,7 @@ int Impl::decodeToYuvNative(
     if (result > 0)
     {
         YuvNative yuvNative;
+        assert(renderState->surface != VDP_INVALID_HANDLE);
         getVideoSurfaceYuvNative(renderState->surface, &yuvNative);
         if (conf.ENABLE_LOG_YUV_NATIVE)
             logYuvNative(&yuvNative);
@@ -604,6 +611,7 @@ void Impl::displayDecoded(void* frameHandle)
     vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(frameHandle);
 
     LOG << "displayDecoded(" << debugDumpRenderStateRef(renderState, m_renderStates) << ") BEGIN";
+    assert(renderState->surface != VDP_INVALID_HANDLE);
 
     VdpOutputSurface outputSurface;
     VDP(vdp_output_surface_create(m_vdpDevice,
