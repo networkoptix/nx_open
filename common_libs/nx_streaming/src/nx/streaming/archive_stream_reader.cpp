@@ -1,6 +1,6 @@
 #include "archive_stream_reader.h"
 
-#include <stdint.h>
+#include <numeric>
 
 #include <core/resource/resource.h>
 
@@ -646,7 +646,7 @@ begin_label:
             // Limitation for duration of the first GOP after reverse mode activation
             if (m_afterBOFCounter != -1)
             {
-                if (m_afterBOFCounter == 0 && m_currentTime == INT64_MAX) 
+                if (m_afterBOFCounter == 0 && m_currentTime == std::numeric_limits<qint64>::max())
                 {
                     // no any packet yet readed from archive and eof reached. So, current time still unknown
                     QnSleep::msleep(10);

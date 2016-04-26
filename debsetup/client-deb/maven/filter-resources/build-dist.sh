@@ -40,7 +40,9 @@ LIBSTAGE=$STAGE$LIBTARGET
 
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
+CLIENT_XCBGLINTEGRATIONS_PATH=$CLIENT_BIN_PATH/xcbglintegrations
 CLIENT_PLATFORMINPUTCONTEXTS_PATH=$CLIENT_BIN_PATH/platforminputcontexts
+CLIENT_QML_PATH=$CLIENT_BIN_PATH/qml
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
@@ -83,15 +85,19 @@ cp -r $CLIENT_BG_PATH/* $BGSTAGE
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
 cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
+cp -r $CLIENT_XCBGLINTEGRATIONS_PATH $BINSTAGE
+cp -r $CLIENT_QML_PATH $BINSTAGE
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
 #copying qt libs
-QTLIBS=`readelf -d $CLIENT_BIN_PATH/client.bin $CLIENT_PLATFORMS_PATH/libqxcb.so | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/' | sort -u`
+QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
 for var in $QTLIBS
 do
-    cp -P ${qt.dir}/lib/$var* $LIBSTAGE
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
 done
 
 cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE

@@ -24,13 +24,17 @@
 
 namespace std
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #   if _MSC_VER <= 1700
 #       define USE_OWN_MAKE_UNIQUE
 #   endif
 #elif defined(__GNUC_PREREQ)
 #   if !__GNUC_PREREQ(4,9)
 #      define USE_OWN_MAKE_UNIQUE
+#   endif
+#elif defined(__ANDROID__)
+#   if !__GNUC_PREREQ__(4,9)
+#       define USE_OWN_MAKE_UNIQUE
 #   endif
 #endif
 

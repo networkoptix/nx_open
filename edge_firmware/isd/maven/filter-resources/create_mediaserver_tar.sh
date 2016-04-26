@@ -118,10 +118,12 @@ done
 popd
 
 #copying qt libs
-QTLIBS=`readelf -d $BUILD_OUTPUT_DIR/bin/${build.configuration}/mediaserver | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/'`
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
 for var in $QTLIBS
 do
-    cp -P ${qt.dir}/lib/$var* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 done
 
 #copying bin
