@@ -24,7 +24,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QSettings>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "util.h"
 #include "licensing/hardware_info.h"
