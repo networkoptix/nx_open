@@ -6,8 +6,9 @@
 #include <utils/common/software_version.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
-#include <finders/systems_finder.h>
 #include <core/core_settings.h>
+#include <finders/systems_finder.h>
+#include <watchers/cloud_status_watcher.h>
 
 namespace
 {
@@ -202,6 +203,11 @@ QnSystemsModel::QnSystemsModel(QObject *parent)
 
     m_connections << discoveredConnection << lostConnection;
 
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
+        , this, &QnSystemsModel::updateOwnerDescription);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
+        , this, &QnSystemsModel::updateOwnerDescription);
+
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
 }
@@ -238,9 +244,15 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         if (!systemDescription->isCloudSystem())
             return lit("WRONG USER NAME! BUG");
 
+        if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
+            && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))
+        {
+            return tr("Your system");
+        }
+
         const auto fullName = systemDescription->ownerFullName();
         return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
-            : lit("%1's system").arg(fullName));
+            : lit("%1%2").arg(fullName, tr("'s system")));
     }
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
@@ -269,6 +281,16 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 RoleNames QnSystemsModel::roleNames() const
 {
     return kRoleNames;
+}
+
+void QnSystemsModel::updateOwnerDescription()
+{
+    const auto count = rowCount();
+    if (!count)
+        return;
+
+    dataChanged(index(0), index(count - 1)
+        , QVector<int>(1, OwnerDescriptionRoleId));
 }
 
 void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)

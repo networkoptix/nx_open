@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/singleton.h>
 
 struct QnCloudSystem
 {
@@ -23,6 +24,7 @@ typedef QList<QnCloudSystem> QnCloudSystemList;
 class QnCloudStatusWatcherPrivate;
 
 class QnCloudStatusWatcher : public QObject
+    , public Singleton<QnCloudStatusWatcher>
 {
     Q_OBJECT
     typedef QObject base_type;
@@ -73,3 +75,5 @@ private:
     QScopedPointer<QnCloudStatusWatcherPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnCloudStatusWatcher)
 };
+
+#define qnCloudStatusWatcher QnCloudStatusWatcher::instance()
