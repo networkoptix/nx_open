@@ -193,7 +193,11 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
     }, QThread::currentThread());
 
     if (m_requestHandle <= 0)
+    {
+        setHint(tr("Network error."));
+        setState(Error);
         return;
+    }
 
     m_started = true;
 }
