@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < argc; ++i)
     {
         std::string arg(argv[i]);
-        if (arg.find("--log=") == 0)
+        if (arg.find("--log-level=") == 0)
             QnLog::initLog(QString::fromStdString(arg.substr(6)));
     }
 

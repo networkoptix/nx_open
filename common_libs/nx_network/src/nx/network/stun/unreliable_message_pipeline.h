@@ -308,7 +308,7 @@ private:
         }
         else
         {
-            NX_ASSERT(bytesSent == m_sendQueue.front().serializedMessage.size());
+            NX_ASSERT(bytesSent == (size_t)m_sendQueue.front().serializedMessage.size());
         }
 
         auto completionHandler = std::move(m_sendQueue.front().completionHandler);

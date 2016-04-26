@@ -30,11 +30,12 @@ enum class TestTrafficLimitType
     outgoing, // quits when receives over limit
 };
 
+// TODO: #mux Think about server mode auto detection
 enum class TestTransmissionMode
 {
-    spam, // send random data as fast as possible, receive always
-    echo, // reads 4K buffer, sends same buffer, waits for futher data...
-    echoTest, // sends random data and verifies if it comes back
+    spam, // sends random data as fast as possible, receive always
+    ping, // sends random data and verifies if it comes back
+    pong, // reads 4K buffer, sends same buffer back, waits for futher data...
 };
 
 //!Reads/writes random data to/from connection

@@ -88,13 +88,9 @@ std::chrono::milliseconds RetryPolicy::maxDelay() const
 RetryTimer::RetryTimer(const RetryPolicy& policy)
 :
     m_retryPolicy(policy),
-    m_currentDelay(m_retryPolicy.initialDelay()),
-    m_effectiveMaxDelay(
-        m_retryPolicy.maxDelay() == RetryPolicy::kNoMaxDelay
-        ? std::chrono::milliseconds::max()
-        : m_retryPolicy.maxDelay()),
     m_triesMade(0)
 {
+    reset();
 }
 
 RetryTimer::~RetryTimer()
@@ -162,6 +158,16 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
 std::chrono::milliseconds RetryTimer::currentDelay() const
 {
     return m_currentDelay;
+}
+
+void RetryTimer::reset()
+{
+    m_currentDelay = m_retryPolicy.initialDelay();
+    m_effectiveMaxDelay = 
+        m_retryPolicy.maxDelay() == RetryPolicy::kNoMaxDelay
+        ? std::chrono::milliseconds::max()
+        : m_retryPolicy.maxDelay();
+    m_triesMade = 0;
 }
 
 }   //network
