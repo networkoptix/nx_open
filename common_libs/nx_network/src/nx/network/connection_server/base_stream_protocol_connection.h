@@ -69,7 +69,7 @@ namespace nx_api
 
         void bytesReceived( const nx::Buffer& buf )
         {
-            for( size_t pos = 0; pos < buf.size(); )
+            for( size_t pos = 0; pos < (size_t)buf.size(); )
             {
                 //parsing message
                 size_t bytesProcessed = 0;
@@ -77,7 +77,7 @@ namespace nx_api
                 {
                     case ParserState::init:
                     case ParserState::inProgress:
-                        NX_ASSERT( bytesProcessed == buf.size() );
+                        NX_ASSERT( bytesProcessed == (size_t)buf.size() );
                         return;
 
                     case ParserState::done:
