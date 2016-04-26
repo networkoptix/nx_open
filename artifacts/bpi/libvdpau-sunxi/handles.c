@@ -74,14 +74,28 @@ void *handle_get(VdpHandle handle)
 	if (handle == VDP_INVALID_HANDLE)
 		return NULL;
 
-	if (pthread_rwlock_rdlock(&ht.lock))
+	int res = pthread_rwlock_rdlock(&ht.lock);
+	if (res != 0)
+	{
+		VDPAU_DBG("pthread_rwlock_rdlock() -> %d => handle_get() -> NULL", res);
 		return NULL;
+	}
 
 	unsigned int index = handle - 1;
 	void *data = NULL;
 
 	if (index < ht.size)
+	{
 		data = ht.data[index];
+		if (!data)
+		{
+			VDPAU_DBG("ht.data[%u] == NULL => handle_get() -> NULL", index);
+		}
+	}
+	else
+	{
+		VDPAU_DBG("(index=%u) >= (ht.size=%u) => handle_get() -> NULL", index, ht.size);
+	}
 
 	pthread_rwlock_unlock(&ht.lock);
 	return data;
