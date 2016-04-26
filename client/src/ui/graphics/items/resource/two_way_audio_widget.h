@@ -5,12 +5,14 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <utils/common/connective.h>
+
 class QnTwoWayAudioWidgetPrivate;
 
-class QnTwoWayAudioWidget : public Customized<GraphicsWidget>
+class QnTwoWayAudioWidget : public Connective<Customized<GraphicsWidget> >
 {
     Q_OBJECT
-    typedef Customized<GraphicsWidget> base_type;
+    typedef Connective<Customized<GraphicsWidget> > base_type;
 
 public:
     QnTwoWayAudioWidget(QGraphicsWidget *parent = nullptr);

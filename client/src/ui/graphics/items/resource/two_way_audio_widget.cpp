@@ -9,14 +9,20 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/private/two_way_audio_widget_p.h>
 
+namespace
+{
+    /** How opaque should enabled button be painted. */
+    const qreal kEnabledOpacityCoeff = 1.0;
+
+    /** How opaque should disabled button be painted. */
+    const qreal kDisabledOpacityCoeff = 0.3;
+}
+
 QnTwoWayAudioWidget::QnTwoWayAudioWidget(QGraphicsWidget *parent)
     : base_type(parent)
     , d_ptr(new QnTwoWayAudioWidgetPrivate(this))
 {
     Q_D(const QnTwoWayAudioWidget);
-
-    d->hint->setText(tr("Hold to Speak Something"));
-    d->hint->hide();
 
     auto audioLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     audioLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
@@ -34,7 +40,25 @@ void QnTwoWayAudioWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
     Q_D(QnTwoWayAudioWidget);
     Q_ASSERT(!d->camera);
     Q_ASSERT(camera);
+
+    if (d->camera)
+        disconnect(d->camera, nullptr, this, nullptr);
+
     d->camera = camera;
+
+    auto updateState = [this](const QnResourcePtr &camera)
+    {
+        Q_D(QnTwoWayAudioWidget);
+        bool enabled = camera && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
+        setEnabled(enabled);
+        d->button->setEnabled(enabled);
+        setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
+    };
+
+    if (camera)
+        connect(camera, &QnResource::statusChanged, this, updateState);
+
+    updateState(camera);
 }
 
 void QnTwoWayAudioWidget::setFixedHeight(qreal height)
@@ -50,19 +74,6 @@ void QnTwoWayAudioWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 {
     base_type::paint(painter, option, widget);
 
-    Q_D(const QnTwoWayAudioWidget);
-
-    QRectF rect(option->rect);
-    qreal w = rect.width() * d->hintVisibility;
-
-    rect.setLeft(rect.width() - w);
-
-    /* Skip painting if totally covered by button */
-    qreal minSize = rect.height();
-    if (rect.width() < minSize)
-        return;
-
-    QPainterPath path;
-    path.addRoundedRect(rect, minSize / 2, minSize / 2);
-    painter->fillPath(path, palette().window());
+    Q_D(QnTwoWayAudioWidget);
+    d->paint(painter, option->rect, palette());
 }

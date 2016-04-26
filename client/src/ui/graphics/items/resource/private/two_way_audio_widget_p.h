@@ -16,15 +16,14 @@ public:
     GraphicsLabel* hint;
     QnVirtualCameraResourcePtr camera;
 
-    /** Visibility of the hint. 0 - hidden, 1 - displayed. */
-    qreal hintVisibility;
-
     QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
 
     void startStreaming();
     void stopStreaming();
 
     void setFixedHeight(qreal height);
+
+    void paint(QPainter *painter, const QRectF& sourceRect, const QPalette& palette);
 
 private:
     enum HintState
@@ -42,12 +41,12 @@ private:
     Q_DECLARE_PUBLIC(QnTwoWayAudioWidget)
     QnTwoWayAudioWidget *q_ptr;
 
-
-
-    bool started;
-    rest::Handle requestHandle;
-    QTimer* hintTimer;
-    VariantAnimator* hintAnimator;
+    bool m_started;
     HintState m_state;
-    QElapsedTimer stateTimer;
+
+    rest::Handle m_requestHandle;
+    QTimer* m_hintTimer;
+    VariantAnimator* m_hintAnimator;
+    qreal m_hintVisibility;       /**< Visibility of the hint. 0 - hidden, 1 - displayed. */
+    QElapsedTimer m_stateTimer;
 };
