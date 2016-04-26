@@ -23,6 +23,9 @@ public:
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    /** handler called just after broken tcp connection has been restored */
+    void setOnReconnectedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
 

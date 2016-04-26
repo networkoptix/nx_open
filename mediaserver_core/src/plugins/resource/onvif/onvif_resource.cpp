@@ -2671,7 +2671,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 
             _oasisWsnB2__Unsubscribe request;
             _oasisWsnB2__UnsubscribeResponse response;
-            const int soapCallResult = soapWrapper.unsubscribe(request, response);
+            soapWrapper.unsubscribe(request, response);
 
             QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
             registerNotificationConsumer();

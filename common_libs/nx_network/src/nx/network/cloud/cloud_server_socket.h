@@ -92,8 +92,8 @@ protected:
             SystemError::ErrorCode code,
             AbstractStreamSocket*)> handler);
     void issueRegistrationRequest();
-    void onConnectionRequested(
-        hpm::api::ConnectionRequestedEvent event);
+    void onConnectionRequested(hpm::api::ConnectionRequestedEvent event);
+    void onMediatorConnectionRestored();
 
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     nx::network::RetryTimer m_mediatorRegistrationRetryTimer;

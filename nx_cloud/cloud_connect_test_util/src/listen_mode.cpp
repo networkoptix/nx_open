@@ -17,7 +17,7 @@ void printListenOptions(std::ostream* const outStream)
     *outStream<<
     "Listen mode (can listen on local or cloud address):\n"
     "  --listen                     Enable listen mode\n"
-    "  --echo                       Makes server to mirror data instead of spaming\n"
+    "  --ping                       Makes server to mirror data instead of spaming\n"
     "  --cloud-credentials={system_id}:{authentication_key}\n"
     "                               Specify credentials to use to connect to mediator\n"
     "  --server-id={server_id}      Id used when registering on mediator (optional)\n"
@@ -89,8 +89,8 @@ int runInListenMode(const std::multimap<QString, QString>& args)
     using namespace nx::network;
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("echo") != args.end())
-        transmissionMode = nx::network::test::TestTransmissionMode::echo;
+    if (args.find("ping") != args.end())
+        transmissionMode = nx::network::test::TestTransmissionMode::pong;
 
     CloudServerSocketGenerator cloudServerSocketGenerator;
     test::RandomDataTcpServer server(

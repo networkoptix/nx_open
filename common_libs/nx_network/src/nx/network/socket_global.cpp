@@ -47,7 +47,7 @@ void SocketGlobals::deinit()
         delete s_instance;
 }
 
-void SocketGlobals::check()
+void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
         s_counter.load() != 0,

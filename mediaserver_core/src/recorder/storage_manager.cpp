@@ -1872,7 +1872,7 @@ void QnStorageManager::writeCameraInfoFiles()
                 if (!resource)
                     continue;
                 auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-                if (!camResource || camResource->isCameraInfoSavedToDisk((int) m_role))
+                if (!camResource || camResource->isCameraInfoSavedToDisk(storageUrl))
                     continue;
 
                 auto path = paths[i] + cameraUniqueId + separator + lit("info.txt");
@@ -1891,7 +1891,7 @@ void QnStorageManager::writeCameraInfoFiles()
                             << "groupName="   << camResource->getGroupName().toLatin1().constData()       << std::endl
                     ).str().c_str()
                 );
-                camResource->setCameraInfoSavedToDisk((int) m_role);
+                camResource->setCameraInfoSavedToDisk(storageUrl);
             } // for catalogs
         } // for qualities
     } // for storages
