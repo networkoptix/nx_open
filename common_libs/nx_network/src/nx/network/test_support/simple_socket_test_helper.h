@@ -253,7 +253,7 @@ void socketSimpleAsync(
             {
                 if (code == SystemError::noError)
                 {
-                    EXPECT_GT(size, 0);
+                    EXPECT_GT(size, (size_t)0);
                     EXPECT_STREQ(serverBuffer.data(), testMessage.data());
                     serverBuffer.resize(0);
                 }
@@ -286,7 +286,7 @@ void socketSimpleAsync(
                         return;
 
                     EXPECT_EQ(code, SystemError::noError);
-                    EXPECT_EQ(size, testMessage.size());
+                    EXPECT_EQ(size, (size_t)testMessage.size());
                 });
         });
 
