@@ -76,6 +76,15 @@ var Helper = function () {
             dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('a[uib-dropdown-toggle]')),
             dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
             logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Logout'))
+        },
+        restorePassEmail: {
+            emailInput: element(by.model('data.email')),
+            emailInputWrap: element(by.model('data.email')).element(by.xpath('../..')),
+            submitButton: element(by.buttonText('Restore password'))
+        },
+        restorePassPassword: {
+            passwordInput: element(by.model('data.newPassword')).element(by.css('input[type=password]')),
+            submitButton: element(by.buttonText('Save password'))
         }
     };
 
@@ -182,14 +191,11 @@ var Helper = function () {
         });
     };
 
-    this.register = function(firstName, lastName, email, password) {
+    this.fillRegisterForm = function(firstName, lastName, email, password) {
         var userFistName = firstName || this.userFirstName;
         var userLastName = lastName || this.userLastName;
         var userEmail = email || this.getRandomEmail();
         var userPassword = password || this.userPassword;
-
-        this.get(this.urls.register);
-        expect(h.forms.register.firstNameInput.isPresent()).toBe(true);
 
         h.forms.register.firstNameInput.sendKeys(userFistName);
         h.forms.register.lastNameInput.sendKeys(userLastName);
@@ -197,23 +203,33 @@ var Helper = function () {
         h.forms.register.passwordInput.sendKeys(userPassword);
 
         h.forms.register.submitButton.click();
+    };
+
+    this.register = function(firstName, lastName, email, password) {
+        this.get(this.urls.register);
+        expect(h.forms.register.firstNameInput.isPresent()).toBe(true);
+        this.fillRegisterForm(firstName, lastName, email, password);
         expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
         expect(h.alert.successMessageElem.getText()).toContain(this.alert.alertMessages.registerSuccess);
     };
 
-    this.getActivationLink = function(userEmail) {
+    this.getUrlFromEmail = function(email, userEmail, subject, where) {
+        expect(email.subject).toContain(subject);
+        expect(email.headers.to).toEqual(userEmail);
+
+        // extract registration token from the link in the email message
+        var pathToIndex = '/static/index.html#/';
+        var pattern = new RegExp(pathToIndex + where + '/([\\w=]+)', 'g');
+        var regCode = pattern.exec(email.html)[1];
+        console.log(regCode);
+        return ('/#/' + where + '/' + regCode); // url
+    };
+
+    this.getEmailedLink = function(userEmail, subject, where) {
         var deferred = protractor.promise.defer();
 
-        browser.controlFlow().wait(this.getEmailTo(userEmail, this.emailSubjects.register).then(function (email) {
-            // extract registration token from the link in the email message
-
-            var pathToIndex = '/static/index.html#/';
-            var pattern = new RegExp(pathToIndex + "activate/(\\w+)", "g");
-            var regCode = pattern.exec(email.html)[1];
-            console.log(regCode);
-            var url = ('/#/activate/' + regCode);
-
-            deferred.fulfill(url);
+        browser.controlFlow().wait(this.getEmailTo(userEmail, subject).then(function (email) {
+            deferred.fulfill(h.getUrlFromEmail(email, userEmail, subject, where));
         }));
 
         return deferred.promise;
@@ -224,7 +240,7 @@ var Helper = function () {
         var userEmail = email || h.getRandomEmail();
 
         h.register(firstName, lastName, userEmail, password);
-        h.getActivationLink(userEmail).then( function(url) {
+        h.getEmailedLink(userEmail, h.emailSubjects.register, 'activate').then( function(url) {
             h.get(url);
             expect(h.htmlBody.getText()).toContain(h.alert.alertMessages.registerConfirmSuccess);
             deferred.fulfill(userEmail);
@@ -297,16 +313,32 @@ var Helper = function () {
         return deferred.promise;
     };
 
-    var RestorePassObject = require('./restore_pass/po.js');
     this.restorePassword = function(userEmail, newPassword) {
-        this.restorePassObj = new RestorePassObject();
         var password = newPassword || h.userPassword;
-        browser.get('/#/restore_password/');
-        browser.waitForAngular();
-        this.restorePassObj.getRestorePassLink(userEmail).then(function(url) {
+        var email = userEmail || h.userEmail;
+        h.forms.restorePassEmail.sendLinkToEmail(email);
+        expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
+        expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassConfirmSent);
+
+        h.getEmailedLink(email, h.emailSubjects.restorePass, 'restore_password').then(function(url) {
             h.get(url);
-            h.restorePassObj.setNewPassword(password);
+            h.forms.restorePassPassword.setNewPassword(password);
         });
+    };
+
+    this.forms.restorePassEmail.sendLinkToEmail = function(userEmail) {
+        h.get(h.urls.restore_password);
+        h.forms.restorePassEmail.emailInput.clear().sendKeys(userEmail);
+        h.forms.restorePassEmail.submitButton.click();
+    };
+
+    this.forms.restorePassPassword.setNewPassword = function(newPassword) {
+        var here = h.forms.restorePassPassword;
+        expect(here.passwordInput.isPresent()).toBe(true);
+        here.passwordInput.sendKeys(newPassword);
+        here.submitButton.click();
+        expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
+        expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassSuccess);
     };
 
     this.isSubstr = function(string, substring) {
