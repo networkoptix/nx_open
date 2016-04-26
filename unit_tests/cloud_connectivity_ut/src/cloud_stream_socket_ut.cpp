@@ -279,6 +279,83 @@ TEST_F(CloudStreamSocketTest, cancellation)
     server.pleaseStopSync();
 }
 
+TEST_F(CloudStreamSocketTest, syncModeCancellation)
+{
+    constexpr const std::chrono::milliseconds kTestDuration =
+        std::chrono::milliseconds(2000);
+    constexpr const int kTestRuns = 10;
+
+    //launching some server
+    test::RandomDataTcpServer tcpServer(
+        test::TestTrafficLimitType::none,
+        0,
+        test::TestTransmissionMode::spam);
+    tcpServer.setLocalAddress(SocketAddress(HostAddress::localhost, 0));
+    ASSERT_TRUE(tcpServer.start());
+
+    for (int i = 0; i < kTestRuns; ++i)
+    {
+        auto sock = std::make_unique<CloudStreamSocket>();
+
+        enum class SocketState {init, connected, closed};
+        std::atomic<SocketState> socketState = SocketState::init;
+
+        std::thread sendThread(
+            [&sock, targetAddress = tcpServer.addressBeingListened(), &socketState]
+            {
+                static const char testBuffer[16*1024];
+
+                if (!sock->isConnected())
+                {
+                    ASSERT_TRUE(sock->connect(targetAddress, 3000));
+                    socketState = SocketState::connected;
+                }
+
+                while (!sock->isClosed() && sock->isConnected())
+                {
+                    int bytesSent = sock->send(testBuffer, sizeof(testBuffer));
+                    int x = 0;
+                }
+            });
+
+        //read thread
+        std::thread recvThread(
+            [&sock, &socketState]
+            {
+                char readBuffer[16 * 1024];
+                for (;;)
+                {
+                    if (socketState == SocketState::init)
+                    {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                        continue;
+                    }
+
+                    if (!sock->isConnected() || sock->isClosed())
+                        break;
+
+                    int bytesReceived = sock->recv(readBuffer, sizeof(readBuffer));
+                    int x = 0;
+                }
+            });
+
+        std::this_thread::sleep_for(kTestDuration);
+
+        //cancelling
+        if (i & 1)
+            sock->close();
+        else
+            sock->shutdown();
+
+        recvThread.join();
+        sendThread.join();
+
+        sock.reset();
+    }
+
+    tcpServer.pleaseStopSync();
+}
+
 } // namespace cloud
 } // namespace network
 } // namespace nx
