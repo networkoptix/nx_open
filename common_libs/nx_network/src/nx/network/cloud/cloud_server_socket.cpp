@@ -308,10 +308,14 @@ bool CloudServerSocket::registerOnMediatorSync()
     nx::utils::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
-        [&listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
+        [this, &listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
         {
+            m_mediatorConnection->setOnReconnectedHandler(
+                std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
+
             listenCompletedPromise.set_value(resultCode);
         });
+
     auto listenCompletedFuture = listenCompletedPromise.get_future();
     listenCompletedFuture.wait();
     const auto resultCode = listenCompletedFuture.get();
@@ -393,6 +397,9 @@ void CloudServerSocket::onListenRequestCompleted(
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
         m_state = State::listening;
+
+        m_mediatorConnection->setOnReconnectedHandler(
+            std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
         NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG2);
         auto acceptHandler = std::move(m_savedAcceptHandler);
@@ -497,6 +504,19 @@ void CloudServerSocket::onConnectionRequested(
                 NX_LOG(lm("Unsupported ConnectionMethods: %1")
                     .arg(event.connectionMethods), cl_logWARNING);
         });
+}
+
+void CloudServerSocket::onMediatorConnectionRestored()
+{
+    NX_LOG(lm("Connection to mediator has been restored after failure. "
+              "Re-sending listen request"));
+
+    if (m_state == State::listening)
+    {
+        //sending listen request again
+        m_mediatorRegistrationRetryTimer.reset();
+        issueRegistrationRequest();
+    }
 }
 
 } // namespace cloud

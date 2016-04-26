@@ -36,6 +36,12 @@ void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     checkHandler(&lk);
 }
 
+void AsyncClientUser::setOnReconnectedHandler(
+    nx::utils::MoveOnlyFunc<void()> handler)
+{
+    //TODO
+}
+
 void AsyncClientUser::sendRequest(Message request,
                                   AbstractAsyncClient::RequestHandler handler)
 {
