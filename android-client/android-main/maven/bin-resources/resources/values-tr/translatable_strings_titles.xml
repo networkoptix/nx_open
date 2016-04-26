@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_resources">Kameralar</string>
+    <string name="title_activity_video">Vidyo</string>
+    <string name="title_activity_archive">Arşiv</string>
+	<string name="title_activity_sendlog">Logları topla ve gönder</string>
+</resources>

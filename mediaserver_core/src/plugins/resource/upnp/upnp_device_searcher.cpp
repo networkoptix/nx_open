@@ -129,6 +129,9 @@ void UPNPDeviceSearcher::pleaseStop()
     }
     m_socketList.clear();
 
+    if(m_receiveSocket)
+        m_receiveSocket->terminateAsyncIO(true);
+
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
     for( auto it = m_httpClients.begin();
@@ -219,6 +222,9 @@ void UPNPDeviceSearcher::onSomeBytesRead(
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QnMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return;
+
             //removing socket from m_socketList
             for( map<QString, SocketReadCtx>::iterator
                 it = m_socketList.begin();

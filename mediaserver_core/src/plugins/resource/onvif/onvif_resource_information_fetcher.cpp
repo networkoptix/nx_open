@@ -119,6 +119,9 @@ bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, 
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return false;
 
+    if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
+        return true;
+
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
         QRegExp rxVendor(QLatin1String((const char*)IGNORE_VENDORS[i][0]), Qt::CaseInsensitive, QRegExp::Wildcard);

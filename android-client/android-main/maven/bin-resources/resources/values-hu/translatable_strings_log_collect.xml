@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collect_log">Napló készítése</string>
+    <string name="acquiring_log_progress_dialog_message">Napló vétele a rendszertől &#8230;</string>
+    <string name="chooser_title">"Válasszon alkalmazást a napló küldésére"</string>
+    <string name="failed_to_get_log_message">"Hiba a napló rendszertől való vételében."</string>
+    <string name="main_dialog_text">"Az alkalmazás megpróbálja az eszköznapló begyűjtését.
+A begyűjtött napló a választott alkalmazással el lesz küldve.
+Lehetőség lesz megnézni és módosítani az elküldött adatokat."
+    </string>  
+</resources>

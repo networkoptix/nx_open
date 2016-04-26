@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">Nieznany Błąd</string>
+    <string name="login_error_path">Zły adres lub port</string>
+    <string name="login_error_protocol">Serwer nie wspiera tego protokołu</string>
+    <string name="login_error_connection">Nie można połączyć się z serwerem używając tego adresu</string>
+    <string name="login_error_credentials">Brak uprawnień logowania</string>
+    <string name="login_error_port">Błędny port</string>
+    <string name="login_error_brand">Serwer niekompatybilny</string>
+
+    <string name="login_title_caption">Nazwa systemu:</string>
+	<string name="login_title_hint">dodaj nazwę systemu</string>
+    
+    <string name="host_caption">Adres hosta:</string>
+    <string name="host_hint">adres IP lub URL</string>
+    <string name="login_empty_host">Pole Adres hosta nie może być puste</string>
+    
+    <string name="port_caption">Port systemu:</string>
+    <string name="port_hint">jeśli nie jesteś pewny wpisz 7001</string>
+    <string name="login_empty_port">Pole Port nie może być puste</string>
+    
+    <string name="login_caption">Użytkownik:</string>    
+    <string name="login_hint">wpisz nazwę użytkownika</string>
+    <string name="login_empty_login">Pole Użytkownik nie może być puste</string>
+    
+    <string name="password_caption">Hasło:</string>
+    <string name="password_hint">wpisz hasło</string>      
+    <string name="login_empty_pass">Pole Hasło nie może być puste</string>
+    
+    <string name="login_progress_caption">Logowanie do…</string>
+    <string name="login_connecting">Łączenie…</string>
+    <string name="login_version_incompatible_title">Niezgodność wersji.</string>
+    <string name="login_version_incompatible_text">Wersja serwera jest niezgodna z tą wersją clienta. Lista kamer może być widoczna, ale obraz z nich niekoniecznie.</string>
+
+	<string name="login_saved_sessions">Zapisane sesje</string>
+	<string name="login_host_title">Adres hosta:</string>
+	<string name="login_login_title">Użytkownik:</string>
+	<string name="login_connect">Połącz</string>
+	<string name="login_delete_confirm">Czy napewno chcesz usunąć zapisaną sesję?</string>
+</resources>

@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "既に同じ名前が登録されています";
+"Please choose another name." = "他の名前を使用してください.";
+"OK" = "OK";
+"Name" = "名前";
+"Host" = "ホスト";
+"IP or hostname" = "IPまたはホスト名";
+"Port" = "ポート";
+"Login" = "ログインID";
+"Password" = "パスワード";
+"Address: %@" = "アドレス: %@";
+"Error" = "エラー";
+"Connecting..." = "接続中...";
+"Can't connect to the System." = "システムに接続できません";
+"Requesting cameras..." = "カメラリクエスト中...";
+"Communication failure." = "通信エラー";
+"The System is incompatible with the app" = "アプリケーションのバージョンが異なっています";
+"Show Offline" = "オフライン表示";
+"Hide Offline" = "オフライン非表示";
+"Systems" = "システム";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "ロード中...";
+"No Signal..." = "シグナルがありません...";
+"Invalid Camera Credentials" = "カメラ認証エラー";
+"Invalid Camera Credentials..." = "カメラ認証エラー...";
+"Live" = "ライブ";
+"Information" = "情報";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "指定日時の記録データが存在しません、近い日時に移動しますか？";
+"No" = "いいえ";
+"Yes" = "はい";
+"Archive" = "アーカイブ";
+"Go" = "Go";
+"Low" = "低い";
+"Medium" = "標準";
+"High" = "高い";
+"Best" = "最高";
+"Please Upgrade to Continue" = "継続して更新を行ってください";
+"This app is not compatible with this version of the software. Please download our new app." = "このバージョンでは互換性がありません 新しいアプリケーションをダウンロードしてください";
+"Not now" = "後日";
+"Download" = "ダウンロード";
+"Upgrade Now!" = "今すぐ更新!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "バージョン2.5以上のシステムに接続しています　新しいアプリケーションのダウンロードを推奨します";

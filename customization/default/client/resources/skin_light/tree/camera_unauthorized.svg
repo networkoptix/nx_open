@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="18"
+   height="18"
+   id="svg2"
+   xml:space="preserve"><metadata
+     id="metadata8"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs6"><clipPath
+       id="clipPath16"><path
+         d="M 0,256 256,256 256,0 0,0 0,256 z"
+         id="path18" /></clipPath></defs><path
+     d="M 16,7 2,7 c 0.050298,4.116488 3,8 7,8 4,0 6.954456,-3.883512 7,-8 z"
+     id="path26"
+     style="fill:#212a2f;fill-opacity:1;fill-rule:nonzero;stroke:none" /><path
+     d="m 0.99999995,2 0,3.5 C 0.99999995,5.770077 1.230077,6 1.5,6 L 16.529615,6 C 16.795154,6 17,5.770077 17,5.5 L 17,2 z"
+     id="path30"
+     style="fill:#2ca0da;fill-opacity:1;fill-rule:nonzero;stroke:none" /><path
+     d="m 11,12 a 2,2 0 0 1 -4,0 2,2 0 1 1 4,0 z"
+     id="path3025"
+     style="fill:#2ca0da;fill-opacity:1;stroke:none" /><path
+     d="m 13,5.4375 c -0.982482,0 -1.883423,0.2756381 -2.5625,0.84375 C 9.7701656,6.8395385 9.3904003,7.5677211 9.1875,8.25 8.9322367,9.1083539 8.990608,9.8214987 9,10.46875 8.4613696,10.814277 8.03125,11.309872 8.03125,12 l 0,4 c 0,1.077591 0.8911592,1.96875 1.96875,1.96875 l 6,0 c 1.077591,0 1.96875,-0.891159 1.96875,-1.96875 l 0,-4 C 17.96875,11.309872 17.53863,10.814277 17,10.46875 17.009392,9.8214941 17.067759,9.1083493 16.8125,8.25 16.6096,7.5677211 16.229834,6.8395385 15.5625,6.28125 14.883423,5.7131381 13.982482,5.4375 13,5.4375 z"
+     id="path3905"
+     style="fill:#ffffff;fill-opacity:1;stroke:none" /><rect
+     width="8"
+     height="6"
+     ry="1"
+     x="9"
+     y="11"
+     id="rect3775"
+     style="fill:#be3938;fill-opacity:1;stroke:none" /><path
+     d="M 10.5,11.5 C 10.5,10 10.230402,7 13,7 c 2.769598,0 2.5,3 2.5,4.5"
+     id="path3777"
+     style="fill:none;stroke:#be3938;stroke-width:1.20000005;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" /></svg>
