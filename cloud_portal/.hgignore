@@ -12,3 +12,5 @@ cloud/static
 .idea
 
 .*\.pyc$
+.*\.pid$
+.*\.log$
