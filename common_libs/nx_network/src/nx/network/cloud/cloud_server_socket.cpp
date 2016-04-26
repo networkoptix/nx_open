@@ -509,7 +509,7 @@ void CloudServerSocket::onConnectionRequested(
 void CloudServerSocket::onMediatorConnectionRestored()
 {
     NX_LOG(lm("Connection to mediator has been restored after failure. "
-              "Re-sending listen request"));
+              "Re-sending listen request"), cl_logDEBUG1);
 
     if (m_state == State::listening)
     {
