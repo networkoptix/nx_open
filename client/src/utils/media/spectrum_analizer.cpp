@@ -18,9 +18,9 @@ namespace {
 		if length(Nx) < NFFT, the remainder of the array must be padded with zeros
 
 	nn : FFT order NFFT. This MUST be a power of 2 and >= length(x).
-	isign:  if set to 1, 
+	isign:  if set to 1,
 				computes the forward FFT
-			if set to -1, 
+			if set to -1,
 				computes Inverse FFT - in this case the output values have
 				to be manually normalized by multiplying with 1/NFFT.
  Outputs:
@@ -34,7 +34,7 @@ void four1(float data[], int nn, int isign)
     int n, mmax, m, j, istep, i;
     float wtemp, wr, wpr, wpi, wi, theta;
     float tempr, tempi;
-    
+
     n = nn << 1;
     j = 1;
     for (i = 1; i < n; i += 2) {
@@ -96,15 +96,28 @@ QnSpectrumData::QnSpectrumData()
 
 }
 
-QnSpectrumAnalizer::QnSpectrumAnalizer(int srcSampleRate, int channels):
-        m_dataSize(0),
-        m_channels(channels)
+QnSpectrumAnalizer::QnSpectrumAnalizer() :
+    m_srcSampleRate(0),
+    m_windowSize(0),
+    m_HannCoeff(),
+    m_data(),
+    m_fftMagnitude(),
+    m_dataSize(0),
+    m_channels(0),
+    m_spectrumData()
+{}
+
+void QnSpectrumAnalizer::initialize(int srcSampleRate, int channels)
 {
+    /* Check if already initialized. */
+    if (m_srcSampleRate == srcSampleRate && m_channels == channels)
+        return;
+
     m_windowSize = toPowerOf2(srcSampleRate / kUpdatesPerSecond);
     m_HannCoeff.resize(m_windowSize);
     m_data.resize(m_windowSize * 2 + 1);
     m_fftMagnitude.resize(m_windowSize / 2);
-    
+
     // create Hann window filter
     for (int n = 0; n < m_windowSize; ++n)
     {
@@ -142,7 +155,7 @@ void QnSpectrumAnalizer::processData(const qint16* sampleData, int sampleCount)
 QnSpectrumData QnSpectrumAnalizer::fillSpectrumData() const
 {
     QnSpectrumData result;
-    
+
     int stepsPerBand = (m_windowSize / 2) / kBands;
     const float* srcData = &m_fftMagnitude[0];
     for (int i = 0; i < kBands; ++i)

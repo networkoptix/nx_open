@@ -65,9 +65,6 @@ void QnTwoWayAudioWidget::setFixedHeight(qreal height)
 {
     Q_D(QnTwoWayAudioWidget);
     d->setFixedHeight(height);
-
-    setContentsMargins(height / 2, 0.0, 0.0, 0.0);
-    updateGeometry();
 }
 
 void QnTwoWayAudioWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

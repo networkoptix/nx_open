@@ -19,6 +19,8 @@
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/util.h>
+#include <utils/media/spectrum_analizer.h>
 
 namespace
 {
@@ -86,6 +88,32 @@ namespace
         QScopedPointer<QMovie> m_micAnimation;
     };
 
+    void paintVisualizer(QPainter* painter, const QRectF& rect, const QVector<float>& oldData, const QVector<float>& newData)
+    {
+        if (newData.isEmpty())
+            return;
+
+        painter->fillRect(rect, QColor(33, 42, 47));
+
+        const qreal kOffset = 1.0;
+        qreal lineWidth = (rect.width() / newData.size()) - kOffset;    /*< offset between lines */
+        if (lineWidth < kOffset)
+            return;
+
+        qreal midY = rect.center().y();
+        qreal maxHeight = rect.height() - (kOffset * 2);
+
+        QPainterPath path;
+        for (int i = 0; i < newData.size(); ++i)
+        {
+            float value = newData[i];
+            qreal lineHeight = qMax(maxHeight * value, kOffset * 2);
+            path.addRect(rect.left() + i * (lineWidth + kOffset), midY - (lineHeight / 2), lineWidth, lineHeight);
+        }
+
+        painter->fillPath(path, Qt::red);
+    }
+
 }
 
 
@@ -94,13 +122,15 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     button(new QnTwoWayAudioWidgetButton(owner)),
     hint(new GraphicsLabel(owner)),
     camera(),
+
     m_started(false),
     m_state(OK),
     m_requestHandle(0),
     m_hintTimer(new QTimer(this)),
     m_hintAnimator(nullptr),
     m_hintVisibility(kHidden),
-    m_stateTimer()
+    m_stateTimer(),
+    m_visualizerData()
 {
     hint->setAcceptedMouseButtons(0);
     hint->setPerformanceHint(GraphicsLabel::PixmapCaching);
@@ -124,10 +154,8 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
         switch (m_state)
         {
         case OK:
-            return;
         case Pressed:
-            timeout = kHoldTimeoutMs;
-            break;
+            return;
         case Released:
             timeout = kShowHintMs;
             break;
@@ -172,7 +200,9 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
         if (!success || result.error != QnRestResult::NoError)
         {
-            setState(Error, result.errorString);
+            return;
+            setHint(result.errorString);
+            setState(Error);
             stopStreaming();
         }
 
@@ -211,9 +241,14 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
 
 void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)
 {
+    Q_Q(QnTwoWayAudioWidget);
+    qreal leftMargin = height / 2;
+
     button->setFixedSize(height);
     hint->setMinimumHeight(height);
     hint->setMaximumHeight(height);
+    q->setContentsMargins(leftMargin, 0.0, 0.0, 0.0);
+    q->updateGeometry();
 }
 
 void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRect, const QPalette& palette)
@@ -228,36 +263,49 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
     if (rect.width() < minSize)
         return;
 
+    qreal roundness = minSize / 2;
     QPainterPath path;
-    path.addRoundedRect(rect, minSize / 2, minSize / 2);
+    path.addRoundedRect(rect, roundness, roundness);
     painter->fillPath(path, palette.window());
+
+    if (m_state == Pressed)
+    {
+        auto data = QnSpectrumAnalizer::instance()->getSpectrumData().data;
+
+        QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize - roundness, 0.0));
+        if (visualizerRect.isValid())
+            paintVisualizer(painter, visualizerRect, m_visualizerData, data);
+        m_visualizerData = data;
+    }
 }
 
-void QnTwoWayAudioWidgetPrivate::setState(HintState state, const QString& hintText)
+void QnTwoWayAudioWidgetPrivate::setState(HintState state)
 {
     if (m_state == state)
         return;
 
+    qDebug() << "state changed from" << m_state << "to" << state;
     m_state = state;
 
     bool open = false;
     switch (m_state)
     {
+    case Pressed:
+        {
+            open = true;
+            setHint(tr("Hold to Speak Something"));
+            opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kHidden);
+        }
+        break;
     case Released:
         if (m_stateTimer.isValid() && !m_stateTimer.hasExpired(kHoldTimeoutMs))
         {
             open = true;
-            Q_Q(QnTwoWayAudioWidget);
-            hint->setText(tr("Hold to Speak Something"));
-            q->updateGeometry();
         }
         break;
     case Error:
         {
             open = true;
-            Q_Q(QnTwoWayAudioWidget);
-            hint->setText(hintText);
-            q->updateGeometry();
         }
         break;
     default:
@@ -270,9 +318,14 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state, const QString& hintTe
     disconnect(m_hintAnimator, nullptr, this, nullptr);
     if (open)
     {
+        qDebug() << "opening hint";
         connect(m_hintAnimator, &AbstractAnimator::finished, this, [this]()
         {
-            opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kVisible);
+            if (m_state == Released || m_state == Error)
+            {
+                qDebug() << "displaying hint text";
+                opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kVisible);
+            }
         });
         m_hintAnimator->setEasingCurve(QEasingCurve::OutCubic);
         m_hintAnimator->animateTo(kVisible);
@@ -280,11 +333,19 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state, const QString& hintTe
     }
     else
     {
+        qDebug() << "closing hint";
         m_hintAnimator->setEasingCurve(QEasingCurve::InCubic);
         m_hintAnimator->animateTo(kHidden);
         m_hintTimer->stop();
         opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kHidden);
     }
+}
+
+void QnTwoWayAudioWidgetPrivate::setHint(const QString& text)
+{
+    Q_Q(QnTwoWayAudioWidget);
+    hint->setText(text);
+    q->updateGeometry();
 }
 
 void QnTwoWayAudioWidgetPrivate::ensureAnimator()

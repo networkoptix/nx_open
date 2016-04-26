@@ -14,6 +14,7 @@ class QnTwoWayAudioWidgetPrivate: public QObject
 public:
     QnImageButtonWidget* button;
     GraphicsLabel* hint;
+
     QnVirtualCameraResourcePtr camera;
 
     QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
@@ -34,7 +35,8 @@ private:
         Error,      /**< Some error occurred */
     };
 
-    void setState(HintState state, const QString& hint = QString());
+    void setState(HintState state);
+    void setHint(const QString& text);
 
     void ensureAnimator();
 private:
@@ -49,4 +51,6 @@ private:
     VariantAnimator* m_hintAnimator;
     qreal m_hintVisibility;       /**< Visibility of the hint. 0 - hidden, 1 - displayed. */
     QElapsedTimer m_stateTimer;
+
+    QVector<float> m_visualizerData;
 };

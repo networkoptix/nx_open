@@ -264,7 +264,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         updateIoModuleVisibility(false);
     }
 
-    if (m_camera && m_camera->hasTwoWayAudio() )
+    if (m_camera /*&& m_camera->hasTwoWayAudio() */)
     {
         auto twoWayAudioItem = new QnTwoWayAudioWidget();
         twoWayAudioItem->setCamera(m_camera);

@@ -356,7 +356,7 @@ int QnDesktopDataProvider::calculateBitrate()
     double bitrate = BASE_BITRATE;
 
     bitrate /=  1920.0*1080.0 / m_grabber->width() / m_grabber->height();
-    
+
     bitrate *= m_encodeQualuty;
     if (m_grabber->width() <= 320)
         bitrate *= 1.5;
@@ -417,7 +417,7 @@ bool QnDesktopDataProvider::init()
     m_videoCodecCtx->bit_rate = calculateBitrate();
     //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
     //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
-    
+
     QString codec_prop;
 
     //if (videoCodecName != QLatin1String("libx264"))
@@ -456,7 +456,7 @@ bool QnDesktopDataProvider::init()
     }
 
 
-    if (m_captureResolution.width() > 0) 
+    if (m_captureResolution.width() > 0)
     {
         double srcAspect = m_grabber->screenWidth() / (double) m_grabber->screenHeight();
         double dstAspect = m_captureResolution.width() / (double) m_captureResolution.height();
@@ -677,9 +677,13 @@ void QnDesktopDataProvider::putAudioData()
             if (buffer2)
                 stereoAudioMux(buffer1, buffer2, stereoPacketSize / 2);
         }
-        if (!m_analizer)
-            m_analizer.reset(new QnSpectrumAnalizer(m_audioCodecCtx->sample_rate, m_audioCodecCtx->channels));
-        m_analizer->processData(buffer1, m_audioCodecCtx->frame_size);
+
+        if (!m_soundAnalyzer)
+        {
+            m_soundAnalyzer = QnSpectrumAnalizer::instance();
+            m_soundAnalyzer->initialize(m_audioCodecCtx->sample_rate, m_audioCodecCtx->channels);
+        }
+        m_soundAnalyzer->processData(buffer1, m_audioCodecCtx->frame_size);
 
         int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_encodedAudioBuf, FF_MIN_BUFFER_SIZE, buffer1);
         if (aEncoded > 0)
@@ -866,7 +870,7 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* co
 {
     QnMutexLocker lock( &m_startMutex );
     removeDataProcessor(consumer);
-    if (processorsCount() == 0) 
+    if (processorsCount() == 0)
         pleaseStop();
 }
 
@@ -897,7 +901,7 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-        if (dp->canAcceptData()) 
+        if (dp->canAcceptData())
         {
             if (media->dataType == QnAbstractMediaData::VIDEO)
             {

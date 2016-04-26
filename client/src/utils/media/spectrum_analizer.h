@@ -9,12 +9,14 @@ struct QnSpectrumData
     QVector<float> data; //< data in range [0..1]
 };
 
-class QnSpectrumAnalizer: public Singleton<QnSpectrumAnalizer>
+class QnSpectrumAnalizer: public QObject, public Singleton<QnSpectrumAnalizer>
 {
+    Q_OBJECT
 public:
-    QnSpectrumAnalizer(int srcSampleRate, int channels);
+    QnSpectrumAnalizer();
+    void initialize(int srcSampleRate, int channels);
 
-    /** 
+    /**
      * Process input data. Data should be in 16 bit form.
      * Total amount of samples is sampleCount * channels
     */
@@ -24,6 +26,7 @@ public:
 private:
     QnSpectrumData fillSpectrumData() const;
 private:
+    int m_srcSampleRate;
     int m_windowSize;
     QVector<float> m_HannCoeff;
     QVector<float> m_data;

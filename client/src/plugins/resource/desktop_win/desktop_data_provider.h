@@ -139,7 +139,7 @@ private:
 
     class QnDesktopAudioLayout;
     QSharedPointer<QnDesktopAudioLayout> m_audioLayout;
-    std::unique_ptr<QnSpectrumAnalizer> m_analizer;
+    QPointer<QnSpectrumAnalizer> m_soundAnalyzer;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
