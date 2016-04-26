@@ -23,7 +23,7 @@ android {
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcrypto.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libssl.so \
-        $$OUTPUT_PATH/lib/libopenal.so
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libopenal.so
 
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavutil.so \
