@@ -36,7 +36,7 @@ public:
     static const int HTTP_LOG_INDEX = CUSTOM_LOG_BASE_ID + 1;
     static const int EC2_TRAN_LOG = CUSTOM_LOG_BASE_ID + 2;
     static const int HWID_LOG = CUSTOM_LOG_BASE_ID + 3;
- 
+
     QnLog();
     ~QnLog();
 
@@ -77,7 +77,7 @@ public:
         QN_LOG_BODY(arg0 << arg1 << arg2 << arg3);
     }
 #undef QN_LOG_BODY
-    
+
     class NX_UTILS_API Logs
     {
     public:
@@ -97,7 +97,7 @@ public:
     static QString logFileName( int logID = MAIN_LOG_ID );
     static const std::shared_ptr< Logs >& logs();
     static const std::unique_ptr< QnLog >& instance( int logID = MAIN_LOG_ID );
-    
+
     static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
 
@@ -159,5 +159,32 @@ QString toDebugString(const T &value) {
     stream << value;
     return result;
 }
+
+namespace {
+
+/**
+ * Debug.
+ * @return Part of a source code filename which is a path relative to "nx_vms..." folder.
+ */
+static const char* relative_src_filename(const char* s)
+{
+    (void) relative_src_filename;
+
+    auto pos = std::string(__FILE__).find("common_libs"); //< This file resides in "common_libs".
+    if (pos == std::string::npos || pos >= strlen(s))
+        return s;
+    else
+        return s + pos;
+}
+
+} // namespace
+
+// Log execution of a line - put double-L at the beginning of the line.
+#ifdef _DEBUG
+    #define LL qDebug().nospace() << "####### XXX line " << __LINE__ \
+        << " [" << relative_src_filename(__FILE__) << "]";
+#else
+    #define LL
+#endif
 
 #endif // QN_LOG_H

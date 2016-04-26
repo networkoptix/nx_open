@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 //-------------------------------------------------------------------------------------------------
 // Public
 
@@ -8,7 +10,6 @@
 // #define ENABLE_TIME
 
 // Debug utils.
-// #define LL ...
 // #define QLOG(...) ...
 // #define TIME_BEGIN(TAG) ...
 // #define TIME_END ...
@@ -32,10 +33,7 @@ typedef std::shared_ptr<const YuvBuffer> ConstYuvBufferPtr;
 #include <chrono>
 #include <deque>
 
-#include <QElapsedTimer>
-
-// Log execution of a line - put double-L at the beginning of the line.
-#define LL qDebug().nospace() << "####### line " << __LINE__;
+#include <QtCore/QElapsedTimer>
 
 #ifdef ENABLE_LOG
     #define QLOG(...) qDebug() << __VA_ARGS__
@@ -61,7 +59,7 @@ std::chrono::milliseconds getCurrentTime()
 
     #define TIME_BEGIN(TAG) \
         { std::chrono::milliseconds TIME_t0 = getCurrentTime(); const char* const TIME_tag = TAG;
-    
+
     #define TIME_END logTime(TIME_t0, TIME_tag); }
 
     void timePush(
@@ -69,13 +67,13 @@ std::chrono::milliseconds getCurrentTime()
         std::vector<qint64>& list, std::vector<QString>& tags)
     {
         const auto t = timer.elapsed();
-        if (std::find(tags.begin(), tags.end(), QString(tag)) != tags.end()) 
-        { 
+        if (std::find(tags.begin(), tags.end(), QString(tag)) != tags.end())
+        {
             std::cerr << "FATAL INTERNAL ERROR: tag \"" << tag << "\" already pushed to time list\n";
-            NX_CRITICAL(false); 
-        } 
-        list.push_back(t); 
-        tags.push_back(tag); 
+            NX_CRITICAL(false);
+        }
+        list.push_back(t);
+        tags.push_back(tag);
     }
 
     void timeFinish(
