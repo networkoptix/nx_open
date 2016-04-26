@@ -11,10 +11,12 @@
 
 #include <QString>
 
-#include <utils/common/cpp14.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
+#include <utils/common/cpp14.h>
+
 
 namespace nx_http {
 
@@ -56,15 +58,18 @@ public:
             const nx_http::StatusCode::Value statusCode,
             std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
     {
-        std::async(
-            std::launch::async,
-            [completionHandler]() {
-                std::this_thread::sleep_for( std::chrono::seconds(5) );
+        m_timer.start(
+            std::chrono::seconds(5),
+            [completionHandler = std::move(completionHandler)]
+            {
                 completionHandler(
                     nx_http::StatusCode::ok,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource>() );
-            } );
+                    std::unique_ptr<nx_http::AbstractMsgBodySource>());
+            });
     }
+
+private:
+    nx::network::aio::Timer m_timer;
 };
 
 const QString TestHandler::PATH = "/tst";
