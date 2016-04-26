@@ -166,7 +166,7 @@ void QnSpectrumAnalizer::processData(const qint16* sampleData, int sampleCount)
     qint16 maxSampleValue = 0;
     for (int i = 0; i < sampleCount * m_channels; ++i)
         maxSampleValue = qMax(maxSampleValue, qint16(abs(sampleData[i])));
-    maxSampleValue = qMax(maxSampleValue, maxAmplifier); // max amlification level 1:4
+    maxSampleValue = qMax(maxSampleValue, maxAmplifier);
 
     const qint16* curPtr = sampleData;
     for (int i = 0; i < sampleCount; ++i)
