@@ -508,15 +508,21 @@ void CloudServerSocket::onConnectionRequested(
 
 void CloudServerSocket::onMediatorConnectionRestored()
 {
-    NX_LOG(lm("Connection to mediator has been restored after failure. "
-              "Re-sending listen request"), cl_logDEBUG1);
+    //TODO #ak it's a pity we cannot move m_mediatorConnection to this object's aio thread
+    m_mediatorRegistrationRetryTimer.dispatch(  //modifiyng state only in aio thread
+        [this]
+        {
+            NX_LOG(lm("Connection to mediator has been restored after failure. "
+                      "Re-sending listen request"), cl_logDEBUG1);
 
-    if (m_state == State::listening)
-    {
-        //sending listen request again
-        m_mediatorRegistrationRetryTimer.reset();
-        issueRegistrationRequest();
-    }
+            if (m_state == State::listening)
+            {
+                m_state = State::registeringOnMediator;
+                //sending listen request again
+                m_mediatorRegistrationRetryTimer.reset();
+                issueRegistrationRequest();
+            }
+        });
 }
 
 } // namespace cloud
