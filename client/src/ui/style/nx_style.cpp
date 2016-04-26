@@ -1961,25 +1961,18 @@ QRect QnNxStyle::subElementRect(
     case SE_ItemViewItemCheckIndicator:
         if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
+            /* Switch: */
             if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
                 return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
-
-            if (isOnlyCheckboxItem(*item))
-            {
-                //TODO //FIXME #vkutin Figure out what happened with checkboxes in camera rules window
-                return alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-                    QSize(Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize),
-                    option->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0));
-            }
         }
-        /* fall through */
+        /* FALL THROUGH */
     case SE_ItemViewItemText:
     case SE_ItemViewItemFocusRect:
     case SE_ItemViewItemDecoration:
         if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
         {
             QStyleOptionViewItem newOpt(*item);
-            int defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget);
+            int defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
             int marginAddition = qMax(Metrics::kStandardPadding - defaultMargin, 0);
             newOpt.rect.adjust(marginAddition, 0, -marginAddition, 0);
             return base_type::subElementRect(subElement, &newOpt, widget);
@@ -2224,10 +2217,9 @@ QSize QnNxStyle::sizeFromContents(
     case CT_ItemViewItem:
         {
             if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
-            {
                 if (isOnlyCheckboxItem(*item))
-                    return item->rect.size() + QSize(Metrics::kStandardPadding * 2, 0);
-            }
+                    return QSize(Metrics::kStandardPadding * 2 + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);
+
             QSize sz = base_type::sizeFromContents(type, option, size, widget);
             sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
             sz.setWidth(sz.width() + Metrics::kStandardPadding * 2);
