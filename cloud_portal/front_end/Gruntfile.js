@@ -84,12 +84,12 @@ module.exports = function (grunt) {
             },
             proxies: [
                 // Local pyhton manage.py runserver
-                /*{context: '/api/',    host: '127.0.0.1', port: 8000},
+                {context: '/api/',    host: '127.0.0.1', port: 8000},
                 {context: '/notifications/',    host: '127.0.0.1', port: 8000}/**/
 
 
                 // cloud-demo.hdw.mx
-                {context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
+                /*{context: '/api/',    host: 'cloud-demo.hdw.mx', port: 80},
                 {context: '/notifications/',    host: 'cloud-demo.hdw.mx', port: 80}/**/
             ],
             livereload: {

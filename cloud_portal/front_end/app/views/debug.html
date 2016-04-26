@@ -40,4 +40,10 @@
             <button type="submit" class="btn btn-default" ng-click="testNotification()">Send Notification</button>
         </div>
     </div>
+    <div class="form-group" ng-if="result" ng-class="{'has-error':notificationError,'has-success':!notificationError}">
+        <label class="col-sm-2 control-label">Result:</label>
+        <div class="col-sm-12">
+            <pre ng-if="result" ng-bind-html="result"></pre>
+        </div>
+    </div>
 </form>

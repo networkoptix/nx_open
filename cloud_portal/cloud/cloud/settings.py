@@ -43,6 +43,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'kombu.transport.django',
+    'djcelery',
     'rest_framework',
     'corsheaders',
     'notifications',
@@ -97,7 +99,7 @@ DATABASES = {
             'sql_mode': 'TRADITIONAL',
             'charset': 'utf8',
             'init_command': 'SET '
-                'storage_engine=INNODB,'
+                # 'storage_engine=INNODB,'
                 'character_set_connection=utf8,'
                 'collation_connection=utf8_bin'
         }
@@ -166,6 +168,13 @@ REST_FRAMEWORK = {
        'rest_framework.permissions.AllowAny',
     )
 }
+
+# Celery settings section
+
+BROKER_URL = 'django://'
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+# / End of Celery settings section
 
 CLOUD_CONNECT = {
     'url': 'http://cloud-demo.hdw.mx:3346/cdb',

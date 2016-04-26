@@ -8,3 +8,6 @@ jsonfield
 enum34
 email
 py2-ipaddress
+celery
+django-celery
+requests
