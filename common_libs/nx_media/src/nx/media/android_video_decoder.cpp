@@ -542,4 +542,4 @@ QVariant TextureBuffer::handle() const
 } // namespace media
 } // namespace nx
 
-#endif // #defined(Q_OS_ANDROID)
+#endif // Q_OS_ANDROID

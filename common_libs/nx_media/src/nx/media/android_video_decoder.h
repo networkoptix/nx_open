@@ -1,9 +1,9 @@
 #pragma once
 
+#if defined(Q_OS_ANDROID)
+
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
-
-#if defined(Q_OS_ANDROID)
 
 #include <nx/streaming/video_data_packet.h>
 
@@ -34,4 +34,4 @@ private:
 }
 }
 
-#endif // #defined(Q_OS_ANDROID)
+#endif // Q_OS_ANDROID

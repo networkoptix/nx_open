@@ -4,7 +4,7 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src \
     ${root.dir}/client.core/src
 
-# Needed to ignore possibly missing libproxydecoder.so
+# Ignore missing platform-dependent libs required for libproxydecoder.so
 LIBS += -Wl,--allow-shlib-undefined
 
 unix: !mac {

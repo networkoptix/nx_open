@@ -1,4 +1,5 @@
 #pragma once
+#if defined(ENABLE_PROXY_DECODER)
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
@@ -34,10 +35,12 @@ public:
 
     virtual void setAllocator(AbstractResourceAllocator* allocator) override;
 
-private: 
+private:
     std::shared_ptr<ProxyVideoDecoderPrivate> d;
     friend class ProxyVideoDecoderPrivate;
 };
 
 } // namespace media
 } // namespace nx
+
+#endif // ENABLE_PROXY_DECODER

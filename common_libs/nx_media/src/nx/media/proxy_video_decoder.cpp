@@ -1,4 +1,5 @@
 #include "proxy_video_decoder.h"
+#if defined(ENABLE_PROXY_DECODER)
 
 // Configuration
 #define xENABLE_GL //< Use ProxyDecoder::decodeYuvPlanar() and then convert to RGB via OpenGL.
@@ -30,7 +31,7 @@ static const bool ENABLE_LARGE_ONLY = true; //< isCompatible() will allow only w
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
-#include <QtGui/QOpenGLFramebufferObject>                       
+#include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOpenGLTexture>
 #include <QtGui/QOpenGLFunctions>
 #include <QtOpenGL/QtOpenGL>
@@ -83,7 +84,7 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         return false;
     }
 
-    QLOG("ProxyVideoDecoder::isCompatible(codec:" << codec << ", resolution" << resolution 
+    QLOG("ProxyVideoDecoder::isCompatible(codec:" << codec << ", resolution" << resolution
         << ") -> true");
     return true;
 }
@@ -119,3 +120,5 @@ void ProxyVideoDecoder::setAllocator(AbstractResourceAllocator* allocator)
 
 } // namespace media
 } // namespace nx
+
+#endif // ENABLE_PROXY_DECODER

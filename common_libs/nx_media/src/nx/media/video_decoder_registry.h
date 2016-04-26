@@ -40,7 +40,7 @@ public:
      */
     template <class Decoder>
     void addPlugin(
-        std::shared_ptr<AbstractResourceAllocator> allocator = 
+        std::shared_ptr<AbstractResourceAllocator> allocator =
         std::shared_ptr<AbstractResourceAllocator>(),
         int maxUseCount = std::numeric_limits<int>::max())
     {
@@ -50,9 +50,9 @@ public:
 private:
     struct Metadata
     {
-        Metadata(): 
-            useCount(0), 
-            maxUseCount(std::numeric_limits<int>::max()) 
+        Metadata():
+            useCount(0),
+            maxUseCount(std::numeric_limits<int>::max())
         {
         }
 
