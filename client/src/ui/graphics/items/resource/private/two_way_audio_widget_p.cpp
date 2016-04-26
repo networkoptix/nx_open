@@ -89,7 +89,7 @@ namespace
                 change = qMin(change, maxChange);
             else
                 change = qMax(change, -maxChange);
-            result[i] = qBound(0.0f, current + change, 1.0f);
+            result[i] = qBound(double(0.0f), current + change, double(1.0f));
         }
         return result;
     }

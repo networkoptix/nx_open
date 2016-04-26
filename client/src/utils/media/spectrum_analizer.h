@@ -6,7 +6,7 @@ struct QnSpectrumData
 {
     QnSpectrumData();
 
-    QVector<float> data; //< data in range [0..1]
+    QVector<double> data; //< data in range [0..1]
 };
 
 class QnSpectrumAnalizer: public QObject, public Singleton<QnSpectrumAnalizer>
@@ -24,14 +24,14 @@ public:
 
     QnSpectrumData getSpectrumData() const;
 private:
-    QnSpectrumData fillSpectrumData() const;
+    void fillSpectrumData();
 private:
     int m_srcSampleRate;
     int m_windowSize;
-    QVector<float> m_HannCoeff;
-    QVector<float> m_data;
-    QVector<float> m_fftMagnitude;
+    QVector<double> m_HannCoeff;
+    QVector<double> m_data;
     int m_dataSize;
     int m_channels;
     QnSpectrumData m_spectrumData;
+    mutable QnMutex m_mutex;
 };

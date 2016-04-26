@@ -1,10 +1,40 @@
 #include "spectrum_analizer.h"
 #include "math.h"
+#include <random>
+
+//#define USE_TEST_DATA
 
 namespace {
 
     static const int kUpdatesPerSecond = 4;
-    static const int kBands = 16;
+    static const int kFreqStart = 300;
+    static const int kFreqEnd = 3500;
+    static const int kBands = (kFreqEnd - kFreqStart) / 200;
+    static const double kBoostLevelDb = 2.5; //< max volume amplification for input data
+
+#ifdef USE_TEST_DATA
+    void fillTestData(const qint16* sampleData, int sampleCount, int channels, int srcSampleRate)
+    {
+        static const double kToneFrequency = 1 * 1000;
+
+        static double currentTime = 0.0;
+        double tonePeriodInSamples = srcSampleRate / kToneFrequency;
+        double stepPerSample = 2.0 * M_PI / tonePeriodInSamples;
+        
+        qint16* srcPtr = const_cast<qint16*>(sampleData);
+        for (int n = 0; n < sampleCount; ++n)
+        {
+            //std::mt19937 gen;
+            //std::uniform_int_distribution<qint64> dis(-32768, 32767);
+            //double value = dis(gen);
+            double value = sin(currentTime) * 32767;
+            for (int ch = 0; ch < channels; ++ch)
+                *srcPtr++ = value;
+            currentTime += stepPerSample;
+        }
+    }
+#endif
+
 
 /*
  FFT/IFFT routine. (see pages 507-508 of Numerical Recipes in C)
@@ -27,13 +57,13 @@ namespace {
 	data[] : The FFT or IFFT results are stored in data, overwriting the input.
 */
 
-static const float TWOPI = 2.0 * M_PI;
+static const double TWOPI = 2.0 * M_PI;
 
-void four1(float data[], int nn, int isign)
+void fftTransform(double data[], int nn, int isign)
 {
     int n, mmax, m, j, istep, i;
-    float wtemp, wr, wpr, wpi, wi, theta;
-    float tempr, tempi;
+    double wtemp, wr, wpr, wpi, wi, theta;
+    double tempr, tempi;
 
     n = nn << 1;
     j = 1;
@@ -101,7 +131,6 @@ QnSpectrumAnalizer::QnSpectrumAnalizer() :
     m_windowSize(0),
     m_HannCoeff(),
     m_data(),
-    m_fftMagnitude(),
     m_dataSize(0),
     m_channels(0),
     m_spectrumData()
@@ -113,20 +142,32 @@ void QnSpectrumAnalizer::initialize(int srcSampleRate, int channels)
     if (m_srcSampleRate == srcSampleRate && m_channels == channels)
         return;
 
+    m_srcSampleRate = srcSampleRate;
+    m_channels = channels;
+
     m_windowSize = toPowerOf2(srcSampleRate / kUpdatesPerSecond);
     m_HannCoeff.resize(m_windowSize);
     m_data.resize(m_windowSize * 2 + 1);
-    m_fftMagnitude.resize(m_windowSize / 2);
 
     // create Hann window filter
     for (int n = 0; n < m_windowSize; ++n)
-    {
-        m_HannCoeff[n] = 0.5 * (1 - cos((2 * M_PI * n) / float(m_windowSize-1)));
-    }
+        m_HannCoeff[n] = 0.5 * (1 - cos((2 * M_PI * n) / double(m_windowSize-1)));
 }
 
 void QnSpectrumAnalizer::processData(const qint16* sampleData, int sampleCount)
 {
+#ifdef USE_TEST_DATA
+    fillTestData(sampleData, sampleCount, m_channels, m_srcSampleRate);
+#endif
+
+    static const double kBoostLevel = 10 * log10(kBoostLevelDb); //< max volume amplification for input data
+    qint16 maxAmplifier = 32768 / kBoostLevel;
+
+    qint16 maxSampleValue = 0;
+    for (int i = 0; i < sampleCount * m_channels; ++i)
+        maxSampleValue = qMax(maxSampleValue, qint16(abs(sampleData[i])));
+    maxSampleValue = qMax(maxSampleValue, maxAmplifier); // max amlification level 1:4
+
     const qint16* curPtr = sampleData;
     for (int i = 0; i < sampleCount; ++i)
     {
@@ -136,40 +177,56 @@ void QnSpectrumAnalizer::processData(const qint16* sampleData, int sampleCount)
         sampleValue /= m_channels;
 
         int index = m_dataSize * 2 + 1;
-        m_data[index] = (sampleValue / 32768.0) * m_HannCoeff[m_dataSize]; // << Hann filtering
+        m_data[index] = (sampleValue / double(maxSampleValue)) * m_HannCoeff[m_dataSize]; // << Hann filtering
         if (++m_dataSize == m_windowSize)
         {
-            four1(m_data.data(), m_windowSize, 1); //< FFT transform
-            for (int n = 0; n < m_windowSize / 2; ++n)
-            {
-                float* complexNum = &m_data[n * 2 + 1];
-                m_fftMagnitude[n] = sqrt(complexNum[0] * complexNum[0] + complexNum[1] * complexNum[1]);
-                m_fftMagnitude[n] = 10 * log10(m_fftMagnitude[n]); //< to db
-            }
+            fftTransform(m_data.data(), m_windowSize, 1);
+            fillSpectrumData();
             m_dataSize = 0;
+            std::fill(m_data.begin(), m_data.end(), 0.0);
         }
-        m_spectrumData = fillSpectrumData();
     }
 }
 
-QnSpectrumData QnSpectrumAnalizer::fillSpectrumData() const
+void QnSpectrumAnalizer::fillSpectrumData()
 {
     QnSpectrumData result;
 
-    int stepsPerBand = (m_windowSize / 2) / kBands;
-    const float* srcData = &m_fftMagnitude[0];
-    for (int i = 0; i < kBands; ++i)
+    const double maxIndex = m_windowSize / 2;
+    const double maxFreqSum = m_windowSize / 2;
+    const double maxFreq = m_srcSampleRate / 2;
+    const double freqPerElement = maxFreq / maxIndex;
+
+    const int startIndex = kFreqStart / freqPerElement + 0.5;
+    const int endIndex = kFreqEnd / freqPerElement + 0.5;
+    const int stepsPerBand = (endIndex - startIndex) / kBands;
+
+    for(int currentIndex = startIndex; currentIndex <= endIndex;)
     {
-        float value = 0.0;
-        for (int j = 0; j < stepsPerBand; ++j)
-            value += *srcData++;
-        result.data.push_back(value);
+        double value = 0;
+        for (int i = 0; i < stepsPerBand; ++i)
+        {
+            double* complexNum = &m_data[currentIndex * 2 + 1];
+            double fftMagnitude = sqrt(complexNum[0] * complexNum[0] + complexNum[1] * complexNum[1]);
+            value += fftMagnitude;
+            currentIndex++;
+        }
+        result.data.push_back(qBound(0.0, value / maxFreqSum, 1.0));
+    }
+    
+    // convert result data to Db
+    for (auto& data: result.data)
+    {
+        static const double kScaler = 9;
+        data = log10(data * kScaler + 1.0);
     }
 
-    return result;
+    QnMutexLocker lock(&m_mutex);
+    m_spectrumData = result;
 }
 
 QnSpectrumData QnSpectrumAnalizer::getSpectrumData() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_spectrumData;
 }
