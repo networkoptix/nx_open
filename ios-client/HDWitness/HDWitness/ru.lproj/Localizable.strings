@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Это имя уже выбрано";
+"Please choose another name." = "Пожалуйста, выберите другое имя.";
+"OK" = "OK";
+"Name" = "Имя";
+"Host" = "Хост";
+"IP or hostname" = "IP адрес или имя хоста";
+"Port" = "Порт";
+"Login" = "Логин";
+"Password" = "Пароль";
+"Address: %@" = "Адрес: %@";
+"Error" = "Ошибка";
+"Connecting..." = "Соединяюсь...";
+"Can't connect to the System." = "Не могу подсоединиться к системе.";
+"Requesting cameras..." = "Запрашиваю камеры...";
+"Communication failure." = "Сетевая ошибка.";
+"The System is incompatible with the app" = "Это система не совместима с приложение";
+"Show Offline" = "Показать все";
+"Hide Offline" = "Скрыть оффлайн";
+"Systems" = "Системы";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Загружаю...";
+"No Signal..." = "Нет сигнала...";
+"Invalid Camera Credentials" = "Неправильные учётные данные для камеры";
+"Invalid Camera Credentials..." = "Неправильные учётные данные для камеры...";
+"Live" = "Сейчас";
+"Information" = "Информация";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "На выбранный момент времени архив отсутствует. Показать ближайшее?";
+"No" = "Нет";
+"Yes" = "Да";
+"Archive" = "Архив";
+"Go" = "Перейти";
+"Low" = "Низкое";
+"Medium" = "Среднее";
+"High" = "Хорошее";
+"Best" = "Лучшее";
+"Please Upgrade to Continue" = "Для продолжения необходимо обновление";
+"This app is not compatible with this version of the software. Please download our new app." = "Приложение несовместимо с данной версией ПО. Пожалуйста, загрузите новой приложение.";
+"Not now" = "Не сейчас";
+"Download" = "Загрузить";
+"Upgrade Now!" = "Загрузить сейчас!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "Вы пытаетесь соединиться с системой версии 2.5 или выше. Попробуйте новое более удобное приложение для просмотра видео.";

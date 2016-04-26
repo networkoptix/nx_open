@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">오프라인 보기</string>
+    <string name="menu_hide_offline">오프라인 숨기기</string>
+    <string name="resources_logout_offer">뒤로가기 버튼을 한번 더 눌러 로그아웃 함</string>
+    <string name="resources_loading_title">로딩중…</string>
+    <string name="resources_loading_text">데이터 읽는 중…</string>
+    <string name="menu_clear_cache">캐쉬 초기화</string>
+    <string name="resources_tree">목록 보기</string>
+    <string name="resources_grid">썸네일</string>
+    <string name="resources_logout">로그아웃</string>
+    <string name="promote_title">Upgrade Now!</string>
+    <string name="promote">You\'re connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience.</string>
+    <string name="download">Download</string>    
+
+</resources>

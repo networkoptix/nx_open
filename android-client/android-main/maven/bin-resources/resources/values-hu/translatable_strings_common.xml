@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accept">Elfogad</string>
+    <string name="error">Hiba</string>
+    <string name="save">Mentés</string>
+    <string name="edit">Szerkesztés</string>
+    <string name="delete">Törlés</string>
+    <string name="add">Hozzáadás</string>
+</resources>

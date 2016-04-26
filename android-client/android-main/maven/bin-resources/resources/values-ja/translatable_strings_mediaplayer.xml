@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_server_died">カメラが有効ではありません</string>
+    <string name="error_already_connected">既にカメラは接続されています</string>
+    <string name="error_not_connected">カメラに接続されていません</string>
+    <string name="error_unknown_host">不明なホスト</string>
+    <string name="error_cannot_connect">カメラに接続できません</string>
+    <string name="error_io">I/O エラー</string>
+    <string name="error_connection_lost">接続エラー</string>
+    <string name="error_malformed_packet">不正パケット</string>
+    <string name="error_out_of_range">範囲外</string>
+    <string name="error_buffer_too_small">バッファーが少なすぎます</string>
+    <string name="error_unsupported_format">フォーマットはサポートされていません</string>
+    <string name="error_end_of_stream">ストリームの最後</string>
+    <string name="error_unsupported_http_transport">Http転送はAndroid 4.0以上でサポートされます</string>
+    <string name="error_unsupported_rtsp_proxy">メディアサーバーに直接接続できません
+        Android4.0以上ではプロキシ経由でビデオ表示が可能です</string>
+    <string name="error_proxy_not_running">メディアサーバーに直接接続できません
+        アプリケーションプロキシサービスが開始されているか確認してください</string>
+    <string name="error_unsupported_rtsp_udp">サーバーからデバイスにビデオが到達できません 
+        ネットワーク上でUDPトラフィックが可能か確認してください</string>
+    <string name="error_native_codec">デバイスのカメラコーデックはサポートされません　解像度を変更して下さい</string>
+    <string name="error_unknown">カメラ無効</string>
+
+</resources>
