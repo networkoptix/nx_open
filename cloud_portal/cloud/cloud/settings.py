@@ -189,7 +189,8 @@ CLOUD_CONNECT = {
 IP_WHITELISTS = {
     'local': (
         '127.0.0.1',  # localhost
-        '95.3.1.136.2'  # moscow office
+        '74.7.76.98',  # LA office
+        '95.31.136.2'  # moscow office
         )
 }
 
@@ -200,6 +201,8 @@ AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend',)
 CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
 CORS_ALLOW_CREDENTIALS = True
 
+
+USE_ASYNC_QUEUE = False
 
 ADMINS = (('Evgeny', 'ebalashov@networkoptix.com'),)
 
