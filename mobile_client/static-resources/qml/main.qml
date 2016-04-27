@@ -1,7 +1,8 @@
-import QtQuick 2.4
+import QtQuick 2.0
 import QtQuick.Window 2.2
-import QtQuick.Controls 1.2
+import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.controls 1.0
 import com.networkoptix.qml 1.0
 
 import "items"
@@ -10,7 +11,8 @@ import "controls"
 import "main.js" as Main
 import "items/QnLoginPage.js" as LoginFunctions
 
-Window {
+ApplicationWindow
+{
     id: mainWindow
 
     visible: true
@@ -43,7 +45,7 @@ Window {
 
             property bool transitionAnimated: false
 
-            x: dp(10)
+            x: 10
             anchors.verticalCenter: parent.verticalCenter
 
             Behavior on progress {
@@ -91,7 +93,7 @@ Window {
         activeSessionId: currentSessionId
     }
 
-    QnMainStackView {
+    StackView {
         id: stackView
 
         anchors.top: toolBar.bottom

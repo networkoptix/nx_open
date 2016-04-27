@@ -1,9 +1,9 @@
 import QtQuick 2.4
-import QtQuick.Controls 1.3
+import Qt.labs.controls 1.0
 
 FocusScope {
     property string title
 
-    property bool activePage: Stack.status === Stack.Active
-    property int pageStatus: Stack.status
+    property bool activePage: StackView.status === StackView.Active
+    property int pageStatus: StackView.status
 }

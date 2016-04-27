@@ -1,5 +1,5 @@
 import QtQuick 2.4
-import QtQuick.Controls 1.3
+import Qt.labs.controls 1.0
 import com.networkoptix.qml 1.0
 import Nx 1.0
 
@@ -63,7 +63,7 @@ QnPage {
                 sideNavigation.enabled = true
             }
         }
-        visible: !liteMode && (pageStatus == Stack.Active || pageStatus == Stack.Activating)
+        visible: !liteMode && (pageStatus == StackView.Active || pageStatus == StackView.Activating)
         Keys.forwardTo: resourcesPage
 
         enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
