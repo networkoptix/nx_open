@@ -11,6 +11,7 @@
 #include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/future.h>
+#include <nx/utils/std/thread.h>
 
 // Template multitype socket tests to ensure that every common_ut run checks
 // TCP and UDT basic functionality
@@ -166,7 +167,7 @@ void socketSimpleSync(
 
     nx::utils::promise<void> promise;
     auto server = serverMaker();
-    std::thread serverThread(
+    nx::utils::thread serverThread(
         syncSocketServerMainFunc<decltype(server)>,
         endpointToBindTo,
         testMessage,
@@ -176,7 +177,7 @@ void socketSimpleSync(
 
     promise.get_future().wait();
 
-    std::thread clientThread([&endpointToConnectTo, &testMessage,
+    nx::utils::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
     {
         for (int i = clientCount; i > 0; --i)
@@ -382,7 +383,7 @@ void shutdownSocket(
     {
         nx::utils::promise<void> promise;
         auto server = serverMaker();
-        std::thread serverThread(
+        nx::utils::thread serverThread(
             syncSocketServerMainFunc<decltype(server)>,
             endpointToBindTo,
             boost::none,
@@ -396,7 +397,7 @@ void shutdownSocket(
         ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
 
         nx::utils::promise<void> recvExitedPromise;
-        std::thread clientThread(
+        nx::utils::thread clientThread(
             [&client, &recvExitedPromise, &endpointToConnectTo]()
             {
                 nx::Buffer readBuffer;
@@ -522,7 +523,7 @@ void socketSingleAioThread(
 {
     aio::AbstractAioThread* aioThread(nullptr);
     std::vector<decltype(clientMaker())> sockets;
-    nx::TestSyncQueue<std::thread::id> threadIdQueue;
+    nx::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
 
     for (auto i = 0; i < clientCount; ++i)
     {
@@ -546,7 +547,7 @@ void socketSingleAioThread(
         sockets.push_back(std::move(client));
     }
 
-    boost::optional<std::thread::id> aioThreadId;
+    boost::optional<nx::utils::thread::id> aioThreadId;
     for (auto i = 0; i < clientCount; ++i)
     {
         const auto threadId = threadIdQueue.pop();

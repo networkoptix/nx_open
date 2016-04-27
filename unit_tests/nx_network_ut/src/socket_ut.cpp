@@ -19,6 +19,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/utils/std/thread.h>
 
 
 namespace nx {
@@ -111,10 +112,10 @@ TEST( Socket, AsyncOperationCancellation )
     static const int TEST_RUNS = 5;
     static const int THREADS = 3;
 
-    std::vector<std::thread> threads(THREADS);
+    std::vector<nx::utils::thread> threads(THREADS);
     for (size_t i = 0; i < threads.size(); ++i)
     {
-        threads[i] = std::thread(
+        threads[i] = nx::utils::thread(
             [](){
                 for (int j = 0; j < TEST_RUNS; ++j)
                 {
