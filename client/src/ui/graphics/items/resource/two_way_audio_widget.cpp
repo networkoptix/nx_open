@@ -87,11 +87,3 @@ void QnTwoWayAudioWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
     Q_D(QnTwoWayAudioWidget);
     d->paint(painter, option->rect, palette());
 }
-
-QSizeF QnTwoWayAudioWidget::sizeHint(Qt::SizeHint which, const QSizeF& constraint /*= QSizeF()*/) const
-{
-    QSizeF base = base_type::sizeHint(which, constraint);
-
-    Q_D(const QnTwoWayAudioWidget);
-    return d->sizeHint(which, constraint, base);
-}

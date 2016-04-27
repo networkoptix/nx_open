@@ -376,18 +376,6 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
     }
 }
 
-QSizeF QnTwoWayAudioWidgetPrivate::sizeHint(Qt::SizeHint which, const QSizeF& constraint, const QSizeF& baseValue) const
-{
-    if (m_state == Pressed && !m_visualizerData.isEmpty())
-    {
-        qreal visualizerWidth = (kVisualizerLineWidth + kVisualizerLineOffset) * m_visualizerData.size();
-        qreal minSize = button->geometry().width();
-        qreal targetWidth = visualizerWidth + minSize * 1.5;
-        return QSizeF(targetWidth, baseValue.height());
-    }
-    return baseValue;
-}
-
 void QnTwoWayAudioWidgetPrivate::setState(HintState state)
 {
     if (m_state == state)

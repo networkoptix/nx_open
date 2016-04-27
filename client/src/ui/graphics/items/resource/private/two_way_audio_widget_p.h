@@ -34,7 +34,6 @@ public:
     void setFixedHeight(qreal height);
 
     void paint(QPainter *painter, const QRectF& sourceRect, const QPalette& palette);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint, const QSizeF& baseValue) const;
 
 private:
     enum HintState

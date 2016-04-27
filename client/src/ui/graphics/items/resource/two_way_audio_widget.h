@@ -29,8 +29,6 @@ public:
     void setColors(const QnTwoWayAudioWidgetColors& value);
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
-
 
 private:
     QScopedPointer<QnTwoWayAudioWidgetPrivate> const d_ptr;
