@@ -5,9 +5,11 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/ssl_socket.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
+#include <utils/common/ssl_gen_cert.h>
 
 namespace nx {
 namespace cctu {
@@ -25,7 +27,8 @@ void printListenOptions(std::ostream* const outStream)
     "  --server-id={server_id}      Id used when registering on mediator (optional)\n"
     "  --server-count=N             Random generated server Ids (to emulate several servers)\n"
     "  --local-address={ip:port}    Local address to listen\n"
-    "  --udt                        Use udt instead of tcp. Only if listening local address\n";
+    "  --udt                        Use udt instead of tcp. Only if listening local address\n"
+    "  --ssl                        Uses SSL on top of server socket type\n";
 }
 
 static const void limitStringList(QStringList* list)
@@ -128,13 +131,12 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
     auto credentialsIter = args.find("cloud-credentials");
     auto localAddressIter = args.find("local-address");
-
     if (credentialsIter != args.end())
     {
         const auto cloudCredentials = credentialsIter->second.split(":");
         if (cloudCredentials.size() != 2)
         {
-            std::cerr << "Error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
+            std::cerr << "error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
             return 1;
         }
 
@@ -186,11 +188,10 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         {
             std::cerr << "error. All sockets failed to listen on mediator. "
                 << std::endl;
-            return 1;
+            return 2;
         }
     }
-    else
-    if (localAddressIter != args.end())
+    else if (localAddressIter != args.end())
     {
         const bool isUdt = args.find("udt") != args.end();
 
@@ -208,13 +209,30 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         return 3;
     }
 
+    if (args.find("ssl") != args.end())
+    {
+        const auto sslCert = tmpnam(nullptr);
+        if (const auto ret = generateSslCertificate(sslCert, "cctu", "US", "cctu"))
+            return ret;
+
+        QFile file(QString::fromUtf8(sslCert));
+        if(!file.open(QIODevice::ReadOnly))
+        {
+            std::cerr << "Could not generate SSL certificate" << std::endl;
+            return 4;
+        }
+
+        nx::network::SslSocket::initSSLEngine(file.readAll());
+        serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
+    }
+
     server.setServerSocket(std::move(serverSocket));
     if (!server.start())
     {
         auto osErrorText = SystemError::getLastOSErrorText().toStdString();
         std::cerr << "error. Failed to start accepting connections. Reason: "
             << osErrorText << std::endl;
-        return 4;
+        return 5;
     }
 
     const int result = printStatsAndWaitForCompletion(

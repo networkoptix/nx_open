@@ -109,9 +109,7 @@ TEST_F( StunClientServerTest, Connectivity )
     EXPECT_EQ( server->connections.size(), 1 );
 
     server.reset();
-    EXPECT_THAT( sendTestRequestSync(), testing::AnyOf(
-        SystemError::connectionRefused, SystemError::connectionReset,
-        SystemError::timedOut ) ); // no server to connect
+    EXPECT_NE( sendTestRequestSync(), SystemError::noError ); // no server
 
     startServer();
     EXPECT_EQ( server->connections.size(), 0 );

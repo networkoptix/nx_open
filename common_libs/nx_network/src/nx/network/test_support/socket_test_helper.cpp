@@ -202,64 +202,95 @@ void TestConnection::startIO()
 
     switch (m_transmissionMode)
     {
-        case TestTransmissionMode::spam:
-            using namespace std::placeholders;
-            m_socket->readSomeAsync(
-                &m_readBuffer,
-                std::bind(&TestConnection::onDataReceived, this, _1, _2));
-            NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
-                .arg(m_accepted).arg(m_outData.size())
-                .arg(m_socket->getForeignAddress().toString()),
-                cl_logDEBUG2);
-            m_socket->sendAsync(
-                m_outData,
-                std::bind(&TestConnection::onDataSent, this, _1, _2));
-            return;
-
-        case TestTransmissionMode::pong:
-            readAllAsync(
-                [this]()
-                {
-                    // just send data back
-                    m_outData = std::move(m_readBuffer);
-                    sendAllAsync(
-                        [this]
-                        {
-                            // start all over again
-                            m_readBuffer.resize(0);
-                            m_readBuffer.reserve(READ_BUF_SIZE);
-                            startIO();
-                        });
-                });
-            return;
-
-        case TestTransmissionMode::ping:
-            sendAllAsync(
-                [this]()
-                {
-                    readAllAsync(
-                        [this]
-                        {
-                            // if all ok start all over again
-                            if (m_readBuffer == m_outData)
-                            {
-                                NX_LOGX(lm("Echo virified bytes: %1")
-                                    .arg(m_readBuffer.size()), cl_logDEBUG2);
-
-                                m_readBuffer.resize(0);
-                                return startIO();
-                            }
-
-                            NX_LOGX(lm("Recieved data does not match sent"),
-                                cl_logERROR);
-
-                            reportFinish( SystemError::invalidData );
-                        });
-                });
-             return;
+        case TestTransmissionMode::spam: return startSpamIO();
+        case TestTransmissionMode::pong: return startEchoIO();
+        case TestTransmissionMode::ping: return startEchoTestIO();
     };
 
     NX_ASSERT(false);
+}
+
+
+void TestConnection::startSpamIO()
+{
+    using namespace std::placeholders;
+    if (m_accepted) // server side?
+    {
+        m_socket->readSomeAsync(
+            &m_readBuffer,
+            [this](SystemError::ErrorCode code, size_t bytes)
+            {
+                if (code == SystemError::noError && bytes != 0)
+                {
+                    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+                        .arg(m_accepted).arg(m_outData.size())
+                        .arg(m_socket->getForeignAddress().toString()),
+                        cl_logDEBUG2);
+                    m_socket->sendAsync(
+                        m_outData,
+                        std::bind(&TestConnection::onDataSent, this, _1, _2));
+                }
+
+                onDataReceived(code, bytes);
+            });
+    }
+    else
+    {
+        m_socket->readSomeAsync(
+            &m_readBuffer,
+            std::bind(&TestConnection::onDataReceived, this, _1, _2));
+        NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+            .arg(m_accepted).arg(m_outData.size())
+            .arg(m_socket->getForeignAddress().toString()),
+            cl_logDEBUG2);
+        m_socket->sendAsync(
+            m_outData,
+            std::bind(&TestConnection::onDataSent, this, _1, _2));
+    }
+}
+
+void TestConnection::startEchoIO()
+{
+    readAllAsync(
+        [this]()
+        {
+            // just send data back
+            m_outData = std::move(m_readBuffer);
+            sendAllAsync(
+                [this]
+                {
+                    // start all over again
+                    m_readBuffer.resize(0);
+                    m_readBuffer.reserve(READ_BUF_SIZE);
+                    startEchoIO();
+                });
+        });
+}
+
+void TestConnection::startEchoTestIO()
+{
+    sendAllAsync(
+        [this]()
+        {
+            readAllAsync(
+                [this]
+                {
+                    // if all ok start all over again
+                    if (m_readBuffer == m_outData)
+                    {
+                        NX_LOGX(lm("Echo virified bytes: %1")
+                            .arg(m_readBuffer.size()), cl_logDEBUG2);
+
+                        m_readBuffer.resize(0);
+                        return startEchoTestIO();
+                    }
+
+                    NX_LOGX(lm("Recieved data does not match sent"),
+                        cl_logERROR);
+
+                    reportFinish( SystemError::invalidData );
+                });
+        });
 }
 
 void TestConnection::readAllAsync( std::function<void()> handler )
