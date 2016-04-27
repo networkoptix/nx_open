@@ -208,18 +208,22 @@ void QnVoiceSpectrumAnalyzer::fillSpectrumData()
 
     const int startIndex = kFreqStart / freqPerElement + 0.5;
     const int endIndex = kFreqEnd / freqPerElement + 0.5;
-    const int stepsPerBand = (endIndex - startIndex) / kBands;
+    const double stepsPerBand = (endIndex - startIndex + 1) / (double) kBands;
 
-    for (int currentIndex = startIndex; currentIndex <= endIndex;)
+    double currentStep = 0.0;
+    for(int currentIndex = startIndex; currentIndex <= endIndex;)
     {
-        double value = 0;
-        for (int i = 0; i < stepsPerBand; ++i)
+        double value = 0.0;
+        static const double epsilon = 1e-10;
+        while (currentStep + epsilon < stepsPerBand)
         {
             double* complexNum = &m_data[currentIndex * 2 + 1];
             double fftMagnitude = sqrt(complexNum[0] * complexNum[0] + complexNum[1] * complexNum[1]);
             value += fftMagnitude;
             currentIndex++;
+            currentStep += 1.0;
         }
+        currentStep -= stepsPerBand;
         result.data.push_back(qBound(0.0, value / maxFreqSum, 1.0));
     }
     //Q_ASSERT_X(result.data.size() == kBands, Q_FUNC_INFO, "Invalid bands count");
