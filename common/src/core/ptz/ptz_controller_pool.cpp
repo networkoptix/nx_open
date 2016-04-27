@@ -161,7 +161,10 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
 
     emit q->controllerAboutToBeChanged(resource);
 
-    controllerByResource.insert(resource, controller);
+    {
+        QnMutexLocker locker(&mutex);
+        controllerByResource.insert(resource, controller);
+    }
 
     /* Some controller require an event loop to function, so we move them
      * to executor thread. Note that controllers don't run synchronous requests
