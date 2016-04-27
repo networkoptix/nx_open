@@ -72,8 +72,6 @@ private:
 }   //namespace detail
 
 class thread
-:
-    private QnLongRunnable
 {
 public:
     typedef std::thread::id id;
