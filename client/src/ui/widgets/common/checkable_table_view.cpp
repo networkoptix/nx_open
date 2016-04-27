@@ -71,7 +71,7 @@ void QnCheckableTableView::synchronizeWithModel()
                 if (selectedStart.isValid())
                 {
                     /* End selected range and store it: */
-                    selected.select(selectedStart, index);
+                    selected.select(selectedStart, dataModel->index(row - 1, m_checkboxColumn));
                     selectedStart = QModelIndex();
                 }
             }
@@ -112,7 +112,7 @@ void QnCheckableTableView::modelDataChanged(const QModelIndex& topLeft, const QM
                     if (deselectedStart.isValid())
                     {
                         /* End deselected range and store it: */
-                        deselected.select(deselectedStart, index);
+                        deselected.select(deselectedStart, dataModel->index(row - 1, m_checkboxColumn));
                         deselectedStart = QModelIndex();
                     }
                 }
@@ -125,7 +125,7 @@ void QnCheckableTableView::modelDataChanged(const QModelIndex& topLeft, const QM
                     if (selectedStart.isValid())
                     {
                         /* End selected range and store it: */
-                        selected.select(selectedStart, index);
+                        selected.select(selectedStart, dataModel->index(row - 1, m_checkboxColumn));
                         selectedStart = QModelIndex();
                     }
                 }
