@@ -376,7 +376,6 @@ namespace nx_http
         *dstBuffer += " ";
         QByteArray path = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         *dstBuffer += path.isEmpty() ? "/" : path;
-        *dstBuffer += urlPostfix;
         *dstBuffer += " ";
         version.serialize( dstBuffer );
         *dstBuffer += "\r\n";
@@ -450,7 +449,8 @@ namespace nx_http
     bool parseRequestOrResponse(
         const ConstBufferRefType& data,
         MessageType* message,
-        MessageLineType MessageType::*messageLine )
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict = false)
     {
         enum ParseState
         {
@@ -487,7 +487,12 @@ namespace nx_http
                         StringType headerName;
                         StringType headerValue;
                         if( !parseHeader( &headerName, &headerValue, currentLine ) )
-                            return false;
+                        {
+                            if(parseHeadersNonStrict)
+                                break;
+                            else
+                                return false;
+                        }
                         message->headers.insert( std::make_pair( headerName, headerValue ) );
                         break;
                     }
@@ -601,6 +606,11 @@ namespace nx_http
         BufferType buf;
         serializeMultipartResponse( &buf, boundary );
         return buf;
+    }
+
+    bool RtspResponse::parse(const ConstBufferRefType &data)
+    {
+        return parseRequestOrResponse( data, (Response*)this, &Response::statusLine, true );
     }
 
     namespace MessageType

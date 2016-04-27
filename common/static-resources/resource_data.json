@@ -19,6 +19,12 @@
     "data": [
         {
             "keys": [
+                "ActiveCam|*"
+            ],
+            "forceONVIF": true
+        },
+		{
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
@@ -247,7 +253,7 @@
         },
     {
             "keys": [
-                "Win4NET Co., Ltd.|Clebo-FD20"
+                "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },

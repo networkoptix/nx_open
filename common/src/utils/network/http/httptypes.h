@@ -271,7 +271,6 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
-        nx::Buffer urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
@@ -325,6 +324,12 @@ namespace nx_http
         void serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary ) const;
         BufferType toString() const;
         BufferType toMultipartString(const ConstBufferRefType& boundary) const;
+    };
+
+    class RtspResponse : public Response
+    {
+    public:
+        bool parse( const ConstBufferRefType& data);
     };
 
     namespace MessageType
@@ -381,7 +386,8 @@ namespace nx_http
             {
                 none,
                 basic,
-                digest
+                digest,
+                automatic
             };
 
             const char* toString( Value val );

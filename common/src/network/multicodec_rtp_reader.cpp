@@ -42,7 +42,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default),
     m_gotData(false),
-    m_rtpStarted(false)
+    m_rtpStarted(false),
+    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -455,8 +456,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     }
     else
         QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
-
-    m_RtpSession.setAuth(nres->getAuth(), nx_http::header::AuthScheme::basic);
+    m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
     m_tracks.clear();
     m_gotKeyDataInfo.clear();
     m_gotData = false;
@@ -580,6 +580,10 @@ void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _def
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
+}
+
+void QnMulticodecRtpReader::setPrefferedAuthScheme(const nx_http::header::AuthScheme::Value scheme){
+    m_prefferedAuthScheme = scheme;
 }
 
 QnConstResourceVideoLayoutPtr QnMulticodecRtpReader::getVideoLayout() const
