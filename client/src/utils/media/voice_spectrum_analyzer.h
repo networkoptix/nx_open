@@ -23,6 +23,9 @@ public:
     void processData(const qint16* sampleData, int sampleCount);
 
     QnSpectrumData getSpectrumData() const;
+
+    /** Number of bands in the result data. */
+    static int bandsCount();
 private:
     void fillSpectrumData();
 private:

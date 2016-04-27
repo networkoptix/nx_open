@@ -10,7 +10,8 @@ namespace
     static const int kUpdatesPerSecond = 30;
     static const int kFreqStart = 50;
     static const int kFreqEnd = 800;
-    static const int kBands = (kFreqEnd - kFreqStart) / 50;
+    static const int kFreqPerElement = 50;
+    static const int kBands = (kFreqEnd - kFreqStart) / kFreqPerElement;
     static const double kBoostLevelDb = 2.5; //< max volume amplification for input data
 
 #ifdef USE_TEST_DATA
@@ -209,7 +210,7 @@ void QnVoiceSpectrumAnalyzer::fillSpectrumData()
     const int endIndex = kFreqEnd / freqPerElement + 0.5;
     const int stepsPerBand = (endIndex - startIndex) / kBands;
 
-    for(int currentIndex = startIndex; currentIndex <= endIndex;)
+    for (int currentIndex = startIndex; currentIndex <= endIndex;)
     {
         double value = 0;
         for (int i = 0; i < stepsPerBand; ++i)
@@ -221,6 +222,7 @@ void QnVoiceSpectrumAnalyzer::fillSpectrumData()
         }
         result.data.push_back(qBound(0.0, value / maxFreqSum, 1.0));
     }
+    //Q_ASSERT_X(result.data.size() == kBands, Q_FUNC_INFO, "Invalid bands count");
 
     // convert result data to Db
     for (auto& data: result.data)
@@ -236,5 +238,11 @@ void QnVoiceSpectrumAnalyzer::fillSpectrumData()
 QnSpectrumData QnVoiceSpectrumAnalyzer::getSpectrumData() const
 {
     QnMutexLocker lock(&m_mutex);
+    //Q_ASSERT_X(m_spectrumData.data.isEmpty() || m_spectrumData.data.size() == kBands, Q_FUNC_INFO, "Invalid result size");
     return m_spectrumData;
+}
+
+int QnVoiceSpectrumAnalyzer::bandsCount()
+{
+    return kBands;
 }

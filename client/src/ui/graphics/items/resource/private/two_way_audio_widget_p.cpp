@@ -37,7 +37,7 @@ namespace
     /** Label font size. */
     const int kHintFontPixelSize = 14;
 
-    /** Max visualizer value change per second. */
+    /** Max visualizer value change per second (on increasing and decreasing values). */
     const qreal kVisualizerAnimationUpSpeed = 5.0;
     const qreal kVisualizerAnimationDownSpeed = 1.0;
 
@@ -47,7 +47,7 @@ namespace
     /** Values lower than that value will be counted as silence. */
     const qreal kNormalizerSilenceValue = 0.1;
 
-    /** Values lower than that value will be counted as silence. */
+    /** Maximum value, to which all values are normalized. */
     const qreal kNormalizerIncreaseValue = 0.9;
 
     /** Recommended visualizer line width. */
@@ -61,6 +61,9 @@ namespace
 
     /** How long error should be displayed. */
     const int kShowErrorMs = 2000;
+
+    /** How fast should we warn user about absent data. */
+    const int kDataTimeoutMs = 2000;
 
     const qreal kHidden = 0.0;
     const qreal kVisible = 1.0;
@@ -102,7 +105,13 @@ namespace
         if (source.isEmpty())
             return;
         auto max = std::max_element(source.cbegin(), source.cend());
+
+        /* Do not normalize if silence */
         if (*max < kNormalizerSilenceValue)
+            return;
+
+        /* Do not normalize if there is bigger value, so normalizing will always only increase values. */
+        if (*max > kNormalizerIncreaseValue)
             return;
 
         auto k = kNormalizerIncreaseValue / *max;
@@ -112,6 +121,8 @@ namespace
 
     VisualizerData animateVector(const VisualizerData& prev, const VisualizerData& next, qint64 timeStepMs)
     {
+        //Q_ASSERT(next.size() == QnVoiceSpectrumAnalyzer::bandsCount());
+
         if (prev.size() != next.size())
             return next;
 
@@ -132,6 +143,24 @@ namespace
         }
         return result;
     }
+
+    VisualizerData generateEmptyVector(qint64 elapsedMs)
+    {
+        /* Making slider move forth and back.. */
+        int size = QnVoiceSpectrumAnalyzer::bandsCount();
+        int maxIdx = size * 2 - 1;
+
+        VisualizerData result(QnVoiceSpectrumAnalyzer::bandsCount(), 0.0);
+        int idx = qRound(16.0 * elapsedMs / 1000) % maxIdx;
+        if (idx >= size)
+            idx = maxIdx - idx;
+
+        bool isValidIndex = idx >= 0 && idx < result.size();
+        Q_ASSERT_X(isValidIndex, Q_FUNC_INFO, "Invalid timeStep value");
+        if (isValidIndex)
+            result[idx] = 0.2;
+        return result;
+    }
 }
 
 
@@ -149,7 +178,8 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     m_hintAnimator(nullptr),
     m_hintVisibility(kHidden),
     m_stateTimer(),
-    m_visualizerData()
+    m_visualizerData(),
+    m_paintTimeStamp(0)
 {
     hint->setAcceptedMouseButtons(0);
     hint->setPerformanceHint(GraphicsLabel::PixmapCaching);
@@ -177,14 +207,25 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
         switch (m_state)
         {
         case OK:
-        case Pressed:
             return;
+
+        case Pressed:
+            if (m_stateTimer.hasExpired(kDataTimeoutMs) && m_visualizerData.isEmpty())
+            {
+                setHint(tr("Input device is not found."));
+                setState(Error);
+                stopStreaming();
+            }
+            return;
+
         case Released:
             timeout = kShowHintMs;
             break;
+
         case Error:
             timeout = kShowErrorMs;
             break;
+
         default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid case");
             return;
@@ -231,14 +272,12 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
     }, QThread::currentThread());
 
-    if (m_requestHandle <= 0)
+    m_started = m_requestHandle > 0;
+    if (!m_started)
     {
         setHint(tr("Network error."));
         setState(Error);
-        return;
     }
-
-    m_started = true;
 }
 
 void QnTwoWayAudioWidgetPrivate::stopStreaming()
@@ -246,10 +285,12 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!m_started)
         return;
 
+    Q_ASSERT_X(m_state == Pressed || m_state == Error, Q_FUNC_INFO, "Invalid state");
     if (m_state != Error)
         setState(Released);
 
     m_started = false;
+    m_requestHandle = 0;
 
     if (!camera)
         return;
@@ -260,7 +301,7 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
 
     //TODO: #GDM What should we do if we cannot stop streaming?
     if (m_state != Error)
-        m_requestHandle = server->restConnection()->twoWayAudioCommand(camera->getId(), false, rest::ServerConnection::GetCallback());
+        server->restConnection()->twoWayAudioCommand(camera->getId(), false, rest::ServerConnection::GetCallback());
 }
 
 void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)
@@ -298,26 +339,20 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
     {
         Q_ASSERT_X(m_stateTimer.isValid(), Q_FUNC_INFO, "Make sure timer is valid");
 
+        qint64 oldTimeStamp = m_paintTimeStamp;
+        m_paintTimeStamp = m_stateTimer.elapsed();
+        qint64 timeStepMs = m_paintTimeStamp - oldTimeStamp;
+
         auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
         if (data.isEmpty())
         {
-            setHint(tr("Input device is not found."));
-            setState(Error);
-            return;
+            m_visualizerData = generateEmptyVector(m_paintTimeStamp);
         }
-
-        qint64 oldTs = m_paintTimeStamp;
-        m_paintTimeStamp = m_stateTimer.elapsed();
-        normalizeVector(data);
-
-        /* Calculate size hint when first time receiving analyzed data. */
-        if (m_visualizerData.isEmpty() && !data.isEmpty())
+        else
         {
-            Q_Q(QnTwoWayAudioWidget);
-            q->updateGeometry();
+            normalizeVector(data);
+            m_visualizerData = animateVector(m_visualizerData, data,timeStepMs);
         }
-
-        m_visualizerData = animateVector(m_visualizerData, data, m_paintTimeStamp - oldTs);
 
         QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize, 0.0));
         if (visualizerRect.isValid())
@@ -327,9 +362,9 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
 
 QSizeF QnTwoWayAudioWidgetPrivate::sizeHint(Qt::SizeHint which, const QSizeF& constraint, const QSizeF& baseValue) const
 {
-    if (m_state == Pressed && !m_visualizerData.isEmpty())
+    if (m_state == Pressed)
     {
-        qreal visualizerWidth = (kVisualizerLineWidth + kVisualizerLineOffset) * m_visualizerData.size();
+        qreal visualizerWidth = (kVisualizerLineWidth + kVisualizerLineOffset) * QnVoiceSpectrumAnalyzer::bandsCount();
         qreal minSize = button->geometry().width();
         qreal targetWidth = visualizerWidth + minSize * 1.5;
         return QSizeF(targetWidth, baseValue.height());
@@ -364,6 +399,7 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
         break;
     }
 
+    m_paintTimeStamp = 0;
     if (m_state == OK)
         m_stateTimer.invalidate();
     else
