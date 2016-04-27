@@ -10,7 +10,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 
 // Template multitype socket tests to ensure that every common_ut run checks

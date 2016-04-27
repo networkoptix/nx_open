@@ -2,7 +2,7 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 struct StoppableTestClass

@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/random_online_endpoint_selector.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 TEST(RandomOnlineEndpointSelector, common)

@@ -8,7 +8,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
 #include <utils/common/model_functions.h>
 #include <utils/serialization/sql.h>

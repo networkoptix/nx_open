@@ -1,7 +1,7 @@
 
 #include "stoppable.h"
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 void QnStoppableAsync::pleaseStopSync()

@@ -6,7 +6,7 @@
 #include <nx/network/stun/async_client.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/retry_timer.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "cdb_endpoint_fetcher.h"

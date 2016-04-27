@@ -3,7 +3,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <utils/serialization/lexical.h>
 
 #include "tunnel/udp/acceptor.h"

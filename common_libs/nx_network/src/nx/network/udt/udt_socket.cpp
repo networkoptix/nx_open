@@ -14,7 +14,7 @@
 #include <boost/optional.hpp>
 
 #include <udt/udt.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
 #include <utils/common/checked_cast.h>
