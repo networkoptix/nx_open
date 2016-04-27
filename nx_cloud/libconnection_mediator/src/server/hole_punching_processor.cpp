@@ -8,19 +8,23 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
+#include <nx/utils/std/future.h>
 
 #include "listening_peer_pool.h"
+#include "settings.h"
 
 
 namespace nx {
 namespace hpm {
 
 HolePunchingProcessor::HolePunchingProcessor(
+    const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool)
 :
     RequestProcessor(cloudData),
+    m_settings(settings),
     m_listeningPeerPool(listeningPeerPool)
 {
     dispatcher->registerRequestProcessor(
@@ -68,7 +72,7 @@ HolePunchingProcessor::~HolePunchingProcessor()
     if (localSessions.empty())
         return;
 
-    std::promise<void> allSessionsStoppedPromise;
+    nx::utils::promise<void> allSessionsStoppedPromise;
     {
         nx::BarrierHandler barrier(
             [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });
@@ -123,7 +127,8 @@ void HolePunchingProcessor::connect(
                 &HolePunchingProcessor::connectSessionFinished,
                 this,
                 std::move(connectionFsmIterAndFlag.first),
-                std::placeholders::_1));
+                std::placeholders::_1),
+            m_settings);
 
     //launching connect FSM
     connectionFsmIterAndFlag.first->second->onConnectRequest(
@@ -138,7 +143,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_LOGX(lm("connect ack. from %1, connection id %3").
+    NX_LOGX(lm("connect ack. from %1, connection id %2").
         arg(connection->getSourceAddress().toString()).
         arg(request.connectSessionId),
         cl_logDEBUG2);
@@ -157,11 +162,16 @@ void HolePunchingProcessor::onConnectionAckRequest(
 }
 
 void HolePunchingProcessor::connectionResult(
-    const ConnectionStrongRef& /*connection*/,
+    const ConnectionStrongRef& connection,
     api::ConnectionResultRequest request,
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
+    NX_LOGX(lm("connect result. from %1, connection id %2. result: %3").
+        arg(connection->getSourceAddress().toString()).
+        arg(request.connectSessionId).arg(QnLexical::serialized(request.resultCode)),
+        cl_logDEBUG2);
+
     QnMutexLocker lk(&m_mutex);
     auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())

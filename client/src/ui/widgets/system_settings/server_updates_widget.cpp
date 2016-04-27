@@ -15,8 +15,8 @@
 #include <ui/common/palette.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/sorted_server_updates_model.h>
-#include <ui/dialogs/file_dialog.h>
-#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
@@ -279,6 +279,13 @@ bool QnServerUpdatesWidget::cancelUpdate() {
     return true;
 }
 
+bool QnServerUpdatesWidget::canCancelUpdate() const
+{
+    if (m_updateTool->isUpdating())
+        return m_updateTool->canCancelUpdate();
+    return true;
+}
+
 bool QnServerUpdatesWidget::isUpdating() const {
     return m_updateTool->isUpdating();
 }
@@ -297,6 +304,14 @@ void QnServerUpdatesWidget::applyChanges()
     qnGlobalSettings->synchronizeNow();
 }
 
+void QnServerUpdatesWidget::discardChanges()
+{
+    if (!canCancelUpdate())
+        QnMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
+    else
+        cancelUpdate();
+}
+
 bool QnServerUpdatesWidget::hasChanges() const {
     if (isReadOnly())
         return false;
@@ -304,22 +319,21 @@ bool QnServerUpdatesWidget::hasChanges() const {
     return qnGlobalSettings->isUpdateNotificationsEnabled() != ui->updatesNotificationCheckbox->isChecked();
 }
 
-bool QnServerUpdatesWidget::canApplyChanges() {
+bool QnServerUpdatesWidget::canApplyChanges() const
+{
     //TODO: #GDM now this prevents other tabs from saving their changes
-    if (isUpdating()) {
-        QnMessageBox::information(this, tr("Information"), tr("Update is in process now."));
+    //QnMessageBox::information(this, tr("Information"), tr("Update is in process now."));
+    if (isUpdating())
         return false;
-    }
 
     return true;
 }
 
-bool QnServerUpdatesWidget::canDiscardChanges() {
+bool QnServerUpdatesWidget::canDiscardChanges() const
+{
     //TODO: #GDM now this prevents other tabs from discarding their changes
-    if(!cancelUpdate()) {
-        QnMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
+    if(!canCancelUpdate())
         return false;
-    }
 
     return true;
 }

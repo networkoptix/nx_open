@@ -10,10 +10,12 @@
 #include <memory>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
+#include "nx/network/aio/abstract_pollable.h"
 #include "nx/network/socket_common.h"
 #include "nx/network/socket_factory.h"
 #include "nx/network/system_socket.h"
@@ -51,7 +53,7 @@ template<
     class SerializerType>
 class UnreliableMessagePipeline
 :
-    public QnStoppableAsync
+    public aio::AbstractPollable
 {
     typedef UnreliableMessagePipeline<
         MessageType,
@@ -69,15 +71,12 @@ public:
     UnreliableMessagePipeline(CustomPipeline* customPipeline)
     :
         m_customPipeline(customPipeline),
-        m_socket(std::make_unique<UDPSocket>()),
-        m_terminationFlag(nullptr)
+        m_socket(std::make_unique<UDPSocket>())
     {
     }
 
     ~UnreliableMessagePipeline()
     {
-        if (m_terminationFlag)
-            *m_terminationFlag = true;
     }
 
     /**
@@ -86,6 +85,26 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
         m_socket->pleaseStop(std::move(completionHandler));
+    }
+
+    virtual aio::AbstractAioThread* getAioThread() override
+    {
+        return m_socket->getAioThread();
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        m_socket->bindToAioThread(aioThread);
+    }
+
+    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override
+    {
+        m_socket->post(std::move(func));
+    }
+
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override
+    {
+        m_socket->dispatch(std::move(func));
     }
 
     /** If not called, any vacant local port will be used */
@@ -122,8 +141,11 @@ public:
         serializedMessage.reserve(nx::network::kTypicalMtuSize);
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
-        NX_ASSERT(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
-                nx_api::SerializerState::done);
+        if (messageSerializer.serialize(&serializedMessage, &bytesWritten) != 
+            nx_api::SerializerState::done)
+        {
+            NX_ASSERT(false);
+        }
 
         m_socket->dispatch(
             [this, endpoint = std::move(destinationEndpoint),
@@ -141,14 +163,13 @@ public:
     }
 
     /** Move ownership of socket to the caller.
-        \a UnreliableMessagePipeline is in undefined state after this call and MUST be freed
-        \note Can be called within send/recv completion handler  only
+        \a UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
+        \note Can be called within send/recv completion handler only
             (more specifically, within socket's aio thread)!
     */
     std::unique_ptr<network::UDPSocket> takeSocket()
     {
-        if (m_terminationFlag)
-            *m_terminationFlag = true;
+        m_terminationFlag.markAsDeleted();
         //we MUST be in aio thread. TODO #ak add NX_ASSERT for aio thread
         m_socket->cancelIOSync(aio::etNone); 
         return std::move(m_socket);
@@ -193,7 +214,7 @@ private:
     nx::Buffer m_readBuffer;
     ParserType m_messageParser;
     std::deque<OutgoingMessageContext> m_sendQueue;
-    bool* m_terminationFlag;
+    nx::utils::ObjectDestructionFlag m_terminationFlag;
 
     void onBytesRead(
         SystemError::ErrorCode errorCode,
@@ -206,37 +227,37 @@ private:
         {
             NX_LOGX(lm("Error reading from socket. %1").
                 arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-            bool terminated = false;
-            m_terminationFlag = &terminated;
+
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
             m_customPipeline->ioFailure(errorCode);
-            if (terminated)
+            if (watcher.objectDestroyed())
                 return; //this has been freed
-            m_terminationFlag = nullptr;
             m_socket->registerTimer(
                 kRetryReadAfterFailureTimeout,
                 [this]() { startReceivingMessages(); });
             return;
         }
 
-        //reading and parsing message
-        size_t bytesParsed = 0;
-        MessageType msg;
-        m_messageParser.setMessage(&msg);
-        if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
+        if (bytesRead > 0)  //zero-sized UDP datagramm is OK
         {
-            bool terminated = false;
-            m_terminationFlag = &terminated;
-            m_customPipeline->messageReceived(
-                std::move(sourceAddress),
-                std::move(msg));
-            if (terminated)
-                return; //this has been freed
-            m_terminationFlag = nullptr;
-        }
-        else
-        {
-            NX_LOGX(lm("Failed to parse UDP datagram of size %1").
-                arg((unsigned int)bytesRead), cl_logDEBUG1);
+            //reading and parsing message
+            size_t bytesParsed = 0;
+            MessageType msg;
+            m_messageParser.setMessage(&msg);
+            if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
+            {
+                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
+                m_customPipeline->messageReceived(
+                    std::move(sourceAddress),
+                    std::move(msg));
+                if (watcher.objectDestroyed())
+                    return; //this has been freed
+            }
+            else
+            {
+                NX_LOGX(lm("Failed to parse UDP datagram of size %1").
+                    arg((unsigned int)bytesRead), cl_logDEBUG1);
+            }
         }
 
         m_readBuffer.resize(0);
@@ -287,13 +308,19 @@ private:
         }
         else
         {
-            NX_ASSERT(bytesSent == m_sendQueue.front().serializedMessage.size());
+            NX_ASSERT(bytesSent == (size_t)m_sendQueue.front().serializedMessage.size());
         }
 
-        if (m_sendQueue.front().completionHandler)
-            m_sendQueue.front().completionHandler(
+        auto completionHandler = std::move(m_sendQueue.front().completionHandler);
+        if (completionHandler)
+        {
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
+            completionHandler(
                 errorCode,
                 std::move(resolvedTargetAddress));
+            if (watcher.objectDestroyed())
+                return;
+        }
         m_sendQueue.pop_front();
 
         if (!m_sendQueue.empty())

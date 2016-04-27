@@ -11,6 +11,7 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket.h>
+#include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
@@ -23,14 +24,18 @@ namespace hpm {
 
 class MediaServerEmulator
 :
-    private QnStoppableAsync
+    private QnStoppableAsync,
+    public StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
     enum class ActionToTake
     {
-        proceedWithConnection,
         ignoreIndication,
-        closeConnectionToMediator
+        closeConnectionToMediator,
+        establishUdtConnection,
+        ignoreSyn,
+        sendBadSynAck,
+        proceedWithConnection,
     };
 
     /**
@@ -79,6 +84,8 @@ private:
     nx::hpm::api::ConnectionRequestedEvent m_connectionRequestedData;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtStreamSocket;
     std::unique_ptr<nx::network::UdtStreamServerSocket> m_udtStreamServerSocket;
+    std::unique_ptr<stun::MessagePipeline> m_stunPipeline;
+    ActionToTake m_action;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);
@@ -87,6 +94,11 @@ private:
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
         AbstractStreamSocket* acceptedSocket);
+    void onMessageReceived(nx::stun::Message message);
+
+    virtual void closeConnection(
+        SystemError::ErrorCode closeReason,
+        stun::MessagePipeline* connection) override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     MediaServerEmulator(const MediaServerEmulator&);

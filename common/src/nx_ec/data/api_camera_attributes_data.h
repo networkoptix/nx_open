@@ -49,7 +49,7 @@ namespace ec2
             minArchiveDays(0),
             maxArchiveDays(0),
             failoverPriority(Qn::FP_Medium),
-            backupType(Qn::CameraBackup_Disabled)
+            backupType(Qn::CameraBackup_Default)
         {}
 
         QnUuid              cameraID;

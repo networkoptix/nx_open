@@ -24,7 +24,6 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/widgets/ptz_tour_widget.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -170,10 +169,10 @@ void QnPtzManageDialog::accept() {
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
     QnPtzPresetList presets = data.presets;
     QnPtzTourList tours = data.tours;
-    qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringLess(l.name, r.name);
     });
-    qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+    std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
         return naturalStringLess(l.name, r.name);
     });
 
@@ -311,7 +310,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
     if (fields & Qn::PresetsPtzField) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
-            qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+            std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
                 return naturalStringLess(l.name, r.name);
             });
             m_model->setPresets(presets);
@@ -321,7 +320,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
     if (fields & Qn::ToursPtzField) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
-            qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+            std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
                 return naturalStringLess(l.name, r.name);
             });
             m_model->setTours(tours);

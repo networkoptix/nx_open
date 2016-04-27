@@ -84,6 +84,15 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     for (const QnResourcePtr &resource: resources)
     {
+        if (resource->getId().isNull())
+        {
+            // ignore invalid resource in release mode
+            qWarning() << "Got resource with empty ID. ignoring."
+                       << "type=" << resource->getTypeId().toString()
+                       << "name=" << resource->getName()
+                       << "url=" << resource->getUrl();
+            continue;
+        }
         bool fakeServer = QnMediaServerResource::isFakeServer(resource);
 
         if( insertOrUpdateResource(
@@ -145,9 +154,16 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
 }
 
-void QnResourcePool::removeResources(const QnResourceList &resources)
+void QnResourcePool::removeResources(const QnResourceList& resources)
 {
-    QnResourceList removedResources;
+    QnResourceList removedLayoutResources, removedOtherResources;
+    auto appendRemovedResource = [&](QnResourcePtr resource)
+    {
+        if (resource.dynamicCast<QnLayoutResource>())
+            removedLayoutResources.push_back(resource);
+        else
+            removedOtherResources.push_back(resource);
+    };
 
     QnMutexLocker lk( &m_resourcesMtx );
 
@@ -155,8 +171,9 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     {
         if (!resource)
             continue;
+
         resource->setRemovedFromPool(true);
-        if(resource->resourcePool() != this)
+        if (resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
 
 #ifdef DESKTOP_CAMERA_DEBUG
@@ -176,11 +193,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         if (m_adminResource && resId == m_adminResource->getId())
             m_adminResource.clear();
 
-        if( resIter != m_resources.end() )
+        if (resIter != m_resources.end())
         {
-            m_resources.erase( resIter );
+            m_resources.erase(resIter);
             invalidateCache();
-            removedResources.append(resource);
+            appendRemovedResource(resource);
         }
         else
         {
@@ -189,45 +206,55 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
             {
                 m_incompatibleResources.erase(resIter);
                 invalidateCache();
-                removedResources.append(resource);
+                appendRemovedResource(resource);
             }
         }
 
-
-
-        resource->setResourcePool(NULL);
+        resource->setResourcePool(nullptr);
     }
 
-    /* Remove resources. */
-    for (const QnResourcePtr &resource: removedResources)
+    /* Remove layout resources. */
+    const auto videoWalls = getResources<QnVideoWallResource>();
+    for (const QnResourcePtr& layoutResource : removedLayoutResources)
     {
-        disconnect(resource, NULL, this, NULL);
+        disconnect(layoutResource, nullptr, this, nullptr);
 
-        for(const QnLayoutResourcePtr &layoutResource: getResources<QnLayoutResource>()) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-            for(const QnLayoutItemData &data: layoutResource->getItems())
-                if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
-                    layoutResource->removeItem(data);
-
-        if (resource.dynamicCast<QnLayoutResource>()) {
-            for (const QnVideoWallResourcePtr &videowall: getResources<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-                for (QnVideoWallItem item: videowall->items()->getItems()) {
-                    if (item.layout != resource->getId())
-                        continue;
-                    item.layout = QnUuid();
-                    videowall->items()->updateItem(item);
-                }
+        for (const QnVideoWallResourcePtr& videowall : videoWalls) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+        {
+            for (QnVideoWallItem item : videowall->items()->getItems())
+            {
+                if (item.layout != layoutResource->getId())
+                    continue;
+                item.layout = QnUuid();
+                videowall->items()->updateItem(item);
             }
         }
 
-        TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
+        TRACE("RESOURCE REMOVED" << layoutResource->metaObject()->className() << layoutResource->getName());
+    }
+
+    /* Remove other resources. */
+    const auto layouts = getResources<QnLayoutResource>();
+    for (const QnResourcePtr& otherResource : removedOtherResources)
+    {
+        disconnect(otherResource, nullptr, this, nullptr);
+
+        for (const QnLayoutResourcePtr& layoutResource : layouts) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+            for (const QnLayoutItemData& data: layoutResource->getItems())
+                if (data.resource.id == otherResource->getId() || data.resource.path == otherResource->getUniqueId())
+                    layoutResource->removeItem(data);
+
+        TRACE("RESOURCE REMOVED" << otherResource->metaObject()->className() << otherResource->getName());
     }
 
     lk.unlock();
 
-    /* Remove resources. */
-    for (const QnResourcePtr &resource: removedResources) {
+    /* Emit notifications. */
+    for (const QnResourcePtr& layoutResource: removedLayoutResources)
+        emit resourceRemoved(layoutResource);
+
+    for (const QnResourcePtr& resource : removedOtherResources)
         emit resourceRemoved(resource);
-    }
 }
 
 QnResourceList QnResourcePool::getResources() const
@@ -236,29 +263,7 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourceList QnResourcePool::getResources(const QVector<QnUuid>& idList) const {
-    QnMutexLocker locker( &m_resourcesMtx );
-    QnResourceList result;
-    for (const auto& id: idList) {
-        const auto itr = m_resources.find(id);
-        if (itr != m_resources.end())
-            result.push_back(itr.value());
-    }
-    return result;
-}
-
- QnResourceList QnResourcePool::getResources(const std::vector<QnUuid>& idList) const {
-    QnMutexLocker locker(&m_resourcesMtx);
-    QnResourceList result;
-    for (const auto& id: idList) {
-        const auto itr = m_resources.find(id);
-        if (itr != m_resources.end())
-            result.push_back(itr.value());
-    }
-    return result;
-}
-
-QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
+ QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
     QnMutexLocker locker( &m_resourcesMtx );
 
     QHash<QnUuid, QnResourcePtr>::const_iterator resIter = m_resources.find(id);

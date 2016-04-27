@@ -1,8 +1,8 @@
-exists( ${libdir}/libcreateprocess.pri ) {
-  include( ${libdir}/libcreateprocess.pri )
+!android:!mac {
+    QT += zlib-private
 }
 
-mac:!ios {
+macx: {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
   LIBS += -lobjc -framework Foundation -framework AppKit
 }
@@ -18,5 +18,3 @@ mac:!ios {
 }
 
 SOURCES += ${project.build.directory}/app_info_impl.cpp
-SOURCES += ${project.build.directory}/common_app_info_impl.cpp
-SOURCES += ${project.build.directory}/compatibility_info.cpp

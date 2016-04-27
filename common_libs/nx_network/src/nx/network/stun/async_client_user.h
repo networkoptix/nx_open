@@ -20,6 +20,9 @@ public:
     /** Returns STUN server address in case if client has one */
     SocketAddress remoteAddress() const;
 
+    /** Handler called just after broken tcp connection has been restored */
+    void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
+
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 

@@ -13,6 +13,7 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiUserData>& tran);
         void triggerNotification(const QnTransaction<ApiIdData>& tran);
         void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran);
+        void triggerNotification(const QnTransaction<ApiUserGroupData>& tran);
     };
 
 
@@ -25,6 +26,10 @@ namespace ec2
         virtual int getUsers(impl::GetUsersHandlerPtr handler ) override;
         virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
+
+        virtual int getUserGroups(impl::GetUserGroupsHandlerPtr handler) override;
+        virtual int saveUserGroup(const ec2::ApiUserGroupData& group, impl::SimpleHandlerPtr handler) override;
+        virtual int removeUserGroup(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
         virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) override;
         virtual int setAccessRights(const ec2::ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) override;

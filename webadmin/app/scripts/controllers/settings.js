@@ -3,6 +3,7 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout, dialogs) {
 
+
         mediaserver.getUser().then(function(user){
             if(!user.isAdmin){
                 $location.path('/info'); //no admin rights - redirect
@@ -44,8 +45,11 @@ angular.module('webadminApp')
 
         $scope.openDisconnectDialog = function () {
             //1. confirm detach
+            var confirmation = $scope.singleServer?
+                'This server will be disconnected from old server and turned into a new one':
+                'Reset system: clear system name, administrator account and cloud settings';
             dialogs.confirmWithPassword(null,
-                'This server will be disconnected from old server and turned into a new one',
+                confirmation,
                 'Create New System').then(function(oldPassword){
                 mediaserver.detachFromSystem(oldPassword).then(function(){
                     //2. throw him to master
@@ -171,8 +175,13 @@ angular.module('webadminApp')
                 return false;
             });
         }
+        $scope.singleServer = true;
 
         mediaserver.getMediaServers().then(function(data){
+
+            $scope.singleServer = data.data.length==1;
+            $scope.disconnectCaption = $scope.singleServer? 'Disconnect Server And Create New System': 'Reset System';
+
             $scope.mediaServers = _.sortBy(data.data,function(server){
                 // Set active state for server
                 server.active = $scope.settings.id.replace('{','').replace('}','') === server.id.replace('{','').replace('}','');

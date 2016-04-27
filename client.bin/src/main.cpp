@@ -76,10 +76,6 @@ extern "C"
 
 #include "plugins/plugin_manager.h"
 
-#ifdef _DEBUG
-#include "tests/auto_tester.h"
-#endif
-
 #include "api/session_manager.h"
 #include "ui/actions/action_manager.h"
 #include <nx/network/socket.h>
@@ -115,7 +111,6 @@ extern "C"
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
-#include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <network/module_finder.h>
@@ -268,11 +263,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnClientModule client(startupParams);
 
     /// TODO: #ynikitenkov move other initialization to QnClientModule constructor
-
-    /* Parse command line. */
-#ifdef _DEBUG
-    QnAutoTester autoTester(argc, argv);
-#endif
 
     ec2::DummyHandler dummyEc2RequestHandler;
 
@@ -537,13 +527,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if(!startupParams.allowMultipleClientInstances)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
-#ifdef _DEBUG
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
-        QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
-        autoTester.start();
-    }
-#endif
-
     /************************************************************************/
     /* Initializing resource searchers                                      */
     /************************************************************************/
@@ -630,13 +613,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
-#ifndef QN_DEMO_SHOW
     // show beta version warning message for the main instance only
     if (!startupParams.allowMultipleClientInstances &&
         !qnRuntime->isDevMode() &&
         QnAppInfo::beta())
         context->action(QnActions::BetaVersionMessageAction)->trigger();
-#endif
 
 #ifdef _DEBUG
     /* Show FPS in debug. */
@@ -644,15 +625,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     result = application->exec();
-
-#ifdef _DEBUG
-    if(autoTester.state() == QnAutoTester::Finished) {
-        if(!autoTester.succeeded())
-            result = 1;
-
-        cl_log.log(autoTester.message(), cl_logALWAYS);
-    }
-#endif
 
     QnResourceDiscoveryManager::instance()->stop();
 

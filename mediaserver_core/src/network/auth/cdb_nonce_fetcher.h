@@ -66,7 +66,7 @@ private:
 
     mutable QnMutex m_mutex;
     std::unique_ptr<AbstractNonceProvider> m_defaultGenerator;
-    bool m_bindedToCloud;
+    bool m_boundToCloud;
     //map<cdb_nonce, valid_time>
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
@@ -84,7 +84,7 @@ private:
         qint64 curClock);
 
 private slots:
-    void cloudBindingStatusChanged(bool bindedToCloud);
+    void cloudBindingStatusChanged(bool boundToCloud);
 };
 
 #endif  //NX_MS_CDB_NONCE_FETCHER_H

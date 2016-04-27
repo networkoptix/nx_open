@@ -6,8 +6,8 @@
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
-#include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
 
 #include <utils/common/string.h>
 
@@ -96,7 +96,7 @@ void QnGridWidgetHelper::getGridData(QTableView *grid, const QLatin1Char &textDe
     if(list.isEmpty())
         return;
 
-    qSort(list);
+    std::sort(list.begin(), list.end());
 
     QString textResult, htmlResult;
 

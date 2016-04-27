@@ -51,7 +51,6 @@
 
 namespace
 {
-    const qreal widgetHeight = 24;
     const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
 
     /** We limit the maximal number of notification items to prevent crashes due
@@ -165,15 +164,14 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 {
     m_statusPixmapManager->setThumbnailSize(kDefaultThumbnailSize);
 
-    qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
-
-    auto newButton = [this, buttonSize](QnActions::IDType actionId, int helpTopicId)
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
+    auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
     {
         const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget")
             , QnLexical::serialized(actionId));
         QnImageButtonWidget *button = new QnImageButtonWidget(statAlias, m_headerWidget);
         button->setDefaultAction(action(actionId));
-        button->setFixedSize(buttonSize);
+        button->setFixedSize(button->defaultAction()->icon().actualSize(QSize(maxIconSize, maxIconSize)));
         button->setCached(true);
         if (helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
@@ -184,10 +182,9 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         return button;
     };
 
-    qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
-    controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
+    controlsLayout->setContentsMargins(2.0, 1.0, 2.0, 0.0);
     controlsLayout->addStretch();
 
     controlsLayout->addItem(newButton(QnActions::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));

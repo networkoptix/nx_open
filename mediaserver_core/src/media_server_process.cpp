@@ -52,7 +52,9 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <events/mserver_business_rule_processor.h>
 
@@ -127,6 +129,9 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/get_nonce_rest_handler.h>
+#include <rest/handlers/cookie_login_rest_handler.h>
+#include <rest/handlers/cookie_logout_rest_handler.h>
 #include <rest/handlers/activate_license_rest_handler.h>
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
@@ -197,7 +202,6 @@
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
-#include "compatibility.h"
 #include "streaming/hls/hls_session_pool.h"
 #include "streaming/hls/hls_server.h"
 #include "streaming/streaming_chunk_transcoder.h"
@@ -210,6 +214,7 @@
 #include "server/host_system_password_synchronizer.h"
 
 #include "core/resource_management/resource_properties.h"
+#include "core/resource/network_resource.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include <nx/network/nettools.h>
@@ -1534,6 +1539,9 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/image", new QnImageRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/createEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/getNonce", new QnGetNonceRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/cookieLogin", new QnCookieLoginRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/cookieLogout", new QnCookieLogoutRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/getCurrentUser", new QnCurrentUserRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/activateLicense", new QnActivateLicenseRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
@@ -1763,7 +1771,12 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
+
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
 
@@ -2011,16 +2024,7 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
-    QnCompatibilityChecker localChecker(localCompatibilityItems());
-
-    QnCompatibilityChecker* compatibilityChecker;
-    if (remoteChecker.size() > localChecker.size())
-        compatibilityChecker = &remoteChecker;
-    else
-        compatibilityChecker = &localChecker;
-
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qnCommon->engineVersion(), "ECS", connectInfo.version))
+    if (connectInfo.nxClusterProtoVersion != QnAppInfo::ec2ProtoVersion())
     {
         NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
         return;

@@ -30,11 +30,12 @@ enum class TestTrafficLimitType
     outgoing, // quits when receives over limit
 };
 
+// TODO: #mux Think about server mode auto detection
 enum class TestTransmissionMode
 {
-    spam, // send random data as fast as possible, receive always
-    echo, // reads 4K buffer, sends same buffer, waits for futher data...
-    echoTest, // sends random data and verifies if it comes back
+    spam, // sends random data as fast as possible, receive always
+    ping, // sends random data and verifies if it comes back
+    pong, // reads 4K buffer, sends same buffer back, waits for futher data...
 };
 
 //!Reads/writes random data to/from connection
@@ -209,6 +210,14 @@ public:
         size_t maxTotalConnections,
         TestTransmissionMode transmissionMode);
 
+    ConnectionsGenerator(
+        std::vector<SocketAddress> remoteAddresses,
+        size_t maxSimultaneousConnectionsCount,
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        size_t maxTotalConnections,
+        TestTransmissionMode transmissionMode);
+
     virtual ~ConnectionsGenerator();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -216,7 +225,7 @@ public:
     void setOnFinishedHandler(nx::utils::MoveOnlyFunc<void()> func);
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
-    void setRemoteAddress(SocketAddress remoteAddress);
+    void resetRemoteAddresses(std::vector<SocketAddress> remoteAddress);
     void start();
 
     virtual ConnectionTestStatistics statistics() const override;
@@ -228,10 +237,13 @@ public:
     const std::map<SystemError::ErrorCode, size_t>& returnCodes() const;
 
 private:
+    const SocketAddress& nextAddress();
+
     /** map<connection id, connection> */
     typedef std::map<int, std::unique_ptr<TestConnection>> ConnectionsContainer;
 
-    SocketAddress m_remoteAddress;
+    std::vector<SocketAddress> m_remoteAddresses;
+    std::vector<SocketAddress>::const_iterator m_remoteAddressesIterator;
     size_t m_maxSimultaneousConnectionsCount;
     const TestTrafficLimitType m_limitType;
     const size_t m_trafficLimit;

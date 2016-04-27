@@ -28,6 +28,15 @@ enum class AddressType
 
 QString toString(const AddressType& type);
 
+struct TypedAddress
+{
+    HostAddress address;
+    AddressType type;
+
+    TypedAddress(HostAddress address_, AddressType type_);
+    QString toString() const;
+};
+
 enum class AddressAttributeType
 {
     unknown,
@@ -75,8 +84,11 @@ class NX_NETWORK_API AddressResolver
         : public QnStoppableAsync
 {
 public:
-    AddressResolver(
-        std::shared_ptr<hpm::api::MediatorClientTcpConnection> mediatorConnection);
+    static const QRegExp kCloudAddressRegExp;
+
+    typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
+    AddressResolver(std::shared_ptr<MediatorConnection> mediatorConnection);
+    virtual ~AddressResolver() = default;
 
     //!Add new peer address
     /*!
@@ -99,10 +111,6 @@ public:
     void removeFixedAddress(
         const HostAddress& hostName, const SocketAddress& hostAddress);
 
-    typedef std::pair<HostAddress, AddressType> TypedAddres;
-
-    static QString toString(const TypedAddres& address);
-
     //!Resolves domain address to the list of subdomains
     /*!
         \example resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
@@ -112,7 +120,7 @@ public:
      */
     void resolveDomain(
         const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddres>)> handler );
+        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler );
 
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, std::vector<AddressEntry>)> ResolveHandler;
@@ -149,21 +157,22 @@ public:
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
-private:
+protected:
     struct HostAddressInfo
     {
-        enum class State { unresolved, resolved, inProgress };
+        explicit HostAddressInfo(const HostAddress& hostAddress);
 
+        const bool isLikelyCloudAddress;
         std::vector<AddressEntry> fixedEntries;
         std::set<void*> pendingRequests;
 
-        HostAddressInfo();
+        enum class State { unresolved, resolved, inProgress };
 
-        State dnsState() { return m_dnsState; }
+        State dnsState() const { return m_dnsState; }
         void dnsProgress() { m_dnsState = State::inProgress; }
         void setDnsEntries(std::vector<AddressEntry> entries = {});
 
-        State mediatorState() { return m_mediatorState; }
+        State mediatorState() const { return m_mediatorState; }
         void mediatorProgress() { m_mediatorState = State::inProgress; }
         void setMediatorEntries(std::vector< AddressEntry > entries = {});
 
@@ -192,27 +201,47 @@ private:
         ResolveHandler handler;
         Guard guard;
 
-        RequestInfo(RequestInfo&&);
         RequestInfo(
             HostAddress _address, bool _natTraversal, ResolveHandler _handler);
     };
 
     void tryFastDomainResolve(HaInfoIterator info);
-    void dnsResolve(HaInfoIterator info);
-    void mediatorResolve(HaInfoIterator info, QnMutexLockerBase* lk);
+
+    void dnsResolve(
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator);
+
+    void mediatorResolve(
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
 
     std::vector<Guard> grabHandlers(
-        SystemError::ErrorCode lastErrorCode,
-        HaInfoIterator info, QnMutexLockerBase* lk );
+        SystemError::ErrorCode lastErrorCode, HaInfoIterator info);
 
-private:
+    template<typename Functor>
+    bool iterateSubdomains(const QString& domain, const Functor& functor)
+    {
+        // TODO: #mux Think about better representation to increase performance
+        const QString suffix = lm(".%1").arg(domain);
+        for (auto it = m_info.begin(); it != m_info.end(); ++it)
+        {
+            if (it->first.toString().endsWith(suffix) &&
+                !it->second.getAll().empty())
+            {
+                if (functor(it))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+protected:
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_condition;
     HostInfoMap m_info;
     std::multimap<void*, RequestInfo> m_requests;
 
     DnsResolver m_dnsResolver;
-    std::shared_ptr<hpm::api::MediatorClientTcpConnection> m_mediatorConnection;
+    std::shared_ptr<MediatorConnection> m_mediatorConnection;
 };
 
 } // namespace cloud

@@ -12,8 +12,8 @@
 
 #include <core/resource/resource_directory_browser.h>
 
-#include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -159,9 +159,9 @@ bool QnGeneralPreferencesWidget::hasChanges() const
     return true;
 }
 
-bool QnGeneralPreferencesWidget::canApplyChanges()
+bool QnGeneralPreferencesWidget::isRestartRequired() const
 {
-    /* These changes can be applied only after reboot. */
+    /* These changes can be applied only after client restart. */
     return m_oldDownmix == ui->downmixAudioCheckBox->isChecked()
         && m_oldDoubleBuffering == ui->doubleBufferCheckbox->isChecked();
 }

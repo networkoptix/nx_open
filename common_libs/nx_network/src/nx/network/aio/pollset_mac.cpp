@@ -4,6 +4,7 @@
 * PollSet class implementation for macosx/freebsd
 ***********************************************************/
 
+#if 1
 #if defined(__APPLE__) || defined(__FreeBSD__)
 
 #include "pollset.h"
@@ -23,8 +24,9 @@
 
 using namespace std;
 
-namespace aio
-{
+namespace nx {
+namespace network {
+namespace aio {
     static const int MAX_EVENTS_TO_RECEIVE = 32;
 
     class PollSetImpl
@@ -56,29 +58,29 @@ namespace aio
 
 
     //////////////////////////////////////////////////////////
-    // ConstIteratorImpl
+    // ConstIteratorImplOld
     //////////////////////////////////////////////////////////
-    class ConstIteratorImpl
+    class ConstIteratorImplOld
     {
     public:
         PollSetImpl* pollSetImpl;
         int currentIndex;
 
-        ConstIteratorImpl()
+        ConstIteratorImplOld()
         :
             pollSetImpl( NULL ),
             currentIndex( 0 )
         {
         }
 
-        ConstIteratorImpl( const ConstIteratorImpl& right )
+        ConstIteratorImplOld( const ConstIteratorImplOld& right )
         :
             pollSetImpl( right.pollSetImpl ),
             currentIndex( right.currentIndex )
         {
         }
 
-        const ConstIteratorImpl& operator=( const ConstIteratorImpl& right )
+        const ConstIteratorImplOld& operator=( const ConstIteratorImplOld& right )
         {
             pollSetImpl = right.pollSetImpl;
             currentIndex = right.currentIndex;
@@ -92,13 +94,13 @@ namespace aio
     //////////////////////////////////////////////////////////
     PollSet::const_iterator::const_iterator()
     :
-        m_impl( new ConstIteratorImpl() )
+        m_impl( new ConstIteratorImplOld() )
     {
     }
 
     PollSet::const_iterator::const_iterator( const const_iterator& right )
     :
-        m_impl( new ConstIteratorImpl( *right.m_impl ) )
+        m_impl( new ConstIteratorImplOld( *right.m_impl ) )
     {
     }
 
@@ -337,6 +339,9 @@ namespace aio
         endIter.m_impl->currentIndex = m_impl->receivedEventCount;
         return endIter;
     }
-}
+}   // namespace aio
+}   // namespace network
+}   // namespace nx
 
 #endif  //defined(__APPLE__) || defined(__FreeBSD__)
+#endif

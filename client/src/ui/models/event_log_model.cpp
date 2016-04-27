@@ -156,7 +156,7 @@ public:
             break;
         }
 
-        qSort(m_records.begin(), m_records.end(), [this, lessThan](const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) {
+        std::sort(m_records.begin(), m_records.end(), [this, lessThan](const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) {
             //return lessThan(this, d1, d2);
             return (this->*lessThan)(d1, d2);
         });

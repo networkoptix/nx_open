@@ -277,6 +277,7 @@ QnDbManager::QnDbManager()
     m_needResyncLicenses(false),
     m_needResyncFiles(false),
     m_needResyncCameraUserAttributes(false),
+    m_needResyncServerUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_needResyncLayout(false),
@@ -563,6 +564,10 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
         if (m_needResyncCameraUserAttributes) {
             if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                return false;
+        }
+        if (m_needResyncServerUserAttributes) {
+            if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
                 return false;
         }
         if (m_needResyncLayout) {
@@ -1460,6 +1465,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncbRules = true;
     }
+    else if (updateName == lit(":/updates/49_fix_migration.sql")) {
+        if (!m_dbJustCreated)
+        {
+            m_needResyncCameraUserAttributes = true;
+            m_needResyncServerUserAttributes = true;
+        }
+    }
     else if (updateName == lit(":/updates/49_add_webpage_table.sql"))
     {
         QMap<int, QnUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'WebPage'", CM_MakeHash);
@@ -1696,50 +1708,80 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
-    QSqlQuery insQuery(m_sdb);
-    if (!data.hash.isEmpty())
-        insQuery.prepare("\
-            INSERT OR REPLACE INTO auth_user (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined, first_name, last_name) \
-            VALUES (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '', '', '')\
-        ");
-    else
-        insQuery.prepare("UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name");
-    QnSql::bind(data, &insQuery);
-    insQuery.bindValue(":internalId", internalId);
-    //insQuery.bindValue(":name", data.name);
-    if (!insQuery.exec())
     {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
+        const QString authQueryStr = data.hash.isEmpty()
+            ? "UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name"
+            : R"(
+                INSERT OR REPLACE
+                INTO auth_user
+                (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined, first_name, last_name)
+                VALUES
+                (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '', '', '')
+            )";
+
+
+        QSqlQuery authQuery(m_sdb);
+        if (!prepareSQLQuery(&authQuery, authQueryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+        QnSql::bind(data, &authQuery);
+        authQuery.bindValue(":internalId", internalId);
+        if (!execSQLQuery(&authQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
     }
 
-    QSqlQuery insQuery2(m_sdb);
-    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled) "
-                      "VALUES (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled)");
-    QnSql::bind(data, &insQuery2);
-	if (data.digest.isEmpty() && !data.isLdap)
     {
-        // keep current digest value if exists
-        QSqlQuery digestQuery(m_sdb);
-        digestQuery.setForwardOnly(true);
-        digestQuery.prepare("SELECT digest, crypt_sha512_hash FROM vms_userprofile WHERE user_id = ?");
-        digestQuery.addBindValue(internalId);
-        if (!digestQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << digestQuery.lastError().text();
+        const QString profileQueryStr = R"(
+            INSERT OR REPLACE
+            INTO vms_userprofile
+            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud)
+            VALUES
+            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :groupId, :isCloud)
+        )";
+
+        QSqlQuery profileQuery(m_sdb);
+        if (!prepareSQLQuery(&profileQuery, profileQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
-        }
-        if (digestQuery.next())
+        QnSql::bind(data, &profileQuery);
+
+        if (data.digest.isEmpty() && !data.isLdap)
         {
-            insQuery2.bindValue(":digest", digestQuery.value(0).toByteArray());
-            insQuery2.bindValue(":cryptSha512Hash", digestQuery.value(1).toByteArray());
+            // keep current digest value if exists
+            QSqlQuery digestQuery(m_sdb);
+            digestQuery.setForwardOnly(true);
+            if (!prepareSQLQuery(&digestQuery, "SELECT digest, crypt_sha512_hash FROM vms_userprofile WHERE user_id = ?", Q_FUNC_INFO))
+                return ErrorCode::dbError;
+            digestQuery.addBindValue(internalId);
+            if (!execSQLQuery(&digestQuery, Q_FUNC_INFO))
+                return ErrorCode::dbError;
+            if (digestQuery.next())
+            {
+                profileQuery.bindValue(":digest", digestQuery.value(0).toByteArray());
+                profileQuery.bindValue(":cryptSha512Hash", digestQuery.value(1).toByteArray());
+            }
         }
+        profileQuery.bindValue(":internalId", internalId);
+        if (!execSQLQuery(&profileQuery, Q_FUNC_INFO))
+            return ErrorCode::dbError;
     }
-    insQuery2.bindValue(":internalId", internalId);
-    if (!insQuery2.exec())
-    {
-        qWarning() << Q_FUNC_INFO << insQuery2.lastError().text();
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::insertOrReplaceUserGroup(const ApiUserGroupData& data)
+{
+    QSqlQuery query(m_sdb);
+    const QString queryStr = R"(
+        INSERT OR REPLACE INTO vms_user_groups
+        (id, name, permissions)
+        VALUES
+        (:id, :name, :permissions)
+    )";
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
+
+    QnSql::bind(data, &query);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }
@@ -2305,6 +2347,23 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
+{
+    /* Cleanup all users, belonging to this group. */
+    {
+        QSqlQuery query(m_sdb);
+        const QString queryStr("UPDATE vms_userprofile SET group = NULL WHERE group = :groupId");
+        if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        query.bindValue(":groupId", guid.toRfc4122());
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+    }
+
+    return deleteTableRecord(guid, "vms_user_groups", "id");
+}
+
 ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
 {
     QSqlQuery query(m_sdb);
@@ -2666,18 +2725,16 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
 
 ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
-    qint32 user_ptr_id = getResourceInternalId(data.userId);
-    if (user_ptr_id <= 0)
-        return ErrorCode::dbError;
+    const QByteArray userOrGroupId = data.userId.toRfc4122();
 
     /* Get list of resources, user already has access to. */
-    QSet<QnUuid> accessibleResources;
+    QSet<qint32> accessibleResources;
+
     {
         QString selectQueryString = R"(
-            SELECT resource.guid as resourceId
-            FROM vms_access_rights rights
-            JOIN vms_resource resource on resource.id = rights.resource_ptr_id
-            WHERE rights.user_ptr_id = :user_ptr_id
+            SELECT resource_ptr_id
+            FROM vms_access_rights
+            WHERE guid = :userOrGroupId
         )";
 
         QSqlQuery selectQuery(m_sdb);
@@ -2685,65 +2742,63 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         if (!prepareSQLQuery(&selectQuery, selectQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        selectQuery.bindValue(":user_ptr_id", user_ptr_id);
+        selectQuery.bindValue(":userOrGroupId", userOrGroupId);
         if (!execSQLQuery(&selectQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
         while (selectQuery.next())
-            accessibleResources.insert(QnUuid::fromRfc4122(selectQuery.value(0).toByteArray()));
-
+            accessibleResources.insert(selectQuery.value(0).toInt());
     }
 
-    QSet<QnUuid> newAccessibleResources;
-    for (const QnUuid& id : data.resourceIds)
-        newAccessibleResources << id;
+    QSet<qint32> newAccessibleResources;
+    for (const QnUuid& resourceId : data.resourceIds)
+    {
+        qint32 resource_ptr_id = getResourceInternalId(resourceId);
+        if (resource_ptr_id <= 0)
+            return ErrorCode::dbError;
+        newAccessibleResources << resource_ptr_id;
+    }
 
-    QSet<QnUuid> resourcesToAdd = newAccessibleResources - accessibleResources;
+    QSet<qint32> resourcesToAdd = newAccessibleResources - accessibleResources;
     if (!resourcesToAdd.empty())
     {
         QString insertQueryString = R"(
             INSERT INTO vms_access_rights
-            (user_ptr_id, resource_ptr_id)
+            (guid, resource_ptr_id)
             VALUES
         )";
 
         QStringList values;
-        for (const QnUuid& resourceId : resourcesToAdd)
-        {
-            qint32 resource_ptr_id = getResourceInternalId(resourceId);
-            if (resource_ptr_id <= 0)
-                return ErrorCode::dbError;
-            values << QString("(%1, %2)").arg(user_ptr_id).arg(resource_ptr_id);
-        }
-        insertQueryString.append(values.join(L',')).append(L';');
+
+        for (const qint32& resource_ptr_id : resourcesToAdd)
+             values << QString("(:userOrGroupId, %1)").arg(resource_ptr_id);
+         insertQueryString.append(values.join(L',')).append(L';');
 
         QSqlQuery insertQuery(m_sdb);
         insertQuery.setForwardOnly(true);
         if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
+        insertQuery.bindValue(":userOrGroupId", userOrGroupId);
+
         if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
 
-    QSet<QnUuid> resourcesToRemove = accessibleResources - newAccessibleResources;
+    QSet<qint32> resourcesToRemove = accessibleResources - newAccessibleResources;
     if (!resourcesToRemove.empty())
     {
         QSqlQuery removeQuery(m_sdb);
         removeQuery.prepare(R"(
             DELETE FROM vms_access_rights
-            WHERE user_ptr_id = :user_ptr_id
+            WHERE guid = :userOrGroupId
             AND resource_ptr_id IN (:resources);
         )");
-        removeQuery.bindValue(":user_ptr_id", user_ptr_id);
+        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
 
         QStringList values;
-        for (const QnUuid& resourceId : resourcesToRemove)
-        {
-            qint32 resource_ptr_id = getResourceInternalId(resourceId);
-            if (resource_ptr_id <= 0)
-                return ErrorCode::dbError;
+        for (const qint32& resource_ptr_id : resourcesToRemove)
             values << QString::number(resource_ptr_id);
-        }
+
         removeQuery.bindValue(":resources", values.join(L','));
         if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
@@ -2768,6 +2823,14 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     return insertOrReplaceUser(tran.params, internalId);
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran)
+{
+    NX_ASSERT(tran.command == ApiCommand::saveUserGroup, Q_FUNC_INFO, "Unsupported transaction");
+    if (tran.command != ApiCommand::saveUserGroup)
+        return ec2::ErrorCode::serverError;
+    return insertOrReplaceUserGroup(tran.params);
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
 {
     NX_ASSERT(tran.command == ApiCommand::setAccessRights, Q_FUNC_INFO, "Unsupported transaction");
@@ -2777,7 +2840,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessR
     return setAccessRights(tran.params);
 }
 
-ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
+ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -2797,11 +2860,11 @@ ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
     QString objectType = query.value("name").toString();
     if (objectType == "Camera")
         return ApiObject_Camera;
-    else if (objectType == "Storage")
+    else if (objectType == QnResourceTypePool::kStorageTypeId)
         return ApiObject_Storage;
     else if (objectType == QnResourceTypePool::kServerTypeId)
         return ApiObject_Server;
-    else if (objectType == "User")
+    else if (objectType == QnResourceTypePool::kUserTypeId)
         return ApiObject_User;
     else if (objectType == QnResourceTypePool::kLayoutTypeId)
         return ApiObject_Layout;
@@ -2811,7 +2874,7 @@ ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_WebPage;
     else
     {
-        NX_ASSERT(0, "Unknown object type", Q_FUNC_INFO);
+        NX_ASSERT(false, "Unknown object type", Q_FUNC_INFO);
         return ApiObject_NotDefined;
     }
 }
@@ -2850,7 +2913,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
     }
     while(query.next()) {
         ApiObjectInfo info;
-        info.type = (ApiOjectType) query.value(0).toInt();
+        info.type = (ApiObjectType) query.value(0).toInt();
         info.id = QnUuid::fromRfc4122(query.value(1).toByteArray());
         result.push_back(info);
     }
@@ -2858,7 +2921,7 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
     return result;
 }
 
-ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiOjectType& objectType)
+ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
 {
     ApiObjectInfoList result;
 
@@ -2933,27 +2996,30 @@ ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
-    switch(tran.command) {
-        case ApiCommand::removeCamera:
-            return removeObject(ApiObjectInfo(ApiObject_Camera, tran.params.id));
-        case ApiCommand::removeStorage:
-            return removeObject(ApiObjectInfo(ApiObject_Storage, tran.params.id));
-        case ApiCommand::removeMediaServer:
-            return removeObject(ApiObjectInfo(ApiObject_Server, tran.params.id));
-        case ApiCommand::removeServerUserAttributes:
-            return removeMediaServerUserAttributes(tran.params.id);
-        case ApiCommand::removeLayout:
-            return removeObject(ApiObjectInfo(ApiObject_Layout, tran.params.id));
-        case ApiCommand::removeBusinessRule:
-            return removeObject(ApiObjectInfo(ApiObject_BusinessRule, tran.params.id));
-        case ApiCommand::removeUser:
-            return removeObject(ApiObjectInfo(ApiObject_User, tran.params.id));
-        case ApiCommand::removeVideowall:
-            return removeObject(ApiObjectInfo(ApiObject_Videowall, tran.params.id));
-        case ApiCommand::removeWebPage:
-            return removeObject(ApiObjectInfo(ApiObject_WebPage, tran.params.id));
-        default:
-            return removeObject(ApiObjectInfo(ApiObject_Resource, tran.params.id));
+    switch(tran.command)
+    {
+    case ApiCommand::removeCamera:
+        return removeCamera(tran.params.id);
+    case ApiCommand::removeStorage:
+        return removeStorage(tran.params.id);
+    case ApiCommand::removeMediaServer:
+        return removeServer(tran.params.id);
+    case ApiCommand::removeServerUserAttributes:
+        return removeMediaServerUserAttributes(tran.params.id);
+    case ApiCommand::removeLayout:
+        return removeLayout(tran.params.id);
+    case ApiCommand::removeBusinessRule:
+        return removeBusinessRule(tran.params.id);
+    case ApiCommand::removeUser:
+        return removeUser(tran.params.id);
+    case ApiCommand::removeUserGroup:
+        return removeUserGroup(tran.params.id);
+    case ApiCommand::removeVideowall:
+        return removeVideowall(tran.params.id);
+    case ApiCommand::removeWebPage:
+        return removeWebPage(tran.params.id);
+    default:
+        return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
 }
 
@@ -2986,10 +3052,7 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
     case ApiObject_WebPage:
         result = removeWebPage(apiObject.id);
         break;
-    case ApiObject_Resource:
-        result = removeObject(ApiObjectInfo(getObjectTypeNoLock(apiObject.id), apiObject.id));
-        break;
-    case ApiCommand::NotDefined:
+    case ApiObject_NotDefined:
         result = ErrorCode::ok; // object already removed
         break;
     default:
@@ -3535,39 +3598,63 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
-    //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
+    const QString queryStr = R"(
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
+        u.is_superuser as isAdmin, u.email,
+        p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions,
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud
+        FROM vms_resource r
+        JOIN auth_user u on u.id = r.id
+        JOIN vms_userprofile p on p.user_id = u.id
+        ORDER BY r.guid
+    )";
+
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        u.is_superuser as isAdmin, u.email, p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions, \
-        p.is_ldap as isLdap, p.is_enabled as isEnabled \
-        FROM vms_resource r \
-        JOIN auth_user u  on u.id = r.id\
-        JOIN vms_userprofile p on p.user_id = u.id\
-        ORDER BY r.guid\
-    "));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     QnSql::fetch_many(query, &userList);
 
     return ErrorCode::ok;
 }
 
+//getUserGroups
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& result)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    const QString queryStr = R"(
+        SELECT id, name, permissions
+        FROM vms_user_groups
+        ORDER BY id
+    )";
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    QnSql::fetch_many(query, &result);
+    return ErrorCode::ok;
+}
+
+
 ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(R"(
-        SELECT user.guid as userId, resource.guid as resourceId
+    const QString queryStr = R"(
+        SELECT rights.guid as userId, resource.guid as resourceId
         FROM vms_access_rights rights
-        JOIN vms_resource user on user.id = rights.user_ptr_id
         JOIN vms_resource resource on resource.id = rights.resource_ptr_id
-        ORDER BY user.guid
-    )");
+        ORDER BY rights.guid
+    )";
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
@@ -3717,7 +3804,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
             matrix.videowall_guid \
         FROM vms_videowall_matrix_items item \
         JOIN vms_videowall_matrix matrix ON matrix.guid = item.matrix_guid \
-        ORDER BY matrix.videowall_guid\
+        ORDER BY item.matrix_guid\
     ");
     if (!queryMatrixItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
@@ -3742,7 +3829,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     std::vector<ApiVideowallMatrixWithRefData> matrices;
     QnSql::fetch_many(queryMatrices, &matrices);
     mergeObjectListData(matrices, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
-    qSort(matrices.begin(), matrices.end(), [] (const ApiVideowallMatrixWithRefData& data1, const ApiVideowallMatrixWithRefData& data2) {
+    std::sort(matrices.begin(), matrices.end(), [] (const ApiVideowallMatrixWithRefData& data1, const ApiVideowallMatrixWithRefData& data2) {
         return data1.videowallGuid.toRfc4122() < data2.videowallGuid.toRfc4122();
     });
     mergeObjectListData(videowallList, matrices, &ApiVideowallData::matrices, &ApiVideowallMatrixWithRefData::videowallGuid);
@@ -3914,6 +4001,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     db_load(data.cameras);
     db_load(data.cameraUserAttributesList);
     db_load(data.users);
+    db_load(data.userGroups);
     db_load(data.layouts);
     db_load(data.videowalls);
     db_load(data.webPages);

@@ -51,6 +51,6 @@
         <windows.oslibs>DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
 
-        <rdep.packages>openssl quazip</rdep.packages>
+        <rdep.packages>openssl quazip qtsinglecoreapplication</rdep.packages>
     </properties>   
 </project>

@@ -201,7 +201,7 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
 {
     const auto userNameQString = QString::fromUtf8(userName);
     //if there is user with same name in system, resolving to that user
-    const auto res = qnResPool->getResourceByCond(
+    const auto res = qnResPool->getResource(
         [&userNameQString](const QnResourcePtr& res) {
             return (res.dynamicCast<QnUserResource>() != nullptr) &&
                    (res->getName() == userNameQString);
@@ -356,7 +356,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     }
 }
 
-void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*bindedToCloud*/)
+void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*boundToCloud*/)
 {
     clear();
 }

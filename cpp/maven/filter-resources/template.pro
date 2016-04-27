@@ -117,11 +117,7 @@ LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/
 }
 LIBS += ${global.libs}
 
-INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
-                ${qt.dir}/include \
-                ${qt.dir}/include/QtCore \
-                ${qt.dir}/include/QtZlib \
-                ${project.build.sourceDirectory} \
+INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_network/src \
@@ -130,13 +126,7 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 ${root.dir}/common_libs/nx_media/src \
                 ${root.dir}/common_libs/nx_audio/src \
                 ${libdir}/include \
-                $$ADDITIONAL_QT_INCLUDES \
-                ${qt.dir}/include/QtCore/ \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
-                ${qt.dir}/include/QtQuick/$$QT_VERSION/ \
-                ${qt.dir}/include/QtQuick/$$QT_VERSION/QtQuick/ \
-
-
+                $$ADDITIONAL_QT_INCLUDES
 
 win* {
     DEFINES += \
@@ -266,19 +256,15 @@ macx {
   QMAKE_INFO_PLIST = Info.plist
   QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
   QMAKE_CFLAGS += -msse4.1
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
   CONFIG -= app_bundle objective_c
-
-  INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 
   contains(TEMPLATE, "lib") {
     QMAKE_LFLAGS += -undefined dynamic_lookup
   }
 }
-
-INCLUDEPATH += ${environment.dir}/boost_1_56_0
-INCLUDEPATH += ${environment.dir}/include/glext
 
 ## ANDROID
 android {

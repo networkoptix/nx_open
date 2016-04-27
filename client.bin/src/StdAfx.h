@@ -148,6 +148,6 @@ extern "C" {
 #include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
 
-#include <ui/workaround/deprecation.h>
+#include <nx/utils/deprecation.h>
 
 #endif

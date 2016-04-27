@@ -134,6 +134,7 @@ public:
         By default, there is no timeout
     */
     virtual bool setRecvTimeout( unsigned int millis ) = 0;
+    bool setRecvTimeout( std::chrono::milliseconds m ) { return setRecvTimeout( m.count() ); }
     //!Get socket's receive timeout (in millis)
     /*!
         \param millis In case of error value is udefined
@@ -147,6 +148,7 @@ public:
         By default, there is no timeout
     */
     virtual bool setSendTimeout( unsigned int ms ) = 0;
+    bool setSendTimeout( std::chrono::milliseconds m ) { return setSendTimeout( m.count() ); }
     //!Get socket's send timeout (in millis)
     /*!
         \param millis In case of error value is udefined

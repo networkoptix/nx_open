@@ -25,10 +25,9 @@ public:
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
+    virtual bool canDiscardChanges() const override;
 
-    virtual bool canApplyChanges() override;
-    virtual bool canDiscardChanges() override;
-
+    bool isRestartRequired() const;
 private:
     void setupLanguageUi();
     void setupSkinUi();

@@ -1,12 +1,12 @@
 
 #include "cloud_server_socket.h"
 
-#include <future>
-
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
+#include <nx/utils/std/future.h>
 #include <utils/serialization/lexical.h>
+
+#include "tunnel/udp/acceptor.h"
 
 
 namespace nx {
@@ -31,8 +31,9 @@ static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers
                 if (!event.udpEndpointList.size())
                     return std::unique_ptr<AbstractTunnelAcceptor>();
 
-                auto acceptor = std::make_unique<UdpHolePunchingTunnelAcceptor>(
-                    std::move(event.udpEndpointList.front()));
+                auto acceptor = std::make_unique<udp::TunnelAcceptor>(
+                    std::move(event.udpEndpointList.front()),
+                    event.params);
 
                 return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
             }
@@ -142,7 +143,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
         return nullptr;
     }
 
-    std::promise<SystemError::ErrorCode> promise;
+    nx::utils::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
     acceptAsync(
         [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
@@ -262,7 +263,7 @@ void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 void CloudServerSocket::cancelIOSync()
 {
     //we need dispatch here to avoid blocking if called within aio thread
-    std::promise<void> cancelledPromise;
+    nx::utils::promise<void> cancelledPromise;
     m_mediatorRegistrationRetryTimer.dispatch(
         [this, &cancelledPromise]
         {
@@ -290,8 +291,9 @@ bool CloudServerSocket::registerOnMediatorSync()
     NX_ASSERT(m_state == State::readyToListen);
     m_state = State::registeringOnMediator;
 
-    const auto cloudCredentials =
-        SocketGlobals::mediatorConnector().getSystemCredentials();
+    const auto cloudCredentials = m_mediatorConnection
+        ->credentialsProvider()->getSystemCredentials();
+
     if (!cloudCredentials)
     {
         SystemError::setLastErrorCode(SystemError::invalidData);
@@ -303,13 +305,17 @@ bool CloudServerSocket::registerOnMediatorSync()
     listenRequestData.systemId = cloudCredentials->systemId;
     listenRequestData.serverId = cloudCredentials->serverId;
 
-    std::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
+    nx::utils::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
-        [&listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
+        [this, &listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
         {
+            m_mediatorConnection->setOnReconnectedHandler(
+                std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
+
             listenCompletedPromise.set_value(resultCode);
         });
+
     auto listenCompletedFuture = listenCompletedPromise.get_future();
     listenCompletedFuture.wait();
     const auto resultCode = listenCompletedFuture.get();
@@ -392,6 +398,9 @@ void CloudServerSocket::onListenRequestCompleted(
     {
         m_state = State::listening;
 
+        m_mediatorConnection->setOnReconnectedHandler(
+            std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
+
         NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG2);
         auto acceptHandler = std::move(m_savedAcceptHandler);
         m_savedAcceptHandler = nullptr;
@@ -448,8 +457,9 @@ void CloudServerSocket::acceptAsyncInternal(
 
 void CloudServerSocket::issueRegistrationRequest()
 {
-    const auto cloudCredentials =
-        SocketGlobals::mediatorConnector().getSystemCredentials();
+    const auto cloudCredentials = m_mediatorConnection
+        ->credentialsProvider()->getSystemCredentials();
+
     if (!cloudCredentials)  //TODO #ak this MUST be assert
     {
         //specially for unit tests
@@ -491,8 +501,27 @@ void CloudServerSocket::onConnectionRequested(
             }
 
             if (event.connectionMethods)
-                NX_LOG(lm("Unsupported ConnectionMethods: %1")
+                NX_LOGX(lm("Unsupported ConnectionMethods: %1")
                     .arg(event.connectionMethods), cl_logWARNING);
+        });
+}
+
+void CloudServerSocket::onMediatorConnectionRestored()
+{
+    //TODO #ak it's a pity we cannot move m_mediatorConnection to this object's aio thread
+    m_mediatorRegistrationRetryTimer.dispatch(  //modifiyng state only in aio thread
+        [this]
+        {
+            NX_LOGX(lm("Connection to mediator has been restored after failure. "
+                "Re-sending listen request"), cl_logDEBUG1);
+
+            if (m_state == State::listening)
+            {
+                m_state = State::registeringOnMediator;
+                //sending listen request again
+                m_mediatorRegistrationRetryTimer.reset();
+                issueRegistrationRequest();
+            }
         });
 }
 

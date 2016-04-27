@@ -33,14 +33,14 @@ public:
     virtual boost::optional<nx::hpm::api::SystemCredentials>
         getSystemCredentials() const override;
 
-    bool bindedToCloud() const;
+    bool boundToCloud() const;
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection();
     const nx::cdb::api::ConnectionFactory& connectionFactory() const;
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
 signals:
-    void cloudBindingStatusChanged(bool bindedToCloud);
+    void cloudBindingStatusChanged(bool boundToCloud);
 
 private:
     QString m_cloudSystemID;
@@ -50,7 +50,7 @@ private:
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
-    bool bindedToCloud(QnMutexLockerBase* const lk) const;
+    bool boundToCloud(QnMutexLockerBase* const lk) const;
 
 private slots:
     void cloudSettingsChanged();

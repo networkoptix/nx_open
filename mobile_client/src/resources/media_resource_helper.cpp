@@ -445,7 +445,7 @@ int QnMediaResourceHelper::optimalResolution() const
         return 0;
 
     int maxHeight = qMax(m_screenSize.width(), m_screenSize.height());
-    auto it = qUpperBound(m_standardResolutions.begin(), m_standardResolutions.end(), maxHeight);
+    auto it = std::upper_bound(m_standardResolutions.begin(), m_standardResolutions.end(), maxHeight);
     return it == m_standardResolutions.end() ? m_standardResolutions.last() : *it;
 }
 

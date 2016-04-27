@@ -1,6 +1,6 @@
 #include "jpeg.h"
 
-#if defined(Q_OS_IOS) || defined(Q_OS_MAC) || defined(Q_OS_ANDROID)
+#if defined(Q_OS_IOS) || defined(Q_OS_ANDROID)
 #define USE_LIBJPEG
 #endif
 

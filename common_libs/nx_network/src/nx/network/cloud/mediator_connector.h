@@ -1,13 +1,12 @@
 #ifndef NX_CC_MEDIATOR_CONNECTOR_H
 #define NX_CC_MEDIATOR_CONNECTOR_H
 
-#include <future>
-
 #include <boost/optional.hpp>
 
 #include <nx/network/stun/async_client.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/retry_timer.h>
+#include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "cdb_endpoint_fetcher.h"
@@ -36,7 +35,8 @@ public:
     std::shared_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
-    void mockupAddress( SocketAddress address );
+    void mockupAddress( SocketAddress address, bool suppressWarning = false );
+    void mockupAddress( const MediatorConnector& connector );
 
     void setSystemCredentials( boost::optional<SystemCredentials> value );
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
@@ -52,8 +52,8 @@ private:
     bool m_isTerminating;
     boost::optional< SystemCredentials > m_credentials;
 
-    boost::optional< std::promise< bool > > m_promise;
-    boost::optional< std::future< bool > > m_future;
+    boost::optional< nx::utils::promise< bool > > m_promise;
+    boost::optional< nx::utils::future< bool > > m_future;
 
     std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
     nx::network::cloud::CloudModuleEndPointFetcher m_endpointFetcher;

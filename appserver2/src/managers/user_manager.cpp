@@ -14,10 +14,19 @@ namespace ec2
         emit addedOrUpdated(tran.params);
     }
 
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserGroupData>& tran)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveUserGroup);
+        emit groupAddedOrUpdated(tran.params);
+    }
+
     void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
     {
-        NX_ASSERT(tran.command == ApiCommand::removeUser);
-        emit removed(tran.params.id);
+        NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserGroup);
+        if (tran.command == ApiCommand::removeUser)
+            emit removed(tran.params.id);
+        else if (tran.command == ApiCommand::removeUserGroup)
+            emit groupRemoved(tran.params.id);
     }
 
     void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiAccessRightsData>& tran)
@@ -102,6 +111,43 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran(ApiCommand::removeUser, id);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int ec2::QnUserManager<QueryProcessorType>::getUserGroups(impl::GetUserGroupsHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiUserGroupDataList& result)
+        {
+            handler->done(reqID, errorCode, result);
+        };
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserGroupDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getUserGroups, nullptr, queryDoneHandler);
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int ec2::QnUserManager<QueryProcessorType>::saveUserGroup(const ec2::ApiUserGroupData& group, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiUserGroupData> tran(ApiCommand::saveUserGroup, group);
+        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int ec2::QnUserManager<QueryProcessorType>::removeUserGroup(const QnUuid& id, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiIdData> tran(ApiCommand::removeUserGroup, id);
         m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);

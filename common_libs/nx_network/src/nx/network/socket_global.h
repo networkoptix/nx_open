@@ -37,9 +37,9 @@ public:
     cloud::OutgoingTunnelPool& outgoingTunnelPool()
     { return s_instance->m_outgoingTunnelPool; }
 
-	static void init();	/** Should be called before any socket use */
-	static void deinit();  /** Should be called when sockets are not needed any more */
-    static void check(); /** May be called to verify initialization */
+    static void init(); /** Should be called before any socket use */
+    static void deinit(); /** Should be called when sockets are not needed any more */
+    static void verifyInitialization();
 
 	class InitGuard
 	{

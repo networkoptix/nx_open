@@ -117,7 +117,9 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <liteMode>false</liteMode>
+        <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
+        <template>lib</template>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -131,28 +133,36 @@
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
+        <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
          <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
         <qt.debug></qt.debug>
-        <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
-        <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
+        <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
+        <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.0</qt.version>
+        <gtest.version>1.7.0</gtest.version>
+        <gmock.version>1.7.0</gmock.version>
         <ffmpeg.version>0.11.4</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
-        <openldap.version>2.4.42-SNAPSHOT</openldap.version>
-        <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
+        <openldap.version>2.4.42</openldap.version>
+        <sasl2.version>2.1.26</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
-        <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
+        <onvif.version>2.1.2-io</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
-        <boost.version>1.56-SNAPSHOT</boost.version>
+        <boost.version>1.56.0</boost.version>
         <quazip.version>0.7.1</quazip.version>
+        <openal.version>1.16</openal.version>
+        <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
+        <libcreateprocess.version>0.1</libcreateprocess.version>
+        <vmux.version>1.0.0</vmux.version>
         <server-external.version>3.0.0</server-external.version>
         <help.version>${customization}-3.0.0</help.version>
+        <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
         <global.libs/>
@@ -162,7 +172,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines>QN_DEMO_SHOW</global.defines>
+        <global.defines></global.defines>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
@@ -186,19 +196,15 @@
         </qtlibs>
         <additional.qtlibs/>
 
-        <!--QT plugins used-->
-        <qtplugins>
-            imageformats, platforms, xcbglintegrations
-        </qtplugins>
-        <additional.qtplugins/>
-
         <!-- List of commonly used RDep packages -->
         <rdep.packages/>
         <rdep.windows.packages/>
         <rdep.linux.packages/>
+        <rdep.linux.arm.packages/>
         <rdep.mac.packages/>
         <rdep.android.packages/>
         <rdep.ios.packages/>
+        <rdep.global.packages/>
 
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -282,6 +288,10 @@
                                     <filtering>true</filtering>
                                 </resource>
                                 <resource>
+                                    <directory>${root.dir}/build_utils/maven/filter-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
                                 </resource>
@@ -305,50 +315,34 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>get-rdep-artifacts</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>get_dependencies.py</argument>
+                            </arguments>
+                            <environmentVariables>
+                                <PYTHONPATH>${root.dir}/build_utils/python</PYTHONPATH>
+                            </environmentVariables>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
     <profiles>
-        <profile>
-            <id>android</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>true</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/android.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>android-client/protobuf-classes</module>
-                <module>android-client/android-main</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>ios</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>mac</family>
-                </os>
-                <property>
-                    <name>mobile</name>
-                    <value>true</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/ios.skip</missing>
-                </file>
-            </activation>
-            <modules>
-                <module>ios-client</module>
-            </modules>
-        </profile>
-
         <profile>
             <id>quicksync</id>
             <activation>
@@ -390,12 +384,14 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/common_ut</module>
                 <module>unit_tests/cloud_connectivity_ut</module>
+                <!--<module>unit_tests/cloud_db_ut</module>-->
+                <module>unit_tests/common_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
-                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <module>unit_tests/mediaserver_core_ut</module>
                 <module>unit_tests/nx_network_ut</module>
+                <module>unit_tests/utils_ut</module>
+                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
@@ -445,7 +441,6 @@
             </activation>
             <properties>
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
-                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>applauncher</module>
@@ -485,6 +480,8 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
+                <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
+                <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
 
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
@@ -509,7 +506,7 @@
             <properties>
                 <machine.type>X86</machine.type>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -606,7 +603,6 @@
             <properties>
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-                <additional.qtplugins>audio, platforminputcontexts</additional.qtplugins>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -634,18 +630,20 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
-                    <value>!true</value>
+                    <name>box</name>
+                    <value>!ios</value>
                 </property>
             </activation>
             <properties>
                 <platform>macosx</platform>
                 <arch>x64</arch>
-                <qt.spec>macx-clang-libc++</qt.spec>
+                <quazip.version>0.7.2</quazip.version>
+                <qt.spec/>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
             <modules>
+                <module>common_libs/nx_email</module>
                 <module>macsetup/client-dmg</module>
             </modules>
         </profile>
@@ -715,8 +713,10 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
                 <compiler>2011.09</compiler>
-                <qt.spec>linux-arm-gnueabi-g++-2014.05</qt.spec>
+                <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
                 <rdep.target>isd</rdep.target>
@@ -745,9 +745,12 @@
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <qt.spec/>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -773,6 +776,9 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
+                <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
             </properties>
@@ -806,6 +812,8 @@
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
                 <qt.spec/>
+                <!-- TODO get rid of this variable. We already have corresponding package name in common/pom.xml -->
+                <gcc.version>4.8.3</gcc.version>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -888,6 +896,7 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
+                <qt.spec>linux-g++-4.9-64</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -906,7 +915,8 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
+                <qt.spec>linux-g++-4.9-32</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -971,7 +981,6 @@
             </activation>
             <properties>
                 <compile.options/>
-                <additional.qtplugins>audio</additional.qtplugins>
             </properties>
             <modules>
                 <module>client.core</module>
@@ -1008,6 +1017,7 @@
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <qt.version>5.5.1</qt.version>
+                <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
@@ -1056,7 +1066,10 @@
                 <compiler>clang</compiler>
                 <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
+                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.1i</openssl.version>
+                <ffmpeg.version>0.11.5</ffmpeg.version>
+                <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
                 <compile.option1/>
                 <rdep.target>ios</rdep.target>
             </properties>
@@ -1075,6 +1088,23 @@
             </activation>
             <modules>
                 <module>webadmin</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>unit-tests</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>test</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>unit_tests</module>
             </modules>
         </profile>
     </profiles>

@@ -178,7 +178,10 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
 }
 
 GraphicsWidget::~GraphicsWidget()
-{}
+{
+    if (GraphicsWidgetSceneData *sd = d_ptr->ensureSceneData())
+        sd->pendingLayoutWidgets.remove(this);
+}
 
 void GraphicsWidget::initStyleOption(QStyleOption *option) const {
     base_type::initStyleOption(option);

@@ -27,6 +27,8 @@
 
         <qt.libs>core</qt.libs>
         <global.libs>-lcommon</global.libs>
+        <ios.oslibs>-framework OpenAL</ios.oslibs>
+        <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
 
     <profiles>
@@ -96,7 +98,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>bpi</value>
+                    <value>tx1</value>
                 </property>
             </activation>
             <properties>

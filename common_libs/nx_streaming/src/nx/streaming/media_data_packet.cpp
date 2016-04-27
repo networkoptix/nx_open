@@ -5,7 +5,7 @@
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_OSX
 #include <smmintrin.h>
 #endif
 
@@ -106,7 +106,7 @@ inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* m
 {
     for (int i = maskStart; i <= maskEnd; ++i)
     {
-        if (_mm_testz_si128(mask[i], data[i]) == 0) /* SSE4. */
+        if (_mm_testz_si128_sse4(mask[i], data[i]) == 0) /* SSE4. */
             return true;
     }
     return false;
@@ -228,7 +228,7 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
     static const __m128i ff_mask = _mm_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff); /* SSE2. */
     for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
     {
-        if (_mm_testz_si128(src[i], ff_mask) == 0) /* SSE4. */
+        if (_mm_testz_si128_sse4(src[i], ff_mask) == 0) /* SSE4. */
             return false;
     }
     return true;

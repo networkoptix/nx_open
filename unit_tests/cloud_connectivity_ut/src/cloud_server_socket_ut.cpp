@@ -9,6 +9,7 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+#include <nx/utils/std/future.h>
 
 
 namespace nx {
@@ -30,8 +31,8 @@ public:
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
-        NX_ASSERT(m_server->setNonBlockingMode(true));
-        NX_ASSERT(m_server->setReuseAddrFlag(true));
+        NX_CRITICAL(m_server->setNonBlockingMode(true));
+        NX_CRITICAL(m_server->setReuseAddrFlag(true));
         if (!m_server->bind(address) || !m_server->listen())
             m_sockets = 0;
 
@@ -220,7 +221,7 @@ static void testTunnelConnect(bool isSuccessExpected)
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(500));
 
-    std::promise<SystemError::ErrorCode> result;
+    nx::utils::promise<SystemError::ErrorCode> result;
     client->connectAsync(
         network::test::kServerAddress,
         [&](SystemError::ErrorCode c){ result.set_value(c); });

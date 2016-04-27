@@ -7,7 +7,6 @@
 
 #include <chrono>
 #include <functional>
-#include <future>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -59,7 +58,7 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
 
 void MediatorFunctionalTest::start()
 {
-    std::promise<void> mediatorInstantiatedCreatedPromise;
+    nx::utils::promise<void> mediatorInstantiatedCreatedPromise;
     auto mediatorInstantiatedCreatedFuture = mediatorInstantiatedCreatedPromise.get_future();
 
     m_mediatorProcessFuture = std::async(

@@ -151,7 +151,7 @@ extern "C" {
 #include <QFileSystemWatcher>
 
 #include <nx/utils/thread/wait_condition.h>
-#include <ui/workaround/deprecation.h>
-#include <ui/dialogs/message_box.h>
+#include <nx/utils/deprecation.h>
+#include <ui/dialogs/common/message_box.h>
 
 #endif

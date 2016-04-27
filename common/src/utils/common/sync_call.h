@@ -7,7 +7,8 @@
 #define NX_MAKE_SYNC_CALL_H
 
 #include <functional>
-#include <future>
+
+#include <nx/utils/std/future.h>
 
 
 //TODO #ak introduce generic implementation using variadic templates (when available)
@@ -20,7 +21,7 @@ template<typename ResultType>
 std::tuple<ResultType> makeSyncCall(
     std::function<void(std::function<void(ResultType)>)> function)
 {
-    std::promise<ResultType> promise;
+    nx::utils::promise<ResultType> promise;
     auto future = promise.get_future();
     function([&promise](ResultType resCode) { promise.set_value(resCode); });
     return std::make_tuple(future.get());
@@ -30,7 +31,7 @@ template<typename ResultType, typename OutArg1>
 std::tuple<ResultType, OutArg1> makeSyncCall(
     std::function<void(std::function<void(ResultType, OutArg1)>)> function)
 {
-    std::promise<ResultType> promise;
+    nx::utils::promise<ResultType> promise;
     auto future = promise.get_future();
     OutArg1 result;
     function([&promise, &result](ResultType resCode, OutArg1 outArg1) {

@@ -448,11 +448,11 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 {
     QStringList result = list;
     if (caseSensitive == Qt::CaseSensitive)
-        qSort(result.begin(), result.end(), [](const QString &left, const QString &right) {
+        std::sort(result.begin(), result.end(), [](const QString &left, const QString &right) {
             return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
         });
     else
-        qSort(result.begin(), result.end(), naturalStringLess);
+        std::sort(result.begin(), result.end(), naturalStringLess);
     return result;
 }
 
@@ -547,38 +547,39 @@ QByteArray generateRandomName(int length)
     return str;
 }
 
-QString bytesToString(uint64_t bytes)
+QString bytesToString(uint64_t bytes, int precision)
 {
-    constexpr const uint64_t KB = 1024;
-    constexpr const uint64_t MB = 1024 * 1024;
-    constexpr const uint64_t GB = 1024 * 1024 * 1024;
+    double number = static_cast<double>(bytes);
+    size_t suffix = 0;
 
-    if (bytes > GB)
-        return lm("%1G").arg(bytes / GB);
-    else if (bytes > MB)
-        return lm("%1M").arg(bytes / MB);
-    else if (bytes > KB)
-        return lm("%1K").arg(bytes / KB);
-    else
-        return lm("%1").arg(bytes);
+    while (number >= kByteSuffixLimit
+        && suffix <= kByteSuffexes.size())
+    {
+        number /= kByteSuffixLimit;
+        ++suffix;
+    }
+
+    if (suffix == 0)
+        return lm("%1").arg(number, 0, 'g', precision);
+
+    return lm("%1%2").arg(number, 0, 'g', precision).arg(
+        QChar::fromLatin1(kByteSuffexes[suffix - 1]));
 }
 
 uint64_t stringToBytes(const QString& str, bool* isOk)
 {
-    uint64_t ret = 0;
-    const auto subint = [&](uint64_t multi)
+    const auto subDouble = [&](double multi)
     {
-        ret = QStringRef(&str, 0, str.size() - 1).toULongLong(isOk) * multi;
+        return static_cast<uint64_t>(
+            QStringRef(&str, 0, str.size() - 1).toDouble(isOk) * multi);
     };
 
-    if (str.endsWith(L'K', Qt::CaseInsensitive))
-        subint(1024);
-    else if (str.endsWith(L'M', Qt::CaseInsensitive))
-        subint(1024 * 1024);
-    else if (str.endsWith(L'G', Qt::CaseInsensitive))
-        subint(1024 * 1024 * 1024);
-    else
-        ret = str.toULongLong(isOk);
+    for (size_t i = 0; i < kByteSuffexes.size(); ++i)
+    {
+        if (str.endsWith(QChar::fromLatin1(kByteSuffexes[i]), Qt::CaseInsensitive))
+            return subDouble(std::pow(kByteSuffixLimit, static_cast<double>(i + 1)));
+    }
 
-    return ret;
+    // NOTE: avoid double to be the most presice
+    return str.toULongLong(isOk);
 }

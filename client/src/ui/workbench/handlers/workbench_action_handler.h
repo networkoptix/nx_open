@@ -164,7 +164,6 @@ protected slots:
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
-    void at_userSettingsAction_triggered();
 
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
@@ -183,8 +182,6 @@ protected slots:
     void at_removeLayoutItemAction_triggered();
     void at_renameAction_triggered();
     void at_removeFromServerAction_triggered();
-
-    void at_newUserAction_triggered();
 
     void at_adjustVideoAction_triggered();
     void at_beforeExitAction_triggered();

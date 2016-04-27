@@ -20,7 +20,7 @@ set -e
 #     echo "$h"
 # }
 
-TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-4.8.3
+TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
@@ -79,14 +79,6 @@ libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
-libQt5Concurrent.so.${qt.version} \
-libQt5Core.so.${qt.version} \
-libQt5Gui.so.${qt.version} \
-libQt5Multimedia.so.${qt.version} \
-libQt5Network.so.${qt.version} \
-libQt5Sql.so.${qt.version} \
-libQt5Xml.so.${qt.version} \
-libQt5XmlPatterns.so.${qt.version} \
 libsigar.so \
 libsasl2.so.3.0.0 \
 liblber-2.4.so.2.10.5 \
@@ -127,17 +119,23 @@ do
 done
 popd
 
+#copying qt libs
+QTLIBS=`readelf -d $BINS_DIR/mediaserver | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/'`
+for var in $QTLIBS
+do
+    cp -P ${qt.dir}/lib/$var* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+done
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+cp $BINS_DIR/external.dat $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
   $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
   $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
 fi
-
 
 #copying plugins
 if [ -e "$BINS_DIR/plugins" ]; then
@@ -164,16 +162,18 @@ cp -R ./opt $BUILD_DIR
 
 
 #additional platform specific files
-cp -R ./root $BUILD_DIR
-mkdir -p $BUILD_DIR/root/tools/nx
-cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
+    cp -R ./root $BUILD_DIR
+    mkdir -p $BUILD_DIR/root/tools/nx
+    cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+fi
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
     rm -Rf $BUILD_DIR/opt/networkoptix/
 fi
 
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
     cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
     cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi

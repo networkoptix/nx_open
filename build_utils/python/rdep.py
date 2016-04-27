@@ -100,15 +100,15 @@ def detect_package_and_target(root, path):
     if not is_relative_to(path, root):
         return None, None
 
-    path, package = os.path.split(path)
     path, target = os.path.split(path)
+    package = None
 
     while path != root and target:
         package = target
         path, target = os.path.split(path)
 
     if path == root:
-        if target in supported_targets and package:
+        if target in supported_targets:
             return target, package
 
     return None, None
@@ -177,14 +177,14 @@ def get_rsync_command(source,
                       additional_args = []):
 
     command = list(RSYNC)
-    command.append("--archive")    
+    command.append("--archive")
     if not rdpack_file:
         command.append("--delete")
 
     if show_progress:
         command.append("--progress")
 
-    if RSYNC_CHMOD_ARG:
+    if RSYNC_CHMOD_ARG and not ":" in destination:
         command.append(RSYNC_CHMOD_ARG)
 
     command.append(source)
@@ -425,7 +425,7 @@ def get_copy_list(package_dir):
     config.read(os.path.join(package_dir, PACKAGE_CONFIG_NAME))
 
     if not config.has_section("Copy"):
-        return { "bin": [ "bin/*" ], "lib": [ "lib/*.so*" ] }
+        return { "bin": [ "bin/*" ], "lib": [ "lib/*.so*", "lib/*.dylib*" ] }
 
     result = {}
     for key, value in config.items("Copy"):
@@ -497,10 +497,11 @@ def main():
         exit(1)
 
     packages = args.packages
-    if root and not packages:
+    if root:
         detected_target, package = detect_package_and_target(root, os.getcwd())
-        if detected_target and package:
+        if detected_target:
             target = detected_target
+        if not packages and package:
             packages = [ package ]
 
     if args.verbose:

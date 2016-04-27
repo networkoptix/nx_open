@@ -7,7 +7,6 @@
 #define NX_CDB_UT_TEST_SETUP_H
 
 #include <chrono>
-#include <future>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -15,6 +14,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <nx/utils/std/future.h>
 #include <cdb/connection.h>
 #include <cloud_db_process_public.h>
 
@@ -151,7 +151,7 @@ private:
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
-    std::unique_ptr<std::promise<bool /*result*/>> m_cdbStartedPromise;
+    std::unique_ptr<nx::utils::promise<bool /*result*/>> m_cdbStartedPromise;
 };
 
 namespace api {

@@ -1,13 +1,17 @@
+
 #include <gtest/gtest.h>
 
-#include <utils/thread/sync_queue.h>
-#include <nx/network/cloud/tunnel/incoming_tunnel_udt_connection.h>
-#include <nx/network/cloud/tunnel/udp_hole_punching_acceptor.h>
+#include <nx/network/cloud/tunnel/udp/incoming_tunnel_connection.h>
+#include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
+#include <nx/utils/std/future.h>
+#include <utils/thread/sync_queue.h>
+
 
 namespace nx {
 namespace network {
 namespace cloud {
+namespace udp {
 namespace test {
 
 static const size_t kTestConnections = 10;
@@ -15,7 +19,7 @@ static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
 static const std::chrono::milliseconds kSocketTimeout(1000);
 static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
 
-class IncomingTunnelUdtConnectionTest
+class IncomingTunnelConnectionTest
 :
     public ::testing::Test
 {
@@ -25,8 +29,8 @@ protected:
         TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
-        NX_ASSERT(tmpSocket->setSendTimeout(0));
-        NX_ASSERT(tmpSocket->setRecvTimeout(0));
+        ASSERT_TRUE(tmpSocket->setSendTimeout(0));
+        ASSERT_TRUE(tmpSocket->setRecvTimeout(0));
         connectionAddress = tmpSocket->getLocalAddress();
 
         freeSocket = makeSocket(true);
@@ -36,21 +40,24 @@ protected:
         ASSERT_EQ(results.pop(), SystemError::noError);
         ASSERT_EQ(results.pop(), SystemError::noError);
 
-        connection = std::make_unique<IncomingTunnelUdtConnection>(
+        nx::hpm::api::ConnectionParameters connectionParameters;
+        connectionParameters.udpTunnelKeepAliveInterval = kMaxKeepAliveInterval;
+        connectionParameters.udpTunnelKeepAliveRetries = 1;
+        connection = std::make_unique<IncomingTunnelConnection>(
             kConnectionId.toUtf8(),
             std::move(tmpSocket),
-            kMaxKeepAliveInterval);
+            std::move(connectionParameters));
         acceptForever();
     }
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
     {
         auto socket = std::make_unique<UdtStreamSocket>();
-        NX_ASSERT(socket->setRendezvous(randevous));
-        NX_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
-        NX_ASSERT(socket->setRecvTimeout(kSocketTimeout.count()));
-        NX_ASSERT(socket->setNonBlockingMode(true));
-        NX_ASSERT(socket->bind(SocketAddress(HostAddress::localhost, 0)));
+        NX_CRITICAL(socket->setRendezvous(randevous));
+        NX_CRITICAL(socket->setSendTimeout(kSocketTimeout.count()));
+        NX_CRITICAL(socket->setRecvTimeout(kSocketTimeout.count()));
+        NX_CRITICAL(socket->setNonBlockingMode(true));
+        NX_CRITICAL(socket->bind(SocketAddress(HostAddress::localhost, 0)));
         return std::move(socket);
     }
 
@@ -107,7 +114,7 @@ protected:
     }
 
     SocketAddress connectionAddress;
-    std::unique_ptr<IncomingTunnelUdtConnection> connection;
+    std::unique_ptr<IncomingTunnelConnection> connection;
     TestSyncQueue<SystemError::ErrorCode> acceptResults;
 
     std::unique_ptr<UdtStreamSocket> freeSocket;
@@ -118,12 +125,12 @@ protected:
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
 };
 
-TEST_F(IncomingTunnelUdtConnectionTest, Timeout)
+TEST_F(IncomingTunnelConnectionTest, Timeout)
 {
     ASSERT_EQ(acceptResults.pop(), SystemError::timedOut);
 }
 
-TEST_F(IncomingTunnelUdtConnectionTest, Connections)
+TEST_F(IncomingTunnelConnectionTest, Connections)
 {
     runConnectingSockets(kTestConnections);
     for (size_t i = 0; i < kTestConnections; ++i)
@@ -139,7 +146,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, Connections)
     ASSERT_EQ(acceptResults.pop(), SystemError::timedOut);
 }
 
-TEST_F(IncomingTunnelUdtConnectionTest, SynAck)
+TEST_F(IncomingTunnelConnectionTest, SynAck)
 {
     // we can connect right after start
     runConnectingSockets();
@@ -158,7 +165,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, SynAck)
         serializer.setMessage(&request);
         serializer.serialize(&buffer, &processed);
 
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         freeSocket->sendAsync(
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
@@ -199,7 +206,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, SynAck)
 
     {
         Buffer buffer("someTrash");
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         freeSocket->sendAsync(
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
@@ -227,11 +234,11 @@ TEST_F(IncomingTunnelUdtConnectionTest, SynAck)
     ASSERT_EQ(acceptResults.pop(), SystemError::invalidData);
 }
 
-TEST_F(IncomingTunnelUdtConnectionTest, PleaseStop)
+TEST_F(IncomingTunnelConnectionTest, PleaseStop)
 {
 }
 
-TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
+TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
 {
     std::vector<std::thread> threads;
     for (size_t i = 0; i < kTestConnections; ++i)
@@ -242,14 +249,14 @@ TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
                 for (;;)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>();
-                    NX_ASSERT(socket->setSendTimeout(kSocketTimeout.count()));
+                    ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
                     if (!socket->connect(connectionAddress))
                         return;
                 }
             }));
     }
 
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     connection->pleaseStop(
         [this, &promise]()
         {
@@ -263,6 +270,7 @@ TEST_F(IncomingTunnelUdtConnectionTest, PleaseStopOnRun)
 }
 
 } // namespace test
+} // namespace udp
 } // namespace cloud
 } // namespace network
 } // namespace nx

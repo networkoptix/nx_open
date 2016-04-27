@@ -26,16 +26,18 @@ public:
     QnServerUpdatesWidget(QWidget *parent = 0);
 
     bool cancelUpdate();
+    bool canCancelUpdate() const;
     bool isUpdating() const;
 
     QnMediaServerUpdateTool *updateTool() const;
 
     virtual void applyChanges() override;
+    virtual void discardChanges() override;
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
 
-    virtual bool canApplyChanges() override;
-    virtual bool canDiscardChanges() override;
+    virtual bool canApplyChanges() const override;
+    virtual bool canDiscardChanges() const override;
 
 private slots:
     void at_updateFinished(const QnUpdateResult &result);
@@ -67,7 +69,7 @@ private:
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     std::array<QAction*, UpdateSourceCount> m_updateSourceActions;
-  
+
     QnSoftwareVersion m_targetVersion;
     QnSoftwareVersion m_latestVersion;
     bool m_checkingInternet;

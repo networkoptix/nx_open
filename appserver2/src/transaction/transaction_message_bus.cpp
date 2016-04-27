@@ -147,6 +147,7 @@ namespace ec2
         case ApiCommand::removeBusinessRule:
         case ApiCommand::removeResource:
         case ApiCommand::removeUser:
+        case ApiCommand::removeUserGroup:
         case ApiCommand::removeLayout:
         case ApiCommand::removeVideowall:
         case ApiCommand::removeWebPage:
@@ -158,6 +159,7 @@ namespace ec2
         case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveStorage:           return handleTransactionParams<ApiStorageData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::saveUserGroup:         return handleTransactionParams<ApiUserGroupData>        (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::setAccessRights:       return handleTransactionParams<ApiAccessRightsData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
@@ -188,7 +190,7 @@ namespace ec2
 
         case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-    case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::saveClientInfo:        return handleTransactionParams<ApiClientInfoData>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
         case ApiCommand::lockRequest:
         case ApiCommand::lockResponse:

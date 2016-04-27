@@ -14,6 +14,7 @@
 #include <boost/optional.hpp>
 
 #include <udt/udt.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
 #include <utils/common/checked_cast.h>
@@ -124,8 +125,11 @@ UdtSocket<InterfaceToImplement>::~UdtSocket()
 {
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
-    NX_ASSERT(!nx::network::SocketGlobals::aioService()
-        .isSocketBeingWatched(static_cast<Pollable*>(this)));
+    NX_CRITICAL(
+        !nx::network::SocketGlobals::aioService()
+            .isSocketBeingWatched(static_cast<Pollable*>(this)),
+        "You MUST cancel running async socket operation before "
+        "deleting socket if you delete socket from non-aio thread");
 
     if (!isClosed())
         close();
@@ -800,7 +804,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         return systemAccept();
 
     //this method always blocks
-    std::promise<
+    nx::utils::promise<
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
     > acceptedSocketPromise;
 

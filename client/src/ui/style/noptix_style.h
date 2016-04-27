@@ -69,12 +69,6 @@ private:
 #define HideCheckBoxInMenu              _id("_qn_hideCheckBoxInMenu")
 
 /**
- * Name of a property to set on a <tt>QAbstractItemView</tt> to change
- * default opacity if its items' background.
- */
-#define ItemViewItemBackgroundOpacity   _id("_qn_itemViewItemBackgroundOpacity")
-
-/**
  * Name of a property to set on a <tt>QTreeView</tt> to make it hide
  * last row if there is not enough space for it.
  */

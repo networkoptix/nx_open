@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 #include <utils/common/cpp14.h>
 #include <utils/common/string.h>
@@ -30,19 +31,6 @@ namespace
 
 //#define DEBUG_OUTPUT
 
-static QByteArray randomData(size_t size)
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist;
-
-    QByteArray data(size, Qt::Uninitialized);
-    for (auto& it : data)
-        it = dist(gen);
-
-    return data;
-}
-
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     TestTrafficLimitType limitType,
@@ -61,7 +49,7 @@ TestConnection::TestConnection(
     m_accepted(true)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = randomData( READ_BUF_SIZE );
+    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
 
     ++TestConnection_count;
 }
@@ -87,7 +75,7 @@ TestConnection::TestConnection(
     m_accepted(false)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = randomData( READ_BUF_SIZE );
+    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
 
     ++TestConnection_count;
 }
@@ -198,7 +186,7 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
-        NX_LOGX(lm("accepted %1. Receive error: %2")
+        NX_LOGX(lm("accepted %1. Connect error: %2")
             .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
 
         return reportFinish( errorCode );
@@ -215,8 +203,8 @@ void TestConnection::startIO()
     switch (m_transmissionMode)
     {
         case TestTransmissionMode::spam: return startSpamIO();
-        case TestTransmissionMode::echo: return startEchoIO();
-        case TestTransmissionMode::echoTest: return startEchoTestIO();
+        case TestTransmissionMode::pong: return startEchoIO();
+        case TestTransmissionMode::ping: return startEchoTestIO();
     };
 
     NX_ASSERT(false);
@@ -452,7 +440,7 @@ void TestConnection::reportFinish( SystemError::ErrorCode code )
 
 QString toString(const ConnectionTestStatistics& data)
 {
-    return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4")
+    return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4.")
         .arg(data.onlineConnections).arg(data.totalConnections)
         .arg(bytesToString(data.bytesReceived))
         .arg(bytesToString(data.bytesSent));
@@ -647,7 +635,26 @@ ConnectionsGenerator::ConnectionsGenerator(
     size_t maxTotalConnections,
     TestTransmissionMode transmissionMode)
 :
-    m_remoteAddress( remoteAddress ),
+    ConnectionsGenerator(
+        std::vector<SocketAddress>(1, std::move(remoteAddress)),
+        maxSimultaneousConnectionsCount,
+        limitType,
+        trafficLimit,
+        maxTotalConnections,
+        transmissionMode)
+{
+}
+
+ConnectionsGenerator::ConnectionsGenerator(
+    std::vector<SocketAddress> remoteAddresses,
+    size_t maxSimultaneousConnectionsCount,
+    TestTrafficLimitType limitType,
+    size_t trafficLimit,
+    size_t maxTotalConnections,
+    TestTransmissionMode transmissionMode)
+:
+    m_remoteAddresses( remoteAddresses ),
+    m_remoteAddressesIterator( m_remoteAddresses.begin() ),
     m_maxSimultaneousConnectionsCount( maxSimultaneousConnectionsCount ),
     m_limitType( limitType ),
     m_trafficLimit( trafficLimit ),
@@ -662,6 +669,7 @@ ConnectionsGenerator::ConnectionsGenerator(
     m_errorEmulationDistribution(1, 100),
     m_errorEmulationPercent(0)
 {
+    NX_CRITICAL(m_remoteAddresses.size());
 }
 
 ConnectionsGenerator::~ConnectionsGenerator()
@@ -714,10 +722,13 @@ void ConnectionsGenerator::setLocalAddress(SocketAddress addr)
     m_localAddress = std::move(addr);
 }
 
-void ConnectionsGenerator::setRemoteAddress(SocketAddress remoteAddress)
+void ConnectionsGenerator::resetRemoteAddresses(
+    std::vector<SocketAddress> remoteAddresses)
 {
+    NX_CRITICAL(remoteAddresses.size());
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_remoteAddress = std::move(remoteAddress);
+    m_remoteAddresses = std::move(remoteAddresses);
+    m_remoteAddressesIterator = m_remoteAddresses.begin();
 }
 
 void ConnectionsGenerator::start()
@@ -728,7 +739,7 @@ void ConnectionsGenerator::start()
 
         std::unique_ptr<TestConnection> connection(
             new TestConnection(
-                m_remoteAddress,
+                nextAddress(),
                 m_limitType,
                 m_trafficLimit,
                 m_transmissionMode));
@@ -788,6 +799,16 @@ const std::map<SystemError::ErrorCode, size_t>&
     return m_returnCodes;
 }
 
+const SocketAddress& ConnectionsGenerator::nextAddress()
+{
+    const auto current = m_remoteAddressesIterator;
+
+    if (++m_remoteAddressesIterator == m_remoteAddresses.end())
+        m_remoteAddressesIterator = m_remoteAddresses.begin();
+
+    return *current;
+}
+
 void ConnectionsGenerator::onConnectionFinished(
     int id,
     SystemError::ErrorCode code)
@@ -837,7 +858,7 @@ void ConnectionsGenerator::addNewConnections(
     while (m_connections.size() < m_maxSimultaneousConnectionsCount)
     {
         auto connection = std::make_unique<TestConnection>(
-            m_remoteAddress,
+            nextAddress(),
             m_limitType,
             m_trafficLimit,
             m_transmissionMode);

@@ -37,6 +37,13 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
             connect(layout, &QnLayoutResource::userCanEditChanged,  this, removeResourceFromCache);
             connect(layout, &QnLayoutResource::lockedChanged,       this, removeResourceFromCache);
         }
+
+        if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
+        {
+            connect(user, &QnUserResource::permissionsChanged,  this, removeResourceFromCache);
+            connect(user, &QnUserResource::userGroupChanged,    this, removeResourceFromCache);
+        }
+
     });
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, removeResourceFromCache](const QnResourcePtr& resource)
@@ -46,7 +53,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     });
 }
 
-void QnResourceAccessManager::reset(const ec2::ApiAccessRightsDataList& accessRights)
+void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights)
 {
     m_accessibleResources.clear();
     for (const auto& item : accessRights)
@@ -55,6 +62,12 @@ void QnResourceAccessManager::reset(const ec2::ApiAccessRightsDataList& accessRi
         for (const auto& id : item.resourceIds)
             accessibleResources << id;
     }
+    m_permissionsCache.clear();
+}
+
+void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& userGroups)
+{
+    m_userGroups = userGroups;
 }
 
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
@@ -65,6 +78,19 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
 {
     m_accessibleResources[userId] = resources;
+
+    for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
+    {
+        if (iter.key().userId == userId)
+            iter = m_permissionsCache.erase(iter);
+        else
+            ++iter;
+    }
+}
+
+ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
+{
+    return m_userGroups;
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr &user) const
@@ -72,6 +98,10 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     NX_ASSERT(user, Q_FUNC_INFO, "We must not request permissions for absent user.");
     if (!user)
         return Qn::NoGlobalPermissions;
+
+    /* Handle just-created user situation. */
+    if (user->flags().testFlag(Qn::local))
+        return user->getRawPermissions();
 
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
@@ -81,7 +111,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     if (iter != m_globalPermissionsCache.cend())
         return *iter;
 
-    Qn::GlobalPermissions result = user->getPermissions();
+    Qn::GlobalPermissions result = user->getRawPermissions();
 
     if (user->isOwner() || result.testFlag(Qn::GlobalOwnerPermission))
         result |= Qn::GlobalOwnerPermissionsSet;
@@ -100,7 +130,7 @@ bool QnResourceAccessManager::hasGlobalPermission(const QnUserResourcePtr &user,
     return globalPermissions(user).testFlag(requiredPermission);
 }
 
-Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource)
+Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
 {
     NX_ASSERT(user && resource, Q_FUNC_INFO, "We must not request permissions for absent resources.");
     if (!user || !resource)
@@ -118,6 +148,11 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
     return result;
 }
 
+bool QnResourceAccessManager::hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const
+{
+    return permissions(user, resource).testFlag(requiredPermission);
+}
+
 Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions permissions)
 {
     Qn::GlobalPermissions result = permissions;
@@ -133,6 +168,9 @@ Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions
         result &= ~Qn::DeprecatedViewExportArchivePermission;
         result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
     }
+
+    if (result.testFlag(Qn::DeprecatedGlobalEditUsersPermission))
+        result &= ~Qn::DeprecatedGlobalEditUsersPermission;
 
     return result;
 }
@@ -333,7 +371,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
-    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalEditUsersPermission))
+    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalAdminPermission))
     {
         result |= Qn::ReadPermission;
         if (m_readOnlyMode)
@@ -387,10 +425,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr &user
         if (resource.dynamicCast<QnWebPageResource>())
             return Qn::GlobalAccessAllCamerasPermission;
 
-        if (resource.dynamicCast<QnUserResource>())
-            return Qn::GlobalEditUsersPermission;
-
-        /* Default value. */
+        /* Default value (e.g. for users). */
         return Qn::GlobalAdminPermission;
     };
 

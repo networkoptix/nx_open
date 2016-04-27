@@ -25,6 +25,8 @@
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <buildLib>sharedLib</buildLib>
+
+        <rdep.global.packages/>
     </properties>
 
     <dependencies>

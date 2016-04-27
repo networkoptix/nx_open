@@ -52,8 +52,11 @@ public:
     /** launches another server */
     void addServer()
     {
-        m_udpServers.emplace_back(std::make_unique<UDPServer>(m_messageDispatcher));
-        NX_ASSERT(m_udpServers.back()->listen());
+        m_udpServers.emplace_back(std::make_unique<UDPServer>(&m_messageDispatcher));
+        if (!m_udpServers.back()->listen())
+        {
+            NX_ASSERT(false);
+        }
     }
 
     /** returns endpoint of any server */

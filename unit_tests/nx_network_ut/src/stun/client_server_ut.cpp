@@ -1,3 +1,6 @@
+
+#include <thread>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -19,7 +22,7 @@ class TestServer
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher)
-        : SocketServer(dispatcher, false) {}
+        : SocketServer(&dispatcher, false) {}
 
     std::vector<std::shared_ptr<ServerConnection>> connections;
 
@@ -33,8 +36,6 @@ protected:
     };
 };
 
-const AbstractAsyncClient::Timeouts CLIENT_TIMEOUTS = { 1000, 1000, 5000 };
-
 class StunClientServerTest
         : public ::testing::Test
 {
@@ -45,9 +46,18 @@ protected:
         return ++port; // to avoid possible address overlap
     }
 
+    static AbstractAsyncClient::Settings defaultSettings()
+    {
+        AbstractAsyncClient::Settings settings;
+        settings.sendTimeout = std::chrono::seconds(1);
+        settings.recvTimeout = std::chrono::seconds(1);
+        settings.reconnectPolicy.setInitialDelay(std::chrono::seconds(3));
+        return settings;
+    }
+
     StunClientServerTest()
         : address( lit( "127.0.0.1"), newPort() )
-        , client( std::make_shared<AsyncClient>( CLIENT_TIMEOUTS ) )
+        , client( std::make_shared<AsyncClient>( defaultSettings() ) )
     {
     }
 
@@ -103,8 +113,8 @@ TEST_F( StunClientServerTest, Connectivity )
 
     startServer();
     EXPECT_EQ( server->connections.size(), 0 );
-    std::this_thread::sleep_for( std::chrono::milliseconds(
-        CLIENT_TIMEOUTS.reconnect * 2 ) ); // automatic reconnect is expected
+    std::this_thread::sleep_for( defaultSettings().reconnectPolicy
+        .initialDelay() * 2 ); // automatic reconnect is expected
     EXPECT_EQ( server->connections.size(), 1 );
 }
 

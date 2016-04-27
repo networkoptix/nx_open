@@ -39,6 +39,8 @@ struct ListeningPeerData
         connectionMethods(0)
     {
     }
+
+    QString toString() const;
 };
 
 /** Stores information on all peers currently listening for connections on all mediator instances.

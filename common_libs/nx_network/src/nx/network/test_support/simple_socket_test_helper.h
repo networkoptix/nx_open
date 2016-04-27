@@ -10,6 +10,8 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 
 // Template multitype socket tests to ensure that every common_ut run checks
 // TCP and UDT basic functionality
@@ -58,7 +60,7 @@ void syncSocketServerMainFunc(
     const boost::optional<QByteArray> testMessage,
     int clientCount,
     ServerSocketType server,
-    std::promise<void>* startedPromise)
+    nx::utils::promise<void>* startedPromise)
 {
     ASSERT_TRUE(server->setReuseAddrFlag(true));
 
@@ -75,7 +77,7 @@ void syncSocketServerMainFunc(
         if (startedPromise)
         {
             //we must trigger startedPromise after actual accept call: UDT requirement
-            std::promise<
+            nx::utils::promise<
                 std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
             > acceptedPromise;
             server->acceptAsync(
@@ -163,10 +165,10 @@ void socketSimpleSync(
     //ASSERT_NE(SystemError::noError, SystemError::getLastOSErrorCode());
     //failClient.reset();
 
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     auto server = serverMaker();
-    std::thread serverThread(
-        syncSocketServerMainFunc<decltype(server)>,
+    nx::utils::thread serverThread(
+        &syncSocketServerMainFunc<decltype(server)>,
         endpointToBindTo,
         testMessage,
         clientCount,
@@ -175,7 +177,7 @@ void socketSimpleSync(
 
     promise.get_future().wait();
 
-    std::thread clientThread([&endpointToConnectTo, &testMessage,
+    nx::utils::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
     {
         for (int i = clientCount; i > 0; --i)
@@ -252,7 +254,7 @@ void socketSimpleAsync(
             {
                 if (code == SystemError::noError)
                 {
-                    EXPECT_GT(size, 0);
+                    EXPECT_GT(size, (size_t)0);
                     EXPECT_STREQ(serverBuffer.data(), testMessage.data());
                     serverBuffer.resize(0);
                 }
@@ -285,7 +287,7 @@ void socketSimpleAsync(
                         return;
 
                     EXPECT_EQ(code, SystemError::noError);
-                    EXPECT_EQ(size, testMessage.size());
+                    EXPECT_EQ(size, (size_t)testMessage.size());
                 });
         });
 
@@ -379,10 +381,10 @@ void shutdownSocket(
 {
     for (int i = 0; i < 29; ++i)
     {
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         auto server = serverMaker();
-        std::thread serverThread(
-            syncSocketServerMainFunc<decltype(server)>,
+        nx::utils::thread serverThread(
+            &syncSocketServerMainFunc<decltype(server)>,
             endpointToBindTo,
             boost::none,
             1,
@@ -394,8 +396,8 @@ void shutdownSocket(
         auto client = clientMaker();
         ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
 
-        std::promise<void> recvExitedPromise;
-        std::thread clientThread(
+        nx::utils::promise<void> recvExitedPromise;
+        nx::utils::thread clientThread(
             [&client, &recvExitedPromise, &endpointToConnectTo]()
             {
                 nx::Buffer readBuffer;
@@ -489,7 +491,7 @@ void socketSimpleAcceptMixed(
     auto client = clientMaker();
     ASSERT_TRUE(client->setSendTimeout(1000));
     ASSERT_TRUE(client->setNonBlockingMode(true));
-    std::promise<SystemError::ErrorCode> connectionEstablishedPromise;
+    nx::utils::promise<SystemError::ErrorCode> connectionEstablishedPromise;
     client->connectAsync(
         kServerAddress,
         [&connectionEstablishedPromise](SystemError::ErrorCode code)
@@ -521,7 +523,7 @@ void socketSingleAioThread(
 {
     aio::AbstractAioThread* aioThread(nullptr);
     std::vector<decltype(clientMaker())> sockets;
-    nx::TestSyncQueue<std::thread::id> threadIdQueue;
+    nx::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
 
     for (auto i = 0; i < clientCount; ++i)
     {
@@ -545,7 +547,7 @@ void socketSingleAioThread(
         sockets.push_back(std::move(client));
     }
 
-    boost::optional<std::thread::id> aioThreadId;
+    boost::optional<nx::utils::thread::id> aioThreadId;
     for (auto i = 0; i < clientCount; ++i)
     {
         const auto threadId = threadIdQueue.pop();
@@ -568,7 +570,7 @@ void connectToBadAddress(const ClientSocketMaker& clientMaker)
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(
         std::chrono::duration_cast<std::chrono::milliseconds>(sendTimeout).count()));
-    std::promise<SystemError::ErrorCode> connectCompletedPromise;
+    nx::utils::promise<SystemError::ErrorCode> connectCompletedPromise;
     client->connectAsync(
         //SocketAddress(HostAddress::localhost, (rand() % 32000) + 4096),
         SocketAddress("abdasdf:123"),

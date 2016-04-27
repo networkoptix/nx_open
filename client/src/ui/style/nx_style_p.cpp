@@ -22,8 +22,9 @@ QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) c
     case QnNxStyle::Colors::kContrast:
         index = 7;
         break;
+    case QnNxStyle::Colors::kRed:
     case QnNxStyle::Colors::kBlue:
-    case QnNxStyle::Colors::kBrang:
+    case QnNxStyle::Colors::kBrand:
         index = 4;
         break;
     case QnNxStyle::Colors::kGreen:
@@ -160,28 +161,25 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
 
-    const int size = Metrics::kCheckIndicatorSize - dp(4);
-
+    const int size = Metrics::kCheckIndicatorSize - dp(5);
     QRectF rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
-
     RectCoordinates rc(rect);
 
     if (option->state.testFlag(QStyle::State_On))
     {
         QPainterPath path;
-        path.moveTo(rc.x(0.7), rc.y(0));
-        path.lineTo(rc.x(0), rc.y(0));
-        path.lineTo(rc.x(0), rc.y(1));
-        path.lineTo(rc.x(1), rc.y(1));
-        path.lineTo(rc.x(1), rc.y(0.6));
+        path.moveTo(rc.x(0.8), rc.y(0.0));
+        path.lineTo(rc.x(0.0), rc.y(0.0));
+        path.lineTo(rc.x(0.0), rc.y(1.0));
+        path.lineTo(rc.x(1.0), rc.y(1.0));
+        path.lineTo(rc.x(1.0), rc.y(0.5));
 
-        painter->setPen(pen);
         painter->drawPath(path);
 
         path = QPainterPath();
-        path.moveTo(rc.x(0.2), rc.y(0.45));
-        path.lineTo(rc.x(0.5), rc.y(0.75));
-        path.lineTo(rc.x(1.05), rc.y(0.15));
+        path.moveTo(rc.x(0.25), rc.y(0.38));
+        path.lineTo(rc.x(0.55), rc.y(0.70));
+        path.lineTo(rc.x(1.12), rc.y(0.13));
 
         pen.setWidthF(dp(2));
         painter->setPen(pen);
