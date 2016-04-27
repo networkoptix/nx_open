@@ -10,7 +10,7 @@
 #include <utils/serialization/lexical.h>
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
-static const auto kMediatorCasheTimeout = std::chrono::seconds(10);
+static const auto kMediatorCacheTimeout = std::chrono::seconds(10);
 
 namespace nx {
 namespace network {
@@ -341,7 +341,7 @@ void AddressResolver::HostAddressInfo::checkExpirations()
     }
 
     if (m_mediatorState == State::resolved &&
-        m_mediatorResolveTime + kMediatorCasheTimeout < std::chrono::system_clock::now())
+        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::system_clock::now())
     {
         m_mediatorState = State::unresolved;
         m_mediatorEntries.clear();
@@ -410,10 +410,15 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator)
 {
-    if (info->second.dnsState() != HostAddressInfo::State::unresolved)
+    switch (info->second.dnsState())
     {
-        if (needMediator) mediatorResolve(info, lk, false);
-        return;
+        case HostAddressInfo::State::resolved:
+            if (needMediator) mediatorResolve(info, lk, false);
+            return;
+        case HostAddressInfo::State::inProgress:
+            return;
+        case HostAddressInfo::State::unresolved:
+            break; // continue
     }
 
     info->second.dnsProgress();
@@ -445,10 +450,15 @@ void AddressResolver::dnsResolve(
 void AddressResolver::mediatorResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needDns)
 {
-    if (info->second.mediatorState() != HostAddressInfo::State::unresolved)
+    switch (info->second.mediatorState())
     {
-        if (needDns) dnsResolve(info, lk, false);
-        return;
+        case HostAddressInfo::State::resolved:
+            if (needDns) dnsResolve(info, lk, false);
+            return;
+        case HostAddressInfo::State::inProgress:
+            return;
+        case HostAddressInfo::State::unresolved:
+            break; // continue
     }
 
     info->second.mediatorProgress();
