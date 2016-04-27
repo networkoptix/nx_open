@@ -1,6 +1,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
 import com.networkoptix.qml 1.0
+import Nx 1.0
 
 import "../main.js" as Main
 import "../controls"
@@ -14,7 +15,7 @@ QnPage {
 
     property alias searchActive: searchItem.opened
 
-    QnObject {
+    Object {
         id: d
 
         readonly property bool serverOffline: connectionManager.connectionState === QnConnectionManager.Connecting && !loadingDummy.visible

@@ -1,3 +1,4 @@
 module Nx
 
+Object 1.0 Object.qml
 singleton ColorTheme 1.0 ColorTheme.qml
