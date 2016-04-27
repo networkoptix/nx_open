@@ -78,6 +78,11 @@ void debugDrawCheckerboardY(
     uint8_t* yBuffer, int lineLen, int frameWidth, int frameHeight);
 
 /**
+ * Draw a moving checkerboard in Y channel in Native (32x32-macroblock) format.
+ */
+void debugDrawCheckerboardYNative(uint8_t* yNative, int frameWidth, int frameHeight);
+
+/**
  * @return Human-readable item index or a "not found" message.
  */
 std::string debugDumpRenderStateRef(const vdpau_render_state* renderState,

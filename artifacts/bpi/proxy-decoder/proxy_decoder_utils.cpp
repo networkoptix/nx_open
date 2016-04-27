@@ -88,6 +88,30 @@ void debugDrawCheckerboardY(uint8_t* yBuffer, int lineLen, int frameWidth, int f
         line0 = 0;
 }
 
+void debugDrawCheckerboardYNative(uint8_t* yNative, int frameWidth, int frameHeight)
+{
+    // All coords are in blocks (32x32 pixels).
+    static int x0 = 0;
+    static int line0 = 0;
+
+    const int w = (frameWidth + 31) / 32;
+    const int h = (frameHeight + 31) / 32;
+
+    for (int x = 0; x < 8; ++x)
+    {
+        for (int y = 0; y < 8; ++y)
+        {
+            uint8_t color = ((x & 1) == (y & 1)) ? 0 : 254;
+            memset(yNative + 32 * 32 * ((line0 + y) * w + (x0 + x)), color, 32 * 32);
+        }
+    }
+
+    if (++x0 >= (w - /* use only whole blocks */ 1) - 8)
+        x0 = 0;
+    if (++line0 >= (h - /* use only whole blocks */ 1) - 8)
+        line0 = 0;
+}
+
 std::string debugDumpRenderStateRef(const vdpau_render_state* renderState,
     const std::vector<vdpau_render_state*>& renderStates)
 {

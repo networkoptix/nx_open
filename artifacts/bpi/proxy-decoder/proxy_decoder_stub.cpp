@@ -8,6 +8,8 @@
 #define LOG_PREFIX "ProxyDecoder[STUB]: "
 #include "proxy_decoder_utils.h"
 
+namespace {
+
 class Stub
 :
     public ProxyDecoder
@@ -131,7 +133,9 @@ int Stub::decodeToYuvNative(const CompressedFrame* compressedFrame, int64_t* out
     assert(outBuffer);
     assert(outBufferSize);
 
-    // TODO: Draw something visible in the "native" buffer.
+    memset(m_nativeYuvBuffer, 0,
+        32 * 32 * ((m_frameWidth + 31) / 32) * ((m_frameHeight + 31) / 32));
+    debugDrawCheckerboardYNative(m_nativeYuvBuffer, m_frameWidth, m_frameHeight);
 
     *outBuffer = m_nativeYuvBuffer;
     *outBufferSize = m_nativeYuvBufferSize;
@@ -145,6 +149,8 @@ int Stub::decodeToDisplayQueue(
     const CompressedFrame* compressedFrame, int64_t* outPts,
     void **outFrameHandle)
 {
+    // Do nothing visible.
+
     assert(outFrameHandle);
     (*outFrameHandle) = nullptr;
 
@@ -157,6 +163,8 @@ void Stub::displayDecoded(void* handle)
 {
     assert(!handle);
 }
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 
