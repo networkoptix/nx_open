@@ -265,7 +265,7 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
         if (!success || result.error != QnRestResult::NoError)
         {
-            setHint(result.errorString);
+            setHint(tr("Streaming is not ready yet, please try again later."));
             setState(Error);
             stopStreaming();
         }
@@ -318,12 +318,16 @@ void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)
 
 void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRect, const QPalette& palette)
 {
+    const qreal minSize = button->geometry().width();
+    const qreal minLeftValue = sourceRect.left();               /*< Left value if hint is visible. */
+    const qreal maxLeftValue = sourceRect.width() - minSize;    /*< Left value if hint is hidden. */
+
+    const qreal maxHintWidth = (maxLeftValue - minLeftValue);
+    const qreal targetHintWidth = maxHintWidth * m_hintVisibility;
+
     QRectF rect(sourceRect);
-    qreal w = rect.width() * m_hintVisibility;
-
-    rect.setLeft(qMin(rect.width() - w, button->geometry().left()));
-
-    qreal minSize = button->geometry().width();
+    rect.setLeft(minLeftValue + maxHintWidth - targetHintWidth);
+    Q_ASSERT(rect.width() >= minSize);
 
     qreal roundness = minSize / 2;
     QPainterPath path;
@@ -335,7 +339,7 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
 
     painter->fillPath(path, bgColor);
 
-    if (m_state == Pressed)
+    if (m_state == Pressed && qFuzzyEquals(m_hintVisibility, kVisible))
     {
         Q_ASSERT_X(m_stateTimer.isValid(), Q_FUNC_INFO, "Make sure timer is valid");
 
@@ -398,6 +402,8 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
     default:
         break;
     }
+    Q_Q(QnTwoWayAudioWidget);
+    q->updateGeometry();
 
     m_paintTimeStamp = 0;
     if (m_state == OK)
