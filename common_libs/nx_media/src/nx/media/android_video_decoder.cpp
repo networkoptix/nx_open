@@ -352,14 +352,14 @@ void AndroidVideoDecoderPrivate::createGlResources()
 
         QOpenGLShader *vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, program);
         vertexShader->compileSourceCode(
-            "attribute highp vec4 vertexCoordsArray; \n" \
-            "attribute highp vec2 textureCoordArray; \n" \
-            "uniform   highp mat4 texMatrix; \n" \
-            "varying   highp vec2 textureCoords; \n" \
-            "void main(void) \n" \
-            "{ \n" \
-            "    gl_Position = vertexCoordsArray; \n" \
-            "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n" \
+            "attribute highp vec4 vertexCoordsArray; \n"
+            "attribute highp vec2 textureCoordArray; \n"
+            "uniform   highp mat4 texMatrix; \n"
+            "varying   highp vec2 textureCoords; \n"
+            "void main(void) \n"
+            "{ \n"
+            "    gl_Position = vertexCoordsArray; \n"
+            "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n"
             "}\n");
         program->addShader(vertexShader);
         if (funcs->glGetError())
@@ -367,12 +367,12 @@ void AndroidVideoDecoderPrivate::createGlResources()
 
         QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, program);
         fragmentShader->compileSourceCode(
-            "#extension GL_OES_EGL_image_external : require \n" \
-            "varying highp vec2         textureCoords; \n" \
-            "uniform samplerExternalOES frameTexture; \n" \
-            "void main() \n" \
-            "{ \n" \
-            "    gl_FragColor = texture2D(frameTexture, textureCoords); \n" \
+            "#extension GL_OES_EGL_image_external : require \n"
+            "varying highp vec2         textureCoords; \n"
+            "uniform samplerExternalOES frameTexture; \n"
+            "void main() \n"
+            "{ \n"
+            "    gl_FragColor = texture2D(frameTexture, textureCoords); \n"
             "}\n");
         program->addShader(fragmentShader);
         if (funcs->glGetError())
@@ -394,7 +394,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(
     AbstractVideoDecoder(),
     d(new AndroidVideoDecoderPrivate(allocator)),
 {
-    (void) resolution;
+    QN_UNUSED(resolution);
 
     #if defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
         QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();

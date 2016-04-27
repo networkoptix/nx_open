@@ -11,7 +11,7 @@ extern "C" {
 
 #include "aligned_mem_video_buffer.h"
 
-#include <QFile>
+#include <QtCore/QFile>
 
 namespace nx {
 namespace media {
@@ -131,9 +131,9 @@ FfmpegVideoDecoder::FfmpegVideoDecoder(
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
 {
-    (void) allocator;
-    (void) resolution;
+    QN_UNUSED(allocator, resolution);
     static InitFfmpegLib init;
+    QN_UNUSED(init);
 }
 
 FfmpegVideoDecoder::~FfmpegVideoDecoder()

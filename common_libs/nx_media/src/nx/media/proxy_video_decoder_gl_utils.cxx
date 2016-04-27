@@ -3,11 +3,19 @@
 //-------------------------------------------------------------------------------------------------
 // Public
 
-#include "proxy_video_decoder_utils.cxx"
-
 // Uses configuration:
 // #define ENABLE_GL_LOG
 // #define ENABLE_GL_FATAL_ERRORS
+
+#include <memory>
+
+#include <QtGui/QOpenGLFramebufferObject>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLTexture>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
+
+#include "proxy_video_decoder_utils.h"
 
 // #define GL_GET_FUNCS(Q_OPENGL_CONTEXT_PTR) ...
 // #define GL_CHECK(BOOL_CALL) ... //< For CALL which returns bool - asserted to be true.
@@ -77,7 +85,7 @@ static void logGlCall(const char *tag)
     #ifdef ENABLE_GL_LOG
         qWarning() << "OpenGL:" << tag;
     #else // ENABLE_GL_LOG
-        (void) tag;
+        QN_UNUSED(tag);
     #endif // ENABLE_GL_LOG
 }
 
@@ -115,7 +123,7 @@ static void logGlCall(const char *tag)
 
 void logGlFbo(const char* tag)
 {
-    (void) tag;
+    QN_UNUSED(tag);
 
     if (!QOpenGLContext::currentContext())
     {
@@ -141,7 +149,7 @@ public:
         m_index(0),
         m_queueSize(queueSize)
     {
-        QLOG("FboManager::FboManager(frameSize:" << frameSize 
+        QLOG("FboManager::FboManager(frameSize:" << frameSize
             << ", queueSize:" << queueSize << ")");
     }
 
@@ -243,10 +251,10 @@ void debugTextureTest()
         GL(tex.setMinMagFilters(QOpenGLTexture::Nearest, QOpenGLTexture::Nearest));
 
         buffer = malloc(17 + kMediaAlignment + 1920 * 1080);
-        bufferStart = unalignPtr(buffer);
+        bufferStart = debugUnalignPtr(buffer);
 
         buffer2 = malloc(17 + kMediaAlignment + 1920 * 1080);
-        buffer2Start = unalignPtr(buffer2);
+        buffer2Start = debugUnalignPtr(buffer2);
     }
 
     funcs->glFlush();
@@ -323,9 +331,8 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
     NX_CRITICAL(false);
 }
 
-void debugXXX()
+void debugTestImageExtension(QOpenGLTexture& yTex)
 {
-#if 0
     PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC) eglGetProcAddress("eglCreateImageKHR");
     QLOG("eglCreateImageKHR =" << eglCreateImageKHR);
 
@@ -333,7 +340,7 @@ void debugXXX()
         eglGetCurrentDisplay(),
         eglGetCurrentContext(),
         EGL_GL_TEXTURE_2D_KHR,
-        (EGLClientBuffer) m_yTex.textureId(),
+        (EGLClientBuffer) yTex.textureId(),
         nullptr);
 
     QLOG("eglImageHandle ==" << eglImageHandle);
@@ -346,7 +353,6 @@ void debugXXX()
     QLOG("eglGetError() returned" << eglGetError());
 
     NX_CRITICAL(false);
-#endif // 0
 }
 
 void debugLogPrecision()

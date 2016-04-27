@@ -22,8 +22,7 @@ JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& res
 :
     d_ptr(new JpegDecoderPrivate())
 {
-    (void) allocator;
-    (void) resolution;
+    QN_UNUSED(allocator, resolution);
 }
 
 bool JpegDecoder::isCompatible(const CodecID codec, const QSize& /*resolution*/)

@@ -7,10 +7,11 @@
 namespace nx {
 namespace media {
 
-namespace
-{
-    static QMutex mutex;
-}
+namespace {
+
+static QMutex mutex;
+
+} // namespace
 
 VideoDecoderRegistry* VideoDecoderRegistry::instance()
 {

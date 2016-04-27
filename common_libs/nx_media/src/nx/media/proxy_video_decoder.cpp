@@ -2,10 +2,12 @@
 #if defined(ENABLE_PROXY_DECODER)
 
 // Configuration
-#define xENABLE_GL //< Use ProxyDecoder::decodeYuvPlanar() and then convert to RGB via OpenGL.
-#define xENABLE_RGB //< Use ProxyDecoder::decodeToRgb() to AlignedMemVideoBuffer, without OpenGL.
-#define xENABLE_YUV //< Use ProxyDecoder::decodeToYuvPlanar() to AlignedMemVideoBuffer, without OpenGL.
-#define ENABLE_DISPLAY //< Use ProxyDecoder::decodeToDisplay().
+#define xENABLE_DISPLAY //< decodeToDisplayQueue() => displayDecoded() in video frame handle().
+#define xENABLE_RGB //< decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.
+#define xENABLE_YUV_PLANAR //< decodeToYuvPlanar() -> AlignedMemVideoBuffer, without OpenGL.
+#define xENABLE_YUV_NATIVE //< decodeToYuvNative() -> AlignedMemVideoBuffer => Qt Plugin Shader.
+#define ENABLE_GL //< decodeYuvPlanar() => Planar YUV Shader.
+
 #define ENABLE_LOG
 #define ENABLE_TIME
 static const bool ENABLE_LARGE_ONLY = true; //< isCompatible() will allow only width > 640.
@@ -20,7 +22,7 @@ static const bool ENABLE_LARGE_ONLY = true; //< isCompatible() will allow only w
 
 #include <nx/utils/log/log.h>
 
-#include "proxy_video_decoder_utils.cxx"
+#include "proxy_video_decoder_utils.h"
 
 // Should be included outside of namespaces.
 #include <QtCore/QThread>
@@ -35,31 +37,33 @@ static const bool ENABLE_LARGE_ONLY = true; //< isCompatible() will allow only w
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
+#include "proxy_video_decoder_private.h"
+
 namespace nx {
 namespace media {
-
-#if defined(ENABLE_RGB) && !defined(ENABLE_YUV) && !defined(ENABLE_DISPLAY) && !defined(ENABLE_GL)
-    #include "proxy_video_decoder_rgb.cxx"
-#elif defined(ENABLE_YUV) && !defined(ENABLE_RGB) && !defined(ENABLE_DISPLAY) && !defined(ENABLE_GL)
-    #include "proxy_video_decoder_yuv.cxx"
-#elif defined(ENABLE_GL) && !defined(ENABLE_YUV) && !defined(ENABLE_RGB) && !defined(ENEABLE_DISPLAY)
-    #include "proxy_video_decoder_gl.cxx"
-#elif defined(ENABLE_DISPLAY) && !defined(ENABLE_YUV) && !defined(ENABLE_RGB) && !defined(ENEABLE_GL)
-    #include "proxy_video_decoder_display.cxx"
-#else
-    #error "More than one of ENABLE_xxx selectors specified."
-#endif // ENABLE_RGB || ENABLE_YUV || ENABLE_GL || ENABLE_DISPLAY
-
-//-------------------------------------------------------------------------------------------------
-// ProxyVideoDecoder
 
 ProxyVideoDecoder::ProxyVideoDecoder(
     const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
-    d(new ProxyVideoDecoderPrivate(this, allocator, resolution))
+// TODO mike: Use conf.h.
+#if defined(ENABLE_DISPLAY)
+    d(ProxyVideoDecoderPrivate::createImplDisplay(this, allocator, resolution))
+#elif defined(ENABLE_RGB)
+    d(ProxyVideoDecoderPrivate::createImplRgb(this, allocator, resolution))
+#elif defined(ENABLE_YUV_PLANAR)
+    d(ProxyVideoDecoderPrivate::createImplYuvPlanar(this, allocator, resolution))
+#elif defined(ENABLE_YUV_NATIVE)
+    d(ProxyVideoDecoderPrivate::createImplYuvNative(this, allocator, resolution))
+#elif defined(ENABLE_GL)
+    d(ProxyVideoDecoderPrivate::createImplGl(this, allocator, resolution))
+#endif
 {
     static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
         "ProxyVideoDecoder: Insufficient padding size");
+
+    // TODO: Consider moving this check to isCompatible().
+    // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
+    NX_CRITICAL(resolution.width() % 2 == 0 || resolution.height() % 2 == 0);
 }
 
 ProxyVideoDecoder::~ProxyVideoDecoder()
@@ -88,9 +92,9 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
 }
 
 int ProxyVideoDecoder::decode(
-    const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* decodedFrame)
+    const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {
-    return d->decode(compressedVideoData, decodedFrame);
+    return d->decode(compressedVideoData, outDecodedFrame);
 }
 
 } // namespace media

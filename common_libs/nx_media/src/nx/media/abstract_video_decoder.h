@@ -18,7 +18,9 @@ namespace media {
  * <pre> ...VideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution); </pre>
  *
  */
-class AbstractVideoDecoder: public QObject
+class AbstractVideoDecoder
+:
+    public QObject
 {
     Q_OBJECT
 public:
@@ -31,8 +33,7 @@ public:
      */
     static bool isCompatible(const CodecID codec, const QSize& resolution)
     {
-        (void) codec;
-        (void) resolution;
+        QN_UNUSED(codec, resolution);
         return false;
     }
 
