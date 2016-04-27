@@ -246,7 +246,7 @@ QnResourceTreeItemDelegate::ItemState QnResourceTreeItemDelegate::itemState(cons
     }
     else if (!resource.isNull() && !currentLayoutResource.isNull())
     {
-        bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).isNull() : false;
+        bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull() : false;
         if (resource == currentLayoutResource)
         {
             /* Current layout if we aren't in videowall control mode or current videowall if we are: */
