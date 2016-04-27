@@ -2,6 +2,7 @@ import QtQuick 2.4
 import QtQuick.Window 2.2
 import QtQuick.Controls 1.2
 
+import Nx 1.0
 import com.networkoptix.qml 1.0
 
 import "items"
@@ -29,7 +30,7 @@ Window {
 
     readonly property bool isPhone: getDeviceIsPhone()
 
-    color: QnTheme.windowBackground
+    color: ColorTheme.windowBackground
 
     QnToolBar {
         id: toolBar
