@@ -253,6 +253,10 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
         return;
 
     setState(Pressed);
+    QSizeF minSize = q->sizeHint(Qt::MinimumSize);
+    QRectF widgetGeometry = q->geometry();
+    widgetGeometry.adjust(widgetGeometry.width() - minSize.width(), 0, 0, 0);
+    q->setGeometry(widgetGeometry);
 
     m_requestHandle = server->restConnection()->twoWayAudioCommand(camera->getId(), true, [this]
         (bool success, rest::Handle handle, const QnJsonRestResult& result)
