@@ -224,7 +224,6 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
         if (!success || result.error != QnRestResult::NoError)
         {
-            return; //TODO: #GDM Debug code, MUST BE REMOVED
             setHint(result.errorString);
             setState(Error);
             stopStreaming();

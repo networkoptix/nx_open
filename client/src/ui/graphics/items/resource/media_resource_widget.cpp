@@ -264,13 +264,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         updateIoModuleVisibility(false);
     }
 
-    //TODO: #GDM Debug code, MUST BE RESTORED
-    if (m_camera /*&& m_camera->hasTwoWayAudio() */)
+    if (m_camera && m_camera->hasTwoWayAudio())
     {
         auto twoWayAudioItem = new QnTwoWayAudioWidget();
         twoWayAudioItem->setCamera(m_camera);
         twoWayAudioItem->setFixedHeight(kTwoWayAudioButtonSize);
-
 
         /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
         overlayWidgets().positionOverlay->insertItem(0, twoWayAudioItem);
