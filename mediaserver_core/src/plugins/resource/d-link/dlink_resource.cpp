@@ -314,14 +314,14 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     }
 
 
-    qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
-    qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
+    std::sort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), std::greater<int>());
+    std::sort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
     
     for (auto itr = profilesMap.begin(); itr != profilesMap.end(); ++itr) {
         itr.value().number = itr.key();
         m_camInfo.profiles << itr.value();
     }
-    qSort(m_camInfo.profiles.begin(), m_camInfo.profiles.end(), profileCompare);
+    std::sort(m_camInfo.profiles.begin(), m_camInfo.profiles.end(), profileCompare);
 
     // =======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)

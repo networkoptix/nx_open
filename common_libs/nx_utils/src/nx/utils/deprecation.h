@@ -39,6 +39,24 @@ namespace boost {
 #define QVectorIterator         qt_java_style_iterators_are_forbidden
 //#define QMapIterator            qt_java_style_iterators_are_forbidden // TODO: #Elric
 
+/* Prevent the usage of deprecated Qt Algorithms */
+#include <QtAlgorithms>
+#define qCopy qCopy_is_deprecated_use_std_copy
+#define qCopyBackward qCopyBackward_is_deprecated_use_std_copy_backward
+#define qEqual qEqual_is_deprecated_use_std_equal
+#define qFill qFill_is_deprecated_use_std_fill
+#define qFind qFinds_is_deprecated_use_std_find
+#define qCount qCount_is_deprecated_use_std_count
+#define qLess qLess_is_deprecated_use_std_less
+#define qGreater qGreater_is_deprecated_use_std_greater
+#define qSort qSort_is_deprecated_use_std_sort
+#define qStableSort qStableSort_is_deprecated_use_std_stable_sort
+#define qLowerBound qLowerBound_is_deprecated_use_std_lower_bound
+#define qUpperBound qUpperBound_is_deprecated_use_std_upper_bound
+#define qBinaryFind qBinaryFind_is_deprecated_use_std_binary_search
+#define qReverse qReverse_is_deprecated_use_std_reverse
+#define qRotate qRotate_is_deprecated_use_std_rotate
+#define qMerge qMerge_is_deprecated_use_std_merge
 
 /* Prevent the usage of local 8-bit encodings for QString. Use toLatin1 instead. */
 //#define toLocal8Bit                                                             \

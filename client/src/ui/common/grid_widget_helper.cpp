@@ -96,7 +96,7 @@ void QnGridWidgetHelper::getGridData(QTableView *grid, const QLatin1Char &textDe
     if(list.isEmpty())
         return;
 
-    qSort(list);
+    std::sort(list.begin(), list.end());
 
     QString textResult, htmlResult;
 

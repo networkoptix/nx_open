@@ -480,7 +480,7 @@ void QnRtspClient::updateTrackNum()
         else
             m_sdpTracks[i]->trackNum = videoNum + audioNum + metadataNum; // unknown track
     }
-    qSort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
+    std::sort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
 }
 
 

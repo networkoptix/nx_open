@@ -489,7 +489,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
             //m_initMutex is locked up the stack
     if (hasVideo(0))
     {
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 
         //detecting primary & secondary resolution
         m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();

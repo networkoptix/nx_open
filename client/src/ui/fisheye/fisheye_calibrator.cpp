@@ -154,7 +154,7 @@ qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
         distances << Distance(qAbs(center.x() - x2), QPointF(x2, yMax), LeftBottom);
         distances << Distance(qAbs(center.x() - x3), QPointF(x3, yMin), RightTop);
         distances << Distance(qAbs(center.x() - x4), QPointF(x4, yMin), LeftTop);
-        qSort(distances);
+        std::sort(distances.begin(), distances.end());
         if (i == 0)
             p1 = QPointF(distances[3].pos);
         else
@@ -229,7 +229,7 @@ void QnFisheyeCalibrator::findCircleParams()
         }
     }
 
-    qSort(distances);
+    std::sort(distances.begin(), distances.end());
     if (distances[3].distance == INT64_MAX || distances[0].distance == 0) {
         emit finished (ErrorNotFisheyeImage);
         return; // not found
@@ -316,7 +316,7 @@ int QnFisheyeCalibrator::findYThreshold(QImage frame)
     }
     if (borders.isEmpty())
         return MAX_Y_THRESHOLD; // default value
-    qSort(borders);
+    std::sort(borders.begin(), borders.end());
     int result = borders[borders.size()/2];
 
     return qBound(MIN_Y_THRESHOLD, result, MAX_Y_THRESHOLD);

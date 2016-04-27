@@ -326,7 +326,7 @@ int MediaEncoder::getSupportedFps() const
         m_supportedFpsList.push_back(fpsS.trimmed().toFloat());
     m_fpsListRead = true;
 
-    qSort( m_supportedFpsList.begin(), m_supportedFpsList.end(), qGreater<float>() );
+    std::sort( m_supportedFpsList.begin(), m_supportedFpsList.end(), std::greater<float>() );
     return nxcip::NX_NO_ERROR;
 }
 

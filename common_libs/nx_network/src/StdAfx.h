@@ -37,3 +37,5 @@
 #else
 #    include <arpa/inet.h>
 #endif
+
+#include <nx/utils/deprecation.h>
