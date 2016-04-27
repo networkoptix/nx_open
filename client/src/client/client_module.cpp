@@ -142,7 +142,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnRedAssController>(new QnRedAssController());
 
     common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
+
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
@@ -157,6 +157,9 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnVoiceSpectrumAnalyzer>(new QnVoiceSpectrumAnalyzer());
 
     initializeStatisticsManager(common);
+
+    /* Long runnables depend on QnCameraHistoryPool and other singletons. */
+    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());
