@@ -10,7 +10,7 @@
 
 #include <QtCore/QByteArray>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "types.h"
 

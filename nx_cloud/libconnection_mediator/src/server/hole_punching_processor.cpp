@@ -8,7 +8,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "listening_peer_pool.h"
 #include "settings.h"

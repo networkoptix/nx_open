@@ -39,7 +39,7 @@ void QnTimelineChunkPainter::start(qint64 startPos, const QRectF &rect, int chun
     m_points = m_geometry->vertexDataAsColoredPoint2D();
     m_index = 0;
 
-    qFill(m_weights, 0);
+    std::fill(m_weights, 0);
 }
 
 void QnTimelineChunkPainter::paintChunk(qint64 length, Qn::TimePeriodContent content) {
@@ -107,7 +107,7 @@ void QnTimelineChunkPainter::flushChunk() {
     m_pendingPosition = rightPosition;
     m_pendingLength = 0;
 
-    qFill(m_weights, 0);
+    std::fill(m_weights, 0);
 }
 
 void QnTimelineChunkPainter::addRect(const QRectF &rect, const QColor &color) {

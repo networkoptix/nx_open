@@ -14,7 +14,7 @@
 #include <nx/network/udt/udt_pollset.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
 #include <utils/common/string.h>
 

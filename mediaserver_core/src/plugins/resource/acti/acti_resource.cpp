@@ -186,7 +186,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     QList<QSize> availResolutions;
     for(const QByteArray& r: resolutions.split(','))
         result << extractResolution(r);
-    qSort(result.begin(), result.end(), resolutionGreaterThan);
+    std::sort(result.begin(), result.end(), resolutionGreaterThan);
     return result;
 }
 
@@ -345,7 +345,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         QList<QByteArray> fps = fpsList[i].split(',');
         for(const QByteArray& data: fps)
             m_availFps[i] << data.toInt();
-        qSort(m_availFps[i]);
+        std::sort(m_availFps[i].begin(), m_availFps[i].end());
     }
 
     QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);

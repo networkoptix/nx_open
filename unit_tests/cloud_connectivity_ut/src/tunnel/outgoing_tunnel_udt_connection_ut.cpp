@@ -3,7 +3,7 @@
 
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
 #include <nx/network/udt/udt_socket.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/cpp14.h>
 
 

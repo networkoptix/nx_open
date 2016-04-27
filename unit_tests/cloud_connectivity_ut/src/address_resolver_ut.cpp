@@ -2,6 +2,7 @@
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+#include <utils/thread/sync_queue.h>
 
 namespace nx {
 namespace network {
@@ -79,19 +80,25 @@ public:
         const HostAddress& address,
         utils::MoveOnlyFunc<void(HaInfoIterator it)> checker)
     {
-        utils::promise<void> promise;
-        resolveAsync(
-            address,
-            [&](SystemError::ErrorCode, std::vector<AddressEntry>)
-            {
+        nx::TestSyncQueue<bool> syncQueue;
+        static const size_t kSimultaneousQueries = 100;
+        for (size_t counter = kSimultaneousQueries; counter; --counter)
+        {
+            resolveAsync(
+                address,
+                [&](SystemError::ErrorCode, std::vector<AddressEntry>)
                 {
-                    QnMutexLocker lk(&m_mutex);
-                    checker(m_info.find(address));
-                }
-                promise.set_value();
-            });
+                    {
+                        QnMutexLocker lk(&m_mutex);
+                        checker(m_info.find(address));
+                    }
 
-        promise.get_future().wait();
+                    syncQueue.push(true);
+                });
+        }
+
+        for (size_t counter = kSimultaneousQueries; counter; --counter)
+            syncQueue.pop();
     }
 
 private:

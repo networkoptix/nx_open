@@ -8,7 +8,7 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/cpp14.h>
 
 #include "nx/network/abstract_socket.h"

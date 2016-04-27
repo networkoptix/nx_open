@@ -9,7 +9,7 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 namespace nx {

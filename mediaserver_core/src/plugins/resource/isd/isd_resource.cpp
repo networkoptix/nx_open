@@ -120,7 +120,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
 
-    qSort(resolutions.begin(), resolutions.end(), sizeCompare);
+    std::sort(resolutions.begin(), resolutions.end(), sizeCompare);
 
     {
         QnMutexLocker lock( &m_mutex );
@@ -189,7 +189,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         fpsList.push_back(fpsS.trimmed().toInt());
     }
 
-    qSort(fpsList.begin(),fpsList.end(), qGreater<int>());
+    std::sort(fpsList.begin(),fpsList.end(), std::greater<int>());
 
     if (fpsList.size()<1)
         return CameraDiagnostics::UnknownErrorResult();

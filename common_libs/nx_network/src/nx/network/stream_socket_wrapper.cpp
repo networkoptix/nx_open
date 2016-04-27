@@ -1,7 +1,7 @@
 
 #include "stream_socket_wrapper.h"
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/thread/wait_condition.h>
 
 

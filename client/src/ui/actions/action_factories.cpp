@@ -29,7 +29,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
 
-    qSort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+    std::sort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
         return naturalStringLess(l->getName(), r->getName());
     });
 
@@ -79,10 +79,10 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
 
-    qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringLess(l.name, r.name);
     });
-    qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+    std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
         return naturalStringLess(l.name, r.name);
     });
 
