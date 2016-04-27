@@ -6,9 +6,16 @@
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
+namespace {
+    const int kIOCheckTimeout = 3000;
+    const int kAlarmCheckTimeout = 300;
+    const QString kAlarmsCountParamName("alarmsCount");
+}
+
 QnFlirEIPResource::QnFlirEIPResource() :
     m_inputPortMonitored(false),
-    m_currentCheckingPortNumber(0)
+    m_currentCheckingPortNumber(0),
+    m_currentAlarmMonitoringState(FlirAlarmMonitoringState::ReadyToCheckAlarm)
 {
 }
 
@@ -31,6 +38,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initInternal()
     m_eipClient = std::make_shared<SimpleEIPClient>(QHostAddress(getHostAddress()));
     m_eipAsyncClient = std::make_shared<EIPAsyncClient>(QHostAddress(getHostAddress()));
     m_outputEipAsyncClient = std::make_shared<EIPAsyncClient>(QHostAddress(getHostAddress()));
+    m_alarmsEipAsyncClient = std::make_shared<EIPAsyncClient>(QHostAddress(getHostAddress()));
 
     m_eipClient->connect();
     m_eipClient->registerSession();
@@ -62,11 +70,6 @@ void QnFlirEIPResource::setIframeDistance(int, int)
 {
 
 }
-
-/*int QnFlirEIPResource::mediaPort() const
-{
-    return 554;
-}*/
 
 QnAbstractStreamDataProvider* QnFlirEIPResource::createLiveDataProvider()
 {
@@ -120,6 +123,28 @@ CIPPath QnFlirEIPResource::parseParamCIPPath(const QnCameraAdvancedParameter &pa
         path.attributeId = pathChunks[2].toUInt(&ok, 16);
 
     return path;
+}
+
+QByteArray QnFlirEIPResource::encodePassthroughVariableName(const QString& variableName) const
+{
+    QByteArray encodedData;
+
+    auto variableNameEncoded = variableName.toLatin1();
+    encodedData[0] = variableNameEncoded.size();
+    encodedData.append(variableNameEncoded);
+
+    return encodedData;
+}
+
+MessageRouterRequest QnFlirEIPResource::buildPassthroughGetRequest(quint8 serviceCode, const QString &variableName) const
+{
+    MessageRouterRequest request;
+    request.serviceCode = serviceCode;
+    request.pathSize = 2;
+    request.epath = PASSTHROUGH_EPATH();
+    request.data = encodePassthroughVariableName(variableName);
+
+    return request;
 }
 
 MessageRouterRequest QnFlirEIPResource::buildEIPGetRequest(const QnCameraAdvancedParameter &param) const
@@ -180,12 +205,7 @@ MessageRouterRequest QnFlirEIPResource::buildEIPSetRequest(const QnCameraAdvance
 
 QByteArray QnFlirEIPResource::encodeGetParamData(const QnCameraAdvancedParameter &param) const
 {
-    QByteArray encoded;
-    const auto variableNameEncoded = param.id.toLatin1();
-    encoded[0] = variableNameEncoded.size();
-    encoded.append(variableNameEncoded);
-
-    return encoded;
+    return encodePassthroughVariableName(param.id);
 }
 
 QByteArray QnFlirEIPResource::encodeSetParamData(const QnCameraAdvancedParameter &param, const QString &value) const
@@ -242,6 +262,25 @@ QByteArray QnFlirEIPResource::encodeSetParamData(const QnCameraAdvancedParameter
     return encoded;
 }
 
+QString QnFlirEIPResource::parseAsciiEIPResponse(const MessageRouterResponse& response) const
+{
+    if(response.data.isEmpty())
+        return QString();
+
+    auto dataLength = response.data[0];
+    return response.data.mid(1, dataLength);
+}
+
+quint32 QnFlirEIPResource::parseInt32EIPResponse(const MessageRouterResponse& response) const
+{
+    quint32 num;
+    QDataStream stream(const_cast<QByteArray*>(&response.data), QIODevice::ReadOnly);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream >> num;
+    return num;
+}
+
+
 QString QnFlirEIPResource::parseEIPResponse(const MessageRouterResponse &response, const QnCameraAdvancedParameter &param) const
 {
     const auto type = getParamDataType(param);
@@ -253,8 +292,7 @@ QString QnFlirEIPResource::parseEIPResponse(const MessageRouterResponse &respons
 
     if(type == FlirDataType::Ascii)
     {
-        auto dataLength = rawData[0];
-        data = rawData.mid(1, dataLength);
+        data = parseAsciiEIPResponse(response);
     }
     else if(type == FlirDataType::Bool)
     {
@@ -262,12 +300,7 @@ QString QnFlirEIPResource::parseEIPResponse(const MessageRouterResponse &respons
     }
     else if(type == FlirDataType::Int)
     {
-        quint32 num;
-        QDataStream stream(const_cast<QByteArray*>(&rawData), QIODevice::ReadOnly);
-        stream.setByteOrder(QDataStream::LittleEndian);
-        stream >> num;
-
-        data = QString::number(num);
+        data = QString::number(parseInt32EIPResponse(response));
     }
     else if(type == FlirDataType::Short)
     {
@@ -422,6 +455,7 @@ QSet<QString> QnFlirEIPResource::calculateSupportedAdvancedParameters(const QnCa
 bool QnFlirEIPResource::startInputPortMonitoringAsync(std::function<void (bool)> &&completionHandler)
 {
     QnMutexLocker lock(&m_ioMutex);
+    qDebug() << "Starting  input port monitoring";
 
     if(m_inputPortMonitored)
         return false;
@@ -434,7 +468,60 @@ bool QnFlirEIPResource::startInputPortMonitoringAsync(std::function<void (bool)>
     m_inputPortMonitored = true;
     m_checkInputPortStatusTimerId = TimerManager::instance()->addTimer(
         std::bind(&QnFlirEIPResource::checkInputPortStatus, this, std::placeholders::_1),
-        IO_CHECK_TIMEOUT );
+        kIOCheckTimeout );
+
+    startAlarmMonitoringAsync();
+
+    return true;
+}
+
+bool QnFlirEIPResource::startAlarmMonitoringAsync()
+{
+    if (m_alarmStates.empty())
+        return false;
+
+    qDebug() << "Starting alarm monitoring";
+    m_currentAlarmMonitoringState = FlirAlarmMonitoringState::ReadyToCheckAlarm;
+    m_currentCheckingAlarmNumber = 0;
+
+    QObject::connect(
+        m_alarmsEipAsyncClient.get(), &EIPAsyncClient::done,
+        this, &QnFlirEIPResource::routeAlarmMonitoringFlow,
+        Qt::DirectConnection);
+
+    m_checkAlarmStatusTimerId = TimerManager::instance()->addTimer(
+        std::bind(&QnFlirEIPResource::checkAlarmStatus, this, std::placeholders::_1),
+        kAlarmCheckTimeout );
+
+    return true;
+}
+
+bool QnFlirEIPResource::isMeasFunc(const QnIOPortData &port) const
+{
+    return port.id.startsWith(lit("alarm"))
+        && port.id.split('_').size() == 3;
+}
+
+QString QnFlirEIPResource::getMeasFuncType(const QnIOPortData& port) const
+{
+    auto split = port.id.split('_');
+
+    if (split.size() != 3)
+        return QString();
+
+    return split[1];
+}
+
+bool QnFlirEIPResource::findAlarmInputByTypeAndId(int id, const QString& type, QnIOPortData& portFound) const
+{
+    for(const auto& port: m_inputPorts)
+    {
+        if(port.id == lit("alarm_") + type + lit("_") + QString::number(id))
+        {
+            portFound = port;
+            return true;
+        }
+    }
 
     return false;
 }
@@ -444,17 +531,23 @@ void QnFlirEIPResource::initializeIO()
     QnMutexLocker lock(&m_ioMutex);
     auto resData = qnCommon->dataPool()->data(MANUFACTURE, getModel());
     auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
+    auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
-    for(const auto& port: portList)
-        if(port.portType == Qn::PT_Input)
+    for (const auto& port: portList)
+        if (port.portType == Qn::PT_Input)
         {
             m_inputPortStates.push_back(false);
             m_inputPorts.push_back(port);
+            if (isMeasFunc(port))
+                m_supportedMeasFuncs << getMeasFuncType(port);
         }
-        else if(port.portType == Qn::PT_Output)
+        else if (port.portType == Qn::PT_Output)
         {
             m_outputPorts.push_back(port);
         }
+
+    for (size_t i=0; i<alarmsCount; i++)
+        m_alarmStates.push_back(false);
 
     setIOPorts(portList);
 }
@@ -532,7 +625,7 @@ void QnFlirEIPResource::checkInputPortStatus(quint64 timerId)
     {
         m_checkInputPortStatusTimerId = TimerManager::instance()->addTimer(
             std::bind(&QnFlirEIPResource::checkInputPortStatus, this, std::placeholders::_1),
-            IO_CHECK_TIMEOUT );
+            kIOCheckTimeout );
     }
 }
 
@@ -542,7 +635,7 @@ void QnFlirEIPResource::checkInputPortStatusDone()
     auto response =  m_eipAsyncClient->getResponse();
     bool portState = response.data[0] != char(0);
 
-    if(portState != m_inputPortStates[m_currentCheckingPortNumber]
+    if (portState != m_inputPortStates[m_currentCheckingPortNumber]
         && response.generalStatus == CIPGeneralStatus::kSuccess)
     {
         m_inputPortStates[m_currentCheckingPortNumber] = portState;
@@ -555,14 +648,14 @@ void QnFlirEIPResource::checkInputPortStatusDone()
         lock.relock();
     }
 
-    if(++m_currentCheckingPortNumber == m_inputPortStates.size())
+    if (++m_currentCheckingPortNumber == m_inputPortStates.size())
         m_currentCheckingPortNumber = 0;
 
-    if(m_currentCheckingPortNumber == 0)
+    if (m_currentCheckingPortNumber == 0)
     {
         m_checkInputPortStatusTimerId = TimerManager::instance()->addTimer(
             std::bind(&QnFlirEIPResource::checkInputPortStatus, this, std::placeholders::_1),
-            IO_CHECK_TIMEOUT );
+            kIOCheckTimeout );
     }
     else
     {
@@ -570,6 +663,150 @@ void QnFlirEIPResource::checkInputPortStatusDone()
         checkInputPortStatus(m_checkInputPortStatusTimerId);
     }
 }
+
+void QnFlirEIPResource::routeAlarmMonitoringFlow()
+{
+    if (m_currentAlarmMonitoringState == FlirAlarmMonitoringState::CheckingAlaramState)
+        checkAlarmStatusDone();
+    else if (m_currentAlarmMonitoringState == FlirAlarmMonitoringState::WaitingForMeasFuncType)
+        getAlarmMeasurementFuncTypeDone();
+    else if (m_currentAlarmMonitoringState == FlirAlarmMonitoringState::WaitingForMeasFuncId)
+        getAlarmMeasurementFuncIdDone();
+}
+
+void QnFlirEIPResource::scheduleNextAlarmCheck()
+{
+    m_currentAlarmMonitoringState = FlirAlarmMonitoringState::ReadyToCheckAlarm;
+    m_checkAlarmStatusTimerId = TimerManager::instance()->addTimer(
+        std::bind(&QnFlirEIPResource::checkAlarmStatus, this, std::placeholders::_1),
+        kAlarmCheckTimeout );
+}
+
+void QnFlirEIPResource::checkAlarmStatus(quint64 timerId)
+{
+    if (timerId != m_checkAlarmStatusTimerId)
+        return;
+
+    m_checkAlarmStatusTimerId = 0;
+    if (!m_inputPortMonitored)
+        return;
+
+    qDebug() << "Checking alarm status" << m_currentCheckingAlarmNumber + 1;
+
+    MessageRouterRequest request;
+    const quint8 kAlarmAttributeCode = 0x01;
+
+    m_currentCheckingAlarmNumber++;
+    if (m_currentCheckingAlarmNumber == m_alarmStates.size())
+        m_currentCheckingAlarmNumber = 0;
+
+    request.serviceCode = CIPServiceCode::kGetAttributeSingle;
+    request.pathSize = 3;
+    request.epath = MessageRouterRequest::buildEPath(
+        FlirEIPClass::kAlarmSettings,
+        m_currentCheckingAlarmNumber + 1,
+        kAlarmAttributeCode);
+
+    m_currentAlarmMonitoringState = FlirAlarmMonitoringState::CheckingAlaramState;
+    if (!m_alarmsEipAsyncClient->doServiceRequestAsync(request))
+        scheduleNextAlarmCheck();
+}
+
+
+void QnFlirEIPResource::checkAlarmStatusDone()
+{
+    auto response = m_alarmsEipAsyncClient->getResponse();
+    bool alarmState = response.data[0] != char(0);
+
+    if (alarmState != m_alarmStates[m_currentCheckingAlarmNumber]
+        && response.generalStatus == CIPGeneralStatus::kSuccess)
+    {
+        m_alarmStates[m_currentCheckingAlarmNumber] = alarmState;
+        qDebug() << "Checking alarm measure function type";
+        getAlarmMeasurementFuncType();
+    }
+    else
+    {
+        qDebug() << "Alarm status is the same (or error occured) checking next alarm";
+        scheduleNextAlarmCheck();
+    }
+}
+
+void QnFlirEIPResource::getAlarmMeasurementFuncType()
+{
+    QString measFuncTypeAttr = lit(".image.sysimg.alarms.measfunc.")
+        + QString::number(m_currentCheckingAlarmNumber + 1)
+        + lit(".measFuncType");
+
+    qDebug() << "Get meas func type varname"  << measFuncTypeAttr;
+
+    MessageRouterRequest request =
+        buildPassthroughGetRequest(FlirEIPPassthroughService::kReadAscii, measFuncTypeAttr);
+
+    m_currentAlarmMonitoringState = FlirAlarmMonitoringState::WaitingForMeasFuncType;
+    if (!m_alarmsEipAsyncClient->doServiceRequestAsync(request))
+        scheduleNextAlarmCheck();
+}
+
+void QnFlirEIPResource::getAlarmMeasurementFuncTypeDone()
+{
+    auto response = m_alarmsEipAsyncClient->getResponse();
+    auto measFuncType = parseAsciiEIPResponse(response);
+
+    qDebug() << "Got alarm measurment func type:"
+        << measFuncType << response.data.toHex();
+
+    if (response.generalStatus == CIPGeneralStatus::kSuccess
+        && m_supportedMeasFuncs.contains(measFuncType))
+    {
+        m_currentAlarmMonitoringState = FlirAlarmMonitoringState::WaitingForMeasFuncId;
+        m_currentCheckingMeasFuncType = measFuncType;
+        getAlarmMeasurementFuncId();
+    }
+    else
+    {
+        scheduleNextAlarmCheck();
+    }
+}
+
+
+void QnFlirEIPResource::getAlarmMeasurementFuncId()
+{
+    QString measFuncIdAttr = lit(".image.sysimg.alarms.measfunc.")
+        + QString::number(m_currentCheckingAlarmNumber + 1)
+        + lit(".measFuncId");
+
+    qDebug() << "Meas func id varname" << measFuncIdAttr;
+
+    MessageRouterRequest request =
+        buildPassthroughGetRequest(FlirEIPPassthroughService::kReadInt32, measFuncIdAttr);
+
+    m_currentAlarmMonitoringState = FlirAlarmMonitoringState::WaitingForMeasFuncId;
+    if (!m_alarmsEipAsyncClient->doServiceRequestAsync(request))
+        scheduleNextAlarmCheck();
+}
+
+void QnFlirEIPResource::getAlarmMeasurementFuncIdDone()
+{
+    auto response = m_alarmsEipAsyncClient->getResponse();
+    auto id = parseInt32EIPResponse(response);
+
+    QnIOPortData port;
+    if (response.generalStatus == CIPGeneralStatus::kSuccess
+        && findAlarmInputByTypeAndId(id, m_currentCheckingMeasFuncType, port))
+    {
+        qDebug() << "Emitting signal cameraInput" << port.id;
+
+        emit cameraInput(
+            toSharedPointer(),
+            port.id,
+            m_alarmStates[m_currentCheckingAlarmNumber],
+            qnSyncTime->currentUSecsSinceEpoch());
+    }
+
+    scheduleNextAlarmCheck();
+}
+
 
 quint8 QnFlirEIPResource::getInputPortCIPAttribute(size_t portNum) const
 {

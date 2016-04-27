@@ -12,6 +12,7 @@ namespace FlirEIPClass
     const quint8 kEthernet = 0xF6;
     const quint8 kPhysicalIO = 0x6F;
     const quint8 kCameraControl = 0x65;
+    const quint8 kAlarmSettings = 0x6A;
 }
 
 namespace FlirEIPPassthroughService

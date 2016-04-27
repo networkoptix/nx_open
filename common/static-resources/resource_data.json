@@ -21,6 +21,7 @@
             "keys": [
                 "FLIR|AX8"
             ],
+            "alarmsCount" : 5,
             "ioSettings": [
                 {
                     "id": "1",
@@ -33,6 +34,48 @@
                     "outputName": "FLIR-OUTPUT-1",
                     "portType": "Output",
                     "supportedPortTypes": "Output"
+                },
+                {
+                    "id": "alarm_spot_1",
+                    "inputName": "Spot1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_1",
+                    "inputName": "Box1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_2",
+                    "inputName": "Box2",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_3",
+                    "inputName": "Box3",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_4",
+                    "inputName": "Box4",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_5",
+                    "inputName": "Box5",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "alarm_mbox_6",
+                    "inputName": "Box6",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
                 }
             ]
         },
