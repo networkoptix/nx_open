@@ -19,8 +19,6 @@
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/util.h>
-
 
 namespace
 {
@@ -36,8 +34,27 @@ namespace
     /** Animation speed. 1.0 means show/hide for 1 second. */
     const qreal kHintOpacityAnimationSpeed = 3.0;
 
-    /* Max visualizer value change per second. */
-    const qreal kVisualizerAnimationSpeed = 2.0;
+    /** Label font size. */
+    const int kHintFontPixelSize = 14;
+
+    /** Max visualizer value change per second. */
+    const qreal kVisualizerAnimationUpSpeed = 5.0;
+    const qreal kVisualizerAnimationDownSpeed = 1.0;
+
+    /** Maximum visualizer height. */
+    const qreal kMaxVisualizerHeightCoeff = 0.9;
+
+    /** Values lower than that value will be counted as silence. */
+    const qreal kNormalizerSilenceValue = 0.1;
+
+    /** Values lower than that value will be counted as silence. */
+    const qreal kNormalizerIncreaseValue = 0.9;
+
+    /** Recommended visualizer line width. */
+    const qreal kVisualizerLineWidth = 4.0;
+
+    /** Visualizer offset between lines. */
+    const qreal kVisualizerLineOffset = 2.0;
 
     /** How long hint should be displayed. */
     const int kShowHintMs = 2000;
@@ -53,23 +70,44 @@ namespace
         if (data.isEmpty())
             return;
 
-        const qreal kOffset = 1.0;
-        qreal lineWidth = (rect.width() / data.size()) - kOffset;    /*< offset between lines */
-        if (lineWidth < kOffset)
-            return;
+        qreal lineWidth = qRound(qMax(kVisualizerLineWidth, (rect.width() / data.size()) - kVisualizerLineOffset));
 
         qreal midY = rect.center().y();
-        qreal maxHeight = rect.height() - (kOffset * 2);
+        qreal maxHeight = rect.height() * kMaxVisualizerHeightCoeff;
 
         QPainterPath path;
         for (int i = 0; i < data.size(); ++i)
         {
             float value = data[i];
-            qreal lineHeight = qMax(maxHeight * value, kOffset * 2);
-            path.addRect(rect.left() + i * (lineWidth + kOffset), midY - (lineHeight / 2), lineWidth, lineHeight);
+            qreal lineHeight = qRound(qMax(maxHeight * value, kVisualizerLineOffset * 2));
+            path.addRect(qRound(rect.left() + i * (lineWidth + kVisualizerLineOffset)), qRound(midY - (lineHeight / 2)), lineWidth, lineHeight);
         }
 
-        painter->fillPath(path, color);
+        bool corrected = false;
+        QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+
+        if (corrected)
+        {
+            QnScopedPainterTransformRollback rollback(painter, roundedTransform);
+            painter->fillPath(path, color);
+        }
+        else
+        {
+            painter->fillPath(path, color);
+        }
+    }
+
+    void normalizeVector(VisualizerData& source)
+    {
+        if (source.isEmpty())
+            return;
+        auto max = std::max_element(source.cbegin(), source.cend());
+        if (*max < kNormalizerSilenceValue)
+            return;
+
+        auto k = kNormalizerIncreaseValue / *max;
+        for (auto &e: source)
+            e *= k;
     }
 
     VisualizerData animateVector(const VisualizerData& prev, const VisualizerData& next, qint64 timeStepMs)
@@ -77,7 +115,8 @@ namespace
         if (prev.size() != next.size())
             return next;
 
-        const qreal maxChange = qBound(0.0, kVisualizerAnimationSpeed * timeStepMs / 1000, 1.0);
+        const qreal maxUpChange = qBound(0.0, kVisualizerAnimationUpSpeed * timeStepMs / 1000, 1.0);
+        const qreal maxDownChange = qBound(0.0, kVisualizerAnimationDownSpeed * timeStepMs / 1000, 1.0);
 
         VisualizerData result(prev.size());
         for (int i = 0; i < prev.size(); ++i)
@@ -86,10 +125,10 @@ namespace
             auto target = next[i];
             auto change = target - current;
             if (change > 0)
-                change = qMin(change, maxChange);
+                change = qMin(change, maxUpChange);
             else
-                change = qMax(change, -maxChange);
-            result[i] = qBound(double(0.0f), current + change, double(1.0f));
+                change = qMax(change, -maxDownChange);
+            result[i] = qBound(0.0, current + change, 1.0);
         }
         return result;
     }
@@ -98,7 +137,7 @@ namespace
 
 QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner) :
     q_ptr(owner),
-    button(new QnImageButtonWidget(lit("two_way_autio"), owner)),
+    button(new QnImageButtonWidget(lit("two_way_audio"), owner)),
     hint(new GraphicsLabel(owner)),
     camera(),
     colors(),
@@ -114,9 +153,10 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
 {
     hint->setAcceptedMouseButtons(0);
     hint->setPerformanceHint(GraphicsLabel::PixmapCaching);
-    hint->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    hint->setAlignment(Qt::AlignCenter);
     QFont f = hint->font();
     f.setBold(true);
+    f.setPixelSize(kHintFontPixelSize);
     hint->setFont(f);
     hint->setOpacity(kHidden);
 
@@ -184,7 +224,7 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
         if (!success || result.error != QnRestResult::NoError)
         {
-            return;
+            return; //TODO: #GDM Debug code, MUST BE REMOVED
             setHint(result.errorString);
             setState(Error);
             stopStreaming();
@@ -259,25 +299,43 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
     {
         Q_ASSERT_X(m_stateTimer.isValid(), Q_FUNC_INFO, "Make sure timer is valid");
 
-        auto data = QnSpectrumAnalizer::instance()->getSpectrumData().data;
+        auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
         if (data.isEmpty())
         {
             setHint(tr("Input device is not found."));
             setState(Error);
             return;
         }
-//         VisualizerData data;
-//         for (int i = 0; i < 64; ++i)
-//             data << 1.0f * random(0, 100) / 100.0f;
 
         qint64 oldTs = m_paintTimeStamp;
         m_paintTimeStamp = m_stateTimer.elapsed();
+        normalizeVector(data);
+
+        /* Calculate size hint when first time receiving analyzed data. */
+        if (m_visualizerData.isEmpty() && !data.isEmpty())
+        {
+            Q_Q(QnTwoWayAudioWidget);
+            q->updateGeometry();
+        }
+
         m_visualizerData = animateVector(m_visualizerData, data, m_paintTimeStamp - oldTs);
 
-        QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize - roundness, 0.0));
+        QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize, 0.0));
         if (visualizerRect.isValid())
             paintVisualizer(painter, visualizerRect, m_visualizerData, colors.visualizer);
     }
+}
+
+QSizeF QnTwoWayAudioWidgetPrivate::sizeHint(Qt::SizeHint which, const QSizeF& constraint, const QSizeF& baseValue) const
+{
+    if (m_state == Pressed && !m_visualizerData.isEmpty())
+    {
+        qreal visualizerWidth = (kVisualizerLineWidth + kVisualizerLineOffset) * m_visualizerData.size();
+        qreal minSize = button->geometry().width();
+        qreal targetWidth = visualizerWidth + minSize * 1.5;
+        return QSizeF(targetWidth, baseValue.height());
+    }
+    return baseValue;
 }
 
 void QnTwoWayAudioWidgetPrivate::setState(HintState state)
@@ -293,7 +351,7 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
     case Pressed:
         {
             open = true;
-            setHint(tr("Hold to Speak Something"));
+            setHint(tr("Hold to Speak"));
             opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kHidden);
         }
         break;
@@ -314,6 +372,7 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
 
     ensureAnimator();
     disconnect(m_hintAnimator, nullptr, this, nullptr);
+    m_hintAnimator->stop();
     if (open)
     {
         connect(m_hintAnimator, &AbstractAnimator::finished, this, [this]()

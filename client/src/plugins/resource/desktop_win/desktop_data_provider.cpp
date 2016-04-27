@@ -680,7 +680,7 @@ void QnDesktopDataProvider::putAudioData()
 
         if (!m_soundAnalyzer)
         {
-            m_soundAnalyzer = QnSpectrumAnalizer::instance();
+            m_soundAnalyzer = QnVoiceSpectrumAnalyzer::instance();
             m_soundAnalyzer->initialize(m_audioCodecCtx->sample_rate, m_audioCodecCtx->channels);
         }
         m_soundAnalyzer->processData(buffer1, m_audioCodecCtx->frame_size);

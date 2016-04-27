@@ -41,7 +41,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
-#include <utils/media/spectrum_analizer.h>
+#include <utils/media/voice_spectrum_analyzer.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -154,7 +154,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
     common->store<QnServerStorageManager>(new QnServerStorageManager());
 
-    common->store<QnSpectrumAnalizer>(new QnSpectrumAnalizer());
+    common->store<QnVoiceSpectrumAnalyzer>(new QnVoiceSpectrumAnalyzer());
 
     initializeStatisticsManager(common);
 

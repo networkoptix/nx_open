@@ -9,11 +9,11 @@ struct QnSpectrumData
     QVector<double> data; //< data in range [0..1]
 };
 
-class QnSpectrumAnalizer: public QObject, public Singleton<QnSpectrumAnalizer>
+class QnVoiceSpectrumAnalyzer: public QObject, public Singleton<QnVoiceSpectrumAnalyzer>
 {
     Q_OBJECT
 public:
-    QnSpectrumAnalizer();
+    QnVoiceSpectrumAnalyzer();
     void initialize(int srcSampleRate, int channels);
 
     /**

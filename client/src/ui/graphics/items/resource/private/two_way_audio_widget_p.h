@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/media/spectrum_analizer.h>
+#include <utils/media/voice_spectrum_analyzer.h>
 
 class QnTwoWayAudioWidget;
 class QnImageButtonWidget;
@@ -34,6 +34,7 @@ public:
     void setFixedHeight(qreal height);
 
     void paint(QPainter *painter, const QRectF& sourceRect, const QPalette& palette);
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint, const QSizeF& baseValue) const;
 
 private:
     enum HintState

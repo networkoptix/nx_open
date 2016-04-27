@@ -18,7 +18,7 @@ class QnTwoWayAudioWidget : public Connective<Customized<GraphicsWidget> >
     typedef Connective<Customized<GraphicsWidget> > base_type;
 
 public:
-    QnTwoWayAudioWidget(QGraphicsWidget *parent = nullptr);
+    QnTwoWayAudioWidget(QGraphicsWidget* parent = nullptr);
     ~QnTwoWayAudioWidget();
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
@@ -28,7 +28,9 @@ public:
     QnTwoWayAudioWidgetColors colors() const;
     void setColors(const QnTwoWayAudioWidgetColors& value);
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
+
 
 private:
     QScopedPointer<QnTwoWayAudioWidgetPrivate> const d_ptr;

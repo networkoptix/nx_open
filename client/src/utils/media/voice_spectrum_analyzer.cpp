@@ -1,15 +1,16 @@
-#include "spectrum_analizer.h"
-#include "math.h"
-#include <random>
+#include "voice_spectrum_analyzer.h"
+
+#include <utils/math/math.h>
 
 //#define USE_TEST_DATA
 
-namespace {
+namespace
+{
 
-    static const int kUpdatesPerSecond = 4;
-    static const int kFreqStart = 300;
-    static const int kFreqEnd = 3500;
-    static const int kBands = (kFreqEnd - kFreqStart) / 200;
+    static const int kUpdatesPerSecond = 30;
+    static const int kFreqStart = 50;
+    static const int kFreqEnd = 800;
+    static const int kBands = (kFreqEnd - kFreqStart) / 50;
     static const double kBoostLevelDb = 2.5; //< max volume amplification for input data
 
 #ifdef USE_TEST_DATA
@@ -20,7 +21,7 @@ namespace {
         static double currentTime = 0.0;
         double tonePeriodInSamples = srcSampleRate / kToneFrequency;
         double stepPerSample = 2.0 * M_PI / tonePeriodInSamples;
-        
+
         qint16* srcPtr = const_cast<qint16*>(sampleData);
         for (int n = 0; n < sampleCount; ++n)
         {
@@ -36,88 +37,95 @@ namespace {
 #endif
 
 
-/*
- FFT/IFFT routine. (see pages 507-508 of Numerical Recipes in C)
+    /*
+    FFT/IFFT routine. (see pages 507-508 of Numerical Recipes in C)
 
- Inputs:
-	data[] : array of complex* data points of size 2*NFFT+1.
-		data[0] is unused,
-		* the n'th complex number x(n), for 0 <= n <= length(x)-1, is stored as:
-			data[2*n+1] = real(x(n))
-			data[2*n+2] = imag(x(n))
-		if length(Nx) < NFFT, the remainder of the array must be padded with zeros
+    Inputs:
+    data[] : array of complex* data points of size 2*NFFT+1.
+    data[0] is unused,
+    * the n'th complex number x(n), for 0 <= n <= length(x)-1, is stored as:
+    data[2*n+1] = real(x(n))
+    data[2*n+2] = imag(x(n))
+    if length(Nx) < NFFT, the remainder of the array must be padded with zeros
 
-	nn : FFT order NFFT. This MUST be a power of 2 and >= length(x).
-	isign:  if set to 1,
-				computes the forward FFT
-			if set to -1,
-				computes Inverse FFT - in this case the output values have
-				to be manually normalized by multiplying with 1/NFFT.
- Outputs:
-	data[] : The FFT or IFFT results are stored in data, overwriting the input.
-*/
+    nn : FFT order NFFT. This MUST be a power of 2 and >= length(x).
+    isign:  if set to 1,
+    computes the forward FFT
+    if set to -1,
+    computes Inverse FFT - in this case the output values have
+    to be manually normalized by multiplying with 1/NFFT.
+    Outputs:
+    data[] : The FFT or IFFT results are stored in data, overwriting the input.
+    */
 
-static const double TWOPI = 2.0 * M_PI;
+    static const double TWOPI = 2.0 * M_PI;
 
-void fftTransform(double data[], int nn, int isign)
-{
-    int n, mmax, m, j, istep, i;
-    double wtemp, wr, wpr, wpi, wi, theta;
-    double tempr, tempi;
+    void fftTransform(double data[], int nn, int isign)
+    {
+        int n, mmax, m, j, istep, i;
+        double wtemp, wr, wpr, wpi, wi, theta;
+        double tempr, tempi;
 
-    n = nn << 1;
-    j = 1;
-    for (i = 1; i < n; i += 2) {
-	if (j > i) {
-	    tempr = data[j];     data[j] = data[i];     data[i] = tempr;
-	    tempr = data[j+1]; data[j+1] = data[i+1]; data[i+1] = tempr;
-	}
-	m = n >> 1;
-	while (m >= 2 && j > m) {
-	    j -= m;
-	    m >>= 1;
-	}
-	j += m;
+        n = nn << 1;
+        j = 1;
+        for (i = 1; i < n; i += 2)
+        {
+            if (j > i)
+            {
+                tempr = data[j];     data[j] = data[i];     data[i] = tempr;
+                tempr = data[j+1]; data[j+1] = data[i+1]; data[i+1] = tempr;
+            }
+            m = n >> 1;
+            while (m >= 2 && j > m)
+            {
+                j -= m;
+                m >>= 1;
+            }
+            j += m;
+        }
+
+        mmax = 2;
+        while (n > mmax)
+        {
+            istep = 2*mmax;
+            theta = TWOPI/(isign*mmax);
+            wtemp = sin(0.5*theta);
+            wpr = -2.0*wtemp*wtemp;
+            wpi = sin(theta);
+            wr = 1.0;
+            wi = 0.0;
+            for (m = 1; m < mmax; m += 2)
+            {
+                for (i = m; i <= n; i += istep)
+                {
+                    j = i + mmax;
+                    tempr = wr*data[j]   - wi*data[j+1];
+                    tempi = wr*data[j+1] + wi*data[j];
+                    data[j]   = data[i]   - tempr;
+                    data[j+1] = data[i+1] - tempi;
+                    data[i] += tempr;
+                    data[i+1] += tempi;
+                }
+                wr = (wtemp = wr)*wpr - wi*wpi + wr;
+                wi = wi*wpr + wtemp*wpi + wi;
+            }
+            mmax = istep;
+        }
     }
-    mmax = 2;
-    while (n > mmax) {
-	istep = 2*mmax;
-	theta = TWOPI/(isign*mmax);
-	wtemp = sin(0.5*theta);
-	wpr = -2.0*wtemp*wtemp;
-	wpi = sin(theta);
-	wr = 1.0;
-	wi = 0.0;
-	for (m = 1; m < mmax; m += 2) {
-	    for (i = m; i <= n; i += istep) {
-		j =i + mmax;
-		tempr = wr*data[j]   - wi*data[j+1];
-		tempi = wr*data[j+1] + wi*data[j];
-		data[j]   = data[i]   - tempr;
-		data[j+1] = data[i+1] - tempi;
-		data[i] += tempr;
-		data[i+1] += tempi;
-	    }
-	    wr = (wtemp = wr)*wpr - wi*wpi + wr;
-	    wi = wi*wpr + wtemp*wpi + wi;
-	}
-	mmax = istep;
+
+    /** Round value up to power of 2 */
+    quint32 toPowerOf2(quint32 v)
+    {
+        v--;
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        v++;
+
+        return v;
     }
-}
-
-/** Round value up to power of 2 */
-quint32 toPowerOf2(quint32 v)
-{
-    v--;
-    v |= v >> 1;
-    v |= v >> 2;
-    v |= v >> 4;
-    v |= v >> 8;
-    v |= v >> 16;
-    v++;
-
-    return v;
-}
 
 } // unnamed namespace
 
@@ -126,7 +134,7 @@ QnSpectrumData::QnSpectrumData()
 
 }
 
-QnSpectrumAnalizer::QnSpectrumAnalizer() :
+QnVoiceSpectrumAnalyzer::QnVoiceSpectrumAnalyzer() :
     m_srcSampleRate(0),
     m_windowSize(0),
     m_HannCoeff(),
@@ -136,7 +144,7 @@ QnSpectrumAnalizer::QnSpectrumAnalizer() :
     m_spectrumData()
 {}
 
-void QnSpectrumAnalizer::initialize(int srcSampleRate, int channels)
+void QnVoiceSpectrumAnalyzer::initialize(int srcSampleRate, int channels)
 {
     /* Check if already initialized. */
     if (m_srcSampleRate == srcSampleRate && m_channels == channels)
@@ -154,7 +162,7 @@ void QnSpectrumAnalizer::initialize(int srcSampleRate, int channels)
         m_HannCoeff[n] = 0.5 * (1 - cos((2 * M_PI * n) / double(m_windowSize-1)));
 }
 
-void QnSpectrumAnalizer::processData(const qint16* sampleData, int sampleCount)
+void QnVoiceSpectrumAnalyzer::processData(const qint16* sampleData, int sampleCount)
 {
 #ifdef USE_TEST_DATA
     fillTestData(sampleData, sampleCount, m_channels, m_srcSampleRate);
@@ -188,7 +196,7 @@ void QnSpectrumAnalizer::processData(const qint16* sampleData, int sampleCount)
     }
 }
 
-void QnSpectrumAnalizer::fillSpectrumData()
+void QnVoiceSpectrumAnalyzer::fillSpectrumData()
 {
     QnSpectrumData result;
 
@@ -213,7 +221,7 @@ void QnSpectrumAnalizer::fillSpectrumData()
         }
         result.data.push_back(qBound(0.0, value / maxFreqSum, 1.0));
     }
-    
+
     // convert result data to Db
     for (auto& data: result.data)
     {
@@ -225,7 +233,7 @@ void QnSpectrumAnalizer::fillSpectrumData()
     m_spectrumData = result;
 }
 
-QnSpectrumData QnSpectrumAnalizer::getSpectrumData() const
+QnSpectrumData QnVoiceSpectrumAnalyzer::getSpectrumData() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_spectrumData;

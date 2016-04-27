@@ -264,6 +264,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         updateIoModuleVisibility(false);
     }
 
+    //TODO: #GDM Debug code, MUST BE RESTORED
     if (m_camera /*&& m_camera->hasTwoWayAudio() */)
     {
         auto twoWayAudioItem = new QnTwoWayAudioWidget();
