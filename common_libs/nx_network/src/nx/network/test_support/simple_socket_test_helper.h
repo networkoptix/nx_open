@@ -168,7 +168,7 @@ void socketSimpleSync(
     nx::utils::promise<void> promise;
     auto server = serverMaker();
     nx::utils::thread serverThread(
-        syncSocketServerMainFunc<decltype(server)>,
+        &syncSocketServerMainFunc<decltype(server)>,
         endpointToBindTo,
         testMessage,
         clientCount,
@@ -384,7 +384,7 @@ void shutdownSocket(
         nx::utils::promise<void> promise;
         auto server = serverMaker();
         nx::utils::thread serverThread(
-            syncSocketServerMainFunc<decltype(server)>,
+            &syncSocketServerMainFunc<decltype(server)>,
             endpointToBindTo,
             boost::none,
             1,
