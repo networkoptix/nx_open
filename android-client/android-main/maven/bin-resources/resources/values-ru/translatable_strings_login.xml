@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">Неизвестная ошибка</string>
+    <string name="login_error_path">Неправильное имя хоста или порт</string>
+    <string name="login_error_protocol">Сервер не поддерживает этот протокол</string>
+    <string name="login_error_connection">Невозможно подключиться к серверу по этому адресу</string>
+    <string name="login_error_credentials">Неправильные данные пользователя</string>
+    <string name="login_error_port">Неправильный порт</string>
+    <string name="login_error_brand">Несовместимый сервер</string>
+    <string name="login_hint">Ваш логин</string>
+    <string name="login_caption">Логин:</string>
+    <string name="password_caption">Пароль:</string>
+    <string name="password_hint">Ваш пароль</string>
+    <string name="host_caption">Хост:</string>
+    <string name="host_hint">Адрес сервера</string>
+    <string name="port_caption">Порт:</string>
+    <string name="port_hint">Порт сервера</string>
+    <string name="login_progress_caption">Авторизация…</string>
+    <string name="login_connecting">Подключение…</string>
+    <string name="login_version_incompatible_title">Версия несовместима.</string>
+    <string name="login_version_incompatible_text">Версия сервера несовместима с текущей версие клиента. Вы сможете увидеть список устройств, но получение видео с них не гарантируется.</string>
+	<string name="login_empty_host">Поле Хост не может быть пустым</string>
+	<string name="login_empty_port">Поле Порт не может быть пустым</string>
+	<string name="login_empty_login">Поле Логин не может быть пустым</string>
+	<string name="login_empty_pass">Поле Пароль не может быть пустым</string>
+	<string name="login_title_caption">"Название: "</string>
+	<string name="login_title_hint">Имя сессии</string>
+	<string name="login_saved_sessions">Сохранённые сессии</string>
+	<string name="login_host_title">"Хост: "</string>
+	<string name="login_login_title">"Логин: "</string>
+	<string name="login_connect">Подключиться</string>
+	<string name="login_delete_confirm">Вы уверены, что хотите удалить сохранённую сессию:</string>
+</resources>

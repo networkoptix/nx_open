@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="hu" sourcelanguage="en">
+<TS version="2.0" language="hu" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -1004,6 +1004,21 @@
     </message>
     <message>
         <location/>
+        <source>Ctrl+E</source>
+        <translation>Ctrl+E</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ctrl+L</source>
+        <translation>Ctrl+L</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ctrl+M</source>
+        <translation>Ctrl+M</translation>
+    </message>
+    <message>
+        <location/>
         <source>System Settings</source>
         <translation>Rendszerbeállítások</translation>
     </message>
@@ -1016,6 +1031,11 @@
         <location/>
         <source>System Backup and Restore</source>
         <translation>Rendszer mentés és visszaállítás</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ctrl+B</source>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
         <location/>
@@ -1046,6 +1066,11 @@
         <location/>
         <source>&amp;Bookmarks...</source>
         <translation>&amp;Könyvjelzők...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Könyvjelzőlista megnyitása (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1099,7 +1124,7 @@
     <message>
         <location/>
         <source>General Settings</source>
-        <translation>ÁLtalános beállítások</translation>
+        <translation>Általános beállítások</translation>
     </message>
     <message>
         <location/>
@@ -1119,7 +1144,7 @@
     <message>
         <location/>
         <source>Clear</source>
-        <translation>Ürítés</translation>
+        <translation>Eltávolítás</translation>
     </message>
     <message>
         <location/>
@@ -1134,7 +1159,7 @@
     <message>
         <location/>
         <source> cells</source>
-        <translation>cellák</translation>
+        <translation> cella</translation>
     </message>
     <message>
         <location/>

@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Dieser Name ist bereits vorhanden";
+"Please choose another name." = "Bitte wählen Sie einen anderen Namen.";
+"OK" = "OK";
+"Name" = "Name";
+"Host" = "Host";
+"IP or hostname" = "IP oder Hostname";
+"Port" = "Port";
+"Login" = "Login";
+"Password" = "Passwort";
+"Address: %@" = "Addresse: %@";
+"Error" = "Fehler";
+"Connecting..." = "Verbindung wird hergestellt...";
+"Can't connect to the System." = "Kann nicht mit dem System verbinden.";
+"Requesting cameras..." = "Kameras werden angefordert...";
+"Communication failure." = "Kommunikationsfehler";
+"The System is incompatible with the app" = "Das System ist mit der App nicht kompatibel";
+"Show Offline" = "Offline-Kameras anzeigen";
+"Hide Offline" = "Offline-Kameras ausblenden";
+"Systems" = "Systeme";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Wird geladen...";
+"No Signal..." = "Kein Signal...";
+"Invalid Camera Credentials" = "Ungültige Kamera Anmeldeinformationen";
+"Invalid Camera Credentials..." = "Ungültige Kamera Anmeldeinformationen...";
+"Live" = "Live";
+"Information" = "Information";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Es gibt kein Archiv für das ausgewählte Datum. Möchten Sie zur nächsten Position springen?";
+"No" = "Nein";
+"Yes" = "Ja";
+"Archive" = "Archiv";
+"Go" = "Los";
+"Low" = "Niedrig";
+"Medium" = "Mittel";
+"High" = "Hoch";
+"Best" = "Sehr hoch";
+"Please Upgrade to Continue" = "Updaten Sie bitte um fortzufahren";
+"This app is not compatible with this version of the software. Please download our new app." = "Diese App ist nicht kompatibel mit dieser Softwareversion. Laden Sie bitte unsere neue App herunter.";
+"Not now" = "Nicht jetzt";
+"Download" = "Download";
+"Upgrade Now!" = "Jetzt updaten!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "Sie versuchen sich mit einem System mit Version 2.5 oder neuer zu verbinden. Laden Sie unsere neue App für bessere Handhabung herunter.";

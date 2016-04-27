@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_server_died">攝影機無法連線</string>
+    <string name="error_already_connected">已連線至攝影機</string>
+    <string name="error_not_connected">未連線至攝影機</string>
+    <string name="error_unknown_host">未知的主機</string>
+    <string name="error_cannot_connect">無法連線至攝影機</string>
+    <string name="error_io">I/O 錯誤</string>
+    <string name="error_connection_lost">連線遺失</string>
+    <string name="error_malformed_packet">封包異常</string>
+    <string name="error_out_of_range">超過範圍</string>
+    <string name="error_buffer_too_small">緩衝太小</string>
+    <string name="error_unsupported_format">格式無法支援</string>
+    <string name="error_end_of_stream">串流末端</string>
+    <string name="error_unsupported_http_transport">Http 傳輸只可用於 Android 4.0 以上</string>
+    <string name="error_unsupported_rtsp_proxy">無法建立與 Media Server 的直接連線.
+        透過 Proxy 觀看影像只可用於 Android 4.0 以上</string>
+    <string name="error_proxy_not_running">無法建立與 Media Server 的直接連線.
+        請確認 Proxy 服務已運作.</string>
+    <string name="error_unsupported_rtsp_udp">伺服器的影像無法送達您的裝置. 
+        請確認您的網路支援 UDP 傳輸.</string>
+    <string name="error_native_codec">攝影機編碼不支援, 請試著改變解析度.</string>
+    <string name="error_unknown">攝影機無法連線.</string>
+
+</resources>

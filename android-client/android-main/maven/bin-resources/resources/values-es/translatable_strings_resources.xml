@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">Mostrar sin conexión</string>
+    <string name="menu_hide_offline">Ocultar sin conexión</string>
+    <string name="resources_logout_offer">Pulse atrás una vez más para cerrar la sesión</string>
+    <string name="resources_loading_title">Cargando ...</string>
+    <string name="resources_loading_text">Recepción de datos…</string>
+    <string name="menu_clear_cache">Borrar caché</string>
+    <string name="resources_tree">Vista de árbol</string>
+    <string name="resources_grid">Miniaturas</string>
+    <string name="resources_logout">Cerrar sesión</string>
+    <string name="promote_title">Upgrade Now!</string>
+    <string name="promote">You\'re connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience.</string>
+    <string name="download">Download</string>    
+
+</resources>

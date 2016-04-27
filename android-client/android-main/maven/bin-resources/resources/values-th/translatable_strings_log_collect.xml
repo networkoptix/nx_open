@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collect_log">เก็บเข้าสู่ระบบ</string>
+    <string name="acquiring_log_progress_dialog_message">การรับเข้าสู่ระบบจากระบบ  &#8230;</string>
+    <string name="chooser_title">"เลือกโปรแกรมที่จะส่งเข้าสู่ระบบ"</string>
+    <string name="failed_to_get_log_message">ไม่สามารถดึงข้อมูลการจัดเก็บจากระบบได้"</string>
+    <string name="main_dialog_text">"โปรแกรมนี้จะพยายามที่จะเก็บบันทึกของอุปกรณ์ การเข้าสู่ระบบที่เก็บรวบรวม จะถูกส่งไปใช้โปรแกรมที่คุณเลือกอกจากนี้คุณยังจะได้มีโอกาสที่จะเห็นและแก้ไขข้อมูลที่ถูกส่ง"</string>
+</resources>

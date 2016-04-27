@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_server_died">"Kamera ist nicht verfügbar"</string>
+    <string name="error_already_connected">"Bereits mit der Kamera verbunden"</string>
+    <string name="error_not_connected">"Nicht an die Kamera angeschlossen"</string>
+    <string name="error_unknown_host">"Unbekannter Host"</string>
+    <string name="error_cannot_connect">"Verbindungsaufbau zur Kamera gescheitert"</string>
+    <string name="error_io">"I / O-Fehler"</string>
+    <string name="error_connection_lost">"Verbindung verloren"</string>
+    <string name="error_malformed_packet">"Ungültiges Paket"</string>
+    <string name="error_out_of_range">"Außerhalb des Bereichs"</string>
+    <string name="error_buffer_too_small">"Puffer zu klein"</string>
+    <string name="error_unsupported_format">"Format wird nicht unterstützt"</string>
+    <string name="error_end_of_stream">"Ende der Übertragung"</string>
+    <string name="error_unsupported_http_transport">"HTTP-Transport ist nur auf Android 4.0+ verfügbar"</string>
+    <string name="error_unsupported_rtsp_proxy">"Direkte Verbindung zum Medienserver kann nicht hergestellt werden. Ansehen von Videos über einen Proxy ist nur auf Android 4.0+ verfügbar"</string>
+    <string name="error_proxy_not_running">"Direkte Verbindung zum Medienserver kann nicht hergestellt werden. Stellen Sie sicher, dass ein Proxy-Dienst für die Applikation verfügbar ist."</string>
+    <string name="error_unsupported_rtsp_udp">"Das Video vom Server kann Ihr Gerät nicht erreichen. Stellen Sie sicher, dass UDP-Daten in Ihrem Netzwerk weitergeleitet werden."</string>
+    <string name="error_native_codec">Kamera Codec wird an Ihrem Computer nicht unterstützt. Ändern Sie die Auflösung.</string>
+    <string name="error_unknown">"Kamera ist nicht verfügbar."</string>
+
+</resources>
