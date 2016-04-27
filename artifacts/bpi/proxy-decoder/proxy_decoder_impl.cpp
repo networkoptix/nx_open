@@ -16,6 +16,8 @@ extern "C" {
 #define LOG_PREFIX "ProxyDecoder: "
 #include "proxy_decoder_utils.h"
 
+namespace {
+
 static const char* const DEBUG_FRAME_PATH = "/tmp";
 
 class Impl
@@ -56,7 +58,8 @@ private:
     vdpau_render_state* getRenderState();
 
     int doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags);
-    void doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame);
+    void doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame,
+        int offset[4], int y, int type, int height);
 
     // Ffmpeg callbacks:
     static int callbackGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags);
@@ -70,8 +73,8 @@ private:
     int decodeFrame(const CompressedFrame* compressedFrame, int64_t* outPts,
         vdpau_render_state** outRenderState);
 
-    static void fillAvPacket(AVPacket* packet,
-        const CompressedFrame* compressedFrame, uint64_t* pLastPts);
+    static void fillAvPacket(
+        AVPacket* packet, const CompressedFrame* compressedFrame, uint64_t* pLastPts);
 
     void convertYuvToRgb(uint8_t* argbBuffer, int argbLineSize);
 
@@ -89,7 +92,6 @@ private:
     VdpPresentationQueue m_vdpQueue = VDP_INVALID_HANDLE;
 
     AVBufferRef* m_stubAvBuffer = nullptr;
-    AVFrame* m_avFrame = nullptr;
     AVCodecContext* m_codecContext = nullptr;
 
     uint64_t m_lastPts = AV_NOPTS_VALUE;
@@ -117,6 +119,7 @@ Impl::Impl(int frameWidth, int frameHeight)
     m_frameHeight(frameHeight)
 {
     static InitOnce initOnce;
+    (void) initOnce;
 
     assert(m_frameWidth > 0);
     assert(m_frameHeight > 0);
@@ -127,14 +130,12 @@ Impl::Impl(int frameWidth, int frameHeight)
 
 Impl::~Impl()
 {
-    LOG << "~Impl() BEGIN";
     deinitializeFfmpeg();
     deinitializeVdpau();
 
     free(m_yBuffer);
     free(m_uBuffer);
     free(m_vBuffer);
-    LOG << "~Impl() END";
 }
 
 void Impl::initializeVdpau()
@@ -195,33 +196,6 @@ void Impl::deinitializeVdpau()
     LOG << "deinitializeVdpau() END";
 }
 
-vdpau_render_state* Impl::getRenderState()
-{
-    vdpau_render_state* renderState = nullptr;
-
-    static const int kRenderStatesCount = 20;
-
-    while (m_renderStates.size() < kRenderStatesCount)
-    {
-        renderState = new vdpau_render_state();
-        m_renderStates.push_back(renderState);
-        memset(renderState, 0, sizeof(vdpau_render_state));
-        renderState->surface = VDP_INVALID_HANDLE;
-
-        VDP(vdp_video_surface_create(m_vdpDevice,
-            VDP_CHROMA_TYPE_420, m_frameWidth, m_frameHeight, &renderState->surface));
-        vdpCheckHandle(renderState->surface, "Video Surface");
-    }
-
-    renderState = m_renderStates[m_renderStateIndex];
-    LOG << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex << " {flags: "
-        << debugDumpRenderStateFlags(renderState) <<  "}";
-    m_renderStateIndex = (m_renderStateIndex + 1) % kRenderStatesCount;
-
-    assert(renderState);
-    return renderState;
-}
-
 void Impl::initializeFfmpeg()
 {
     AVCodec* codec = avcodec_find_decoder_by_name("h264_vdpau");
@@ -249,8 +223,6 @@ void Impl::initializeFfmpeg()
         return;
     }
 
-    m_avFrame = av_frame_alloc();
-
     m_stubAvBuffer = av_buffer_alloc(/*size*/ 1);
 }
 
@@ -258,9 +230,6 @@ void Impl::deinitializeFfmpeg()
 {
     if (m_stubAvBuffer)
         av_buffer_unref(&m_stubAvBuffer);
-
-    if (m_avFrame)
-        av_frame_free(&m_avFrame);
 
     if (m_codecContext)
     {
@@ -275,14 +244,89 @@ void Impl::deinitializeFfmpeg()
     }
 }
 
+vdpau_render_state* Impl::getRenderState()
+{
+    vdpau_render_state* renderState = nullptr;
+
+    static const int kRenderStatesCount = 20;
+
+    while (m_renderStates.size() < kRenderStatesCount)
+    {
+        renderState = new vdpau_render_state();
+        m_renderStates.push_back(renderState);
+        memset(renderState, 0, sizeof(vdpau_render_state));
+        renderState->surface = VDP_INVALID_HANDLE;
+
+        VDP(vdp_video_surface_create(m_vdpDevice,
+            VDP_CHROMA_TYPE_420, m_frameWidth, m_frameHeight, &renderState->surface));
+        vdpCheckHandle(renderState->surface, "Video Surface");
+    }
+
+    renderState = m_renderStates[m_renderStateIndex];
+    LOG << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex << " {flags: "
+            << debugDumpRenderStateFlags(renderState) <<  "}";
+    m_renderStateIndex = (m_renderStateIndex + 1) % kRenderStatesCount;
+
+    assert(renderState);
+    return renderState;
+}
+
+void Impl::doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame,
+    int offset[4], int y, int type, int height)
+{
+    (void) pContext;
+    (void) offset;
+    (void) y;
+    (void) type;
+    (void) height;
+
+    assert(pFrame);
+    vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(pFrame->data[0]);
+    if (!renderState)
+    {
+        LOG << "pFrame->data[0] is null instead of vdpau_render_state*";
+        return;
+    }
+    if (renderState->surface == VDP_INVALID_HANDLE)
+    {
+        LOG << "((vdpau_render_state*) pFrame->data[0])->surface is VDP_INVALID_HANDLE";
+        return;
+    }
+
+    TIME_BEGIN(vdp_decoder_render);
+    VDP(vdp_decoder_render(m_vdpDecoder, renderState->surface,
+        (VdpPictureInfo const*) &(renderState->info),
+        renderState->bitstream_buffers_used, renderState->bitstream_buffers));
+    TIME_END(vdp_decoder_render);
+}
+
+int Impl::doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
+{
+    (void) pContext;
+
+    if (flags & AV_GET_BUFFER_FLAG_REF)
+    LOG << "AV_GET_BUFFER_FLAG_REF is set";
+
+    vdpau_render_state* renderState = getRenderState();
+    assert(renderState);
+
+    pFrame->buf[0] = av_buffer_ref(m_stubAvBuffer);
+    pFrame->data[0] = reinterpret_cast<uint8_t*>(renderState);
+    pFrame->extended_data = pFrame->data;
+    pFrame->linesize[0] = 0;
+    pFrame->extended_buf = nullptr;
+    pFrame->nb_extended_buf = 0;
+
+    //renderState->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE; //< Old approach.
+    return 0;
+}
+
 int Impl::callbackGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
 {
     LOG << "callbackGetBuffer2() BEGIN";
-
     Impl* d = (Impl*) pContext->opaque;
     assert(d);
     int result = d->doGetBuffer2(pContext, pFrame, flags);
-
     LOG << "callbackGetBuffer2() END";
     return result;
 }
@@ -290,11 +334,11 @@ int Impl::callbackGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flag
 void Impl::callbackDrawHorizBand(struct AVCodecContext* pContext, const AVFrame* src,
     int offset[4], int y, int type, int height)
 {
-    LOG << "callbackDrawHorizBand()";
-
+    LOG << "callbackDrawHorizBand() BEGIN";
     Impl* d = (Impl*) pContext->opaque;
     assert(d);
-    d->doDrawHorizBand(pContext, src);
+    d->doDrawHorizBand(pContext, src, offset, y, type, height);
+    LOG << "callbackDrawHorizBand() END";
 }
 
 AVPixelFormat Impl::callbackGetFormat(AVCodecContext* pContext, const AVPixelFormat* pFmt)
@@ -318,40 +362,8 @@ AVPixelFormat Impl::callbackGetFormat(AVCodecContext* pContext, const AVPixelFor
     }
 }
 
-int Impl::doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
-{
-    vdpau_render_state* renderState = getRenderState();
-
-    pFrame->buf[0] = av_buffer_ref(m_stubAvBuffer);
-    pFrame->data[0] = reinterpret_cast<uint8_t*>(renderState);
-    pFrame->extended_data = pFrame->data;
-    pFrame->linesize[0] = 0;
-    pFrame->extended_buf = nullptr;
-    pFrame->nb_extended_buf = 0;
-
-    //renderState->state |= FF_VDPAU_STATE_USED_FOR_REFERENCE; //< Old approach.
-
-    return 0;
-}
-
-void Impl::doDrawHorizBand(AVCodecContext* pContext, const AVFrame* pFrame)
-{
-    assert(pFrame);
-    vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(pFrame->data[0]);
-    assert(renderState);
-    assert(renderState->surface != VDP_INVALID_HANDLE);
-
-    assert(m_vdpDecoder != VDP_INVALID_HANDLE);
-
-    TIME_BEGIN(vdp_decoder_render);
-    VDP(vdp_decoder_render(m_vdpDecoder, renderState->surface,
-        (VdpPictureInfo const*) &(renderState->info),
-        renderState->bitstream_buffers_used, renderState->bitstream_buffers));
-    TIME_END(vdp_decoder_render);
-}
-
-void Impl::fillAvPacket(AVPacket* packet,
-    const CompressedFrame* compressedFrame, uint64_t* pLastPts)
+void Impl::fillAvPacket(
+    AVPacket* packet, const CompressedFrame* compressedFrame, uint64_t* pLastPts)
 {
     assert(packet);
     assert(pLastPts);
@@ -402,9 +414,9 @@ static void inline convertPixelYuvToRgb(uint8_t* p, int y, int u, int v)
     if (r < 0) r = 0;
     if (r > 255) r = 255;
 
-    p[0] = b;
-    p[1] = g;
-    p[2] = r;
+    p[0] = (uint8_t) b;
+    p[1] = (uint8_t) g;
+    p[2] = (uint8_t) r;
     p[3] = 0;
 }
 
@@ -455,31 +467,44 @@ int Impl::decodeFrame(const CompressedFrame* compressedFrame, int64_t* outPts,
     vdpau_render_state** outRenderState)
 {
     assert(outRenderState);
+    *outRenderState = nullptr;
 
     AVPacket avpkt;
     fillAvPacket(&avpkt, compressedFrame, &m_lastPts);
 
+    AVFrame* avFrame = av_frame_alloc();
+
     LOG << "avcodec_decode_video2() BEGIN";
-    int gotPicture = 0;
-    int res;
     TIME_BEGIN(avcodec_decode_video2);
-    res = avcodec_decode_video2(m_codecContext, m_avFrame, &gotPicture, &avpkt);
+    int gotPicture = 0;
+    int res = avcodec_decode_video2(m_codecContext, avFrame, &gotPicture, &avpkt);
     TIME_END(avcodec_decode_video2);
     LOG << "avcodec_decode_video2() END -> " << res << "; gotPicture: " << gotPicture << "";
 
-    if (res <= 0 || !gotPicture)
-        return res; //< Negative value means error, zero means buffering.
+    // Ffmpeg doc guarantees that avcodec_decode_video2() returns 0 if gotPicture is false.
+    int result = 0;
+    if (res <= 0)
+    {
+        result = res; //< Negative value means error, zero means buffering.
+    }
+    else
+    {
+        if (gotPicture)
+        {
+            *outRenderState = reinterpret_cast<vdpau_render_state*>(avFrame->data[0]);
+            if (*outRenderState) //< Null may happen if ffmpeg did not call callbackGetBuffer2().
+            {
+                // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert us to ms.
+                if (outPts)
+                    *outPts = avFrame->pkt_dts / 1000;
 
-    LOG << "decodeFrame(): frame size: " << m_frameWidth << " x " << m_frameHeight;
+                result = avFrame->coded_picture_number;
+            }
+        }
+    }
 
-    *outRenderState = reinterpret_cast<vdpau_render_state*>(m_avFrame->data[0]);
-    assert(*outRenderState);
-
-    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert us to ms.
-    if (outPts)
-        *outPts = m_avFrame->pkt_dts / 1000;
-
-    return m_avFrame->coded_picture_number;
+    av_frame_free(&avFrame);
+    return result;
 }
 
 int Impl::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPts,
@@ -590,16 +615,14 @@ int Impl::decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* 
     void **outFrameHandle)
 {
     LOG << "decodeForDisplaying() BEGIN";
-
     assert(outFrameHandle);
     *outFrameHandle = nullptr;
 
     vdpau_render_state* renderState;
     int result = decodeFrame(compressedFrame, outPts, &renderState);
     if (result > 0)
-    {
         *outFrameHandle = reinterpret_cast<void*>(renderState);
-    }
+
     LOG << "decodeForDisplaying() END -> " << result;
     return result;
 }
@@ -645,6 +668,8 @@ void Impl::displayDecoded(void* frameHandle)
 
     LOG << "displayDecoded(" << debugDumpRenderStateRef(renderState, m_renderStates) << ") END";
 }
+
+} // namespace
 
 //-------------------------------------------------------------------------------------------------
 
