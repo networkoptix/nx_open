@@ -21,15 +21,6 @@ struct RandomGenerationContext
 {
     std::mutex mutex;
     std::random_device randomDevice;
-    std::uniform_int_distribution<int> distribution;
-
-    RandomGenerationContext()
-    :
-        distribution(
-            std::numeric_limits<std::int8_t>::min(),
-            std::numeric_limits<std::int8_t>::max())
-    {
-    }
 };
 
 RandomGenerationContext randomGenerationContext;
@@ -39,11 +30,16 @@ bool generateRandomData(std::int8_t* data, std::size_t count)
 {
     try
     {
-        std::unique_lock<std::mutex> lk(randomGenerationContext.mutex);
+        std::lock_guard<std::mutex> lk(randomGenerationContext.mutex);
+        std::uniform_int_distribution<int> distribution(
+            std::numeric_limits<std::int8_t>::min(),
+            std::numeric_limits<std::int8_t>::max());
         std::generate(
             data, data + count,
-            [] { return randomGenerationContext.distribution(
-                            randomGenerationContext.randomDevice); });
+            [&distribution]
+            {
+                return distribution(randomGenerationContext.randomDevice);
+            });
         return true;
     }
     catch (const std::exception& /*e*/)
