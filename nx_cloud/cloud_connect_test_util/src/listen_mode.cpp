@@ -190,10 +190,6 @@ int runInListenMode(const std::multimap<QString, QString>& args)
                 << std::endl;
             return 2;
         }
-        serverSocket = std::move(cloudServerSocket);
-        std::cout << "listening on mediator. Address "
-            << serverId.toStdString() << "." << cloudCredentials[0].toStdString()
-            << std::endl;
     }
     else if (localAddressIter != args.end())
     {
