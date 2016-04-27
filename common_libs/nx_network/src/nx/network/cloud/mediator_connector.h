@@ -35,8 +35,8 @@ public:
     std::shared_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
-    void mockupAddress( SocketAddress address );
-    void mockupAddress( const MediatorConnector* mc );
+    void mockupAddress( SocketAddress address, bool suppressWarning = false );
+    void mockupAddress( const MediatorConnector& connector );
 
     void setSystemCredentials( boost::optional<SystemCredentials> value );
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
