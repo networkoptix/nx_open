@@ -431,9 +431,6 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-
-
-
     QByteArray body;
     http.readAll(body);
     if (hasVideo(0))
@@ -485,10 +482,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
                 }
             }
         }
-    }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
-            //m_initMutex is locked up the stack
+    }
+
     if (hasVideo(0))
     {
+        QnMutexLocker lock(&m_mutex);
         std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 
         //detecting primary & secondary resolution
