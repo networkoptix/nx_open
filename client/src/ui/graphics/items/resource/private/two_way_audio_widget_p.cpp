@@ -253,10 +253,7 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
         return;
 
     setState(Pressed);
-    QSizeF minSize = q->sizeHint(Qt::MinimumSize);
-    QRectF widgetGeometry = q->geometry();
-    widgetGeometry.adjust(widgetGeometry.width() - minSize.width(), 0, 0, 0);
-    q->setGeometry(widgetGeometry);
+
 
     m_requestHandle = server->restConnection()->twoWayAudioCommand(camera->getId(), true, [this]
         (bool success, rest::Handle handle, const QnJsonRestResult& result)
@@ -391,6 +388,12 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
             open = true;
             setHint(tr("Hold to Speak"));
             opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kHidden);
+
+            Q_Q(QnTwoWayAudioWidget);
+            QSizeF minSize = q->sizeHint(Qt::MinimumSize);
+            QRectF widgetGeometry = q->geometry();
+            widgetGeometry.adjust(widgetGeometry.width() - minSize.width(), 0, 0, 0);
+            q->setGeometry(widgetGeometry);
         }
         break;
     case Released:
@@ -405,9 +408,15 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
 
     m_paintTimeStamp = 0;
     if (m_state == OK)
+    {
         m_stateTimer.invalidate();
+        m_hintTimer->stop();
+    }
     else
+    {
         m_stateTimer.restart();
+        m_hintTimer->start();
+    }
 
     ensureAnimator();
     disconnect(m_hintAnimator, nullptr, this, nullptr);
@@ -421,13 +430,12 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
         });
         m_hintAnimator->setEasingCurve(QEasingCurve::OutCubic);
         m_hintAnimator->animateTo(kVisible);
-        m_hintTimer->start();
+
     }
     else
     {
         m_hintAnimator->setEasingCurve(QEasingCurve::InCubic);
         m_hintAnimator->animateTo(kHidden);
-        m_hintTimer->stop();
         opacityAnimator(hint, kHintOpacityAnimationSpeed)->animateTo(kHidden);
     }
 }
