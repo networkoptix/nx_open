@@ -55,5 +55,28 @@ decltype(detail::Apply<
         ::apply(::std::forward<F>(f), ::std::forward<T>(t));
 }
 
+
+/** Converts unique_ptr of one type to another using static_cast.
+    Consumes original unique_ptr. Actually moves memory to a new unique_ptr
+*/
+template<typename ResultType, typename InitialType, typename DeleterType>
+std::unique_ptr<ResultType, DeleterType>
+static_unique_ptr_cast(std::unique_ptr<InitialType, DeleterType>&& sourcePtr)
+{
+    return std::unique_ptr<ResultType, DeleterType>(
+        static_cast<ResultType>(sourcePtr.release()),
+        sourcePtr.get_deleter());
+}
+
+template<typename ResultType, typename InitialType>
+std::unique_ptr<ResultType, std::default_delete<ResultType>>
+static_unique_ptr_cast(
+    std::unique_ptr<InitialType, std::default_delete<InitialType>>&& sourcePtr)
+{
+    return std::unique_ptr<ResultType>(
+        static_cast<ResultType*>(sourcePtr.release()));
+}
+
+
 }   //namespace utils
 }   //namespace nx
