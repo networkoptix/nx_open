@@ -212,7 +212,7 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
         case Pressed:
             if (m_stateTimer.hasExpired(kDataTimeoutMs) && m_visualizerData.isEmpty())
             {
-                setHint(tr("Input device is not found."));
+                setHint(tr("Input device is not selected."));
                 setState(Error);
                 stopStreaming();
             }
@@ -341,7 +341,11 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
 
     if (m_state == Pressed && qFuzzyEquals(m_hintVisibility, kVisible))
     {
-        Q_ASSERT_X(m_stateTimer.isValid(), Q_FUNC_INFO, "Make sure timer is valid");
+        Q_ASSERT(m_stateTimer.isValid());
+        QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize, 0.0));
+        Q_ASSERT(visualizerRect.isValid());
+        if (!visualizerRect.isValid())
+            return;
 
         qint64 oldTimeStamp = m_paintTimeStamp;
         m_paintTimeStamp = m_stateTimer.elapsed();
@@ -350,25 +354,29 @@ void QnTwoWayAudioWidgetPrivate::paint(QPainter *painter, const QRectF& sourceRe
         auto data = QnVoiceSpectrumAnalyzer::instance()->getSpectrumData().data;
         if (data.isEmpty())
         {
-            m_visualizerData = generateEmptyVector(m_paintTimeStamp);
-        }
-        else
-        {
-            normalizeVector(data);
-            m_visualizerData = animateVector(m_visualizerData, data,timeStepMs);
+            paintVisualizer(painter, visualizerRect, generateEmptyVector(m_paintTimeStamp), colors.visualizer);
+            return;
         }
 
-        QRectF visualizerRect(rect.adjusted(roundness, 0.0, -minSize, 0.0));
-        if (visualizerRect.isValid())
-            paintVisualizer(painter, visualizerRect, m_visualizerData, colors.visualizer);
+        normalizeVector(data);
+
+        /* Calculate size hint when first time receiving analyzed data. */
+        if (m_visualizerData.isEmpty() && !data.isEmpty())
+        {
+            Q_Q(QnTwoWayAudioWidget);
+            q->updateGeometry();
+        }
+
+        m_visualizerData = animateVector(m_visualizerData, data, timeStepMs);
+        paintVisualizer(painter, visualizerRect, m_visualizerData, colors.visualizer);
     }
 }
 
 QSizeF QnTwoWayAudioWidgetPrivate::sizeHint(Qt::SizeHint which, const QSizeF& constraint, const QSizeF& baseValue) const
 {
-    if (m_state == Pressed)
+    if (m_state == Pressed && !m_visualizerData.isEmpty())
     {
-        qreal visualizerWidth = (kVisualizerLineWidth + kVisualizerLineOffset) * QnVoiceSpectrumAnalyzer::bandsCount();
+        qreal visualizerWidth = (kVisualizerLineWidth + kVisualizerLineOffset) * m_visualizerData.size();
         qreal minSize = button->geometry().width();
         qreal targetWidth = visualizerWidth + minSize * 1.5;
         return QSizeF(targetWidth, baseValue.height());
@@ -402,8 +410,6 @@ void QnTwoWayAudioWidgetPrivate::setState(HintState state)
     default:
         break;
     }
-    Q_Q(QnTwoWayAudioWidget);
-    q->updateGeometry();
 
     m_paintTimeStamp = 0;
     if (m_state == OK)
