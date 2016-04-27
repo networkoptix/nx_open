@@ -27,7 +27,7 @@ class thread
     public QnLongRunnable
 {
 public:
-    thread(nx::utils::MoveOnlyFunc<void()> threadFunc) throw(std::system_error)
+    thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false)
     :
         m_threadFunc(std::move(threadFunc))
     {
@@ -41,7 +41,7 @@ public:
     thread(const thread&) = delete;
     thread& operator=(const thread&) = delete;
 
-    void join() throw (std::system_error)
+    void join() noexcept(false)
     {
         if (get_id() == std::this_thread::get_id())
             throw std::system_error(
@@ -88,7 +88,7 @@ public:
     }
 
     template< class Function, class... Args >
-        explicit thread(Function&& f, Args&&... args) throw(std::system_error)
+        explicit thread(Function&& f, Args&&... args) noexcept(false)
     {
         auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
         m_actualThread = std::make_unique<detail::thread>(
@@ -106,7 +106,7 @@ public:
             std::terminate();
     }
 
-    thread& operator=(thread&& other)
+    thread& operator=(thread&& other) noexcept
     {
         if (this != &other)
         {
@@ -128,7 +128,7 @@ public:
         return m_actualThread->get_id();
     }
 
-    native_handle_type native_handle()
+    native_handle_type native_handle() noexcept
     {
         if (!m_actualThread)
             return (native_handle_type)nullptr;
@@ -136,7 +136,7 @@ public:
         return (native_handle_type)m_actualThread->systemThreadId();
     }
 
-    void join() throw (std::system_error)
+    void join() noexcept(false)
     {
         if (!joinable())
             throw std::system_error(
