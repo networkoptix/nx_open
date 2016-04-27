@@ -154,8 +154,7 @@ var Helper = function () {
     this.login = function(email, password) {
         var loginButton = element(by.linkText('Login'));
 
-        browser.get('/');
-        browser.waitForAngular();
+        h.get(h.urls.homepage);
         browser.sleep(500);
 
         loginButton.click();
@@ -163,7 +162,11 @@ var Helper = function () {
         this.loginFromCurrPage(email, password);
 
         // Check that element that is visible only for authorized user is displayed on page
-        expect(this.loginSuccessElement.isDisplayed()).toBe(true);
+        return h.loginSuccessElement.isDisplayed().then( function (isDisplayed) {
+            if (!isDisplayed) {
+                return protractor.promise.rejected('Login failed');
+            }
+        });
     };
 
     this.loginFromCurrPage = function(email, password) {
