@@ -13,12 +13,15 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
+#include "core/dataconsumer/audio_data_transmitter.h"
 
 #include <mutex>
 #include <map>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
+
+typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
@@ -42,7 +45,7 @@ public:
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
-
+    bool hasTwoWayAudio() const;
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
@@ -256,6 +259,8 @@ public:
 
     bool isCameraInfoSavedToDisk(int pool) const;
     void setCameraInfoSavedToDisk(int pool);
+
+    virtual QnAudioTransmitterPtr getAudioTransmitter();
 
 public slots:
     virtual void inputPortListenerAttached();

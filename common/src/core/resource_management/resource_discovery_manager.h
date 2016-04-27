@@ -109,6 +109,7 @@ public:
     
     void setLastDiscoveredResources(const QnResourceList& resources);
     QSet<QString> lastDiscoveredIds() const;
+    virtual bool processDiscoveredResources(QnResourceList& resources);
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -118,7 +119,6 @@ protected:
     unsigned int m_runNumber;
 
     virtual void run();
-    virtual bool processDiscoveredResources(QnResourceList& resources);
 
 signals:
     void localSearchDone();

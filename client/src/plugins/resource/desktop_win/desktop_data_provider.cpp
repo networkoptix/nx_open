@@ -356,7 +356,7 @@ int QnDesktopDataProvider::calculateBitrate()
     double bitrate = BASE_BITRATE;
 
     bitrate /=  1920.0*1080.0 / m_grabber->width() / m_grabber->height();
-    
+
     bitrate *= m_encodeQualuty;
     if (m_grabber->width() <= 320)
         bitrate *= 1.5;
@@ -417,7 +417,7 @@ bool QnDesktopDataProvider::init()
     m_videoCodecCtx->bit_rate = calculateBitrate();
     //m_videoCodecCtx->rc_buffer_size = m_videoCodecCtx->bit_rate;
     //m_videoCodecCtx->rc_max_rate = m_videoCodecCtx->bit_rate;
-    
+
     QString codec_prop;
 
     //if (videoCodecName != QLatin1String("libx264"))
@@ -456,7 +456,7 @@ bool QnDesktopDataProvider::init()
     }
 
 
-    if (m_captureResolution.width() > 0) 
+    if (m_captureResolution.width() > 0)
     {
         double srcAspect = m_grabber->screenWidth() / (double) m_grabber->screenHeight();
         double dstAspect = m_captureResolution.width() / (double) m_captureResolution.height();
@@ -535,7 +535,6 @@ bool QnDesktopDataProvider::init()
     //m_maxAudioJitter = m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num / 20;
 
 
-    m_grabber->start(QThread::HighestPriority);
     foreach(EncodedAudioInfo* info, m_audioInfo)
     {
         if (!info->start())
@@ -605,6 +604,13 @@ int QnDesktopDataProvider::processData(bool flush)
         putData(video);
     }
 
+    putAudioData();
+
+    return out_size;
+}
+
+void QnDesktopDataProvider::putAudioData()
+{
     // write all audio frames
     EncodedAudioInfo* ai = m_audioInfo.size() > 0 ? m_audioInfo[0] : 0;
     EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
@@ -671,9 +677,25 @@ int QnDesktopDataProvider::processData(bool flush)
             if (buffer2)
                 stereoAudioMux(buffer1, buffer2, stereoPacketSize / 2);
         }
+
+        if (!m_soundAnalyzer)
+        {
+            m_soundAnalyzer = QnVoiceSpectrumAnalyzer::instance();
+            m_soundAnalyzer->initialize(m_audioCodecCtx->sample_rate, m_audioCodecCtx->channels);
+        }
+        m_soundAnalyzer->processData(buffer1, m_audioCodecCtx->frame_size);
+
         int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_encodedAudioBuf, FF_MIN_BUFFER_SIZE, buffer1);
         if (aEncoded > 0)
         {
+            AVRational timeBaseNative;
+            timeBaseNative.num = 1;
+            timeBaseNative.den = 1000000;
+
+            AVRational timeBaseMs;
+            timeBaseMs.num = 1;
+            timeBaseMs.den = 1000;
+
             QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, aEncoded, m_audioCodecCtxPtr));
             audio->m_data.write((const char*) m_encodedAudioBuf, aEncoded);
             audio->compressionType = m_audioCodecCtx->codec_id;
@@ -685,8 +707,6 @@ int QnDesktopDataProvider::processData(bool flush)
             putData(audio);
         }
     }
-
-    return out_size;
 }
 
 void QnDesktopDataProvider::start(Priority priority)
@@ -709,53 +729,73 @@ bool QnDesktopDataProvider::isInitialized() const
     return m_isInitialized;
 }
 
+bool QnDesktopDataProvider::needVideoData() const
+{
+    QnMutexLocker mutex( &m_mutex );
+    for (const auto& consumer: m_dataprocessors)
+    {
+        if (consumer->needConfigureProvider())
+            return true;
+    }
+    return false;
+}
+
 void QnDesktopDataProvider::run()
 {
     while (!needToStop() || m_grabber->dataExist())
     {
-        if (needToStop() && !m_capturingStopped)
+        if (needVideoData())
         {
-            stopCapturing();
-            m_capturingStopped = true;
-        }
+            m_grabber->start(QThread::HighestPriority);
 
-        CaptureInfoPtr capturedData = m_grabber->getNextFrame();
-        if (!capturedData || !capturedData->opaque || capturedData->width == 0 || capturedData->height == 0)
-            continue;
-        m_grabber->capturedDataToFrame(capturedData, m_frame);
-
-        AVRational r;
-        r.num = 1;
-        r.den = 1000;
-        qint64 capturedPts = av_rescale_q(m_frame->pts, r, m_grabber->getFrameRate());
-
-
-        if (m_encodedFrames == 0)
-            m_encodedFrames = capturedPts;
-
-        //cl_log.log("captured pts=", capturedPts, cl_logALWAYS);
-
-        bool firstStep = true;
-        while (firstStep || capturedPts - m_encodedFrames >= MAX_VIDEO_JITTER)
-        {
-            m_frame->pts = m_encodedFrames;
-            if (processData(false) < 0)
+            if (needToStop() && !m_capturingStopped)
             {
-                cl_log.log(QLatin1String("Video encoding error. Stop recording."), cl_logWARNING);
-                break;
+                stopCapturing();
+                m_capturingStopped = true;
             }
-            //cl_log.log(QLatin1String("encode pts="), m_encodedFrames, cl_logALWAYS);
 
-            m_encodedFrames++;
-            firstStep = false;
+            CaptureInfoPtr capturedData = m_grabber->getNextFrame();
+            if (!capturedData || !capturedData->opaque || capturedData->width == 0 || capturedData->height == 0)
+                continue;
+            m_grabber->capturedDataToFrame(capturedData, m_frame);
+
+            AVRational r;
+            r.num = 1;
+            r.den = 1000;
+            qint64 capturedPts = av_rescale_q(m_frame->pts, r, m_grabber->getFrameRate());
+            if (m_encodedFrames == 0)
+                m_encodedFrames = capturedPts;
+
+            bool firstStep = true;
+            while (firstStep || capturedPts - m_encodedFrames >= MAX_VIDEO_JITTER)
+            {
+                m_frame->pts = m_encodedFrames;
+                if (processData(false) < 0)
+                {
+                    cl_log.log(QLatin1String("Video encoding error. Stop recording."), cl_logWARNING);
+                    break;
+                }
+                //cl_log.log(QLatin1String("encode pts="), m_encodedFrames, cl_logALWAYS);
+
+                m_encodedFrames++;
+                firstStep = false;
+            }
+        }
+        else
+        {
+            m_grabber->pleaseStop();
+            putAudioData();
         }
     }
     if (!m_capturingStopped)
         stopCapturing();
 
     cl_log.log(QLatin1String("flushing video buffer"), cl_logDEBUG2);
-    do {
-    } while (processData(true) > 0); // flush buffers
+    if (needVideoData())
+    {
+        do {
+        } while (processData(true) > 0); // flush buffers
+    }
 
     closeStream();
 }
@@ -830,7 +870,7 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* co
 {
     QnMutexLocker lock( &m_startMutex );
     removeDataProcessor(consumer);
-    if (processorsCount() == 0) 
+    if (processorsCount() == 0)
         pleaseStop();
 }
 
@@ -861,7 +901,7 @@ void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-        if (dp->canAcceptData()) 
+        if (dp->canAcceptData())
         {
             if (media->dataType == QnAbstractMediaData::VIDEO)
             {

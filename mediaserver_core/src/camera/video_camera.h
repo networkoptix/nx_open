@@ -50,10 +50,10 @@ public:
     void updateActivity();
 
     /* Mark some camera activity (RTSP client connection for example) */
-    void inUse(void* user);
+    virtual void inUse(void* user) override;
 
     /* Unmark some camera activity (RTSP client connection for example) */
-    void notInUse(void* user);
+    virtual void notInUse(void* user) override;
 
     //!Returns cache holding several last seconds of media stream
     /*!

@@ -22,6 +22,7 @@ public:
     bool isInitialized() const;
     QString lastErrorStr() const;
     virtual bool hasThread() const override { return false; }
+    virtual bool needConfigureProvider() const override;
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& /*data*/) { return true; }
 protected:

@@ -19,6 +19,7 @@
 
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
+#include <utils/media/voice_spectrum_analyzer.h>
 
 class CaptureAudioStream;
 class QnAbstractDataConsumer;
@@ -55,21 +56,19 @@ public:
 
 protected:
     virtual void run() override;
-
-private:
-    bool init();
-
 private:
     friend class CaptureAudioStream;
 
+    bool init();
     virtual void closeStream();
 
     qint64 currentTime() const;
     int calculateBitrate();
     int processData(bool flush);
+    void putAudioData();
     void stopCapturing();
     SpeexPreprocessState* createSpeexPreprocess();
-
+    bool needVideoData() const;
 private:
     class EncodedAudioInfo
     {
@@ -140,6 +139,7 @@ private:
 
     class QnDesktopAudioLayout;
     QSharedPointer<QnDesktopAudioLayout> m_audioLayout;
+    QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };

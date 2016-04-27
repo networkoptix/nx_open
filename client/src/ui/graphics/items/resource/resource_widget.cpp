@@ -19,8 +19,8 @@
 #include <utils/math/linear_combination.h>
 
 #include <core/resource/resource_media_layout.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/cursor_cache.h>
@@ -39,6 +39,7 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
+
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -52,7 +53,8 @@
 
 namespace
 {
-    const auto kButtonsSize = 24.0;
+    const qreal kButtonsSize = 24.0;
+
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -269,11 +271,14 @@ void QnResourceWidget::addInfoOverlay() {
 
         m_overlayWidgets.positionItem->setOptions(infoOptions);
         m_overlayWidgets.positionItem->setProperty(Qn::NoBlockMotionSelection, true);
+
         auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
         positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
         positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
-        positionOverlay->addItem(m_overlayWidgets.positionItem);
         positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
+        positionOverlay->addItem(m_overlayWidgets.positionItem);
+
+
         addOverlayWidget(positionOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.positionOverlay = positionOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.positionOverlay, false, false);
@@ -963,6 +968,11 @@ float QnResourceWidget::defaultAspectRatio() const {
     return noAspectRatio;
 }
 
+
+const QnResourceWidget::OverlayWidgets& QnResourceWidget::overlayWidgets() const
+{
+    return m_overlayWidgets;
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
