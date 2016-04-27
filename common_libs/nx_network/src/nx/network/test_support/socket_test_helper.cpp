@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 
 #include <utils/common/cpp14.h>
 #include <utils/common/string.h>
@@ -30,19 +31,6 @@ namespace
 
 //#define DEBUG_OUTPUT
 
-static QByteArray randomData(size_t size)
-{
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist;
-
-    QByteArray data(size, Qt::Uninitialized);
-    for (auto& it : data)
-        it = dist(gen);
-
-    return data;
-}
-
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
     TestTrafficLimitType limitType,
@@ -61,7 +49,7 @@ TestConnection::TestConnection(
     m_accepted(true)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = randomData( READ_BUF_SIZE );
+    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
 
     ++TestConnection_count;
 }
@@ -87,7 +75,7 @@ TestConnection::TestConnection(
     m_accepted(false)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = randomData( READ_BUF_SIZE );
+    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
 
     ++TestConnection_count;
 }
