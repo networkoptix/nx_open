@@ -35,6 +35,13 @@ angular.module('cloudApp')
                     $location.path(Config.redirectAuthorised);
                 });
             },
+            redirectToHome:function(){
+                this.get().then(function(){
+                    $location.path(Config.redirectAuthorised);
+                },function(){
+                    $location.path(Config.redirectUnauthorised);
+                })
+            },
 
             setEmail:function(email){
                 $rootScope.session.email = email;
