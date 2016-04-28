@@ -7,7 +7,7 @@
 #include <nx/utils/log/log.h>
 
 #include "proxy_video_decoder_utils.h"
-#include "proxy_video_decoder_gl_utils.cxx"
+#include "proxy_video_decoder_gl_utils.h"
 
 namespace nx {
 namespace media {
@@ -15,9 +15,6 @@ namespace media {
 namespace {
 
 // TODO mike: Use conf.h.
-// Configuration
-#define xENABLE_GL_LOG
-#define ENABLE_GL_FATAL_ERRORS
 static const bool USE_GUI_RENDERING = false;
 static const bool USE_SHARED_CTX = true;
 
@@ -285,8 +282,8 @@ int Impl::decodeFrameToYuvBuffer(
             yuvBuffer->u(), yuvBuffer->v(), yuvBuffer->uVLineSize());
     TIME_END
 #endif // 1
-        if (result < 0)
-            NX_LOG(lm("ERROR: ProxyDecoder::decodeToYuvPlanar() -> %1").arg(result), cl_logERROR);
+    if (result < 0)
+        NX_LOG(lm("ERROR: ProxyDecoder::decodeToYuvPlanar() -> %1").arg(result), cl_logERROR);
 
     return result;
 }
@@ -311,7 +308,7 @@ void Impl::renderYuvBufferToFbo(const YuvBuffer* yuvBuffer, FboPtr* outFbo)
     TIME_END
 #endif // 0
 
-        TIME_PUSH("t1");
+    TIME_PUSH("t1");
 
     TIME_BEGIN("renderYuvBufferToFbo::setData")
 #if 0 // NO_QT

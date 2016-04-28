@@ -1,40 +1,10 @@
-#pragma once
+#include "proxy_video_decoder_gl_utils.h"
+#if defined(ENABLE_PROXY_DECODER)
 
-//-------------------------------------------------------------------------------------------------
-// Public
-
-// Uses configuration:
-// #define ENABLE_GL_LOG
-// #define ENABLE_GL_FATAL_ERRORS
-
-#include <memory>
-
-#include <QtGui/QOpenGLFramebufferObject>
-#include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLTexture>
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
-
-#include "proxy_video_decoder_utils.h"
-
-// #define GL_GET_FUNCS(Q_OPENGL_CONTEXT_PTR) ...
-// #define GL_CHECK(BOOL_CALL) ... //< For CALL which returns bool - asserted to be true.
-// #define GL(CALL) ... //< For arbitrary CALL.
-// #define LOG_GL(OBJ) ...
-void logGlFbo(const char* tag);
-
-typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
-
-class FboManager;
-
-void checkGlFramebufferStatus();
-
-void debugGlGetAttribsAndAbort(QSize frameSize);
-void debugTextureTest();
-
-void debugLogPrecision();
-
-//-------------------------------------------------------------------------------------------------
+// TODO mike: Use conf.h.
+// Configuration
+#define ENABLE_GL_LOG
+#define ENABLE_GL_FATAL_ERRORS
 
 static const char* glErrorStr(GLenum err)
 {
@@ -52,7 +22,7 @@ static const char* glErrorStr(GLenum err)
     }
 }
 
-static void checkGlError(QOpenGLFunctions* funcs, const char* tag)
+void checkGlError(QOpenGLFunctions* funcs, const char* tag)
 {
     bool anyErrors = false;
     for (;;)
@@ -80,7 +50,7 @@ static void checkGlError(QOpenGLFunctions* funcs, const char* tag)
     }
 }
 
-static void logGlCall(const char *tag)
+void logGlCall(const char *tag)
 {
     #ifdef ENABLE_GL_LOG
         qWarning() << "OpenGL:" << tag;
@@ -88,38 +58,6 @@ static void logGlCall(const char *tag)
         QN_UNUSED(tag);
     #endif // ENABLE_GL_LOG
 }
-
-#define GL_GET_FUNCS(Q_OPENGL_CONTEXT_PTR) \
-    QOpenGLContext* qOpenGlContextPtr = (Q_OPENGL_CONTEXT_PTR); \
-    NX_CRITICAL(qOpenGlContextPtr); \
-    QOpenGLFunctions* funcs = qOpenGlContextPtr->functions(); \
-    NX_CRITICAL(funcs);
-
-#define GL(CALL) do \
-{ \
-    logGlCall(#CALL); \
-    checkGlError(funcs, "{prior to:}" #CALL); \
-    CALL; \
-    checkGlError(funcs, #CALL); \
-} while (0)
-
-#define GL_CHECK(BOOL_CALL) do \
-{ \
-    logGlCall(#BOOL_CALL); \
-    checkGlError(funcs, "{prior to:}" #BOOL_CALL); \
-    bool result = BOOL_CALL; \
-    if (!result) \
-        qWarning() << "OpenGL FAILED CALL:" << #BOOL_CALL << "-> false"; \
-    checkGlError(funcs, #BOOL_CALL); \
-    NX_CRITICAL(result); \
-} while (0)
-
-#define LOG_GL(OBJ) do \
-{ \
-    QLOG("OpenGL " #OBJ " BEGIN"); \
-    QLOG(OBJ->log()); \
-    QLOG("OpenGL " #OBJ " END"); \
-} while (0)
 
 void logGlFbo(const char* tag)
 {
@@ -137,62 +75,6 @@ void logGlFbo(const char* tag)
         QLOG(tag << ": current FBO ==" << curFbo);
     }
 }
-
-//-------------------------------------------------------------------------------------------------
-
-class FboManager
-{
-public:
-    FboManager(const QSize& frameSize, int queueSize)
-    :
-        m_frameSize(frameSize),
-        m_index(0),
-        m_queueSize(queueSize)
-    {
-        QLOG("FboManager::FboManager(frameSize:" << frameSize
-            << ", queueSize:" << queueSize << ")");
-    }
-
-    FboPtr getFbo()
-    {
-        while ((int) m_fboQueue.size() < m_queueSize)
-        {
-            logGlFbo("getFbo 1");
-            GL_GET_FUNCS(QOpenGLContext::currentContext());
-            GLint prevFbo = 0;
-            GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo));
-            QOpenGLFramebufferObject* fbo;
-
-            QOpenGLFramebufferObjectFormat fmt;
-            fmt.setMipmap(false);
-            fmt.setSamples(1);
-            fmt.setTextureTarget(GL_TEXTURE_2D);
-            fmt.setInternalTextureFormat(GL_RGBA);
-
-            GL(fbo = new QOpenGLFramebufferObject(m_frameSize, fmt));
-            NX_CRITICAL(fbo->isValid());
-            logGlFbo("getFbo 2");
-            m_fboQueue.push_back(FboPtr(fbo));
-            glBindFramebuffer(GL_FRAMEBUFFER, prevFbo);
-            logGlFbo("getFbo 3");
-        }
-
-        return m_fboQueue[m_index++ % m_fboQueue.size()];
-
-        //if (!m_fbo)
-        //    m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
-        //return m_fbo;
-    }
-
-private:
-    //FboPtr m_fbo;
-    std::vector<FboPtr> m_fboQueue;
-    QSize m_frameSize;
-    int m_index;
-    const int m_queueSize;
-};
-
-//-------------------------------------------------------------------------------------------------
 
 static const char* glFramebufferStatusStr(GLenum status)
 {
@@ -222,8 +104,6 @@ void checkGlFramebufferStatus()
         NX_CRITICAL(false);
     }
 }
-
-//-------------------------------------------------------------------------------------------------
 
 void debugTextureTest()
 {
@@ -387,3 +267,5 @@ void debugLogPrecision()
     glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_LOW_INT, range, &precision);
     fprintf(stderr, "Vertex lowp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
 }
+
+#endif // ENABLE_PROXY_DECODER
