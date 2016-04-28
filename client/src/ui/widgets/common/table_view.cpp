@@ -33,7 +33,7 @@ QSize QnTableView::viewportSizeHint() const
 
 bool QnTableView::edit(const QModelIndex& index, EditTrigger trigger, QEvent* event)
 {
-    if (trigger == QAbstractItemView::SelectedClicked && (this->editTriggers() & QAbstractItemView::DoubleClicked))
+    if (trigger == QAbstractItemView::SelectedClicked && this->editTriggers().testFlag(QAbstractItemView::DoubleClicked))
         return base_type::edit(index, QAbstractItemView::DoubleClicked, event);
 
     return base_type::edit(index, trigger, event);
@@ -51,6 +51,7 @@ bool QnTableView::event(QEvent* event)
     case QEvent::HoverLeave:
     case QEvent::HoverMove:
         hoverEvent(static_cast<QHoverEvent*>(event));
+        break;
     };
 
     return result;
