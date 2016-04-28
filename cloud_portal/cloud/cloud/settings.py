@@ -15,6 +15,7 @@ import os
 import re
 import json
 import sys
+from util.config import get_config
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -85,19 +86,23 @@ WSGI_APPLICATION = 'cloud.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+
+conf = get_config()
+cloud_db = conf['cloud_database']
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'nx_cloud',
-        'USER': 'root',
-        'PASSWORD': '',  # 'KME2m9TjsvDugs',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'HOST': cloud_db['host'],
+        'PORT': cloud_db['port'],
+        'USER': cloud_db['username'],
+        'PASSWORD': cloud_db['password'],
+        'NAME': cloud_db['database'],
         'OPTIONS': {
             'sql_mode': 'TRADITIONAL',
             'charset': 'utf8',
             'init_command': 'SET '
-                'storage_engine=INNODB,'
                 'character_set_connection=utf8,'
                 'collation_connection=utf8_bin'
         }
@@ -168,7 +173,7 @@ REST_FRAMEWORK = {
 }
 
 CLOUD_CONNECT = {
-    'url': 'http://cloud-demo.hdw.mx:3346/cdb',
+    'url': conf['cloud_db']['url'],
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
     'customization': 'default',
@@ -208,5 +213,10 @@ PASSWORD_REQUIREMENTS = {
     'requiredRegex': re.compile("^[\x21-\x7E][\x20-\x7E]+[\x21-\x7E]$"),
     'commonList': 'static/scripts/commonPasswordsList.json'
 }
-with open(PASSWORD_REQUIREMENTS['commonList']) as data_file:
-    PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)
+
+common_list_file = PASSWORD_REQUIREMENTS['commonList']
+if os.path.isfile(common_list_file):
+    with open(common_list_file) as data_file:
+        PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)
+else:
+    print >> sys.stderr, "Warning: Can't read from {}".format(common_list_file)

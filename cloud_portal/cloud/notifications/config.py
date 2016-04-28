@@ -1,3 +1,7 @@
+from util.config import get_config
+
+conf = get_config()
+
 notifications_config = {
     'activate_account': {
         'engine': 'email',
@@ -18,5 +22,5 @@ notifications_config = {
 }
 
 notifications_module_config = {
-    'portal_url': 'http://cloud-demo.hdw.mx/static/index.html#'
+    'portal_url': conf['cloud_portal']['url']
 }

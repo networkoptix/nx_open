@@ -6,6 +6,7 @@ front_end/.sass-cache
 front_end/bower_components
 app/bower_components
 
+env
 cloud/.idea
 cloud/static
 .DS_Store
