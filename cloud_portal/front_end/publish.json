@@ -5,8 +5,8 @@
     "publish": {
         "options": {
             "host": "cloud-demo.hdw.mx",
-            "username": "root",
-            "password": "VhhK4l1SwbMTHlLIWlBNXHLIBv0S1SNA"
+            "username": "portal",
+            "password": "qweasd123"
         },
         "files": [
             {
