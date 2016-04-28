@@ -284,7 +284,7 @@ public:
         m_minChunkLength = minChunkLength;
         m_rect = rect;
 
-        qFill(m_weights, 0);
+        std::fill(m_weights.begin(), m_weights.end(), 0);
     }
 
     void paintChunk(qint64 length, Qn::TimePeriodContent content)
@@ -347,7 +347,7 @@ private:
         m_pendingPosition = rightPosition;
         m_pendingLength = 0;
 
-        qFill(m_weights, 0);
+        std::fill(m_weights.begin(), m_weights.end(), 0);
     }
 
     QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1>& colors) const

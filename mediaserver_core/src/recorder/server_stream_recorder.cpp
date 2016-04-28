@@ -494,7 +494,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             int scheduleTimeMs = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600+dt.time().minute()*60+dt.time().second();
             scheduleTimeMs *= 1000;
 
-            QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
+            QnScheduleTaskList::iterator itr = std::upper_bound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
             if (itr > m_schedule.begin())
                 --itr;
 

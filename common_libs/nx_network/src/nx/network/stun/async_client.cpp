@@ -7,7 +7,7 @@
 namespace nx {
 namespace stun {
 
-const AbstractAsyncClient::Timeouts AbstractAsyncClient::DEFAULT_TIMEOUTS = { 3000, 3000, 60000 };
+const AbstractAsyncClient::Settings AbstractAsyncClient::kDefaultSettings;
 
 boost::optional< QString >
     AbstractAsyncClient::hasError(SystemError::ErrorCode code, const Message& message)
@@ -28,10 +28,11 @@ boost::optional< QString >
     return boost::none;
 }
 
-AsyncClient::AsyncClient(Timeouts timeouts):
-    m_timeouts(timeouts),
+AsyncClient::AsyncClient(Settings timeouts):
+    m_settings(timeouts),
     m_useSsl(false),
-    m_state(State::disconnected)
+    m_state(State::disconnected),
+    m_timer(m_settings.reconnectPolicy)
 {
 }
 
@@ -73,6 +74,22 @@ bool AsyncClient::ignoreIndications(int method)
 {
     QnMutexLocker lock(&m_mutex);
     return m_indicationHandlers.erase(method);
+}
+
+void AsyncClient::addOnReconnectedHandler(ReconnectHandler handler, void* client)
+{
+    NX_CRITICAL(client);
+
+    QnMutexLocker lock(&m_mutex);
+    m_reconnectHandlers.emplace(client, std::move(handler));
+}
+
+void AsyncClient::removeOnReconnectedHandlers(void* client)
+{
+    NX_CRITICAL(client);
+
+    QnMutexLocker lock(&m_mutex);
+    m_reconnectHandlers.erase(client);
 }
 
 void AsyncClient::sendRequest(Message request, RequestHandler handler)
@@ -166,8 +183,8 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
                 { onConnectionComplete( code ); };
 
             if (!m_connectingSocket->setNonBlockingMode( true ) ||
-                !m_connectingSocket->setSendTimeout( m_timeouts.send ) ||
-                // TODO: #mu Use m_timeouts.recv on timer when request is sent
+                !m_connectingSocket->setSendTimeout( m_settings.sendTimeout ) ||
+                // TODO: #mu Use m_timeouts.recvTimeout on timer when request is sent
                 !m_connectingSocket->setRecvTimeout( 0 ))
             {
                 m_connectingSocket->post(
@@ -215,16 +232,18 @@ void AsyncClient::closeConnectionImpl(
     lock->relock();
 
     if( m_state != State::terminated )
-        m_timer.start(
-            std::chrono::milliseconds(m_timeouts.reconnect),
+    {
+        m_timer.scheduleNextTry(
             [this]
             {
+                NX_LOGX(lm("Try to restore mediator connection..."), cl_logDEBUG1);
                 QnMutexLocker lock( &m_mutex );
                 openConnectionImpl( &lock );
             });
+    }
 }
 
-void AsyncClient::dispatchRequestsInQueue(QnMutexLockerBase* lock)
+void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
 {
     static_cast< void >( lock );
     while( !m_requestQueue.empty() )
@@ -267,6 +286,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
+    m_timer.reset();
     NX_ASSERT(!m_baseConnection);
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
@@ -277,6 +297,11 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     m_state = State::connected;
     dispatchRequestsInQueue( &lock );
+
+    const auto reconnectHandlers = m_reconnectHandlers;
+    lock.unlock();
+    for( const auto& it: reconnectHandlers )
+        it.second();
 }
 
 void AsyncClient::processMessage(Message message)

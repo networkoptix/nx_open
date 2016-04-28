@@ -385,7 +385,7 @@
             </activation>
             <modules>
                 <module>unit_tests/cloud_connectivity_ut</module>
-                <module>unit_tests/cloud_db_ut</module>
+                <!--<module>unit_tests/cloud_db_ut</module>-->
                 <module>unit_tests/common_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
                 <module>unit_tests/mediaserver_core_ut</module>
@@ -506,7 +506,7 @@
             <properties>
                 <machine.type>X86</machine.type>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>

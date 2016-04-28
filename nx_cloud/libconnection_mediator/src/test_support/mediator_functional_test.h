@@ -6,7 +6,6 @@
 #ifndef NX_MEDIATOR_FUNCTIONAL_TEST_H
 #define NX_MEDIATOR_FUNCTIONAL_TEST_H
 
-#include <future>
 #include <vector>
 
 #include <QtCore/QDir>
@@ -14,6 +13,7 @@
 
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/std/thread.h>
 
 #include "../cloud_data_provider.h"
 #include "../mediator_process_public.h"
@@ -65,8 +65,8 @@ private:
     int m_port;
     std::vector<char*> m_args;
     std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;
-    std::future<int> m_mediatorProcessFuture;
-    std::promise<bool /*result*/> m_mediatorStartedPromise;
+    nx::utils::thread m_mediatorProcessThread;
+    nx::utils::promise<bool /*result*/> m_mediatorStartedPromise;
     //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
 };

@@ -20,7 +20,7 @@ TEST(PcpMessaging, RequestHeader)
     const auto h2 = dsh::fromBytes<RequestHeader>(a);
     EXPECT_EQ(VERSION,       h2.version);
     EXPECT_EQ(Opcode::MAP,   h2.opcode);
-    EXPECT_EQ(0x12345678,    h2.lifeTime);
+    EXPECT_EQ((size_t)0x12345678,    h2.lifeTime);
     EXPECT_EQ(ipBin,         h2.clientIp);
 }
 
@@ -35,8 +35,8 @@ TEST(PcpMessaging, ResponseHeadeer)
     EXPECT_EQ(VERSION,              h2.version);
     EXPECT_EQ(Opcode::PEER,         h2.opcode);
     EXPECT_EQ(ResultCode::SUCCESS,  h2.resultCode);
-    EXPECT_EQ(0x12345678,           h2.lifeTime);
-    EXPECT_EQ(0xAABBCCDD,           h2.epochTime);
+    EXPECT_EQ((size_t)0x12345678,           h2.lifeTime);
+    EXPECT_EQ((size_t)0xAABBCCDD,           h2.epochTime);
 }
 
 TEST(PcpMessaging, MapMessage)

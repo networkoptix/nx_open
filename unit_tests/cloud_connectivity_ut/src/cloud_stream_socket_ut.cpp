@@ -73,7 +73,7 @@ TEST_F(CloudStreamSocketTest, simple)
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
-        ASSERT_EQ(bytesToSendThroughConnection, bytesRead);
+        ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
     }
 
     // also try to connect just by system name
@@ -83,7 +83,7 @@ TEST_F(CloudStreamSocketTest, simple)
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
-        ASSERT_EQ(bytesToSendThroughConnection, bytesRead);
+        ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
     }
 
     server.pleaseStopSync();
@@ -298,12 +298,12 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
         auto sock = std::make_unique<CloudStreamSocket>();
 
         enum class SocketState {init, connected, closed};
-        std::atomic<SocketState> socketState = SocketState::init;
+        std::atomic<SocketState> socketState(SocketState::init);
 
-        std::thread sendThread(
+        nx::utils::thread sendThread(
             [&sock, targetAddress = tcpServer.addressBeingListened(), &socketState]
             {
-                static const char testBuffer[16*1024];
+                char testBuffer[16*1024];
 
                 if (!sock->isConnected())
                 {
@@ -314,12 +314,13 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
                 while (!sock->isClosed() && sock->isConnected())
                 {
                     int bytesSent = sock->send(testBuffer, sizeof(testBuffer));
-                    int x = 0;
+                    if (bytesSent == -1)
+                        continue;
                 }
             });
 
         //read thread
-        std::thread recvThread(
+        nx::utils::thread recvThread(
             [&sock, &socketState]
             {
                 char readBuffer[16 * 1024];
@@ -335,7 +336,8 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
                         break;
 
                     int bytesReceived = sock->recv(readBuffer, sizeof(readBuffer));
-                    int x = 0;
+                    if (bytesReceived == -1)
+                        continue;
                 }
             });
 

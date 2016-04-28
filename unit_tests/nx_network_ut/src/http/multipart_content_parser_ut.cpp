@@ -269,7 +269,7 @@ TEST( HttpMultipartContentParser, unSizedData )
                 parser.processData( QnByteArrayConstRef(
                     testData,
                     pos,
-                    pos + dataStep <= testData.size() ? dataStep : QnByteArrayConstRef::npos ) );
+                    pos + dataStep <= (size_t)testData.size() ? dataStep : QnByteArrayConstRef::npos ) );
             parser.flush();
 
             ASSERT_EQ( readFrames.size(), testFrames.size() );

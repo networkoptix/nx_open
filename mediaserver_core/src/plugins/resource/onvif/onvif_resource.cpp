@@ -132,7 +132,7 @@ public:
         if (isH264) {
             for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
                 h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
-            qSort(h264Profiles);
+            std::sort(h264Profiles.begin(), h264Profiles.end());
 
             if (resp.Options->H264->FrameRateRange)
                 frameRateMax = resp.Options->H264->FrameRateRange->Max;
@@ -1062,7 +1062,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsLocal& o
 {
     QnMutexLocker lock( &m_mutex );
     m_secondaryResolutionList = opts.resolutions;
-    qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
+    std::sort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
 
 void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsLocal& opts) {
@@ -1115,7 +1115,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     {
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
 
     }
 
@@ -1149,7 +1149,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     {
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
     }
 
     QnMutexLocker lock( &m_mutex );
@@ -1806,7 +1806,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
-    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
+    std::sort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
     /*
     if (optionsList.size() <= m_channelNumer)

@@ -10,14 +10,18 @@
 #include <random>
 #include <chrono>
 #include <atomic>
+#include <thread>
 #include <boost/bimap.hpp>
 
 #include <QElapsedTimer>
+
+#include <nx/utils/std/thread.h>
 
 //#include <server/server_globals.h>
 #include "utils/media_db/media_db.h"
 
 #include "device_file_catalog.h"
+
 
 class QnStorageDb: public nx::media_db::DbHelperHandler 
 {
@@ -104,7 +108,7 @@ private:
     std::mt19937 m_gen;
 
     std::chrono::system_clock::time_point m_vacuumTimePoint;
-    std::thread m_vacuumThread;
+    nx::utils::thread m_vacuumThread;
     std::atomic<bool> m_vacuumThreadRunning;
     mutable QnMutex m_vacuumMutex;
 };

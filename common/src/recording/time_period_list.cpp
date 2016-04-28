@@ -28,7 +28,7 @@ QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 time
     if (isEmpty())
         return end();
 
-    const_iterator itr = qUpperBound(cbegin(), cend(), timeMs);
+    const_iterator itr = std::upper_bound(cbegin(), cend(), timeMs);
     if (itr != begin())
         --itr;
 
@@ -437,7 +437,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 
     iterator iter = basePeriods.begin();
     for (const QnTimePeriod& period: appendingPeriods) {
-        iter = qUpperBound(iter, basePeriods.end(), period.startTimeMs);
+        iter = std::upper_bound(iter, basePeriods.end(), period.startTimeMs);
         if (iter != basePeriods.begin())
             --iter;
 

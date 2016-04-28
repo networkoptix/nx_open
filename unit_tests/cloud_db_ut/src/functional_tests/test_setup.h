@@ -14,7 +14,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <cdb/connection.h>
 #include <cloud_db_process_public.h>
 

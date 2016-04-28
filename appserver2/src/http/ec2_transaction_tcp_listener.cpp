@@ -248,9 +248,12 @@ void QnTransactionTcpProcessor::run()
         if( base64EncodingRequiredHeaderIter != d->request.headers.end() )
             d->response.headers.insert( *base64EncodingRequiredHeaderIter );
 
+
+        sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
+
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
-            d->socket,
+            std::move(d->socket),
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
@@ -258,12 +261,9 @@ void QnTransactionTcpProcessor::run()
             contentEncoding,
             ttFinishCallback
             );
-        sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
         if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
             QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
-
-        d->socket.clear();
     }
 }
 
