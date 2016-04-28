@@ -165,12 +165,13 @@ namespace
 
 
 QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner) :
-    q_ptr(owner),
     button(new QnImageButtonWidget(lit("two_way_audio"), owner)),
     hint(new GraphicsLabel(owner)),
     camera(),
     colors(),
 
+    q_ptr(owner),
+    
     m_started(false),
     m_state(OK),
     m_requestHandle(0),
