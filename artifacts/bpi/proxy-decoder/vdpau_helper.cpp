@@ -67,7 +67,7 @@ static VdpDevice getVdpDeviceX11()
     }
 
     int stderrFile = -1;
-    if (SUPPRESS_X11_LOG_VDPAU())
+    if (suppressX11LogVdpau())
     {
         // Redirect stderr to /dev/null temporarily to prevent libvdpau console spam.
         int devNullFile = open("/dev/null", O_WRONLY);
@@ -80,7 +80,7 @@ static VdpDevice getVdpDeviceX11()
     VDP(vdp_device_create_x11(
         pXDisplay,  DefaultScreen(pXDisplay), &vdpDevice, &vdp_get_proc_address));
 
-    if (SUPPRESS_X11_LOG_VDPAU())
+    if (suppressX11LogVdpau())
     {
         dup2(stderrFile, STDERR_FILENO);
         close(stderrFile);
@@ -166,7 +166,7 @@ static void getProcAddresses(VdpDevice vdpDevice)
 
 VdpDevice createVdpDevice()
 {
-    VdpDevice vdpDevice = ENABLE_X11_VDPAU() ?  getVdpDeviceX11() : getVdpDeviceWithoutX11();
+    VdpDevice vdpDevice = enableX11Vdpau() ?  getVdpDeviceX11() : getVdpDeviceWithoutX11();
     getProcAddresses(vdpDevice);
     return vdpDevice;
 }

@@ -429,10 +429,10 @@ void Impl::convertYuvToRgb(uint8_t* argbBuffer, int argbLineSize)
     //  86 ms Y_ONLY FULL
     //  12 ms Y_ONLY PART
 
-    const int y0 = conf.ENABLE_RGB_PART_ONLY ? (m_frameHeight / 3) : 0;
-    const int yEnd = conf.ENABLE_RGB_PART_ONLY ? (m_frameHeight * 2 / 3) : m_frameHeight;
-    const int x0 = conf.ENABLE_RGB_PART_ONLY ? (m_frameWidth / 3) : 0;
-    const int xEnd = conf.ENABLE_RGB_PART_ONLY ? (m_frameWidth * 2 / 3) : m_frameWidth;
+    const int y0 = conf.enableRgbPartOnly ? (m_frameHeight / 3) : 0;
+    const int yEnd = conf.enableRgbPartOnly ? (m_frameHeight * 2 / 3) : m_frameHeight;
+    const int x0 = conf.enableRgbPartOnly ? (m_frameWidth / 3) : 0;
+    const int xEnd = conf.enableRgbPartOnly ? (m_frameWidth * 2 / 3) : m_frameWidth;
 
     uint8_t* pYSrc = m_yBufferStart + m_yLineSize * y0;
     uint8_t* pDestLine = argbBuffer + argbLineSize * y0;
@@ -442,7 +442,7 @@ void Impl::convertYuvToRgb(uint8_t* argbBuffer, int argbLineSize)
 
     for (int y = y0; y < yEnd; ++y)
     {
-        if (conf.ENABLE_RGB_Y_ONLY)
+        if (conf.enableRgbYOnly)
         {
             for (int x = x0; x < xEnd; ++x)
                 ((uint32_t*) pDestLine)[x] = pYSrc[x]; //< Convert byte to 32-bit.
@@ -556,7 +556,7 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
     int result = decodeFrame(compressedFrame, outPts, &renderState);
     if (result > 0)
     {
-        if (!conf.DISABLE_GET_BITS)
+        if (!conf.disableGetBits)
         {
             void* const dest[3] = {yBuffer, vBuffer, uBuffer};
             const uint32_t pitches[3] = {
@@ -568,7 +568,7 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
                 VDP_YCBCR_FORMAT_YV12, dest, pitches));
             TIME_END(vdp_video_surface_get_bits_y_cb_cr);
 
-            if (conf.ENABLE_YUV_DUMP)
+            if (conf.enableYuvDump)
             {
                 debugDumpYuvSurfaceToFiles(DEBUG_FRAME_PATH, renderState->surface,
                     yBuffer, yLineSize, uBuffer, vBuffer, uVLineSize);
@@ -599,7 +599,7 @@ int Impl::decodeToYuvNative(
         YuvNative yuvNative;
         assert(renderState->surface != VDP_INVALID_HANDLE);
         getVideoSurfaceYuvNative(renderState->surface, &yuvNative);
-        if (conf.ENABLE_LOG_YUV_NATIVE)
+        if (conf.enableLogYuvNative)
             logYuvNative(&yuvNative);
 
         *outBuffer = (uint8_t*) yuvNative.virt;

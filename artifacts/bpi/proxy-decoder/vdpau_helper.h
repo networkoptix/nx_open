@@ -1,9 +1,9 @@
 #pragma once
 
 // Configuration: should be defined elsewhere in the project which uses vdpau_helper.
-extern bool ENABLE_LOG_VDPAU();
-extern bool ENABLE_X11_VDPAU();
-extern bool SUPPRESS_X11_LOG_VDPAU();
+extern bool outputVdpauCalls();
+extern bool enableX11Vdpau();
+extern bool suppressX11LogVdpau();
 
 #include <stdio.h>
 #include <stdint.h>
@@ -45,7 +45,7 @@ void checkedVdpCall(VdpStatus status, const char* funcName);
  */
 #define VDP(CALL) do \
 { \
-    if (ENABLE_LOG_VDPAU()) \
+    if (outputVdpauCalls()) \
         fprintf(stderr, "VDPAU CALL: %s\n", #CALL); \
     checkedVdpCall(CALL, #CALL); \
 } while(0)

@@ -3,33 +3,38 @@
 #include <string>
 #include <vector>
 
+namespace nx {
+namespace utils {
+
 /**
  * Mechanism for bool configuration variables with initial values defined in the code, which can
  * be overridden by creating empty .flag files in system temp directory named as follows:
- * mymodule_<0|1>_MY_FLAG.flag
+ * <pre><code>
+ *     mymodule_<0|1>_myFlag.flag
+ * </code></pre>
  *
  * To use, define a derived class and its instance as follows:
  * <pre><code>
  *
- *     class MyModuleConf: public Conf
+ *     class MyModuleFlagConfig: public nx::utils::FlagConfig
  *     {
  *     public:
- *         using Conf::Conf;
- *         FLAG(0, MY_FLAG); //< Here 0 stands for 'false' as default value.
+ *         using FlagConfig::FlagConfig;
+ *         NX_FLAG(0, myFlag); //< Here 0 stands for 'false' as default value.
  *     };
- *     MyModuleConf conf("mymodule");
+ *     MyModuleFlagConfig conf("mymodule");
  *
  * </code></pre>
- * In the code, use conf.MY_CONF_VAR to test the value.
+ * In the code, use conf.myFlag to test the value.
  */
-class Conf // abstract
+class FlagConfig // abstract
 {
 public:
     /** @param moduleName Is a prefix for .flag files. */
-    Conf(const char* moduleName);
+    FlagConfig(const char* moduleName);
 
-    /** Called by FLAG() macro. */
-    void regFlag(bool* pFlag, bool defaultValue, const char* flagName);
+    /** Called by FLAG() macro; @return defaultValue. */
+    bool regFlag(bool* pFlag, bool defaultValue, const char* flagName);
 
     /** Scan .flag files and set each variable accordingly, logging the values to std::cerr. */
     void reload();
@@ -51,8 +56,12 @@ private:
     std::vector<Flag> m_flags;
 
 private:
-    std::string flagFilename(const char* value, const char* flagName);
+    void printHeader() const;
+    std::string flagFilename(const char* value, const char* flagName) const;
     void reloadFlag(const Flag& flag, bool printLog);
 };
 
-#define FLAG(DEFAULT, NAME) bool NAME = (regFlag(&NAME, DEFAULT, #NAME) /*operator,*/, DEFAULT)
+#define NX_FLAG(DEFAULT, NAME) bool NAME = regFlag(&NAME, DEFAULT, #NAME)
+
+} // namespace utils
+} // namespace nx

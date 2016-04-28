@@ -1,16 +1,22 @@
-#include "conf.h"
+#include "flag_config.h"
 
-#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <cstring>
+
+namespace nx {
+namespace utils {
+
+namespace {
 
 static bool fileExists(const char* filename)
 {
     return static_cast<bool>(std::ifstream(filename));
 }
 
-Conf::Conf(const char* moduleName)
+} // namespace
+
+FlagConfig::FlagConfig(const char* moduleName)
 :
     m_moduleName(moduleName)
 {
@@ -31,19 +37,29 @@ Conf::Conf(const char* moduleName)
             }
         }
     }
+
+    printHeader();
 }
 
-void Conf::regFlag(bool* pFlag, bool defaultValue, const char* flagName)
+void FlagConfig::printHeader() const
+{
+    std::cerr << m_moduleName << " configuration (touch "
+        << flagFilename("<0|1>", "<CONF>") << " to override):\n";
+}
+
+bool FlagConfig::regFlag(bool* pFlag, bool defaultValue, const char* flagName)
 {
     m_flags.push_back(Flag{pFlag, defaultValue, flagName});
+    reloadFlag(m_flags.back(), /*printLog*/ true);
+    return defaultValue;
 }
 
-std::string Conf::flagFilename(const char* value, const char* flagName)
+std::string FlagConfig::flagFilename(const char* value, const char* flagName) const
 {
     return std::string(m_tempPath) + m_moduleName + "_" + value + "_" + flagName + ".flag";
 }
 
-void Conf::reloadFlag(const Flag& flag, bool printLog)
+void FlagConfig::reloadFlag(const Flag& flag, bool printLog)
 {
     const bool exists1 = fileExists(flagFilename("1", flag.name).c_str());
     const bool exists0 = fileExists(flagFilename("0", flag.name).c_str());
@@ -60,7 +76,7 @@ void Conf::reloadFlag(const Flag& flag, bool printLog)
     }
 }
 
-void Conf::reloadSingleFlag(bool* pFlag)
+void FlagConfig::reloadSingleFlag(bool* pFlag)
 {
     for (const auto& flag: m_flags)
     {
@@ -73,12 +89,12 @@ void Conf::reloadSingleFlag(bool* pFlag)
     std::cerr << m_moduleName << " configuration WARNING: Flag to reload not found.\n";
 }
 
-void Conf::reload()
+void FlagConfig::reload()
 {
-    std::cerr << m_moduleName << " configuration (touch "
-        << flagFilename("<0|1>", "<CONF>") << " to override):\n";
-    std::cerr << "{\n";
+    printHeader();
     for (const auto& item: m_flags)
         reloadFlag(item, /*printLog*/ true);
-    std::cerr << "}\n";
 }
+
+} // namespace utils
+} // namespace nx

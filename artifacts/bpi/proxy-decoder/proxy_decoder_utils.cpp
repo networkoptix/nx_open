@@ -5,21 +5,21 @@
 
 #include "proxy_decoder.h"
 
-ProxyDecoderConf conf("proxydecoder");
+ProxyDecoderFlagConfig conf("proxydecoder");
 
-bool ENABLE_LOG_VDPAU()
+bool outputVdpauCalls()
 {
-    return conf.ENABLE_LOG_VDPAU;
+    return conf.outputVdpauCalls;
 }
 
-bool ENABLE_X11_VDPAU()
+bool enableX11Vdpau()
 {
-    return conf.ENABLE_X11_VDPAU;
+    return conf.enableX11Vdpau;
 }
 
-bool SUPPRESS_X11_LOG_VDPAU()
+bool suppressX11LogVdpau()
 {
-    return conf.SUPPRESS_X11_LOG_VDPAU;
+    return conf.suppressX11LogVdpau;
 }
 
 long getTimeMs()
@@ -28,10 +28,10 @@ long getTimeMs()
         std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-void logTimeMs(long oldTimeMs, const char* message)
+void logTimeMs(long oldTimeMs, const char* tag)
 {
     long timeMs = getTimeMs();
-    std::cerr << "TIME ms: " << (timeMs - oldTimeMs) << " [" << message << "]\n";
+    std::cerr << "TIME ms: " << (timeMs - oldTimeMs) << " [" << tag << "]\n";
 }
 
 void debugDrawCheckerboardArgb(
@@ -140,8 +140,8 @@ std::string debugDumpRenderStateFlags(const vdpau_render_state* renderState)
 
 ProxyDecoder* ProxyDecoder::create(int frameWidth, int frameHeight)
 {
-    conf.reloadSingleFlag(&conf.ENABLE_STUB);
-    if (conf.ENABLE_STUB)
+    conf.reloadSingleFlag(&conf.enableStub);
+    if (conf.enableStub)
         return createStub(frameWidth, frameHeight);
     else
         return createImpl(frameWidth, frameHeight);

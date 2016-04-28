@@ -1,31 +1,30 @@
 #pragma once
 
-#include "conf.h"
-
-class ProxyDecoderConf: public Conf
+#include "flag_config.h"
+class ProxyDecoderFlagConfig: public nx::utils::FlagConfig
 {
 public:
-    using Conf::Conf;
+    using nx::utils::FlagConfig::FlagConfig;
 
-    FLAG(0, ENABLE_STUB);
+    NX_FLAG(0, enableStub);
 
     // vdpau_helper
-    FLAG(0, ENABLE_LOG_VDPAU); //< Log each VDPAU call (errors are logged anyway).
-    FLAG(0, ENABLE_X11_VDPAU); //< Open X11 Display for VDPAU (otherwise, supply null for Display).
-    FLAG(0, SUPPRESS_X11_LOG_VDPAU); //< If ENABLE_X11_VDPAU, do not suppress X logging to stderr.
+    NX_FLAG(0, outputVdpauCalls); //< Log each VDPAU call (errors are logged anyway).
+    NX_FLAG(0, enableX11Vdpau); //< Open X11 Display for VDPAU (otherwise, use null for Display).
+    NX_FLAG(0, suppressX11LogVdpau); //< If enableX11Vdpau, do not suppress X logging to stderr.
 
     // proxy_decoder_utils
-    FLAG(0, ENABLE_LOG);
-    FLAG(0, ENABLE_TIME);
+    NX_FLAG(0, enableOutput);
+    NX_FLAG(0, enableTime);
 
     // proxy_decoder_impl
-    FLAG(0, DISABLE_GET_BITS); //< Avoid calling ...get_bits... (thus no picture).
-    FLAG(1, ENABLE_RGB_Y_ONLY); //< Convert only Y to Blue, setting Red and Green to 0.
-    FLAG(1, ENABLE_RGB_PART_ONLY); //< Convert to RGB only a part of the frame.
-    FLAG(0, ENABLE_YUV_DUMP); //< Dump frames in both Native and Planar YUV to files.
-    FLAG(0, ENABLE_LOG_YUV_NATIVE); //< Log struct returned from vdpau with native data ref.
+    NX_FLAG(0, disableGetBits); //< Avoid calling ...get_bits... (thus no picture).
+    NX_FLAG(1, enableRgbYOnly); //< Convert only Y to Blue, setting Red and Green to 0.
+    NX_FLAG(1, enableRgbPartOnly); //< Convert to RGB only a part of the frame.
+    NX_FLAG(0, enableYuvDump); //< Dump frames in both Native and Planar YUV to files.
+    NX_FLAG(0, enableLogYuvNative); //< Log struct returned from vdpau with native data ref.
 };
-extern ProxyDecoderConf conf;
+extern ProxyDecoderFlagConfig conf;
 
 // Configuration: should be defined before including this header.
 //#define LOG_PREFIX "<ModuleName>: "
@@ -54,16 +53,14 @@ struct EndWithEndl
 
 } // namespace
 
-#define LOG if (!conf.ENABLE_LOG) {} else EndWithEndl() /*operator,*/, std::cerr << LOG_PREFIX
+#define LOG if (!conf.enableOutput) {} else EndWithEndl() /*operator,*/, std::cerr << LOG_PREFIX
 
 #define PRINT EndWithEndl() /*operator,*/, std::cerr
 
 long getTimeMs();
-
-void logTimeMs(long oldTime, const char* message);
-
-#define TIME_BEGIN(TAG) long TIME_##TAG = conf.ENABLE_TIME ? getTimeMs() : 0
-#define TIME_END(TAG) if(conf.ENABLE_TIME) logTimeMs(TIME_##TAG, #TAG)
+void logTimeMs(long oldTime, const char* tag);
+#define TIME_BEGIN(TAG) long TIME_##TAG = conf.enableTime ? getTimeMs() : 0
+#define TIME_END(TAG) if(conf.enableTime) logTimeMs(TIME_##TAG, #TAG)
 
 /**
  * Draw a colored checkerboard in RGB.
