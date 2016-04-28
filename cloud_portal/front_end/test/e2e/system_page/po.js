@@ -26,7 +26,7 @@ var SystemPage = function () {
     this.ownedSystem = element.all(by.cssContainingText('h2', this.systemName)).first();
 
     this.systemNameElem = element(by.css('h1'));
-    this.systemOwnElem = element.all(by.css('.panel')).get(0).element(by.css('h2')); // TODO: add better id here
+    this.systemOwnElem = element.all(by.css('.panel')).get(0).all(by.css('h2,h3'));
     this.openInNxButton = element(by.buttonText('Open in Nx Witness'));
     this.shareButton = element(by.partialButtonText('Share'));
     this.emailField = element(by.model('share.accountEmail'));

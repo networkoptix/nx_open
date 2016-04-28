@@ -86,7 +86,7 @@ describe('Login with incorrect credentials', function () {
         p.helper.forms.restorePassEmail.sendLinkToEmail(email);
         p.helper.getEmailedLink(email, p.helper.emailSubjects.restorePass, 'restore_password').then(function(url) {
             p.helper.get(url);
-            p.helper.forms.restorePassPassword.setNewPassword(email);
+            p.helper.forms.restorePassPassword.setNewPassword(p.helper.userPassword);
             p.helper.get(url);
             p.helper.forms.restorePassPassword.passwordInput.sendKeys(p.helper.userPassword);
             p.helper.forms.restorePassPassword.submitButton.click();
@@ -101,5 +101,6 @@ describe('Login with incorrect credentials', function () {
         p.helper.restorePassword();
         p.loginButton.click();
         p.helper.loginFromCurrPage(p.helper.userEmailWrong);
+        p.helper.logout();
     });
 });
