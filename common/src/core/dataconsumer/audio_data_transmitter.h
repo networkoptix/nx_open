@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/dataconsumer/abstract_data_consumer.h>
+#include <nx/streaming/abstract_data_consumer.h>
 #include <core/dataprovider/live_stream_provider.h>
 
 struct QnOutputAudioFormat

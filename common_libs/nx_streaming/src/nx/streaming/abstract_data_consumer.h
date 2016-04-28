@@ -6,7 +6,7 @@
 #include <nx/streaming/data_packet_queue.h>
 
 class QN_EXPORT QnAbstractDataConsumer
-:                                                         
+:
     public QnLongRunnable,
     public QnAbstractDataReceptor
 {
