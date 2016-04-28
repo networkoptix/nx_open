@@ -33,6 +33,7 @@ class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
 class QnHtmlTextItem;
+class QnScrollableOverlayWidget;
 class QnButtonsOverlay;
 class GraphicsLabel;
 
@@ -339,6 +340,23 @@ protected:
     Q_SLOT virtual void at_itemDataChanged(int role);
 
     float defaultAspectRatio() const;
+
+protected:
+    struct OverlayWidgets
+	{
+	    QnButtonsOverlay *buttonsOverlay;
+
+	    QnScrollableOverlayWidget *detailsOverlay;     /**< Overlay containing info item. */
+	    QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
+
+	    QnScrollableOverlayWidget *positionOverlay;    /**< Overlay containing position item. */
+	    QnHtmlTextItem *positionItem;       /**< Current camera position. */
+
+	    OverlayWidgets();
+	};
+
+    OverlayWidgets* overlayWidgets() const;
+
 private:
     void createButtons();
     void createHeaderOverlay();
@@ -403,10 +421,7 @@ private:
 
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
-    struct OverlayWidgets;
-    typedef QScopedPointer<OverlayWidgets> OverlayWidgetsPtr;
-
-    const OverlayWidgetsPtr m_overlayWidgets;
+    QScopedPointer<OverlayWidgets> m_overlayWidgets;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

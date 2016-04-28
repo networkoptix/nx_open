@@ -1018,7 +1018,7 @@
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <qt.version>5.5.1</qt.version>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2d</openssl.version>
+                <openssl.version>1.0.2g</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>android-${arch}</rdep.target>

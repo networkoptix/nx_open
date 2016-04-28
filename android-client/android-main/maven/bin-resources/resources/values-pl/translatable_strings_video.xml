@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="video_offline">Kamera jest niedostępna</string>
+    <string name="video_loading">"Loading..."</string>
+    <string name="video_no_signal">BRAK SYGNAŁU</string>
+    <string name="video_stopped">Zatrzymaj</string>
+    <string name="video_button_rewind">Do tyłu</string>
+    <string name="video_live_detail">Obraz na żywo</string>
+    <string name="video_button_forward">Do przodu</string>
+    <string name="video_button_live">NA ŻYWO</string>
+    <string name="video_button_archive">NAGRANIA</string>
+    <string name="video_button_play_pause">Play/Pause</string>
+    <string name="datetime_full_format">MMM dd, yyyy kk:mm:ss</string>
+    <string name="datetime_live_format">Obraz na żywo</string>
+    <string name="datetime_short_format">kk:mm:ss</string>
+    <string name="video_resolution">Rozdzielczość</string>
+    <string name="video_transport">Transmisja</string>
+    <string name="video_live">Na żywo</string>
+    <string name="video_archive">Nagrania</string>
+    <string name="video_actionbar_pin">Pinezka</string>
+
+</resources>

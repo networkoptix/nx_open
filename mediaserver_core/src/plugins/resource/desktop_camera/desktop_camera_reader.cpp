@@ -8,6 +8,7 @@
 #include "network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
+#include <http/custom_headers.h>
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
@@ -37,7 +38,10 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(bool i
         if (!m_socket)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
-        QString request = QString(lit("PLAY %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
+        QString extraHeaders;
+        if (!isCameraControlRequired)
+            extraHeaders = QString(lit("%1: \r\n")).arg(QLatin1String(Qn::DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME));
+        QString request = QString(lit("PLAY %1 RTSP/1.0\r\ncSeq: %2\r\n%3\r\n")).arg("*").arg(cseq).arg(extraHeaders);
         m_socket->send(request.toLatin1());
         m_keepaliveTimer.restart();
     }

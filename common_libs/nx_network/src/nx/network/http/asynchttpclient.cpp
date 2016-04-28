@@ -124,6 +124,11 @@ namespace nx_http
         return m_lastSysErrorCode;
     }
 
+    SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
+    {
+        return m_lastSysErrorCode;
+    }
+
     //!Start request to \a url
     /*!
         \return true, if socket is created and async connect is started. false otherwise

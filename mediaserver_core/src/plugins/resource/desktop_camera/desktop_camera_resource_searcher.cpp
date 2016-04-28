@@ -6,6 +6,7 @@
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 #include <core/resource/network_resource.h>
+#include <core/resource_management/mserver_resource_discovery_manager.h>
 
 namespace {
     const int keepAliveInterval = 5 * 1000;
@@ -53,7 +54,13 @@ void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<Abstra
 
     ClientConnectionInfo info(connection, userName, userId);
     m_connections << info;
-    log("registerCamera", info);
+
+    // add camera to the pool immediately
+    QnResourceList resources;
+    resources << cameraFromConnection(info);
+    QnMServerResourceDiscoveryManager::instance()->processDiscoveredResources(resources);
+
+    log("register desktop camera", info);
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -80,6 +87,19 @@ bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraRes
     return isClientConnectedInternal(userId);
 }
 
+QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(const ClientConnectionInfo& info)
+{
+    auto rt = qnResTypePool->desktopCameraResourceType();
+    if (rt->getId().isNull())
+        return QnSecurityCamResourcePtr();
+
+    QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
+    cam->setModel(lit("virtual desktop camera"));   //TODO: #GDM globalize the constant
+    cam->setTypeId(rt->getId());
+    cam->setPhysicalId(info.userId);
+    return cam;
+}
+
 QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
 {
 #ifdef DESKTOP_CAMERA_DEBUG
@@ -89,20 +109,13 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     cleanupConnections();
 
     QnResourceList result;
-    auto rt = qnResTypePool->desktopCameraResourceType();
-    if (rt->getId().isNull())
-        return result;
 
     QnMutexLocker lock( &m_mutex );
 
     for(const auto &info: m_connections)
     {
-        QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
-        cam->setModel(lit("virtual desktop camera"));   //TODO: #GDM globalize the constant
-        cam->setTypeId(rt->getId());
-        cam->setPhysicalId(info.userId);
-        result << cam;
-        log("findResources camera", info);
+        if (auto camera = cameraFromConnection(info))
+            result << camera;
     }
     return result;
 }

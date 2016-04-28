@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">Unknown error</string>
+    <string name="login_error_path">Invalid host address or port</string>
+    <string name="login_error_protocol">Server does not supports this protocol</string>
+    <string name="login_error_connection">Cannot connect to server on this address</string>
+    <string name="login_error_credentials">Invalid logon credentials</string>
+    <string name="login_error_port">Invalid port</string>
+    <string name="login_error_brand">Incompatible Server</string>
+
+    <string name="login_title_caption">System name:</string>
+	<string name="login_title_hint">add a system name</string>
+    
+    <string name="host_caption">Host Address:</string>
+    <string name="host_hint">an IP address or URL</string>
+    <string name="login_empty_host">Host address field cannot be empty</string>
+    
+    <string name="port_caption">System Port:</string>
+    <string name="port_hint">if unsure enter 7001</string>
+    <string name="login_empty_port">Port field cannot be empty</string>
+    
+    <string name="login_caption">Username:</string>    
+    <string name="login_hint">enter your username</string>
+    <string name="login_empty_login">Username field cannot be empty</string>
+    
+    <string name="password_caption">Password:</string>
+    <string name="password_hint">enter your password</string>      
+    <string name="login_empty_pass">Password field cannot be empty</string>
+    
+    <string name="login_progress_caption">Logging in…</string>
+    <string name="login_connecting">Connecting…</string>
+    <string name="login_version_incompatible_title">Version incompatible.</string>
+    <string name="login_version_incompatible_text">Server version is incompatible with this version of the client. You can view the list of cameras but there is no guarantee that you can watch them.</string>
+
+	<string name="login_saved_sessions">Saved sessions</string>
+	<string name="login_host_title">Host Address:</string>
+	<string name="login_login_title">Username:</string>
+	<string name="login_connect">Connect</string>
+	<string name="login_delete_confirm">Are you sure you want to delete saved session:</string>
+</resources>

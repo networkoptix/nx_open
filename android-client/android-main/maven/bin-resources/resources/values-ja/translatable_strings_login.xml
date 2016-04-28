@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">不明なエラー</string>
+    <string name="login_error_path">無効なホスト名またはポート</string>
+    <string name="login_error_protocol">サーバーのサポートしないプロトコル</string>
+    <string name="login_error_connection">このアドレスではサーバーに接続できません</string>
+    <string name="login_error_credentials">無効なログイン情報</string>
+    <string name="login_error_port">無効なポート</string>
+    <string name="login_error_brand">互換性のないサーバー</string>    
+    <string name="login_hint">ログイン</string>
+    <string name="login_caption">ログイン:</string>
+    <string name="password_caption">パスワード:</string>
+    <string name="password_hint">パスワード</string>
+    <string name="host_caption">ホスト:</string>
+    <string name="host_hint">サーバーアドレス</string>
+    <string name="port_caption">ポート:</string>
+    <string name="port_hint">サーバーポート</string>
+    <string name="login_progress_caption">ログイン中…</string>
+    <string name="login_connecting">接続中…</string>
+    <string name="login_version_incompatible_title">互換性のないバージョン</string>
+    <string name="login_version_incompatible_text">サーバーとクライアントのバージョンの互換性がありません　カメラリストは表示されますが動作保証されません</string>
+	<string name="login_empty_host">ホストを入力してください</string>
+	<string name="login_empty_port">ポートを入力してください</string>
+	<string name="login_empty_login">ログインを入力してください</string>
+	<string name="login_empty_pass">パスワードを入力してください</string>
+	<string name="login_title_caption">"タイトル: "</string>
+	<string name="login_title_hint">セッション名</string>
+	<string name="login_saved_sessions">保存されたセッション</string>
+	<string name="login_host_title">"ホスト: "</string>
+	<string name="login_login_title">"ログイン: "</string>
+	<string name="login_connect">接続</string>
+	<string name="login_delete_confirm">保存されたセッションを削除しますか:</string>
+</resources>

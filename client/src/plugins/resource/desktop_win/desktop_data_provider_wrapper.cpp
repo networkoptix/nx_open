@@ -18,6 +18,17 @@ QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()
     m_owner->beforeDestroyDataProvider(this);
 }
 
+bool QnDesktopDataProviderWrapper::needConfigureProvider() const
+{
+    QnMutexLocker mutex( &m_mutex );
+    for (const auto& dataProcessor: m_dataprocessors)
+    {
+        if (dataProcessor->needConfigureProvider())
+            return true;
+    }
+    return false;
+}
+
 void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
 {
     const QnAbstractMediaData* media  = dynamic_cast<QnAbstractMediaData*>(data.get());

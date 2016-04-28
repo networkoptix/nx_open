@@ -80,6 +80,11 @@ void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
     m_owner = owner;
 }
 
+QnAbstractVideoCamera* QnLiveStreamProvider::getOwner() const
+{
+    return m_owner;
+}
+
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
     directDisconnectAll();
