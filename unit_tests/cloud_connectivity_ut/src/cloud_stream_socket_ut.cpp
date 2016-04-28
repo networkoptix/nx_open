@@ -300,7 +300,7 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
         enum class SocketState {init, connected, closed};
         std::atomic<SocketState> socketState(SocketState::init);
 
-        std::thread sendThread(
+        nx::utils::thread sendThread(
             [&sock, targetAddress = tcpServer.addressBeingListened(), &socketState]
             {
                 char testBuffer[16*1024];
@@ -320,7 +320,7 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
             });
 
         //read thread
-        std::thread recvThread(
+        nx::utils::thread recvThread(
             [&sock, &socketState]
             {
                 char readBuffer[16 * 1024];
