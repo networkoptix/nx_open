@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="video_offline">המצלמה אינה מחוברת</string>
+    <string name="video_loading">טוען...</string>
+    <string name="video_no_signal">אין אות וידאו</string>
+    <string name="video_stopped">עצור</string>
+    <string name="video_button_rewind">החזר לאחור</string>
+    <string name="video_live_detail">וידאו חי</string>
+    <string name="video_button_forward">העבר קדימה</string>
+    <string name="video_button_live">חי</string>
+    <string name="video_button_archive">ארכיון</string>
+    <string name="video_button_play_pause">נגן/השהה</string>
+    <string name="datetime_full_format">MMM dd, yyyy kk:mm:ss</string>
+    <string name="datetime_live_format">וידאו חי</string>
+    <string name="datetime_short_format">kk:mm:ss</string>
+    <string name="video_resolution">רזולוציה</string>
+    <string name="video_transport">הזרמה</string>
+    <string name="video_live">חי</string>
+    <string name="video_archive">ארכיון</string>
+    <string name="video_actionbar_pin">נעץ</string>
+
+</resources>

@@ -53,17 +53,17 @@ namespace {
 
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
-        {   /* Check external package. */
-            static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-            QIODevicePtr result(new QuaZipFile(packageName, relativePath));
-            if (result->open(QuaZipFile::ReadOnly))
-                return result;
-        }
-
         {   /* Check internal resources. */
             QString fileName = ":" + relativePath;
             QIODevicePtr result(new QFile(fileName));
             if (result->open(QFile::ReadOnly))
+                return result;
+        }
+
+        {   /* Check external package. */
+            static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
+            QIODevicePtr result(new QuaZipFile(packageName, relativePath));
+            if (result->open(QuaZipFile::ReadOnly))
                 return result;
         }
 

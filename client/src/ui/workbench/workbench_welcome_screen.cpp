@@ -66,15 +66,14 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject *parent)
     , m_visibleControls(true)
     , m_visible(false)
     , m_connectingNow(false)
-    , m_cloudWatcher(qnCommon->instance<QnCloudStatusWatcher>())
     , m_palette(extractPalette())
     , m_widget(createMainView(this))
     , m_pageSize(m_widget->size())
 {
-    NX_CRITICAL(m_cloudWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
-    connect(m_cloudWatcher, &QnCloudStatusWatcher::loginChanged
+    NX_CRITICAL(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher does not exist");
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
         , this, &QnWorkbenchWelcomeScreen::cloudUserNameChanged);
-    connect(m_cloudWatcher, &QnCloudStatusWatcher::statusChanged
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
         , this, &QnWorkbenchWelcomeScreen::isLoggedInToCloudChanged);
 
     //
@@ -125,12 +124,12 @@ void QnWorkbenchWelcomeScreen::setVisible(bool isVisible)
 
 QString QnWorkbenchWelcomeScreen::cloudUserName() const
 {
-    return m_cloudWatcher->cloudLogin();
+    return qnCloudStatusWatcher->cloudLogin();
 }
 
 bool QnWorkbenchWelcomeScreen::isLoggedInToCloud() const
 {
-    return (m_cloudWatcher->status() == QnCloudStatusWatcher::Online);
+    return (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online);
 }
 
 QSize QnWorkbenchWelcomeScreen::pageSize() const
@@ -210,8 +209,8 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
     if (!isLoggedInToCloud())
         return;
 
-    connectToLocalSystem(serverUrl, m_cloudWatcher->cloudLogin()
-        , m_cloudWatcher->cloudPassword());
+    connectToLocalSystem(serverUrl, qnCloudStatusWatcher->cloudLogin()
+        , qnCloudStatusWatcher->cloudPassword());
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
@@ -235,8 +234,8 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
         dialog->setUrl(QUrl::fromUserInput(serverUrl));
         if (isLoggedInToCloud())
         {
-            dialog->setCloudLogin(m_cloudWatcher->cloudLogin());
-            dialog->setCloudPassword(m_cloudWatcher->cloudPassword());
+            dialog->setCloudLogin(qnCloudStatusWatcher->cloudLogin());
+            dialog->setCloudPassword(qnCloudStatusWatcher->cloudPassword());
         }
 
         if (dialog->exec() != QDialog::Accepted)

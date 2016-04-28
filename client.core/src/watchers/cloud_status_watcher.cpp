@@ -26,6 +26,8 @@ namespace
             QnCloudSystem system;
             system.id = QString::fromStdString(systemData.id);
             system.name = QString::fromStdString(systemData.name);
+            system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
+            system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
             system.authKey = systemData.authKey;
             result.append(system);
         }

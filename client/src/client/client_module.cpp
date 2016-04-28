@@ -44,6 +44,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
+#include <utils/media/voice_spectrum_analyzer.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -95,6 +96,7 @@ namespace
             , statManager, &QnStatisticsManager::resetStatistics);
         QObject::connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
             , statManager, &QnStatisticsManager::sendStatistics);
+
     }
 }
 
@@ -144,7 +146,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnRedAssController>(new QnRedAssController());
 
     common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
+
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
@@ -156,7 +158,12 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnServerStorageManager>(new QnServerStorageManager());
     common->store<QnClientRecentConnectionsManager>(new QnClientRecentConnectionsManager());
 
+    common->store<QnVoiceSpectrumAnalyzer>(new QnVoiceSpectrumAnalyzer());
+
     initializeStatisticsManager(common);
+
+    /* Long runnables depend on QnCameraHistoryPool and other singletons. */
+    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
     QnCloudStatusWatcher *cloudStatusWatcher = new QnCloudStatusWatcher();
     cloudStatusWatcher->setCloudEndpoint(qnSettings->cdbEndpoint());

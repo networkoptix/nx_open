@@ -1,0 +1,49 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Ilyen rendszer már létezik";
+"Please choose another name." = "Kérjük, válasszon másik nevet.";
+"OK" = "OK";
+"Name" = "Név";
+"Host" = "Host";
+"IP or hostname" = "IP vagy host név";
+"Port" = "Port";
+"Login" = "Felhasználó";
+"Password" = "Jelszó";
+"Address: %@" = "Cím: %@";
+"Error" = "Hiba";
+"Connecting..." = "Csatlakozás...";
+"Can't connect to the System." = "Nem lehet csatlakozni a rendszerhez.";
+"Requesting cameras..." = "Kamerák kérése...";
+"Communication failure." = "Kommunikációs hiba.";
+"The System is incompatible with the app" = "A rendszer nem kompatibilis az alkalmazással";
+"Show Offline" = "Minden kamera";
+"Hide Offline" = "Elérhető kamerák";
+"Systems" = "Rendszerek";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Beolvasás...";
+"No Signal..." = "Nincs jel...";
+"Invalid Camera Credentials" = "Érvénytelen kamera paraméterek";
+"Invalid Camera Credentials..." = "Érvénytelen kamera paraméterek...";
+"Live" = "Élő";
+"Information" = "Információ";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Nincs rögzítés a kiválasztott időpontban. Szeretné a legközelebbi felvételt?";
+"No" = "Nem";
+"Yes" = "Igen";
+"Archive" = "Archív";
+"Go" = "Menj";
+"Low" = "Alacsony";
+"Medium" = "Közepes";
+"High" = "Magas";
+"Best" = "Legjobb";
+"Please Upgrade to Continue" = "A folytatáshoz frissítse az alkalmazást";
+"This app is not compatible with this version of the software. Please download our new app." = "Ez az akalmazás nem kompatibilis a szodfverrel. Kérjük frissítse az alkalmazást.";
+"Not now" = "Ne most";
+"Download" = "Letöltés";
+"Upgrade Now!" = "Frissítés most!";
+"You are connecting to a System running v2.5 or newer. Download our new app for a better mobile viewing experience." = "2.5 vagy újabb rendszerhez próbál csatlakozni. Töltse le legújabb alkalmazásunkat a legjobb mobil megjelenítés eléréséhez.";

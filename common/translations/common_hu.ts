@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="hu" sourcelanguage="en">
+<TS version="2.0" language="hu" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -757,7 +757,7 @@
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation>Próba licencek</translation>
+        <translation>próbalicenc</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
@@ -984,7 +984,7 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation>Próba licence</translation>
+        <translation>próbalicenc</translation>
     </message>
     <message>
         <source>Licensed To: </source>

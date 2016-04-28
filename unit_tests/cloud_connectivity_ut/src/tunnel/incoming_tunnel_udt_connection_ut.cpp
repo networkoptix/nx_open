@@ -5,6 +5,7 @@
 #include <nx/network/cloud/tunnel/udp/acceptor.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 #include <utils/thread/sync_queue.h>
 
 
@@ -240,10 +241,10 @@ TEST_F(IncomingTunnelConnectionTest, PleaseStop)
 
 TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
 {
-    std::vector<std::thread> threads;
+    std::vector<nx::utils::thread> threads;
     for (size_t i = 0; i < kTestConnections; ++i)
     {
-        threads.push_back(std::thread(
+        threads.push_back(nx::utils::thread(
             [this]()
             {
                 for (;;)

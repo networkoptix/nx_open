@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="calendar_missing_time">Tiempo Perdido</string>
+    <string name="calendar_from">"De: "</string>
+    <string name="calendar_to">"a: "</string>
+    <string name="calendar_not_recorded">Tiempo seleccionado no está registrado.</string>
+    <string name="calendar_offer_nearest">¿Quisiera usted ir al período registrado más cercano?</string>
+    <string name="calendar_now">Hoy</string>
+    <string name="calendar_future_time_selected">El tiempo seleccionado está en el futuro.</string>
+    <string name="calendar_offer_last">¿Le gustaría ver el último período registrado en su lugar?</string>
+    <string name="use_24_hour_clock">Utilice reloj de 24 horas</string>
+    <string name="advanced">Avanzada ...</string>
+    <string name="archive_divider">" - "</string>
+    <string name="datetime_hours_format">kk:mm</string>
+    <string name="datetime_days_format">dd of MMM</string>
+    <string name="datetime_months_format">MMM yyyy</string>
+
+</resources>

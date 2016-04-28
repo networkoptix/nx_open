@@ -10,6 +10,7 @@
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 
 
 namespace nx {
@@ -362,7 +363,7 @@ protected:
 
     void startClientThread(size_t clientCount)
     {
-        std::thread thread(
+        nx::utils::thread thread(
             [this, clientCount]()
             {
                 for (size_t i = 0; i < clientCount; ++i)
@@ -507,7 +508,7 @@ protected:
     std::shared_ptr<network::test::StunAsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     TestSyncQueue<Counters> m_connectedResults;
-    std::vector<std::thread> m_threads;
+    std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
