@@ -202,7 +202,7 @@ CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
 CORS_ALLOW_CREDENTIALS = True
 
 
-USE_ASYNC_QUEUE = False
+USE_ASYNC_QUEUE = True
 
 ADMINS = (('Evgeny', 'ebalashov@networkoptix.com'),)
 
