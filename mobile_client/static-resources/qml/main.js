@@ -37,40 +37,42 @@ function isMobile() {
     return Qt.platform.os == "android" || Qt.platform.os == "ios" || Qt.platform.os == "winphone" || Qt.platform.os == "blackberry"
 }
 
-function openDiscoveredSession(_host, _port, _systemName) {
+function openDiscoveredSession(_host, _port, _systemName)
+{
     sideNavigation.hide()
     sideNavigation.enabled = false
 
     stackView.setScaleTransition()
-    stackView.push({
-        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
-        properties: {
-            title: _systemName,
-            host: _host,
-            port: _port,
-            sessionId: "",
-            state: "Discovered"
-        }
-    })
+    stackView.push(
+            Qt.resolvedUrl("items/QnLoginPage.qml"),
+            {
+                "title": _systemName,
+                "host": _host,
+                "port": _port,
+                "sessionId": "",
+                "state": "Discovered"
+            }
+    )
 }
 
-function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
+function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName)
+{
     sideNavigation.hide()
     sideNavigation.enabled = false
 
     stackView.setScaleTransition()
-    stackView.push({
-        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
-        properties: {
-            title: _systemName,
-            host: _host,
-            port: _port,
-            login: _login,
-            password: _password,
-            sessionId: _sessionId,
-            state: "Saved"
-        }
-    })
+    stackView.push(
+            Qt.resolvedUrl("items/QnLoginPage.qml"),
+            {
+                "title": _systemName,
+                "host": _host,
+                "port": _port,
+                "login": _login,
+                "password": _password,
+                "sessionId": _sessionId,
+                "state": "Saved"
+            }
+    )
 }
 
 function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, infoParameter) {
