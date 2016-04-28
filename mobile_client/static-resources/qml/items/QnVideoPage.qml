@@ -1,9 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Window 2.2
-import QtQuick.Controls 1.2
-import QtQuick.Controls.Styles 1.2
 import QtMultimedia 5.0
-
+import Nx 1.0
 import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
@@ -18,7 +16,7 @@ QnPage {
     property string resourceId
     property string initialScreenshot
 
-    QnObject {
+    Object {
         id: d
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||

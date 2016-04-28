@@ -144,6 +144,24 @@ QnNavigationDrawer {
             onClicked: Main.openSettings()
         }
 
+        Text
+        {
+            id: versionText
+            text: applicationInfo.version()
+            x: dp(16)
+            height: dp(48)
+            width: parent.width - 2 * x
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: sp(13)
+            color: QnTheme.versionText
+
+            MouseArea
+            {
+                anchors.fill: parent
+                onDoubleClicked: copyToClipboard(versionText.text)
+            }
+        }
+
         Item {
             width: parent.width
             height: navigationBarPlaceholder.height + dp(8)

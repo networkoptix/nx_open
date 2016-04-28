@@ -91,6 +91,7 @@ QtObject {
     property color navigationPanelBackground
     property color offlineDimmer
     property color cameraStatus
+    property color versionText
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -166,6 +167,7 @@ QtObject {
         navigationPanelBackground = colorTheme.color("other.navigationPanelBackground")
         offlineDimmer           = colorTheme.color("other.offlineDimmer")
         cameraStatus            = colorTheme.color("other.cameraStatus")
+        versionText             = colorTheme.color("other.versionText")
     }
 
     function transparent(color, opacity) {

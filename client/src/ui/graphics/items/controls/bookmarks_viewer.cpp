@@ -761,8 +761,8 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
         /*
          * This workaround is required (Qt 5.6.0 RC) because of the following crash scenario:
          *  * Deleting of QnTooltipWidget causes all its children to be deleted (in dtor of QGraphicsItem)
-         *  * Some children are QnProxyLabel's
-         *  * In dtor of QnProxyLabel we calling setWidget(nullptr), that calls unsetCursor() method
+         *  * Some children are of class QnProxyLabel.
+         *  * In dtor of QnProxyLabel we're calling setWidget(nullptr), that calls unsetCursor() method
          *  * Here we are seeking the next widget at the current position..
          *  * .. finding our deleting QnTooltipWidget ..
          *  * .. checking its boundingRect() ..

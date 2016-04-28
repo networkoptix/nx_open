@@ -1,10 +1,8 @@
 import QtQuick 2.4
-import QtQuick.Controls 1.2
 
 import com.networkoptix.qml 1.0
 
 import "../controls"
-import "../controls/style"
 import "../items"
 import "../icons"
 import "../main.js" as Main

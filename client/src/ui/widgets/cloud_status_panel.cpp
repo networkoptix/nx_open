@@ -2,7 +2,6 @@
 
 #include <QtWidgets/QMenu>
 
-#include <common/common_module.h>
 #include <watchers/cloud_status_watcher.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/helper.h>
@@ -44,7 +43,8 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     setIcon(d->offlineIcon);
     adjustIconSize();
 
-    connect(this, &QnCloudStatusPanel::justPressed, qnCommon->instance<QnCloudStatusWatcher>(), &QnCloudStatusWatcher::updateSystems);
+    connect(this, &QnCloudStatusPanel::justPressed, qnCloudStatusWatcher
+        , &QnCloudStatusWatcher::updateSystems);
 
     d->updateUi();
 }
@@ -70,8 +70,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
     cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
     cloudMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,           this,   &QnCloudStatusPanelPrivate::updateUi);
+    connect(qnCloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,           this,   &QnCloudStatusPanelPrivate::updateUi);
     //TODO: #dklychkov Uncomment when cloud login is implemented
 //    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::cloudSystemsChanged,     this,   &QnCloudStatusPanelPrivate::updateSystems);
 //    updateSystems();
@@ -81,9 +80,7 @@ void QnCloudStatusPanelPrivate::updateUi()
 {
     Q_Q(QnCloudStatusPanel);
 
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-
-    const bool isLogged = (cloudStatusWatcher->status() == QnCloudStatusWatcher::Online);
+    const bool isLogged = (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online);
     if (!isLogged)
     {
         q->setText(tr("Login to cloud..."));
@@ -99,7 +96,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     else
         setWarningStyle(q);
 
-    q->setText(cloudStatusWatcher->cloudLogin());
+    q->setText(qnCloudStatusWatcher->cloudLogin());
     q->setIcon(onlineIcon);
     q->setMenu(cloudMenu);
     disconnect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);
@@ -107,8 +104,7 @@ void QnCloudStatusPanelPrivate::updateUi()
 
 void QnCloudStatusPanelPrivate::updateSystems()
 {
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    const QnCloudSystemList &systems = cloudStatusWatcher->cloudSystems();
+    const QnCloudSystemList &systems = qnCloudStatusWatcher->cloudSystems();
 
     systemsMenu->clear();
     for (const QnCloudSystem &system: systems)

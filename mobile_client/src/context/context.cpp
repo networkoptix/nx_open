@@ -1,5 +1,8 @@
 #include "context.h"
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/QClipboard>
+
 #include "connection_manager.h"
 #include "ui/color_theme.h"
 #include "utils/mobile_app_info.h"
@@ -62,6 +65,11 @@ qreal QnContext::iconScale() const {
 
 void QnContext::exitFullscreen() {
     showSystemUi();
+}
+
+void QnContext::copyToClipboard(const QString &text)
+{
+    qApp->clipboard()->setText(text);
 }
 
 void QnContext::enterFullscreen() {

@@ -66,10 +66,12 @@ cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
 cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 
 #copying qt libs
-QTLIBS=`readelf -d $CLIENT_BIN_PATH/client.bin $CLIENT_PLATFORMS_PATH/libqxcb.so | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/' | sort -u`
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
 for var in $QTLIBS
 do
-    cp -P ${qt.dir}/lib/$var* $LIBSTAGE
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
 done
 
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE

@@ -1,7 +1,10 @@
-<?xml version="1.0"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="auto" android:versionCode="${project.version.code}"
-    android:versionName="${project.version.name}.${project.version.code}" package="${new.android.packagename}">
+<?xml version='1.0' encoding='utf-8'?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:installLocation="auto"
+    package="${new.android.packagename}"
+    android:versionCode="${project.version.code}"
+    android:versionName="${project.version.name}.${project.version.code}">
 
     <application
         android:hardwareAccelerated="true"
@@ -11,7 +14,7 @@
         android:theme="@android:style/Theme.Holo.NoActionBar">
 
         <activity
-            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|locale|fontScale|keyboard|keyboardHidden|navigation"
+            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation"
             android:name="com.networkoptix.nxwitness.QnActivity"
             android:label="@string/app_name"
             android:screenOrientation="unspecified"
@@ -21,6 +24,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
             <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>
             <meta-data android:name="android.app.qt_sources_resource_id" android:resource="@array/qt_sources"/>
             <meta-data android:name="android.app.repository" android:value="default"/>
@@ -45,9 +49,22 @@
             <!-- Splash screen -->
             <meta-data android:name="android.app.splash_screen_drawable" android:resource="@drawable/splash"/>
             <!-- Splash screen -->
+
+            <!-- Background running -->
+            <!-- Warning: changing this value to true may cause unexpected crashes if the
+                          application still try to draw after
+                          "applicationStateChanged(Qt::ApplicationSuspended)"
+                          signal is sent! -->
+            <meta-data android:name="android.app.background_running" android:value="false"/>
+            <!-- Background running -->
+
+            <!-- auto screen scale factor -->
+            <meta-data android:name="android.app.auto_screen_scale_factor" android:value="false"/>
+            <!-- auto screen scale factor -->
         </activity>
     </application>
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="22"/>
+    <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
     <uses-permission android:name="${old.android.packagename}.readLogonEntries"/>
 

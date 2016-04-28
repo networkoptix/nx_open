@@ -70,7 +70,6 @@ private slots:
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_selectAllAction_triggered();
-    void at_masterItemPressed(const QModelIndex& index);
     void at_itemPressed(const QModelIndex& index);
     void at_itemEntered(const QModelIndex& index);
     void at_eventsGrid_clicked(const QModelIndex& idx);
@@ -87,7 +86,7 @@ private:
 
     /**
      * Get data from server
-     * 
+     *
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */
@@ -130,7 +129,7 @@ private:
     QAction *m_clipboardAction;
     QList<QCheckBox*> m_filterCheckboxes;
     QModelIndex m_hoveredIndex;
-    
+
     bool m_skipNextPressSignal;
     QModelIndex m_skipNextSelIndex;
     QModelIndex m_lastPressIndex;
