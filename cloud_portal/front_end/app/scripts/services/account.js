@@ -7,7 +7,7 @@ angular.module('cloudApp')
         var initialState = $rootScope.session.loginState;
         $rootScope.$watch('session.loginState',function(value){  // Catch logout from other tabs
             if(initialState !== value){
-                window.location.reload();
+                document.location.reload();
             }
         });
 
@@ -61,8 +61,10 @@ angular.module('cloudApp')
                 this.setEmail(email);
                 this.setPassword(password);
                 var promise = cloudApi.login(email, password, remember);
-                promise.then(function(){
-                    $rootScope.session.loginState = true;
+                promise.then(function(result){
+                    if(result.data.resultCode === L.errorCodes.ok){
+                        $rootScope.session.loginState = true;
+                    }
                 });
                 return promise;
             },
