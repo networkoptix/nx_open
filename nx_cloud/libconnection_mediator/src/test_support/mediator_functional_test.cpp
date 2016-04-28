@@ -61,8 +61,7 @@ void MediatorFunctionalTest::start()
     nx::utils::promise<void> mediatorInstantiatedCreatedPromise;
     auto mediatorInstantiatedCreatedFuture = mediatorInstantiatedCreatedPromise.get_future();
 
-    m_mediatorProcessFuture = std::async(
-        std::launch::async,
+    m_mediatorProcessThread = nx::utils::thread(
         [this, &mediatorInstantiatedCreatedPromise]()->int {
             m_mediatorInstance = std::make_unique<nx::hpm::MediatorProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
@@ -100,7 +99,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
 void MediatorFunctionalTest::stop()
 {
     m_mediatorInstance->pleaseStop();
-    m_mediatorProcessFuture.wait();
+    m_mediatorProcessThread.join();
     m_mediatorInstance.reset();
 }
 
