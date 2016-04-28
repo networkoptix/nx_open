@@ -32,4 +32,5 @@ private:
     const QnAbstractPermissionsModel::Filter m_filter;
 
     QScopedPointer<QnResourceListModel> m_resourcesModel;
+    QScopedPointer<QSortFilterProxyModel> m_viewModel;
 };

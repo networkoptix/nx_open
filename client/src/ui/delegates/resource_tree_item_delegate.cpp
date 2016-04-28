@@ -34,6 +34,16 @@ QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject* parent):
     m_buggyIcon = qnSkin->icon("tree/buggy.png");
 }
 
+QnWorkbench* QnResourceTreeItemDelegate::workbench() const
+{
+    return m_workbench.data();
+}
+
+void QnResourceTreeItemDelegate::setWorkbench(QnWorkbench* workbench)
+{
+    m_workbench = workbench;
+}
+
 void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
     QStyleOptionViewItem option(styleOption);
@@ -45,7 +55,8 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
         return;
     }
 
-    if (index.column() == Qn::CheckColumn) // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
+    /* Check indicators in this implementation are handled elsewhere: */
+    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
     {
         base_type::paint(painter, option, index);
         return;
@@ -82,8 +93,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
     QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
 
-    /* Check indicators in this implementation are handled elsewhere: */
-    NX_ASSERT(!option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator));
+
 
     /* Paint background: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
