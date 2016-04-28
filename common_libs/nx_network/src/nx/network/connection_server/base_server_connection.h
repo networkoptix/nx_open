@@ -189,7 +189,8 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
 
-            NX_ASSERT( count == m_bytesToSend );
+            static_cast<void>(count);
+            NX_ASSERT(count == m_bytesToSend);
 
             static_cast<CustomConnectionType*>(this)->readyToSendData();
         }

@@ -10,7 +10,7 @@ AsyncClientMock::AsyncClientMock( const HostAddress& externalIp )
     : m_externalIp( externalIp )
     , m_disabledPort( 80 )
 {
-    m_thread = std::thread(
+    m_thread = nx::utils::thread(
         [this]()
         {
             while (const auto task = m_tasks.pop())

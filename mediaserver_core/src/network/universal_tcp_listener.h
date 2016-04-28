@@ -34,7 +34,8 @@ protected:
     
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
-    std::unique_ptr<nx::network::MultipleServerSocket> m_multipleServerSocket;
+    nx::network::MultipleServerSocket* m_multipleServerSocket;
+    std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;

@@ -5,12 +5,16 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/ssl_socket.h>
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
+#include <utils/common/ssl_gen_cert.h>
 
 namespace nx {
 namespace cctu {
+
+static const int kMaxAddressesToPrint = 10;
 
 void printListenOptions(std::ostream* const outStream)
 {
@@ -23,7 +27,18 @@ void printListenOptions(std::ostream* const outStream)
     "  --server-id={server_id}      Id used when registering on mediator (optional)\n"
     "  --server-count=N             Random generated server Ids (to emulate several servers)\n"
     "  --local-address={ip:port}    Local address to listen\n"
-    "  --udt                        Use udt instead of tcp. Only if listening local address\n";
+    "  --udt                        Use udt instead of tcp. Only if listening local address\n"
+    "  --ssl                        Uses SSL on top of server socket type\n";
+}
+
+static const void limitStringList(QStringList* list)
+{
+    if (list->size() <= kMaxAddressesToPrint)
+        return;
+
+    const auto size = list->size();
+    list->erase(list->begin() + kMaxAddressesToPrint, list->end());
+    *list << lm("... (%1 total)").arg(size);
 }
 
 class CloudServerSocketGenerator
@@ -49,48 +64,66 @@ public:
     std::unique_ptr<AbstractStreamServerSocket> make(
         String systemId, String authKey, String serverId)
     {
-        m_mediatorConnectors.emplace_back(new hpm::api::MediatorConnector);
+        socketContexts.push_back(SocketContext(
+            std::move(systemId), std::move(authKey), std::move(serverId)));
 
-        auto& mc = m_mediatorConnectors.back();
-        mc->mockupAddress(&network::SocketGlobals::mediatorConnector());
-        mc->setSystemCredentials(hpm::api::SystemCredentials(systemId, serverId, authKey));
-        mc->enable(true);
+        auto& currentContext = socketContexts.back();
+        auto socket = std::make_unique<network::cloud::CloudServerSocket>(
+            currentContext.mediatorConnector->systemConnection());
 
-        auto cloudServerSocket = std::make_unique<network::cloud::CloudServerSocket>(
-            mc->systemConnection());
-        /*
-        if (!cloudServerSocket->registerOnMediatorSync())
-        {
-            std::cerr << "error. Failed to listen on mediator. Reason: " <<
-                SystemError::getLastOSErrorText().toStdString() << std::endl;
-            return nullptr;
-        }
-        */
-
-        std::cout << "listening on mediator. Address "
-            << serverId.toStdString() << "." << systemId.toStdString()
-            << std::endl;
-
-        return std::move(cloudServerSocket);
+        currentContext.socket = socket.get();
+        return std::move(socket);
     }
+
+    struct SocketContext
+    {
+        std::unique_ptr<hpm::api::MediatorConnector> mediatorConnector;
+        network::cloud::CloudServerSocket* socket;
+        QString listeningAddress;
+        SystemError::ErrorCode listeningStatus;
+
+        SocketContext(const SocketContext&) = delete;
+        SocketContext(SocketContext&&) = default;
+        SocketContext& operator=(const SocketContext&) = delete;
+        SocketContext& operator=(SocketContext&&) = default;
+
+        SocketContext(String systemId, String authKey, String serverId)
+        :
+            mediatorConnector(new hpm::api::MediatorConnector),
+            socket(nullptr),
+            listeningAddress(QString::fromUtf8(serverId)),
+            listeningStatus(SystemError::noError)
+        {
+            mediatorConnector->mockupAddress(network::SocketGlobals::mediatorConnector());
+            mediatorConnector->setSystemCredentials(
+                hpm::api::SystemCredentials(systemId, serverId, authKey));
+            mediatorConnector->enable(true);
+        }
+    };
 
     ~CloudServerSocketGenerator()
     {
-        for (auto& mc : m_mediatorConnectors)
-            mc->pleaseStopSync();
+        for (auto& context: socketContexts)
+            context.socket->pleaseStopSync();
     }
 
-private:
-    std::vector<std::unique_ptr<hpm::api::MediatorConnector>> m_mediatorConnectors;
+    std::vector<SocketContext> socketContexts;
 };
 
 int runInListenMode(const std::multimap<QString, QString>& args)
 {
     using namespace nx::network;
 
-    auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
+    auto transmissionMode = test::TestTransmissionMode::spam;
     if (args.find("ping") != args.end())
-        transmissionMode = nx::network::test::TestTransmissionMode::pong;
+        transmissionMode = test::TestTransmissionMode::pong;
+
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket;
+    const auto guard = makeScopedGuard([&serverSocket]()
+    {
+        if (serverSocket)
+            serverSocket->pleaseStopSync();
+    });
 
     CloudServerSocketGenerator cloudServerSocketGenerator;
     test::RandomDataTcpServer server(
@@ -98,14 +131,12 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
     auto credentialsIter = args.find("cloud-credentials");
     auto localAddressIter = args.find("local-address");
-    QStringList cloudCredentials;
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket;
     if (credentialsIter != args.end())
     {
-        cloudCredentials = credentialsIter->second.split(":");
+        const auto cloudCredentials = credentialsIter->second.split(":");
         if (cloudCredentials.size() != 2)
         {
-            std::cerr << "Error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
+            std::cerr << "error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
             return 1;
         }
 
@@ -124,11 +155,43 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         serverSocket = cloudServerSocketGenerator.make(
             cloudCredentials[0].toUtf8(), cloudCredentials[1].toUtf8(), serverIds);
 
-        if (!serverSocket)
+        QStringList sucessfulListening;
+        QStringList failedListening;
+        for (auto& context: cloudServerSocketGenerator.socketContexts)
+        {
+            if (context.socket->registerOnMediatorSync())
+            {
+                sucessfulListening << context.listeningAddress;
+            }
+            else
+            {
+                const auto error = SystemError::getLastOSErrorText();
+                failedListening << lm("%1(%2)")
+                    .arg(context.listeningAddress).arg(error);
+            }
+        }
+
+        if (!failedListening.isEmpty())
+        {
+            limitStringList(&failedListening);
+            std::cerr << "warning. Addresses failed to listen: " <<
+                failedListening.join(lit(", ")).toStdString() << std::endl;
+        }
+
+        if (!sucessfulListening.isEmpty())
+        {
+            limitStringList(&sucessfulListening);
+            std::cout << "listening on mediator. Addresses: " <<
+                sucessfulListening.join(lit(", ")).toStdString() << std::endl;
+        }
+        else
+        {
+            std::cerr << "error. All sockets failed to listen on mediator. "
+                << std::endl;
             return 2;
+        }
     }
-    else
-    if (localAddressIter != args.end())
+    else if (localAddressIter != args.end())
     {
         const bool isUdt = args.find("udt") != args.end();
 
@@ -146,19 +209,35 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         return 3;
     }
 
+    if (args.find("ssl") != args.end())
+    {
+        const auto sslCert = tmpnam(nullptr);
+        if (const auto ret = generateSslCertificate(sslCert, "cctu", "US", "cctu"))
+            return ret;
+
+        QFile file(QString::fromUtf8(sslCert));
+        if(!file.open(QIODevice::ReadOnly))
+        {
+            std::cerr << "Could not generate SSL certificate" << std::endl;
+            return 4;
+        }
+
+        nx::network::SslSocket::initSSLEngine(file.readAll());
+        serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
+    }
+
     server.setServerSocket(std::move(serverSocket));
     if (!server.start())
     {
         auto osErrorText = SystemError::getLastOSErrorText().toStdString();
         std::cerr << "error. Failed to start accepting connections. Reason: "
             << osErrorText << std::endl;
-        return 4;
+        return 5;
     }
 
     const int result = printStatsAndWaitForCompletion(
         &server,
         nx::utils::MoveOnlyFunc<bool()>());
-    server.pleaseStopSync();
     return result;
 }
 
@@ -202,7 +281,8 @@ int printStatsAndWaitForCompletion(
                 {
                     std::cout << "\nNo activity for "
                         << (duration_cast<seconds>(timePassed)).count() << "s. "
-                        << "Resetting statistics...\n" << std::endl;;
+                        << "Resetting statistics...\n" << std::endl;
+
                     //resetting statistics
                     baseStatisticsData = data;
                     prevStatistics = invalidStatistics;

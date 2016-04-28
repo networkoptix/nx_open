@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/retry_timer.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 namespace nx {

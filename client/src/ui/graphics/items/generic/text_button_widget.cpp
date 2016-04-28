@@ -16,7 +16,7 @@ QnTextButtonWidget::QnTextButtonWidget(const QString &statisticsAlias
 {
     setFrameShape(Qn::NoFrame);
     setDynamic(true);
-    qFill(m_opacities, -1.0);
+    std::fill(m_opacities.begin(), m_opacities.end(), -1.0);
     m_opacities[0] = 1.0;
 }
 

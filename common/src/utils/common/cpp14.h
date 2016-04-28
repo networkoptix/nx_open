@@ -47,23 +47,4 @@ template<
 
 #endif // __clang__
 
-/** TODO #ak following methods are inappropriate here. Find a better place for them */
-template<typename ResultType, typename InitialType, typename DeleterType>
-std::unique_ptr<ResultType, DeleterType>
-    static_unique_ptr_cast(std::unique_ptr<InitialType, DeleterType>&& sourcePtr)
-{
-    return std::unique_ptr<ResultType, DeleterType>(
-        static_cast<ResultType>(sourcePtr.release()),
-        sourcePtr.get_deleter());
-}
-
-template<typename ResultType, typename InitialType>
-std::unique_ptr<ResultType, std::default_delete<ResultType>>
-    static_unique_ptr_cast(
-        std::unique_ptr<InitialType, std::default_delete<InitialType>>&& sourcePtr)
-{
-    return std::unique_ptr<ResultType>(
-        static_cast<ResultType*>(sourcePtr.release()));
-}
-
 #endif  //libcommon_cpp14_h
