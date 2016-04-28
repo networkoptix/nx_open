@@ -450,7 +450,7 @@ namespace nx_http
         const ConstBufferRefType& data,
         MessageType* message,
         MessageLineType MessageType::*messageLine,
-        bool parseHeadersNonStrict = false)
+        bool parseHeadersNonStrict)
     {
         enum ParseState
         {
