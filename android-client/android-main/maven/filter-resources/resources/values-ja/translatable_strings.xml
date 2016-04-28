@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_description">${old.android.product.name}は最先端のビデオ監視システムです。最適なプラットフォームアーキテクチャーでは無制限のスケーラビリティ、自動デバイス検索、容易な操作性が提供されます
+　　　　メガピクセルIPビデオ業界のプロフェッショナルにより設計されておりエンタープライズHDビデオシステム構築が実現可能です。</string>
+</resources>

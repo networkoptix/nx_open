@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>android-client</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.5.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <artifactId>protobuf-classes</artifactId>
+	<version>2.5.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Android Protobuf Classes</name>	
+
+    <properties>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/../..</root.dir>    
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/../..</root.dir>
+    </properties>	
+
+    <build>
+        <plugins>					
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>generate-java-protos</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${environment.dir}/bin/protoc</executable>
+                            <workingDirectory>${basedir}/../../common/src/api/pb</workingDirectory>		
+                            <arguments>
+                                <commandlineArgs>--java_out=${project.build.directory}/filtered-sources</commandlineArgs>
+                                <commandlineArgs>*.proto</commandlineArgs>
+                            </arguments>
+                        </configuration>
+                    </execution>								
+                </executions>
+            </plugin>	         
+        </plugins>					
+    </build>				
+</project>

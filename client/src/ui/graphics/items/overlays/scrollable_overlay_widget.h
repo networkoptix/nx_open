@@ -19,6 +19,8 @@ public:
 
     /** Add item to scrollable area. Will take ownership of the item. */
     QnUuid addItem(QGraphicsWidget *item, const QnUuid &externalId = QnUuid());
+    QnUuid insertItem(int index, QGraphicsWidget *item, const QnUuid &externalId = QnUuid());
+
     void removeItem(const QnUuid &id);
     void clear();
 
@@ -33,6 +35,11 @@ public:
      */
     QSizeF maxFillCoeff() const;
     void setMaxFillCoeff(const QSizeF &coeff);
+
+    QSizeF contentSize() const;
+
+signals:
+    void contentSizeChanged();
 
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;

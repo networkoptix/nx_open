@@ -56,6 +56,15 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
     return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
+rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread /*= 0*/)
+{
+    QnRequestParamList params;
+    params.insert(lit("clientId"),      qnCommon->moduleGUID().toString());
+    params.insert(lit("resourceId"),    cameraId.toString());
+    params.insert(lit("action"),        start ? lit("start") : lit("stop"));
+    return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
+}
+
 Handle ServerConnection::getStatisticsSettingsAsync(Result<QByteArray>::type callback
     , QThread *targetThread)
 {
@@ -176,7 +185,8 @@ void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool succ
 template <typename ResultType>
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
-    return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+    if (callback)
+        return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
     {
         bool success = false;
         ResultType result;
@@ -187,36 +197,47 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
         }
         invoke(callback, targetThread, success, id, result);
     });
+
+    return sendRequest(request);
 }
 
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
 {
-    QPointer<QThread> targetThreadGuard(targetThread);
-    return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+    if (callback)
     {
-        Q_UNUSED(contentType)
+        QPointer<QThread> targetThreadGuard(targetThread);
+        return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+        {
+            Q_UNUSED(contentType)
+            bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
 
-        bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+            if (targetThread && targetThreadGuard.isNull())
+                return;
 
-        if (targetThread && targetThreadGuard.isNull())
-            return;
+            invoke(callback, targetThread, success, id, msgBody);
+        });
+    }
 
-        invoke(callback, targetThread, success, id, msgBody);
-    });
+    return sendRequest(request);
 }
 
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
 {
-    QPointer<QThread> targetThreadGuard(targetThread);
-    return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+    if (callback)
     {
-        bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        QPointer<QThread> targetThreadGuard(targetThread);
+        return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+        {
+            bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
 
-        if (targetThread && targetThreadGuard.isNull())
-            return;
+            if (targetThread && targetThreadGuard.isNull())
+                return;
 
-        invoke(callback, targetThread, success, id, EmptyResponseType());
-    });
+            invoke(callback, targetThread, success, id, EmptyResponseType());
+        });
+    }
+
+    return sendRequest(request);
 }
 
 void ServerConnection::cancelRequest(const Handle& requestId)

@@ -161,6 +161,15 @@ struct QnHistogramColors {
 };
 #define QnHistogramColors_Fields (background)(border)(histogram)(selection)(grid)(text)
 
+struct QnTwoWayAudioWidgetColors
+{
+    QnTwoWayAudioWidgetColors();
+
+    QColor background;
+    QColor visualizer;
+};
+#define QnTwoWayAudioWidgetColors_Fields (background)(visualizer)
+
 
 struct QnResourceWidgetFrameColors {
     QnResourceWidgetFrameColors();
@@ -312,6 +321,7 @@ struct QnGraphicsMessageBoxColors {
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
+    (QnTwoWayAudioWidgetColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \

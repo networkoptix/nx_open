@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="calendar_missing_time">Hiányzó idő</string>
+    <string name="calendar_from">"Tól: "</string>
+    <string name="calendar_to">"Ig: "</string>
+    <string name="calendar_not_recorded">A választott időben nincs felvétel.</string>
+    <string name="calendar_offer_nearest">Szeretne a legközelebbi felvétel időszakhoz ugrani?</string>
+    <string name="calendar_now">Most</string>
+    <string name="calendar_future_time_selected">A választot idő a jövőben van.</string>
+    <string name="calendar_offer_last">Szeretné látni a legutolsó felvétel időszakot?</string>
+    <string name="use_24_hour_clock">24-órás idő használata</string>
+    <string name="advanced">Haladó...</string>
+    <string name="archive_divider">" - "</string>
+    <string name="datetime_hours_format">kk:mm</string>
+    <string name="datetime_days_format">dd of MMM</string>
+    <string name="datetime_months_format">MMM yyyy</string>
+
+</resources>

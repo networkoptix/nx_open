@@ -12,6 +12,7 @@
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
+#include <nx/utils/std/future.h>
 
 namespace nx {
 namespace stun {
@@ -111,10 +112,11 @@ TEST_F( StunClientServerTest, Connectivity )
     server.reset();
     EXPECT_NE( sendTestRequestSync(), SystemError::noError ); // no server
 
+    utils::promise<void> promise;
+    client->addOnReconnectedHandler([&]{ promise.set_value(); });
+
     startServer();
-    EXPECT_EQ( server->connections.size(), 0 );
-    std::this_thread::sleep_for( defaultSettings().reconnectPolicy
-        .initialDelay() * 2 ); // automatic reconnect is expected
+    promise.get_future().wait(); // automatic reconnect is expected
     EXPECT_EQ( server->connections.size(), 1 );
 }
 

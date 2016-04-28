@@ -20,14 +20,31 @@
 #include <utils/common/model_functions.h>
 #include "utils/common/concurrent.h"
 #include "common/common_module.h"
+#include "axis_audio_transmitter.h"
 
 using namespace std;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
-static const float MAX_AR_EPS = 0.04f;
-static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-static const quint16 DEFAULT_AXIS_API_PORT = 80;
-static const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+
+namespace{
+    const float MAX_AR_EPS = 0.04f;
+    const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
+    const quint16 DEFAULT_AXIS_API_PORT = 80;
+    const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+    const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+
+    QnOutputAudioFormat toAudioFormat(const QString& codecName)
+    {
+        if (codecName == lit("g711"))
+            return QnOutputAudioFormat(CODEC_ID_PCM_MULAW, 8000);
+        else if (codecName == lit("g726"))
+            return QnOutputAudioFormat(CODEC_ID_ADPCM_G726, 8000);
+        else if (codecName == lit("axis-mulaw-128"))
+            return QnOutputAudioFormat(CODEC_ID_PCM_MULAW, 16000);
+        else
+            return QnOutputAudioFormat();
+    }
+}
 
 int QnPlAxisResource::portIdToIndex(const QString& id) const
 {
@@ -79,16 +96,18 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource()
+QnPlAxisResource::QnPlAxisResource() :
+    m_lastMotionReadTime(0),
+    m_audioTransmitter(new QnAxisAudioTransmitter(this))
 {
     setVendor(lit("Axis"));
     setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
-    m_lastMotionReadTime = 0;
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
 {
+    m_audioTransmitter.reset();
     stopInputPortMonitoringAsync();
 }
 
@@ -505,6 +524,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     if (!initializeIOPorts( &http ))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
 
+    if(!initialize2WayAudio(&http))
+        return CameraDiagnostics::UnknownErrorResult();
+
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
     // determin camera max resolution
@@ -825,6 +847,26 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
     return status;
 }
 
+bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
+{
+    QString outputFormats;
+    auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
+    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+        return false;
+
+    for (const auto& formatStr: outputFormats.split(','))
+    {
+        QnOutputAudioFormat outputFormat = toAudioFormat(formatStr);
+        if (m_audioTransmitter->isCompatible(outputFormat))
+        {
+            m_audioTransmitter->setOutputFormat(outputFormat);
+            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+        }
+    }
+
+    return true;
+}
+
 void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
@@ -1067,14 +1109,8 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
 
 bool QnPlAxisResource::ioPortErrorOccured()
 {
-    if (isIOModule()) {
-        return false; // it's error if can't read IO state for I/O module
-    }
-    else {
-        hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayInputCapability);
-        hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayOutputCapability);
-        return true;
-    }
+    // it's error if can't read IO state for I/O module
+    return !isIOModule();
 };
 
 void QnPlAxisResource::readPortIdLIst()
@@ -1322,6 +1358,14 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
+}
+
+QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
+{
+    if (!isInitialized() && !m_audioTransmitter->isInitialized())
+        return nullptr;
+
+    return m_audioTransmitter;
 }
 
 #endif // #ifdef ENABLE_AXIS

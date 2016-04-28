@@ -54,7 +54,8 @@
 
 namespace
 {
-    const auto kButtonsSize = 24.0;
+    const qreal kButtonsSize = 24.0;
+
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -100,19 +101,6 @@ namespace
             && !item->layout()->resource()->getParentId().isNull());
     }
 } // anonymous namespace
-
-struct QnResourceWidget::OverlayWidgets
-{
-    QnButtonsOverlay *buttonsOverlay;
-
-    GraphicsWidget *detailsOverlay;     /**< Overlay containing info item. */
-    QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
-
-    GraphicsWidget *positionOverlay;    /**< Overlay containing position item. */
-    QnHtmlTextItem *positionItem;       /**< Current camera position. */
-
-    OverlayWidgets();
-};
 
 QnResourceWidget::OverlayWidgets::OverlayWidgets()
     : buttonsOverlay(nullptr)
@@ -903,6 +891,11 @@ float QnResourceWidget::defaultAspectRatio() const {
     return noAspectRatio;
 }
 
+
+QnResourceWidget::OverlayWidgets* QnResourceWidget::overlayWidgets() const
+{
+    return m_overlayWidgets.data();
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers

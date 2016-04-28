@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accept">Kabul et</string>
+    <string name="error">Hata</string>
+    <string name="save">Kaydet</string>
+    <string name="edit">Değiştir</string>
+    <string name="delete">Sil</string>
+    <string name="add">Ekle</string>
+</resources>

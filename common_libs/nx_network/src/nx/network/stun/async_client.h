@@ -66,24 +66,11 @@ public:
     */
     virtual bool setIndicationHandler(int method, IndicationHandler handler) = 0;
 
-    //!Stops monitoring for certain indications
-    /*!
-        \param method Is monitoring indication type
-        \note does not affect indications in progress
-        \return true on success, false if this method was not monitored
-    */
-    virtual bool ignoreIndications(int method) = 0;
-
     //!Subscribes for the event of successful reconnect
     /*!
-        \param handler is called on every successfull
-        \param client can be used to unsubscribe
+        \param handler is called on every successfull reconnect
     */
-    virtual void addOnReconnectedHandler(
-        ReconnectHandler handler, void* client) = 0;
-
-    //!Stops monitoring for @param client emited subscriptions
-    virtual void removeOnReconnectedHandlers(void* client = nullptr) = 0;
+    virtual void addOnReconnectedHandler(ReconnectHandler handler) = 0;
 
     //!Sends message asynchronously
     /*!
@@ -132,9 +119,7 @@ public:
 
     void connect(SocketAddress endpoint, bool useSsl = false) override;
     bool setIndicationHandler(int method, IndicationHandler handler) override;
-    bool ignoreIndications(int method) override;
-    void addOnReconnectedHandler(ReconnectHandler handler, void* client) override;
-    void removeOnReconnectedHandlers(void* client) override;
+    void addOnReconnectedHandler(ReconnectHandler handler) override;
     void sendRequest(Message request, RequestHandler handler) override;
     SocketAddress localAddress() const override;
     SocketAddress remoteAddress() const override;
@@ -174,7 +159,7 @@ private:
 
     std::list<std::pair<Message, RequestHandler>> m_requestQueue;
     std::map<int, IndicationHandler> m_indicationHandlers;
-    std::multimap<void*, ReconnectHandler> m_reconnectHandlers;
+    std::vector<ReconnectHandler> m_reconnectHandlers;
     std::map<Buffer,RequestHandler> m_requestsInProgress;
 };
 

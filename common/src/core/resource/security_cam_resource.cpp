@@ -459,6 +459,12 @@ int QnSecurityCamResource::motionSensWindowCount() const
     return val.toInt();
 }
 
+
+bool QnSecurityCamResource::hasTwoWayAudio() const
+{
+    return getCameraCapabilities().testFlag(Qn::AudioTransmitCapability);
+}
+
 bool QnSecurityCamResource::isAudioSupported() const {
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
     if (val.toInt() > 0)
@@ -529,7 +535,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
-    return getCameraCapabilities() & capabilities;
+    return (getCameraCapabilities() & capabilities) == capabilities;
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
@@ -1034,4 +1040,10 @@ Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 bool QnSecurityCamResource::isIOModule() const
 {
     return m_cachedIsIOModule.get();
+}
+
+
+QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
+{
+    return nullptr;
 }

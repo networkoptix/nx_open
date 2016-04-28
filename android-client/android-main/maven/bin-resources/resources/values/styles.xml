@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="AppTheme" parent="android:Theme" />
+
+    <style name="AppTheme.Main">
+        <item name="android:textColorPrimary">@color/text_color_primary</item>
+        <item name="android:textColorSecondary">@color/text_color_secondary</item>
+        <item name="android:textColorHint">@color/text_color_hint</item>
+        <item name="android:textColorHighlight">@color/text_color_highlight</item>
+
+        <item name="android:listDivider">@drawable/divider_horizontal_dark</item>
+        
+        <item name="android:progressDrawable">@drawable/progress_horizontal_holo_dark</item>
+        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
+        
+        <item name="android:buttonStyle">@style/HdwStyledButton</item>
+        <item name="android:progressBarStyleHorizontal">@style/HdwStyledProgressBar</item>
+        <item name="android:seekBarStyle">@style/HdwStyledSeekBar</item>
+        <item name="android:checkboxStyle">@style/HdwStyledCheckBox</item>
+    </style>
+
+    <style name="HdwStyledDialogWindowTitle">
+        <item name="android:maxLines">1</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:textAppearance">@style/HdwStyledDialogWindowTitleText</item>
+    </style>
+
+    <style name="HdwStyledButton">
+        <item name="android:background">@drawable/btn_default_holo_dark</item>
+        <item name="android:textColor">@color/text_color_button</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:minWidth">64dip</item>
+    </style>
+
+    <style name="HdwStyledActionBar" parent="android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_dark_holo</item>
+    </style>
+
+    <style name="HdwStyledDialogWindowTitleText">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/dialog_title_color</item>
+    </style>
+    
+    <style name="HdwStyledProgressBar">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_holo_dark</item>
+        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
+        <item name="android:minHeight">16dip</item>
+        <item name="android:maxHeight">16dip</item>
+    </style>
+    
+    <style name="HdwStyledSeekBar" parent="android:style/Widget.Holo.SeekBar">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/progress_horizontal_holo_dark</item>
+        <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo</item>
+        <item name="android:minHeight">13dip</item>
+        <item name="android:maxHeight">13dip</item>
+        <item name="android:thumb">@drawable/scrubber_control_selector_holo</item>
+        <item name="android:thumbOffset">16dip</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">16dip</item>
+        <item name="android:paddingRight">16dip</item>
+    </style>
+    
+    <style name="HdwStyledCheckBox" parent="android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_check_holo_dark</item>
+    </style>
+
+    <style name="PhotoGridLayout">
+        <item name="android:drawSelectorOnTop">true</item>
+        <item name="android:listSelector">@drawable/photogrid_list_selector</item>
+    </style>
+
+</resources>
