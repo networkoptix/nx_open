@@ -2,7 +2,7 @@ import QtQuick 2.0
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 import Nx 1.0
-import Nx.controls 1.0
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
 import "items"
@@ -33,48 +33,6 @@ ApplicationWindow
 
     color: ColorTheme.windowBackground
 
-    QnToolBar {
-        id: toolBar
-
-        width: mainWindow.width - navigationBarPlaceholder.width
-
-        QnMenuBackButton {
-            id: menuBackButton
-
-            parent: toolBar.contentItem
-
-            property bool transitionAnimated: false
-
-            x: 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            Behavior on progress {
-                enabled: menuBackButton.transitionAnimated
-                NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            function animateToMenu() {
-                transitionAnimated = true
-                progress = 0.0
-            }
-
-            function animateToBack() {
-                transitionAnimated = true
-                progress = 1.0
-            }
-
-            onMenuOpenedChanged: transitionAnimated = false
-
-            onClicked: {
-                if (!menuOpened)
-                    sideNavigation.show()
-            }
-        }
-    }
-
     Item {
         id: navigationBarPlaceholder
 
@@ -96,26 +54,14 @@ ApplicationWindow
     StackView {
         id: stackView
 
-        anchors.top: toolBar.bottom
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: navigationBarPlaceholder.realHeight
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.rightMargin: navigationBarPlaceholder.realWidth
-
-        onCurrentItemChanged: {
-            if (currentItem) {
-                toolBar.title = Qt.binding(function() { return currentItem ? currentItem.title : "" })
-                currentItem.forceActiveFocus()
-            }
-        }
+        width: parent.width - navigationBarPlaceholder.realWidth
+        height: parent.height - navigationBarPlaceholder.realHeight
     }
 
     Item {
         id: overlayBound
 
         anchors.fill: parent
-        anchors.topMargin: toolBar.statusBarHeight
         anchors.bottomMargin: navigationBarPlaceholder.realHeight
         anchors.rightMargin: navigationBarPlaceholder.realWidth
 

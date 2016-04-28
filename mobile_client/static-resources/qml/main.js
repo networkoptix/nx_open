@@ -40,7 +40,6 @@ function isMobile() {
 function openDiscoveredSession(_host, _port, _systemName) {
     sideNavigation.hide()
     sideNavigation.enabled = false
-    menuBackButton.animateToBack()
 
     stackView.setScaleTransition()
     stackView.push({
@@ -58,7 +57,6 @@ function openDiscoveredSession(_host, _port, _systemName) {
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
     sideNavigation.hide()
     sideNavigation.enabled = false
-    menuBackButton.animateToBack()
 
     stackView.setScaleTransition()
     stackView.push({
@@ -88,7 +86,6 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
     sideNavigation.hide()
 
     if (!mainWindow.customConnection) {
-        menuBackButton.animateToBack()
         sideNavigation.enabled = false
     }
 
@@ -130,7 +127,6 @@ function gotoNewSession() {
     mainWindow.currentSessionId = ""
     mainWindow.currentSystemName = ""
     sideNavigation.enabled = true
-    menuBackButton.animateToMenu()
 
     if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected) {
         connectionManager.disconnectFromServer(true)
@@ -150,11 +146,6 @@ function gotoNewSession() {
 
 function gotoResources() {
     var item = stackView.get(0)
-
-    if (!item.searchActive) {
-        menuBackButton.animateToMenu()
-        sideNavigation.enabled = true
-    }
     stackView.pop(item)
 }
 
@@ -164,8 +155,6 @@ function gotoMainScreen() {
 
     activeResourceId = ""
 
-    toolBar.opacity = 1.0
-    toolBar.backgroundOpacity = 1.0
     exitFullscreen()
 
     if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected)
@@ -188,7 +177,6 @@ function openMediaResource(uuid, xHint, yHint, initialScreenshot) {
 function openSettings() {
     sideNavigation.hide()
     sideNavigation.enabled = false
-    menuBackButton.animateToBack()
     stackView.setScaleTransition()
     stackView.push(settingsPageComponent)
 }
@@ -223,7 +211,7 @@ function keyIsBack(key) {
     if (key === Qt.Key_Back)
         return true
 
-    if (liteMode)
+//    if (liteMode)
     {
         if (key == Qt.Key_Escape)
             return true

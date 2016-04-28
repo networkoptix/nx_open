@@ -1,5 +1,5 @@
 import QtQuick 2.4
-
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
 import "../controls"
@@ -8,7 +8,7 @@ import "../icons"
 import "../main.js" as Main
 import "QnLoginPage.js" as LoginFunctions
 
-QnPage {
+Page {
     id: loginPage
 
     property alias host: hostField.text
@@ -22,6 +22,7 @@ QnPage {
     property var oldClientOfferDialog: oldClientOfferDialog
 
     title: newConnectionLabel
+    leftButtonIcon: "/images/arrow_back.png"
 
     property bool _authError: false
     property bool _serverError: false
@@ -30,17 +31,13 @@ QnPage {
 
     objectName: "loginPage"
 
-    Connections
+    onLeftButtonClicked:
     {
-        target: menuBackButton
-        onClicked:
+        if (state != "New")
         {
-            if (state != "New")
-            {
-                if (connecting)
-                    connectionManager.disconnectFromServer(true)
-                Main.gotoMainScreen()
-            }
+            if (connecting)
+                connectionManager.disconnectFromServer(true)
+            Main.gotoMainScreen()
         }
     }
 
@@ -344,6 +341,11 @@ QnPage {
             {
                 target: discoveredSessionsLoader
                 sourceComponent: discoveredSessionsList
+            }
+            PropertyChanges
+            {
+                target: loginPage
+                leftButtonIcon: "/images/menu.png"
             }
             StateChangeScript
             {

@@ -1,20 +1,17 @@
 import QtQuick 2.4
-
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
 
 import "../controls"
 
-QnPage {
+Page
+{
     id: settingsPage
 
     title: qsTr("Settings")
-
-    Connections {
-        target: menuBackButton
-        onClicked: Main.gotoMainScreen()
-    }
+    onLeftButtonClicked: Main.gotoMainScreen()
 
     QnFlickable {
         id: flickable

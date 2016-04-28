@@ -1,27 +1,28 @@
 import QtQuick 2.4
+import QtQuick.Layouts 1.3
 import Qt.labs.controls 1.0
 import com.networkoptix.qml 1.0
 import Nx 1.0
+import Nx.Controls 1.0
 
 import "../main.js" as Main
 import "../controls"
 import "../icons"
 import ".."
 
-QnPage {
+Page
+{
     id: resourcesPage
 
-    title: mainWindow.currentSystemName
-
-    property alias searchActive: searchItem.opened
-
-    Object {
+    Object
+    {
         id: d
 
         readonly property bool serverOffline: connectionManager.connectionState === QnConnectionManager.Connecting && !loadingDummy.visible
         property bool serverOfflineWarningVisible: false
 
-        onServerOfflineChanged: {
+        onServerOfflineChanged:
+        {
             if (!serverOffline)
                 serverOfflineWarningVisible = false
         }
@@ -33,81 +34,83 @@ QnPage {
             repeat: false
             running: d.serverOffline
 
-            onTriggered: {
-                searchItem.close()
+            onTriggered:
+            {
+                searchToolBar.close()
                 d.serverOfflineWarningVisible = true
             }
         }
     }
 
-    Connections {
-        target: menuBackButton
-        onClicked: {
-            if (!resourcesPage.activePage || !menuBackButton.menuOpened)
-                return
+    title: mainWindow.currentSystemName
+    leftButtonIcon: "/images/menu.png"
+    titleControls:
+    [
+        QnIconButton
+        {
+            icon: "/images/search.png"
+            enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
+            opacity: !d.serverOfflineWarningVisible ? 1.0 : 0.2
+            onClicked: searchToolBar.open()
+        }
+    ]
 
-            searchItem.close()
+    SearchToolBar
+    {
+        id: searchToolBar
+        parent: header
+    }
+
+    Rectangle
+    {
+        id: offlineWarning
+
+        width: parent.width
+        height: d.serverOfflineWarningVisible ? 40 : 0
+
+        clip: true
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        color: ColorTheme.orange_main
+
+        Behavior on height
+        {
+            enabled: activePage
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+        }
+
+        Text
+        {
+            id: warningText
+            anchors.horizontalCenter: parent.horizontalCenter
+            // Two lines below are the hack to prevent text from moving when the header changes its size
+            anchors.verticalCenter: parent.bottom
+            anchors.verticalCenterOffset: -20
+            font.pixelSize: 16
+            font.weight: Font.DemiBold
+            text: qsTr("Server offline")
+            color: ColorTheme.windowText
         }
     }
 
-    QnSearchItem {
-        id: searchItem
-        parent: toolBar.contentItem
-        onOpenedChanged: {
-            searchListLoader.sourceComponent = opened ? searchListComponent : undefined
-            if (opened) {
-                menuBackButton.animateToBack()
-                sideNavigation.enabled = false
-            } else {
-                menuBackButton.animateToMenu()
-                sideNavigation.enabled = true
-            }
-        }
-        visible: !liteMode && (pageStatus == StackView.Active || pageStatus == StackView.Activating)
-        Keys.forwardTo: resourcesPage
-
-        enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
-        opacity: !d.serverOfflineWarningVisible ? 1.0 : 0.2
-        Behavior on opacity { NumberAnimation { duration: 200 } }
-    }
-
-    QnCameraFlow {
+    QnCameraFlow
+    {
         id: camerasList
         anchors.fill: parent
         anchors.topMargin: offlineWarning.height
         animationsEnabled: !loadingDummy.visible
     }
 
-    Rectangle {
-        id: offlineWarning
-
-        width: parent.width
-        height: d.serverOfflineWarningVisible ? dp(40) : 0
-
-        clip: true
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        color: QnTheme.attentionBackground
-
-        Behavior on height {
-            enabled: activePage
-            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
-        }
-
-        Text {
-            id: warningText
-            anchors.horizontalCenter: parent.horizontalCenter
-            // Two lines below are the hack to prevent text from moving when the header changes its size
-            anchors.verticalCenter: parent.bottom
-            anchors.verticalCenterOffset: -dp(20)
-            font.pixelSize: sp(16)
-            font.weight: Font.DemiBold
-            text: qsTr("Server offline")
-            color: QnTheme.windowText
-        }
+    Loader
+    {
+        id: searchListLoader
+        anchors.fill: parent
+        active: searchToolBar.text && searchToolBar.opacity == 1.0
+        sourceComponent: searchListComponent
     }
 
-    Rectangle {
+    Rectangle
+    {
         id: offlineDimmer
         anchors.fill: parent
         anchors.topMargin: offlineWarning.height
@@ -118,14 +121,18 @@ QnPage {
 
         visible: opacity > 0
 
-        MouseArea {
+        MouseArea
+        {
             anchors.fill: parent
             // Block mouse events
         }
     }
 
-    Rectangle {
+
+    Rectangle
+    {
         id: loadingDummy
+
         anchors.fill: parent
         color: QnTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
@@ -133,9 +140,9 @@ QnPage {
 
         Column {
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: -dp(28)
+            anchors.verticalCenterOffset: -28
 
-            spacing: dp(16)
+            spacing: 16
 
             QnCirclesPreloader {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -143,11 +150,11 @@ QnPage {
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                height: dp(56)
+                height: 56
                 verticalAlignment: Qt.AlignVCenter
 
                 text: connectionManager.connectionState === QnConnectionManager.Connected ? qsTr("Loading...") : qsTr("Connecting...")
-                font.pixelSize: sp(32)
+                font.pixelSize: 32
                 color: QnTheme.loadingText
             }
         }
@@ -159,43 +166,37 @@ QnPage {
         }
     }
 
-    Rectangle {
-        id: searchList
-
-        anchors.fill: parent
-        color: QnTheme.windowBackground
-
-        visible: searchListLoader.status == Loader.Ready && searchItem.text
-
-        Loader {
-            id: searchListLoader
-            anchors.fill: parent
-        }
-    }
-
-    Component {
+    Component
+    {
         id: searchListComponent
 
-        QnCameraList {
-            id: cameraListItem
-            model: QnCameraListModel {
-                id: searchModel
-            }
+        Rectangle
+        {
+            color: ColorTheme.windowBackground
 
-            Connections {
-                target: searchItem
-                onTextChanged: searchModel.setFilterFixedString(searchItem.text)
+            QnCameraList
+            {
+                anchors.fill: parent
+                model: QnCameraListModel { id: searchModel }
+                Connections
+                {
+                    target: searchToolBar
+                    onTextChanged: searchModel.setFilterFixedString(searchToolBar.text)
+                }
             }
         }
     }
 
     Connections {
         target: connectionManager
-        onInitialResourcesReceived: {
+        onInitialResourcesReceived:
+        {
             loadingDummy.opacity = 0.0
         }
-        onConnectionStateChanged: {
-            if (connectionManager.connectionState === QnConnectionManager.Disconnected) {
+        onConnectionStateChanged:
+        {
+            if (connectionManager.connectionState === QnConnectionManager.Disconnected)
+            {
                 loadingDummy.opacity = 1.0
             }
         }
@@ -207,9 +208,9 @@ QnPage {
     {
         if (Main.keyIsBack(event.key))
         {
-            if (searchItem.opened)
+            if (searchToolBar.visible)
             {
-                searchItem.close()
+                searchToolBar.close()
                 event.accepted = true
             }
             else if (Main.backPressed())

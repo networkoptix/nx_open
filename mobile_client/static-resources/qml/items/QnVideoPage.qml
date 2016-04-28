@@ -2,21 +2,22 @@ import QtQuick 2.2
 import QtQuick.Window 2.2
 import QtMultimedia 5.0
 import Nx 1.0
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
 import "../controls"
 import ".."
 
-QnPage {
+Page
+{
     id: videoPage
-
-    title: mainWindow.currentSystemName
 
     property string resourceId
     property string initialScreenshot
 
-    Object {
+    Object
+    {
         id: d
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
@@ -104,49 +105,43 @@ QnPage {
         }
     }
 
-    QnMediaResourceHelper {
+    QnMediaResourceHelper
+    {
         id: resourceHelper
         resourceId: player.resourceId
     }
 
-    Rectangle {
-        width: mainWindow.width
-        height: mainWindow.height
-        y: -stackView.y
-        color: QnTheme.windowBackground
-    }
-
-    QnToolBar {
+    header: ToolBar
+    {
         id: toolBar
 
-        z: 5.0
-
-        anchors.top: undefined
-        anchors.bottom: parent.top
-        backgroundOpacity: 0.0
-
         title: resourceHelper.resourceName
-
-        opacity: liteMode ? 0.0 : 1.0
-
-        QnMenuBackButton {
-            x: dp(10)
-            anchors.verticalCenter: parent.verticalCenter
-            progress: 1.0
-            onClicked: Main.gotoMainScreen()
+        leftButtonIcon: "/images/arrow_back.png"
+        onLeftButtonClicked: Main.gotoMainScreen()
+        background: Image
+        {
+            anchors.fill: parent
+            anchors.topMargin: -toolBar.statusBarHeight
+            source: "/images/toolbar_gradient.png"
         }
 
-        // TODO: #dklychkov enable if we need the menu
-//        QnIconButton {
-//            anchors.verticalCenter: parent.verticalCenter
-//            anchors.right: parent.right
-//            anchors.rightMargin: dp(8)
-//            icon: "image://icon/more_vert.png"
-//            onClicked: {
-//                cameraMenu.updateGeometry(this)
-//                cameraMenu.show()
+        opacity: liteMode ? 0.0 : 1.0
+        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+
+        controls:
+        [
+            // TODO: #dklychkov enable if we need the menu
+//            QnIconButton {
+//                anchors.verticalCenter: parent.verticalCenter
+//                anchors.right: parent.right
+//                anchors.rightMargin: dp(8)
+//                icon: "image://icon/more_vert.png"
+//                onClicked: {
+//                    cameraMenu.updateGeometry(this)
+//                    cameraMenu.show()
+//                }
 //            }
-//        }
+        ]
     }
 
 //    QnCameraMenu {
@@ -169,15 +164,16 @@ QnPage {
 //        onHidden: videoPage.forceActiveFocus()
 //    }
 
-    QnScalableVideo {
+    QnScalableVideo
+    {
         id: video
 
-        visible: dummyLoader.status != Loader.Ready
+        parent: videoPage
+        z: -0.5
+        width: mainWindow.width
+        height: mainWindow.height
 
-        anchors.fill: parent
-        anchors.topMargin: -toolBar.fullHeight
-        anchors.bottomMargin: -navigationBarPlaceholder.realHeight
-        anchors.rightMargin: -navigationBarPlaceholder.realWidth
+        visible: dummyLoader.status != Loader.Ready
 
         source: player
         screenshotSource: initialResourceScreenshot
