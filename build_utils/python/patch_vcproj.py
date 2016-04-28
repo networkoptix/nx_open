@@ -110,6 +110,19 @@ def fix_qrc(root):
             allowed = [f for f in files if not f.endswith('.png') and not f.endswith('.ico') and not f.endswith('.qm')]
             inputNode.text = ';'.join(allowed)
 
+def add_qt_path(root):
+    """Adding runtime path to QT libs."""
+    #xpath = "./Project/PropertyGroup"
+
+    print "Adding path to QT libs"
+    target = Element('PropertyGroup')
+    root.insert(3, target)
+    
+    env = Element('LocalDebuggerEnvironment')
+    env.text= 'PATH=%ENVIRONMENT%\\packages\\windows-{0}\\qt-5.6.0\\bin$(LocalDebuggerEnvironment)'.format(arch)
+    target.append(env)
+    indent(target, 1)
+            
 def patch_project(project):
     print "Patching {0}...".format(project)
     tree = ET.parse(project)
@@ -121,6 +134,7 @@ def patch_project(project):
     fix_qrc(root)
     fix_mocables(root)
     add_prebuild_events(root)
+    add_qt_path(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():
