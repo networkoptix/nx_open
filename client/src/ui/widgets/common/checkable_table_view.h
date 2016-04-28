@@ -42,7 +42,7 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
-    Q_INVOKABLE void synchronizeWithModel();
+    void synchronizeWithModel();
     void modelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
 
 private:

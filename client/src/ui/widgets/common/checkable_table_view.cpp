@@ -4,6 +4,8 @@
 #include "checkable_table_view.h"
 
 #include <client/client_globals.h>
+
+#include <utils/common/delayed.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace
@@ -29,6 +31,10 @@ QnCheckableTableView::QnCheckableTableView(QWidget* parent):
 
 void QnCheckableTableView::reset()
 {
+    /* Disable visual updates: */
+    setUpdatesEnabled(false);
+    bool syncQueued = false;
+
     /* Inherited reset: */
     base_type::reset();
 
@@ -36,15 +42,35 @@ void QnCheckableTableView::reset()
     disconnect(m_dataChangedConnection);
     m_dataChangedConnection = QMetaObject::Connection();
 
-    /* Clear model check states at model reset: */
+    /* If model exists and is not empty we should synchronize selection with it: */
     if (auto dataModel = model())
     {
-        /* Defer synchronization past all handing of modelReset signal: */
         if (dataModel->rowCount())
-            QMetaObject::invokeMethod(this, "synchronizeWithModel", Qt::QueuedConnection);
+        {
+            /* Defer synchronization past all further handing of modelReset signal: */
+            executeDelayed(
+                [this]()
+                {
+                    /* Synchronize selection with model: */
+                    synchronizeWithModel();
+
+                    /* Re-enable visual updates and mark entire widget for update: */
+                    setUpdatesEnabled(true);
+                    update();
+                });
+
+            syncQueued = true;
+        }
 
         /* Connect to model's dataChanged: */
         m_dataChangedConnection = connect(dataModel, &QAbstractItemModel::dataChanged, this, &QnCheckableTableView::modelDataChanged);
+    }
+
+    /* Re-enable visual updates if synchronization wasn't queued, and mark entire widget for update: */
+    if (!syncQueued)
+    {
+        setUpdatesEnabled(true);
+        update();
     }
 }
 
