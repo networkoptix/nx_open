@@ -48,24 +48,6 @@ namespace ec2
             QnMiscNotificationManager* miscManager,
             QnDiscoveryNotificationManager* discoveryManager);
 
-        template<typename Param>
-        struct GenericTransactionDescriptorTriggerVisitor
-        {
-            template<typename Descriptor>
-            void operator ()(const Descriptor &d)
-            {
-                d.triggerNotificationFunc(m_tran, m_notificationParams);
-            }
-
-            GenericTransactionDescriptorTriggerVisitor(const QnTransaction<Param> &tran, const ec2::detail::NotificationParams &notificationParams)
-                : m_tran(tran),
-                  m_notificationParams(notificationParams)
-            {}
-        private:
-            const QnTransaction<Param> &m_tran;
-            const ec2::detail::NotificationParams &m_notificationParams;
-        };
-
         template<typename T>
         void triggerNotification(const QnTransaction<T> &tran)
         {
@@ -86,10 +68,12 @@ namespace ec2
                 m_discoveryManager
             };
 
-            auto filteredDescriptors = getTransactionDescriptorsFilteredByTransactionParams<T>();
-            static_assert(std::tuple_size<decltype(filteredDescriptors)>::value, "Should be at least one Transaction descriptor to proceed");
-            GenericTransactionDescriptorTriggerVisitor<T> visitor(tran, notificationParams);
-            visitTransactionDescriptorIfValue(tran.command, visitor, filteredDescriptors);
+            auto tdBase = getTransactionDescriptorByValue(tran.command);
+            auto td = dynamic_cast<detail::TransactionDescriptor<T>*>(tdBase);
+            NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
+            if (td == nullptr)
+                return;
+            td->triggerNotificationFunc(tran, notificationParams);
         }
 
     private:

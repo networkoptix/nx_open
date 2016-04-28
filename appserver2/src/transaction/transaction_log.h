@@ -34,72 +34,27 @@ namespace ec2
 
         bool contains(const QnTranState& state) const;
 
-        template<typename Param>
-        struct GenericTransactionDescriptorSaveVisitor
-        {
-            template<typename Descriptor>
-            void operator ()(const Descriptor &d)
-            {
-                m_errorCode = d.saveFunc(m_tran, &m_tlog);
-            }
-
-            GenericTransactionDescriptorSaveVisitor(const QnTransaction<Param> &tran, QnTransactionLog &tlog)
-                : m_tran(tran),
-                  m_tlog(tlog),
-                  m_errorCode(ErrorCode::notImplemented)
-            {}
-
-            ErrorCode getError() const { return m_errorCode; }
-        private:
-            const QnTransaction<Param> &m_tran;
-            QnTransactionLog &m_tlog;
-            ErrorCode m_errorCode;
-        };
-
-        template<typename Param>
-        struct GenericTransactionDescriptorSaveSerializedVisitor
-        {
-            template<typename Descriptor>
-            void operator ()(const Descriptor &d)
-            {
-                m_errorCode = d.saveSerializedFunc(m_tran, m_serializedTran, &m_tlog);
-            }
-
-            GenericTransactionDescriptorSaveSerializedVisitor(const QnTransaction<Param> &tran, const QByteArray &serializedTran, QnTransactionLog &tlog)
-                : m_tran(tran),
-                  m_serializedTran(serializedTran),
-                  m_tlog(tlog),
-                  m_errorCode(ErrorCode::notImplemented)
-            {}
-
-            ErrorCode getError() const { return m_errorCode; }
-        private:
-            const QnTransaction<Param> &m_tran;
-            const QByteArray &m_serializedTran;
-            QnTransactionLog &m_tlog;
-            ErrorCode m_errorCode;
-        };
-
         template <typename T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran)
         {
-            auto filteredDescriptors = ec2::getTransactionDescriptorsFilteredByTransactionParams<T>();
-            static_assert(std::tuple_size<decltype(filteredDescriptors)>::value, "Should be at least one Transaction descriptor to proceed");
-            GenericTransactionDescriptorSaveVisitor<T> visitor(tran, *this);
-            visitTransactionDescriptorIfValue(tran.command, visitor, filteredDescriptors);
-
-            return visitor.getError();
+            auto tdBase = getTransactionDescriptorByValue(tran.command);
+            auto td = dynamic_cast<detail::TransactionDescriptor<T>*>(tdBase);
+            NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
+            if (td == nullptr)
+                return ErrorCode::notImplemented;
+            return td->saveFunc(tran, this);
         }
 
         template <typename T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            auto filteredDescriptors = ec2::getTransactionDescriptorsFilteredByTransactionParams<T>();
-            static_assert(std::tuple_size<decltype(filteredDescriptors)>::value, "Should be at least one Transaction descriptor to proceed");
-            GenericTransactionDescriptorSaveSerializedVisitor<T> visitor(tran, serializedTran, *this);
-            visitTransactionDescriptorIfValue(tran.command, visitor, filteredDescriptors);
-
-            return visitor.getError();
+            auto tdBase = getTransactionDescriptorByValue(tran.command);
+            auto td = dynamic_cast<detail::TransactionDescriptor<T>*>(tdBase);
+            NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
+            if (td == nullptr)
+                return ErrorCode::notImplemented;
+            return td->saveSerializedFunc(tran, serializedTran, this);
+            return ErrorCode::ok;
         }
 
         qint64 getTimeStamp();
@@ -119,8 +74,16 @@ namespace ec2
         template<typename Param>
         QnUuid transactionHash(const Param &param)
         {
-            auto descriptor = getTransactionDescriptorByTransactionParams<Param>();
-            return descriptor.getHashFunc(param);
+            for (auto it = detail::transactionDescriptors.get<0>().begin();
+                 it != detail::transactionDescriptors.get<0>().end(); ++it)
+            {
+                auto tdBase = (*it).get();
+                auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
+                if (td)
+                    return td->getHashFunc(param);
+            }
+            NX_ASSERT(0, "Transaciton descriptor for the given param not found");
+            return QnUuid();
         }
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);

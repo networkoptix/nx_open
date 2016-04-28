@@ -123,7 +123,7 @@ namespace ec2
     };
 
     //Overload for ubjson transactions
-    template<class Function>
+    template<typename Function, typename Param>
     bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction,
         Function function, FastFunctionType fastFunction)
     {
@@ -131,78 +131,38 @@ namespace ec2
             return true; // process transaction directly without deserialize
         }
 
-        HandleTranParamsUBJsonVisitor<Function> visitor(abstractTransaction, serializedTransaction, stream, function);
-        visitTransactionDescriptorIfValue(abstractTransaction.command, visitor);
-
-        if (!visitor.visited())
+        auto transaction = QnTransaction<Param>(abstractTransaction);
+        if (!QnUbjson::deserialize(stream, &transaction.params))
         {
-            qWarning() << "Transaction type " << abstractTransaction.command << " is not implemented for delivery! Implement me!";
-            NX_ASSERT(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
+            qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
             return false;
         }
-        return visitor.getResult();
+        if (!abstractTransaction.persistentInfo.isNull())
+            QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
+        function(transaction);
+        return true;
     }
 
-    template<typename Function>
-    struct HandleTranParamsJsonVisitor
-    {
-        template<typename Descriptor>
-        void operator ()(const Descriptor& d)
-        {
-            m_visited = true;
-            auto transaction = d.createTransactionFromAbstractTransactionFunc(m_abstractTransaction);
-            if (!QJson::deserialize(m_jsonData["params"], &transaction.params)) {
-                qWarning() << "Can't deserialize transaction " << toString(m_abstractTransaction.command);
-                m_result = false;
-                return;
-            }
-            //if (!abstractTransaction.persistentInfo.isNull())
-            //    QnJsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
-            m_f(transaction);
-            m_result = true;
-        }
-
-        HandleTranParamsJsonVisitor(const QnAbstractTransaction &abstractTransaction, Function f, const QJsonObject &jsonData)
-            : m_abstractTransaction(abstractTransaction),
-              m_f(f),
-              m_result(false),
-              m_jsonData(jsonData),
-              m_visited(false)
-        {}
-
-        bool getResult() const { return m_result; }
-        bool visited() const { return m_visited; }
-    private:
-        const QnAbstractTransaction &m_abstractTransaction;
-        Function m_f;
-        bool m_result;
-        const QJsonObject &m_jsonData;
-        bool m_visited;
-    };
-
     //Overload for json transactions
-    template<class Function>
+    template<typename Function, typename Param>
     bool handleTransactionParams(const QByteArray &serializedTransaction, const QJsonObject& jsonData, const QnAbstractTransaction &abstractTransaction,
         Function function, FastFunctionType fastFunction)
     {
         if (fastFunction(Qn::JsonFormat, serializedTransaction)) {
             return true; // process transaction directly without deserialize
         }
-
-        HandleTranParamsJsonVisitor<Function> visitor(abstractTransaction, function, jsonData);
-        visitTransactionDescriptorIfValue(abstractTransaction.command, visitor);
-
-        if (!visitor.visited())
-        {
-            qWarning() << "Transaction type " << abstractTransaction.command << " is not implemented for delivery! Implement me!";
-            NX_ASSERT(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
+        auto transaction = QnTransaction<Param>(abstractTransaction);
+        if (!QJson::deserialize(jsonData["params"], &transaction.params)) {
+            qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
             return false;
         }
-
-        return visitor.getResult();
+        function(transaction);
+        return true;
     }
 
-    template<class SerializationSupport, class Function>
+#define HANDLE_TRANSACTION_PARAMS_APPLY(_, value, param, ...) case ApiCommand::value : return handleTransactionParams<Function, param>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
+
+    template<typename SerializationSupport, typename Function>
     bool handleTransaction2(
         const QnAbstractTransaction& transaction,
         const SerializationSupport& serializationSupport,
@@ -210,9 +170,16 @@ namespace ec2
         const Function& function,
         FastFunctionType fastFunction )
     {
-        return handleTransactionParams(serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        switch (transaction.command)
+        {
+        TRANSACTION_DESCRIPTOR_LIST(HANDLE_TRANSACTION_PARAMS_APPLY)
+        default:
+            NX_ASSERT(0, "Unknown transaction command");
+        }
+        return false;
     }
 
+#undef HANDLE_TRANSACTION_PARAMS_APPLY
 
     template<class Function>
     bool handleTransaction(
