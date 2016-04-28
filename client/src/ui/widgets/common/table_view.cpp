@@ -11,6 +11,26 @@ QnTableView::~QnTableView()
 {
 }
 
+QSize QnTableView::viewportSizeHint() const
+{
+    /* Fix for QTableView bug
+     *  QTableView adjusts sizeHint if scrollBar.isVisible()
+     *  But isVisible() deals with global visibility and returns false if QTableView is hidden (while its scrollbar is not)
+     *  To check local visibility isHidden() must be used
+     *  So as a workaround we adjust sizeHint after Qt if !scrollbar.isVisible() && !scrollbar.isHidden()
+     */
+
+    QSize size = base_type::viewportSizeHint();
+
+    if (!verticalScrollBar()->isVisible() && !verticalScrollBar()->isHidden())
+        size.setWidth(size.width() + verticalScrollBar()->width());
+
+    if (!horizontalScrollBar()->isVisible() && !horizontalScrollBar()->isHidden())
+        size.setHeight(size.height() + horizontalScrollBar()->height());
+
+    return size;
+}
+
 bool QnTableView::edit(const QModelIndex& index, EditTrigger trigger, QEvent* event)
 {
     if (trigger == QAbstractItemView::SelectedClicked && (this->editTriggers() & QAbstractItemView::DoubleClicked))

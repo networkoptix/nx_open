@@ -17,6 +17,8 @@ public:
     explicit QnTableView(QWidget* parent = nullptr);
     virtual ~QnTableView();
 
+    virtual QSize viewportSizeHint() const override;
+
     QModelIndex mouseIndex() const { return m_lastModelIndex; }
 
 signals:
