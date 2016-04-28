@@ -608,10 +608,6 @@ namespace nx_http
         return buf;
     }
 
-    bool RtspResponse::parse(const ConstBufferRefType &data)
-    {
-        return parseRequestOrResponse( data, (Response*)this, &Response::statusLine, true );
-    }
 
     namespace MessageType
     {
