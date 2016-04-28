@@ -35,7 +35,7 @@ describe('Login dialog', function () {
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
 
-        // Check that element that user is on page Systems
+        // Check that user is on page Systems
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(p.htmlBody.getText()).toContain('Systems');
 
@@ -256,25 +256,30 @@ describe('Login dialog', function () {
         return deferred.promise;
     }, p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger, true);
 
-    xit("logs in with Remember Me checkmark switched on; after close browser, open browser enters same session", function () {
+    it("logs in with Remember Me checkmark switched on; after close browser, open browser enters same session", function () {
         //check remember me function by closing browser instance and opening it again
-        expect("test").toBe("written");
+        p.helper.login();
     });
 
-    xit("displays password masked", function () {
-        expect("test").toBe("written with screenshot");
-    });
-
-    xit("allows to copy password masked", function () {
-        expect("test").toBe("written with screenshot");
+    it("displays password masked", function () {
+        p.get();
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        expect(p.passwordInput.getText()).not.toContain(p.helper.userPassword);
+        browser.takeScreenshot().then(function (png) {
+            p.helper.writeScreenShot(png, '...../masked_password.png');
+        });
     });
 
     xit("locks account after several failed attempts", function () {
         expect("functionality").toBe("implemented");
     });
 
-    xit("rejects log in, if the user just logged out and pressed back button in browser", function () {
-        expect("test").toBe("written");
+    it("requires login, if the user has just logged out and pressed back button in browser", function () {
+        p.helper.login();
+        p.helper.logout();
+        browser.navigate().back();
+        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        expect(p.loginDialog.isDisplayed()).toBe(true);
     });
 
     xit("handles more than 256 symbols email and password", function() {
@@ -285,14 +290,79 @@ describe('Login dialog', function () {
          Use password with much more than 256 symbols
          */
     });
-    xit(": logout refreshes page", function() {
+
+    it(": logout refreshes page", function() {
+        p.helper.login();
+        p.helper.get(p.helper.urls.account);
+        var accountElem = p.helper.forms.account.lastNameInput;
+        expect(accountElem.isDisplayed()).toBe(true);
+        p.helper.logout();
+        expect(accountElem.isPresent()).toBe(false);
     });
-    xit("can be opened in new tab", function() {
-    });
+
     xit("allows copy-paste in input fields", function() {
     });
-    xit("supports hotkeys", function() {
+
+    it("should respond to Esc key and close dialog", function () {
+        p.get();
+        p.emailInput.sendKeys(protractor.Key.ESCAPE);
+        expect(p.loginDialog.isPresent()).toBe(false);
     });
-    xit("handles two tabs, updates second tab state if logout is done on first", function() {
+
+    it("should respond to Enter key and log in", function () {
+        p.get();
+        p.emailInput.sendKeys(p.helper.userEmail);
+        p.passwordInput.sendKeys(p.helper.userPassword)
+            .sendKeys(protractor.Key.ENTER);
+        expect(p.helper.loginSuccessElement.isPresent()).toBe(true);
+        p.helper.logout();
+    });
+
+    it("should respond to Tab key", function () {
+        p.get();
+        // Navigate to next field using TAB key
+        p.emailInput.sendKeys(protractor.Key.TAB);
+        p.helper.checkElementFocusedBy(p.passwordInput, 'id');
+    });
+
+    it("should respond to Space key and toggle checkbox", function () {
+        p.get();
+        p.passwordInput.sendKeys(protractor.Key.TAB);
+        p.rememberCheckbox.sendKeys(protractor.Key.SPACE);
+        expect(p.rememberCheckbox.isSelected()).toBe(false); // verify that it is switched off
+        expect(p.rememberCheckbox.getAttribute('class')).toContain('ng-empty'); // verify that it is really switched off
+
+        p.rememberCheckbox.sendKeys(protractor.Key.SPACE);
+        expect(p.rememberCheckbox.isSelected()).toBe(true); // verify that it is switched on
+        expect(p.rememberCheckbox.getAttribute('class')).not.toContain('ng-empty'); // verify that it is really switched on
+    });
+
+    it("handles two tabs, updates second tab state if logout is done on first", function() {
+        var termsConditions = element(by.linkText('Terms and Conditions'));
+        // Open Terms and Conditions link allows to open new tab. Opening new browser Tab is not supported in Selenium
+        p.helper.get(p.helper.urls.register);
+        termsConditions.click();
+        p.helper.get(); // moving away from register page (because it logs out)
+
+        // Switch to just opened new tab
+        browser.getAllWindowHandles().then(function (handles) {
+            var oldWindow = handles[0];
+            var newWindow = handles[1];
+            browser.switchTo().window(newWindow).then(function () {
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+                p.helper.login();
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
+            });
+            browser.switchTo().window(oldWindow).then(function () {
+                browser.refresh();
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
+                p.helper.logout();
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+            });
+            browser.switchTo().window(newWindow).then(function () {
+                browser.refresh();
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+            });
+        });
     });
 });

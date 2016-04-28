@@ -20,7 +20,8 @@ var Helper = function () {
 
     this.basePassword = 'qweasd123';
 
-    this.get = function (url) {
+    this.get = function (opt_url) {
+        var url = opt_url || '/';
         browser.get(url);
         browser.waitForAngular();
     };
@@ -347,6 +348,17 @@ var Helper = function () {
     this.isSubstr = function(string, substring) {
         if (string.indexOf(substring) > -1) return true;
     };
+
+    var fs = require('fs');
+
+    // writing screen shot to a file
+    this.writeScreenShot = function(data, filename) {
+        var stream = fs.createWriteStream(filename);
+
+        stream.write(new Buffer(data, 'base64'));
+        stream.end();
+    }
+
 };
 
 module.exports = Helper;
