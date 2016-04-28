@@ -1,6 +1,9 @@
+
 #include "audio_transmission_rest_handler.h"
+
+#include <nx/network/http/httptypes.h>
 #include <streaming/audio_streamer_pool.h>
-#include <utils/network/http/httptypes.h>
+
 
 namespace
 {
@@ -32,8 +35,14 @@ int QnAudioTransmissionRestHandler::executeGet(
         ? QnAudioStreamerPool::Action::Start 
         : QnAudioStreamerPool::Action::Stop;
 
-    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(clientId, resourceId, action, errorStr))
+    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(
+            QnUuid::fromStringSafe(clientId),
+            QnUuid::fromStringSafe(resourceId),
+            action,
+            errorStr))
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
+    }
     return nx_http::StatusCode::ok;
 }
 

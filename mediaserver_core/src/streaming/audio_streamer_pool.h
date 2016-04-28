@@ -1,7 +1,7 @@
 #ifndef AUDIO_STREAMER_POOL_H
 #define AUDIO_STREAMER_POOL_H
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnAudioStreamerPool : public Singleton<QnAudioStreamerPool>
 {
