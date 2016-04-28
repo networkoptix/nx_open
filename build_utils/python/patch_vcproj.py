@@ -86,9 +86,13 @@ def fix_mocables(root):
         return
 
     print "Removing moc custom build steps"
-    nodesToRemove = [parent_map[node] for node in nodes]
-    for itemGroupNode in nodesToRemove:
-        root.remove(itemGroupNode)        
+    for node in nodes:
+        include = node.attrib
+        itemGroupNode = parent_map[node]
+        itemGroupNode.remove(node)
+        itemGroupNode.append(Element('ClInclude', include))
+        indent(itemGroupNode, 1)
+            
 
 def fix_qrc(root):
     """Removing additional inputs from qrc, since we rebuild it manually."""
