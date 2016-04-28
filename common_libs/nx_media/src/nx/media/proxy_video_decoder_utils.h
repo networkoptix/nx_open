@@ -4,16 +4,45 @@
 #include <memory>
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QElapsedTimer>
 
 #include <proxy_decoder.h>
 
+#include <nx/utils/flag_config.h>
 #include <nx/streaming/video_data_packet.h>
 
-// Uses configuration:
-// #define ENABLE_LOG
-// #define ENABLE_TIME
+#include "media_fwd.h"
 
-void showFps();
+namespace nx {
+namespace media {
+
+class ProxyVideoDecoderFlagConfig: public nx::utils::FlagConfig
+{
+public:
+    using FlagConfig::FlagConfig;
+
+    NX_FLAG(1, largeOnly); //< isCompatible() will allow only width > 640.
+
+    // Debug output.
+    NX_FLAG(0, enableOutput);
+    NX_FLAG(0, enableTime);
+
+    // Choosing impl.
+    NX_FLAG(1, implDisplay); //< decodeToDisplayQueue() => displayDecoded() in frame handle().
+    NX_FLAG(0, implRgb); //< decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.
+    NX_FLAG(0, implYuvPlanar); //< decodeToYuvPlanar() -> AlignedMemVideoBuffer => Qt Shader.
+    NX_FLAG(0, implYuvNative); //< decodeToYuvNative() -> AlignedMemVideoBuffer => Plugin Shader.
+    NX_FLAG(0, implGl); //< decodeYuvPlanar() => Planar YUV Shader.
+
+    // OpenGL impl options.
+    NX_FLAG(0, stopOnGlErrors);
+    NX_FLAG(0, outputGlCalls);
+    NX_FLAG(0, useGlGuiRendering);
+    NX_FLAG(1, useSharedGlContext);
+};
+extern ProxyVideoDecoderFlagConfig conf;
+
+void debugShowFps();
 
 /** Debug tool - implicitly unaligned pointer. */
 uint8_t* debugUnalignPtr(void* data);
@@ -24,44 +53,40 @@ uint8_t* debugUnalignPtr(void* data);
 std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
     const QnConstCompressedVideoDataPtr& compressedVideoData);
 
-// TODO mike: Rewrite macros as in proxy_decoder.
+#define PRINT qWarning().nospace() << OUTPUT_PREFIX
 
-#ifdef ENABLE_LOG
-    #define QLOG(...) qDebug().nospace() << __VA_ARGS__
-#else // ENABLE_LOG
-    #define QLOG(...)
-#endif // ENABLE_LOG
+#if !defined(OUTPUT_PREFIX)
+    #define OUTPUT_PREFIX "ProxyVideoDecoder: "
+#endif
+#define OUTPUT if (!conf.enableOutput) {} else qWarning().nospace() << OUTPUT_PREFIX
 
-#ifdef ENABLE_TIME
+long getTimeMs();
+void logTimeMs(long oldTime, const char* message);
+#define TIME_BEGIN(TAG) long TIME_##TAG = conf.enableTime ? getTimeMs() : 0
+#define TIME_END(TAG) if(conf.enableTime) logTimeMs(TIME_##TAG, #TAG)
 
-    #define TIME_BEGIN(TAG) \
-        { std::chrono::milliseconds TIME_t0 = getCurrentTime(); const char* const TIME_tag = TAG;
+/**
+ * Is a stub if !conf.enableTime.
+ */
+class DebugTimer
+{
+public:
+    DebugTimer(const char* name);
+    ~DebugTimer();
+    void mark(const char* tag);
+    void finish(const char* tag);
 
-    #define TIME_END logTime(TIME_t0, TIME_tag); }
+private:
+    struct Private;
+    std::unique_ptr<Private> d;
+};
 
-    #define TIME_START() \
-        QElapsedTimer TIME_timer; \
-        TIME_timer.restart(); \
-        std::vector<qint64> TIME_list; \
-        std::vector<QString> TIME_tags
-
-    #define TIME_PUSH(TAG) timePush((TAG), TIME_timer, TIME_list, TIME_tags)
-
-    #define TIME_FINISH(TAG) timeFinish((TAG), TIME_timer, TIME_list, TIME_tags)
-
-#else // ENABLE_TIME
-    #define TIME_BEGIN(TAG)
-    #define TIME_END
-    #define TIME_START()
-    #define TIME_PUSH(TAG)
-    #define TIME_FINISH(TAG)
-#endif // ENABLE_TIME
+void debugDrawCheckerboardArgb(
+    uint8_t* argbBuffer, int lineSizeBytes, int frameWidth, int frameHeight);
 
 class YuvBuffer;
 typedef std::shared_ptr<YuvBuffer> YuvBufferPtr;
 typedef std::shared_ptr<const YuvBuffer> ConstYuvBufferPtr;
-
-static const int kMediaAlignment = 32;
 
 class YuvBuffer
 {
@@ -121,5 +146,8 @@ private:
     void* m_uBuffer = nullptr;
     void* m_vBuffer = nullptr;
 };
+
+} // namespace media
+} // namespace nx
 
 #endif // ENABLE_PROXY_DECODER

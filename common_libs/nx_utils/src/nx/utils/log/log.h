@@ -181,7 +181,7 @@ static const char* relative_src_filename(const char* s)
 
 // Log execution of a line - put double-L at the beginning of the line.
 #ifdef _DEBUG
-    #define LL qDebug().nospace() << "####### XXX line " << __LINE__ \
+    #define LL qDebug().nospace() << "####### line " << __LINE__ \
         << " [" << relative_src_filename(__FILE__) << "]";
 #else
     #define LL

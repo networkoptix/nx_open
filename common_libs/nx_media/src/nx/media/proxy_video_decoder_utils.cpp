@@ -1,70 +1,92 @@
 #include "proxy_video_decoder_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <chrono>
+#include <cstdint>
 #include <deque>
-#include <vector>
 
-#include <QtCore/QString>
-#include <QtCore/QElapsedTimer>
+namespace nx {
+namespace media {
 
-std::chrono::milliseconds getCurrentTime()
+ProxyVideoDecoderFlagConfig conf("ProxyVideoDecoder");
+
+long getTimeMs()
 {
-    Q_UNUSED(getCurrentTime);
-
     return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch());
+        std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-void logTime(std::chrono::milliseconds oldTime, const char* tag)
+void logTimeMs(long oldTimeMs, const char* tag)
 {
-    std::chrono::milliseconds time = getCurrentTime();
-    qWarning() << "TIME ms:" << (time - oldTime).count() << " [" << tag << "]";
+    long timeMs = getTimeMs();
+    PRINT << "TIME ms: " << (timeMs - oldTimeMs) << " [" << tag << "]";
 }
 
-void timePush(
-    const char* tag, const QElapsedTimer& timer,
-    std::vector<qint64>& list, std::vector<QString>& tags)
+struct DebugTimer::Private
 {
-    const auto t = timer.elapsed();
-    if (std::find(tags.begin(), tags.end(), QString(tag)) != tags.end())
+    const char* name;
+    QElapsedTimer timer;
+    std::vector<qint64> list;
+    std::vector<QString> tags;
+};
+
+DebugTimer::DebugTimer(const char* name)
+{
+    if (conf.enableTime)
     {
-        std::cerr << "FATAL INTERNAL ERROR: tag \"" << tag << "\" already pushed to time list.\n";
-        NX_CRITICAL(false);
+        d.reset(new Private);
+        d->name = name;
+        d->timer.restart();
     }
-    list.push_back(t);
-    tags.push_back(tag);
 }
 
-void timeFinish(
-    const char* tag, const QElapsedTimer& timer,
-    std::vector<qint64>& list, std::vector<QString>& tags)
+DebugTimer::~DebugTimer() //< Destructor should be defined to satisfy unique_ptr.
 {
-    auto now = timer.elapsed();
-    QString s;
-    for (int i = 0; i < (int) list.size(); ++i)
+}
+
+void DebugTimer::mark(const char* tag)
+{
+    if (d)
     {
-        if (i > 0)
+        const auto t = d->timer.elapsed();
+        if (std::find(d->tags.begin(), d->tags.end(), QString(tag)) != d->tags.end())
+            NX_CRITICAL(false, lm("INTERNAL ERROR: Timer mark '%s' already defined").arg(tag));
+        d->list.push_back(t);
+        d->tags.push_back(tag);
+    }
+}
+
+void DebugTimer::finish(const char* tag)
+{
+    if (d)
+    {
+        mark(tag);
+
+        auto now = d->timer.elapsed();
+        QString s;
+        for (int i = 0; i < (int) d->list.size(); ++i)
+        {
+            if (i > 0)
+                s.append(", ");
+            s.append(d->tags.at(i) + QString(": ") + QString::number(d->list.at(i)));
+        }
+        if (d->list.size() > 0)
             s.append(", ");
-        s.append(tags.at(i) + QString(": ") + QString::number(list.at(i)));
+        s.append("last: ");
+        s.append(QString::number(now));
+        PRINT << "TIME [" << d->name << "]: " << qPrintable(s);
     }
-    if (list.size() > 0)
-        s.append(", ");
-    s.append("last: ");
-    s.append(QString::number(now));
-    qWarning().nospace() << "TIME [" << tag << "]: " << qPrintable(s);
 }
 
-void showFps()
+void debugShowFps()
 {
     static const int kFpsCount = 30;
-    static std::deque<int> deltaList;
-    static std::chrono::milliseconds prevT(0);
+    static std::deque<long> deltaList;
+    static long prevT = 0;
 
-    const std::chrono::milliseconds t = getCurrentTime();
-    if (prevT.count() != 0)
+    const long t = getTimeMs();
+    if (prevT != 0)
     {
-        const int delta = (t - prevT).count();
+        const long delta = t - prevT;
         deltaList.push_back(delta);
         if (deltaList.size() > kFpsCount)
             deltaList.pop_front();
@@ -72,7 +94,7 @@ void showFps()
         double deltaAvg = std::accumulate(deltaList.begin(), deltaList.end(), 0.0)
             / deltaList.size();
 
-        qWarning().nospace() << "FPS: Avg: "
+        PRINT << "FPS: Avg: "
             << qPrintable(QString::number(1000.0 / deltaAvg, 'f', 1))
             << ", ms: " << delta << ", avg ms: " << deltaAvg;
     }
@@ -83,6 +105,35 @@ uint8_t* debugUnalignPtr(void* data)
 {
     return (uint8_t*) (
         (17 + ((uintptr_t) data) + kMediaAlignment - 1) / kMediaAlignment * kMediaAlignment);
+}
+
+void debugDrawCheckerboardArgb(
+    uint8_t* argbBuffer, int lineSizeBytes, int frameWidth, int frameHeight)
+{
+    static const int kBoardSize = 128;
+    static const int kShift = 4; //< log2(kBoardSize / 8)
+
+    static int x0 = 0;
+    static int line0 = 0;
+
+    assert((lineSizeBytes & 0x03) == 0);
+    const int lineLen = lineSizeBytes >> 2;
+
+    if (!(frameWidth >= kBoardSize && frameHeight >= kBoardSize)) //< Frame is too small.
+        return;
+
+    uint32_t* pLine = ((uint32_t*) argbBuffer) + line0 * lineLen;
+    for (int line = 0; line < kBoardSize; ++line)
+    {
+        for (int x = 0; x < kBoardSize; ++x)
+            pLine[x0 + x] = (((x >> kShift) & 1) == ((line >> kShift) & 1)) ? 0x006480FE : 0;
+        pLine += lineLen;
+    }
+
+    if (++x0 >= frameWidth - kBoardSize)
+        x0 = 0;
+    if (++line0 >= frameHeight - kBoardSize)
+        line0 = 0;
 }
 
 std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
@@ -103,5 +154,8 @@ std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
 
     return compressedFrame;
 }
+
+} // namespace media
+} // namespace nx
 
 #endif // ENABLE_PROXY_DECODER

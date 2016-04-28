@@ -14,24 +14,24 @@ namespace media {
 class ProxyVideoDecoderPrivate // abstract
 {
 public:
-    static ProxyVideoDecoderPrivate* createImplDisplay(
-        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution);
-    static ProxyVideoDecoderPrivate* createImplRgb(
-        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution);
-    static ProxyVideoDecoderPrivate* createImplYuvPlanar(
-        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution);
-    static ProxyVideoDecoderPrivate* createImplYuvNative(
-        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution);
-    static ProxyVideoDecoderPrivate* createImplGl(
-        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    struct Params
+    {
+        ProxyVideoDecoder* owner;
+        ResourceAllocatorPtr allocator;
+        QSize resolution;
+    };
 
-    ProxyVideoDecoderPrivate(
-        ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
+    static ProxyVideoDecoderPrivate* createImplStub(const Params& params);
+    static ProxyVideoDecoderPrivate* createImplDisplay(const Params& params);
+    static ProxyVideoDecoderPrivate* createImplRgb(const Params& params);
+    static ProxyVideoDecoderPrivate* createImplYuvPlanar(const Params& params);
+    static ProxyVideoDecoderPrivate* createImplYuvNative(const Params& params);
+    static ProxyVideoDecoderPrivate* createImplGl(const Params& params);
+
+    ProxyVideoDecoderPrivate(const Params& params)
     :
-        m_owner(owner),
-        m_frameSize(resolution),
-        m_allocator(allocator),
-        m_proxyDecoder(ProxyDecoder::create(resolution.width(), resolution.height()))
+        m_params(params),
+        m_proxyDecoder(ProxyDecoder::create(params.resolution.width(), params.resolution.height()))
     {
     }
 
@@ -48,17 +48,17 @@ public:
 protected:
     const std::shared_ptr<ProxyVideoDecoderPrivate>& sharedPtrToThis() const
     {
-        return m_owner->d;
+        return m_params.owner->d;
     }
 
     QSize frameSize() const
     {
-        return m_frameSize;
+        return m_params.resolution;
     }
 
     AbstractResourceAllocator& allocator()
     {
-        return *m_allocator.get();
+        return *m_params.allocator.get();
     }
 
     ProxyDecoder& proxyDecoder() const
@@ -67,9 +67,7 @@ protected:
     }
 
 private:
-    ProxyVideoDecoder* m_owner;
-    const QSize m_frameSize;
-    ResourceAllocatorPtr m_allocator;
+    Params m_params;
     std::unique_ptr<ProxyDecoder> m_proxyDecoder;
 };
 

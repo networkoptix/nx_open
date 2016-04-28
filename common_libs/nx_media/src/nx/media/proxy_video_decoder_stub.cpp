@@ -3,7 +3,7 @@
 
 #include "aligned_mem_video_buffer.h"
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder<rgb>: "
+#define OUTPUT_PREFIX "ProxyVideoDecoder<STUB>: "
 #include "proxy_video_decoder_utils.h"
 
 namespace nx {
@@ -27,6 +27,8 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
+    static int frameNumber = 0;
+
     NX_CRITICAL(outDecodedFrame);
 
     const int alignedWidth = qPower2Ceil(
@@ -42,29 +44,19 @@ int Impl::decode(
     decodedFrame->map(QAbstractVideoBuffer::WriteOnly);
     uchar* argbBuffer = decodedFrame->bits();
 
-    auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
-    int64_t outPts = 0;
-    int result;
-    TIME_BEGIN(decodeToRgb);
-    // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
-    result = proxyDecoder().decodeToRgb(compressedFrame.get(), &outPts, argbBuffer, argbLineSize);
-    TIME_END(decodeToRgb);
+    debugDrawCheckerboardArgb(argbBuffer, argbLineSize, frameSize().width(), frameSize().height());
 
     decodedFrame->unmap();
+    decodedFrame->setStartTime(/*outPts*/ 0);
 
-    if (result <= 0) //< Error or no frame (buffering).
-        outDecodedFrame->reset();
-    else
-        decodedFrame->setStartTime(outPts);
-
-    return result;
+    return ++frameNumber;
 }
 
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplRgb(const Params& params)
+ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplStub(const Params& params)
 {
     PRINT << "Using this impl";
     return new Impl(params);

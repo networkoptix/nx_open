@@ -2,6 +2,8 @@
 #if defined(ENABLE_PROXY_DECODER)
 
 #include "aligned_mem_video_buffer.h"
+
+#define OUTPUT_PREFIX "ProxyVideoDecoder<yuv_planar>: "
 #include "proxy_video_decoder_utils.h"
 
 namespace nx {
@@ -48,11 +50,11 @@ int Impl::decode(
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     int64_t outPts = 0;
     int result = -1;
-    TIME_BEGIN("decodeToYuvPlanar")
+    TIME_BEGIN(decodeToYuvPlanar);
     // Perform actual decoding from QnCompressedVideoData to QVideoFrame.
     result = proxyDecoder().decodeToYuvPlanar(compressedFrame.get(), &outPts,
         yBuffer, lineSize, uBuffer, vBuffer, lineSize / 2);
-    TIME_END
+    TIME_END(decodeToYuvPlanar);
 
     decodedFrame->unmap();
 
@@ -68,11 +70,10 @@ int Impl::decode(
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplYuvPlanar(
-    ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
+ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplYuvPlanar(const Params& params)
 {
-    qDebug() << "ProxyVideoDecoder: Using 'yuv_planar' impl";
-    return new Impl(owner, allocator, resolution);
+    PRINT << "Using this impl";
+    return new Impl(params);
 }
 
 } // namespace media

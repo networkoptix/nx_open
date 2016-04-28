@@ -1,10 +1,8 @@
 #include "proxy_video_decoder_gl_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-// TODO mike: Use conf.h.
-// Configuration
-#define ENABLE_GL_LOG
-#define ENABLE_GL_FATAL_ERRORS
+namespace nx {
+namespace media {
 
 static const char* glErrorStr(GLenum err)
 {
@@ -34,45 +32,33 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag)
         if (!anyErrors)
         {
             anyErrors = true;
-            qWarning() << "OpenGL ERROR:" << tag << "->";
+            PRINT << "OpenGL ERROR:" << tag << "->";
         }
 
         const char* const s = glErrorStr(err);
         if (s)
-            qWarning() << "    " << s;
+            qWarning().nospace() << "    " << s;
         else
-            qWarning() << "    " << std::hex << err;
+            qWarning().nospace() << "    " << std::hex << err;
 
-        #ifdef ENABLE_GL_FATAL_ERRORS
+        if (conf.stopOnGlErrors)
             NX_CRITICAL(false);
-        #endif // ENABLE_GL_FATAL_ERRORS
         NX_CRITICAL(err != GL_OUT_OF_MEMORY); //< Abort because GL state is undefined.
     }
 }
 
-void logGlCall(const char *tag)
+void outputGlFbo(const char* tag)
 {
-    #ifdef ENABLE_GL_LOG
-        qWarning() << "OpenGL:" << tag;
-    #else // ENABLE_GL_LOG
-        QN_UNUSED(tag);
-    #endif // ENABLE_GL_LOG
-}
-
-void logGlFbo(const char* tag)
-{
-    QN_UNUSED(tag);
-
     if (!QOpenGLContext::currentContext())
     {
-        QLOG(tag << ": Unable to log FBO: no current context");
+        OUTPUT << tag << ": Unable to log FBO: no current context";
     }
     else
     {
         GL_GET_FUNCS(QOpenGLContext::currentContext());
         GLint curFbo = 0;
         GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &curFbo));
-        QLOG(tag << ": current FBO ==" << curFbo);
+        OUTPUT << tag << ": current FBO ==" << curFbo;
     }
 }
 
@@ -98,16 +84,16 @@ void checkGlFramebufferStatus()
     {
         const char* const s = glFramebufferStatusStr(res);
         if (s)
-            qWarning() << "OpenGL FAILED CHECK: glCheckFramebufferStatus() ->" << s;
+            PRINT << "OpenGL FAILED CHECK: glCheckFramebufferStatus() -> " << s;
         else
-            qWarning() << "OpenGL FAILED CHECK: glCheckFramebufferStatus() ->" << res;
+            PRINT << "OpenGL FAILED CHECK: glCheckFramebufferStatus() -> " << res;
         NX_CRITICAL(false);
     }
 }
 
 void debugTextureTest()
 {
-    QLOG("####### debugTextureTest() BEGIN");
+    PRINT << "debugTextureTest() BEGIN";
     static QOpenGLTexture tex(QOpenGLTexture::Target2D);
     static QOpenGLContext *ctx;
     static QOpenGLFunctions *funcs;
@@ -139,26 +125,26 @@ void debugTextureTest()
 
     funcs->glFlush();
     funcs->glFinish();
-    TIME_BEGIN("debugTextureTest::setData && glFlush && glFinish")
+    TIME_BEGIN(debugTextureTest_setData_glFlush_glFinish);
         GL(tex.setData(QOpenGLTexture::Alpha, QOpenGLTexture::UInt8, bufferStart));
     funcs->glFlush();
     funcs->glFinish();
-    TIME_END
+    TIME_END(debugTextureTest_setData_glFlush_glFinish);
 
-    TIME_BEGIN("debugTextureTest::memcpy")
+    TIME_BEGIN(debugTextureTest_memcpy);
     memcpy(buffer2Start, bufferStart, 1920 * 1080);
-    TIME_END
+    TIME_END(debugTextureTest_memcpy);
 
-    QLOG("####### debugTextureTest() END");
+    PRINT << "debugTextureTest() END";
 }
 
 void debugGlGetAttribsAndAbort(QSize frameSize)
 {
-    QLOG("error=" << eglGetError());
+    PRINT << "error=" << eglGetError();
 
     EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    QLOG("eglGetDisplay ->" << display);
-    QLOG("error=" << eglGetError());
+    PRINT << "eglGetDisplay -> " << display;
+    PRINT << "error=" << eglGetError();
 
     EGLint configAttribs[] =
     {
@@ -178,15 +164,15 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
     EGLConfig configs[100];
     EGLint numConfigs(0);
     eglChooseConfig(display, configAttribs, configs, 100, &numConfigs);
-    QLOG("eglChooseConfig num configs ->" << numConfigs);
-    QLOG("error=" << eglGetError());
+    PRINT << "eglChooseConfig num configs -> " << numConfigs;
+    PRINT << "error=" << eglGetError();
 
     for (int i = 0; i < numConfigs; ++i)
     {
-        QLOG("config " << i);
+        PRINT << "config " << i;
         EGLint isLockSupp(0);
         eglGetConfigAttrib(display, configs[i], EGL_LOCK_SURFACE_BIT_KHR, &isLockSupp);
-        QLOG("isLockSupp=" << isLockSupp);
+        PRINT << "isLockSupp=" << isLockSupp;
     }
 
     EGLint attribs[] = {
@@ -199,13 +185,13 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
     };
 
     EGLSurface pBuffer = eglCreatePbufferSurface(display, configs[0], attribs);
-    QLOG("eglCreatePbufferSurface ->" << pBuffer);
-    QLOG("error=" << eglGetError());
+    PRINT << "eglCreatePbufferSurface -> " << pBuffer;
+    PRINT << "error=" << eglGetError();
 
     EGLint width(0), height(0);
     eglQuerySurface(display, pBuffer, EGL_WIDTH, &width);
     eglQuerySurface(display, pBuffer, EGL_HEIGHT, &height);
-    QLOG("width=" << width << ", height=" << height);
+    PRINT << "width=" << width << ", height=" << height;
 
     // Abort.
     NX_CRITICAL(false);
@@ -214,7 +200,7 @@ void debugGlGetAttribsAndAbort(QSize frameSize)
 void debugTestImageExtension(QOpenGLTexture& yTex)
 {
     PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC) eglGetProcAddress("eglCreateImageKHR");
-    QLOG("eglCreateImageKHR =" << eglCreateImageKHR);
+    PRINT << "eglCreateImageKHR =" << eglCreateImageKHR;
 
     EGLImageKHR eglImageHandle = eglCreateImageKHR(
         eglGetCurrentDisplay(),
@@ -223,49 +209,51 @@ void debugTestImageExtension(QOpenGLTexture& yTex)
         (EGLClientBuffer) yTex.textureId(),
         nullptr);
 
-    QLOG("eglImageHandle ==" << eglImageHandle);
-    QLOG("eglGetError() returned" << eglGetError());
+    PRINT << "eglImageHandle ==" << eglImageHandle;
+    PRINT << "eglGetError() returned" << eglGetError();
 
     GLvoid* bitmapAddress(0);
     eglQuerySurface(eglGetCurrentDisplay(), eglImageHandle, EGL_BITMAP_POINTER_KHR, (GLint*) &bitmapAddress);
 
-    QLOG("bitmapAddress ==" << bitmapAddress);
-    QLOG("eglGetError() returned" << eglGetError());
+    PRINT << "bitmapAddress ==" << bitmapAddress;
+    PRINT << "eglGetError() returned" << eglGetError();
 
+    // Abort.
     NX_CRITICAL(false);
 }
 
-void debugLogPrecision()
+namespace {
+
+static void dumpPrecision(const char*tag, GLenum shaderType, GLenum precisionType)
 {
-    int range[2], precision;
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range, &precision);
+    int range[2];
+    int precision;
 
-    fprintf(stderr, "Fragment highp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_MEDIUM_FLOAT, range, &precision);
-    fprintf(stderr, "Fragment mediump float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_LOW_FLOAT, range, &precision);
-    fprintf(stderr, "Fragment lowp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    glGetShaderPrecisionFormat(shaderType, precisionType, range, &precision);
 
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_INT, range, &precision);
-    fprintf(stderr, "Fragment highp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_MEDIUM_INT, range, &precision);
-    fprintf(stderr, "Fragment mediump int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_LOW_INT, range, &precision);
-    fprintf(stderr, "Fragment lowp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-
-    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_HIGH_FLOAT, range, &precision);
-    fprintf(stderr, "Vertex highp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_MEDIUM_FLOAT, range, &precision);
-    fprintf(stderr, "Vertex mediump float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_LOW_FLOAT, range, &precision);
-    fprintf(stderr, "Vertex lowp float range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-
-    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_HIGH_INT, range, &precision);
-    fprintf(stderr, "Vertex highp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_MEDIUM_INT, range, &precision);
-    fprintf(stderr, "Vertex mediump int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
-    glGetShaderPrecisionFormat(GL_VERTEX_SHADER, GL_LOW_INT, range, &precision);
-    fprintf(stderr, "Vertex lowp int range 2^%d..2^%d, precision 2^%d\n", range[0], range[1], precision);
+    qWarning().nospace() << tag << " range 2^" << range[0] << "..2^" << range[1]
+        << ", precision 2^" << precision;
 }
+
+} // namespace
+
+void debugDumpGlPrecisions()
+{
+    dumpPrecision("Fragment highp float", GL_FRAGMENT_SHADER, GL_HIGH_FLOAT);
+    dumpPrecision("Fragment mediump float", GL_FRAGMENT_SHADER, GL_MEDIUM_FLOAT);
+    dumpPrecision("Fragment lowp float", GL_FRAGMENT_SHADER, GL_LOW_FLOAT);
+    dumpPrecision("Fragment highp int", GL_FRAGMENT_SHADER, GL_HIGH_INT);
+    dumpPrecision("Fragment mediump int", GL_FRAGMENT_SHADER, GL_MEDIUM_INT);
+    dumpPrecision("Fragment lowp int", GL_FRAGMENT_SHADER, GL_LOW_INT);
+    dumpPrecision("Vertex highp float", GL_VERTEX_SHADER, GL_HIGH_FLOAT);
+    dumpPrecision("Vertex mediump float", GL_VERTEX_SHADER, GL_MEDIUM_FLOAT);
+    dumpPrecision("Vertex lowp float", GL_VERTEX_SHADER, GL_LOW_FLOAT);
+    dumpPrecision("Vertex highp int", GL_VERTEX_SHADER, GL_HIGH_INT);
+    dumpPrecision("Vertex mediump int", GL_VERTEX_SHADER, GL_MEDIUM_INT);
+    dumpPrecision("Vertex lowp int", GL_VERTEX_SHADER, GL_LOW_INT);
+}
+
+} // namespace media
+} // namespace nx
 
 #endif // ENABLE_PROXY_DECODER

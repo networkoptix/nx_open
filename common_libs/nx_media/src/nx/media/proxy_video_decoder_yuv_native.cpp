@@ -2,6 +2,8 @@
 #if defined(ENABLE_PROXY_DECODER)
 
 #include "aligned_mem_video_buffer.h"
+
+#define OUTPUT_PREFIX "ProxyVideoDecoder<yuv_native>: "
 #include "proxy_video_decoder_utils.h"
 
 namespace nx {
@@ -33,11 +35,11 @@ int Impl::decode(
     auto compressedFrame = createUniqueCompressedFrame(compressedVideoData);
     int64_t outPts = 0;
     int result = -1;
-    TIME_BEGIN("decodeToYuvNative")
+    TIME_BEGIN(decodeToYuvNative);
     // Perform actual decoding from QnCompressedVideoData to memory.
     result = proxyDecoder().decodeToYuvNative(
         compressedFrame.get(), &outPts, &nativeBuffer, &nativeBufferSize);
-    TIME_END
+    TIME_END(decodeToYuvNative);
 
     if (result > 0)
     {
@@ -72,11 +74,10 @@ int Impl::decode(
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplYuvNative(
-    ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
+ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplYuvNative(const Params& params)
 {
-    qDebug() << "ProxyVideoDecoder: Using 'yuv_native' impl";
-    return new Impl(owner, allocator, resolution);
+    PRINT << "Using this impl";
+    return new Impl(params);
 }
 
 } // namespace media

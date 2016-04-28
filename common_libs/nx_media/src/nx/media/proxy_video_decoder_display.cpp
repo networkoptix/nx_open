@@ -111,11 +111,10 @@ void Impl::displayDecodedFrame(void* frameHandle)
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplDisplay(
-    ProxyVideoDecoder* owner, const ResourceAllocatorPtr& allocator, const QSize& resolution)
+ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplDisplay(const Params& params)
 {
     qDebug() << "ProxyVideoDecoder: Using 'display' impl";
-    return new Impl(owner, allocator, resolution);
+    return new Impl(params);
 }
 
 } // namespace media

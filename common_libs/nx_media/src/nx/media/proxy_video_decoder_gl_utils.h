@@ -11,7 +11,9 @@
 
 #include "proxy_video_decoder_utils.h"
 
-void logGlCall(const char *tag);
+namespace nx {
+namespace media {
+
 void checkGlError(QOpenGLFunctions* funcs, const char* tag);
 
 #define GL_GET_FUNCS(Q_OPENGL_CONTEXT_PTR) \
@@ -22,7 +24,8 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
 
 #define GL(CALL) do \
 { \
-    logGlCall(#CALL); \
+    if (conf.outputGlCalls) \
+        PRINT << "OpenGL CALL: " << #CALL; \
     checkGlError(funcs, "{prior to:}" #CALL); \
     CALL; \
     checkGlError(funcs, #CALL); \
@@ -30,23 +33,24 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
 
 #define GL_CHECK(BOOL_CALL) do \
 { \
-    logGlCall(#BOOL_CALL); \
+    if (conf.outputGlCalls) \
+        PRINT << "OpenGL CALL: " << #BOOL_CALL; \
     checkGlError(funcs, "{prior to:}" #BOOL_CALL); \
     bool result = BOOL_CALL; \
     if (!result) \
-        qWarning() << "OpenGL FAILED CALL:" << #BOOL_CALL << "-> false"; \
+        PRINT << "OpenGL FAILED CALL: " << #BOOL_CALL << " -> false"; \
     checkGlError(funcs, #BOOL_CALL); \
     NX_CRITICAL(result); \
 } while (0)
 
-#define LOG_GL(OBJ) do \
+#define GL_DUMP(OBJ) do \
 { \
-    QLOG("OpenGL " #OBJ " BEGIN"); \
-    QLOG(OBJ->log()); \
-    QLOG("OpenGL " #OBJ " END"); \
+    OUTPUT << "OpenGL " #OBJ " BEGIN"; \
+    OUTPUT << OBJ->log(); \
+    OUTPUT << "OpenGL " #OBJ " END"; \
 } while (0)
 
-void logGlFbo(const char* tag);
+void outputGlFbo(const char* tag);
 
 typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
 
@@ -59,15 +63,15 @@ public:
         m_index(0),
         m_queueSize(queueSize)
     {
-        QLOG("FboManager::FboManager(frameSize:" << frameSize
-            << ", queueSize:" << queueSize << ")");
+        OUTPUT << "FboManager::FboManager(frameSize:" << frameSize
+            << ", queueSize:" << queueSize << ")";
     }
 
     FboPtr getFbo()
     {
         while ((int) m_fboQueue.size() < m_queueSize)
         {
-            logGlFbo("getFbo 1");
+            outputGlFbo("getFbo 1");
             GL_GET_FUNCS(QOpenGLContext::currentContext());
             GLint prevFbo = 0;
             GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFbo));
@@ -81,10 +85,10 @@ public:
 
             GL(fbo = new QOpenGLFramebufferObject(m_frameSize, fmt));
             NX_CRITICAL(fbo->isValid());
-            logGlFbo("getFbo 2");
+            outputGlFbo("getFbo 2");
             m_fboQueue.push_back(FboPtr(fbo));
             glBindFramebuffer(GL_FRAMEBUFFER, prevFbo);
-            logGlFbo("getFbo 3");
+            outputGlFbo("getFbo 3");
         }
 
         return m_fboQueue[m_index++ % m_fboQueue.size()];
@@ -107,7 +111,9 @@ void checkGlFramebufferStatus();
 void debugTestImageExtensionAndAbort(QOpenGLTexture& yTex);
 void debugGlGetAttribsAndAbort(QSize frameSize);
 void debugTextureTest();
+void debugDumpGlPrecision();
 
-void debugLogPrecision();
+} // namespace media
+} // namespace nx
 
 #endif // ENABLE_PROXY_DECODER
