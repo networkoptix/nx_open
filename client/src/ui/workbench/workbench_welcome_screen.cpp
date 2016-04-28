@@ -33,7 +33,7 @@ namespace
 
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
-        qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
+        qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
 
         const auto quickWidget = new QQuickWidget();
         quickWidget->rootContext()->setContextProperty(
@@ -194,8 +194,10 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
         if (!userName.isEmpty())
             url.setUserName(userName);
 
-        menu()->trigger(QnActions::ConnectAction
-            , QnActionParameters().withArgument(Qn::UrlRole, url));
+        QnActionParameters params;
+        params.setArgument(Qn::UrlRole, url);
+        params.setArgument(Qn::StorePassword, true);
+        menu()->trigger(QnActions::ConnectAction, params);
     };
 
     enum { kMinimalDelay = 1};

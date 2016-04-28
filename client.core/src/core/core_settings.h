@@ -3,7 +3,7 @@
 
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
-#include <core/system_connection_data.h>
+#include <core/user_recent_connection_data.h>
 
 class QSettings;
 
@@ -17,7 +17,7 @@ class QnCoreSettings : public QnPropertyStorage
 public:
     enum PropertyIdentifier
     {
-        LastSystemConnections
+        RecentUserConnections
 
         , PropertiesCount
     };
@@ -29,9 +29,10 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(QnSystemConnectionDataList, lastSystemConnections
-            , setLastSystemConnections, LastSystemConnections, QnSystemConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionDataList, recentUserConnections
+            , setRecentUserConnections, RecentUserConnections, QnUserRecentConnectionDataList())
     QN_END_PROPERTY_STORAGE()
+
 
 private:
     typedef QScopedPointer<QSettings> SettingsPtr;

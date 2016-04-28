@@ -7,8 +7,8 @@ BaseTile
 {
     id: thisComponent;
 
-    property var knownUsersModel;
     property var knownHostsModel;
+    property var recentUserConnectionsModel;
 
     // Properties
     property string selectedUser:
@@ -87,7 +87,7 @@ BaseTile
             enabled: thisComponent.allowExpanding;
 
             comboBoxTextRole: "userName";
-            model: thisComponent.knownUsersModel;
+            model: thisComponent.recentUserConnectionsModel;
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";

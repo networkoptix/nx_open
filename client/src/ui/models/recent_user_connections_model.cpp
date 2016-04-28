@@ -3,7 +3,7 @@
 #include <client/client_recent_connections_manager.h>
 
 #include <core/core_settings.h>
-#include <core/system_connection_data.h>
+#include <core/user_recent_connection_data.h>
 
 #include <nx/utils/raii_guard.h>
 #include <utils/math/math.h>
@@ -16,7 +16,6 @@ namespace
 
         , UserNameRoleId = FirstRoleId
         , PasswordRoleId
-
         , RolesCount
     };
 
@@ -30,7 +29,7 @@ namespace
     }();
 }
 
-QnLastSystemUsersModel::QnLastSystemUsersModel(QObject *parent)
+QnRecentUserConnectionsModel::QnRecentUserConnectionsModel(QObject *parent)
     : base_type(parent)
     , m_systemName()
     , m_data()
@@ -38,17 +37,17 @@ QnLastSystemUsersModel::QnLastSystemUsersModel(QObject *parent)
     QnClientRecentConnectionsManager::instance()->addModel(this);
 }
 
-QnLastSystemUsersModel::~QnLastSystemUsersModel()
+QnRecentUserConnectionsModel::~QnRecentUserConnectionsModel()
 {
     QnClientRecentConnectionsManager::instance()->removeModel(this);
 }
 
-QString QnLastSystemUsersModel::systemName() const
+QString QnRecentUserConnectionsModel::systemName() const
 {
     return m_systemName;
 }
 
-void QnLastSystemUsersModel::setSystemName(const QString &systemName)
+void QnRecentUserConnectionsModel::setSystemName(const QString &systemName)
 {
     if (m_systemName == systemName)
         return;
@@ -57,18 +56,16 @@ void QnLastSystemUsersModel::setSystemName(const QString &systemName)
     emit systemNameChanged();
 }
 
-bool QnLastSystemUsersModel::hasConnections() const
+bool QnRecentUserConnectionsModel::hasConnections() const
 {
     return !m_data.isEmpty();
 }
 
-void QnLastSystemUsersModel::updateData(const UserPasswordPairList &newData)
+void QnRecentUserConnectionsModel::updateData(const UserPasswordPairList &newData)
 {
     if (m_data == newData)
         return;
 
-    if (systemName().contains(lit("YURIY")))
-        int i = 0;
     const bool hadConnections = hasConnections();
 
     auto itCurrent = m_data.begin();
@@ -117,12 +114,12 @@ void QnLastSystemUsersModel::updateData(const UserPasswordPairList &newData)
         emit hasConnectionsChanged();
 }
 
-int QnLastSystemUsersModel::rowCount(const QModelIndex &parent) const
+int QnRecentUserConnectionsModel::rowCount(const QModelIndex &parent) const
 {
     return (parent.isValid() ? 0 : m_data.size());
 }
 
-QVariant QnLastSystemUsersModel::data(const QModelIndex &index, int role) const
+QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();
     if (!qBetween(0, row, rowCount())
@@ -143,7 +140,7 @@ QVariant QnLastSystemUsersModel::data(const QModelIndex &index, int role) const
     }
 }
 
-RoleNameHash QnLastSystemUsersModel::roleNames() const
+RoleNameHash QnRecentUserConnectionsModel::roleNames() const
 {
     return kRoleNames;
 }

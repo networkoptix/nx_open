@@ -6,7 +6,7 @@
 typedef QPair<QString, QString> UserPasswordPair;
 typedef QList<UserPasswordPair> UserPasswordPairList;
 
-class QnLastSystemUsersModel : public QAbstractListModel
+class QnRecentUserConnectionsModel : public QAbstractListModel
 {
     Q_OBJECT
     typedef QAbstractListModel base_type;
@@ -15,9 +15,9 @@ class QnLastSystemUsersModel : public QAbstractListModel
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
 
 public:
-    QnLastSystemUsersModel(QObject *parent = nullptr);
+    QnRecentUserConnectionsModel(QObject *parent = nullptr);
 
-    virtual ~QnLastSystemUsersModel();
+    virtual ~QnRecentUserConnectionsModel();
 
 public: // properties
     QString systemName() const;

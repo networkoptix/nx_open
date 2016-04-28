@@ -114,13 +114,13 @@ Rectangle
                         LocalSystemTile
                         {
                             property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
-                            property var knownUsersModelProp:
-                                QnLastSystemConnectionsData { systemName: model.systemName; }
+                            property var recentUserConnectionsModel:
+                                QnRecentUserConnectionsData { systemName: model.systemName; }
 
                             visualParent: screenHolder;
 
                             systemName: model.systemName;
-                            isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
+                            isRecentlyConnected: (recentUserConnectionsModel ? recentUserConnectionsModel.hasConnections : false);
 
                             isValidVersion: model.isCompatibleVersion;
                             isValidCustomization: model.isCorrectCustomization;
@@ -136,7 +136,7 @@ Rectangle
 
                             isExpandable: model.isCompatible;
                             isAvailable: isExpandable;
-                            knownUsersModel: knownUsersModelProp;
+                            recentUserConnectionsModel: knownUsersModelProp;
                             knownHostsModel: hostsModel;
 
                             onConnectClicked:

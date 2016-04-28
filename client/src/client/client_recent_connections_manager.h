@@ -4,7 +4,7 @@
 
 #include <nx/utils/singleton.h>
 
-class QnLastSystemUsersModel; //TODO: #ynikitenkov rename it
+class QnRecentUserConnectionsModel;
 
 //TODO: #ynikitenkov move to some common place. Btw, why are we storing passwords anyway?
 typedef QPair<QString, QString> UserPasswordPair;
@@ -19,16 +19,16 @@ public:
     QnClientRecentConnectionsManager();
     virtual ~QnClientRecentConnectionsManager();
 
-    void addModel(QnLastSystemUsersModel* model);
-    void removeModel(QnLastSystemUsersModel* model);
+    void addModel(QnRecentUserConnectionsModel* model);
+    void removeModel(QnRecentUserConnectionsModel* model);
 
 private:
-    void updateModelBinding(QnLastSystemUsersModel* model);
+    void updateModelBinding(QnRecentUserConnectionsModel* model);
     void updateModelsData();
 
 private:
-    typedef QSet<QnLastSystemUsersModel*> UnboundModelsSet;
-    typedef QHash<QString, QnLastSystemUsersModel*> BoundModelsHash;
+    typedef QSet<QnRecentUserConnectionsModel*> UnboundModelsSet;
+    typedef QHash<QString, QnRecentUserConnectionsModel*> BoundModelsHash;
     typedef QHash<QString, UserPasswordPairList> DataCache;
 
     UnboundModelsSet m_unbound;
