@@ -34,12 +34,21 @@ function prepare {
 
     python ../common/gencomp.py objc > HDWitness/HDWitness/HDWCompatibilityItems.m
 
-    PROVISIONING_PROFILE_UUID=`grep UUID -A1 -a ${PROVISIONING_PROFILE} | grep -o "[-A-Za-z0-9]\{36\}"`
+    if [ -f "${PROVISIONING_PROFILE}" ]
+    then
+        PROVISIONING_PROFILE_UUID=`grep UUID -A1 -a ${PROVISIONING_PROFILE} | grep -o "[-A-Za-z0-9]\{36\}"`
+        CODE_SIGNING_REQUIRED=YES
+    else
+        DEVELOPER_NAME=
+        CODE_SIGNING_REQUIRED=NO
+    fi
 
     sed -i "" "s/\${PROVISIONING_PROFILE_UUID}/${PROVISIONING_PROFILE_UUID}/g" HDWitness/HDWitness/HDWitness.xcconfig
+    sed -i "" "s/\${DEVELOPER_NAME}/${DEVELOPER_NAME}/g" HDWitness/HDWitness/HDWitness.xcconfig
+    sed -i "" "s/\${CODE_SIGNING_REQUIRED}/${CODE_SIGNING_REQUIRED}/g" HDWitness/HDWitness/HDWitness.xcconfig
+
     sed -i "" "s/\${MAVEN_MINIMUM_IOS_VERSION}/${MAVEN_MINIMUM_IOS_VERSION}/g" HDWitness/HDWitness/HDWitness.xcconfig
     sed -i "" "s/\${VALID_ARCHS}/${VALID_ARCHS}/g" HDWitness/HDWitness/HDWitness.xcconfig
-    sed -i "" "s/\${DEVELOPER_NAME}/${DEVELOPER_NAME}/g" HDWitness/HDWitness/HDWitness.xcconfig
     sed -i "" "s/\${PRODUCT_NAME_NO_SPACES}/${PRODUCT_NAME_NO_SPACES}/g" HDWitness/HDWitness/HDWitness.xcconfig
 
     pod install --no-repo-update || true
@@ -53,7 +62,16 @@ function build_package {
 
     PROFILES_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
     [ -d "$PROFILES_DIR" ] || mkdir -p "$PROFILES_DIR"
-    cp "${PROVISIONING_PROFILE}" "$PROFILES_DIR/${PROVISIONING_PROFILE_UUID}.mobileprovision"
+
+    if [ -f "${PROVISIONING_PROFILE}" ]
+    then
+        cp "${PROVISIONING_PROFILE}" "$PROFILES_DIR/${PROVISIONING_PROFILE_UUID}.mobileprovision"
+        XCODEBUILD_PROVISION_ARGS="PROVISIONING_PROFILE=${PROVISIONING_PROFILE_UUID}"
+        XCRUN_PROVISION_ARGS="--embed ${PROVISIONING_PROFILE}"
+    else
+        XCODEBUILD_PROVISION_ARGS=
+        XCRUN_PROVISION_ARGS=
+    fi
 
     rm -rf build dist
     mkdir dist
@@ -61,11 +79,11 @@ function build_package {
     security unlock-keychain -p 123 ${HOME}/Library/Keychains/login.keychain
 
     touch HDWitness/HDWitness/Base.lproj/MainStoryboard*
-    xcodebuild -workspace ${WORKSPACE} -scheme HDWitness -sdk "${TARGET_SDK}" -configuration "${BUILD_CONFIGURATION}" build SYMROOT="${PROJECT_BUILDDIR}/${PROJECT_NAME}" PROVISIONING_PROFILE="${PROVISIONING_PROFILE_UUID}"
+    xcodebuild -workspace ${WORKSPACE} -scheme HDWitness -sdk "${TARGET_SDK}" -configuration "${BUILD_CONFIGURATION}" build SYMROOT="${PROJECT_BUILDDIR}/${PROJECT_NAME}" $XCODEBUILD_PROVISION_ARGS
     [ $? != 0 ] && { echo "Cancelled..."; exit 1; }
 
     echo Packaging
-    /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication -v "${PROJECT_BUILDDIR}/${PROJECT_NAME}/${BUILD_CONFIGURATION}-${TARGET_SDK}/${PRODUCT_NAME_NO_SPACES}.app" -o "${PROJECT_BUILDDIR}/${NAMESPACE_ADDITIONAL}-${MAVEN_VERSION}.${MAVEN_BUILD_NUMBER}-${SUFFIX}.ipa"  --embed "${PROVISIONING_PROFILE}" > /dev/null
+    /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication -v "${PROJECT_BUILDDIR}/${PROJECT_NAME}/${BUILD_CONFIGURATION}-${TARGET_SDK}/${PRODUCT_NAME_NO_SPACES}.app" -o "${PROJECT_BUILDDIR}/${NAMESPACE_ADDITIONAL}-${MAVEN_VERSION}.${MAVEN_BUILD_NUMBER}-${SUFFIX}.ipa" $XCRUN_PROVISION_ARGS  > /dev/null
 }
 
 if [ "$PREPARE" = "prepare" ]
@@ -77,7 +95,7 @@ then
     exit 0
 fi
 
-# # Build release package
+# Build release package
 DEVELOPER_NAME=${DEVELOPER_NAME_RELEASE}
 PROVISIONING_PROFILE=${PROVISIONING_PROFILE_RELEASE}
 SUFFIX=production
