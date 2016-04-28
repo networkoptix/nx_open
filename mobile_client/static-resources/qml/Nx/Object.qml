@@ -1,6 +1,7 @@
-import QtQuick 2.4
+import QtQuick 2.0
 
-QtObject {
+QtObject
+{
     default property var children: []
 }
 

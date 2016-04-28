@@ -13,8 +13,8 @@ class QnResourceTreeItemDelegate : public QStyledItemDelegate
 public:
     explicit QnResourceTreeItemDelegate(QObject* parent = nullptr);
 
-    QnWorkbench* workbench() const { return m_workbench.data(); }
-    void setWorkbench(QnWorkbench* workbench) { m_workbench = workbench; }
+    QnWorkbench* workbench() const;
+    void setWorkbench(QnWorkbench* workbench);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;

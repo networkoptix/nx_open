@@ -104,6 +104,7 @@ int runUi(QGuiApplication *application) {
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
+    engine.addImportPath(lit("qrc:///qml"));
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 

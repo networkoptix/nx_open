@@ -124,6 +124,14 @@ namespace
 
         return false;
     }
+
+    /* Checks whether view item contains a checkbox without any text or decoration: */
+    bool isOnlyCheckboxItem(const QStyleOptionViewItem& item)
+    {
+        return (!(item.features & QStyleOptionViewItem::HasDisplay) || item.text.isEmpty()) &&
+               (!(item.features & QStyleOptionViewItem::HasDecoration) || item.icon.isNull()) &&
+                  item.features & QStyleOptionViewItem::HasCheckIndicator;
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -327,62 +335,101 @@ void QnNxStyle::drawPrimitive(
         return;
 
     /**
-     * Hover marker is drawn in PE_PanelItemViewRow.
-     * Selection marker is drawn over later in PE_PanelItemViewItem,
-     *  except selection marker in tree view branch area which is drawn in PE_PanelItemViewRow as well.
+     * QTreeView draws in PE_PanelItemViewRow:
+     *  - hover markers
+     *  - selection marker in the branch area
+     *
+     * All item views draw in PE_PanelItemViewRow:
+     *  - alternate background
      */
-    case PE_PanelItemViewRow:
-        if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+    case PE_PanelItemViewRow: /* is deprecated, but cannot be avoided in Qt 5 */
+        if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
-            /* Markers can be semi-transparent, so we draw all layers on top of each other. */
+            /* In case of tree view: */
+            if (qobject_cast<const QTreeView*>(widget))
+            {
+                /* Markers can be semi-transparent, so we draw all layers on top of each other. */
 
-            /* Draw alternate row background if requested: */
-            if (item->features.testFlag(QStyleOptionViewItem::Alternate))
-                painter->fillRect(item->rect, option->palette.alternateBase());
+                /* Obtain hover information: */
+                QBrush hoverBrush = option->palette.midlight();
+                bool hasHover = item->state.testFlag(State_MouseOver);
+                bool hoverOpaque = hasHover && hoverBrush.color().alpha() == 255;
 
-            /* Draw hover marker if needed: */
-            if (item->state.testFlag(State_MouseOver))
-                painter->fillRect(item->rect, option->palette.midlight());
+                /* Obtain selection information: */
+                QBrush selectionBrush = option->palette.highlight();
+                bool hasSelection = item->state.testFlag(State_Selected);
+                bool selectionOpaque = hasSelection && selectionBrush.color().alpha() == 255;
 
-            /* Draw selection marker if needed: */
-            if (item->state.testFlag(State_Selected))
-                painter->fillRect(item->rect, option->palette.highlight());
+                /* Draw alternate row background if requested: */
+                if (item->features.testFlag(QStyleOptionViewItem::Alternate) && !hoverOpaque && !selectionOpaque)
+                    painter->fillRect(item->rect, option->palette.alternateBase());
+
+                /* Draw hover marker if needed: */
+                if (hasHover && !selectionOpaque)
+                    painter->fillRect(item->rect, hoverBrush);
+
+                /* Draw selection marker if needed, but only in tree views: */
+                if (hasSelection)
+                {
+                    /* Update opaque selection color if also hovered: */
+                    if (hasHover && selectionOpaque)
+                        selectionBrush.setColor(findColor(selectionBrush.color()).lighter(1));
+
+                    painter->fillRect(item->rect, selectionBrush);
+                }
+            }
+            else
+            /* In case of non-tree view: */
+            {
+                /* Draw alternate row background if requested: */
+                if (item->features.testFlag(QStyleOptionViewItem::Alternate))
+                    painter->fillRect(item->rect, option->palette.alternateBase());
+            }
 
             return;
         }
         break;
 
+    /**
+    * QTreeView draws in PE_PanelItemViewItem:
+    *  - selection markers for items (but not branch area)
+    *
+    * All views draw in PE_PanelItemViewRow:
+    *  - hover markers
+    *  - selection markers
+    */
     case PE_PanelItemViewItem:
-        //TODO #vkutin Complete refinement of this code when restyling table views
         if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
-            bool selected = item->state.testFlag(State_Selected);
+            /* Obtain selection information: */
+            QBrush selectionBrush = option->palette.highlight();
+            bool hasSelection = item->state.testFlag(State_Selected);
+            bool selectionOpaque = hasSelection && selectionBrush.color().alpha() == 255;
 
-            /* Handle here entire row hovering in table views: */
+            /* Obtain Nx hovered row information: */
             int hoveredRow = -1;
-            if (widget)
+            if (qobject_cast<const QTableView*>(widget))
             {
                 QVariant value = widget->property(Properties::kHoveredRowProperty);
                 if (value.isValid())
                     hoveredRow = value.toInt();
             }
 
-            bool hovered = item->index.row() == hoveredRow;
+            bool hasHover = item->index.row() == hoveredRow;
 
-            QnPaletteColor fillColor;
-            if (selected)
-            {
-                fillColor = findColor(option->palette.highlight().color());
-                if (hovered)
-                    fillColor = fillColor.lighter(1);
-            }
-            else if (hovered)
-            {
-                fillColor = findColor(option->palette.midlight().color()).darker(1);
-            }
+            /* Draw hover marker if needed: */
+            if (hasHover && !selectionOpaque)
+                painter->fillRect(item->rect, option->palette.midlight());
 
-            if (fillColor.isValid())
-                painter->fillRect(item->rect, fillColor.color());
+            /* Draw selection marker if needed: */
+            if (hasSelection)
+            {
+                /* Update opaque selection color if also hovered: */
+                if (hasHover && selectionOpaque)
+                    selectionBrush.setColor(findColor(selectionBrush.color()).lighter(1));
+
+                painter->fillRect(item->rect, selectionBrush);
+            }
 
             return;
         }
@@ -982,8 +1029,7 @@ void QnNxStyle::drawControl(
     switch (element)
     {
     case CE_ShapedFrame:
-        if (const QStyleOptionFrame *frame =
-                qstyleoption_cast<const QStyleOptionFrame *>(option))
+        if (const QStyleOptionFrame* frame = qstyleoption_cast<const QStyleOptionFrame*>(option))
         {
             switch (frame->frameShape)
             {
@@ -1002,6 +1048,9 @@ void QnNxStyle::drawControl(
 
                     QColor firstColor = mainColor;
                     QColor secondColor;
+
+                    QLine coords;
+                    QPoint shift;
 
                     if (frame->state.testFlag(State_Sunken))
                     {
@@ -1028,6 +1077,7 @@ void QnNxStyle::drawControl(
                     }
                     else
                     {
+                        rect.setLeft(rect.left() + (rect.width() - frame->lineWidth + 1) / 2); /* - center-align vertical lines */
                         rect.setWidth(frame->lineWidth);
                         painter->fillRect(rect, firstColor);
 
@@ -1210,8 +1260,7 @@ void QnNxStyle::drawControl(
         {
             if (header->state.testFlag(State_MouseOver) || header->state.testFlag(State_HasFocus))
             {
-                QColor color = findColor(header->palette.midlight().color()).darker(1);
-                color.setAlphaF(0.2);
+                QColor color = findColor(header->palette.midlight().color());
                 painter->fillRect(header->rect, color);
             }
 
@@ -1912,15 +1961,27 @@ QRect QnNxStyle::subElementRect(
     case SE_ItemViewItemCheckIndicator:
         if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
+            /* Switch: */
             if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
                 return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
+        }
+        /* FALL THROUGH */
+    case SE_ItemViewItemText:
+    case SE_ItemViewItemFocusRect:
+    case SE_ItemViewItemDecoration:
+        if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
+        {
+            QStyleOptionViewItem newOpt(*item);
+            int defaultMargin = pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
+            int marginAddition = qMax(Metrics::kStandardPadding - defaultMargin, 0);
+            newOpt.rect.adjust(marginAddition, 0, -marginAddition, 0);
+            return base_type::subElementRect(subElement, &newOpt, widget);
         }
         break;
 
     case SE_HeaderArrow:
         if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
         {
-            QSize size(Metrics::kSortIndicatorSize, Metrics::kSortIndicatorSize);
             QRect rect = header->rect.adjusted(Metrics::kStandardPadding, 0, -Metrics::kStandardPadding, 0);
             Qt::Alignment alignment = static_cast<Qt::Alignment>(styleHint(SH_Header_ArrowAlignment, header, widget));
 
@@ -1931,6 +1992,7 @@ QRect QnNxStyle::subElementRect(
                 rect.setLeft(labelRect.right() + margin);
             }
 
+            QSize size(Metrics::kSortIndicatorSize, Metrics::kSortIndicatorSize);
             return alignedRect(Qt::LeftToRight, Qt::AlignLeft | (alignment & Qt::AlignVertical_Mask), size, rect);
         }
         break;
@@ -2154,8 +2216,14 @@ QSize QnNxStyle::sizeFromContents(
 
     case CT_ItemViewItem:
         {
+            if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
+                if (isOnlyCheckboxItem(*item))
+                    return QSize(Metrics::kStandardPadding * 2 + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);
+
             QSize sz = base_type::sizeFromContents(type, option, size, widget);
             sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
+            sz.setWidth(sz.width() + Metrics::kStandardPadding * 2);
+            sz.setWidth(sz.width() + Metrics::kStandardPadding * 2);
             return sz;
         }
 

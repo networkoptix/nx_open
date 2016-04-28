@@ -1,7 +1,8 @@
 import QtQuick 2.4
-import QtQuick.Controls 1.2
 import QtQuick.Window 2.2
+import Qt.labs.controls 1.0
 
+import Nx 1.0
 import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
@@ -18,7 +19,7 @@ Item {
 
     clip: true
 
-    QnObject
+    Object
     {
         id: d
 
@@ -50,7 +51,7 @@ Item {
             target: resourcesPage
             onPageStatusChanged:
             {
-                if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
+                if (pageStatus != StackView.Active && pageStatus != StackView.Activating)
                     d.hiddenItems = []
             }
         }

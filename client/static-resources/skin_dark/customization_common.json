@@ -157,7 +157,17 @@
     "QAbstractItemView": {
         "palette": {
             "default": {
-                "base":             "transparent"
+                "base":             "transparent",
+                "midlight":         "dark12.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)"
+            }
+        }
+    },
+
+    "QHeaderView": {
+        "palette": {
+            "default": {
+                "midlight":         "dark12.setAlpha(51)"
             }
         }
     },

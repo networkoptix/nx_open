@@ -179,6 +179,10 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
 
 GraphicsWidget::~GraphicsWidget()
 {
+    /*
+     * List of pending layout requests is stored in the scene data.
+     * See QGraphicsWidgetPrivate::_q_relayout() for details.
+     */
     if (GraphicsWidgetSceneData *sd = d_ptr->ensureSceneData())
         sd->pendingLayoutWidgets.remove(this);
 }
