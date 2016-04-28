@@ -249,11 +249,7 @@ public:
     //TODO #ak is std::shared_ptr really needed here?
 	typedef std::shared_ptr< attrs::Attribute > AttributePtr;
 
-	#ifdef _DEBUG
-		typedef std::map< int, AttributePtr > AttributesMap;
-	#else
-		typedef std::unordered_map< int, AttributePtr > AttributesMap;
-	#endif
+	typedef std::map< int, AttributePtr > AttributesMap;
 
     Header header;
     AttributesMap attributes;

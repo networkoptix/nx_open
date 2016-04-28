@@ -75,7 +75,7 @@ TEST_F(UdpHolePunching, simpleSync)
         []{
             auto serverSocket = std::make_unique<CloudServerSocket>(
                 SocketGlobals::mediatorConnector().systemConnection());
-            NX_ASSERT(serverSocket->registerOnMediatorSync());
+            NX_CRITICAL(serverSocket->registerOnMediatorSync());
             return serverSocket;
         },
         &std::make_unique<CloudStreamSocket>,
@@ -89,7 +89,7 @@ TEST_F(UdpHolePunching, simpleAsync)
         []{
             auto serverSocket = std::make_unique<CloudServerSocket>(
                 SocketGlobals::mediatorConnector().systemConnection());
-            NX_ASSERT(serverSocket->registerOnMediatorSync());
+            NX_CRITICAL(serverSocket->registerOnMediatorSync());
             return serverSocket;
         },
         &std::make_unique<CloudStreamSocket>,

@@ -39,9 +39,10 @@ ICONSTAGE=$STAGE$ICONTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
-CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
+CLIENT_XCBGLINTEGRATIONS_PATH=$CLIENT_BIN_PATH/xcbglintegrations
 CLIENT_PLATFORMINPUTCONTEXTS_PATH=$CLIENT_BIN_PATH/platforminputcontexts
+CLIENT_QML_PATH=$CLIENT_BIN_PATH/qml
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
@@ -49,35 +50,10 @@ CLIENT_HELP_PATH=${ClientHelpSourceDir}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
-QT_LIBS=\
-( \
-    Core \
-    Gui \
-    Widgets \
-    Network \
-    Concurrent \
-    Multimedia \
-    OpenGL \
-    WebKit \
-    WebKitWidgets \
-    WebChannel \
-    Qml \
-    Quick \
-    QuickWidgets \
-    X11Extras \
-    Sql \
-    Xml \
-    XmlPatterns \
-    Sensors \
-    PrintSupport \
-    Positioning
-)
-
 #. $CLIENT_BIN_PATH/env.sh
 
 # Prepare stage dir
 rm -rf $STAGEBASE
-mkdir -p $BINSTAGE/styles
 mkdir -p $BINSTAGE/imageformats
 mkdir -p $BINSTAGE/platforminputcontexts
 mkdir -p $HELPSTAGE
@@ -100,26 +76,28 @@ cp -P -Rf $ICONS_PATH $ICONSTAGE
 for f in `find $ICONSTAGE -name *.png`; do mv $f `dirname $f`/`basename $f .png`-${customization}.png; done
 
 # Copy help
-cp -r $CLIENT_HELP_PATH/** $HELPSTAGE
+cp -r $CLIENT_HELP_PATH/* $HELPSTAGE
 
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
 
-# Copy libraries, styles, imageformats
+# Copy libraries, imageformats
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
-cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
 cp -r $CLIENT_PLATFORMINPUTCONTEXTS_PATH/*.* $BINSTAGE/platforminputcontexts
 cp -r $CLIENT_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
+cp -r $CLIENT_XCBGLINTEGRATIONS_PATH $BINSTAGE
+cp -r $CLIENT_QML_PATH $BINSTAGE
 cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
-for lib in "${QT_LIBS[@]}"
+#copying qt libs
+QTLIBS="Core Gui Widgets WebKit WebChannel WebKitWidgets OpenGL Multimedia Qml Quick QuickWidgets LabsTemplates X11Extras XcbQpa DBus Xml XmlPatterns Concurrent Network Sql PrintSupport"
+for var in $QTLIBS
 do
-    SONAME=libQt5${lib}.so.${qt.version}
-    cp ${qt.dir}/lib/$SONAME $LIBSTAGE
-    LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -sf $LIBSTAGE/$SONAME $LIBSTAGE/$LINK_TARGET
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
 done
 
 cp -r /usr/lib/${arch.dir}/libXss.so.1* $LIBSTAGE
@@ -127,6 +105,7 @@ cp -r /lib/${arch.dir}/libpng12.so* $LIBSTAGE
 cp -r /usr/lib/${arch.dir}/libopenal.so.1* $LIBSTAGE
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644

@@ -6,8 +6,9 @@
 #include <utils/common/software_version.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
-#include <finders/systems_finder.h>
 #include <core/core_settings.h>
+#include <finders/systems_finder.h>
+#include <watchers/cloud_status_watcher.h>
 
 namespace
 {
@@ -20,7 +21,7 @@ namespace
         , SystemNameRoleId = FirstRoleId
         , SystemIdRoleId
 
-        , UserRoleId
+        , OwnerDescriptionRoleId
         , LastPasswordRoleId
 
         , IsFactorySystemRoleId
@@ -47,7 +48,7 @@ namespace
         RoleNames result;
         result.insert(SystemNameRoleId, "systemName");
         result.insert(SystemIdRoleId, "systemId");
-        result.insert(UserRoleId, "userName");
+        result.insert(OwnerDescriptionRoleId, "ownerDescription");
         result.insert(LastPasswordRoleId, "lastPassword");
 
         result.insert(IsFactorySystemRoleId, "isFactorySystem");
@@ -202,6 +203,11 @@ QnSystemsModel::QnSystemsModel(QObject *parent)
 
     m_connections << discoveredConnection << lostConnection;
 
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
+        , this, &QnSystemsModel::updateOwnerDescription);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::loginChanged
+        , this, &QnSystemsModel::updateOwnerDescription);
+
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
 }
@@ -233,8 +239,21 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         return systemDescription->name();
     case SystemIdRoleId:
         return systemDescription->id();
-    case UserRoleId:
-        return lit("Fake Admin <replace me>");
+    case OwnerDescriptionRoleId:
+    {
+        if (!systemDescription->isCloudSystem())
+            return lit("WRONG USER NAME! BUG");
+
+        if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
+            && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))
+        {
+            return tr("Your system");
+        }
+
+        const auto fullName = systemDescription->ownerFullName();
+        return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
+            : lit("%1%2").arg(fullName, tr("'s system")));
+    }
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
     case IsFactorySystemRoleId:
@@ -262,6 +281,16 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 RoleNames QnSystemsModel::roleNames() const
 {
     return kRoleNames;
+}
+
+void QnSystemsModel::updateOwnerDescription()
+{
+    const auto count = rowCount();
+    if (!count)
+        return;
+
+    dataChanged(index(0), index(count - 1)
+        , QVector<int>(1, OwnerDescriptionRoleId));
 }
 
 void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
@@ -305,7 +334,7 @@ void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)
         m_internalData.insert(insertPos, data);
     }
 
-    if (isMaximumNumber)
+    if (emitInsertSignal && isMaximumNumber)
     {
         beginRemoveRows(QModelIndex(), m_maxCount, m_maxCount);
         endRemoveRows();
@@ -339,7 +368,7 @@ void QnSystemsModel::removeSystem(const QString &systemId)
         m_internalData.erase(removeIt);
     }
 
-    if (moreThanMaximum)
+    if (emitRemoveSignal && moreThanMaximum)
     {
         beginInsertRows(QModelIndex(), m_maxCount - 1, m_maxCount - 1);
         endInsertRows();

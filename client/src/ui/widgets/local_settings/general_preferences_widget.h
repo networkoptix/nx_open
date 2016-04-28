@@ -23,7 +23,7 @@ public:
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
 
-    virtual bool canApplyChanges() override;
+    bool isRestartRequired() const;
 private slots:
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();

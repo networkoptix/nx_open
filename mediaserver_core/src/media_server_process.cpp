@@ -52,7 +52,9 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <events/mserver_business_rule_processor.h>
 
@@ -158,6 +160,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
+#include <rest/handlers/audio_transmission_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -212,6 +215,7 @@
 #include "server/host_system_password_synchronizer.h"
 
 #include "core/resource_management/resource_properties.h"
+#include "core/resource/network_resource.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
 #include <nx/network/nettools.h>
@@ -1577,6 +1581,8 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
+    QnRestProcessorPool::instance()->registerHandler("api/transmitAudio", new QnAudioTransmissionRestHandler());
+
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
@@ -1744,7 +1750,7 @@ void MediaServerProcess::run()
     if( f.isOpen() )
     {
         const QByteArray& certData = f.readAll();
-        nx::network::QnSSLSocket::initSSLEngine( certData );
+        nx::network::SslSocket::initSSLEngine( certData );
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
@@ -1886,6 +1892,7 @@ void MediaServerProcess::run()
     {
         systemName.resetToDefault();
         setSysIdTime(0);
+        systemName.saveToConfig();
     }
     if (systemName.isDefault())
         serverFlags |= Qn::SF_AutoSystemName;
@@ -2518,7 +2525,7 @@ void MediaServerProcess::run()
     //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
-    nx::network::QnSSLSocket::releaseSSLEngine();
+    nx::network::SslSocket::releaseSSLEngine();
     authHelper.reset();
 
     fileDeletor.reset();

@@ -37,16 +37,18 @@ public:
     std::vector<QColor> dateBarBackgrounds;
     QColor dateBarText;
 
-    QColor pastLastMinute;
-    QColor futureLastMinute;
+    QColor pastLastMinuteBackground;
+    QColor futureLastMinuteBackground;
+    QColor pastLastMinuteStripe;
+    QColor futureLastMinuteStripe;
 
     std::vector<QColor> tickmarkLines;
     std::vector<QColor> tickmarkText;
 };
 #define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
-    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
-    (separator)(dateBarBackgrounds)(dateBarText)(pastLastMinute)(futureLastMinute)\
-    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)(separator)\
+    (dateBarBackgrounds)(dateBarText)(pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
     (tickmarkLines)(tickmarkText)
 
 struct QnTimeScrollBarColors {
@@ -158,6 +160,15 @@ struct QnHistogramColors {
     QColor text;
 };
 #define QnHistogramColors_Fields (background)(border)(histogram)(selection)(grid)(text)
+
+struct QnTwoWayAudioWidgetColors
+{
+    QnTwoWayAudioWidgetColors();
+
+    QColor background;
+    QColor visualizer;
+};
+#define QnTwoWayAudioWidgetColors_Fields (background)(visualizer)
 
 
 struct QnResourceWidgetFrameColors {
@@ -310,6 +321,7 @@ struct QnGraphicsMessageBoxColors {
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
+    (QnTwoWayAudioWidgetColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \

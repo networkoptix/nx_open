@@ -1,0 +1,5 @@
+pragma Singleton
+
+ColorThemeBase
+{
+}

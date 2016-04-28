@@ -14,56 +14,36 @@ namespace Ui
     class UserSettingsWidget;
 }
 
+class QnUserSettingsModel;
+
 class QnUserSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnUserSettingsWidget(QWidget* parent = 0);
+    QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent = 0);
     virtual ~QnUserSettingsWidget();
-
-    QnUserResourcePtr user() const;
-    void setUser(const QnUserResourcePtr &user);
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
-    /** Custom access rights are selected */
-    bool isCustomAccessRights() const;
+    QnUuid selectedUserGroup() const;
+    Qn::GlobalPermissions selectedPermissions() const;
+
 private:
     void updateLogin();
     void updatePassword();
     void updateEmail();
-    void updateAccessRights();
 
 private:
-    /* Mode of the dialog. */
-    enum class Mode
-    {
-        /* No user is provided. */
-        Invalid,
-        /* Admin creates a new user. */
-        NewUser,
-        /* User edits himself. */
-        OwnUser,
-        /* Admin edits other user. */
-        OtherUser
-    };
-
     void updateControlsAccess();
     void updateAccessRightsPresets();
 
-    void createAccessRightsAdvanced();
-    QCheckBox *createAccessRightCheckBox(QString text, int right, QWidget *previous);
-    void selectAccessRightsPreset(int rights);
-    void fillAccessRightsAdvanced(int rights);
 
-    Qn::GlobalPermissions selectedPermissions() const;
-    QnUuid selectedUserGroup() const;
+    bool validMode() const;
 private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
-    Mode m_mode;
-    QnUserResourcePtr m_user;
+    QnUserSettingsModel* const m_model;
 };

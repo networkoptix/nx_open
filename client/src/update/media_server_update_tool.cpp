@@ -220,6 +220,17 @@ void QnMediaServerUpdateTool::startOnlineClientUpdate(const QnSoftwareVersion &v
     startUpdate(target);
 }
 
+bool QnMediaServerUpdateTool::canCancelUpdate() const
+{
+    if (!m_updateProcess)
+        return true;
+
+    if (m_stage == QnFullUpdateStage::Servers)
+        return false;
+
+    return true;
+}
+
 bool QnMediaServerUpdateTool::cancelUpdate() {
     if (!m_updateProcess)
         return true;

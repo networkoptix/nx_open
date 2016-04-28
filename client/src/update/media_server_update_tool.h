@@ -42,6 +42,7 @@ public:
     void startUpdate(const QString &fileName);
     void startOnlineClientUpdate(const QnSoftwareVersion &version);
 
+    bool canCancelUpdate() const;
     bool cancelUpdate();
 
 signals:
@@ -66,13 +67,13 @@ private:
     void setPeerStageProgress(const QnUuid &peerId, QnPeerUpdateStage stage, int progress);
 
     void finishUpdate(const QnUpdateResult &result);
-    
+
 private:
     QnFullUpdateStage m_stage;
-    
+
     QnUpdateProcess* m_updateProcess;
 
     QnMediaServerResourceList m_targets;
-    
+
     bool m_enableClientUpdates;
 };

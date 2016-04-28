@@ -2,12 +2,11 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
+class QnAbstractPermissionsModel;
 
 namespace Ui
 {
@@ -15,33 +14,24 @@ namespace Ui
 }
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
-class QnPermissionsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
+class QnPermissionsWidget : public QnAbstractPreferencesWidget
 {
     Q_OBJECT
 
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
+    typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnPermissionsWidget(QWidget* parent = 0);
+    QnPermissionsWidget(QnAbstractPermissionsModel* permissionsModel, QWidget* parent = 0);
     virtual ~QnPermissionsWidget();
-
-    /** Id of the target . */
-    QnUuid targetGroupId() const;
-    /** Set if of the group. */
-    void setTargetGroupId(const QnUuid& id);
-
-    QnUserResourcePtr targetUser() const;
-    void setTargetUser(const QnUserResourcePtr& user);
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
-private:
-    bool targetIsValid() const;
-    QnUuid targetId() const;
-
+    Qn::GlobalPermissions selectedPermissions() const;
 private:
     QScopedPointer<Ui::PermissionsWidget> ui;
-    QnUuid m_targetGroupId;
-    QnUserResourcePtr m_targetUser;
+
+    QnAbstractPermissionsModel* const m_permissionsModel;
+
+    QList<QCheckBox*> m_checkboxes;
 };

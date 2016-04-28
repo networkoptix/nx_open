@@ -1,0 +1,12 @@
+{
+    "palette" : {
+        "attention" : {
+            "color_1" :     "#611f21",
+            "color_2" :     "#aa2222"
+        }
+    },
+
+    "window" : {
+        "accent" :      "#f37222"
+    }
+}

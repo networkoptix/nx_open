@@ -24,13 +24,17 @@
 
 namespace std
 {
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #   if _MSC_VER <= 1700
 #       define USE_OWN_MAKE_UNIQUE
 #   endif
 #elif defined(__GNUC_PREREQ)
 #   if !__GNUC_PREREQ(4,9)
 #      define USE_OWN_MAKE_UNIQUE
+#   endif
+#elif defined(__ANDROID__)
+#   if !__GNUC_PREREQ__(4,9)
+#       define USE_OWN_MAKE_UNIQUE
 #   endif
 #endif
 
@@ -44,26 +48,6 @@ template<
 }
 #endif  //USE_OWN_MAKE_UNIQUE
 }   //std
-
-
-/** TODO #ak following methods are inappropriate here. Find a better place for them */
-template<typename ResultType, typename InitialType, typename DeleterType>
-std::unique_ptr<ResultType, DeleterType>
-    static_unique_ptr_cast(std::unique_ptr<InitialType, DeleterType>&& sourcePtr)
-{
-    return std::unique_ptr<ResultType, DeleterType>(
-        static_cast<ResultType>(sourcePtr.release()),
-        sourcePtr.get_deleter());
-}
-
-template<typename ResultType, typename InitialType>
-std::unique_ptr<ResultType, std::default_delete<ResultType>>
-    static_unique_ptr_cast(
-        std::unique_ptr<InitialType, std::default_delete<InitialType>>&& sourcePtr)
-{
-    return std::unique_ptr<ResultType>(
-        static_cast<ResultType*>(sourcePtr.release()));
-}
 
 #endif // __clang__
 

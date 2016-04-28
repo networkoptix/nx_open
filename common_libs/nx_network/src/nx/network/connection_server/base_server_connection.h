@@ -169,7 +169,7 @@ namespace nx_api
                     SystemError::connectionReset,
                     static_cast<CustomConnectionType*>(this) );
 
-            NX_ASSERT( m_readBuffer.size() == bytesRead );
+            NX_ASSERT( (size_t)m_readBuffer.size() == bytesRead );
 
             {
                 nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
@@ -189,7 +189,8 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
 
-            NX_ASSERT( count == m_bytesToSend );
+            static_cast<void>(count);
+            NX_ASSERT(count == m_bytesToSend);
 
             static_cast<CustomConnectionType*>(this)->readyToSendData();
         }

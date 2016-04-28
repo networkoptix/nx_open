@@ -82,6 +82,7 @@ bool QnGenericTabbedDialog::forcefullyClose()
     if (!canDiscardChanges())
         return false;
 
+    discardChanges();
     loadDataToUi();
     hide();
     return true;
@@ -112,6 +113,13 @@ void QnGenericTabbedDialog::applyChanges()
     updateButtonBox();
 }
 
+void QnGenericTabbedDialog::discardChanges()
+{
+    for (const Page &page : m_pages)
+        if (page.enabled && page.visible)
+            page.widget->discardChanges();
+}
+
 void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, const QString &title)
 {
     if (!m_tabWidget)
@@ -139,6 +147,16 @@ void QnGenericTabbedDialog::addPage(int key, QnAbstractPreferencesWidget *page, 
     connect(page, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnGenericTabbedDialog::updateButtonBox);
 }
 
+
+bool QnGenericTabbedDialog::isPageVisible(int key) const
+{
+    for (const Page &page : m_pages)
+        if (page.key == key)
+            return page.visible;
+
+    NX_ASSERT(false);
+    return false;
+}
 
 void QnGenericTabbedDialog::setPageVisible(int key, bool visible)
 {
@@ -238,7 +256,7 @@ void QnGenericTabbedDialog::initializeTabWidget()
     setTabWidget(tabWidgets[0]);
 }
 
-bool QnGenericTabbedDialog::canApplyChanges()
+bool QnGenericTabbedDialog::canApplyChanges() const
 {
     if (m_readOnly)
         return false;
@@ -249,7 +267,7 @@ bool QnGenericTabbedDialog::canApplyChanges()
     });
 }
 
-bool QnGenericTabbedDialog::canDiscardChanges()
+bool QnGenericTabbedDialog::canDiscardChanges() const
 {
     if (m_readOnly)
         return true;
@@ -324,8 +342,14 @@ void QnGenericTabbedDialog::updateButtonBox()
     if (m_updating || !buttonBox())
         return;
 
+    bool changesPresent = hasChanges();
+    bool canApply = !changesPresent || canApplyChanges();
+
     if (QPushButton *applyButton = buttonBox()->button(QDialogButtonBox::Apply))
-        applyButton->setEnabled(!m_readOnly && hasChanges());
+        applyButton->setEnabled(!m_readOnly && changesPresent && canApply);
+
+    if (QPushButton *okButton = buttonBox()->button(QDialogButtonBox::Ok))
+        okButton->setEnabled(m_readOnly || canApply);
 }
 
 

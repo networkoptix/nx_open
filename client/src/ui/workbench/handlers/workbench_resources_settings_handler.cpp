@@ -72,12 +72,12 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource());
-    user->setPermissions(Qn::GlobalLiveViewerPermissionSet);
+    user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
     user->setId(QnUuid::createUuid());
     user->addFlags(Qn::local);
 
     QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
-    dialogConstructor.setDontFocus(true);
+   // dialogConstructor.setDontFocus(true);
     m_userSettingsDialog->setUser(user);
 }
 

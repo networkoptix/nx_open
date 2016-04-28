@@ -101,7 +101,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
     /* Handle just-created user situation. */
     if (user->flags().testFlag(Qn::local))
-        return user->getPermissions();
+        return user->getRawPermissions();
 
     NX_ASSERT(user->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool user");
 
@@ -111,7 +111,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     if (iter != m_globalPermissionsCache.cend())
         return *iter;
 
-    Qn::GlobalPermissions result = user->getPermissions();
+    Qn::GlobalPermissions result = user->getRawPermissions();
 
     if (user->isOwner() || result.testFlag(Qn::GlobalOwnerPermission))
         result |= Qn::GlobalOwnerPermissionsSet;
@@ -168,6 +168,9 @@ Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions
         result &= ~Qn::DeprecatedViewExportArchivePermission;
         result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
     }
+
+    if (result.testFlag(Qn::DeprecatedGlobalEditUsersPermission))
+        result &= ~Qn::DeprecatedGlobalEditUsersPermission;
 
     return result;
 }
@@ -368,7 +371,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         result |= Qn::CreateLayoutPermission; /* Everyone can create a layout for themselves */
     }
 
-    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalEditUsersPermission))
+    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalAdminPermission))
     {
         result |= Qn::ReadPermission;
         if (m_readOnlyMode)
@@ -422,10 +425,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr &user
         if (resource.dynamicCast<QnWebPageResource>())
             return Qn::GlobalAccessAllCamerasPermission;
 
-        if (resource.dynamicCast<QnUserResource>())
-            return Qn::GlobalEditUsersPermission;
-
-        /* Default value. */
+        /* Default value (e.g. for users). */
         return Qn::GlobalAdminPermission;
     };
 

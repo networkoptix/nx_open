@@ -21,12 +21,14 @@
 QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::PreferencesDialog())
+    ui(new Ui::PreferencesDialog()),
+    m_generalWidget(new QnGeneralPreferencesWidget(this)),
+    m_lookAndFeelWidget(new QnLookAndFeelPreferencesWidget(this))
 {
     ui->setupUi(this);
 
-    addPage(GeneralPage, new QnGeneralPreferencesWidget(this), tr("General"));
-    addPage(LookAndFeelPage, new QnLookAndFeelPreferencesWidget(this), tr("Look and Feel"));
+    addPage(GeneralPage, m_generalWidget , tr("General"));
+    addPage(LookAndFeelPage, m_lookAndFeelWidget, tr("Look and Feel"));
 
     if (QnScreenRecorder::isSupported())
         addPage(RecordingPage, new QnRecordingSettingsWidget(this), tr("Screen Recording"));
@@ -51,40 +53,36 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
 
 QnPreferencesDialog::~QnPreferencesDialog() {}
 
-void QnPreferencesDialog::applyChanges() {
+void QnPreferencesDialog::applyChanges()
+{
+    // TODO: #dklychkov remove this define if the way to restart the app will be found
+#ifndef Q_OS_MACX
+    if (m_generalWidget->isRestartRequired() || m_lookAndFeelWidget->isRestartRequired())
+    {
+        QDialogButtonBox::StandardButton result = QnMessageBox::information(
+            this,
+            tr("Information"),
+            tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Yes);
+        switch (result)
+        {
+        case QDialogButtonBox::Cancel:
+            return;
+        case QDialogButtonBox::Yes:
+            /* The slot must be connected as QueuedConnection because it must start the new instance
+            * after the settings have been saved. Settings saving will be performed just after this (confirm)
+            * without returning to the event loop. */
+            menu()->trigger(QnActions::QueueAppRestartAction);
+            break;
+        default:
+            break;
+        }
+    }
+#endif
+
     base_type::applyChanges();
     if (qnSettings->isWritable())
         qnSettings->save();
 }
 
-bool QnPreferencesDialog::canApplyChanges() {
-#ifdef Q_OS_MACX
-    // TODO: #dklychkov remove this if the way to restart the app will be found
-    return true;
-#endif
-
-    bool allPagesCanApplyChanges = base_type::canApplyChanges();
-    if (allPagesCanApplyChanges)
-        return true;
-
-    QDialogButtonBox::StandardButton result = QnMessageBox::information(
-        this,
-        tr("Information"),
-        tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Yes);
-    switch (result) {
-    case QDialogButtonBox::Cancel:
-        return false;
-    case QDialogButtonBox::Yes:
-        /* The slot must be connected as QueuedConnection because it must start the new instance
-         * after the settings have been saved. Settings saving will be performed just after this (confirm)
-         * without returning to the event loop. */
-        menu()->trigger(QnActions::QueueAppRestartAction);
-        break;
-    default:
-        break;
-    }
-
-    return true;
-}

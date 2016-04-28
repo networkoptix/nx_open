@@ -157,7 +157,17 @@
     "QAbstractItemView": {
         "palette": {
             "default": {
-                "base":             "transparent"
+                "base":             "transparent",
+                "midlight":         "dark12.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)"
+            }
+        }
+    },
+
+    "QHeaderView": {
+        "palette": {
+            "default": {
+                "midlight":         "dark12.setAlpha(51)"
             }
         }
     },
@@ -173,6 +183,24 @@
         }
     },
 
+    "QnResourceTreeWidget": {
+        "palette": {
+            "default": {
+                "midlight":         "dark8.setAlpha(102)",
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light12",
+                "highlightedText":  "light4",
+                "brightText":       "brand_core"
+            },
+            "inactive": {
+                "midlight":         "dark8.setAlpha(102)",
+                "highlight":        "dark8.setAlpha(102)",
+                "text":             "dark17",
+                "highlightedText":  "light10",
+                "brightText":       "brand_d3"
+            }
+        }
+    },
 
     "QnPanel": {
         "palette": {
@@ -227,13 +255,15 @@
             "dateBarBackgrounds": [ "dark11", "dark9" ],
             "dateBarText": "light4",
 
-            "pastLastMinute": "dark6",
-            "futureLastMinute": "dark6",
+            "pastLastMinuteBackground": "dark6.setAlpha(127)",
+            "futureLastMinuteBackground": "dark6.setAlpha(127)",
+            "pastLastMinuteStripe": "dark6.setAlpha(38)",
+            "futureLastMinuteStripe": "dark6.setAlpha(38)",
 
             "pastBookmark": "blue12.setAlpha(204)",
             "futureBookmark": "blue12.setAlpha(204)",
-            "pastBookmarkBound": "link",
-            "futureBookmarkBound": "link",
+            "pastBookmarkBound": "brand_core",
+            "futureBookmarkBound": "brand_core",
 
             "tickmarkLines": [ "light10", "dark17", "dark13", "dark9" ],
             "tickmarkText" : [ "light8", "light16", "dark15" ]
@@ -328,6 +358,19 @@
         },
         "colors": {
             "idLabel": "#575757"
+        }
+    },
+    
+    "QnTwoWayAudioWidget": {
+        "palette": {
+            "default": {
+            "window": "#00000080",
+            "windowText": "#ffffff"
+            }
+        },
+        "colors": {
+            "background": "#212a2f",
+            "visualizer": "#cf2727"
         }
     },
 

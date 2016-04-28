@@ -5,9 +5,9 @@
 
 #include "cloud_stream_socket.h"
 
-#include <future>
-
 #include <utils/common/systemerror.h>
+
+#include <nx/utils/std/future.h>
 
 #include "tunnel/outgoing_tunnel.h"
 #include "../socket_global.h"
@@ -86,7 +86,7 @@ bool CloudStreamSocket::shutdown()
     }
 
     //interrupting blocking calls
-    std::promise<void> stoppedPromise;
+    nx::utils::promise<void> stoppedPromise;
     pleaseStop(
         [this, &stoppedPromise]()
         {
@@ -137,7 +137,7 @@ bool CloudStreamSocket::connect(
     if (!setSendTimeout(timeoutMillis))
         return false;
 
-    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
         QnMutexLocker lk(&m_mutex);
         if (m_terminated)
@@ -199,7 +199,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
-    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
         QnMutexLocker lk(&m_mutex);
         if (m_terminated)
@@ -469,7 +469,7 @@ bool CloudStreamSocket::startAsyncConnect(
 
 int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
 {
-    std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
         QnMutexLocker lk(&m_mutex);
         if (m_terminated)

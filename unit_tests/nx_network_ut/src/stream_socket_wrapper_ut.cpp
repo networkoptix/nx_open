@@ -1,3 +1,4 @@
+
 #include <gtest/gtest.h>
 
 #include <utils/common/cpp14.h>
@@ -5,6 +6,7 @@
 
 #include <nx/network/system_socket.h>
 #include <nx/network/stream_socket_wrapper.h>
+#include <nx/utils/std/thread.h>
 
 
 namespace nx {
@@ -132,7 +134,7 @@ TEST_F(StreamSocketWrapperTest, SyncAsync)
 
 TEST_F(StreamSocketWrapperTest, Sync)
 {
-    std::thread clientThread([this]()
+    nx::utils::thread clientThread([this]()
     {
         client = std::make_unique<StreamSocketWrapper>(std::move(client));
         buffer.resize(kTestSize + 1);
@@ -143,7 +145,7 @@ TEST_F(StreamSocketWrapperTest, Sync)
         ASSERT_EQ(buffer, kTestMessage);
     });
 
-    std::thread acceptedThread([this]()
+    nx::utils::thread acceptedThread([this]()
     {
         accepted = std::make_unique<StreamSocketWrapper>(std::move(accepted));
         ASSERT_EQ(accepted->send(kTestMessage.data(), kTestSize), kTestSize);

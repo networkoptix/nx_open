@@ -94,20 +94,20 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
-bool QnSecurityCamResource::isCameraInfoSavedToDisk(int pool) const
+bool QnSecurityCamResource::isCameraInfoSavedToDisk(const QString &storageUrl) const
 {
     QnMutexLocker lk(&m_mutex);
-    auto resultIt = m_cameraInfoSavedToDisk.find(pool);
+    auto resultIt = m_cameraInfoSavedToDisk.find(storageUrl);
     if (resultIt == m_cameraInfoSavedToDisk.cend()) {
-        m_cameraInfoSavedToDisk.emplace(pool, false);
+        m_cameraInfoSavedToDisk.emplace(storageUrl, false);
         return false;
     }
-    return m_cameraInfoSavedToDisk[pool];
+    return m_cameraInfoSavedToDisk[storageUrl];
 }
 
-void QnSecurityCamResource::setCameraInfoSavedToDisk(int pool)
+void QnSecurityCamResource::setCameraInfoSavedToDisk(const QString &storageUrl)
 {
-    SAFE(m_cameraInfoSavedToDisk[pool] = true);
+    SAFE(m_cameraInfoSavedToDisk[storageUrl] = true);
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -459,6 +459,12 @@ int QnSecurityCamResource::motionSensWindowCount() const
     return val.toInt();
 }
 
+
+bool QnSecurityCamResource::hasTwoWayAudio() const
+{
+    return getCameraCapabilities().testFlag(Qn::AudioTransmitCapability);
+}
+
 bool QnSecurityCamResource::isAudioSupported() const {
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
     if (val.toInt() > 0)
@@ -529,7 +535,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
-    return getCameraCapabilities() & capabilities;
+    return (getCameraCapabilities() & capabilities) == capabilities;
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
@@ -1034,4 +1040,10 @@ Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 bool QnSecurityCamResource::isIOModule() const
 {
     return m_cachedIsIOModule.get();
+}
+
+
+QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
+{
+    return nullptr;
 }

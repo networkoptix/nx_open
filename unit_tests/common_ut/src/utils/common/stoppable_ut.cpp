@@ -2,6 +2,8 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/std/future.h>
+
 
 struct StoppableTestClass
     : public QnStoppableAsync
@@ -47,7 +49,7 @@ private:
 TEST( QnStoppableAsync, SingleAsync )
 {
     StoppableTestClass s;
-    std::promise< bool > p;
+    nx::utils::promise< bool > p;
     s.pleaseStop([ & ](){ p.set_value( true ); });
 
     ASSERT_TRUE( s.isRunning() );
@@ -88,7 +90,7 @@ TEST( QnStoppableAsync, MultiAuto )
     auto s1 = std::make_unique< StoppableTestClass >();
     auto s2 = std::make_unique< StoppableTestClass >();
 
-    std::promise< bool > p;
+    nx::utils::promise< bool > p;
     QnStoppableAsync::pleaseStop( [ & ](){ p.set_value( true ); },
                                   std::move( s1 ), std::move( s2 ) );
 

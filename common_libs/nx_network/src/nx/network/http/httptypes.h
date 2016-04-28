@@ -344,6 +344,14 @@ namespace nx_http
         BufferType toMultipartString(const ConstBufferRefType& boundary) const;
     };
 
+    class NX_NETWORK_API RtspResponse
+    :
+        public Response
+    {
+    public:
+        bool parse(const ConstBufferRefType& data);
+    };
+
     namespace MessageType
     {
         enum Value

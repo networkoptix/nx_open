@@ -1,9 +1,12 @@
+
 #include "mediator_connector.h"
 
 #include "common/common_globals.h"
 #include "utils/common/cpp14.h"
+
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_factory.h>
+
 
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
 static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes( 10 );
@@ -35,7 +38,7 @@ void MediatorConnector::enable( bool waitComplete )
         if( !m_promise )
         {
             needToFetch = true;
-            m_promise = std::promise< bool >();
+            m_promise = nx::utils::promise< bool >();
             m_future = m_promise->get_future();
         }
     }
@@ -59,30 +62,32 @@ std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
                 new MediatorServerTcpConnection( m_stunClient, this ) );
 }
 
-void MediatorConnector::mockupAddress( SocketAddress address )
+void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarning )
 {
     {
         QnMutexLocker lk( &m_mutex );
         NX_ASSERT( !m_promise, Q_FUNC_INFO,
                     "Address resolving is already in progress!" );
 
-        m_promise = std::promise< bool >();
+        m_promise = nx::utils::promise< bool >();
         m_future = m_promise->get_future();
     }
 
-
-    NX_LOGX( lit( "Mediator address is mocked up: %1" )
-             .arg( address.toString() ), cl_logWARNING );
+    if (!suppressWarning)
+    {
+        NX_LOGX( lit( "Mediator address is mocked up: %1" )
+                 .arg( address.toString() ), cl_logWARNING );
+    }
 
     m_mediatorAddress = std::move(address);
     m_stunClient->connect( address );
     m_promise->set_value( true );
 }
 
-void MediatorConnector::mockupAddress( const MediatorConnector* mc )
+void MediatorConnector::mockupAddress( const MediatorConnector& connector )
 {
-    if (auto address = mc->mediatorAddress())
-        mockupAddress(std::move(*address));
+    if (auto address = connector.mediatorAddress())
+        mockupAddress(std::move(*address), true);
 }
 
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )
@@ -122,7 +127,7 @@ boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
     return m_mediatorAddress;
 }
 
-static bool isReady(std::future<bool> const& f)
+static bool isReady(nx::utils::future<bool> const& f)
 {
     return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }

@@ -27,26 +27,45 @@ QnSystemDescriptionPtr QnSystemDescription::createLocalSystem(const QString &sys
     , const QString &systemName)
 {
     return QnSystemDescriptionPtr(
-        new QnSystemDescription(systemId, systemName, false));
+        new QnSystemDescription(systemId, systemName));
 }
 
 QnSystemDescriptionPtr QnSystemDescription::createCloudSystem(const QString &systemId
-    , const QString &systemName)
+    , const QString &systemName
+    , const QString &ownerAccountEmail
+    , const QString &ownerFullName)
 {
     return QnSystemDescriptionPtr(
-        new QnSystemDescription(systemId, systemName, true));
+        new QnSystemDescription(systemId, systemName
+            , ownerAccountEmail, ownerFullName));
 }
 
 QnSystemDescription::QnSystemDescription(const QString &systemId
-    , const QString &systemName
-    , const bool isCloudSystem)
+    , const QString &systemName)
     : m_id(systemId)
     , m_systemName(systemName)
-    , m_isCloudSystem(isCloudSystem)
+    , m_ownerAccountEmail()
+    , m_ownerFullName()
+    , m_isCloudSystem(false)
     , m_serverTimestamps()
     , m_servers()
     , m_prioritized()
     , m_hosts()
+{}
+
+QnSystemDescription::QnSystemDescription(const QString &systemId
+    , const QString &systemName
+    , const QString &cloudOwnerAccountEmail
+    , const QString &ownerFullName)
+    : m_id(systemId)
+    , m_systemName(systemName)
+    , m_ownerAccountEmail(cloudOwnerAccountEmail)
+    , m_ownerFullName(ownerFullName)
+    , m_isCloudSystem(true)
+    , m_serverTimestamps()
+    , m_servers()
+    , m_prioritized()
+    , m_hosts() 
 {}
 
 QnSystemDescription::~QnSystemDescription()
@@ -60,6 +79,16 @@ QString QnSystemDescription::id() const
 QString QnSystemDescription::name() const
 {
     return m_systemName;
+}
+
+QString QnSystemDescription::ownerAccountEmail() const
+{
+    return m_ownerAccountEmail;
+}
+
+QString QnSystemDescription::ownerFullName() const
+{
+    return m_ownerFullName;
 }
 
 bool QnSystemDescription::isCloudSystem() const

@@ -5,9 +5,12 @@
 
 #include "message.h"
 
+#include <mutex>
 #include <random>
 
 #include <openssl/hmac.h>
+
+#include <nx/utils/random.h>
 
 #include "message_parser.h"
 #include "message_serializer.h"
@@ -67,28 +70,9 @@ Header& Header::operator=(Header&& rhs)
     return *this;
 }
 
-namespace {
-std::random_device randomForBufferGeneration;
-std::mutex randomForBufferGenerationMutex;
-}
-
-static Buffer randomBuffer( int size )
-{
-    Buffer id( size, 0 );
-
-    std::unique_lock<std::mutex> lk(randomForBufferGenerationMutex);
-    std::uniform_int_distribution<int> dist(
-        std::numeric_limits<char>::min(),
-        std::numeric_limits<char>::max());
-    std::generate(
-        id.begin(), id.end(),
-        [&dist] { return dist(randomForBufferGeneration); });
-    return id;
-}
-
 Buffer Header::makeTransactionId()
 {
-    return randomBuffer( TRANSACTION_ID_SIZE );
+    return nx::utils::generateRandomData( TRANSACTION_ID_SIZE );
 }
 
 namespace attrs
@@ -234,7 +218,7 @@ static Buffer hmacSha1( const String& key, const Message* message )
 void Message::insertIntegrity( const String& userName, const String& key )
 {
     newAttribute< attrs::UserName >( userName );
-    newAttribute< attrs::Nonce >( randomBuffer( 10 ).toHex() );
+    newAttribute< attrs::Nonce >( nx::utils::generateRandomData( 10 ).toHex() );
     newAttribute< attrs::MessageIntegrity >( nx::Buffer(
         attrs::MessageIntegrity::SIZE, 0 ) );
 

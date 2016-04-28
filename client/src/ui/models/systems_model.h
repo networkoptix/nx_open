@@ -25,6 +25,8 @@ public: // overrides
     QHash<int, QByteArray> roleNames() const override;
 
 private:
+    void updateOwnerDescription();
+
     void addSystem(const QnSystemDescriptionPtr &systemDescription);
 
     void removeSystem(const QString &systemId);

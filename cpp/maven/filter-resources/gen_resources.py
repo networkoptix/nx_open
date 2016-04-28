@@ -161,6 +161,18 @@ if __name__ == '__main__':
             os.environ["path"] += os.pathsep + vc_path
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
             execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
+        elif '${platform}' in [ 'ios', 'macosx' ]:
+            os.environ["DYLD_FRAMEWORK_PATH"] = ldpath
+            os.environ["DYLD_LIBRARY_PATH"] = ldpath
+            makefile = "Makefile.${build.configuration}"
+            config = ""
+            if "${platform}" == "ios":
+                config = "CONFIG+=${iosTarget}"
+                if "${iosTarget}" != "iphonesimulator":
+                    config += " CONFIG-=iphonesimulator"
+            qmake = "${qt.dir}/bin/qmake {0} -o {1} CONFIG+=${build.configuration} {2}".format(output_pro_file, makefile, config)
+            print qmake
+            os.system(qmake)
         else:
             qt_spec = "${qt.spec}"
             if qt_spec:

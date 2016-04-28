@@ -7,7 +7,6 @@
 #include <utils/common/model_functions.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/network/socket_global.h>
-#include <common/common_module.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <rest/server/json_rest_result.h>
 
@@ -15,9 +14,12 @@ namespace
 {
     enum 
     {
-        kCloudSystemsRefreshPeriodMs = 7 * 1000          // 7 seconds
-        , kCloudServerOutdateTimeoutMs = 10 * 1000        // 10 seconds
+        kCloudSystemsRefreshPeriodMs = 7 * 1000         // 7 seconds
+        , kCloudServerOutdateTimeoutMs = 10 * 1000      // 10 seconds
     };
+
+    constexpr static const std::chrono::seconds kSystemConnectTimeout = 
+        std::chrono::seconds(15);
 }
 
 QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
@@ -27,14 +29,13 @@ QnCloudSystemsFinder::QnCloudSystemsFinder(QObject *parent)
     , m_systems()
     , m_requestToSystem()
 {
-    const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    NX_ASSERT(cloudWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
+    NX_ASSERT(qnCloudStatusWatcher, Q_FUNC_INFO, "Cloud watcher is not ready");
 
-    connect(cloudWatcher, &QnCloudStatusWatcher::statusChanged
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
         , this, &QnCloudSystemsFinder::onCloudStatusChanged);
-    connect(cloudWatcher, &QnCloudStatusWatcher::cloudSystemsChanged
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged
         , this, &QnCloudSystemsFinder::setCloudSystems);
-    connect(cloudWatcher, &QnCloudStatusWatcher::error
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::error
         , this, &QnCloudSystemsFinder::onCloudError);
 
     connect(m_updateSystemsTimer, &QTimer::timeout
@@ -72,19 +73,13 @@ QnSystemDescriptionPtr QnCloudSystemsFinder::getSystem(const QString &id) const
 
 void QnCloudSystemsFinder::onCloudStatusChanged(QnCloudStatusWatcher::Status status)
 {
+    // TODO: #ynikitenkov Add handling of status changes
     switch (status)
     {
     case QnCloudStatusWatcher::Online:
-    {
-        const auto cloudWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-//        cloudWatcher->updateSystems();
-        break;
-    }
-
     case QnCloudStatusWatcher::LoggedOut:
     case QnCloudStatusWatcher::Unauthorized:
     case QnCloudStatusWatcher::Offline:
-//        setCloudSystems(QnCloudSystemList());
         break;
     }
 }
@@ -95,7 +90,9 @@ void QnCloudSystemsFinder::setCloudSystems(const QnCloudSystemList &systems)
     for (const auto system : systems)
     {
         updatedSystems.insert(system.id
-            , QnSystemDescription::createCloudSystem(system.id, system.name));
+            , QnSystemDescription::createCloudSystem(system.id
+                , system.name, system.ownerAccountEmail
+                , system.ownerFullName));
     }
 
     typedef QSet<QString> IdsSet;
@@ -191,9 +188,8 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
     const auto onModuleInformationCompleted = [this, guard, systemId, host, serverPriority]
         (SystemError::ErrorCode errorCode, int httpCode, nx_http::BufferType buffer)
     {
-        enum { kHttpSuccess = 200 };
         if (!guard || (errorCode != SystemError::noError)
-            || (httpCode != kHttpSuccess))
+            || (httpCode != nx_http::StatusCode::ok))
         {
             return;
         }
@@ -227,7 +223,17 @@ void QnCloudSystemsFinder::pingServerInternal(const QString &host
         systemDescription->setServerHost(serverId, host);
     };
 
-    nx_http::downloadFileAsync(apiUrl, onModuleInformationCompleted);
+    nx_http::AsyncHttpClient::Timeouts httpRequestTimeouts;
+    //first connect to a cloud (and not cloud) system may take a long time
+    //  since it may require hole punching
+    httpRequestTimeouts.sendTimeout = kSystemConnectTimeout;
+    httpRequestTimeouts.responseReadTimeout = kSystemConnectTimeout;
+    nx_http::downloadFileAsync(
+        apiUrl,
+        onModuleInformationCompleted,
+        nx_http::HttpHeaders(),
+        nx_http::AsyncHttpClient::authBasicAndDigest,
+        httpRequestTimeouts);
 }
 
 void QnCloudSystemsFinder::checkOutdatedServersInternal(const QnSystemDescriptionPtr &system)

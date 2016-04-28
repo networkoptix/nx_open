@@ -551,7 +551,7 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
     }
 
     // try to select profile by is lexicographical order
-    qSort(availableProfiles);
+    std::sort(availableProfiles.begin(), availableProfiles.end());
     int profileIndex = isPrimary ? 0 : 1;
     profileIndex += m_onvifRes->getChannel()* (m_onvifRes->hasDualStreaming() ? 2 : 1);
     if (availableProfiles.size() <= profileIndex)

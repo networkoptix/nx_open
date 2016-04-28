@@ -99,9 +99,6 @@
 
 namespace
 {
-    const QSize kShowHideButtonSize(15, 45);
-    const QMargins showHideButtonMargins(0, 10, 0, 10);
-
     const qreal kDefaultSizeMultiplier = 1.0;
     const int kDefaultHelpTopicId = -1;
 
@@ -114,21 +111,15 @@ namespace
         return QnLexical::serialized(ourAction->id());
     }
 
-    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = kDefaultSizeMultiplier
-        , int helpTopicId = kDefaultHelpTopicId, QGraphicsItem *parent = nullptr)
+    QnImageButtonWidget* newActionButton(QAction* action, int helpTopicId = kDefaultHelpTopicId, QGraphicsItem *parent = nullptr)
     {
-        int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-
-        qreal height = baseSize * sizeMultiplier;
-        qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
-
-        QnImageButtonWidget *button =
-                new QnImageButtonWidget(aliasFromAction(action), parent);
-
+        QnImageButtonWidget* button = new QnImageButtonWidget(aliasFromAction(action), parent);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
-        button->setFixedSize(width, height);
         button->setDefaultAction(action);
         button->setCached(true);
+
+        int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+        button->setFixedSize(action->icon().actualSize(QSize(maxIconSize, maxIconSize)));
 
         if (helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
@@ -136,19 +127,18 @@ namespace
         return button;
     }
 
-    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent, QAction *action)
+    QnImageButtonWidget* newShowHideButton(QGraphicsItem* parent, QAction* action)
     {
-        QnImageButtonWidget *button = new QnImageButtonWidget(
-            aliasFromAction(action), parent);
-
-        button->setFixedSize(kShowHideButtonSize);
-        button->setImageMargins(showHideButtonMargins);
+        QnImageButtonWidget* button = new QnImageButtonWidget(aliasFromAction(action), parent);
         if (action)
             button->setDefaultAction(action);
         else
             button->setCheckable(true);
 
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
+
+        int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+        button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
 
         button->setProperty(Qn::NoHandScrollOver, true);
         button->setCached(true);
@@ -157,19 +147,21 @@ namespace
         return button;
     }
 
-    QnImageButtonWidget *newPinButton(QGraphicsItem *parent, QAction *action)
+    QnImageButtonWidget* newPinButton(QGraphicsItem* parent, QAction* action)
     {
-        QnImageButtonWidget *button = new QnImageButtonWidget(
-            aliasFromAction(action), parent);
+        QnImageButtonWidget* button = new QnImageButtonWidget(aliasFromAction(action), parent);
 
-        int size = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
-        button->resize(size, size);
         if (action)
             button->setDefaultAction(action);
         else
             button->setCheckable(true);
+
         button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
         button->setCached(true);
+
+        int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+        button->setFixedSize(button->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
@@ -428,8 +420,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     });
 
     /* Init fields. */
-    m_pinOffset = (24 - QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr)) / 2.0;
-
     setFlags(HideWhenNormal | HideWhenZoomed | AdjustMargins);
 
     setSliderVisible(false, false);
@@ -1151,11 +1141,11 @@ void QnWorkbenchUi::at_treeItem_paintGeometryChanged()
 
     m_treeShowButton->setPos(QPointF(
         qMax(m_controlsWidgetRect.left(), paintGeometry.right()),
-        (paintGeometry.top() + paintGeometry.bottom() - kShowHideButtonSize.height()) / 2));
+        (paintGeometry.top() + paintGeometry.bottom() - m_treeShowButton->size().height()) / 2.0));
 
     m_treePinButton->setPos(QPointF(
-        paintGeometry.right() - m_treePinButton->size().width() - m_pinOffset,
-        paintGeometry.top() + m_pinOffset));
+        paintGeometry.right() - m_treePinButton->size().width() - 1.0,
+        paintGeometry.top() + 1.0));
 
     updateTreeResizerGeometry();
     updateViewportMargins();
@@ -1274,7 +1264,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     m_treeXAnimator->setTimer(m_instrumentManager->animationTimer());
     m_treeXAnimator->setTargetObject(m_treeItem);
     m_treeXAnimator->setAccessor(new PropertyAccessor("x"));
-    m_treeXAnimator->setSpeed(m_treeItem->size().width() * 2.0);
+    m_treeXAnimator->setSpeed(qMax(1.0, m_treeItem->size().width() * 2.0));
     m_treeXAnimator->setTimeLimit(500);
 
     m_treeOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -1527,7 +1517,7 @@ void QnWorkbenchUi::setNotificationsOpened(bool opened, bool animate)
     qreal newX = m_controlsWidgetRect.right() + (opened ? -m_notificationsItem->size().width() : 1.0 /* Just in case. */);
     if (animate)
     {
-        m_notificationsXAnimator->setSpeed(m_notificationsItem->size().width() * 2.0);
+        m_notificationsXAnimator->setSpeed(qMax(1.0, m_notificationsItem->size().width() * 2.0));
         m_notificationsXAnimator->animateTo(newX);
     }
     else
@@ -1713,9 +1703,9 @@ void QnWorkbenchUi::at_notificationsItem_geometryChanged()
     m_notificationsBackgroundItem->setGeometry(paintGeometry);
     m_notificationsShowButton->setPos(QPointF(
         qMin(m_controlsWidgetRect.right(), paintGeometry.left()),
-        (paintGeometry.top() + paintGeometry.bottom() - kShowHideButtonSize.height()) / 2
+        (paintGeometry.top() + paintGeometry.bottom() - m_notificationsShowButton->size().height()) / 2
     ));
-    m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(m_pinOffset, m_pinOffset));
+    m_notificationsPinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
     if (isNotificationsOpened())
         setNotificationsOpened(); //there is no check there but it will fix the X-coord animation
 
@@ -1739,9 +1729,8 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(
         lit("notifications_collection_widget_toggle"), m_controlsWidget);
+
     m_notificationsShowButton = blinker;
-    m_notificationsShowButton->setFixedSize(kShowHideButtonSize);
-    m_notificationsShowButton->setImageMargins(showHideButtonMargins);
     m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
@@ -1749,6 +1738,10 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
     m_notificationsShowButton->setTransform(QTransform::fromScale(-1, 1));
     m_notificationsShowButton->setFocusProxy(m_notificationsItem);
     m_notificationsShowButton->stackBefore(m_notificationsItem);
+
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
+    m_notificationsShowButton->setFixedSize(m_notificationsShowButton->icon().actualSize(QSize(maxIconSize, maxIconSize)));
+
     setHelpTopic(m_notificationsShowButton, Qn::MainWindow_Pin_Help);
     m_notificationsItem->setBlinker(blinker);
 
@@ -2039,8 +2032,7 @@ void QnWorkbenchUi::createCalendarWidget(const QnPaneSettings& settings)
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
     m_dayTimeItem->stackBefore(m_calendarItem);
 
-    m_dayTimeMinimizeButton = newActionButton(action(QnActions::MinimizeDayTimeViewAction)
-        , kDefaultSizeMultiplier, kDefaultHelpTopicId, m_controlsWidget);
+    m_dayTimeMinimizeButton = newActionButton(action(QnActions::MinimizeDayTimeViewAction), kDefaultHelpTopicId, m_controlsWidget);
     m_dayTimeMinimizeButton->setFocusProxy(m_dayTimeItem);
 
     m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);

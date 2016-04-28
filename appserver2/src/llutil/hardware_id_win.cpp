@@ -24,6 +24,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QSettings>
 
+#include <nx/utils/log/log.h>
+
 #include "util.h"
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
@@ -34,7 +36,113 @@
 
 namespace LLUtil {
 
-static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devices) {
+    namespace {
+        const int kWbemTimeoutMs = 5000;
+    }
+
+HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
+{
+    HRESULT hres;
+
+    IEnumWbemClassObject* pEnumerator = NULL;
+    hres = pSvc->ExecQuery( L"WQL", L"SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter=true AND NetEnabled=false",
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+
+    if (FAILED(hres))
+    {
+        NX_LOG(QString(lit("GetDisabledNICS(): ExecQuery failed. Error code = 0x%1, Message: %2"))
+            .arg((long)hres, 0, 16)
+            .arg(QString::fromWCharArray(_com_error(hres).ErrorMessage()))
+            , cl_logINFO);
+        return 1;
+    }
+
+    // Get the data from the WQL sentence
+    IWbemClassObject* pclsObj = NULL;
+    ULONG uReturnCount = 0;
+    
+    while (pEnumerator)
+    {
+        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturnCount);
+
+        // Leave the loop is no items returned or request failed
+        if(0 == uReturnCount || FAILED(hr))
+            break;
+
+        _bstr_t path;
+        VARIANT vtProp;
+
+        hr = pclsObj->Get(L"__Path", 0, &vtProp, 0, 0); // String
+        if (!FAILED(hr))
+        {
+            if ((vtProp.vt != VT_NULL) && (vtProp.vt != VT_EMPTY) && !(vtProp.vt & VT_ARRAY))
+                path = vtProp.bstrVal;
+
+        }
+        VariantClear(&vtProp);
+
+        if (path.length() == 0)
+            continue;
+
+        paths.push_back(path);
+
+        pclsObj->Release();
+        pclsObj=NULL;
+    }
+
+    pEnumerator->Release();
+    if (pclsObj!=NULL)
+        pclsObj->Release();
+
+    return S_OK;
+}
+
+HRESULT ExecuteMethodAtPaths(IWbemServices* pSvc, const TCHAR* methodName, const std::vector<_bstr_t>& paths)
+{
+    HRESULT hres  = S_OK;
+
+    for (const _bstr_t& path: paths)
+    {
+        IWbemCallResult *result = NULL;
+        hres = pSvc->ExecMethod(path, _bstr_t(methodName), 0, NULL, NULL, NULL, &result);
+        if (hres != WBEM_S_NO_ERROR)
+        {
+            NX_LOG(QString(lit("ExecuteMethodAtPaths Method: %1 failed. Error code = 0x%2, Message: %3"))
+                .arg(QString::fromWCharArray(methodName))
+                .arg((long)hres, 0, 16)
+                .arg(QString::fromWCharArray(_com_error(hres).ErrorMessage()))
+                , cl_logINFO);
+
+            continue;
+        }
+
+        LONG lStatus;
+        result->GetCallStatus(kWbemTimeoutMs, &lStatus);
+        if (lStatus != WBEM_S_NO_ERROR)
+        {
+            NX_LOG(QString(lit("ExecuteMethodAtPaths Method: %1 failed. GetCallStatus() failed. Error code = 0x%2, Message: %3"))
+                .arg(QString::fromWCharArray(methodName))
+                .arg((long)hres, 0, 16)
+                .arg(QString::fromWCharArray(_com_error(hres).ErrorMessage()))
+                , cl_logINFO);
+        }
+    }
+
+    return hres;
+}
+
+HRESULT EnableNICSAtPaths(IWbemServices* pSvc, const std::vector<_bstr_t>& paths)
+{
+    return ExecuteMethodAtPaths(pSvc, _T("Enable"), paths);
+}
+
+HRESULT DisableNICSAtPaths(IWbemServices* pSvc, const std::vector<_bstr_t>& paths)
+{
+    return ExecuteMethodAtPaths(pSvc, _T("Disable"), paths);
+}
+
+static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devices)
+{
     HRESULT hres;
     IEnumWbemClassObject* pEnumerator = NULL;
     hres = pSvc->ExecQuery(
@@ -52,12 +160,13 @@ static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devic
         throw LLUtil::HardwareIdError(os.str());
     }
 
-    IWbemClassObject *pclsObj;
+    IWbemClassObject* pclsObj;
     ULONG uReturn = 0;
 
     QString classes[] = {"PCI", "USB"};
 
-    for (;;) {
+    for (;;)
+    {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1,
             &pclsObj, &uReturn);
 
@@ -68,13 +177,17 @@ static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devic
 
         VARIANT vtProp;
         hr = pclsObj->Get(L"PNPDeviceID", 0, &vtProp, 0, 0);
-        if (SUCCEEDED(hr)) {
-            if (V_VT(&vtProp) == VT_BSTR) {
+        if (SUCCEEDED(hr))
+        {
+            if (V_VT(&vtProp) == VT_BSTR)
+            {
                 QString value = (const char*)(bstr_t)vtProp.bstrVal;
                 VariantClear(&vtProp);
 
-                for (const QString& xclass : classes) {
-                    if (value.mid(0, 3) == xclass) {
+                for (const QString& xclass : classes)
+                {
+                    if (value.mid(0, 3) == xclass)
+                    {
                         device.xclass = xclass;
                     }
                 }
@@ -82,17 +195,21 @@ static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devic
                 if (device.xclass.isEmpty())
                     continue;
             }
-        } else {
+        } else
+        {
             continue;
         }
 
         hr = pclsObj->Get(L"MACAddress", 0, &vtProp, 0, 0);
-        if (SUCCEEDED(hr)) {
-            if (V_VT(&vtProp) == VT_BSTR) {
+        if (SUCCEEDED(hr))
+        {
+            if (V_VT(&vtProp) == VT_BSTR)
+            {
                 device.mac = (const char *)(bstr_t)vtProp.bstrVal;
                 VariantClear(&vtProp);
             }
-        } else {
+        } else
+        {
             continue;
         }
 
@@ -107,14 +224,14 @@ static void findMacAddresses(IWbemServices *pSvc, QnMacAndDeviceClassList& devic
 
 
 
-static QByteArray getMacAddress(const QnMacAndDeviceClassList &devices,  QSettings *settings) {
+static QByteArray getMacAddress(const QnMacAndDeviceClassList& devices,  QSettings* settings) {
     if (devices.empty())
         return QByteArray();
 
     return getSaveMacAddress(devices, settings).toUtf8();
 }
 
-static QString execQueryForHWID1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName)
+static QString execQueryForHWID1(IWbemServices* pSvc, const BSTR fieldName, const BSTR objectName)
 {
     bstr_t rezStr = _T("");
 
@@ -157,7 +274,8 @@ static QString execQueryForHWID1(IWbemServices *pSvc, const BSTR fieldName, cons
         {
             VARIANT vtProp;
             hr = pclsObj->Get((LPCWSTR) fieldName, 0, &vtProp, 0, 0);
-            if (SUCCEEDED(hr) && V_VT(&vtProp) == VT_BSTR) {
+            if (SUCCEEDED(hr) && V_VT(&vtProp) == VT_BSTR)
+            {
                 rezStr = vtProp.bstrVal;
                 VariantClear(&vtProp);
             }
@@ -170,7 +288,7 @@ static QString execQueryForHWID1(IWbemServices *pSvc, const BSTR fieldName, cons
     return (LPCSTR)rezStr;
 }
 
-static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName)
+static QString execQuery2(IWbemServices* pSvc, const BSTR fieldName, const BSTR objectName)
 {
     bstr_t rezStr = _T("");
 
@@ -190,7 +308,8 @@ static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR 
         NULL,
         &pEnumerator);
 
-    if (FAILED(hres)) {
+    if (FAILED(hres))
+    {
         std::ostringstream os;
         os << "Query for operating system name failed. Error code = 0x"
             << " " << std::ios_base::hex << hres;
@@ -215,7 +334,8 @@ static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR 
         {
             VARIANT vtProp;
             hr = pclsObj->Get((LPCWSTR) fieldName, 0, &vtProp, 0, 0);
-            if (SUCCEEDED(hr) && V_VT(&vtProp) == VT_BSTR) {
+            if (SUCCEEDED(hr) && V_VT(&vtProp) == VT_BSTR)
+            {
                 values.insert(CAtlString(vtProp).Trim());
                 VariantClear(&vtProp);
             }
@@ -229,7 +349,8 @@ static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR 
 
     pEnumerator->Release();
 
-    for (StrSet::const_iterator ci = values.begin(); ci != values.end(); ++ci) {
+    for (StrSet::const_iterator ci = values.begin(); ci != values.end(); ++ci)
+    {
         rezStr += bstr_t(ci->AllocSysString(), false);
     }
 
@@ -238,22 +359,22 @@ static QString execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR 
 
 static unsigned short SwapShort(unsigned short a)
 {
-  a = ((a & 0x00FF) << 8) | ((a & 0xFF00) >> 8);
-  return a;
+    a = ((a & 0x00FF) << 8) | ((a & 0xFF00) >> 8);
+    return a;
 }
 
 static unsigned int SwapWord(unsigned int a)
 {
-  a = ((a & 0x000000FF) << 24) |
-      ((a & 0x0000FF00) <<  8) |
-      ((a & 0x00FF0000) >>  8) |
-      ((a & 0xFF000000) >> 24);
-  return a;
+      a = ((a & 0x000000FF) << 24) |
+          ((a & 0x0000FF00) <<  8) |
+          ((a & 0x00FF0000) >>  8) |
+          ((a & 0xFF000000) >> 24);
+      return a;
 }
 
-typedef QString (*ExecQueryFunction)(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName);
+typedef QString (*ExecQueryFunction)(IWbemServices* pSvc, const BSTR fieldName, const BSTR objectName);
 
-static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, QnHardwareInfo& hardwareInfo)
+static void fillHardwareInfo(IWbemServices* pSvc, ExecQueryFunction execQuery, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.compatibilityBoardUUID = execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
     hardwareInfo.boardUUID = changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
@@ -269,14 +390,17 @@ static void fillHardwareInfo(IWbemServices *pSvc, ExecQueryFunction execQuery, Q
     hardwareInfo.memorySerialNumber = execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
 }
 
-static void calcHardwareId(QString &hardwareId, const QnHardwareInfo& hi, int version, bool guidCompatibility)
+static void calcHardwareId(QString& hardwareId, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
-    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
+    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length())
+    {
         hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
-        if (version == 3) {
+        if (version == 3)
+        {
             hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
         }
-    } else {
+    } else
+    {
         hardwareId.clear();
     }
 
@@ -302,8 +426,11 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
     if (FAILED(hres))
     {
         if (hres == RPC_E_CHANGED_MODE)
+        {
             needUninitialize = false;
-        else {
+        }
+        else
+        {
             std::ostringstream os;
             os << "Failed to initialize COM library. Error code = 0x"
                 << std::ios_base::hex << hres;
@@ -313,10 +440,6 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
 
     // Step 2: --------------------------------------------------
     // Set general COM security levels --------------------------
-    // Note: If you are using Windows 2000, you need to specify -
-    // the default authentication credentials for a user by using
-    // a SOLE_AUTHENTICATION_LIST structure in the pAuthList ----
-    // parameter of CoInitializeSecurity ------------------------
 
     hres =  CoInitializeSecurity(
         NULL,
@@ -419,8 +542,53 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
         throw HardwareIdError(os.str());
     }
 
+    OSVERSIONINFOEX osvi;
+    ZeroMemory(&osvi, sizeof(osvi));
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+
+    bool vistaOrLater = false;
+
+    if (GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osvi)))
+    {
+        vistaOrLater = osvi.dwMajorVersion >= 6;
+    }
+
+    // Find disabled NICs
+    std::vector<_bstr_t> paths;
+
+    if (vistaOrLater)
+    {
+        if (GetDisabledNICS(pSvc, paths) == S_OK)
+        {
+            // Temporarily enable them
+            if (EnableNICSAtPaths(pSvc, paths) == S_OK)
+            {
+                // Wait up to 10 seconds for all interfaces to be enabled
+                for (int i = 0; i < 10; i++)
+                {
+                    std::vector<_bstr_t> tmpPaths;
+                    GetDisabledNICS(pSvc, tmpPaths);
+
+                    if (!tmpPaths.empty())
+                    {
+                        break;
+                    } else
+                    {
+                        Sleep(1000);
+                    }
+                }
+            }
+        }
+    }
 
     findMacAddresses(pSvc, hardwareInfo.nics);
+
+    if (vistaOrLater)
+    {
+        // Disable enabled NICs again if were any
+        DisableNICSAtPaths(pSvc, paths);
+    }
+
     hardwareInfo.mac = getMacAddress(hardwareInfo.nics, settings);
 
     // Only for HWID1
@@ -431,7 +599,8 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
 
     // For HWID>1
     fillHardwareInfo(pSvc, execQuery2, hardwareInfo);
-    for (int i = 1; i < LATEST_HWID_VERSION; i++) {
+    for (int i = 1; i < LATEST_HWID_VERSION; i++)
+    {
         calcHardwareId(hardwareIds[i], hardwareInfo, i + 1, false);
         calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], hardwareInfo, i + 1, true);
     }

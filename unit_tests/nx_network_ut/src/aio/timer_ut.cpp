@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/future.h>
+
 
 namespace nx {
 namespace network {
@@ -17,7 +19,7 @@ TEST(aioTimer, modify_timeout)
     for (int i = 0; i < 29; ++i)
     {
         aio::Timer timer;
-        std::promise<void> timedoutPromise;
+        nx::utils::promise<void> timedoutPromise;
         auto timeoutHandler = [&timedoutPromise]{ timedoutPromise.set_value(); };
         timer.start(std::chrono::seconds(250), timeoutHandler);
         timer.start(std::chrono::milliseconds(250), timeoutHandler);

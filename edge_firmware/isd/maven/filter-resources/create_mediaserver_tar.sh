@@ -45,7 +45,7 @@ PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
-STRIP="`find ${root.dir}/mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
+STRIP=${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip
 
 
 for i in "$@"
@@ -76,14 +76,6 @@ libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
-libQt5Concurrent.so.${qt.version} \
-libQt5Core.so.${qt.version} \
-libQt5Gui.so.${qt.version} \
-libQt5Multimedia.so.${qt.version} \
-libQt5Network.so.${qt.version} \
-libQt5Sql.so.${qt.version} \
-libQt5Xml.so.${qt.version} \
-libQt5XmlPatterns.so.${qt.version} \
 libquazip.so.1.0.0 \
 libsasl2.so.3.0.0 \
 liblber-2.4.so.2.10.5 \
@@ -125,6 +117,14 @@ do
 done
 popd
 
+#copying qt libs
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+for var in $QTLIBS
+do
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+done
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
@@ -157,10 +157,13 @@ fi
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+
+set +e
 cp -P $LIBS_DIR/*.debug ${project.build.directory}
 cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/*.debug ${project.build.directory}
 cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/*.debug ${project.build.directory}
 tar czf ./$PACKAGE_NAME-debug-symbols.tar.gz ./*.debug
+set -e
 rm -Rf $BUILD_DIR
 
 mkdir -p zip

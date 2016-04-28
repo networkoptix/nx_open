@@ -18,7 +18,7 @@ QnMetaDataV1Ptr QnLightMotionArchiveConnection::getMotionData(qint64 timeUsec)
         return QnMetaDataV1Ptr();
 
     qint64 timeMs = timeUsec/1000;
-    QnMetaDataLightVector::const_iterator itr = qUpperBound(m_motionData.begin(), m_motionData.end(), timeMs);
+    QnMetaDataLightVector::const_iterator itr = std::upper_bound(m_motionData.begin(), m_motionData.end(), timeMs);
     if (itr != m_motionData.begin())
         --itr;
     //for (; itr != m_motionData.constEnd() && itr->channel != m_channel; ++itr);

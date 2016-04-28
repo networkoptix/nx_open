@@ -3,8 +3,6 @@
 * akolesnikov
 ***********************************************************/
 
-#include <future>
-
 #include <boost/optional.hpp>
 #include <gtest/gtest.h>
 
@@ -119,7 +117,7 @@ private:
 
         ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
 
-        std::promise<ConnectResult> connectedPromise;
+        nx::utils::promise<ConnectResult> connectedPromise;
         udp::TunnelConnector connector(
             SocketAddress((server->serverId() + "." + system.id).constData()),
             mediatorAddressForConnector);

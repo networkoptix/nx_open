@@ -19,7 +19,7 @@ void printConnectOptions(std::ostream* const outStream)
     *outStream <<
         "Connect mode:\n"
         "  --connect            Enable connect mode\n"
-        "  --echo               Makes connections to verify server responses\n"
+        "  --ping               Makes connections to verify server responses\n"
         "  --target={endpoint}  Regular or cloud address of server\n"
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
@@ -27,7 +27,8 @@ void printConnectOptions(std::ostream* const outStream)
         "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
         "                       Bytes to receive before closing connection\n"
         "  --bytes-to-send={N}  Bytes to send before closing connection\n"
-        "  --udt                Force using udt socket. Disables cloud connect\n";
+        "  --udt                Force using udt socket. Disables cloud connect\n"
+        "  --ssl                 Use SSL on top of client sockets\n";
 }
 
 int runInConnectMode(const std::multimap<QString, QString>& args)
@@ -54,24 +55,19 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     readArg(args, "bytes-to-receive", &trafficLimit);
 
     if (readArg(args, "bytes-to-send", &trafficLimit))
-        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing;
+        trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("echo") != args.end())
-        transmissionMode = nx::network::test::TestTransmissionMode::echoTest;
+    if (args.find("ping") != args.end())
+        transmissionMode = nx::network::test::TestTransmissionMode::ping;
 
     if (args.find("udt") != args.end())
     {
         SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
     }
-    else
-    {
-        SocketFactory::setCreateStreamSocketFunc(
-            [](bool /*ssl*/, SocketFactory::NatTraversalType /*ntt*/)
-            {
-                return std::make_unique<nx::network::cloud::CloudStreamSocket>();
-            });
-    }
+
+    if (args.find("ssl") != args.end())
+        SocketFactory::enforceSsl(true);
 
     SocketAddress targetAddress(target);
     std::vector<SocketAddress> targetList;
@@ -101,15 +97,27 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         promise.get_future().wait();
     }
 
-    std::cout << lm("Target(s): %1")
-        .arg(containerString(targetList)).toStdString() << std::endl;
+    if (targetList.empty())
+    {
+        std::cerr << "error. There are no targets to connect to!" << std::endl;
+        return 1;
+    }
 
-    const uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
+    uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
+    trafficLimitBytes = trafficLimitBytes ? trafficLimitBytes : kDefaultBytesToReceive;
+
+    std::cout
+        << lm("Target(s): %1\n").arg(containerString(targetList)).toStdString()
+        << lm("Limit(type=%1): %2").arg(static_cast<int>(trafficLimitType))
+           .arg(bytesToString(trafficLimitBytes))
+           .toStdString()
+        << std::endl;
+
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         std::move(targetList),
         maxConcurrentConnections,
         trafficLimitType,
-        trafficLimitBytes != 0 ? trafficLimitBytes : kDefaultBytesToReceive,
+        trafficLimitBytes,
         totalConnections,
         transmissionMode);
 

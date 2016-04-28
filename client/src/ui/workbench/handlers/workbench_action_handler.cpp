@@ -2114,7 +2114,7 @@ struct ItemPositionCmp {
 
 void QnWorkbenchActionHandler::at_tourTimer_timeout() {
     QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
-    qSort(items.begin(), items.end(), ItemPositionCmp());
+    std::sort(items.begin(), items.end(), ItemPositionCmp());
 
     if(items.empty()) {
         action(QnActions::ToggleTourModeAction)->setChecked(false);

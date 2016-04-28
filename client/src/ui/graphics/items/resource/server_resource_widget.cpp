@@ -842,7 +842,7 @@ void QnServerResourceWidget::at_statistics_received() {
         m_sortedKeys.clear();
 
         QList<QnStatisticsData> tmp(m_history.values());
-        qSort(tmp.begin(), tmp.end(), statisticsDataLess);
+        std::sort(tmp.begin(), tmp.end(), statisticsDataLess);
         foreach(QnStatisticsData key, tmp)
             m_sortedKeys.append(key.description);
 

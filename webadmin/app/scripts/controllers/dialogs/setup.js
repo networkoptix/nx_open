@@ -67,18 +67,20 @@ angular.module('webadminApp')
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
             if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl);
+                nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
             }else{
-                window.open(Config.cloud.portalRegisterUrl);
+                window.open(Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
             }
             $scope.next('cloudLogin');
         };
         $scope.portalUrl = Config.cloud.portalUrl;
         $scope.openLink = function($event){
             if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser($scope.portalUrl);
-                $event.preventDefault();
+                nativeClientObject.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.clientSetupContext);
+            }else{
+                window.open(Config.cloud.portalUrl + Config.cloud.webadminSetupContext);
             }
+            $event.preventDefault();
         };
 
         function sendCredentialsToNativeClient(){
@@ -91,7 +93,7 @@ angular.module('webadminApp')
         function checkInternet(reload){
 
             $log.log("check internet connection");
-            if(debugMode){
+            if(true || debugMode){ // Temporary skip all internet checks
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
                 return;

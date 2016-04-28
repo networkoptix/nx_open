@@ -23,12 +23,12 @@ public:
     template<class OtherResource>
     QnSharedResourcePointerList(const QList<QnSharedResourcePointer<OtherResource> > &other) {
         this->reserve(other.size());
-        qCopy(other.begin(), other.end(), std::back_inserter(*this));
+        std::copy(other.begin(), other.end(), std::back_inserter(*this));
     }
 
     template<class OtherResource>
     bool operator==(const QList<QnSharedResourcePointer<OtherResource> > &other) const {
-        return this->size() == other.size() && qEqual(this->begin(), this->end(), other.begin());
+        return this->size() == other.size() && std::equal(this->begin(), this->end(), other.begin());
     }
 
     template<class OtherResource>

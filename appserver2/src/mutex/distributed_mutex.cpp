@@ -1,5 +1,7 @@
 #include "distributed_mutex.h"
 
+#include <numeric>
+
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
@@ -10,7 +12,7 @@
 namespace ec2
 {
 
-static const qint64 NO_MUTEX_LOCK = INT64_MAX;
+static const qint64 NO_MUTEX_LOCK = std::numeric_limits<qint64>::max();
 
 // ----------------------------- QnDistributedMutex ----------------------------
 

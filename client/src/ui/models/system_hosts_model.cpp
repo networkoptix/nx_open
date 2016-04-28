@@ -72,7 +72,7 @@ void QnSystemHostsModel::reloadHosts()
         m_hosts.clear();
     }
 
-    m_disconnectHelper.reset();
+    m_disconnectHelper.reset(new QnDisconnectHelper());
     if (m_systemId.isNull())
         return;
 
@@ -83,8 +83,6 @@ void QnSystemHostsModel::reloadHosts()
 
         for (const auto server : system->servers())
             addServer(system, server.id);
-
-        m_disconnectHelper.reset(new QnDisconnectHelper());
 
         const auto serverAddedConnection =
             connect(system, &QnSystemDescription::serverAdded, this

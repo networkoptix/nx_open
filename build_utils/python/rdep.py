@@ -184,7 +184,7 @@ def get_rsync_command(source,
     if show_progress:
         command.append("--progress")
 
-    if RSYNC_CHMOD_ARG:
+    if RSYNC_CHMOD_ARG and not ":" in destination:
         command.append(RSYNC_CHMOD_ARG)
 
     command.append(source)
@@ -425,7 +425,7 @@ def get_copy_list(package_dir):
     config.read(os.path.join(package_dir, PACKAGE_CONFIG_NAME))
 
     if not config.has_section("Copy"):
-        return { "bin": [ "bin/*" ], "lib": [ "lib/*.so*" ] }
+        return { "bin": [ "bin/*" ], "lib": [ "lib/*.so*", "lib/*.dylib*" ] }
 
     result = {}
     for key, value in config.items("Copy"):

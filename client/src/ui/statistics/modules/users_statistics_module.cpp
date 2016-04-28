@@ -34,6 +34,7 @@ QnUsersStatisticsModule::~QnUsersStatisticsModule()
 
 QnStatisticValuesHash QnUsersStatisticsModule::values() const
 {
+
     QnStatisticValuesHash result;
 
     const auto availableUsers = qnResPool->getResources<QnUserResource>();

@@ -169,10 +169,10 @@ void QnPtzManageDialog::accept() {
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
     QnPtzPresetList presets = data.presets;
     QnPtzTourList tours = data.tours;
-    qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringLess(l.name, r.name);
     });
-    qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+    std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
         return naturalStringLess(l.name, r.name);
     });
 
@@ -310,7 +310,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
     if (fields & Qn::PresetsPtzField) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
-            qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+            std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
                 return naturalStringLess(l.name, r.name);
             });
             m_model->setPresets(presets);
@@ -320,7 +320,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
     if (fields & Qn::ToursPtzField) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
-            qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+            std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
                 return naturalStringLess(l.name, r.name);
             });
             m_model->setTours(tours);

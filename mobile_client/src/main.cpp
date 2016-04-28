@@ -28,6 +28,7 @@
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
+#include <ui/helpers/font_loader.h>
 
 #include <nx/media/video_decoder_registry.h>
 #include <nx/media/audio_decoder_registry.h>
@@ -68,11 +69,13 @@ int runUi(QGuiApplication *application) {
 
     QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
 
-#ifndef Q_OS_IOS
+    // TODO: #dklychkov Detect fonts dir for iOS.
+    QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts"));
+    QnFontLoader::loadFonts(fontsDir);
+
     QFont font;
     font.setFamily(lit("Roboto"));
     QGuiApplication::setFont(font);
-#endif
 
     QnContext context;
 
@@ -101,6 +104,7 @@ int runUi(QGuiApplication *application) {
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
+    engine.addImportPath(lit("qrc:///qml"));
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 

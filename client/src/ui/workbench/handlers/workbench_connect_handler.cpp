@@ -297,8 +297,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
 
     ec2::ApiClientInfoData clientData;
     {
-        const auto hwId = LLUtil::getMainHardwareIds(0, qnSettings->rawSettings()).last();
-        clientData.id = QnUuid::fromHardwareId(hwId);
+        clientData.id = qnSettings->pcUuid();
 
         const auto skin = qnSettings->clientSkin();
         /**/ if (skin == Qn::DarkSkin) clientData.skin = lit("Dark");

@@ -41,18 +41,6 @@ SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
 
-QT_LIBS=\
-( \
-    Core \
-    Gui \
-    Network \
-    Concurrent \
-    Multimedia \
-    Sql \
-    Xml \
-    XmlPatterns
-)
-
 # Prepare stage dir
 rm -rf $STAGE
 mkdir -p $BINSTAGE
@@ -75,13 +63,15 @@ cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 rm -f $LIBSTAGE/*.debug
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
 
-for lib in "${QT_LIBS[@]}"
+#copying qt libs
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+for var in $QTLIBS
 do
-    SONAME=libQt5${lib}.so.${qt.version}
-    cp ${qt.dir}/lib/$SONAME $LIBSTAGE
-    LINK_TARGET="`echo $SONAME | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -sf $LIBSTAGE/$SONAME $LIBSTAGE/$LINK_TARGET
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
 done
 
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
@@ -131,10 +121,13 @@ install -m 644 debian/templates $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
+set +e
 cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_LIB_PLUGIN_PATH/*.debug ${project.build.directory}
 tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
+set -e
+
 (cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
 mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

@@ -24,11 +24,11 @@
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>
-        <ios.oslibs>-lturbojpeg</ios.oslibs>
+        <ios.oslibs>-lturbojpeg -framework OpenAL</ios.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg roboto-ttf</rdep.packages>
         <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
@@ -80,6 +80,27 @@
                     </execution>
                 </executions>
             </plugin>    
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>additional-build-steps</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>pre-build.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>     
+                        </configuration>
+                    </execution>                   
+                </executions>
+            </plugin>               
         </plugins>    
     </build>
     
@@ -112,6 +133,8 @@
                 <google.storepass>${android.storepass}</google.storepass>
                 <google.keypass>${android.keypass}</google.keypass>
                 <google.alias>${namespace.additional}</google.alias>
+                <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
+                <rdep.packages>openssl ffmpeg</rdep.packages>
             </properties>
             <build>
                 <plugins>
@@ -149,6 +172,9 @@
                     <value>ios</value>
                 </property>
             </activation>
+            <properties>
+                <ios.defines>DISABLE_FFMPEG</ios.defines>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

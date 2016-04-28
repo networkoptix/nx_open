@@ -3,7 +3,6 @@
 
 #include <helpers/cloud_url_helper.h>
 #include <watchers/cloud_status_watcher.h>
-#include <common/common_module.h>
 #include <utils/common/string.h>
 #include <client/client_settings.h>
 #include <ui/help/help_topic_accessor.h>
@@ -90,12 +89,13 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 
     Q_Q(QnLoginToCloudDialog);
 
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    cloudStatusWatcher->setCloudCredentials(QString(), QString());
+    qnCloudStatusWatcher->setCloudCredentials(QString(), QString());
 
-    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,       this,   &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
-    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::error,               this,   &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
-    cloudStatusWatcher->setCloudCredentials(q->ui->loginLineEdit->text(), q->ui->passwordLineEdit->text());
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::statusChanged
+        , this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged);
+    connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::error
+        , this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
+    qnCloudStatusWatcher->setCloudCredentials(q->ui->loginLineEdit->text(), q->ui->passwordLineEdit->text());
 }
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status)
@@ -106,8 +106,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
         return;
     }
 
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    disconnect(cloudStatusWatcher, nullptr, this, nullptr);
+    disconnect(qnCloudStatusWatcher, nullptr, this, nullptr);
 
     Q_Q(QnLoginToCloudDialog);
 
@@ -122,8 +121,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error(QnCloudStatusWatcher::ErrorCode errorCode)
 {
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    disconnect(cloudStatusWatcher, nullptr, this, nullptr);
+    disconnect(qnCloudStatusWatcher, nullptr, this, nullptr);
 
     QString message;
 

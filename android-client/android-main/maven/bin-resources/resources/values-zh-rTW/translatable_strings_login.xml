@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">未知的錯誤</string>
+    <string name="login_error_path">無效的主機地址及通訊埠</string>
+    <string name="login_error_protocol">伺服器不支援此協助</string>
+    <string name="login_error_connection">無法連線至此伺服器位址</string>
+    <string name="login_error_credentials">無效的登入資訊</string>
+    <string name="login_error_port">無效的通訊埠</string>
+    <string name="login_error_brand">不兼容的服務器</string>
+    <string name="login_hint">登入名稱</string>
+    <string name="login_caption">登入:</string>
+    <string name="password_caption">密碼:</string>
+    <string name="password_hint">登入密碼</string>
+    <string name="host_caption">主機:</string>
+    <string name="host_hint">伺服器地址</string>
+    <string name="port_caption">通訊埠:</string>
+    <string name="port_hint">伺服器通訊埠</string>
+    <string name="login_progress_caption"> 登入中...</string>
+    <string name="login_connecting">建立連線中...</string>
+    <string name="login_version_incompatible_title">版本不相容.</string>
+    <string name="login_version_incompatible_text">伺服器版本不相容此客戶端. 您可以看到攝影機列表但不保証能看到影像.</string>
+	<string name="login_empty_host">主機欄位不能為空</string>
+	<string name="login_empty_port">通訊埠欄位不能為空</string>
+	<string name="login_empty_login">登入欄位不能為空</string>
+	<string name="login_empty_pass">密碼欄位不能為空</string>
+	<string name="login_title_caption">"名稱: "</string>
+	<string name="login_title_hint">伺服器列表</string>
+	<string name="login_saved_sessions">已儲存的伺服器列表</string>
+	<string name="login_host_title">"伺服器地址: "</string>
+	<string name="login_login_title">"登入名: "</string>
+	<string name="login_connect">連線</string>
+	<string name="login_delete_confirm">請確定是否需要刪除已儲存的伺服器:</string>
+   
+</resources>

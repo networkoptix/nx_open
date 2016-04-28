@@ -26,7 +26,7 @@
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
 
-        <qt.libs>core core-private network xml xmlpatterns sql concurrent multimedia zlib-private</qt.libs>
+        <qt.libs>core core-private network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl</linux.oslibs>
@@ -230,7 +230,7 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core network xml sql</qt.libs>
+                <qt.libs>core core-private network concurrent xml sql</qt.libs>
             </properties>
         </profile>
     </profiles>
