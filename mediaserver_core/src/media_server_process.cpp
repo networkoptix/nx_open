@@ -1892,6 +1892,7 @@ void MediaServerProcess::run()
     {
         systemName.resetToDefault();
         setSysIdTime(0);
+        systemName.saveToConfig();
     }
     if (systemName.isDefault())
         serverFlags |= Qn::SF_AutoSystemName;
