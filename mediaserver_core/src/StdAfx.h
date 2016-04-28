@@ -65,5 +65,6 @@ extern "C" {
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/deprecation.h>
 
 #endif

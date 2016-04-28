@@ -59,7 +59,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     if (m_currentServer && !m_allServers.contains(m_currentServer))
         m_allServers << m_currentServer;
 
-    qSort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
+    std::sort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
         return naturalStringLess(getResourceName(left), getResourceName(right));
     });
 

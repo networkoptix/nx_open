@@ -26,6 +26,21 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
 {
 }
 
+void AsyncClientUser::setOnReconnectedHandler(
+    AbstractAsyncClient::ReconnectHandler handler)
+{
+    m_client->addOnReconnectedHandler(
+        [this, self = shared_from_this(), handler = std::move(handler)]()
+        {
+            if (!self->startOperation())
+                return;
+
+            handler();
+            self->stopOperation();
+        },
+        this);
+}
+
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -34,12 +49,6 @@ void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     m_pleaseStopHasBeenCalled = true;
     m_client.reset();
     checkHandler(&lk);
-}
-
-void AsyncClientUser::setOnReconnectedHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
-{
-    //TODO
 }
 
 void AsyncClientUser::sendRequest(Message request,
@@ -51,7 +60,10 @@ void AsyncClientUser::sendRequest(Message request,
             SystemError::ErrorCode code, Message message) mutable
         {
             if (!self->startOperation())
+            {
+                m_client->removeOnReconnectedHandlers(this); // break the cycle
                 return;
+            }
 
             handler(code, std::move(message));
             self->stopOperation();

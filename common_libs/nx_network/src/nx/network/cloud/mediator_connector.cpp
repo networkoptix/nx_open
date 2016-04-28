@@ -62,7 +62,7 @@ std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
                 new MediatorServerTcpConnection( m_stunClient, this ) );
 }
 
-void MediatorConnector::mockupAddress( SocketAddress address )
+void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarning )
 {
     {
         QnMutexLocker lk( &m_mutex );
@@ -73,19 +73,21 @@ void MediatorConnector::mockupAddress( SocketAddress address )
         m_future = m_promise->get_future();
     }
 
-
-    NX_LOGX( lit( "Mediator address is mocked up: %1" )
-             .arg( address.toString() ), cl_logWARNING );
+    if (!suppressWarning)
+    {
+        NX_LOGX( lit( "Mediator address is mocked up: %1" )
+                 .arg( address.toString() ), cl_logWARNING );
+    }
 
     m_mediatorAddress = std::move(address);
     m_stunClient->connect( address );
     m_promise->set_value( true );
 }
 
-void MediatorConnector::mockupAddress( const MediatorConnector* mc )
+void MediatorConnector::mockupAddress( const MediatorConnector& connector )
 {
-    if (auto address = mc->mediatorAddress())
-        mockupAddress(std::move(*address));
+    if (auto address = connector.mediatorAddress())
+        mockupAddress(std::move(*address), true);
 }
 
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )

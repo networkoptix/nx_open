@@ -45,7 +45,7 @@ TEST( StunMessageSerialization, BindingRequest )
     static const Buffer MESSAGE = Buffer(
             "0001" "0000" "2112A442"    // request: binding, length, magic cookie
         ) + DEFAULT_TID;                // transaction id (rev)
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper());
 
     Message parsed;
@@ -56,7 +56,7 @@ TEST( StunMessageSerialization, BindingRequest )
     ASSERT_EQ( parsed.header.messageClass, MessageClass::request );
     ASSERT_EQ( parsed.header.method, MethodType::bindingMethod );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
-    ASSERT_EQ( parsed.attributes.size(), 0 );
+    ASSERT_EQ( parsed.attributes.size(), (size_t)0 );
 }
 
 TEST( StunMessageSerialization, BindingResponse )
@@ -80,7 +80,7 @@ TEST( StunMessageSerialization, BindingResponse )
             "0020" "0008" "0001"        // xor-mapped-address, ipv4
             "3326" "3326F23A"           // xor port, xor ip
         );
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper() );
 
     Message parsed;
@@ -88,15 +88,15 @@ TEST( StunMessageSerialization, BindingResponse )
     parser.setMessage(&parsed);
     partialParse(parser, serializedMessage, 2); // parse by 2 byte chanks
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::successResponse );
     ASSERT_EQ( parsed.header.method, MethodType::bindingMethod );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
-    ASSERT_EQ( parsed.attributes.size(), 1 );
+    ASSERT_EQ( parsed.attributes.size(), (size_t)1 );
 
     const auto address = parsed.getAttribute< attrs::XorMappedAddress >();
     ASSERT_NE( address, nullptr );
-    ASSERT_EQ( address->address.ipv4, 0x12345678 );
+    ASSERT_EQ( address->address.ipv4, (size_t)0x12345678 );
 }
 
 TEST( StunMessageSerialization, BindingError )
@@ -120,7 +120,7 @@ TEST( StunMessageSerialization, BindingError )
             "0009" "0010" "00000401"    // error code 0x3 0x77
         ) + Buffer( "Unauthorized" ).toHex().toUpper();
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper() );
 
     Message parsed;
@@ -128,11 +128,11 @@ TEST( StunMessageSerialization, BindingError )
     parser.setMessage( &parsed );
     partialParse( parser, serializedMessage, 3 ); // parse by 3 byte chanks
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::errorResponse );
     ASSERT_EQ( parsed.header.method, MethodType::bindingMethod );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
-    ASSERT_EQ( parsed.attributes.size(), 1 );
+    ASSERT_EQ( parsed.attributes.size(), (size_t)1 );
 
     const auto error = parsed.getAttribute< attrs::ErrorDescription >();
     ASSERT_NE( error, nullptr );
@@ -257,7 +257,7 @@ TEST(StunMessageSerialization, serialization3)
     ASSERT_EQ(
         nx_api::ParserState::done,
         parser.parse(serializedMessage, &bytesRead));
-    const auto attr = checkMessage.getAttribute<stun::attrs::ErrorDescription>();
+    /*const auto attr =*/ checkMessage.getAttribute<stun::attrs::ErrorDescription>();
     //ASSERT_EQ(testData, attr->getBuffer());
 }
 

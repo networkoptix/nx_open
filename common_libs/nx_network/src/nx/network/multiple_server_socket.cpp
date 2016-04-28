@@ -3,7 +3,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 

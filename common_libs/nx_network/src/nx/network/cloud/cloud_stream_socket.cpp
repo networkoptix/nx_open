@@ -7,7 +7,7 @@
 
 #include <utils/common/systemerror.h>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "tunnel/outgoing_tunnel.h"
 #include "../socket_global.h"

@@ -28,7 +28,7 @@ TEST(PcpRouter, StaticMap)
 
     EXPECT_TRUE(TestRouter::parseMapResponse(QByteArray::fromHex(response), mapping));
     EXPECT_EQ(mapping.external.toString().toUtf8(), QByteArray("32.43.12.43:4660"));
-    EXPECT_GT(mapping.lifeTime, 0);
+    EXPECT_GT(mapping.lifeTime, (size_t)0);
 }
 
 TEST(PcpRouter, DISABLED_RealMap)

@@ -14,6 +14,7 @@
 #include <nx/network/udt/udt_pollset.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/guard.h>
 #include <utils/common/string.h>
 
@@ -216,7 +217,7 @@ TEST_F(SocketUdt, rendezvousConnect)
             acceptorSocket->pleaseStopSync();
         });
 
-    std::promise<SystemError::ErrorCode> connectorConnectedPromise;
+    nx::utils::promise<SystemError::ErrorCode> connectorConnectedPromise;
     connectorSocket->connectAsync(
         acceptorSocket->getLocalAddress(),
         [&connectorConnectedPromise](
@@ -225,7 +226,7 @@ TEST_F(SocketUdt, rendezvousConnect)
             connectorConnectedPromise.set_value(errorCode);
         });
 
-    std::promise<SystemError::ErrorCode> acceptorConnectedPromise;
+    nx::utils::promise<SystemError::ErrorCode> acceptorConnectedPromise;
     acceptorSocket->connectAsync(
         connectorSocket->getLocalAddress(),
         [&acceptorConnectedPromise](
@@ -366,7 +367,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
         ASSERT_TRUE(serverSocket.listen());
         ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
 
-        std::promise<SystemError::ErrorCode> socketAcceptedPromise;
+        nx::utils::promise<SystemError::ErrorCode> socketAcceptedPromise;
         serverSocket.acceptAsync(
             [&socketAcceptedPromise](
                 SystemError::ErrorCode errorCode,
@@ -402,7 +403,7 @@ TEST_F(SocketUdt, DISABLED_allDataReadAfterFin)
     ASSERT_TRUE(server.bind(SocketAddress(HostAddress::localhost, 0)));
     ASSERT_TRUE(server.listen());
 
-    std::promise<
+    nx::utils::promise<
         std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
     > connectionAcceptedPromise;
 

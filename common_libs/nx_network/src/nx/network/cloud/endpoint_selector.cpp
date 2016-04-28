@@ -5,7 +5,8 @@
 
 #include "endpoint_selector.h"
 
-#include <random>
+#include <cstdlib>
+
 
 namespace nx {
 namespace network {
@@ -16,15 +17,10 @@ void RandomEndpointSelector::selectBestEndpont(
     std::vector<SocketAddress> endpoints,
     std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler)
 {
-    std::random_device rd;
-    std::default_random_engine e1(rd());
-    std::uniform_int_distribution<std::vector<SocketAddress>::size_type>
-        uniformDist(0, endpoints.size()-1);
-
     NX_ASSERT(!endpoints.empty());
     handler(
         nx_http::StatusCode::ok,
-        endpoints[uniformDist(e1)]);
+        endpoints[rand() % endpoints.size()]);
 }
 
 } // namespace cloud

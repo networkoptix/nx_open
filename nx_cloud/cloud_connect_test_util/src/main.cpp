@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
 
 /** AK old PC mediator test:
 
---enforce-mediator=10.0.2.41:3345 --listen --echo --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:02e780b8-2dc3-4389-9af3-8170de591835 --server-id=xxx
---enforce-mediator=10.0.2.41:3345 --connect --echo --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0 --bytes-to-receive=1m --total-connections=5 --max-concurrent-connections=5
+--enforce-mediator=10.0.2.41:3345 --listen --ping --cloud-credentials=93e0467f-3145-41a8-8ebc-7f3c95e2ccf0:02e780b8-2dc3-4389-9af3-8170de591835 --server-id=xxx
+--enforce-mediator=10.0.2.41:3345 --connect --ping --target=xxx.93e0467f-3145-41a8-8ebc-7f3c95e2ccf0 --bytes-to-receive=1m --total-connections=5 --max-concurrent-connections=5
 
 --listen --local-address=0.0.0.0:5724 --udt
 --connect --target=192.168.0.1:5724 --udt

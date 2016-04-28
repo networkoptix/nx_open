@@ -12,7 +12,7 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "utils/common/warnings.h"
 #include "utils/common/delete_later.h"

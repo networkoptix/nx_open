@@ -6,6 +6,7 @@
 #include "rendezvous_connector_with_verification.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/cpp14.h>
 
 #include "nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h"
@@ -143,8 +144,9 @@ void RendezvousConnectorWithVerification::onMessageReceived(
         cl_logDEBUG2);
 
     //success!
-    auto udtConnection =
-        static_unique_ptr_cast<UdtStreamSocket>(m_requestPipeline->takeSocket());
+    auto udtConnection = 
+        nx::utils::static_unique_ptr_cast<UdtStreamSocket>(
+            m_requestPipeline->takeSocket());
     m_requestPipeline.reset();
     auto connectCompletionHandler = std::move(m_connectCompletionHandler);
     connectCompletionHandler(SystemError::noError, std::move(udtConnection));

@@ -98,7 +98,9 @@ namespace ec2
             //else if( format == Qn::XmlFormat )
             //    tranBuffer = QnXml::serialized(tran, lit("reply"));
             else
+            {
                 NX_ASSERT(false);
+            }
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
