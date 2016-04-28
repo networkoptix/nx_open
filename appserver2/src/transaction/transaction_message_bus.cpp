@@ -82,46 +82,6 @@ namespace ec2
 
     typedef std::function<bool (Qn::SerializationFormat, const QByteArray&)> FastFunctionType;
 
-    template<typename Function>
-    struct HandleTranParamsUBJsonVisitor
-    {
-        template<typename Descriptor>
-        void operator ()(const Descriptor& d)
-        {
-            m_visited = true;
-            auto transaction = d.createTransactionFromAbstractTransactionFunc(m_abstractTransaction);
-            if (!QnUbjson::deserialize(m_stream, &transaction.params))
-            {
-                qWarning() << "Can't deserialize transaction " << toString(m_abstractTransaction.command);
-                m_result = false;
-                return;
-            }
-            if (!m_abstractTransaction.persistentInfo.isNull())
-                QnUbjsonTransactionSerializer::instance()->addToCache(m_abstractTransaction.persistentInfo, m_abstractTransaction.command, m_serializedTran);
-            m_f(transaction);
-            m_result = true;
-        }
-
-        HandleTranParamsUBJsonVisitor(const QnAbstractTransaction &abstractTransaction, const QByteArray &serializedTran, QnUbjsonReader<QByteArray> *stream, Function f)
-            : m_abstractTransaction(abstractTransaction),
-              m_serializedTran(serializedTran),
-              m_stream(stream),
-              m_f(f),
-              m_result(false),
-              m_visited(false)
-        {}
-
-        bool getResult() const { return m_result; }
-        bool visited() const { return m_visited; }
-    private:
-        const QnAbstractTransaction &m_abstractTransaction;
-        const QByteArray &m_serializedTran;
-        QnUbjsonReader<QByteArray> *m_stream;
-        Function m_f;
-        bool m_result;
-        bool m_visited;
-    };
-
     //Overload for ubjson transactions
     template<typename Function, typename Param>
     bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction,
