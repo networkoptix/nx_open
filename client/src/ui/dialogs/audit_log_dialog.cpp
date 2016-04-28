@@ -42,6 +42,7 @@
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -344,8 +345,8 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& _
         button.iconSize = QSize(BTN_ICON_SIZE, BTN_ICON_SIZE);
         button.state = option.state;
 
-        //ToDo: #vkutin : implement good button behavior and determine what visual design we want
-        // For now, position button to cover entire cell area
+        //ToDo: #vkutin : implement new button behavior in accordance with design specification
+        // For now - temporarily - position button to cover entire cell area
         button.rect = option.rect.adjusted(style::Metrics::kStandardPadding, 2, -style::Metrics::kStandardPadding, -1);
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);
         break;
@@ -401,9 +402,9 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
     setTabShape(ui->mainTabWidget->tabBar(), style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), style::TabShape::Compact);
 
-    ui->gridMaster->setCheckboxColumn(0);
+    ui->gridMaster->setCheckboxColumn(QnAuditLogModel::SelectRowColumn);
     ui->gridMaster->setWholeModelChange(true);
-    ui->gridCameras->setCheckboxColumn(0);
+    ui->gridCameras->setCheckboxColumn(QnAuditLogModel::SelectRowColumn);
     ui->gridCameras->setWholeModelChange(true);
 
     m_clipboardAction = new QAction(tr("Copy Selection to Clipboard"), this);
@@ -418,7 +419,11 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
 
     setupSessionsGrid();
     setupCamerasGrid();
+
+    ui->gridCameras->horizontalHeader()->setStretchLastSection(true);
+
     connect(m_sessionModel, &QnAuditLogModel::colorsChanged, this, &QnAuditLogDialog::at_updateCheckboxes);
+
     at_updateCheckboxes();
     connect(ui->selectAllCheckBox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
 
@@ -430,15 +435,17 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
     ui->gridDetails->setModel(m_detailModel);
     ui->gridDetails->setItemDelegate(m_itemDelegate);
     ui->gridDetails->setWordWrap(true);
+
     m_detailModel->setHeaderHeight(calcHeaderHeight(ui->gridDetails->horizontalHeader()));
 
+    QnSnappedScrollBar* detailsScrollBar = new QnSnappedScrollBar(ui->detailsTab);
+    ui->gridDetails->setVerticalScrollBar(detailsScrollBar->proxyScrollBar());
     ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
 
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridDetails->horizontalHeader()->setSectionResizeMode(detailColumns.indexOf(QnAuditLogModel::DescriptionColumn), QHeaderView::Stretch);
 
     ui->gridDetails->setMouseTracking(true);
-
 
     connect(ui->gridDetails, &QTableView::pressed, this, &QnAuditLogDialog::at_itemPressed);
     connect(ui->gridDetails, &QTableView::entered, this, &QnAuditLogDialog::at_itemEntered);
@@ -448,27 +455,25 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-
     QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
     mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
 
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
     ui->loadingProgressBar->hide();
 
-    connect(m_clipboardAction, &QAction::triggered, this, &QnAuditLogDialog::at_clipboardAction_triggered);
-    connect(m_exportAction, &QAction::triggered, this, &QnAuditLogDialog::at_exportAction_triggered);
+    connect(m_clipboardAction,  &QAction::triggered,        this, &QnAuditLogDialog::at_clipboardAction_triggered);
+    connect(m_exportAction,     &QAction::triggered,        this, &QnAuditLogDialog::at_exportAction_triggered);
 
-    connect(ui->dateEditFrom, &QDateEdit::dateChanged, this, &QnAuditLogDialog::updateData);
-    connect(ui->dateEditTo, &QDateEdit::dateChanged, this, &QnAuditLogDialog::updateData);
-    connect(ui->refreshButton, &QAbstractButton::clicked, this, &QnAuditLogDialog::updateData);
+    connect(ui->dateEditFrom,   &QDateEdit::dateChanged,    this, &QnAuditLogDialog::updateData);
+    connect(ui->dateEditTo,     &QDateEdit::dateChanged,    this, &QnAuditLogDialog::updateData);
+    connect(ui->refreshButton,  &QAbstractButton::clicked,  this, &QnAuditLogDialog::updateData);
 
-
-    connect(ui->gridDetails, &QTableView::clicked, this, &QnAuditLogDialog::at_eventsGrid_clicked);
+    connect(ui->gridDetails,    &QTableView::clicked,       this, &QnAuditLogDialog::at_eventsGrid_clicked);
 
     ui->mainGridLayout->activate();
 
     ui->filterLineEdit->setPlaceholderText(tr("Search"));
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged,    this, &QnAuditLogDialog::at_filterChanged);
     connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
@@ -490,7 +495,6 @@ QnAuditRecordRefList QnAuditLogDialog::applyFilter()
         if (!checkBox->isChecked())
             disabledTypes |= (Qn::AuditRecordTypes) checkBox->property(checkBoxFilterProperty).toInt();
     }
-
 
     auto filter = [&keywords, &disabledTypes, this] (const QnAuditRecord& record)
     {
@@ -724,16 +728,16 @@ void QnAuditLogDialog::at_updateCheckboxes()
 {
     m_filterCheckboxes.clear();
     QnAuditLogColors colors = m_sessionModel->colors();
-    setupFilterCheckbox(ui->checkBoxLogin, colors.loginAction, Qn::AR_UnauthorizedLogin | Qn::AR_Login);
-    setupFilterCheckbox(ui->checkBoxUsers, colors.updUsers, Qn::AR_UserUpdate | Qn::AR_UserRemove);
-    setupFilterCheckbox(ui->checkBoxLive, colors.watchingLive, Qn::AR_ViewLive);
-    setupFilterCheckbox(ui->checkBoxArchive, colors.watchingArchive, Qn::AR_ViewArchive);
-    setupFilterCheckbox(ui->checkBoxExport, colors.exportVideo, Qn::AR_ExportVideo);
-    setupFilterCheckbox(ui->checkBoxCameras, colors.updCamera, Qn::AR_CameraUpdate | Qn::AR_CameraRemove | Qn::AR_CameraInsert);
-    setupFilterCheckbox(ui->checkBoxSystem, colors.systemActions, Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_SettingsChange | Qn::AR_DatabaseRestore);
-    setupFilterCheckbox(ui->checkBoxServers, colors.updServer, Qn::AR_ServerUpdate | Qn::AR_ServerRemove);
-    setupFilterCheckbox(ui->checkBoxBRules, colors.eventRules, Qn::AR_BEventUpdate | Qn::AR_BEventRemove | Qn::AR_BEventReset);
-    setupFilterCheckbox(ui->checkBoxEmail, colors.emailSettings, Qn::AR_EmailSettings);
+    setupFilterCheckbox(ui->checkBoxLogin,      colors.loginAction,     Qn::AR_UnauthorizedLogin | Qn::AR_Login);
+    setupFilterCheckbox(ui->checkBoxUsers,      colors.updUsers,        Qn::AR_UserUpdate | Qn::AR_UserRemove);
+    setupFilterCheckbox(ui->checkBoxLive,       colors.watchingLive,    Qn::AR_ViewLive);
+    setupFilterCheckbox(ui->checkBoxArchive,    colors.watchingArchive, Qn::AR_ViewArchive);
+    setupFilterCheckbox(ui->checkBoxExport,     colors.exportVideo,     Qn::AR_ExportVideo);
+    setupFilterCheckbox(ui->checkBoxCameras,    colors.updCamera,       Qn::AR_CameraUpdate | Qn::AR_CameraRemove | Qn::AR_CameraInsert);
+    setupFilterCheckbox(ui->checkBoxSystem,     colors.systemActions,   Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_SettingsChange | Qn::AR_DatabaseRestore);
+    setupFilterCheckbox(ui->checkBoxServers,    colors.updServer,       Qn::AR_ServerUpdate | Qn::AR_ServerRemove);
+    setupFilterCheckbox(ui->checkBoxBRules,     colors.eventRules,      Qn::AR_BEventUpdate | Qn::AR_BEventRemove | Qn::AR_BEventReset);
+    setupFilterCheckbox(ui->checkBoxEmail,      colors.emailSettings,   Qn::AR_EmailSettings);
 };
 
 void setGridGeneralCheckState(QTableView* gridMaster)
@@ -778,13 +782,13 @@ void QnAuditLogDialog::setupMasterGridCommon(QnTableView* gridMaster)
 {
     QnAuditLogModel* model = static_cast<QnAuditLogModel*>(gridMaster->model());
 
-    gridMaster->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(gridMaster->parentWidget());
+    gridMaster->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     QnCheckBoxedHeaderView* headers = new QnCheckBoxedHeaderView(QnAuditLogModel::SelectRowColumn, this);
     headers->setVisible(true);
     headers->setSectionsClickable(true);
     headers->setSectionResizeMode(QHeaderView::ResizeToContents);
-    headers->setStretchLastSection(true);
 
     gridMaster->setHorizontalHeader(headers);
     gridMaster->setItemDelegate(m_itemDelegate);
@@ -851,14 +855,16 @@ void QnAuditLogDialog::at_itemEntered(const QModelIndex& index)
 
 void QnAuditLogDialog::at_headerCheckStateChanged(Qt::CheckState state)
 {
-    QHeaderView* headers = (QHeaderView*) sender();
-    QTableView* masterGrid = (QTableView*) headers->parent();
-    QnAuditLogModel* model = (QnAuditLogModel*) masterGrid->model();
-    if (state == Qt::Checked)
+    QTableView* masterGrid = static_cast<QTableView*>(sender()->parent());
+    switch (state)
+    {
+    case Qt::Checked:
         masterGrid->selectAll();
-    else if (state == Qt::Unchecked)
+        break;
+    case Qt::Unchecked:
         masterGrid->clearSelection();
-    model->setCheckState(state); //TODO: #vkutin check why this is needed
+        break;
+    }
 }
 
 void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
@@ -1117,13 +1123,9 @@ void QnAuditLogDialog::makeCameraData()
 
 void QnAuditLogDialog::requestFinished()
 {
-    //TODO: #vkutin FIXME! rewrite this shit
-    static_cast<QnCheckBoxedHeaderView*>(ui->gridMaster->horizontalHeader())->setCheckState(Qt::Unchecked);
-    static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader())->setCheckState(Qt::Unchecked);
     makeSessionData();
     makeCameraData();
-    static_cast<QnCheckBoxedHeaderView*>(ui->gridMaster->horizontalHeader())->setCheckState(Qt::Checked);
-    static_cast<QnCheckBoxedHeaderView*>(ui->gridCameras->horizontalHeader())->setCheckState(Qt::Checked);
+
     at_filterChanged();
 
     ui->gridMaster->setDisabled(false);
