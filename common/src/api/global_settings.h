@@ -67,6 +67,7 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+    bool takeCameraOwnershipWithoutLock() const;
 
     std::chrono::seconds proxyConnectTimeout() const;
 
@@ -123,6 +124,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
     /** seconds */
     QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

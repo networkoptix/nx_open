@@ -84,6 +84,11 @@ private:
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
+
+    void updateCameraHistoryNonSafe(
+        const QString uniqueCameraId,
+        qint64 currentTime);
+
 private:
     struct LockData 
     {
