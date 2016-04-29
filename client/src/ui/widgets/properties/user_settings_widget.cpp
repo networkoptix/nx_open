@@ -9,7 +9,7 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/models/user_settings_model.h>
+#include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>

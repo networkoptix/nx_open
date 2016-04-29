@@ -14,12 +14,14 @@ namespace Ui
     class UserGroupSettingsWidget;
 }
 
+class QnUserGroupSettingsModel;
+
 class QnUserGroupSettingsWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
-    QnUserGroupSettingsWidget(QWidget* parent = 0);
+    QnUserGroupSettingsWidget(QnUserGroupSettingsModel* model, QWidget* parent = 0);
     virtual ~QnUserGroupSettingsWidget();
 
     virtual bool hasChanges() const override;
@@ -28,5 +30,5 @@ public:
 
 private:
     QScopedPointer<Ui::UserGroupSettingsWidget> ui;
-
+    QnUserGroupSettingsModel* m_model;
 };
