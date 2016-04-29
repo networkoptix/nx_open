@@ -459,16 +459,30 @@ void QnResourceTreeWidget::updateFilter() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-        (event->type() == QEvent::Show || event->type() == QEvent::Hide)) {
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+    case QEvent::Hide:
+        if (obj == ui->resourcesTreeView->verticalScrollBar())
             emit viewportSizeChanged();
-    } else if (obj == ui->resourcesTreeView && event->type() == QEvent::ContextMenu) {
-        QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
-        if (me->reason() == QContextMenuEvent::Mouse
-                && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
-            selectionModel()->clear();
+        break;
+
+    case QEvent::ContextMenu:
+        if (obj == ui->resourcesTreeView)
+        {
+            QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
+            if (me->reason() == QContextMenuEvent::Mouse && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
+                selectionModel()->clear();
+        }
+        break;
+
+    case QEvent::PaletteChange:
+        ui->resourcesTreeView->setPalette(palette()); // override default item view palette
+        break;
     }
+
     return base_type::eventFilter(obj, event);
 }
 

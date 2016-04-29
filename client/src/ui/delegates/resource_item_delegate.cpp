@@ -11,8 +11,6 @@
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
 
-#include <ui/common/palette.h>
-
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/helper.h>
@@ -214,16 +212,27 @@ QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptio
     font.setWeight(QFont::DemiBold);
     editor->setFont(font);
 
-    /* Set editor text color by item state: */
+    /* Set text and selected text editor colors by item state: */
+    QPalette editorPalette = editor->palette();
     switch (itemState(index))
     {
-    case ItemState::Selected:
-        setPaletteColor(editor, QPalette::Text, editor->palette().color(QPalette::HighlightedText));
+    case ItemState::Normal:
+        editorPalette.setColor(QPalette::Text, m_colors.mainText);
+        editorPalette.setColor(QPalette::HighlightedText, m_colors.mainText);
         break;
+
+    case ItemState::Selected:
+        editorPalette.setColor(QPalette::Text, m_colors.mainTextSelected);
+        editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextSelected);
+        break;
+
     case ItemState::Accented:
-        setPaletteColor(editor, QPalette::Text, editor->palette().color(QPalette::BrightText));
+        editorPalette.setColor(QPalette::Text, m_colors.mainTextAccented);
+        editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextAccented);
         break;
     }
+
+    editor->setPalette(editorPalette);
 
     return editor;
 }
