@@ -255,10 +255,6 @@ void QnPlISDResourceSearcher::processPacket(
     QnResourceList& result )
 {
 
-    QAuthenticator auth;
-    auth.setUser(DEFAULT_ISD_USERNAME);
-    auth.setPassword(DEFAULT_ISD_PASSWORD);
-
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 
@@ -271,12 +267,12 @@ void QnPlISDResourceSearcher::processPacket(
     {
         cameraMAC = existingRes->getMAC();
 
-        auto optAuth = existingRes->getAuth();
-        if (optAuth)
-            cameraAuth = *optAuth;
+        auto existAuth = existingRes->getAuth();
+        if (!existAuth.isNull())
+            cameraAuth = existAuth;
     }
 
-    createResource( devInfo, cameraMAC, auth, result );
+    createResource( devInfo, cameraMAC, cameraAuth, result );
 }
 
 void QnPlISDResourceSearcher::createResource(

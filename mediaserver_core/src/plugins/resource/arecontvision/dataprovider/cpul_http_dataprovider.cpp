@@ -21,9 +21,7 @@ QnPlAVClinetPullStreamReader(res)
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();
     m_name = avRes->getName();
-    auto optAuth = avRes->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    m_auth = auth;
+    m_auth = avRes->getAuth();
 
 }
 

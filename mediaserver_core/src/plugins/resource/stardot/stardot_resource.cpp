@@ -76,9 +76,7 @@ QByteArray QnStardotResource::makeStardotRequest(const QString& request, CLHttpS
     QByteArray result;
 
     QUrl url(getUrl());
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    CLSimpleHTTPClient client(getHostAddress(), 80, TCP_TIMEOUT, auth);
+    CLSimpleHTTPClient client(getHostAddress(), 80, TCP_TIMEOUT, getAuth());
     status = client.doGET(request);
     if (status == CL_HTTP_SUCCESS)
         client.readAll(result);
@@ -90,9 +88,7 @@ QByteArray QnStardotResource::makeStardotPostRequest(const QString& request, con
     QByteArray result;
 
     QUrl url(getUrl());
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    CLSimpleHTTPClient client(getHostAddress(), 80, TCP_TIMEOUT, auth);
+    CLSimpleHTTPClient client(getHostAddress(), 80, TCP_TIMEOUT, getAuth());
     status = client.doPOST(request, body);
     if (status == CL_HTTP_SUCCESS)
         client.readAll(result);

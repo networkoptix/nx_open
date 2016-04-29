@@ -112,10 +112,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         std::set<QByteArray> profilesToRemove;
         for (int i = 0; i < 3; ++i)
         {
-            auto optAuth = res->getAuth();
-            QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), auth);
+            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
             const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
             CLHttpStatus status = http.doGET(requestPath);
 
@@ -166,10 +163,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         //removing old profiles
         for( const auto& profileToRemove: profilesToRemove )
         {
-            auto optAuth = res->getAuth();
-            QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), auth);
+            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
             const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile."+profileToRemove);
             const int httpStatus = http.doGET( requestPath );    //ignoring error code
             if( httpStatus != CL_HTTP_SUCCESS )
@@ -215,10 +209,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
             str.flush();
 
-            auto optAuth = res->getAuth();
-            QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), auth);
+            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
             CLHttpStatus status = http.doGET(streamProfile);
 
             if (status == CL_HTTP_AUTH_REQUIRED)

@@ -426,8 +426,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     if( !m_camManager )
     {

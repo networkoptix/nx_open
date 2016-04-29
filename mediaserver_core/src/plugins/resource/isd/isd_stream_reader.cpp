@@ -42,10 +42,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     CLHttpStatus status;
 
     int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
-    auto optAuth = res->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-    CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, auth);
+    CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
     if (isCameraControlRequired)
     {
@@ -112,10 +109,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
         : QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath");
 
-    optAuth = res->getAuth();
-    auth = optAuth ? *optAuth : QAuthenticator();
-
-    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, auth);
+    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(Qn::Unauthorized);

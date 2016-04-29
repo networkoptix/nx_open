@@ -99,8 +99,7 @@ void QnVistaFocusPtzController::ensureClientLocked() {
 
     QString host = m_resource->getHostAddress();
     int timeout = m_resource->getNetworkTimeout();
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
 
     if(m_client && m_lastHostAddress == host && m_client->timeout() == timeout && m_client->auth() == auth)
         return;

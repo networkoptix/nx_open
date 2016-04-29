@@ -49,8 +49,7 @@ QString PlDlinkStreamReader::getRTPurl(int profileId) const
     CLHttpStatus status;
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-    auto optAuth = res->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = res->getAuth();
     QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, auth);
 
     if (status != CL_HTTP_SUCCESS || reply.isEmpty())
@@ -105,10 +104,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     requestedUrl.setPath( prifileStr );
 
     CLHttpStatus status;
-    auto optAuth = res->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, auth); // setup video profile
+    QByteArray cam_info_file = downloadFile(status, prifileStr,  res->getHostAddress(), 80, 1000, res->getAuth()); // setup video profile
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -151,9 +147,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
     else
     {
         // mpeg4 or jpeg
-        auto optAuth = res->getAuth();
-        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-        m_HttpClient.reset(new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, auth));
+        m_HttpClient.reset(new CLSimpleHTTPClient(res->getHostAddress(), 80, 2000, res->getAuth()));
         const CLHttpStatus status = m_HttpClient->doGET(m_profile.url);
         if( status == CL_HTTP_SUCCESS )
             return CameraDiagnostics::NoErrorResult();
@@ -431,10 +425,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
 
     CLHttpStatus status;
-    auto optAuth = res->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/notify.cgi"),  res->getHostAddress(), 80, 1000, auth);
+    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/notify.cgi"),  res->getHostAddress(), 80, 1000, res->getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
