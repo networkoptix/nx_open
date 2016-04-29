@@ -271,7 +271,11 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setMAC(firstResource->getMAC());
             resource->setGroupName(physicalId);
             resource->setGroupId(physicalId);
-            resource->setDefaultAuth(firstResource->getAuth());
+
+            auto optAuth = firstResource->getAuth();
+            if (optAuth)
+                resource->setDefaultAuth(*optAuth);
+
             resource->setUrl(firstResource->getUrl());
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
