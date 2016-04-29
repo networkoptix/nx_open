@@ -6,12 +6,9 @@
 #include <client/client_globals.h>
 
 #include <utils/common/delayed.h>
-#include <utils/common/scoped_value_rollback.h>
 
 namespace
 {
-    const QVariant kChecked = Qt::Checked;
-    const QVariant kUnchecked = Qt::Unchecked;
     const QVector<int> kCheckRoles({ Qt::CheckStateRole });
 
     QItemSelectionModel::SelectionFlags entireRow(QItemSelectionModel::SelectionFlags flags)
@@ -33,19 +30,19 @@ void QnCheckableTableView::reset()
 {
     /* Disable visual updates: */
     setUpdatesEnabled(false);
-    bool syncQueued = false;
+    bool syncRequired = false;
 
     /* Inherited reset: */
     base_type::reset();
 
     /* Disconnect previous model connection: */
     disconnect(m_dataChangedConnection);
-    m_dataChangedConnection = QMetaObject::Connection();
 
     /* If model exists and is not empty we should synchronize selection with it: */
     if (auto dataModel = model())
     {
-        if (dataModel->rowCount())
+        syncRequired = dataModel->rowCount() > 0;
+        if (syncRequired)
         {
             /* Defer synchronization past all further handing of modelReset signal: */
             executeDelayed(
@@ -58,8 +55,6 @@ void QnCheckableTableView::reset()
                     setUpdatesEnabled(true);
                     update();
                 });
-
-            syncQueued = true;
         }
 
         /* Connect to model's dataChanged: */
@@ -67,7 +62,7 @@ void QnCheckableTableView::reset()
     }
 
     /* Re-enable visual updates if synchronization wasn't queued, and mark entire widget for update: */
-    if (!syncQueued)
+    if (!syncRequired)
     {
         setUpdatesEnabled(true);
         update();
@@ -86,7 +81,7 @@ void QnCheckableTableView::synchronizeWithModel()
         for (int row = 0; row < rowCount; ++row)
         {
             QModelIndex index = dataModel->index(row, m_checkboxColumn);
-            if (dataModel->data(index, Qt::CheckStateRole).toInt() == Qt::Checked)
+            if (index.data(Qt::CheckStateRole).toInt() == Qt::Checked)
             {
                 /* Begin selected range if not begun already: */
                 if (!selectedStart.isValid())
@@ -129,7 +124,7 @@ void QnCheckableTableView::modelDataChanged(const QModelIndex& topLeft, const QM
             for (int row = topLeft.row(); row <= bottomRight.row(); ++row)
             {
                 QModelIndex index = dataModel->index(row, m_checkboxColumn);
-                if (dataModel->data(index, Qt::CheckStateRole).toInt() == Qt::Checked)
+                if (index.data(Qt::CheckStateRole).toInt() == Qt::Checked)
                 {
                     /* Begin selected range if not begun already: */
                     if (!selectedStart.isValid())
@@ -190,14 +185,14 @@ void QnCheckableTableView::selectionChanged(const QItemSelection& selected, cons
         for (auto range : deselected)
         {
             for (auto row = range.top(); row <= range.bottom(); ++row)
-                dataModel->setData(dataModel->index(row, m_checkboxColumn), kUnchecked, Qt::CheckStateRole);
+                dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
         }
 
         /* Check selected: */
         for (auto range : selected)
         {
             for (auto row = range.top(); row <= range.bottom(); ++row)
-                dataModel->setData(dataModel->index(row, m_checkboxColumn), kChecked, Qt::CheckStateRole);
+                dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Checked, Qt::CheckStateRole);
         }
 
         blocker.unblock();
@@ -231,6 +226,13 @@ QItemSelectionModel::SelectionFlags QnCheckableTableView::selectionCommand(const
     /* Avoid drag-selecting operations originating from checkbox column items: */
     if (m_mousePressedOnCheckbox)
         return QItemSelectionModel::NoUpdate;
+    /*
+    * m_mousePressedOnCheckbox boolean variable is set in this method after left mouse button is pressed
+    *   on the checkbox column (and handled as selection command), and it is cleared in mouseReleaseEvent()
+    *   when left mouse button is released.
+    * It indicates the state when drag-selection operations must not be started, because we don't want the user
+    *    to click on a checkbox, drag and select other rows (and deselect everything that was selected before).
+    */
 
     /* If selection event is mouse button press on a checkbox column item: */
     if (event && event->type() == QEvent::MouseButtonPress && index.column() == m_checkboxColumn)
