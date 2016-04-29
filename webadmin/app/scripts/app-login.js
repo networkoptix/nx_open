@@ -7,4 +7,7 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'ui.select',
     'ngStorage'
-]);
+]).run(['mediaserver',function (mediaserver) {
+    mediaserver.getCurrentUser();
+}]);
+

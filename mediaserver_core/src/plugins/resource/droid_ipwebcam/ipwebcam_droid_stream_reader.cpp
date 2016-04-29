@@ -171,7 +171,9 @@ CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(bool isCam
         return CameraDiagnostics::NoErrorResult();
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
-    mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
+    auto optAuth = nres->getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, auth);
     mDataRemainedBeginIndex = -1;
     const CLHttpStatus status = mHttpClient->doGET(QLatin1String("videofeed"));
     switch( status )

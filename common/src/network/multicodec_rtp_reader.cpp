@@ -456,7 +456,12 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     }
     else
         QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
-    m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
+    auto optAuth = nres->getAuth();
+    if (optAuth)
+        m_RtpSession.setAuth(*optAuth, m_prefferedAuthScheme);
+    else
+        m_RtpSession.setAuth(QAuthenticator(), m_prefferedAuthScheme);
+
     m_tracks.clear();
     m_gotKeyDataInfo.clear();
     m_gotData = false;

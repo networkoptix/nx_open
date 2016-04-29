@@ -184,6 +184,8 @@
                                         <argument>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</argument>
                                         <argument>--arch</argument>
                                         <argument>${arch}</argument>
+                                        <argument>--qt-dir</argument>
+                                        <argument>${qt.dir}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

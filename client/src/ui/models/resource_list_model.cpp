@@ -226,7 +226,7 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
         if (!resource)
             return false;
 
-        bool checked = static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked;
+        bool checked = value.toInt() == Qt::Checked;
         if (checked)
             m_checkedResources.insert(resource->getId());
         else

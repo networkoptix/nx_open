@@ -141,7 +141,8 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
         header->setCheckState(selectionState);
     };
 
-    connect(ui->usersTable, &QTableView::clicked, this,  [usersModel, updateSelection] (const QModelIndex &index) {
+    connect(ui->usersTable, &QTableView::clicked, this,  [usersModel, updateSelection] (const QModelIndex &index)
+    {
         if (index.column() != QnLdapUserListModel::CheckBoxColumn)
             return;
 
@@ -150,7 +151,7 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
             return;
 
         /* Invert current state */
-        usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, login);
+        usersModel->setCheckState(index.data(Qt::CheckStateRole).toInt() == Qt::Checked ? Qt::Unchecked : Qt::Checked, login);
         updateSelection();
 
     });
@@ -277,7 +278,7 @@ QnLdapUsers QnLdapUsersDialog::visibleSelectedUsers() const {
 
     for (int row = 0; row < model->rowCount(); ++row) {
         QModelIndex index = model->index(row, QnLdapUserListModel::CheckBoxColumn);
-        bool checked = index.data(Qt::CheckStateRole).toBool();
+        bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
         auto user = index.data(QnLdapUserListModel::LdapUserRole).value<QnLdapUser>();

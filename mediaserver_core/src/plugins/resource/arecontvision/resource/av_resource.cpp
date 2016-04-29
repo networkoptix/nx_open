@@ -61,7 +61,10 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
     QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
     QUrl devUrl(getUrl());
-    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), auth);
 
     CLHttpStatus result = http.doGET(req);
 
@@ -86,7 +89,9 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
     QString req;
     QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
     QUrl devUrl(getUrl());
-    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), auth);
 
     CLHttpStatus result = http.doGET(req);
 
@@ -156,8 +161,10 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
         url.setHost( urlStr );
     }
     url.setPath( lit("/get?mac") );
-    url.setUserName( getAuth().user() );
-    url.setPassword( getAuth().password() );
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    url.setUserName( auth.user() );
+    url.setPassword( auth.password() );
 
     nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
@@ -305,8 +312,12 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     const auto activateWithAutoResetDoneHandler =
         [autoResetTimeoutMS, url](
@@ -532,7 +543,9 @@ QString QnPlAreconVisionResource::generateRequestString(
 // ===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &value) {
     QUrl devUrl(getUrl());
-    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), auth);
 
     QString request = lit("get?") + id;
 
@@ -559,7 +572,9 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &valu
 
 bool QnPlAreconVisionResource::setParamPhysical(const QString &id, const QString &value) {
     QUrl devUrl(getUrl());
-    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), auth);
 
     QString request = lit("set?") + id;
     request += QLatin1Char('=') + value;
@@ -673,8 +688,12 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/get?auxin"));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     m_relayInputClient = nx_http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
@@ -745,7 +764,11 @@ bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& nam
     m_mutex.lock();
     m_mutex.unlock();
     QUrl devUrl(getUrl());
-    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
+
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), auth);
     QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 
     CLHttpStatus status = connection.doGET(request);
