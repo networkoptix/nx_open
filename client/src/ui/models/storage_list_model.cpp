@@ -111,7 +111,7 @@ void QnStorageListModel::updateRebuildInfo( QnServerStoragesPool pool, const QnS
 
 
 void QnStorageListModel::sortStorages() {
-    qSort(m_storages.begin(), m_storages.end(), [](const QnStorageModelInfo &left, const QnStorageModelInfo &right) {
+    std::sort(m_storages.begin(), m_storages.end(), [](const QnStorageModelInfo &left, const QnStorageModelInfo &right) {
 
         /* Local storages should go first. */
         if (left.isExternal != right.isExternal)

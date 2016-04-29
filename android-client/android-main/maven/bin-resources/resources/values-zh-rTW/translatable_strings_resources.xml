@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">顯示離線的攝影機</string>
+    <string name="menu_hide_offline">隱藏離線的攝影機</string>
+    <string name="resources_logout_offer">再按一次退出即可登出</string>
+    <string name="resources_loading_title">讀取中…</string>
+    <string name="resources_loading_text">接收資料中…</string>
+    <string name="menu_clear_cache">清除快取</string>
+    <string name="resources_tree">樹狀圖顯示</string>
+    <string name="resources_grid">縮圖</string>
+    <string name="resources_logout">登出</string>
+    <string name="promote_title">馬上升級!</string>
+    <string name="promote">您正連線至v2.5以上的主機. 請下載我們最新的APP.</string>
+    <string name="download">下載</string>    
+
+</resources>

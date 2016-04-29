@@ -12,6 +12,7 @@
 
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/future.h>
 
 #include "utils/common/warnings.h"
 #include "utils/common/delete_later.h"
@@ -93,7 +94,7 @@ QNetworkReply::NetworkError QnSessionManager::sendSyncRequest(
 {
     AsyncRequestInfo reqInfo;
     reqInfo.handle = s_handle.fetchAndAddAcquire(1);
-    std::promise<QnHTTPRawResponse> requestedCompletedPromise;
+    nx::utils::promise<QnHTTPRawResponse> requestedCompletedPromise;
     reqInfo.requestedCompletedPromise = &requestedCompletedPromise;
 
     sendAsyncRequest(

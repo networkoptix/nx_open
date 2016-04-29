@@ -7,7 +7,6 @@
 #define QNSTOPPABLE_H
 
 #include <functional>
-#include <future>
 #include <vector>
 
 #include <nx/utils/move_only_func.h>

@@ -1,4 +1,8 @@
+
 #include "socket_global.h"
+
+#include <nx/utils/std/future.h>
+
 
 namespace nx {
 namespace network {
@@ -16,7 +20,7 @@ SocketGlobals::~SocketGlobals()
     // NOTE: can be move out into QnStoppableAsync::pleaseStop,
     //       what does not make any sense so far
 
-    std::promise< void > promise;
+    nx::utils::promise< void > promise;
     {
         BarrierHandler barrier([&](){ promise.set_value(); });
         m_addressResolver.pleaseStop( barrier.fork() );
@@ -43,7 +47,7 @@ void SocketGlobals::deinit()
         delete s_instance;
 }
 
-void SocketGlobals::check()
+void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
         s_counter.load() != 0,

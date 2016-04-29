@@ -124,7 +124,7 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core network xml sql</qt.libs>
+                <qt.libs>core core-private network xml sql</qt.libs>
             </properties>
         </profile>
 
@@ -142,7 +142,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>gcc-${gcc.version} quazip opengl-es-mali</rdep.linux.packages>
+                <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
 

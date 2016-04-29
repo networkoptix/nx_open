@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">Offline cihazları göster</string>
+    <string name="menu_hide_offline">Offline cihazları gizle</string>
+    <string name="resources_logout_offer">Çıkış yapmak için bir kere daha geri tuşuna basın</string>
+    <string name="resources_loading_title">Yükleniyor…</string>
+    <string name="resources_loading_text">Veri yüklenioyr…</string>
+    <string name="menu_clear_cache">Geçiçi dosyaları temizle</string>
+    <string name="resources_tree">Ağaç görünümü</string>
+    <string name="resources_grid">Önizleme görünümü</string>
+    <string name="resources_logout">Çıkış</string>
+    <string name="promote_title">Sürüm yükselt!</string>
+    <string name="promote">2.5 yada daha yüksek bir sürüme bağlanıyorsunuz.Daha iyi sonuç almak için lütfen en son sürümü indirin</string>
+    <string name="download">İndir</string>
+    
+</resources>

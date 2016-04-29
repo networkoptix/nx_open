@@ -448,11 +448,11 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 {
     QStringList result = list;
     if (caseSensitive == Qt::CaseSensitive)
-        qSort(result.begin(), result.end(), [](const QString &left, const QString &right) {
+        std::sort(result.begin(), result.end(), [](const QString &left, const QString &right) {
             return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
         });
     else
-        qSort(result.begin(), result.end(), naturalStringLess);
+        std::sort(result.begin(), result.end(), naturalStringLess);
     return result;
 }
 

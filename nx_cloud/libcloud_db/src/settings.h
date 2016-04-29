@@ -87,7 +87,6 @@ public:
     const Notification& notification() const;
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
-    const QString& cloudBackendUrl() const;
     const QString& changeUser() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
@@ -106,7 +105,6 @@ private:
     Notification m_notification;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
-    QString m_cloudBackendUrl;
     QString m_changeUser;
 
     void fillSupportedCmdParameters();

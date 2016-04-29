@@ -37,10 +37,10 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateLogin);
     connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->passwordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::updatePassword);
+    connect(ui->passwordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->confirmPasswordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::updatePassword);
+    connect(ui->confirmPasswordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateEmail);
     connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserSettingsWidget::hasChangesChanged);
@@ -75,12 +75,10 @@ bool QnUserSettingsWidget::hasChanges() const
             return true;
 
         QnUuid groupId = selectedUserGroup();
-        if (!groupId.isNull())
-        {
-            if (m_model->user()->userGroup() != groupId)
-                return true;
-        }
-        else
+        if (m_model->user()->userGroup() != groupId)
+            return true;
+
+        if (groupId.isNull())
         {
             /* Check if we have selected a predefined internal group. */
             Qn::GlobalPermissions permissions = selectedPermissions();
@@ -163,22 +161,14 @@ void QnUserSettingsWidget::applyChanges()
         m_model->user()->setPassword(QString());
     }
 
+    /* Here we must be sure settings widget goes before the permissions one. */
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         QnUuid groupId = selectedUserGroup();
         if (!groupId.isNull())
-        {
             m_model->user()->setUserGroup(groupId);
-        }
         else
-        {
-            /* If we have selected predefined group, just set it. */
-            Qn::GlobalPermissions permissions = selectedPermissions();
-            if (permissions != Qn::NoGlobalPermissions)
-                m_model->user()->setRawPermissions(permissions);
-            /* Otherwise permissions must be loaded from custom tabs. */
-        }
-
+            m_model->user()->setRawPermissions(selectedPermissions());
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
@@ -186,12 +176,6 @@ void QnUserSettingsWidget::applyChanges()
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
         m_model->user()->setEnabled(ui->enabledButton->isChecked());
-}
-
-bool QnUserSettingsWidget::isCustomAccessRights() const
-{
-    return selectedPermissions() == Qn::NoGlobalPermissions
-        && selectedUserGroup().isNull();
 }
 
 void QnUserSettingsWidget::updateLogin()

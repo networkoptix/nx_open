@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <ui/models/abstract_permissions_model.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui
@@ -10,7 +11,6 @@ namespace Ui
 }
 
 class QnResourceListModel;
-class QnAbstractPermissionsDelegate;
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
 class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget
@@ -19,14 +19,7 @@ class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget
 
     typedef QnAbstractPreferencesWidget base_type;
 public:
-    enum Filter
-    {
-        CamerasFilter,
-        LayoutsFilter,
-        ServersFilter
-    };
-
-    QnAccessibleResourcesWidget(QnAbstractPermissionsDelegate* delegate, Filter filter, QWidget* parent = 0);
+    QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnAbstractPermissionsModel::Filter filter, QWidget* parent = 0);
     virtual ~QnAccessibleResourcesWidget();
 
     virtual bool hasChanges() const override;
@@ -34,12 +27,10 @@ public:
     virtual void applyChanges() override;
 
 private:
-    Qn::GlobalPermission allResourcesPermission() const;
-
-private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
-    QnAbstractPermissionsDelegate* const m_delegate;
-    const Filter m_filter;
+    QnAbstractPermissionsModel* const m_permissionsModel;
+    const QnAbstractPermissionsModel::Filter m_filter;
 
-    QScopedPointer<QnResourceListModel> m_model;
+    QScopedPointer<QnResourceListModel> m_resourcesModel;
+    QScopedPointer<QSortFilterProxyModel> m_viewModel;
 };

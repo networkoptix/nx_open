@@ -1,19 +1,19 @@
 #include "permissions_widget.h"
 #include "ui_permissions_widget.h"
 
-#include <ui/delegates/abstract_permissions_delegate.h>
+#include <ui/models/abstract_permissions_model.h>
 
 namespace
 {
     const char* kPermissionProperty = "_qn_global_permission_property";
 }
 
-QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsDelegate* delegate, QWidget* parent /*= 0*/):
+QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissionsModel, QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::PermissionsWidget()),
-    m_delegate(delegate)
+    m_permissionsModel(permissionsModel)
 {
-    NX_ASSERT(m_delegate);
+    NX_ASSERT(m_permissionsModel);
     ui->setupUi(this);
 
     auto createCheckBox = [this](Qn::GlobalPermission permission, const QString& text)
@@ -44,12 +44,15 @@ QnPermissionsWidget::~QnPermissionsWidget()
 
 bool QnPermissionsWidget::hasChanges() const
 {
-    return m_delegate->rawPermissions() != rawPermissions();
+    Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
+    value &= ~Qn::GlobalAccessResourcesPermissionsSet;
+
+    return selectedPermissions() != value;
 }
 
 void QnPermissionsWidget::loadDataToUi()
 {
-    Qn::GlobalPermissions value = m_delegate->rawPermissions();
+    Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
 
     for (QCheckBox* checkbox : m_checkboxes)
     {
@@ -60,13 +63,21 @@ void QnPermissionsWidget::loadDataToUi()
 
 void QnPermissionsWidget::applyChanges()
 {
-    m_delegate->setRawPermissions(rawPermissions());
+    auto value = m_permissionsModel->rawPermissions();
+    for (QCheckBox* checkbox : m_checkboxes)
+    {
+        Qn::GlobalPermission flag = checkbox->property(kPermissionProperty).value<Qn::GlobalPermission>();
+        if (checkbox->isChecked())
+            value |= flag;
+        else
+            value &= ~flag;
+    }
+    m_permissionsModel->setRawPermissions(value);
 }
 
-Qn::GlobalPermissions QnPermissionsWidget::rawPermissions() const
+Qn::GlobalPermissions QnPermissionsWidget::selectedPermissions() const
 {
-    Qn::GlobalPermissions value = m_delegate->rawPermissions();
-
+    Qn::GlobalPermissions value = Qn::NoGlobalPermissions;
     for (QCheckBox* checkbox : m_checkboxes)
     {
         Qn::GlobalPermission flag = checkbox->property(kPermissionProperty).value<Qn::GlobalPermission>();

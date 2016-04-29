@@ -15,6 +15,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/std/future.h>
 
 #include "../abstract_socket.h"
 #include "../socket_global.h"
@@ -344,7 +345,7 @@ public:
         }
         else
         {
-            std::promise< bool > promise;
+            nx::utils::promise< bool > promise;
             cancelIOAsync(eventType, [&]() { promise.set_value(true); });
             promise.get_future().wait();
         }
@@ -872,7 +873,7 @@ public:
     void cancelIOSync()
     {
         //TODO #ak promise not needed if we are already in aio thread
-        std::promise< bool > promise;
+        nx::utils::promise< bool > promise;
         cancelIOAsync( [ & ](){ promise.set_value( true ); } );
         promise.get_future().wait();
     }

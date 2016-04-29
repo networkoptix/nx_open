@@ -6,7 +6,7 @@
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
-class QnAbstractPermissionsDelegate;
+class QnAbstractPermissionsModel;
 
 namespace Ui
 {
@@ -20,18 +20,18 @@ class QnPermissionsWidget : public QnAbstractPreferencesWidget
 
     typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnPermissionsWidget(QnAbstractPermissionsDelegate* delegate, QWidget* parent = 0);
+    QnPermissionsWidget(QnAbstractPermissionsModel* permissionsModel, QWidget* parent = 0);
     virtual ~QnPermissionsWidget();
 
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
-    Qn::GlobalPermissions rawPermissions() const;
+    Qn::GlobalPermissions selectedPermissions() const;
 private:
     QScopedPointer<Ui::PermissionsWidget> ui;
 
-    QnAbstractPermissionsDelegate* const m_delegate;
+    QnAbstractPermissionsModel* const m_permissionsModel;
 
     QList<QCheckBox*> m_checkboxes;
 };

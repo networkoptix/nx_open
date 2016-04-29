@@ -330,6 +330,9 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
         return;
 
+    if (cameraRes->hasFlags(Qn::desktop_camera))
+        return;
+
     auto camera = qnCameraPool->getVideoCamera(cameraRes);
     if (!camera)
         return;

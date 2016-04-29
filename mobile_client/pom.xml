@@ -28,7 +28,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>openssl ffmpeg</rdep.packages>
+        <rdep.packages>openssl ffmpeg roboto-ttf</rdep.packages>
         <rdep.windows.packages>quazip openal</rdep.windows.packages>
         <rdep.linux.packages>quazip</rdep.linux.packages>
         <rdep.android.packages>openal libjpeg-turbo</rdep.android.packages>
@@ -133,6 +133,8 @@
                 <google.storepass>${android.storepass}</google.storepass>
                 <google.keypass>${android.keypass}</google.keypass>
                 <google.alias>${namespace.additional}</google.alias>
+                <!-- Exclude roboto-ttf package because the font is present on the every android device. -->
+                <rdep.packages>openssl ffmpeg</rdep.packages>
             </properties>
             <build>
                 <plugins>

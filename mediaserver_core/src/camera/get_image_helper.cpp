@@ -246,7 +246,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
 
     QnServerArchiveDelegate serverDelegate;
     if( !useHQ )
-        serverDelegate.setQuality( MEDIA_Quality_Low, true );
+        serverDelegate.setQuality( MEDIA_Quality_Low, true, QSize() );
 
     QList<QnAbstractImageFilterPtr> filterChain;
 

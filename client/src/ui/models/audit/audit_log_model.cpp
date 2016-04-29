@@ -188,7 +188,7 @@ public:
             break;
         }
 
-        qSort(m_data.begin(), m_data.end(), lessThan);
+        std::sort(m_data.begin(), m_data.end(), lessThan);
     }
 
 private:

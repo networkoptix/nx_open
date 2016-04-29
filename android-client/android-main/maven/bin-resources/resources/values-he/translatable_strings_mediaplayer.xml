@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_server_died">המצלמה אינה זמינה</string>
+    <string name="error_already_connected">המצלמה כבר מחוברת</string>
+    <string name="error_not_connected">המצלמה אינה מחוברת</string>
+    <string name="error_unknown_host">שרת לא ידוע</string>
+    <string name="error_cannot_connect">לא ניתן להתחבר למצלמה</string>
+    <string name="error_io">שגיאת קלט/פלט</string>
+    <string name="error_connection_lost">החיבור אבד</string>
+    <string name="error_malformed_packet">נתוני רשת פגומים</string>
+    <string name="error_out_of_range">מחוץ לתחום</string>
+    <string name="error_buffer_too_small">חוצץ קטן מידי</string>
+    <string name="error_unsupported_format">פורמט שאינו נתמך</string>
+    <string name="error_end_of_stream">סוף תזרים</string>
+    <string name="error_unsupported_http_transport">שידור על גבי HTTP זמין רק בגירסאות אנדרויד 4 ומעלה</string>
+    <string name="error_unsupported_rtsp_proxy">לא ניתן לבצע חיבור ישיר לשרת המדיה.
+        צפייה בוידאו דרך שרת פרוקסי זמין רק מגירסת אנדרויד 4 ומעלה.</string>
+    <string name="error_proxy_not_running">לא ניתן לבצע חיבור ישיר לשרת המדיה.
+        יש לוודא ששרת הפרוקסי פעיל ותקין.</string>
+    <string name="error_unsupported_rtsp_udp">וידאו מהשרת אינו מגיע להתקן. 
+        יש לוודא שתקשורת UDP מאופשרת ברשת.</string>
+    <string name="error_native_codec">קידוד המצלמה אינו זמין בהתקן זה. נסה לשנות את רזולוצית המצלמה.</string>
+    <string name="error_unknown">המצלמה אינה זמינה.</string>
+
+</resources>

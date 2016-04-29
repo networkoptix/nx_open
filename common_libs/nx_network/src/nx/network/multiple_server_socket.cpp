@@ -1,9 +1,12 @@
+
 #include "multiple_server_socket.h"
 
 #include <boost/optional.hpp>
 
-#include "nx/utils/log/log.h"
-#include "nx/utils/log/log_message.h"
+#include <nx/utils/std/future.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_message.h>
+
 
 namespace nx {
 namespace network {
@@ -179,7 +182,7 @@ AbstractStreamSocket* MultipleServerSocket::accept()
     //if (m_serverSockets.size() == 1)
     //    return m_serverSockets[0]->accept();
 
-    std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
+    nx::utils::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
     acceptAsync(
         [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
         {
@@ -258,7 +261,7 @@ void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler
 
 void MultipleServerSocket::cancelIOSync()
 {
-    std::promise<void> ioCancelledPromise;
+    nx::utils::promise<void> ioCancelledPromise;
     //TODO #ak deal with copy-paste
     dispatch(
         [this, &ioCancelledPromise]() mutable
@@ -301,7 +304,7 @@ bool MultipleServerSocket::addSocket(
 
     //NOTE socket count MUST be updated without delay
 
-    std::promise<void> socketAddedPromise;
+    nx::utils::promise<void> socketAddedPromise;
     dispatch(
         [this, &socketAddedPromise, socket = std::move(socket)]() mutable
         {
@@ -325,7 +328,7 @@ bool MultipleServerSocket::addSocket(
 
 void MultipleServerSocket::removeSocket(size_t pos)
 {
-    std::promise<void> socketRemovedPromise;
+    nx::utils::promise<void> socketRemovedPromise;
     dispatch(
         [this, &socketRemovedPromise, pos]()
         {

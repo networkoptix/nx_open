@@ -73,7 +73,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020
+        ShareIpCapability                   = 0x020,
+        AudioTransmitCapability             = 0x040
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -881,6 +882,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
         GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
         GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
+
+        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
 
         /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
         DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */

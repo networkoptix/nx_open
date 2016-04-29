@@ -155,7 +155,7 @@ void QnStorageDb::startVacuumAsync(Callback callback)
     if (m_vacuumThread.joinable())
         m_vacuumThread.join();
 
-    m_vacuumThread = std::thread([this, callback] 
+    m_vacuumThread = nx::utils::thread([this, callback]
                                  { 
                                      m_vacuumThreadRunning = true;
                                      callback(vacuum());

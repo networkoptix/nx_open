@@ -1,0 +1,3 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_clear_cache" android:title="@string/menu_clear_cache" android:showAsAction="never"></item>
+</menu>

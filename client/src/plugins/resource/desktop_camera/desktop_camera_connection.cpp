@@ -8,6 +8,7 @@
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 
 #include <plugins/resource/desktop_win/desktop_resource.h>
+#include <http/custom_headers.h>
 
 
 static const int CONNECT_TIMEOUT = 1000 * 5;
@@ -19,18 +20,25 @@ public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
         QnAbstractDataConsumer(20),
         m_sequence(0),
-        m_owner(owner)
+        m_owner(owner),
+        m_needVideoData(false)
     {
         for (int i = 0; i < 2; ++i) {
             m_serializers[i].setAdditionFlags(0);
             m_serializers[i].setLiveMarker(true);
         }
     }
+
     virtual ~QnDesktopCameraDataConsumer()
     {
         stop();
     }
-protected:
+
+    void setNeedVideoData(bool value)
+    {
+        m_needVideoData = value;
+    }
+	
 protected:
 
     virtual bool processData(const QnAbstractDataPacketPtr& packet) override
@@ -71,10 +79,17 @@ protected:
         m_owner->sendUnlock();
         return true;
     }
+	
+    virtual bool needConfigureProvider() const override
+    {
+        return m_needVideoData;
+    }
+	
 private:
     quint32 m_sequence;
     QnRtspFfmpegEncoder m_serializers[2]; // video + audio
     QnDesktopCameraConnectionProcessor* m_owner;
+    bool m_needVideoData;
 };
 
 class QnDesktopCameraConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
@@ -82,7 +97,7 @@ class QnDesktopCameraConnectionProcessorPrivate: public QnTCPConnectionProcessor
 public:
     QnDesktopResource* desktop;
     QnAbstractStreamDataProvider* dataProvider;
-    QnAbstractDataConsumer* dataConsumer;
+    QnDesktopCameraDataConsumer* dataConsumer;
     QnMutex sendMutex;
 };
 
@@ -112,13 +127,16 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     QByteArray method = d->request.requestLine.method;
     if (method == "PLAY")
     {
-        if (d->dataProvider == 0) {
+        if (d->dataProvider == 0) 
+        {
             d->dataProvider = d->desktop->createDataProvider(Qn::CR_Default);
             d->dataConsumer = new QnDesktopCameraDataConsumer(this);
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();
             d->dataProvider->start();
         }
+        bool needVideoData = d->request.headers.find(Qn::DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME) == d->request.headers.end();
+        d->dataConsumer->setNeedVideoData(needVideoData);
     }
     else if (method == "TEARDOWN")
     {

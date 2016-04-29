@@ -506,11 +506,11 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellPa
     NX_ASSERT(isValidCell(cell));
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
-    if(qEqual(value, &value[ParamCount], localValue)) {
+    if(std::equal(value, &value[ParamCount], localValue)) {
         return;
     }
 
-    qCopy(value, &value[ParamCount], localValue);
+    std::copy(value, &value[ParamCount], localValue);
 
     emit cellValueChanged(cell);
 }

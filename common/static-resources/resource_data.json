@@ -19,6 +19,12 @@
     "data": [
         {
             "keys": [
+                "ActiveCam|*"
+            ],
+            "forceONVIF": true
+        },
+		{
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"

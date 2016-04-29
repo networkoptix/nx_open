@@ -520,7 +520,7 @@ void QnServerArchiveDelegate::setSendMotion(bool value)
 }
 */
 
-bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
+bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize &)
 {
     QnMutexLocker lk( &m_mutex );
 

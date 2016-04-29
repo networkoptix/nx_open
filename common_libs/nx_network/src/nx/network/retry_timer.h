@@ -63,9 +63,8 @@ private:
 /** Implements request retry policy, specified in STUN rfc.
     There are maximum N retries, delay between retries is increased by 
         some multiplier with each unsuccessful try.
-    \note Object of this class can be used for a single retry sequence only. 
-        No "reset state" is provided!
     \note \a RetryTimer instance can be safely freed within \a doAnotherTryFunc
+    \note Class methods are not thread-safe
 */
 class NX_NETWORK_API RetryTimer
 :
@@ -87,6 +86,9 @@ public:
     bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
 
     std::chrono::milliseconds currentDelay() const;
+
+    /** Resets internal state to default values */
+    void reset();
 
 private:
     aio::Timer m_timer;

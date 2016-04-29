@@ -76,9 +76,8 @@ void QnWorkbenchCloudHandlerPrivate::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandlerPrivate::at_logoutFromCloudAction_triggered()
 {
-    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
     qnSettings->setCloudPassword(QString());
-    cloudStatusWatcher->setCloudPassword(QString());
+    qnCloudStatusWatcher->setCloudPassword(QString());
 }
 
 void QnWorkbenchCloudHandlerPrivate::at_openCloudMainUrlAction_triggered()

@@ -45,7 +45,7 @@ void DBStructureUpdater::addUpdateScript( const QByteArray& updateScript )
 
 bool DBStructureUpdater::updateStructSync()
 {
-    m_dbUpdatePromise = std::promise<DBResult>();
+    m_dbUpdatePromise = nx::utils::promise<DBResult>();
     auto future = m_dbUpdatePromise.get_future();
 
     //starting async operation

@@ -1,8 +1,12 @@
+
 #include "stoppable.h"
+
+#include <nx/utils/std/future.h>
+
 
 void QnStoppableAsync::pleaseStopSync()
 {
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     auto fut = promise.get_future();
     pleaseStop( [&](){ promise.set_value(); } );
     fut.wait();

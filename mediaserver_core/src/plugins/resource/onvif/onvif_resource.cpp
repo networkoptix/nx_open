@@ -132,7 +132,7 @@ public:
         if (isH264) {
             for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
                 h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
-            qSort(h264Profiles);
+            std::sort(h264Profiles.begin(), h264Profiles.end());
 
             if (resp.Options->H264->FrameRateRange)
                 frameRateMax = resp.Options->H264->FrameRateRange->Max;
@@ -571,17 +571,17 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     fetchRelayInputInfo( capabilitiesResponse );
 
     const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.contains(lit("relayInputCountForced")))
+    if (resourceData.contains(QString("relayInputCountForced")))
     {
         setCameraCapability(
             Qn::RelayInputCapability,
-            resourceData.value<int>(lit("relayInputCountForced"), 0) > 0);
+            resourceData.value<int>(QString("relayInputCountForced"), 0) > 0);
     }
-    if (resourceData.contains(lit("relayOutputCountForced")))
+    if (resourceData.contains(QString("relayOutputCountForced")))
     {
         setCameraCapability(
             Qn::RelayOutputCapability,
-            resourceData.value<int>(lit("relayOutputCountForced"), 0) > 0);
+            resourceData.value<int>(QString("relayOutputCountForced"), 0) > 0);
     }
 
     QnIOPortDataList allPorts = getRelayOutputList();
@@ -617,14 +617,14 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
-        bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
+        bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
         if (forcedAR && m_primaryResolution.height() > 0) 
         {
             qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
             setCustomAspectRatio(ar);
         }
         
-        QString defaultAR = resourceData.value<QString>(lit("defaultAR"));
+        QString defaultAR = resourceData.value<QString>(QString("defaultAR"));
         QStringList parts = defaultAR.split(L'x');
         if (parts.size() == 2) {
             qreal ar = parts[0].toFloat() / parts[1].toFloat();
@@ -636,9 +636,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (customInitResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return customInitResult;
 
-    m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
+    m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
 
-    m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
+    m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
 
     saveParams();
 
@@ -1062,7 +1062,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsLocal& o
 {
     QnMutexLocker lock( &m_mutex );
     m_secondaryResolutionList = opts.resolutions;
-    qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
+    std::sort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
 
 void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsLocal& opts) {
@@ -1115,7 +1115,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     {
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
 
     }
 
@@ -1149,7 +1149,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     {
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
     }
 
     QnMutexLocker lock( &m_mutex );
@@ -1678,7 +1678,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
 bool QnPlOnvifResource::trustMaxFPS()
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    bool result = resourceData.value<bool>(lit("trustMaxFPS"), false);
+    bool result = resourceData.value<bool>(QString("trustMaxFPS"), false);
     return result;
 }
 
@@ -1731,7 +1731,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 {
 
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    QnOnvifConfigDataPtr forcedParams = resourceData.value<QnOnvifConfigDataPtr>(lit("forcedOnvifParams"));
+    QnOnvifConfigDataPtr forcedParams = resourceData.value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
     QStringList videoEncodersTokens;
     VideoConfigsResp confResponse;
 
@@ -1806,7 +1806,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
-    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
+    std::sort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
     /*
     if (optionsList.size() <= m_channelNumer)
@@ -2671,7 +2671,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 
             _oasisWsnB2__Unsubscribe request;
             _oasisWsnB2__UnsubscribeResponse response;
-            const int soapCallResult = soapWrapper.unsubscribe(request, response);
+            soapWrapper.unsubscribe(request, response);
 
             QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
             registerNotificationConsumer();

@@ -1,5 +1,6 @@
 TEMPLATE = app
 
+
 INCLUDEPATH += \
     ${root.dir}/appserver2/src \
     ${root.dir}/client.core/src \
@@ -8,6 +9,8 @@ unix: !mac {
     LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
     LIBS += "-Wl,-rpath-link,$$OPENSSL_DIR/lib"
 }
+
+QML_IMPORT_PATH = ${basedir}/static-resources/qml
 
 android {
     QT += androidextras
@@ -23,7 +26,7 @@ android {
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcrypto.so \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libssl.so \
-        $$OUTPUT_PATH/lib/libopenal.so
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libopenal.so
 
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libavutil.so \

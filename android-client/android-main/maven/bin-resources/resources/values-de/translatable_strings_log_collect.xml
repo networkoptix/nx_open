@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="acquiring_log_progress_dialog_message">"Rufe Protokoll ab ..."</string>
+    <string name="chooser_title">"Wählen Sie eine Anwendung, um das Protokoll zu senden"</string>
+    <string name="failed_to_get_log_message">"Angefordertes Protokoll vom System nicht erhalten."</string>
+    <string name="main_dialog_text">"Diese Anwendung ruft das Gerät Protokoll ab. Die abgerufene Protokoll kann mit einer Anwendung Ihrer Wahl versendet werden. Sie haben die Möglichkeit die gesammelten Daten vor der Versendung einzusehen und zu ändern."</string>         
+</resources>

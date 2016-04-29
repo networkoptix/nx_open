@@ -14,6 +14,7 @@
 #include <boost/optional.hpp>
 
 #include <udt/udt.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
 #include <utils/common/checked_cast.h>
@@ -803,7 +804,7 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         return systemAccept();
 
     //this method always blocks
-    std::promise<
+    nx::utils::promise<
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
     > acceptedSocketPromise;
 

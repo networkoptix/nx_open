@@ -12,7 +12,7 @@ class QnPaletteColor
 public:
     static const int kMaxAlpha;
 
-    QnPaletteColor();
+    explicit QnPaletteColor(QColor fallbackColor = QColor());
 
     QnPaletteColor(const QString &group,
                    const int index,
@@ -26,6 +26,8 @@ public:
     int alpha() const;
     void setAlpha(int alpha);
     void setAlphaF(qreal alpha);
+
+    void setFallbackColor(QColor fallbackColor);
 
     bool isValid() const;
 
@@ -41,6 +43,7 @@ private:
     int m_index;
     QnColorList m_palette;
     int m_alpha;
+    QColor m_fallbackColor;
 };
 
 class QnGenericPalette

@@ -164,6 +164,7 @@
         "playPauseBackground" : "#32171c1f",
         "navigationPanelBackground" : "palette.base.color_3",
         "offlineDimmer" :       "#cc171c1f",
-        "cameraStatus" :        "palette.base.color_13"
+        "cameraStatus" :        "palette.base.color_13",
+        "versionText" :         "palette.base.color_15"
     }
 }

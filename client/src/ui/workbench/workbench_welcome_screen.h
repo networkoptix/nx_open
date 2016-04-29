@@ -115,7 +115,6 @@ private:
     bool m_visibleControls;
     bool m_visible;
     bool m_connectingNow;
-    const CloudStatusWatcherPtr m_cloudWatcher;
     const QnGenericPalette m_palette;
     const WidgetPtr m_widget;
     QSize m_pageSize;

@@ -251,7 +251,7 @@ private:
             return m_resultHandler( SOAP_FAULT );
         }
 
-        NX_ASSERT( bytesSent == m_serializedRequest.size() );
+        NX_ASSERT( bytesSent == (size_t)m_serializedRequest.size() );
         m_state = receivingResponse;
 
         m_responseBuffer.reserve( READ_BUF_SIZE );

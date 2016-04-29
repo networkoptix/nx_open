@@ -160,6 +160,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
 #include <rest/handlers/system_settings_handler.h>
+#include <rest/handlers/audio_transmission_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1580,6 +1581,8 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler());
 
+    QnRestProcessorPool::instance()->registerHandler("api/transmitAudio", new QnAudioTransmissionRestHandler());
+
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
@@ -1747,7 +1750,7 @@ void MediaServerProcess::run()
     if( f.isOpen() )
     {
         const QByteArray& certData = f.readAll();
-        nx::network::QnSSLSocket::initSSLEngine( certData );
+        nx::network::SslSocket::initSSLEngine( certData );
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
@@ -1889,6 +1892,7 @@ void MediaServerProcess::run()
     {
         systemName.resetToDefault();
         setSysIdTime(0);
+        systemName.saveToConfig();
     }
     if (systemName.isDefault())
         serverFlags |= Qn::SF_AutoSystemName;
@@ -2521,7 +2525,7 @@ void MediaServerProcess::run()
     //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
-    nx::network::QnSSLSocket::releaseSSLEngine();
+    nx::network::SslSocket::releaseSSLEngine();
     authHelper.reset();
 
     fileDeletor.reset();

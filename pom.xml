@@ -385,7 +385,7 @@
             </activation>
             <modules>
                 <module>unit_tests/cloud_connectivity_ut</module>
-                <module>unit_tests/cloud_db_ut</module>
+                <!--<module>unit_tests/cloud_db_ut</module>-->
                 <module>unit_tests/common_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
                 <module>unit_tests/mediaserver_core_ut</module>
@@ -776,6 +776,9 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
+                <quazip.version>0.7.2</quazip.version>
+                <gcc.version>4.9.3</gcc.version>
+                <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
             </properties>
@@ -809,6 +812,8 @@
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
                 <qt.spec/>
+                <!-- TODO get rid of this variable. We already have corresponding package name in common/pom.xml -->
+                <gcc.version>4.8.3</gcc.version>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -1011,9 +1016,8 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
-                <qt.version>5.5.1</qt.version>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2d</openssl.version>
+                <openssl.version>1.0.2g</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>android-${arch}</rdep.target>

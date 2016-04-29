@@ -1,7 +1,3 @@
-!mac {
-    QT += zlib-private
-}
-
 INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/client.core/src \
                 ${root.dir}/nx_cloud/cloud_db_client/src/include

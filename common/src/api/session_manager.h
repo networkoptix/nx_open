@@ -10,6 +10,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -32,7 +33,7 @@ struct AsyncRequestInfo
     QObject* object;
     const char* slot;
     Qt::ConnectionType connectionType;
-    std::promise<QnHTTPRawResponse>* requestedCompletedPromise;
+    nx::utils::promise<QnHTTPRawResponse>* requestedCompletedPromise;
 };
 Q_DECLARE_METATYPE(AsyncRequestInfo);
 

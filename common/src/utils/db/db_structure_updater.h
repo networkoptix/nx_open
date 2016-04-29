@@ -6,10 +6,11 @@
 #ifndef DB_STRUCTURE_UPDATER_H
 #define DB_STRUCTURE_UPDATER_H
 
-#include <future>
 #include <vector>
 
 #include <QtCore/QByteArray>
+
+#include <nx/utils/std/future.h>
 
 #include "types.h"
 
@@ -37,7 +38,7 @@ public:
 private:
     AsyncSqlQueryExecutor* const m_dbManager;
     std::vector<QByteArray> m_updateScripts;
-    std::promise<DBResult> m_dbUpdatePromise;
+    nx::utils::promise<DBResult> m_dbUpdatePromise;
 
     DBResult updateDbInternal(QSqlDatabase* const dbConnection);
 };

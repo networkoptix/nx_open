@@ -13,12 +13,15 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
+#include "core/dataconsumer/audio_data_transmitter.h"
 
 #include <mutex>
 #include <map>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
+
+typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
@@ -42,7 +45,7 @@ public:
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
-
+    bool hasTwoWayAudio() const;
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
@@ -254,8 +257,10 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-    bool isCameraInfoSavedToDisk(int pool) const;
-    void setCameraInfoSavedToDisk(int pool);
+    bool isCameraInfoSavedToDisk(const QString &storageUrl) const;
+    void setCameraInfoSavedToDisk(const QString &storageUrl);
+
+    virtual QnAudioTransmitterPtr getAudioTransmitter();
 
 public slots:
     virtual void inputPortListenerAttached();
@@ -352,7 +357,7 @@ private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 
-    mutable std::map<int, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
+    mutable std::map<QString, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 
 private slots:
     void resetCachedValues();

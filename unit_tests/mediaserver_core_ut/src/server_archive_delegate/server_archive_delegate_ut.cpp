@@ -526,9 +526,8 @@ TEST(ServerArchiveDelegate_playback_test, Main)
 
     QnServerArchiveDelegate archiveDelegate;
     archiveDelegate.open(cameraResource);
-    archiveDelegate.setQuality(MEDIA_Quality_High, true);
+    archiveDelegate.setQuality(MEDIA_Quality_High, true, QSize());
     archiveDelegate.seek(0, true);
-
     testHelper.getTimeLine().reset();
 
     QnAbstractMediaDataPtr data;
@@ -540,7 +539,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             break;
     }
 
-    archiveDelegate.setQuality(MEDIA_Quality_Low, true);
+    archiveDelegate.setQuality(MEDIA_Quality_Low, true, QSize());
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();
 

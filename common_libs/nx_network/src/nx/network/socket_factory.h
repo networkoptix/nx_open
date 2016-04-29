@@ -60,6 +60,7 @@ public:
     static void enforceStreamSocketType( SocketType type );
     static void enforceStreamSocketType( QString type );
     static bool isStreamSocketTypeEnforced();
+    static void enforceSsl( bool isEnforced );
 
     /** Sets new factory. Returns old one */
     static CreateStreamSocketFuncType 
@@ -75,6 +76,7 @@ private:
     ~SocketFactory();
 
     static std::atomic< SocketType > s_enforcedStreamSocketType;
+    static std::atomic< bool > s_isSslEnforced;
 };
 
 #endif  //SOCKET_FACTORY_H

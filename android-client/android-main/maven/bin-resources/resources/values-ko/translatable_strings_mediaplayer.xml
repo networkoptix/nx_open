@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_server_died">카메라가 유효하지 않음</string>
+    <string name="error_already_connected">이미 연결된 카메라</string>
+    <string name="error_not_connected">카메라가 연결되지 않음</string>
+    <string name="error_unknown_host">알수 없는 호스트</string>
+    <string name="error_cannot_connect">카메라를 연결할 수 없음</string>
+    <string name="error_io">I/O 오류</string>
+    <string name="error_connection_lost">연결 끊어짐</string>
+    <string name="error_malformed_packet">조작된 패킷</string>
+    <string name="error_out_of_range">범위를 벗어남</string>
+    <string name="error_buffer_too_small">버퍼가 너무 작음</string>
+    <string name="error_unsupported_format">지원하지 않는 포맷</string>
+    <string name="error_end_of_stream">스트림 종료</string>
+    <string name="error_unsupported_http_transport">HTTP 전송은 Android 4.0 이상에서만 사용가능합니다.</string>
+    <string name="error_unsupported_rtsp_proxy">저장서버에 직접 연결할 수 없습니다.
+        프록시 서버를 통해 카메라를 감시 할 수 있는 것은 안드로이드 4.0이상에서만 가능합니다.</string>
+    <string name="error_proxy_not_running">저장서버에 직접 연결할 수 없습니다.
+        응용 프로그램의 프록시 서비스가 실행 되어있는지 확인 하십시오.</string>
+    <string name="error_unsupported_rtsp_udp">서버에서 비디오 장치를 연결 할 수 없습니다. 
+        네트워크에서 UDP 트래픽이 유효한지 확인 하십시오.</string>
+    <string name="error_native_codec">카메라의 코덱을 지원하지 않습니다. 해상도의 변경을 시도하십시오.</string>        
+    <string name="error_unknown">카메라가 유효하지 않습니다.</string>
+</resources>
