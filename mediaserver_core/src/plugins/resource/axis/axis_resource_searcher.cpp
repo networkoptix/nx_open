@@ -272,9 +272,9 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setGroupName(physicalId);
             resource->setGroupId(physicalId);
 
-            auto optAuth = firstResource->getAuth();
-            if (optAuth)
-                resource->setDefaultAuth(*optAuth);
+            auto auth = firstResource->getAuth();
+            if (!auth.isNull())
+                resource->setDefaultAuth(auth);
 
             resource->setUrl(firstResource->getUrl());
 

@@ -151,8 +151,7 @@ QnPlDlinkResource::QnPlDlinkResource()
 
 void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
@@ -234,9 +233,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     QnPhysicalCameraResource::initInternal();
 
     CLHttpStatus status;
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/stream_info.cgi"),  getHostAddress(), 80, 1000, auth);
+    QByteArray cam_info_file = downloadFile(status, QLatin1String("config/stream_info.cgi"),  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -464,9 +461,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 
 
     CLHttpStatus status;
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    QByteArray result = downloadFile(status, str,  getHostAddress(), 80, 1000, auth);
+    QByteArray result = downloadFile(status, str,  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {

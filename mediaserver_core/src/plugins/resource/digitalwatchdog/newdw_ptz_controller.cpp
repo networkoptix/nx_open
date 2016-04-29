@@ -80,9 +80,7 @@ bool QnNewDWPtzController::doQuery(const QString &request, QByteArray* body) con
         url.setQuery(request.mid(queryPos+1));
     }
     QString encodedPath = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, auth);
+    CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, m_resource->getAuth());
     CLHttpStatus status = client.doGET(encodedPath);
     if (status == CL_HTTP_SUCCESS && body)
         client.readAll(*body);

@@ -100,8 +100,7 @@ QnOnvifPtzController::~QnOnvifPtzController() {
 Qn::PtzCapabilities QnOnvifPtzController::initMove() {
     QString ptzUrl = m_resource->getPtzUrl();
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
 
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
@@ -195,8 +194,7 @@ bool QnOnvifPtzController::readBuiltinPresets() {
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
@@ -225,8 +223,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousFocus() {
     if(imagingUrl.isEmpty())
         return Qn::NoPtzCapabilities;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     ImagingSoapWrapper imaging(imagingUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     imaging.getProxy()->soap->float_format = m_floatFormat;
     imaging.getProxy()->soap->double_format = m_doubleFormat;
@@ -261,8 +258,7 @@ bool QnOnvifPtzController::stopInternal() {
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
@@ -288,8 +284,7 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
@@ -331,8 +326,7 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
     if(imagingUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     ImagingSoapWrapper imaging(imagingUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     imaging.getProxy()->soap->float_format = m_floatFormat;
     imaging.getProxy()->soap->double_format = m_doubleFormat;
@@ -364,8 +358,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
 
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
@@ -425,8 +418,7 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
@@ -491,8 +483,7 @@ bool QnOnvifPtzController::removePreset(const QString &presetId) {
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
@@ -526,8 +517,7 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) 
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
@@ -570,8 +560,7 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
     if(ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
