@@ -1,20 +1,26 @@
-#ifndef QN_RESOURCE_TREE_ITEM_DELEGATE_H
-#define QN_RESOURCE_TREE_ITEM_DELEGATE_H
+#pragma once
 
 #include <QtCore/QPointer>
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <client/client_color_types.h>
+
 class QnWorkbench;
 
-class QnResourceTreeItemDelegate : public QStyledItemDelegate
+class QnResourceItemDelegate : public QStyledItemDelegate
 {
     typedef QStyledItemDelegate base_type;
 
+    Q_PROPERTY(QnResourceItemColors colors READ colors WRITE setColors)
+
 public:
-    explicit QnResourceTreeItemDelegate(QObject* parent = nullptr);
+    explicit QnResourceItemDelegate(QObject* parent = nullptr);
 
     QnWorkbench* workbench() const;
     void setWorkbench(QnWorkbench* workbench);
+
+    const QnResourceItemColors& colors() const;
+    void setColors(const QnResourceItemColors& colors);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
@@ -38,6 +44,5 @@ private:
 private:
     QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon, m_scheduledIcon, m_buggyIcon;
+    QnResourceItemColors m_colors;
 };
-
-#endif // QN_RESOURCE_TREE_ITEM_DELEGATE_H

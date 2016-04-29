@@ -1,4 +1,4 @@
-#include "resource_tree_item_delegate.h"
+#include "resource_item_delegate.h"
 
 #include <QtWidgets/QApplication>
 
@@ -26,7 +26,7 @@
 
 #include <common/common_module.h>
 
-QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject* parent):
+QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent)
 {
     m_recordingIcon = qnSkin->icon("tree/recording.png");
@@ -34,17 +34,27 @@ QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject* parent):
     m_buggyIcon = qnSkin->icon("tree/buggy.png");
 }
 
-QnWorkbench* QnResourceTreeItemDelegate::workbench() const
+QnWorkbench* QnResourceItemDelegate::workbench() const
 {
     return m_workbench.data();
 }
 
-void QnResourceTreeItemDelegate::setWorkbench(QnWorkbench* workbench)
+void QnResourceItemDelegate::setWorkbench(QnWorkbench* workbench)
 {
     m_workbench = workbench;
 }
 
-void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
+const QnResourceItemColors& QnResourceItemDelegate::colors() const
+{
+    return m_colors;
+}
+
+void QnResourceItemDelegate::setColors(const QnResourceItemColors& colors)
+{
+    m_colors = colors;
+}
+
+void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
@@ -63,24 +73,27 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
     }
 
     /* Select icon and text color by item state: */
-    QPalette::ColorRole actualRole;
+    QColor mainColor, extraColor;
     QIcon::Mode iconMode;
 
     switch (itemState(index))
     {
     case ItemState::Selected:
-        actualRole = QPalette::HighlightedText;
         iconMode = QIcon::Selected;
+        mainColor = m_colors.mainTextSelected;
+        extraColor = m_colors.extraTextSelected;
         break;
 
     case ItemState::Accented:
-        actualRole = QPalette::BrightText;
         iconMode = QIcon::Active;
+        mainColor = m_colors.mainTextAccented;
+        extraColor = m_colors.extraTextAccented;
         break;
 
     default:
-        actualRole = QPalette::Text;
         iconMode = QIcon::Normal;
+        mainColor = m_colors.mainText;
+        extraColor = m_colors.extraText;
     }
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
@@ -92,8 +105,6 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
     /* Obtain sub-element rectangles: */
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
     QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
-
-
 
     /* Paint background: */
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
@@ -112,7 +123,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
         option.font.setWeight(QFont::DemiBold);
 
         QnScopedPainterFontRollback fontRollback(painter, option.font);
-        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Normal, actualRole));
+        QnScopedPainterPenRollback penRollback(painter, mainColor);
 
         QFontMetrics metrics(option.font);
         const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
@@ -141,7 +152,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
                 QString elidedHost = extraMetrics.elidedText(host, option.textElideMode, textRect.width(), kTextFlags);
 
                 painter->setFont(option.font);
-                painter->setPen(option.palette.color(QPalette::Inactive, actualRole));
+                painter->setPen(extraColor);
                 painter->drawText(textRect, kTextFlags, elidedHost);
             }
         }
@@ -177,7 +188,7 @@ void QnResourceTreeItemDelegate::paint(QPainter* painter, const QStyleOptionView
             m_buggyIcon.paint(painter, extraIconRect);
 }
 
-QSize QnResourceTreeItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
+QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
     /* Init style option: */
     QStyleOptionViewItem option(styleOption);
@@ -193,7 +204,7 @@ QSize QnResourceTreeItemDelegate::sizeHint(const QStyleOptionViewItem& styleOpti
     return (textRect | iconRect | checkRect).size();
 }
 
-QWidget* QnResourceTreeItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     /* Create editor: */
     QWidget* editor = base_type::createEditor(parent, option, index);
@@ -217,14 +228,14 @@ QWidget* QnResourceTreeItemDelegate::createEditor(QWidget* parent, const QStyleO
     return editor;
 }
 
-void QnResourceTreeItemDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
+void QnResourceItemDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
 {
     // TODO: #QTBUG If focus is not cleared, we get crashes. Should be fixed in QWidget.
     editor->clearFocus();
     base_type::destroyEditor(editor, index);
 }
 
-bool QnResourceTreeItemDelegate::eventFilter(QObject* object, QEvent* event)
+bool QnResourceItemDelegate::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::ContextMenu)
         return true; /* Ignore context menu events as they don't work well with editors embedded into graphics scene. */
@@ -232,7 +243,7 @@ bool QnResourceTreeItemDelegate::eventFilter(QObject* object, QEvent* event)
     return base_type::eventFilter(object, event);
 }
 
-QnResourceTreeItemDelegate::ItemState QnResourceTreeItemDelegate::itemState(const QModelIndex& index) const
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModelIndex& index) const
 {
     /* Fetch information from model: */
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();

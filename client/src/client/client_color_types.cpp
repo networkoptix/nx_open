@@ -230,7 +230,6 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     high    = QColor(0xff5500);
 }
 
-
 QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
 {
     text    = QColor(0xff, 0xff, 0xff, 0x99);
@@ -238,6 +237,15 @@ QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
     window  = QColor(0x00, 0x4b, 0x80, 0xcc);
 }
 
+QnResourceItemColors::QnResourceItemColors()
+{
+    mainText = QColor(0x91a7b2);
+    mainTextSelected = QColor(0xe1e7eA);
+    mainTextAccented = QColor(0x2fa2db);
+    extraText = QColor(0x53707f);
+    extraTextSelected = QColor(0xa5b7c0);
+    extraTextAccented = QColor(0x117297);
+}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

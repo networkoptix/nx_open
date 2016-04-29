@@ -7,7 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <ui/delegates/resource_tree_item_delegate.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_list_model.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -110,7 +110,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     m_viewModel->sort(Qn::NameColumn);
 
 
-    auto itemDelegate = new QnResourceTreeItemDelegate(this);
+    auto itemDelegate = new QnResourceItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(itemDelegate);
 
     ui->resourcesTreeView->setModel(m_viewModel.data());

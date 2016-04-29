@@ -15,7 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
-#include <ui/delegates/resource_tree_item_delegate.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 
@@ -192,7 +192,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->filterFrame->setVisible(false);
     ui->selectFilterButton->setVisible(false);
 
-    m_itemDelegate = new QnResourceTreeItemDelegate(this);
+    m_itemDelegate = new QnResourceItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
