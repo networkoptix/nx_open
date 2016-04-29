@@ -132,7 +132,7 @@ void QnUserSettingsWidget::loadDataToUi()
     if (permissionsIndex < 0)
         permissionsIndex = customPermissionsIndex;
     ui->groupComboBox->setCurrentIndex(permissionsIndex);
-
+    ui->permissionsLabel->setText(m_model->groupDescription());
 
     updateLogin();
     updatePassword();

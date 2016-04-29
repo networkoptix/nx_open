@@ -126,11 +126,17 @@ namespace
     }
 
     /* Checks whether view item contains a checkbox without any text or decoration: */
-    bool isOnlyCheckboxItem(const QStyleOptionViewItem& item)
+    bool isCheckboxOnlyItem(const QStyleOptionViewItem& item)
     {
-        return (!(item.features & QStyleOptionViewItem::HasDisplay) || item.text.isEmpty()) &&
-               (!(item.features & QStyleOptionViewItem::HasDecoration) || item.icon.isNull()) &&
-                  item.features & QStyleOptionViewItem::HasCheckIndicator;
+        return (!item.features.testFlag(QStyleOptionViewItem::HasDisplay) || item.text.isEmpty()) &&
+               (!item.features.testFlag(QStyleOptionViewItem::HasDecoration) || item.icon.isNull()) &&
+                 item.features.testFlag(QStyleOptionViewItem::HasCheckIndicator);
+    }
+
+    /* Checks whether specified color is opaque: */
+    bool isColorOpaque(const QColor& color)
+    {
+        return color.alpha() == 255;
     }
 }
 
@@ -353,12 +359,12 @@ void QnNxStyle::drawPrimitive(
                 /* Obtain hover information: */
                 QBrush hoverBrush = option->palette.midlight();
                 bool hasHover = item->state.testFlag(State_MouseOver);
-                bool hoverOpaque = hasHover && hoverBrush.color().alpha() == 255;
+                bool hoverOpaque = hasHover && isColorOpaque(hoverBrush.color());
 
                 /* Obtain selection information: */
                 QBrush selectionBrush = option->palette.highlight();
                 bool hasSelection = item->state.testFlag(State_Selected);
-                bool selectionOpaque = hasSelection && selectionBrush.color().alpha() == 255;
+                bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
                 /* Draw alternate row background if requested: */
                 if (item->features.testFlag(QStyleOptionViewItem::Alternate) && !hoverOpaque && !selectionOpaque)
@@ -404,7 +410,7 @@ void QnNxStyle::drawPrimitive(
             /* Obtain selection information: */
             QBrush selectionBrush = option->palette.highlight();
             bool hasSelection = item->state.testFlag(State_Selected);
-            bool selectionOpaque = hasSelection && selectionBrush.color().alpha() == 255;
+            bool selectionOpaque = hasSelection && isColorOpaque(selectionBrush.color());
 
             /* Obtain Nx hovered row information: */
             int hoveredRow = -1;
@@ -1048,9 +1054,6 @@ void QnNxStyle::drawControl(
 
                     QColor firstColor = mainColor;
                     QColor secondColor;
-
-                    QLine coords;
-                    QPoint shift;
 
                     if (frame->state.testFlag(State_Sunken))
                     {
@@ -2217,7 +2220,7 @@ QSize QnNxStyle::sizeFromContents(
     case CT_ItemViewItem:
         {
             if (const QStyleOptionViewItem *item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
-                if (isOnlyCheckboxItem(*item))
+                if (isCheckboxOnlyItem(*item))
                     return QSize(Metrics::kStandardPadding * 2 + Metrics::kCheckIndicatorSize, Metrics::kCheckIndicatorSize);
 
             QSize sz = base_type::sizeFromContents(type, option, size, widget);

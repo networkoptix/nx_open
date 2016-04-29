@@ -117,7 +117,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->resourcesTreeView->setMouseTracking(true);
 
     ui->resourcesTreeView->header()->setStretchLastSection(false);
-    ui->resourcesTreeView->header()->setSectionResizeMode(QnResourceListModel::CheckColumn, QHeaderView::ResizeToContents);
+    ui->resourcesTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->resourcesTreeView->header()->setSectionResizeMode(QnResourceListModel::NameColumn, QHeaderView::Stretch);
 
     auto updateThumbnail = [this](const QModelIndex& index)
@@ -151,7 +151,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this](const QModelIndex& index)
     {
         QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
-        bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         int inverted = checked ? Qt::Unchecked : Qt::Checked;
         m_viewModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
     });

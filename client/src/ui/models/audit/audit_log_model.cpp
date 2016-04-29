@@ -666,7 +666,7 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
 
     if (role == Qt::CheckStateRole)
     {
-        if (value == Qt::Checked)
+        if (value.toInt() == Qt::Checked)
             m_index->at(index.row())->addParam(CheckedParamName, "1");
         else
             m_index->at(index.row())->removeParam(CheckedParamName);
