@@ -159,10 +159,7 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraCon
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
 
-    auto optAuth = nres->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-    mHttpClient.reset( new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, auth) );
+    mHttpClient.reset( new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth()) );
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
     switch( httpStatus )
     {

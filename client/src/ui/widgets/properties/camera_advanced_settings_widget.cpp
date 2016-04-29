@@ -115,8 +115,7 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
             .arg(m_camera->httpPort())
             .arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
 
-        auto optAuth = m_camera->getAuth();
-        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+        QAuthenticator auth = m_camera->getAuth();
 
         targetUrl.setUserName(auth.user());
         targetUrl.setPassword(auth.password());
@@ -221,8 +220,7 @@ void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*
     if (!m_camera)
         return;
 
-    auto optAuth = m_camera->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = m_camera->getAuth();
 
     authenticator->setUser(auth.user());
     authenticator->setPassword(auth.password());

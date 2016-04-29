@@ -34,9 +34,7 @@ QnDigitalWatchdogResource::~QnDigitalWatchdogResource()
 
 CLSimpleHTTPClient QnDigitalWatchdogResource::httpClient() const
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    return CLSimpleHTTPClient(getHostAddress(), HTTP_PORT, getNetworkTimeout(), auth);
+    return CLSimpleHTTPClient(getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
 }
 
 bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
@@ -44,10 +42,7 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
     if (m_appStopping)
         return false;
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-    CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), auth);
+    CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS) 
     {
@@ -100,10 +95,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
 void QnDigitalWatchdogResource::enableOnvifSecondStream()
 {
     // The camera most likely is going to reset after enabling dual streaming
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
-    CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), auth);
+    CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     QByteArray request;
     request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
     request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
@@ -147,8 +139,7 @@ void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvanced
     base_type::initAdvancedParametersProviders(params);
 
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     if (resourceData.value<bool>(lit("dw-pravis-chipset")))
         m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), auth));
@@ -171,8 +162,7 @@ void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
 }
 
 QString QnDigitalWatchdogResource::fetchCameraModel() {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     //TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 

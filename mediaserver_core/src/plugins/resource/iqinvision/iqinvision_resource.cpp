@@ -65,9 +65,7 @@ CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
     QString request = QLatin1String("get.oid?") + oid;
 
     CLHttpStatus status;
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    result = QLatin1String(downloadFile(status, request,  getHostAddress(), 80, 1000, auth));
+    result = QLatin1String(downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth()));
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -93,9 +91,7 @@ CLHttpStatus QnPlIqResource::setOID(const QString& oid, const QString& val)
 {
     QString request = QLatin1String("set.oid?OidTR") + oid + QLatin1String("=") + val;
     CLHttpStatus status;
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-    downloadFile(status, request,  getHostAddress(), 80, 1000, auth);
+    downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {

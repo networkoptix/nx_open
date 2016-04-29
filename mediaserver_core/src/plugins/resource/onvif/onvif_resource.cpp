@@ -371,8 +371,7 @@ typedef GSoapAsyncCallWrapper <
 
 void QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     const QString deviceUrl = getDeviceOnvifUrl();
     if( deviceUrl.isEmpty() )
@@ -489,8 +488,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     DeviceSoapWrapper deviceSoapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     CapabilitiesResp capabilitiesResponse;
@@ -827,9 +825,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
 {
     OnvifResExtInfo extInfo;
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
+    QAuthenticator auth = getAuth();
     CameraDiagnostics::Result result =  readDeviceInformation(getDeviceOnvifUrl(), auth, m_timeDrift, &extInfo);
     if (result) {
         if (getName().isEmpty())
@@ -1036,8 +1032,7 @@ void QnPlOnvifResource::notificationReceived(
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     CameraDiagnostics::Result result = fetchAndSetVideoEncoderOptions(soapWrapper);
@@ -1419,8 +1414,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         return true;
     }
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     DeviceIOWrapper soapWrapper(
         m_deviceIOUrl,
         auth.user(),
@@ -1443,8 +1437,7 @@ bool QnPlOnvifResource::fetchPtzInfo() {
     if(m_ptzUrl.isEmpty())
         return false;
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     PtzSoapWrapper ptz (getPtzUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     _onvifPtz__GetConfigurations request;
@@ -1546,8 +1539,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     }
     localAddress = sock->getLocalAddress().address.toString();
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     NotificationProducerSoapWrapper soapWrapper(
         m_eventCapabilities->XAddr,
@@ -1662,8 +1654,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
 CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList)
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     ProfilesReq request;
@@ -2166,8 +2157,7 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source, const QRect& maxR
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source)
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
 
     SetVideoSrcConfigReq request;
@@ -2195,8 +2185,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
 
 bool QnPlOnvifResource::detectVideoSourceCount()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     _onvifMedia__GetVideoSources request;
@@ -2230,8 +2219,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     _onvifMedia__GetVideoSources request;
@@ -2292,8 +2280,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 
 QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     VideoSrcOptionsReq request;
@@ -2329,8 +2316,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     VideoSrcConfigsReq request;
@@ -2385,8 +2371,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     AudioSrcConfigsReq request;
@@ -2576,8 +2561,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
 }
 
 void QnPlOnvifResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     QString imagingUrl = getImagingUrl();
     if (!imagingUrl.isEmpty()) {
         m_imagingParamsProxy.reset(new QnOnvifImagingProxy(imagingUrl.toLatin1().data(),  auth.user(), auth.password(), m_videoSourceToken.toStdString(), m_timeDrift) );
@@ -2616,8 +2600,7 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     SetVideoConfigReq request;
@@ -2654,8 +2637,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         return;
     m_renewSubscriptionTimerID = 0;
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
         m_onvifNotificationSubscriptionReference.isEmpty()
             ? m_eventCapabilities->XAddr
@@ -3025,8 +3007,7 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     EventSoapWrapper soapWrapper(
         m_eventCapabilities->XAddr,
         auth.user(),
@@ -3111,8 +3092,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
 void QnPlOnvifResource::removePullPointSubscription()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
         m_onvifNotificationSubscriptionReference.isEmpty()
             ? m_eventCapabilities->XAddr
@@ -3171,8 +3151,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     if( m_asyncPullMessagesCallWrapper )
         return; //previous request is still running, new timer will be added within completion handler
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
@@ -3319,8 +3298,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 
 bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs )
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
         auth.user(),
@@ -3375,8 +3353,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
 
 bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo )
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
         auth.user(),
@@ -3483,8 +3460,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     }
 
     //modifying output
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
@@ -3545,8 +3521,7 @@ void QnPlOnvifResource::afterConfigureStream()
 
 void QnPlOnvifResource::updateFirmware()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     DeviceInfoReq request;
@@ -3562,8 +3537,7 @@ void QnPlOnvifResource::updateFirmware()
 
 CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     CapabilitiesResp response;
@@ -3589,8 +3563,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchOnvifCapabilities(
     DeviceSoapWrapper* const soapWrapper,
     CapabilitiesResp* const response )
 {
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     //Trying to get onvif URLs
     CapabilitiesReq request;

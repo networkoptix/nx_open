@@ -388,8 +388,7 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
 
-        auto optAuth = m_camera->getAuth();
-        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+        QAuthenticator auth = m_camera->getAuth();
 
         ui->loginEdit->setText(auth.user());
         ui->passwordEdit->setText(auth.password());

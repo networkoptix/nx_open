@@ -250,9 +250,9 @@ void QnActiResourceSearcher::processPacket(
     if( existingRes )
     {
         cameraMAC = existingRes->getMAC();
-        auto optAuth = existingRes->getAuth();
-        if (optAuth)
-            cameraAuth = *optAuth;
+        auto auth = existingRes->getAuth();
+        if (!auth.isNull())
+            cameraAuth = auth;
     }
 
     if( cameraMAC.isNull() || isNx )

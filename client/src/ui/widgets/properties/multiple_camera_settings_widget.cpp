@@ -161,8 +161,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
     for(const QnVirtualCameraResourcePtr &camera: m_cameras)
     {
-        auto optAuth = camera->getAuth();
-        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+        QAuthenticator auth = camera->getAuth();
 
         QString cameraLogin = auth.user();
         if (!login.isEmpty() || !m_loginWasEmpty)
@@ -300,9 +299,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
                 for (const QnVirtualCameraResourcePtr &camera: m_cameras)
                 {
-                    auto optAuth = camera->getAuth();
-                    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
+                    QAuthenticator auth = camera->getAuth();
                     logins.insert(auth.user());
                     passwords.insert(auth.password());
                 }

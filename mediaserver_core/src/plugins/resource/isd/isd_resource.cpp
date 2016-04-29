@@ -45,8 +45,7 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     apiUrl.setUserName( auth.user());
     apiUrl.setPassword( auth.password() );
@@ -92,8 +91,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     QUrl apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+    QAuthenticator auth = getAuth();
 
     apiRequestUrl.setUserName( auth.user() );
     apiRequestUrl.setPassword( auth.password() );

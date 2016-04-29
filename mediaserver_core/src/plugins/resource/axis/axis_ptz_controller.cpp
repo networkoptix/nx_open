@@ -192,14 +192,11 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
 
 CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const
 {
-    auto optAuth = m_resource->getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
     return new CLSimpleHTTPClient(
         m_resource->getHostAddress(), 
         QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 
         m_resource->getNetworkTimeout(),  // TODO: #Elric use int in getNetworkTimeout
-        auth
+        m_resource->getAuth()
     );
 }
 
