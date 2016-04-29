@@ -30,6 +30,7 @@ ecs.db-wal
 *_tmp.py*
 donotrebuild
 vms.pro
+.idea
 
 .DS_Store
 Debug

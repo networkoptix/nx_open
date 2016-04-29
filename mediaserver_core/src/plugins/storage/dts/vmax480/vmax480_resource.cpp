@@ -135,11 +135,8 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     if (!httpPortStr.isEmpty())
         httpPort = httpPortStr.toInt();
 
-    auto optAuth = getAuth();
-    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
-
     CLSimpleHTTPClient client(url.host(), httpPort, 3000, QAuthenticator());
-    if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, auth))
+    if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, getAuth()))
         return CameraDiagnostics::CannotEstablishConnectionResult(httpPort);
 
     QnPhysicalCameraResource::initInternal();

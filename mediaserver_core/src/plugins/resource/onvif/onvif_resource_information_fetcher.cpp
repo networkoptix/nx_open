@@ -181,11 +181,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
-        auto optAuth = existResource->getAuth();
-        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+        QAuthenticator auth = existResource->getAuth();
 
-        soapWrapper.setLogin(auth.user());
-        soapWrapper.setPassword(auth.password());
+        if (!auth.isNull())
+        {
+            soapWrapper.setLogin(auth.user());
+            soapWrapper.setPassword(auth.password());
+        }
     }
     else if (!info.defaultLogin.isEmpty()) {
         soapWrapper.setLogin(info.defaultLogin);

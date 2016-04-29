@@ -18,13 +18,14 @@ namespace {
 
 QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
 {
-    const auto& context = frame->context;
-    QSize result;
-    switch (context->getCodecId())
+    switch (frame->context->getCodecId())
     {
         case CODEC_ID_H264:
+        {
+            QSize result;
             extractSpsPps(frame, &result, nullptr);
             return result;
+        }
         case CODEC_ID_MJPEG:
         {
             nx_jpg::ImageInfo imgInfo;
@@ -32,7 +33,7 @@ QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
             return QSize(imgInfo.width, imgInfo.height);
         }
         default:
-            return result;
+            return QSize();
     }
 }
 
@@ -184,7 +185,7 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder.reset();
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, QSize(frame->width, frame->height));
+            frame->compressionType, frameInfo.size);
         d->decoderFrameOffset = d->frameNumber;
         d->prevFrameInfo = frameInfo;
         d->clearMetadata();

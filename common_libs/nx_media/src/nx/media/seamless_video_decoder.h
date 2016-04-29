@@ -13,11 +13,13 @@ class SeamlessVideoDecoderPrivate;
 
 /**
  * This class encapsulates common logic related to any video decoder. It guarantees seamless
- * decoding in case a compressed frame has changed resolution or codecId. VideoDecoder uses 
- * PhysicalDecoderFactory to instantiate compatible PhysicalDecoder to decode next frame if
+ * decoding in case a compressed frame has changed resolution or codecId. VideoDecoder uses
+ * VideoDecoderFactory to instantiate compatible VideoDecoder to decode next frame if
  * video parameters have changed.
  */
-class SeamlessVideoDecoder: public QObject
+class SeamlessVideoDecoder
+:
+    public QObject
 {
     Q_OBJECT
 

@@ -9,11 +9,6 @@
 
 #include "warnings.h"
 
-/**
- * Same as FF_INPUT_BUFFER_PADDING_SIZE.
- */
-#define QN_BYTE_ARRAY_PADDING 16
-
 //#define CALC_QnByteArray_ALLOCATION
 #ifdef CALC_QnByteArray_ALLOCATION
 QAtomicInt QnByteArray_bytesAllocated;
