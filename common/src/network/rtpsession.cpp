@@ -1903,7 +1903,7 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
         if( !readTextResponce(responseBuf) )
             return false;
 
-        nx_http::RtspResponse response;
+        nx_rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
             return false;
         m_responseCode = response.statusLine.statusCode;

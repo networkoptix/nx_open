@@ -450,7 +450,7 @@ namespace nx_http
         const ConstBufferRefType& data,
         MessageType* message,
         MessageLineType MessageType::*messageLine,
-        bool parseHeadersNonStrict = false)
+        bool parseHeadersNonStrict)
     {
         enum ParseState
         {
@@ -608,10 +608,6 @@ namespace nx_http
         return buf;
     }
 
-    bool RtspResponse::parse(const ConstBufferRefType &data)
-    {
-        return parseRequestOrResponse( data, (Response*)this, &Response::statusLine, true );
-    }
 
     namespace MessageType
     {
