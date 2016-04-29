@@ -196,7 +196,7 @@ namespace ec2
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
-        /**%apidoc POST saveServerUserAttributes
+        /**%apidoc POST /ec2/saveServerUserAttributes
          * Save user attributes of a server.
          * <p>
          * Parameters should be passed as a JSON object in POST message body with
