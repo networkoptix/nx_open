@@ -39,7 +39,6 @@ function isMobile() {
 
 function openDiscoveredSession(_host, _port, _systemName)
 {
-    stackView.setScaleTransition()
     stackView.push(
             Qt.resolvedUrl("items/QnLoginPage.qml"),
             {
@@ -54,7 +53,6 @@ function openDiscoveredSession(_host, _port, _systemName)
 
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName)
 {
-    stackView.setScaleTransition()
     stackView.push(
             Qt.resolvedUrl("items/QnLoginPage.qml"),
             {
@@ -95,7 +93,6 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
                 state: "FailedSaved"
             }
         })
-        stackView.setScaleTransition()
         stackView.push(pushList)
         item = stackView.get(stackView.depth - 1)
     } else {
@@ -124,13 +121,10 @@ function gotoNewSession() {
 
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
-    if (item) {
-        stackView.setScaleTransition()
+    if (item)
         stackView.pop(item)
-    } else {
-        stackView.setInvertedSlideTransition()
+    else
         stackView.push(loginPageComponent)
-    }
 }
 
 function gotoResources() {
@@ -139,9 +133,6 @@ function gotoResources() {
 }
 
 function gotoMainScreen() {
-    if (activeResourceId)
-        stackView.setScaleTransition()
-
     activeResourceId = ""
 
     exitFullscreen()
@@ -156,12 +147,11 @@ function openMediaResource(uuid, xHint, yHint, initialScreenshot) {
     mainWindow.activeResourceId = uuid
     mainWindow.initialResourceScreenshot = initialScreenshot
 
-    stackView.setScaleTransition(xHint, yHint)
+    stackView.setScaleTransitionHint(xHint, yHint)
     stackView.push(videoPlayerComponent)
 }
 
 function openSettings() {
-    stackView.setScaleTransition()
     stackView.push(settingsPageComponent)
 }
 

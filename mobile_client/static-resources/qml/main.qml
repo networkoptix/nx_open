@@ -137,7 +137,6 @@ ApplicationWindow
                 if (stackView.currentItem.objectName == "newConnectionPage" ||
                     stackView.currentItem.objectName == "loginPage")
                 {
-                    stackView.setFadeTransition()
                     Main.gotoResources()
                 }
 
