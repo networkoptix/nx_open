@@ -7,10 +7,11 @@
 namespace nx {
 namespace media {
 
-namespace
-{
-    static QMutex mutex;
-}
+namespace {
+
+static QMutex mutex;
+
+} // namespace
 
 VideoDecoderRegistry* VideoDecoderRegistry::instance()
 {
@@ -26,24 +27,24 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     static std::map<AbstractVideoDecoder*, Metadata*> decodersInUse;
     for (auto& plugin: m_plugins)
     {
-        if (plugin.isCompatible(codec, resolution) && plugin.useCount < plugin.maxUseCount)
+        if (plugin.useCount < plugin.maxUseCount && plugin.isCompatible(codec, resolution))
         {
-            auto result = VideoDecoderPtr(plugin.instance(), [](AbstractVideoDecoder* decoder)
-            {
-                QMutexLocker lock(&mutex);
-                auto itr = decodersInUse.find(decoder);
-                if (itr != decodersInUse.end())
+            auto videoDecoder = VideoDecoderPtr(
+                plugin.createVideoDecoder(plugin.allocator, resolution),
+                [](AbstractVideoDecoder* decoder)
                 {
-                    --itr->second->useCount;
-                    decodersInUse.erase(itr);
-                }
-                delete decoder;
-            });
+                    QMutexLocker lock(&mutex);
+                    auto itr = decodersInUse.find(decoder);
+                    if (itr != decodersInUse.end())
+                    {
+                        --itr->second->useCount;
+                        decodersInUse.erase(itr);
+                    }
+                    delete decoder;
+                });
             ++plugin.useCount;
-            decodersInUse[result.get()] = &plugin;
-            if (plugin.allocator)
-                result->setAllocator(plugin.allocator.get());
-            return result;
+            decodersInUse[videoDecoder.get()] = &plugin;
+            return videoDecoder;
         }
     }
     return VideoDecoderPtr(nullptr, nullptr); //< no compatible decoder found

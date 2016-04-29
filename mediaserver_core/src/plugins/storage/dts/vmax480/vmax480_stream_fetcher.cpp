@@ -174,11 +174,10 @@ bool VMaxStreamFetcher::vmaxConnect()
             m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
 
         if (m_vmaxConnection) {
-            auto optAuth = m_res->getAuth();
             m_vmaxConnection->vMaxConnect(
                 m_res->getUrl(),
                 getCurrentChannelMask(),
-                optAuth ? *optAuth : QAuthenticator(),
+                m_res->getAuth(),
                 m_isLive);
             return true;
         }

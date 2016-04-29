@@ -20,7 +20,7 @@ class FfmpegVideoDecoderPrivate;
 class FfmpegVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    FfmpegVideoDecoder();
+    FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
     virtual ~FfmpegVideoDecoder();
 
     static bool isCompatible(const CodecID codec, const QSize& resolution);

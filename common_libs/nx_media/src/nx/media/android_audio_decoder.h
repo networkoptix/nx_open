@@ -1,8 +1,7 @@
 #pragma once
+#if defined(Q_OS_ANDROID)
 
 #include <QtCore/QObject>
-
-#if defined(Q_OS_ANDROID)
 
 #include <nx/streaming/audio_data_packet.h>
 
@@ -11,24 +10,28 @@
 namespace nx {
 namespace media {
 
-/*
-* This class implements hardware android video decoder
-*/
 class AndroidAudioDecoderPrivate;
-class AndroidAudioDecoder : public AbstractAudioDecoder
+
+/**
+ * Implements hardware android audio decoder.
+ */
+class AndroidAudioDecoder
+:
+    public AbstractAudioDecoder
 {
 public:
     AndroidAudioDecoder();
     virtual ~AndroidAudioDecoder();
 
     static bool isCompatible(const CodecID codec);
-    virtual bool decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame) override;
+    virtual bool decode(
+        const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame) override;
 private:
     QScopedPointer<AndroidAudioDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(AndroidAudioDecoder);
 };
 
-}
-}
+} // namespace media
+} // namespace nx
 
-#endif // #defined(Q_OS_ANDROID)
+#endif // Q_OS_ANDROID

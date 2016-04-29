@@ -1,7 +1,5 @@
 #include "resource_allocator.h"
 
-#if defined(Q_OS_ANDROID)
-
 ResourceAllocator::ResourceAllocator(QQuickWindow *window):
     nx::media::AbstractResourceAllocator(),
     m_window(window),
@@ -21,6 +19,19 @@ void ResourceAllocator::at_execLambda()
     }
 }
 
+void ResourceAllocator::at_execLambdaAsync()
+{
+    QMutexLocker lock(&m_mutex);
+    while (!m_lambdasAsync.empty())
+    {
+        auto lambda = m_lambdasAsync.front();
+        m_lambdasAsync.pop_front();
+        lock.unlock();
+        lambda();
+        lock.relock();
+    }
+}
+
 void ResourceAllocator::execAtGlThread(std::function<void (void*)> lambda, void* opaque)
 {
     if (!m_connected)
@@ -37,4 +48,15 @@ void ResourceAllocator::execAtGlThread(std::function<void (void*)> lambda, void*
         m_waitCond.wait(&m_mutex);
 }
 
-#endif // #if defined(Q_OS_ANDROID)
+void ResourceAllocator::execAtGlThreadAsync(std::function<void()> lambda)
+{
+    if (!m_connected)
+    {
+        m_connected = true;
+        connect(m_window, &QQuickWindow::beforeSynchronizing, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
+        connect(m_window, &QQuickWindow::frameSwapped, this, &ResourceAllocator::at_execLambdaAsync, Qt::DirectConnection);
+    }
+
+    QMutexLocker lock(&m_mutex);
+    m_lambdasAsync.push_back(lambda);
+}
