@@ -450,8 +450,9 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
         if (record.isBackup)
             showWarningLabelIfNeeded();
     }
-    else if (index.column() == QnStorageListModel::CheckBoxColumn) {
-        if (index.data(Qt::CheckStateRole) == Qt::Unchecked && hasChanges())
+    else if (index.column() == QnStorageListModel::CheckBoxColumn)
+    {
+        if (index.data(Qt::CheckStateRole).toInt() == Qt::Unchecked && hasChanges())
             ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageStoragesWarning);
         else if (!hasChanges())
             ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);

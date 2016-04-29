@@ -9,8 +9,6 @@
 
 namespace
 {
-    const QVariant kChecked = Qt::Checked;
-    const QVariant kUnchecked = Qt::Unchecked;
     const QVector<int> kCheckRoles({ Qt::CheckStateRole });
 
     QItemSelectionModel::SelectionFlags entireRow(QItemSelectionModel::SelectionFlags flags)
@@ -187,14 +185,14 @@ void QnCheckableTableView::selectionChanged(const QItemSelection& selected, cons
         for (auto range : deselected)
         {
             for (auto row = range.top(); row <= range.bottom(); ++row)
-                dataModel->setData(dataModel->index(row, m_checkboxColumn), kUnchecked, Qt::CheckStateRole);
+                dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Unchecked, Qt::CheckStateRole);
         }
 
         /* Check selected: */
         for (auto range : selected)
         {
             for (auto row = range.top(); row <= range.bottom(); ++row)
-                dataModel->setData(dataModel->index(row, m_checkboxColumn), kChecked, Qt::CheckStateRole);
+                dataModel->setData(dataModel->index(row, m_checkboxColumn), Qt::Checked, Qt::CheckStateRole);
         }
 
         blocker.unblock();
