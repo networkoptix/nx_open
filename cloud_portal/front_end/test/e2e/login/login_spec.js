@@ -19,27 +19,21 @@ describe('Login dialog', function () {
     });
 
     it("allows to log in with existing credentials and to log out", function () {
-
-        browser.ignoreSynchronization = false;
         p.get();
         p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.login();
-        p.logout();
+        p.helper.logout();
     });
 
     it("redirects to Systems after login", function () {
-        p.get();
-
-        p.emailInput.sendKeys(p.helper.userEmail);
-        p.passwordInput.sendKeys(p.helper.userPassword);
-        p.login();
+        p.helper.login();
 
         // Check that user is on page Systems
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(p.htmlBody.getText()).toContain('Systems');
 
-        p.logout();
+        p.helper.logout();
     });
 
     it("; after login, display user's email and menu in top right corner", function () {
@@ -59,7 +53,7 @@ describe('Login dialog', function () {
         expect(p.userAccountDropdownMenu.getText()).toContain('Logout');
         p.userAccountDropdownToggle.click();
 
-        p.logout();
+        p.helper.logout();
     });
 
     p.alert.checkAlert(function(){
@@ -197,7 +191,7 @@ describe('Login dialog', function () {
         expect(p.rememberCheckbox.getAttribute('class')).not.toContain('ng-not-empty'); // verify that it is really really switched off
 
         p.login();
-        p.logout();
+        p.helper.logout();
     });
 
     it("contains \'I forgot password\' link that leads to Restore Password page with pre-filled email from login form", function () {
@@ -270,10 +264,6 @@ describe('Login dialog', function () {
         });
     });
 
-    xit("locks account after several failed attempts", function () {
-        expect("functionality").toBe("implemented");
-    });
-
     it("requires login, if the user has just logged out and pressed back button in browser", function () {
         p.helper.login();
         p.helper.logout();
@@ -282,13 +272,13 @@ describe('Login dialog', function () {
         expect(p.loginDialog.isDisplayed()).toBe(true);
     });
 
-    xit("handles more than 256 symbols email and password", function() {
-        /*
-         Use email with 256 symbols
-         Use email with more than 256 symbols
-         Use password with 256 symbols
-         Use password with much more than 256 symbols
-         */
+    it("handles more than 256 symbols email and password", function() {
+        p.get();
+        p.emailInput.clear().sendKeys(p.helper.inputLong300);
+        p.passwordInput.clear().sendKeys(p.helper.inputLong300);
+        p.dialogLoginButton.click();
+        expect(p.emailInput.getAttribute('value')).toMatch(p.helper.inputLongCut);
+        expect(p.passwordInput.getAttribute('value')).toMatch(p.helper.inputLongCut);
     });
 
     it(": logout refreshes page", function() {
@@ -362,6 +352,42 @@ describe('Login dialog', function () {
             browser.switchTo().window(newWindow).then(function () {
                 browser.refresh();
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+            });
+        });
+    });
+
+    it("handles two tabs, rejects navigation on second tab if logout is done on first", function() {
+        var termsConditions = element(by.linkText('Terms and Conditions'));
+        // Open Terms and Conditions link allows to open new tab. Opening new browser Tab is not supported in Selenium
+        p.helper.get(p.helper.urls.register);
+        termsConditions.click();
+        p.helper.login();
+
+        // Switch to the new tab
+        browser.getAllWindowHandles().then(function (handles) {
+            var oldWindow = handles[0];
+            var newWindow = handles[1];
+            browser.switchTo().window(newWindow).then(function () {
+                browser.refresh();
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
+                p.helper.logout();
+            });
+            browser.switchTo().window(oldWindow).then(function () {
+                expect(p.userAccountDropdownToggle.isPresent()).toBe(true);
+
+                // Go to account page
+                p.userAccountDropdownToggle.click();
+                p.accountLink.click();
+                expect(p.loginDialog.isPresent()).toBe(true);
+
+                // Go to change password page
+                p.userAccountDropdownToggle.click();
+                p.changePassLink.click();
+                expect(p.loginDialog.isPresent()).toBe(true);
+
+                // Open systems page
+                p.helper.get(p.helper.urls.systems);
+                expect(p.loginDialog.isPresent()).toBe(true);
             });
         });
     });

@@ -9,8 +9,6 @@ LoginPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
-    var self = this;
-
     this.get = function () {
         browser.get('/');
         browser.waitForAngular();
@@ -53,7 +51,8 @@ LoginPage = function () {
     this.navbar = element(by.css('header')).element(by.css('.navbar'));
     this.userAccountDropdownToggle = this.navbar.element(by.css('a[uib-dropdown-toggle]'));
     this.userAccountDropdownMenu = this.navbar.element(by.css('[uib-dropdown-menu]'));
-    this.userLogoutLink = this.userAccountDropdownMenu.element(by.linkText('Logout'));
+    this.accountLink = this.userAccountDropdownMenu.element(by.linkText('Account Settings'));
+    this.changePassLink = this.userAccountDropdownMenu.element(by.linkText('Change Password'));
 
     this.rememberCheckbox = element(by.model('auth.remember'));
     this.iForgotPasswordLink = element(by.linkText('I forgot my password'));
@@ -70,19 +69,6 @@ LoginPage = function () {
 
         // Check that element that is visible only for authorized user is displayed on page
         expect(this.loginSuccessElement.isDisplayed()).toBe(true);
-    };
-    this.logout = function () {
-        expect(this.userAccountDropdownToggle.isDisplayed()).toBe(true);
-        this.userAccountDropdownToggle.getText().then(function(text) {
-            if(self.helper.isSubstr(text, 'noptixqa')) {
-                self.userAccountDropdownToggle.click();
-                self.userLogoutLink.click();
-                browser.sleep(500); // such a shame, but I can't solve it right now
-
-                // Check that element that is visible only for authorized user is NOT displayed on page
-                expect(self.loginSuccessElement.isDisplayed()).toBe(false);
-            }
-        });
     };
 };
 
