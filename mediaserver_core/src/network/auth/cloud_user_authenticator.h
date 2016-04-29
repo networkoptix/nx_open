@@ -18,11 +18,13 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <utils/common/safe_direct_connection.h>
+#include <utils/common/subscription.h>
 
 #include "abstract_user_data_provider.h"
 
 
 class CdbNonceFetcher;
+class CloudConnectionManager;
 
 //!Add support for authentication using cloud account credentials
 class CloudUserAuthenticator
@@ -35,6 +37,7 @@ public:
         \param defaultAuthenticator Used to authenticate requests with local user credentials
     */
     CloudUserAuthenticator(
+        CloudConnectionManager* const cloudConnectionManager,
         std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
         const CdbNonceFetcher& cdbNonceFetcher);
     ~CloudUserAuthenticator();
@@ -68,6 +71,7 @@ private:
         }
     };
 
+    CloudConnectionManager* const m_cloudConnectionManager;
     std::unique_ptr<AbstractUserDataProvider> m_defaultAuthenticator;
     const CdbNonceFetcher& m_cdbNonceFetcher;
     mutable QnMutex m_mutex;
@@ -79,6 +83,7 @@ private:
     QElapsedTimer m_monotonicClock;
     //!set<pair<username, nonce>, auth_data>
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
+    nx::utils::SubscriptionId m_systemAccessListUpdatedSubscriptionId;
 
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
@@ -96,6 +101,7 @@ private:
         nx_http::HttpHeaders* const responseHeaders,
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authorizationHeader) const;
+    void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
 
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);

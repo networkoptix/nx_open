@@ -33,6 +33,10 @@ namespace cdb {
 */
 namespace api {
 
+class SystemAccessListModifiedEvent
+{
+};
+
 class Connection
 {
 public:
@@ -51,6 +55,29 @@ public:
         const std::string& password) = 0;
     //!Pings cloud_db with current creentials
     virtual void ping(std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler) = 0;
+};
+
+class SystemEventHandlers
+{
+public:
+    std::function<void(SystemAccessListModifiedEvent)> onSystemAccessListUpdated;
+};
+
+/**
+    \note Can be safely removed 
+*/
+class EventConnection
+{
+public:
+    /** If event handler is running in another thread, blocks until handler has returned */
+    virtual ~EventConnection() {}
+
+    /**
+        @param completionHandler Used to report result. Can be \a nullptr
+    */
+    virtual void start(
+        SystemEventHandlers eventHandlers,
+        std::function<void (ResultCode)> completionHandler) = 0;
 };
 
 //!
@@ -72,6 +99,9 @@ public:
         \note No connection to cloud is performed in this method!
     */
     virtual std::unique_ptr<api::Connection> createConnection(
+        const std::string& login,
+        const std::string& password) = 0;
+    virtual std::unique_ptr<api::EventConnection> createEventConnection(
         const std::string& login,
         const std::string& password) = 0;
     //!Returns text description of \a resultCode

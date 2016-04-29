@@ -28,6 +28,7 @@
 
 
 struct QnLdapDigestAuthContext;
+class CloudConnectionManager;
 
 class QnAuthHelper
 :
@@ -39,11 +40,16 @@ class QnAuthHelper
 public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
-    QnAuthHelper();
+    QnAuthHelper(CloudConnectionManager* const cloudConnectionManager);
     virtual ~QnAuthHelper();
 
     //!Authenticates request on server side
-    Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
+    Qn::AuthResult authenticate(
+        const nx_http::Request& request,
+        nx_http::Response& response,
+        bool isProxy = false,
+        QnUuid* authUserId = 0,
+        AuthMethod::Value* usedAuthMethod = 0);
 
     QnAuthMethodRestrictionList* restrictionList();
 

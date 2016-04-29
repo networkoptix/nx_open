@@ -32,6 +32,9 @@ public:
     virtual std::unique_ptr<api::Connection> createConnection(
         const std::string& login,
         const std::string& password) override;
+    virtual std::unique_ptr<api::EventConnection> createEventConnection(
+        const std::string& login,
+        const std::string& password) override;
     //!Implementation of \a api::ConnectionFactory::createConnection
     virtual std::string toString(api::ResultCode resultCode) const override;
 

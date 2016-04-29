@@ -1763,7 +1763,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
-    auto authHelper = std::make_unique<QnAuthHelper>();
+    auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
