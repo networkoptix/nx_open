@@ -270,7 +270,10 @@ void QnPlISDResourceSearcher::processPacket(
     if( existingRes )
     {
         cameraMAC = existingRes->getMAC();
-        cameraAuth = existingRes->getAuth();
+
+        auto optAuth = existingRes->getAuth();
+        if (optAuth)
+            cameraAuth = *optAuth;
     }
 
     createResource( devInfo, cameraMAC, auth, result );

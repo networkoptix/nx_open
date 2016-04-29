@@ -1,6 +1,7 @@
 #ifndef QN_NETWORK_RESOURCE_H
 #define QN_NETWORK_RESOURCE_H
 
+#include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 #include <nx/network/mac_address.h>
@@ -43,7 +44,7 @@ public:
     void setDefaultAuth(const QAuthenticator &auth);
 
     static QAuthenticator getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId);
-    QAuthenticator getAuth() const;
+    boost::optional<QAuthenticator> getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called
     bool isAuthenticated() const;

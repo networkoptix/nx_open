@@ -123,11 +123,15 @@ QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, cons
     return auth;
 }
 
-QAuthenticator QnNetworkResource::getAuth() const
+boost::optional<QAuthenticator> QnNetworkResource::getAuth() const
 {
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    if (value.isNull())
+        return boost::none;
+
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if( credentialsList.size() >= 1 )

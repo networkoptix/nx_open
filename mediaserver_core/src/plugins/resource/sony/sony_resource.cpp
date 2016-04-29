@@ -41,7 +41,8 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
     }
 
-    QAuthenticator auth(getAuth());
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
     QString login = auth.user();
     QString password = auth.password();
     std::string endpoint = getMediaUrl().toStdString();
@@ -133,11 +134,14 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     if( !hasCameraCapabilities(Qn::RelayInputCapability) )
         return result;
 
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
     CLSimpleHTTPClient http(
         getHostAddress(),
         QUrl(getUrl()).port(DEFAULT_HTTP_PORT),
         getNetworkTimeout(),
-        getAuth() );
+        auth );
     //turning on input monitoring
     CLHttpStatus status = http.doGET( QLatin1String("/command/system.cgi?AlarmData=on") );
     if( status % 100 != 2 )
@@ -165,7 +169,9 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
         m_inputMonitorHttpClient.reset();
     }
 
-    const QAuthenticator& auth = getAuth();
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_HTTP_PORT) );

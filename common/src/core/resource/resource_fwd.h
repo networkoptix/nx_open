@@ -139,6 +139,10 @@ class QnPlOnvifResource;
 typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 typedef QnSharedResourcePointerList<QnPlOnvifResource> QnPlOnvifResourceList;
 
+class QnArchiveCamResource;
+typedef QnSharedResourcePointer<QnArchiveCamResource> QnArchiveCamResourcePtr;
+typedef QnSharedResourcePointerList<QnArchiveCamResource> QnArchiveCamResourceList;
+
 class QnPlIsdResource;
 typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
