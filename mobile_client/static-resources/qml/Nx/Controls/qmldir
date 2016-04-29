@@ -5,3 +5,4 @@ ToolBar 1.0 ToolBar.qml
 SearchToolBar 1.0 SearchToolBar.qml
 PageTitleLabel 1.0 PageTitleLabel.qml
 Page 1.0 Page.qml
+MaterialEffect 1.0 MaterialEffect.qml
