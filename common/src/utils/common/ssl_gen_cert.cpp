@@ -2,8 +2,21 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 
+#if defined(Q_OS_WIN)
+    #ifdef __cplusplus
+    extern "C" {
+    #endif // __cplusplus
+    #include <openssl/applink.c>
+    #ifdef __cplusplus
+    }
+    #endif // __cplusplus
+#endif // Q_OS_WIN
+
 int generateSslCertificate(const char *outpath, const char *commonName, const char *country, const char *companyName)
 {
+    OpenSSL_add_all_algorithms();
+    CRYPTO_malloc_init();
+
     int returnValue = -1;
 
     EVP_PKEY * pkey = NULL;

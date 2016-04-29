@@ -6,6 +6,11 @@
 
 #include <utils/memory/abstract_allocator.h>
 
+/**
+ * Not less than FF_INPUT_BUFFER_PADDING_SIZE.
+ */
+#define QN_BYTE_ARRAY_PADDING 32
+
 class QByteArray;
 
 /**

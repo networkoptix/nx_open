@@ -63,11 +63,12 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
         return false;
     }
 
-    const auto& auth = getAuth();
-
     m_checkInputUrl = QUrl(getUrl());
     m_checkInputUrl.setScheme( lit("http") );
     m_checkInputUrl.setPath( lit("/cgi-x/get-digitalio") );
+
+    QAuthenticator auth = getAuth();
+
     m_checkInputUrl.setUserName( auth.user() );
     m_checkInputUrl.setPassword( auth.password() );
 

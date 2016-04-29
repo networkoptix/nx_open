@@ -1,6 +1,7 @@
 #ifndef QN_NETWORK_RESOURCE_H
 #define QN_NETWORK_RESOURCE_H
 
+#include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 #include <nx/network/mac_address.h>

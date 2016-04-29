@@ -238,10 +238,11 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     return QVariant();
 }
 
-bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role) {
-    if (column == QnBusiness::DisabledColumn && role == Qt::CheckStateRole) {
-        Qt::CheckState checked = (Qt::CheckState)value.toInt();
-        setDisabled(checked == Qt::Unchecked);
+bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role)
+{
+    if (column == QnBusiness::DisabledColumn && role == Qt::CheckStateRole)
+    {
+        setDisabled(value.toInt() == Qt::Unchecked);
         return true;
     }
 

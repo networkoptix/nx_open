@@ -16,6 +16,8 @@ namespaces_dict = {'ms' : ms_namespace}
 
 parent_map = {}
 arch = 'x64'
+qt_default_path = '%ENVIRONMENT%\\packages\\windows-{0}\\qt-5.6.0'
+qt_path = ''
 
 def indent(elem, level=0):
     i = "\n" + level*"  "
@@ -117,13 +119,13 @@ def fix_qrc(root):
 def add_qt_path(root):
     """Adding runtime path to QT libs."""
     #xpath = "./Project/PropertyGroup"
-
-    print "Adding path to QT libs"
+   
+    print "Adding path to QT libs: {}".format(qt_path)
     target = Element('PropertyGroup')
     root.insert(3, target)
     
     env = Element('LocalDebuggerEnvironment')
-    env.text= 'PATH=%ENVIRONMENT%\\packages\\windows-{0}\\qt-5.6.0\\bin$(LocalDebuggerEnvironment)'.format(arch)
+    env.text= 'PATH={0}\\bin$(LocalDebuggerEnvironment)'.format(qt_path)
     target.append(env)
     indent(target, 1)
             
@@ -145,11 +147,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('project', type=str, help='Project to be patched.')
     parser.add_argument('-a', '--arch', help='Target architecture.')
+    parser.add_argument('-q', '--qt-dir', help='Path to Qt.')
     args = parser.parse_args()
     
     if args.arch:
         global arch
         arch = args.arch
+    
+    global qt_path
+    if args.qt_dir:
+        qt_path = args.qt_dir.replace('/', '\\')
+    else:
+        qt_path = qt_default_path.format(arch)
     
     patch_project(args.project)
 

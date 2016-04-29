@@ -117,8 +117,11 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/axis-cgi/param.cgi") );
     apiUrl.setQuery( lit("action=list&group=root.Network.eth0.MACAddress") );
 
@@ -191,7 +194,7 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
 
     //based on VAPIX Version 3 I/O Port API
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
@@ -395,9 +398,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
+    QAuthenticator auth = getAuth();
+
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
         if (status == CL_HTTP_SUCCESS) {
             QByteArray firmware;
@@ -410,7 +415,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     if (hasVideo(0))
     {
         // enable send motion into H.264 stream
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=").append(isAudioEnabled() ? "yes" : "no"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
@@ -423,7 +428,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     {
         //reading RTSP port
-        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), getAuth() );
+        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), auth );
         CLHttpStatus status = http.doGET( QByteArray( "axis-cgi/param.cgi?action=list&group=Network.RTSP.Port" ) );
         if( status != CL_HTTP_SUCCESS )
         {
@@ -442,7 +447,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     readMotionInfo();
 
     // determin camera max resolution
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
@@ -748,7 +753,7 @@ bool QnPlAxisResource::setRelayOutputState(
         cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "");
     }
 
-    CLSimpleHTTPClient httpClient( getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth() );
+    CLSimpleHTTPClient httpClient( getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
 
     //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I0.Configurable");
     //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1.Output.Name");
@@ -1292,7 +1297,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
 
     //based on VAPIX Version 3 I/O Port API
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );

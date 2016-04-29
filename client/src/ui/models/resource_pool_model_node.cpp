@@ -33,7 +33,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     m_parent(NULL),
     m_status(Qn::Online),
     m_modified(false),
-    m_checked(Qt::Unchecked)
+    m_checkState(Qt::Unchecked)
 {
     NX_ASSERT(type == Qn::LocalNode ||
            type == Qn::ServersNode ||
@@ -105,7 +105,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_parent(NULL),
     m_status(Qn::Offline),
     m_modified(false),
-    m_checked(Qt::Unchecked)
+    m_checkState(Qt::Unchecked)
 {
     NX_ASSERT(model != NULL);
     NX_ASSERT(nodeType == Qn::ResourceNode ||
@@ -128,7 +128,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_parent(NULL),
     m_status(Qn::Offline),
     m_modified(false),
-    m_checked(Qt::Unchecked)
+    m_checkState(Qt::Unchecked)
 {
     NX_ASSERT(model != NULL);
 
@@ -522,7 +522,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         break;
     case Qt::CheckStateRole:
         if (column == Qn::CheckColumn)
-            return m_checked;
+            return m_checkState;
         break;
     case Qn::ResourceRole:
         if(m_resource)
@@ -589,8 +589,9 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
 }
 
 bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int column) {
-    if (column == Qn::CheckColumn && role == Qt::CheckStateRole){
-        m_checked = (Qt::CheckState)value.toInt();
+    if (column == Qn::CheckColumn && role == Qt::CheckStateRole)
+    {
+        m_checkState = static_cast<Qt::CheckState>(value.toInt());
         changeInternal();
         return true;
     }

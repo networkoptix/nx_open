@@ -87,7 +87,8 @@ SocketAddress QnAxisAudioTransmitter::getSocketAddress() const
 
 QByteArray QnAxisAudioTransmitter::buildTransmitRequest() const
 {
-    auto  auth = m_resource->getAuth();
+    QAuthenticator auth = m_resource->getAuth();
+
     QByteArray transmitRequest;
     SocketAddress sockAddr = getSocketAddress();
 

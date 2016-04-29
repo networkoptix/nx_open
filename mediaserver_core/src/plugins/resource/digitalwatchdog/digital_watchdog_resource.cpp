@@ -139,10 +139,12 @@ void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvanced
     base_type::initAdvancedParametersProviders(params);
 
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QAuthenticator auth = getAuth();
+
     if (resourceData.value<bool>(lit("dw-pravis-chipset")))
-        m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
+        m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), auth));
     else
-        m_cameraProxy.reset(new QnWin4NetCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
+        m_cameraProxy.reset(new QnWin4NetCameraProxy(getHostAddress(), 80, getNetworkTimeout(), auth));
     m_cameraProxy->setCameraAdvancedParams(params);
 }
 
@@ -160,7 +162,7 @@ void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
 }
 
 QString QnDigitalWatchdogResource::fetchCameraModel() {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     //TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
