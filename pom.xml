@@ -38,6 +38,7 @@
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
+        <nx_bpi_videonode_plugin.guid>{5e528d46-180a-4ea2-85b0-eeccef76ef79}</nx_bpi_videonode_plugin.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
@@ -384,14 +385,12 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/cloud_connectivity_ut</module>
-                <!--<module>unit_tests/cloud_db_ut</module>-->
                 <module>unit_tests/common_ut</module>
+                <module>unit_tests/cloud_connectivity_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
+                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <module>unit_tests/mediaserver_core_ut</module>
                 <module>unit_tests/nx_network_ut</module>
-                <module>unit_tests/utils_ut</module>
-                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
@@ -457,6 +456,7 @@
         </profile>
         <profile>
             <id>windows</id>
+	    
             <activation>
                 <os>
                     <family>Windows</family>
@@ -490,6 +490,11 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
             </properties>
+
+            <modules>
+                <module>common_libs/nx_bpi_videonode_plugin</module>
+            </modules>
+
         </profile>
         <profile>
             <id>windows-x86</id>
@@ -506,7 +511,7 @@
             <properties>
                 <machine.type>X86</machine.type>
             </properties>
-        </profile>
+        </profile>        
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -812,12 +817,15 @@
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
                 <qt.spec/>
-                <!-- TODO get rid of this variable. We already have corresponding package name in common/pom.xml -->
-                <gcc.version>4.8.3</gcc.version>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
-                <module>edge_firmware/rpi</module>
+                <module>common_libs/nx_bpi_videonode_plugin</module>
+                <!--module>edge_firmware/rpi</module-->
+                <module>client.core</module>
+                <module>common_libs/nx_media</module>
+                <module>common_libs/nx_audio</module>
+                <module>mobile_client</module>
             </modules>
         </profile>
         <profile>
@@ -896,7 +904,6 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
-                <qt.spec>linux-g++-4.9-64</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -915,8 +922,7 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-                <target.arch>i386</target.arch>
-                <qt.spec>linux-g++-4.9-32</qt.spec>
+        <target.arch>i386</target.arch>
             </properties>
         </profile>
         <profile>
@@ -1016,8 +1022,9 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
+                <qt.version>5.5.1</qt.version>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2g</openssl.version>
+                <openssl.version>1.0.2d</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <compile.option1/>
                 <rdep.target>android-${arch}</rdep.target>
@@ -1100,11 +1107,11 @@
                 <property>
                     <name>test</name>
                     <value>true</value>
-                </property>
+                </property>                
             </activation>
             <modules>
                 <module>unit_tests</module>
             </modules>
-        </profile>
+        </profile>        
     </profiles>
 </project>

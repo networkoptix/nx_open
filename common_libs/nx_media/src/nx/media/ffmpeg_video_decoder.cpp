@@ -11,6 +11,8 @@ extern "C" {
 
 #include "aligned_mem_video_buffer.h"
 
+#include <QtCore/QFile>
+
 namespace nx {
 namespace media {
 
@@ -92,6 +94,8 @@ public:
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+
+    QByteArray testData;
 };
 
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -121,12 +125,15 @@ void FfmpegVideoDecoderPrivate::closeCodecContext()
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-FfmpegVideoDecoder::FfmpegVideoDecoder()
+FfmpegVideoDecoder::FfmpegVideoDecoder(
+    const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
 {
+    QN_UNUSED(allocator, resolution);
     static InitFfmpegLib init;
+    QN_UNUSED(init);
 }
 
 FfmpegVideoDecoder::~FfmpegVideoDecoder()
@@ -140,33 +147,38 @@ bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resoluti
     return true;
 }
 
-int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+int FfmpegVideoDecoder::decode(
+    const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {
     Q_D(FfmpegVideoDecoder);
 
     if (!d->codecContext)
     {
-        d->initContext(frame);
+        d->initContext(compressedVideoData);
         if (!d->codecContext)
             return -1;
     }
 
     AVPacket avpkt;
     av_init_packet(&avpkt);
-    if (frame)
+    if (compressedVideoData)
     {
-        avpkt.data = (unsigned char*) frame->data();
-        avpkt.size = static_cast<int>(frame->dataSize());
-        avpkt.dts = avpkt.pts = frame->timestamp;
-        if (frame->flags & QnAbstractMediaData::MediaFlags_AVKey)
+        avpkt.data = (unsigned char*) compressedVideoData->data();
+        avpkt.size = static_cast<int>(compressedVideoData->dataSize());
+        avpkt.dts = avpkt.pts = compressedVideoData->timestamp;
+        if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
         // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
+        {
+            static_assert(QN_BYTE_ARRAY_PADDING >= FF_INPUT_BUFFER_PADDING_SIZE,
+                "FfmpegVideoDecoder: Insufficient padding size");
             memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+        }
 
-        d->lastPts = frame->timestamp;
+        d->lastPts = compressedVideoData->timestamp;
     }
     else
     {
@@ -178,12 +190,12 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVide
         avpkt.size = 0;
     }
 
-    int gotData = 0;
-    avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
-    if (gotData <= 0)
-        return gotData; //< Negative value means error. Zero value means buffering.
+    int gotPicture = 0;
+    int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
+    if (res <= 0 || !gotPicture)
+        return res; //< Negative value means error, zero means buffering.
 
-    ffmpegToQtVideoFrame(result);
+    ffmpegToQtVideoFrame(outDecodedFrame);
     return d->frame->coded_picture_number;
 }
 
@@ -191,6 +203,31 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
 {
     Q_D(FfmpegVideoDecoder);
 
+#if 0
+    // test data
+    const QVideoFrame::PixelFormat Format_Tiled32x32NV12 = QVideoFrame::PixelFormat(QVideoFrame::Format_User + 17);
+
+    if (d->testData.isEmpty())
+    {
+        QFile file("f:\\yuv_frames\\frame_1920x1080_26_native.dat");
+        file.open(QIODevice::ReadOnly);
+        d->testData = file.readAll();
+    }
+
+    quint8* srcData[4];
+    srcData[0] = (quint8*) d->testData.data();
+    srcData[1] = srcData[0] + qPower2Ceil((unsigned) d->frame->width, 32) * qPower2Ceil((unsigned) d->frame->height, 32);
+
+    int srcLineSize[4];
+    srcLineSize[0] = srcLineSize[1] = qPower2Ceil((unsigned) d->frame->width, 32);
+
+    auto alignedBuffer = new AlignedMemVideoBuffer(srcData, srcLineSize, 2); //< two planes buffer
+    auto videoFrame = new QVideoFrame(alignedBuffer, QSize(d->frame->width, d->frame->height), Format_Tiled32x32NV12);
+
+    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
+    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
+
+#else
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
     const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, d->frame->height);
     const int lineSize = alignedWidth;
@@ -208,20 +245,21 @@ void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
     dstData[0] = buffer;
     dstData[1] = buffer + lineSize * d->frame->height;
     dstData[2] = dstData[1] + lineSize * d->frame->height / 4;
-    
+
     for (int i = 0; i < 3; ++i)
     {
         const int k = (i == 0 ? 0 : 1);
         copyPlane(
-            dstData[i], 
-            d->frame->data[i], 
-            d->frame->width >> k, 
-            lineSize >> k, 
-            d->frame->linesize[i], 
+            dstData[i],
+            d->frame->data[i],
+            d->frame->width >> k,
+            lineSize >> k,
+            d->frame->linesize[i],
             d->frame->height >> k);
     }
-    
+
     videoFrame->unmap();
+#endif
 
     result->reset(videoFrame);
 }

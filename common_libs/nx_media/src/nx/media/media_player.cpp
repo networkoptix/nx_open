@@ -126,10 +126,10 @@ public:
 
     // Live buffer overflow counter.
     int overflowCounter;
-    
+
     // Video quality
     Player::VideoQuality videoQuality;
-    
+
     // User-defined video resolution for custom quality
     QSize videoResolution;
 
@@ -264,7 +264,7 @@ void PlayerPrivate::presentNextFrameDelayed()
     {
         if (dataConsumer->audioOutput()->isBufferUnderflow())
         {
-            // If audio buffer is empty we have to display current video frame to unblock data stream 
+            // If audio buffer is empty we have to display current video frame to unblock data stream
             // and allow audio data to fill the buffer.
             presentNextFrame();
             return;
@@ -394,14 +394,22 @@ qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& fram
 qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
+    const qint64 ptsDelta = pts - ptsTimerBase;
     FrameMetadata metadata = FrameMetadata::deserialize(frame);
 
     // Calculate time to present next frame
     qint64 mediaQueueLen = usecToMsec(dataConsumer->queueVideoDurationUsec());
-    const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
+    const auto elapsed = ptsTimer.elapsed();
+    const int frameDelayMs = ptsDelta - elapsed;
     bool liveBufferUnderflow =
         liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
     bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
+
+    // TODO mike: REMOVE
+#if 0
+    if (frameDelayMs < 0)
+        qWarning() << "pts: " << pts << ", ptsDelta: " << ptsDelta << ", frameDelayMs: " << frameDelayMs;
+#endif // 0
 
     if (liveMode)
     {
@@ -565,7 +573,7 @@ void Player::setPosition(qint64 value)
     else
         d->positionMs = value;
     d->setLiveMode(value == kLivePosition);
-    
+
     d->at_hurryUp(); //< renew receiving frames
 }
 

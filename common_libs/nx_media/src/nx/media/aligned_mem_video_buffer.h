@@ -14,9 +14,10 @@ class AlignedMemVideoBufferPrivate;
 class AlignedMemVideoBuffer: public QAbstractVideoBuffer
 {
     Q_DECLARE_PRIVATE(AlignedMemVideoBuffer)
-    QScopedPointer<AlignedMemVideoBufferPrivate> d_ptr;
 public:
     AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine);
+    AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount);
+
     ~AlignedMemVideoBuffer();
 
     virtual MapMode mapMode() const override;
