@@ -68,10 +68,14 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/cgi-bin/system") );
-    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(getAuth().user()).arg(getAuth().password()) );
+    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(auth.user()).arg(auth.password()) );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
@@ -143,7 +147,10 @@ QByteArray QnActiResource::unquoteStr(const QByteArray& v)
 QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData, QString* const localAddress) const
 {
     QByteArray result;
-    status = makeActiRequest( getUrl(), getAuth(), group, command, keepAllData, &result, localAddress );
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    status = makeActiRequest( getUrl(), auth, group, command, keepAllData, &result, localAddress );
     return result;
 }
 
@@ -521,7 +528,8 @@ void QnActiResource::stopInputPortMonitoringAsync()
     }
     m_inputMonitored = false;
 
-    const QAuthenticator auth = getAuth();
+    auto optAuth = getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
     QUrl url = getUrl();
     url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();

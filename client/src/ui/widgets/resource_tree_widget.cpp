@@ -153,7 +153,7 @@ protected:
                 state = Qt::Unchecked;
 
         QModelIndex checkRoot = root.sibling(root.row(), Qn::CheckColumn);
-        if (checkRoot.data(Qt::CheckStateRole) == state)
+        if (checkRoot.data(Qt::CheckStateRole).toInt() == state)
             return;
         base_type::setData(checkRoot, state, Qt::CheckStateRole);
         setCheckStateRecursiveUp(root, state);
@@ -481,18 +481,21 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
     base_type::mousePressEvent(event);
 }
 
-void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
+void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index)
+{
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
         emit activated(resource);
 }
 
-void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index) {
+void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index)
+{
     if (!m_checkboxesVisible)
         return;
+
     QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
 
-    bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+    bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
     int inverted = checked ? Qt::Unchecked : Qt::Checked;
     m_resourceProxyModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
 }
@@ -516,13 +519,13 @@ void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index) {
         return; /* Will be processed by delegate. */
 
     QModelIndex checkIndex = index.sibling(index.row(), Qn::CheckColumn);
-    if(QAbstractItemModel *model = ui->resourcesTreeView->model()) {
+    if(QAbstractItemModel *model = ui->resourcesTreeView->model())
+    {
         int checkState = model->data(checkIndex, Qt::CheckStateRole).toInt();
-        if(checkState == Qt::Checked) {
+        if(checkState == Qt::Checked)
             checkState = Qt::Unchecked;
-        } else {
+        else
             checkState = Qt::Checked;
-        }
         model->setData(checkIndex, checkState, Qt::CheckStateRole);
     }
 }

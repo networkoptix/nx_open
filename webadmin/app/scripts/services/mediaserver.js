@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $log) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
@@ -426,6 +426,26 @@ angular.module('webadminApp')
                         return $http.post(this.debugFunctionUrl(url,getParams), postParams);
 
                 }
+            },
+            resolveNewSystemAndUser:function(){
+                var self = this;
+                var deferred = $q.defer();
+
+                this.getModuleInformation().then(function (r) {
+                    // check for safe mode and new server and redirect.
+                    if(r.data.reply.serverFlags.includes(Config.newServerFlag) && !r.data.reply.ecDbReadOnly){
+                        $location.path("/setup");
+                        deferred.resolve("setup");
+                        return;
+                    }
+                    self.getCurrentUser().then(function(){
+                        deferred.resolve(error);
+                    },function(error){
+                        deferred.reject(error);
+                    });
+                });
+
+                return deferred.promise;
             }
         };
     });

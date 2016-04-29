@@ -2,6 +2,30 @@
 
 const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 
+QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher()
+{
+    setDiscoveryMode(DiscoveryMode::disabled);
+}
+
+void QnArchiveCamResourceSearcher::pleaseStop()  {}
+
+QnResourceList QnArchiveCamResourceSearcher::findResources() { return QnResourceList(); }
+
+QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+{
+    static auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
+    if (resourceTypeId == archiveCamTypeId)
+        return QnArchiveCamResourcePtr(new QnArchiveCamResource);
+    return QnArchiveCamResourcePtr();
+}
+
+QString QnArchiveCamResourceSearcher::manufacture() const  { return kArchiveCamName; }
+
+QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const QUrl& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
+{
+    return QList<QnResourcePtr>();
+}
+
 QnArchiveCamResource::QnArchiveCamResource()
 {}
 

@@ -211,8 +211,9 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex &index) {
     if (!user)
         return;
 
-    if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */ {
-        m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, user);
+    if (index.column() == QnUserListModel::CheckBoxColumn) /* Invert current state */
+    {
+        m_usersModel->setCheckState(index.data(Qt::CheckStateRole).toInt() == Qt::Checked ? Qt::Unchecked : Qt::Checked, user);
     }
 }
 
@@ -271,12 +272,14 @@ QnUserResourceList QnUserManagementWidget::visibleUsers() const {
 }
 
 
-QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const {
+QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
+{
     QnUserResourceList result;
 
-    for (int row = 0; row < m_sortModel->rowCount(); ++row) {
+    for (int row = 0; row < m_sortModel->rowCount(); ++row)
+    {
         QModelIndex index = m_sortModel->index(row, QnUserListModel::CheckBoxColumn);
-        bool checked = index.data(Qt::CheckStateRole).toBool();
+        bool checked = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
         auto user = index.data(Qn::UserResourceRole).value<QnUserResourcePtr>();

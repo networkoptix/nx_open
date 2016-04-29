@@ -9,6 +9,7 @@
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
+#include "../archive_camera/archive_camera.h"
 #include "../sony/sony_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resource/flex_watch/flexwatch_resource.h"
@@ -180,8 +181,11 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
-        soapWrapper.setLogin(existResource->getAuth().user());
-        soapWrapper.setPassword(existResource->getAuth().password());
+        auto optAuth = existResource->getAuth();
+        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+        soapWrapper.setLogin(auth.user());
+        soapWrapper.setPassword(auth.password());
     }
     else if (!info.defaultLogin.isEmpty()) {
         soapWrapper.setLogin(info.defaultLogin);

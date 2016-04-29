@@ -159,7 +159,7 @@ QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelInd
             result.append(selectedResourcesInner(idx));
 
         QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
-        bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
 
