@@ -1,0 +1,43 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Tên như vậy đã tồn tại";
+"Please choose another name." = "Hãy chọn tên khác.";
+"OK" = "ĐƯỢC";
+"Name" = "tên";
+"Host" = "chủ nhà";
+"IP or hostname" = "IP hoặc hostname";
+"Port" = "hải cảng";
+"Login" = "Đăng Nhập";
+"Password" = "mật khẩu";
+"Address: %@" = "địa chỉ: %@";
+"Error" = "lỗi";
+"Connecting..." = "Kết nối...";
+"Can't connect to the System." = "Không thể kết nối với các hệ thống.";
+"Requesting cameras..." = "Yêu cầu máy ảnh...";
+"Communication failure." = "Giao tiếp thất bại.";
+"The System is incompatible with the app" = "Các hệ thống không tương thích với các ứng dụng";
+"Show Offline" = "Hiện tuyến";
+"Hide Offline" = "Ẩn tuyến";
+"Systems" = "hệ thống";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Đang tải...";
+"No Signal..." = "không Tín Hiệu...";
+"Invalid Camera Credentials" = "thông tin Máy ảnh không hợp lệ";
+"Invalid Camera Credentials..." = "thông tin Máy ảnh không hợp lệ...";
+"Live" = "Trực Tiếp";
+"Information" = "Thông tin";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Không có kho lưu trữ cho ngày đã chọn. Bạn có muốn nhảy đến vị trí gần nhất?";
+"No" = "không";
+"Yes" = "vâng";
+"Archive" = "lưu trữ";
+"Go" = "đi";
+"Low" = "thấp";
+"Medium" = "trung bình";
+"High" = "cao";
+"Best" = "tốt";

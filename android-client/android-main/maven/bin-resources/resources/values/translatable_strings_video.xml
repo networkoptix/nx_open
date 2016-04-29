@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="video_offline">Camera is offline</string>
+    <string name="video_loading">"Loading..."</string>
+    <string name="video_no_signal">NO SIGNAL</string>
+    <string name="video_stopped">Stopped</string>
+    <string name="video_button_rewind">Rewind</string>
+    <string name="video_live_detail">Live video</string>
+    <string name="video_button_forward">Forward</string>
+    <string name="video_button_live">LIVE</string>
+    <string name="video_button_archive">ARCHIVE</string>
+    <string name="video_button_play_pause">Play/Pause</string>
+    <string name="datetime_full_format">MMM dd, yyyy kk:mm:ss</string>
+    <string name="datetime_live_format">Live video</string>
+    <string name="datetime_short_format">kk:mm:ss</string>
+    <string name="video_resolution">Resolution</string>
+    <string name="video_transport">Transport</string>
+    <string name="video_live">Live</string>
+    <string name="video_archive">Archive</string>
+    <string name="video_actionbar_pin">Pin</string>
+
+</resources>

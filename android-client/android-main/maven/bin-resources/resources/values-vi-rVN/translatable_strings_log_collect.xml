@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collect_log">thu nhập</string>
+    <string name="acquiring_log_progress_dialog_message">Thu log từ hệ thống &#8230;</string>
+    <string name="chooser_title">"Chọn một ứng dụng để đăng nhập gửi"</string>
+    <string name="failed_to_get_log_message">"Không thể có được các bản ghi từ hệ thống."</string>
+    <string name="main_dialog_text">"Ứng dụng này sẽ cố gắng để thu thập các thiết bị ghi.
+Nhật ký thu thập được sẽ được gửi bằng cách sử dụng một ứng dụng của sự lựa chọn của bạn.
+Bạn cũng sẽ có cơ hội để xem và chỉnh sửa các dữ liệu được gửi đi."
+    </string>  
+</resources>

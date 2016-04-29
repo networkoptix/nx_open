@@ -1,0 +1,39 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Such name already exists";
+"Please choose another name." = "Please choose another name.";
+"OK" = "OK";
+"Name" = "Name";
+"Host" = "Host";
+"IP or hostname" = "IP or hostname";
+"Port" = "Port";
+"Login" = "Login";
+"Password" = "Password";
+"Address: %@" = "Address: %@";
+"Error" = "Error";
+"Connecting..." = "Connecting...";
+"Can't connect to the System." = "Can't connect to the System.";
+"Requesting cameras..." = "Requesting cameras...";
+"Communication failure." = "Communication failure.";
+"The System is incompatible with the app" = "The System is incompatible with the app";
+"Show Offline" = "Show Offline";
+"Hide Offline" = "Hide Offline";
+"Systems" = "Systems";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Loading...";
+"No Signal..." = "No Signal...";
+"Invalid Camera Credentials" = "Invalid Camera Credentials";
+"Invalid Camera Credentials..." = "Invalid Camera Credentials...";
+"Live" = "Live";
+"Information" = "Information";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "There is no archive for selected date. Do you want to jump to the nearest location?";
+"No" = "No";
+"Yes" = "Yes";
+"Archive" = "Archive";
+"Go" = "Go";

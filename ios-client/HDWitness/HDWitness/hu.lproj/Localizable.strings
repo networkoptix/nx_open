@@ -1,0 +1,44 @@
+/* 
+  Localizable.strings
+  HDWitness
+
+  Created by Ivan Vigasin on 3/10/14.
+  Copyright (c) 2014 Ivan Vigasin. All rights reserved.
+*/
+
+"Such name already exists" = "Ilyen névvel már létezik";
+"Please choose another name." = "Kérjük, válasszon másik nevet.";
+"OK" = "Oké";
+"Name" = "Név";
+"Host" = "Házigazda";
+"IP or hostname" = "IP vagy host név";
+"Port" = "Port";
+"Login" = "Bejelentkezés";
+"Password" = "Jelszó";
+"Address: %@" = "Cím: %@";
+"Error" = "Hiba";
+"Connecting..." = "csatlakoztassa...";
+"Can't connect to the System." = "nem tud csatlakozni a rendszerre.";
+"Requesting cameras..." = "Kérő kamerák...";
+"Communication failure." = "Kommunikációs hiba.";
+"The System is incompatible with the app" = "A rendszer nem egyeztethető össze a app";
+"Show Offline" = "Mutass nem elérhető";
+"Hide Offline" = "elrejtése nem elérhető";
+"Systems" = "Rendszerek";
+"FPS: %d" = "FPS: %d";
+"Loading..." = "Rakodás...";
+"No Signal..." = "Nincs jel...";
+"Invalid Camera Credentials" = "Érvénytelen Kamera megbízólevelét";
+"Invalid Camera Credentials..." = "Érvénytelen Kamera megbízólevelét...";
+"Live" = "El";
+"Information" = "Információ";
+"There is no archive for selected date. Do you want to jump to the nearest location?" = "Nincs archív kiválasztott időpont. Szeretné , hogy ugrik a legközelebbi hely?";
+"No" = "Nem";
+"Yes" = "Igen";
+"Archive" = "Archívum";
+"Go" = "Menj";
+"Low" = "Alacsony";
+"Medium" = "Közepes";
+"High" = "Magas";
+"Best" = "Legjobb";
+

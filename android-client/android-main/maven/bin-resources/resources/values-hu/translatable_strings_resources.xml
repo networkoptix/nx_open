@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">Nem elérhető mutatása</string>
+    <string name="menu_hide_offline">Nem elérhető elrejtése</string>
+    <string name="resources_logout_offer">A kilépéshez nyomja meg a vissza gombot mégegyszer</string>
+    <string name="resources_loading_title">Betöltés…</string>
+    <string name="resources_loading_text">Adat fogadása…</string>
+    <string name="menu_clear_cache">Gyorsítótár törlése</string>
+    <string name="resources_tree">Fa nézet</string>
+    <string name="resources_grid">Bélyegképek</string>
+    <string name="resources_logout">Kijelentkezés</string>
+
+</resources>

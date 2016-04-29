@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">הצג לא מחוברות</string>
+    <string name="menu_hide_offline">הסתר לא מחוברות</string>
+    <string name="resources_logout_offer">לחץ אחורה פעם נוספת ליציאה</string>
+    <string name="resources_loading_title">טוען…</string>
+    <string name="resources_loading_text">מקבל מידע…</string>
+    <string name="menu_clear_cache">נקה מטמון</string>
+    <string name="resources_tree">תצוגת עץ</string>
+    <string name="resources_grid">תמונות ממוזערות</string>
+    <string name="resources_logout">יציאה</string>
+
+</resources>

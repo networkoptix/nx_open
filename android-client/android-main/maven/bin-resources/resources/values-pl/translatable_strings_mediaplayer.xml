@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_server_died">Kamera jest niedostepna</string>
+    <string name="error_already_connected">Połączono z kamerą</string>
+    <string name="error_not_connected">Nie połączono z kamerą</string>
+    <string name="error_unknown_host">Nieznany host</string>
+    <string name="error_cannot_connect">Nie można połączyć się z kamerą</string>
+    <string name="error_io">błąd WE/WY</string>
+    <string name="error_connection_lost">Utracono połączenie</string>
+    <string name="error_malformed_packet">Nieprawidłowy pakiet</string>
+    <string name="error_out_of_range">Poza zakresem</string>
+    <string name="error_buffer_too_small">Za mały bufor</string>
+    <string name="error_unsupported_format">Ten format jest niewspierany</string>
+    <string name="error_end_of_stream">Koniec strumienia</string>
+    <string name="error_unsupported_http_transport">Transmisja Http dostępna jest tylko od wersji Android 4.0</string>
+    <string name="error_unsupported_rtsp_proxy">Bezpośrednie połączenie do mediaserwera nie może być zestawione.
+        Oglądanie video przez proxy dostępne jest tylko od wersji Android 4.0</string>
+    <string name="error_proxy_not_running">Bezpośrednie połączenie do mediaserwera nie może być zestawione.
+        Upewnij się, że usługa proxy jest uruchomiona.</string>
+    <string name="error_unsupported_rtsp_udp">Video z serwera nie dociera do Twojego urządzenia. 
+        Upewnij się, że protokół UDP nie jest blokowany w twojej sieci.</string>
+    <string name="error_native_codec">Kodek kamery nie jest wspierany przez twoje urządzenie. Spróbuj zmienić rozdzielczosćć.</string>
+    <string name="error_unknown">Kamera jest niedostępna.</string>
+
+</resources>
