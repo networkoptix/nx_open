@@ -46,11 +46,6 @@ ApplicationWindow
         anchors.right: parent.right
     }
 
-    QnSideNavigation {
-        id: sideNavigation
-        activeSessionId: currentSessionId
-    }
-
     StackView {
         id: stackView
 

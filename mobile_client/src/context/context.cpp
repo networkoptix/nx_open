@@ -13,6 +13,7 @@
 #include "context_settings.h"
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
+#include <models/saved_sessions_model.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
 
@@ -31,6 +32,7 @@ QnContext::QnContext(QObject *parent):
     m_colorTheme(new QnColorTheme(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_settings(new QnContextSettings(this)),
+    m_savedSessionsModel(new QnSavedSessionsModel(this)),
     m_resolutionUtil(customDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(customDensityClass)))
 {
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this, [this](){

@@ -5,7 +5,7 @@ function makeUrl(host, port, login, password) {
 }
 
 function updateSession(sessionId, host, port, login, password, systemName, moveTop) {
-    return sideNavigation.savedSessionsModel.updateSession(sessionId, host, port, login, password, systemName, moveTop)
+    return savedSessionsModel.updateSession(sessionId, host, port, login, password, systemName, moveTop)
 }
 
 function clearCurrentSession() {
@@ -31,7 +31,6 @@ function connectToServer(sessionId, host, port, login, password, customConnectio
     mainWindow.currentSessionId = sessionId
     mainWindow.customConnection = customConnection ? true : false
 
-    sideNavigation.hide()
     connectionManager.connectToServer(makeUrl(host, port, login, password))
 }
 
@@ -39,13 +38,10 @@ function saveSession(sessionId, host, port, login, password, systemName) {
     updateSession(sessionId, host, port, login, password, systemName, false)
 
     Main.gotoMainScreen()
-
-    if (connectionManager.connectionState == QnConnectionManager.Disconnected)
-        sideNavigation.show()
 }
 
 function deleteSesion(sessionId) {
-    sideNavigation.savedSessionsModel.deleteSession(sessionId)
+    savedSessionsModel.deleteSession(sessionId)
     if (mainWindow.currentSessionId == sessionId)
         Main.gotoNewSession()
     else

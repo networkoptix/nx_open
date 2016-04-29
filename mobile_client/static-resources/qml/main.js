@@ -39,9 +39,6 @@ function isMobile() {
 
 function openDiscoveredSession(_host, _port, _systemName)
 {
-    sideNavigation.hide()
-    sideNavigation.enabled = false
-
     stackView.setScaleTransition()
     stackView.push(
             Qt.resolvedUrl("items/QnLoginPage.qml"),
@@ -57,9 +54,6 @@ function openDiscoveredSession(_host, _port, _systemName)
 
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName)
 {
-    sideNavigation.hide()
-    sideNavigation.enabled = false
-
     stackView.setScaleTransition()
     stackView.push(
             Qt.resolvedUrl("items/QnLoginPage.qml"),
@@ -84,12 +78,6 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
 
     if (stackView.currentItem.objectName == pageName)
         item = stackView.currentItem
-
-    sideNavigation.hide()
-
-    if (!mainWindow.customConnection) {
-        sideNavigation.enabled = false
-    }
 
     if (!item) {
         var pushList = []
@@ -128,7 +116,6 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
 function gotoNewSession() {
     mainWindow.currentSessionId = ""
     mainWindow.currentSystemName = ""
-    sideNavigation.enabled = true
 
     if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected) {
         connectionManager.disconnectFromServer(true)
@@ -169,28 +156,18 @@ function openMediaResource(uuid, xHint, yHint, initialScreenshot) {
     mainWindow.activeResourceId = uuid
     mainWindow.initialResourceScreenshot = initialScreenshot
 
-    sideNavigation.hide()
-    sideNavigation.enabled = false
-
     stackView.setScaleTransition(xHint, yHint)
     stackView.push(videoPlayerComponent)
 }
 
 function openSettings() {
-    sideNavigation.hide()
-    sideNavigation.enabled = false
     stackView.setScaleTransition()
     stackView.push(settingsPageComponent)
 }
 
 function backPressed()
 {
-    if (sideNavigation.open)
-    {
-        sideNavigation.hide()
-        return true
-    }
-    else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage")
+    if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage")
     {
         // First stack item is always resources page.
         return false

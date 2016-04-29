@@ -4,6 +4,7 @@ import Qt.labs.controls 1.0
 import com.networkoptix.qml 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Items 1.0
 
 import "../main.js" as Main
 import "../controls"
@@ -44,6 +45,7 @@ Page
 
     title: mainWindow.currentSystemName
     leftButtonIcon: "/images/menu.png"
+    onLeftButtonClicked: sideNavigation.open()
     titleControls:
     [
         QnIconButton
@@ -59,6 +61,11 @@ Page
     {
         id: searchToolBar
         parent: header
+    }
+
+    SideNavigation
+    {
+        id: sideNavigation
     }
 
     Rectangle
