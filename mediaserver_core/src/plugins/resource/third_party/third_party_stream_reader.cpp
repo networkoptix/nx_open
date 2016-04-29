@@ -154,7 +154,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
-    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+    auto optAuth = m_thirdPartyRes->getAuth();
+    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+    m_camManager.setCredentials( auth.user(), auth.password() );
 
     m_mediaEncoder2.reset();
     m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );

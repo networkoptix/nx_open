@@ -161,11 +161,14 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
     for(const QnVirtualCameraResourcePtr &camera: m_cameras)
     {
-        QString cameraLogin = camera->getAuth().user();
+        auto optAuth = camera->getAuth();
+        QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+        QString cameraLogin = auth.user();
         if (!login.isEmpty() || !m_loginWasEmpty)
             cameraLogin = login;
 
-        QString cameraPassword = camera->getAuth().password();
+        QString cameraPassword = auth.password();
         if (!password.isEmpty() || !m_passwordWasEmpty)
             cameraPassword = password;
 
@@ -295,9 +298,13 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             {
                 QSet<QString> logins, passwords;
 
-                for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
-                    logins.insert(camera->getAuth().user());
-                    passwords.insert(camera->getAuth().password());
+                for (const QnVirtualCameraResourcePtr &camera: m_cameras)
+                {
+                    auto optAuth = camera->getAuth();
+                    QAuthenticator auth = optAuth ? *optAuth : QAuthenticator();
+
+                    logins.insert(auth.user());
+                    passwords.insert(auth.password());
                 }
 
                 if (logins.size() == 1) {
