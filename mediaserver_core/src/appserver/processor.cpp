@@ -23,7 +23,8 @@
 #include "utils/common/util.h"
 #include "core/resource/camera_user_attribute_pool.h"
 #include "utils/license_usage_helper.h"
-#include "media_server/settings.h"
+#include <media_server/settings.h>
+#include <api/global_settings.h>
 
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
@@ -69,7 +70,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
-        QnGlobalSettings::instance()->takeCameraOwnershipWithoutLock();
+        qnGlobalSettings->takeCameraOwnershipWithoutLock();
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
