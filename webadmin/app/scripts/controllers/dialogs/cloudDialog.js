@@ -90,7 +90,7 @@ angular.module('webadminApp')
                 cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                     function(message){
                         //2. Save settings to local server
-                        mediaserver.saveCloudSystemCredentials(message.data.systemId, message.data.authKey,
+                        mediaserver.saveCloudSystemCredentials(message.data.id, message.data.authKey,
                             $scope.settings.cloudEmail).then(successHandler,errorHandler);
                     }, cloudErrorHandler);
             }else{
