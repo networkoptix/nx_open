@@ -109,6 +109,7 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+    bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
 
@@ -219,6 +220,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeoutAdaptor;
     /** seconds */
     QnResourcePropertyAdaptor<int>* m_proxyConnectTimeoutAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     // set of cloud adaptors
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;

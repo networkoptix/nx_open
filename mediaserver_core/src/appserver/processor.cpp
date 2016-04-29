@@ -25,6 +25,7 @@
 #include "utils/license_usage_helper.h"
 #include "media_server/settings.h"
 
+
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
 {
@@ -66,7 +67,9 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    bool takeCameraWithoutLock = ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy();
+    const bool takeCameraWithoutLock =
+        (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
+        QnGlobalSettings::instance()->takeCameraOwnershipWithoutLock();
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);

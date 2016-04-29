@@ -24,6 +24,12 @@ namespace nx_rtsp
         };
     }
 
+    class RtspResponse : public nx_http::Response
+    {
+    public:
+        bool parse( const nx_http::ConstBufferRefType& data);
+    };
+
     //!Parses Range header ([rfc2326, 12.29])
     /*!
         Returns range in microseconds
