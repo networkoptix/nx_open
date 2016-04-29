@@ -108,7 +108,7 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->groupInputField->setText(m_model->groupName());
-    ui->permissionsLabel->setText(m_model->groupDescription());
+    ui->permissionsLabel->setText(m_model->permissionsDescription());
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
 }

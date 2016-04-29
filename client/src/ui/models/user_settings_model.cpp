@@ -127,13 +127,16 @@ QString QnUserSettingsModel::groupName() const
     return tr("Custom Permissions");
 }
 
-QString QnUserSettingsModel::groupDescription() const
+QString QnUserSettingsModel::permissionsDescription() const
 {
     if (!m_user)
         return QString();
 
-    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_user);
+    return permissionsDescription(qnResourceAccessManager->globalPermissions(m_user), m_user->userGroup());
+}
 
+QString QnUserSettingsModel::permissionsDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const
+{
     if (permissions == Qn::GlobalOwnerPermissionsSet)
         return tr("Has access to whole system and can do everything.");
 
@@ -141,7 +144,7 @@ QString QnUserSettingsModel::groupDescription() const
         return tr("Has access to whole system and can manage it. Can create users.");
 
     for (const ec2::ApiUserGroupData& group : qnResourceAccessManager->userGroups())
-        if (group.id == m_user->userGroup())
+        if (group.id == groupId)
             return getCustomPermissionsDescription(group.id, group.permissions);
 
     if (permissions == Qn::GlobalAdvancedViewerPermissionSet)
@@ -153,7 +156,10 @@ QString QnUserSettingsModel::groupDescription() const
     if (permissions == Qn::GlobalLiveViewerPermissionSet)
         return tr("Can view live video from all cameras.");
 
-    return getCustomPermissionsDescription(m_user->getId(), m_user->getRawPermissions());
+    if (m_user)
+        return getCustomPermissionsDescription(m_user->getId(), permissions);
+
+    return QString();
 }
 
 QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const
