@@ -4,6 +4,24 @@
 #include "core/resource_management/resource_searcher.h"
 #include "core/resource/camera_resource.h"
 
+class QnArchiveCamResourceSearcher : public QnAbstractNetworkResourceSearcher
+{
+public:
+    QnArchiveCamResourceSearcher();
+
+    virtual void pleaseStop() override;
+
+    bool isProxy() const;
+
+    virtual QnResourceList findResources() override;
+
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+
+    virtual QString manufacture() const override;
+
+    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+};
+
 class QnArchiveCamResource 
     : public QnPhysicalCameraResource
 {

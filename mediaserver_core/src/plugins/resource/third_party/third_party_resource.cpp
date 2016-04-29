@@ -426,6 +426,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
+    QAuthenticator auth = getAuth();
+
     if( !m_camManager )
     {
         QnMutexLocker lk( &m_mutex );
@@ -461,13 +463,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         if( strlen(m_camInfo.defaultLogin) == 0 )
         {
-            const QByteArray userName = getAuth().user().toLatin1();
+            const QByteArray userName = auth.user().toLatin1();
             memset( m_camInfo.defaultLogin, 0, sizeof( m_camInfo.defaultLogin ) );
             strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
         }
         if( strlen(m_camInfo.defaultPassword) == 0 )
         {
-            const QByteArray userPassword = getAuth().password().toLatin1();
+            const QByteArray userPassword = auth.password().toLatin1();
             memset( m_camInfo.defaultPassword, 0, sizeof( m_camInfo.defaultPassword ) );
             strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
@@ -480,7 +482,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
     }
 
-    m_camManager->setCredentials( getAuth().user(), getAuth().password() );
+    m_camManager->setCredentials( auth.user(), auth.password() );
 
     int result = m_camManager->getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )

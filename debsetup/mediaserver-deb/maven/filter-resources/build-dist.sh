@@ -60,7 +60,6 @@ cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -r $SERVER_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
-rm -f $LIBSTAGE/*.debug
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
 cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
@@ -102,6 +101,7 @@ install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
+install -m 644 bin/external.dat $BINSTAGE
 
 # Copy upstart and sysv script
 install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
@@ -121,12 +121,6 @@ install -m 644 debian/templates $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
-set +e
-cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
-cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
-cp -P $SERVER_LIB_PLUGIN_PATH/*.debug ${project.build.directory}
-tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
-set -e
 
 (cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
 mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}

@@ -1089,6 +1089,15 @@
                     </result>
                 </function>
                 <function>
+                    <name>restart</name>
+                    <description>Restarts the server.</description>
+                    <method>GET</method>
+                    <params/>
+                    <result>
+                        <caption>JSON with error code.</caption>
+                    </result>
+                </function>
+                <function>
                     <name>statistics</name>
                     <description>Returns server info: CPU usage, HDD usage e.t.c.</description>
                     <method>GET</method>
@@ -1335,7 +1344,7 @@
                 </function>
                 <function>
                     <name>backupDatabase</name>
-                    <description>Backup server database.</description>
+                    <description>Back up server database.</description>
                     <method>GET</method>
                     <params/>
                     <result>

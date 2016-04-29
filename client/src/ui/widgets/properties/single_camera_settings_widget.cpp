@@ -387,8 +387,11 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported() && !m_camera->isAudioForced());
 
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
-        ui->loginEdit->setText(m_camera->getAuth().user());
-        ui->passwordEdit->setText(m_camera->getAuth().password());
+
+        QAuthenticator auth = m_camera->getAuth();
+
+        ui->loginEdit->setText(auth.user());
+        ui->passwordEdit->setText(auth.password());
 
         bool dtsBased = m_camera->isDtsBased();
         setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased);
