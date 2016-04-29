@@ -30,6 +30,9 @@ class QnAbstractVideoCamera
 public:
     virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
     virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
+
+    virtual void inUse(void* user) = 0;
+    virtual void notInUse(void* user) = 0;
 };
 
 struct QnLiveStreamParams
@@ -95,6 +98,7 @@ public:
     void updateSoftwareMotionStreamNum();
 
     void setOwner(QnAbstractVideoCamera* owner);
+    QnAbstractVideoCamera* getOwner() const;
     virtual void pleaseReopenStream() = 0;
 protected:
     /*! Called when @param currentStreamParams are updated */

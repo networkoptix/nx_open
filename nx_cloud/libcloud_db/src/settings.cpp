@@ -56,9 +56,6 @@ namespace
     const QLatin1String kDbMaxConnections( "db/maxConnections" );
     const QLatin1String kDefaultDbMaxConnections( "1" );
 
-    const QLatin1String kCloudDbUrl( "cloudDbUrl" );
-    const QLatin1String kDefaultCloudDbUrl( "http://nowhere.com:3346/" );
-
     const QLatin1String kChangeUser( "changeUser" );
 
     //notification settings
@@ -163,11 +160,6 @@ const SystemManager& Settings::systemManager() const
     return m_systemManager;
 }
 
-const QString& Settings::cloudBackendUrl() const
-{
-    return m_cloudBackendUrl;
-}
-
 const QString& Settings::changeUser() const
 {
     return m_changeUser;
@@ -242,7 +234,6 @@ void Settings::loadConfiguration()
     if( m_dbConnectionOptions.maxConnectionCount == 0 )
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
 
-    m_cloudBackendUrl = m_settings.value( kCloudDbUrl, kDefaultCloudDbUrl ).toString();
     m_changeUser = m_settings.value( kChangeUser ).toString();
 
     //email

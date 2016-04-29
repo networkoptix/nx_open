@@ -70,26 +70,10 @@ bool AsyncClient::setIndicationHandler(int method, IndicationHandler handler)
     return m_indicationHandlers.emplace(method, std::move(handler)).second;
 }
 
-bool AsyncClient::ignoreIndications(int method)
+void AsyncClient::addOnReconnectedHandler(ReconnectHandler handler)
 {
     QnMutexLocker lock(&m_mutex);
-    return m_indicationHandlers.erase(method);
-}
-
-void AsyncClient::addOnReconnectedHandler(ReconnectHandler handler, void* client)
-{
-    NX_CRITICAL(client);
-
-    QnMutexLocker lock(&m_mutex);
-    m_reconnectHandlers.emplace(client, std::move(handler));
-}
-
-void AsyncClient::removeOnReconnectedHandlers(void* client)
-{
-    NX_CRITICAL(client);
-
-    QnMutexLocker lock(&m_mutex);
-    m_reconnectHandlers.erase(client);
+    m_reconnectHandlers.push_back(std::move(handler));
 }
 
 void AsyncClient::sendRequest(Message request, RequestHandler handler)
@@ -300,8 +284,8 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     const auto reconnectHandlers = m_reconnectHandlers;
     lock.unlock();
-    for( const auto& it: reconnectHandlers )
-        it.second();
+    for( const auto& handelr: reconnectHandlers )
+        handelr();
 }
 
 void AsyncClient::processMessage(Message message)

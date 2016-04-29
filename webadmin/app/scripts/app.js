@@ -17,7 +17,7 @@ angular.module('webadminApp', [
 
     var universalResolves = {
         currentUser: ['mediaserver',function(mediaserver){
-            return mediaserver.getCurrentUser();
+            return mediaserver.resolveNewSystemAndUser();
         }]
     };
 

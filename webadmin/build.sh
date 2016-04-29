@@ -23,7 +23,7 @@ if [ $? -gt 0 ]; then
 fi
 #sleep 2
 echo "+++++++++++++++++++++++++ Running GRUNT... +++++++++++++++++++++++++"
-cp -f ./target/version_maven.txt ./static
+cp -f ./target/version_maven.txt ./static/
 grunt pub
 if [ $? -gt 0 ]; then
    echo "+++++++++++++++++++++++++ GRUNT errorlevel:" $? "+++++++++++++++++++++++++"

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log, $timeout) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
 
         if( $location.search().retry) {
@@ -246,7 +246,7 @@ angular.module('webadminApp')
                 // Merge fail:
                 'INCOMPATIBLE':'fail',
                 'SAFE_MODE':'fail',
-                'CONFIGURATION_ERROR':'fail',
+                'CONFIGURATION_ERROR':'fail'
             };
             return errorClasses[error] || 'fail';
         }

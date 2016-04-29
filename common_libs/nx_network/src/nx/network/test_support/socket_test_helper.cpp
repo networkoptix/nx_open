@@ -214,39 +214,16 @@ void TestConnection::startIO()
 void TestConnection::startSpamIO()
 {
     using namespace std::placeholders;
-    if (m_accepted) // server side?
-    {
-        m_socket->readSomeAsync(
-            &m_readBuffer,
-            [this](SystemError::ErrorCode code, size_t bytes)
-            {
-                if (code == SystemError::noError && bytes != 0)
-                {
-                    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
-                        .arg(m_accepted).arg(m_outData.size())
-                        .arg(m_socket->getForeignAddress().toString()),
-                        cl_logDEBUG2);
-                    m_socket->sendAsync(
-                        m_outData,
-                        std::bind(&TestConnection::onDataSent, this, _1, _2));
-                }
-
-                onDataReceived(code, bytes);
-            });
-    }
-    else
-    {
-        m_socket->readSomeAsync(
-            &m_readBuffer,
-            std::bind(&TestConnection::onDataReceived, this, _1, _2));
-        NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
-            .arg(m_accepted).arg(m_outData.size())
-            .arg(m_socket->getForeignAddress().toString()),
-            cl_logDEBUG2);
-        m_socket->sendAsync(
-            m_outData,
-            std::bind(&TestConnection::onDataSent, this, _1, _2));
-    }
+    m_socket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&TestConnection::onDataReceived, this, _1, _2));
+    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+        .arg(m_accepted).arg(m_outData.size())
+        .arg(m_socket->getForeignAddress().toString()),
+        cl_logDEBUG2);
+    m_socket->sendAsync(
+        m_outData,
+        std::bind(&TestConnection::onDataSent, this, _1, _2));
 }
 
 void TestConnection::startEchoIO()
