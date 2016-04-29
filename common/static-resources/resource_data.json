@@ -161,7 +161,8 @@
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
-                "ACTI|I96","ACTI|I98"
+                "ACTI|I96","ACTI|I98", 
+                "UNIVIEW|IPC6242SR-X22"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -865,13 +866,13 @@
                 "fromCamera": {
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [   -1,  1],
+                        "device":  [   1,  -1],
                         "logical": [-180, 180]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "_TODO" : "Actual tilt range is [0,-180]",
-                        "device":  [-1, 1],
+                        "device":  [1, -1],
                         "logical": [20,-90]
                     },
                     "z": {
