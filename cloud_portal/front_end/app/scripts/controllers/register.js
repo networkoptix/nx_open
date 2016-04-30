@@ -6,7 +6,7 @@ angular.module('cloudApp')
         $http.get('views/static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
-        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$routeParams', 'account', 'urlProtocol',
+        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$sessionStorage', '$routeParams', 'account', 'urlProtocol',
         function ($scope, cloudApi, process, $location, $localStorage, $sessionStorage, $routeParams, account, urlProtocol) {
 
         account.logoutAuthorised();
