@@ -7,11 +7,12 @@ angular.module('cloudApp')
     }])
     .controller('RegisterCtrl', [
         '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$routeParams', 'account', 'urlProtocol',
-        function ($scope, cloudApi, process, $location, $localStorage, $routeParams, account, urlProtocol) {
+        function ($scope, cloudApi, process, $location, $localStorage, $sessionStorage, $routeParams, account, urlProtocol) {
 
         account.logoutAuthorised();
         $scope.Config = Config;
         $scope.session = $localStorage;
+        $scope.context = $sessionStorage;
 
         $scope.session.fromClient = urlProtocol.source.isApp;
 
@@ -19,6 +20,10 @@ angular.module('cloudApp')
         $scope.lockEmail = !!$routeParams.email;
 
         $scope.registerSuccess = $routeParams.registerSuccess;
+
+        if($scope.registerSuccess &&  $scope.context.process !== 'registerSuccess'){
+            account.redirectToHome();
+        }
 
         $scope.account = {
             email: registerEmail,
@@ -52,6 +57,7 @@ angular.module('cloudApp')
             holdAlerts:true,
             errorPrefix:'Some error has happened:'
         }).then(function(){
+            $scope.context.process = 'registerSuccess';
             $location.path('/register/success',false);
         });
     }]);
