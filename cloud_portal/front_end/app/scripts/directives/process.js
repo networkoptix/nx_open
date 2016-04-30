@@ -51,6 +51,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                 processLoading:'='
             },
             link:function(scope, element, attrs){
+                element = $(element);
                 function checkVisibility(){
                     if(scope.processLoading){
                         if(scope.processLoading.finished) {
