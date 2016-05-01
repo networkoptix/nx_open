@@ -10,12 +10,14 @@ Item
     property var mouseArea: null
     property bool centered: false
     property bool rounded: false
+    property alias radius: highlightRectangle.radius
 
     property Ripple _currentRipple: null
 
     Connections
     {
         target: mouseArea
+        ignoreUnknownSignals: true
 
         onPressedChanged:
         {
@@ -37,7 +39,7 @@ Item
                 fadeOutAnimation.duration = 500
             }
 
-            fadeInAnimation.stop()
+            fadeInAnimation.complete()
             fadeOutAnimation.start()
         }
 
@@ -45,10 +47,10 @@ Item
         {
             _currentRipple = rippleComponent.createObject(materialEffect)
             _currentRipple.fadeInDuration = 400
-            if (centered || typeof mouse == "undefined")
+            if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
                 _currentRipple.fadeIn(width / 2, height / 2)
             else
-                _currentRipple.fadeIn(mouse.x, mouse.y)
+                _currentRipple.fadeIn(mouseArea.mouseX, mouseArea.mouseY)
         }
 
         onReleased:
@@ -63,10 +65,10 @@ Item
             {
                 var ripple = rippleComponent.createObject(materialEffect)
                 fadeOutAnimation.duration = ripple.scaleDuration
-                if (centered || typeof mouse == "undefined")
+                if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
                     ripple.splash(width / 2, height / 2)
                 else
-                    ripple.splash(mouse.x, mouse.y)
+                    ripple.splash(mouseArea.mouseX, mouseArea.mouseY)
             }
 
             fadeInAnimation.stop()
