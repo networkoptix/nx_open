@@ -712,8 +712,9 @@ angular.module('webadminApp')
             $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
                 discoverSystems();
-            },function(){
+            },function(error){
                 $log.log("Couldn't run setup wizard: auth failed");
+                $log.error(error);
                 if( $location.search().retry) {
                     $log.log("Second try: show error to user");
                     $scope.next("initFailure");
