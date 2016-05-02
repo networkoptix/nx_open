@@ -116,7 +116,7 @@
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
-    <form class="master-controls" name="forms.remoteSystemForm" novalidate disable-autocomplete>
+    <form class="master-controls wide" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
             <ui-select ng-model="settings.remoteSystem" name="remoteSystemName" reset-search-input="false"
                        ng-change="clearRemoteError()" required autofocus>
