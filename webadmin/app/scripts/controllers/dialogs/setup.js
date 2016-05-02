@@ -30,6 +30,7 @@ angular.module('webadminApp')
             remoteLogin: Config.defaultLogin,
             remotePassword:''
         };
+        $scope.forms = {};
 
         $scope.serverAddress = window.location.host;
 
@@ -283,12 +284,12 @@ angular.module('webadminApp')
                 return;
             }
             $scope.settings.remoteAuthError = false;
-            $scope.remoteSystemForm.remoteLogin.$setValidity('system',true);
-            $scope.remoteSystemForm.remotePassword.$setValidity('system',true);
+            $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system',true);
+            $scope.forms.remoteSystemForm.remotePassword.$setValidity('system',true);
 
             $scope.settings.remoteError = null;
             $scope.settings.remoteSystemError = false;
-            $scope.remoteSystemForm.remoteSystemName.$setValidity('system',true);
+            $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system',true);
         };
         function remoteErrorHandler(error){
             logMediaserverError(error);
@@ -302,14 +303,14 @@ angular.module('webadminApp')
             switch(classifyError(error.data.errorString)){
                 case 'auth':
                     $scope.settings.remoteAuthError = true;
-                    $scope.remoteSystemForm.remoteLogin.$setValidity('system',false);
-                    $scope.remoteSystemForm.remotePassword.$setValidity('system',false);
+                    $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system',false);
+                    $scope.forms.remoteSystemForm.remotePassword.$setValidity('system',false);
                     $scope.next('merge');
                     break;
 
                 case 'system':
                     $scope.settings.remoteSystemError = true;
-                    $scope.remoteSystemForm.remoteSystemName.$setValidity('system',false);
+                    $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system',false);
                     $scope.next('merge');
                     break;
 

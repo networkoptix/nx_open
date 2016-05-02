@@ -29,7 +29,7 @@
     <p class="master-description">
         System name helps you identify or find your system.
     </p>
-    <form class="master-controls" name="systemNameForm" novalidate>
+    <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
             <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
                    placeholder="System name" required autofocus>
@@ -80,7 +80,7 @@
         Login to your account<br>
     </p>
 
-    <form class="master-controls" name="cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
+    <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
                    type="email" placeholder="Email" autocomplete="new-password"  required autofocus ng-change="clearCloudError()">
@@ -99,7 +99,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localLogin')">
     <h2>Set up administrator's password</h2>
-    <form class="master-controls" name="localForm" novalidate disable-autocomplete>
+    <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
             <input ng-model="settings.localLogin" name="localLogin" class="form-control"
                    type="text" placeholder="Login" required readonly>
@@ -116,7 +116,7 @@
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
-    <form class="master-controls" name="remoteSystemForm" novalidate disable-autocomplete>
+    <form class="master-controls" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
             <ui-select ng-model="settings.remoteSystem" name="remoteSystemName" reset-search-input="false"
                        ng-change="clearRemoteError()" required autofocus>
