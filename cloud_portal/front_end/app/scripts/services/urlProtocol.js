@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('urlProtocol', ['$base64', '$location',function ($base64, $location) {
+    .factory('urlProtocol', ['$base64', '$location', 'account', function ($base64, $location, account) {
 
         function parseSource() {
             var search = $location.search();
