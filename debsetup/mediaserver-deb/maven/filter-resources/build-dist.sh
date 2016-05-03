@@ -97,11 +97,11 @@ chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
 install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # Copy mediaserver startup script
 install -m 755 bin/mediaserver $BINSTAGE
-install -m 644 bin/external.dat $BINSTAGE
 
 # Copy upstart and sysv script
 install -m 644 init/networkoptix-mediaserver.conf $INITSTAGE/$COMPANY_NAME-mediaserver.conf
