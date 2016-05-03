@@ -21,7 +21,9 @@ public:
 
 protected:
     ec2::ErrorCode connectToServer(const QUrl &appServerUrl
+        , const QString &connectionAlias
         , bool storePassword
+        , bool autoLogin
         , bool silent);
 
     bool disconnectFromServer(bool force);

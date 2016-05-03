@@ -2,7 +2,7 @@
 
 #include <core/core_settings.h>
 
-#include <ui/models/last_system_users_model.h>
+#include <ui/models/recent_user_connections_model.h>
 
 QnClientRecentConnectionsManager::QnClientRecentConnectionsManager()
     : base_type()
@@ -98,8 +98,7 @@ void QnClientRecentConnectionsManager::updateModelsData()
     const auto lastConnectionsData = qnCoreSettings->recentUserConnections();
     for (const auto connectionDesc : lastConnectionsData)
     {
-        m_dataCache[connectionDesc.systemName].append(UserPasswordPair(
-            connectionDesc.userName, connectionDesc.password));
+        m_dataCache[connectionDesc.systemName].append(connectionDesc);
     }
     for (const auto boundModel : m_bound)
     {

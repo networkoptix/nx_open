@@ -535,7 +535,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
-        StorePassword,                              /**< Role for flag that shows if password of successfull connection should be stored
+        ConnectionAliasRole,                        /**< Role for alias of connection. Used in QnActions::ConnectAction, QnLoginDialog. */
+        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials 
+                                                        (or to the last system) automatically next time */
+        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */

@@ -1,4 +1,4 @@
-#include "last_system_users_model.h"
+#include "recent_user_connections_model.h"
 
 #include <client/client_recent_connections_manager.h>
 
@@ -16,6 +16,7 @@ namespace
 
         , UserNameRoleId = FirstRoleId
         , PasswordRoleId
+        , HasStoredPasswordRoleId
         , RolesCount
     };
 
@@ -25,6 +26,16 @@ namespace
         RoleNameHash result;
         result.insert(UserNameRoleId, "userName");
         result.insert(PasswordRoleId, "password");
+        result.insert(HasStoredPasswordRoleId, "hasStoredPassword");
+        return result;
+    }();
+
+    typedef QHash<QByteArray, int> NameRoleHash;
+    const auto kRoleIdByName = []()->NameRoleHash
+    {
+        NameRoleHash result;
+        for (auto it = kRoleNames.begin(); it != kRoleNames.end(); ++it)
+            result.insert(it.value(), it.key());
         return result;
     }();
 }
@@ -61,7 +72,7 @@ bool QnRecentUserConnectionsModel::hasConnections() const
     return !m_data.isEmpty();
 }
 
-void QnRecentUserConnectionsModel::updateData(const UserPasswordPairList &newData)
+void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataList &newData)
 {
     if (m_data == newData)
         return;
@@ -132,9 +143,11 @@ QVariant QnRecentUserConnectionsModel::data(const QModelIndex &index, int role) 
     switch (role)
     {
     case UserNameRoleId:
-        return userPasswordData.first;
+        return userPasswordData.userName;
     case PasswordRoleId:
-        return userPasswordData.second;
+        return userPasswordData.password;
+    case HasStoredPasswordRoleId:
+        return userPasswordData.isStoredPassword;
     default:
         return QVariant();
     }
@@ -144,3 +157,14 @@ RoleNameHash QnRecentUserConnectionsModel::roleNames() const
 {
     return kRoleNames;
 }
+
+QVariant QnRecentUserConnectionsModel::getData(const QString &dataRole
+    , int row)
+{
+    const auto it = kRoleIdByName.find(dataRole.toLatin1());
+    if (it == kRoleIdByName.end())
+        return QVariant();
+
+    return data(index(row), it.value());
+}
+

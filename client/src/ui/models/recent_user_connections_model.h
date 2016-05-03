@@ -1,10 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
-
-
-typedef QPair<QString, QString> UserPasswordPair;
-typedef QList<UserPasswordPair> UserPasswordPairList;
+#include <core/user_recent_connection_data.h>
 
 class QnRecentUserConnectionsModel : public QAbstractListModel
 {
@@ -33,7 +30,11 @@ public: // overrides
 
     QHash<int, QByteArray> roleNames() const;
 
-    void updateData(const UserPasswordPairList &newData);
+    void updateData(const QnUserRecentConnectionDataList &newData);
+
+public slots:
+    QVariant getData(const QString &dataRole
+        , int row);
 
 signals:
     void systemNameChanged();
@@ -43,5 +44,5 @@ signals:
 
 private:
     QString m_systemName;
-    UserPasswordPairList m_data;
+    QnUserRecentConnectionDataList m_data;
 };
