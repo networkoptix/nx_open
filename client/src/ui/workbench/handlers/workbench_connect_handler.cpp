@@ -301,7 +301,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         const bool autoLogin = qnSettings->autoLogin();
         if (autoLogin && url.isValid() && !url.password().isEmpty())
         {
-            if (connectToServer(url, connectionAlias, storePassword, autoLogin, false) != ec2::ErrorCode::ok)
+            if (connectToServer(url, connectionAlias, true, true, false) != ec2::ErrorCode::ok)
                 showWelcomeScreen();
         } 
         else
