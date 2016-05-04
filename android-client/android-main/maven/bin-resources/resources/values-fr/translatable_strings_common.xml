@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accept">Accepter</string>
+    <string name="error">Erreur</string>
+    <string name="save">Sauver</string>
+    <string name="edit">Modifier</string>
+    <string name="delete">Supprimer</string>
+    <string name="add">Ajouter</string>
+
+</resources>

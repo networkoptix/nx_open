@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include <utils/common/byte_array.h>
+
 #include "media_data_packet.h"
 
 

@@ -221,6 +221,21 @@ void mergeObjectListData(
         [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
 }
 
+/** 
+* Updaters are used to update object's fields, which are stored as a raw json string
+* Returns true if object is updated
+*/
+
+bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
+{
+    if (data.actionParams.size() <= 4) //< keep empty json
+        return false;
+    auto deserializedData = QJson::deserialized<QnBusinessActionParameters>(data.actionParams);
+    data.actionParams = QJson::serialized(deserializedData);
+    return true;
+}
+
+
 // --------------------------------------- QnDbTransactionExt -----------------------------------------
 
 bool QnDbManager::QnDbTransactionExt::beginTran()
@@ -575,7 +590,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 return false;
         }
         if (m_needResyncbRules) {
-            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
+            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule, businessRuleObjectUpdater))
                 return false;
         }
         if (m_needResyncUsers) {
@@ -732,7 +747,7 @@ bool QnDbManager::queryObjects(ObjectListType& objects)
 }
 
 template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
+bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
     if (!queryObjects<ObjectListType>(objects))
@@ -742,6 +757,12 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
     {
         QnTransaction<ObjectType> transaction(command, object);
         transactionLog->fillPersistentInfo(transaction);
+        if (updater && updater(transaction.params))
+        {
+            if (executeTransactionInternal(transaction) != ErrorCode::ok)
+                return false;
+        }
+
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
@@ -762,7 +783,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
         return false;
-    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
+    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule, businessRuleObjectUpdater))
         return false;
     if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
@@ -1343,7 +1364,8 @@ bool QnDbManager::fixBusinessRules()
             }
         }
     }
-    m_needResyncbRules = true;
+    if (!m_dbJustCreated)
+        m_needResyncbRules = true;
     return true;
 }
 
@@ -1485,6 +1507,15 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
+    else if (updateName == lit(":/updates/50_fix_migration.sql")) 
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needResyncbRules = true;
+            m_needResyncUsers = true;
+        }
+    }
+	
     return true;
 }
 

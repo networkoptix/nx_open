@@ -7,15 +7,70 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <ui/delegates/resource_tree_item_delegate.h>
 #include <ui/models/resource_list_model.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include <utils/common/string.h>
+
+namespace
+{
+    class QnResourcesListSortModel: public QSortFilterProxyModel
+    {
+        typedef QSortFilterProxyModel base_type;
+    public:
+        explicit QnResourcesListSortModel(QObject *parent = 0) :
+            base_type(parent)
+        {
+        }
+        virtual ~QnResourcesListSortModel() {}
+
+        QnResourcePtr resource(const QModelIndex &index) const
+        {
+            return index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        }
+
+    protected:
+        virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
+        {
+            QnResourcePtr l = resource(left);
+            QnResourcePtr r = resource(right);
+
+            if (!l || !r)
+                return l < r;
+
+            if (l->getTypeId() != r->getTypeId())
+            {
+                QnVirtualCameraResourcePtr lcam = l.dynamicCast<QnVirtualCameraResource>();
+                QnVirtualCameraResourcePtr rcam = r.dynamicCast<QnVirtualCameraResource>();
+                if (!lcam || !rcam)
+                    return lcam < rcam;
+            }
+
+            {
+                /* Sort by name. */
+                QString leftDisplay = left.data(Qt::DisplayRole).toString();
+                QString rightDisplay = right.data(Qt::DisplayRole).toString();
+                int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+                if (result != 0)
+                    return result < 0;
+            }
+
+            /* We want the order to be defined even for items with the same name. */
+            return l->getUniqueId() < r->getUniqueId();
+        }
+
+    };
+
+}
 
 QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnAbstractPermissionsModel::Filter filter, QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::AccessibleResourcesWidget()),
     m_permissionsModel(permissionsModel),
     m_filter(filter),
-    m_resourcesModel(new QnResourceListModel())
+    m_resourcesModel(new QnResourceListModel()),
+    m_viewModel(new QnResourcesListSortModel())
 {
     ui->setupUi(this);
 
@@ -48,8 +103,22 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
             emit hasChangesChanged();
     });
 
-    ui->resourcesTreeView->setModel(m_resourcesModel.data());
+    m_viewModel->setSourceModel(m_resourcesModel.data());
+    m_viewModel->setDynamicSortFilter(true);
+    m_viewModel->setSortRole(Qt::DisplayRole);
+    m_viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_viewModel->sort(Qn::NameColumn);
+
+
+    auto itemDelegate = new QnResourceTreeItemDelegate(this);
+    ui->resourcesTreeView->setItemDelegate(itemDelegate);
+
+    ui->resourcesTreeView->setModel(m_viewModel.data());
     ui->resourcesTreeView->setMouseTracking(true);
+
+    ui->resourcesTreeView->header()->setStretchLastSection(false);
+    ui->resourcesTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->resourcesTreeView->header()->setSectionResizeMode(QnResourceListModel::NameColumn, QHeaderView::Stretch);
 
     auto updateThumbnail = [this](const QModelIndex& index)
     {
@@ -77,6 +146,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     {
         ui->resourcesTreeView->setEnabled(!ui->allResourcesCheckBox->isChecked());
         emit hasChangesChanged();
+    });
+
+    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this](const QModelIndex& index)
+    {
+        QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
+        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+        int inverted = checked ? Qt::Unchecked : Qt::Checked;
+        m_viewModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
     });
 
     updateThumbnail(QModelIndex());

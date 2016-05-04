@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">Bilinmeyen hata</string>
+    <string name="login_error_path">yanlış IP adresi yada port</string>
+    <string name="login_error_protocol">Sunucu bu protokolü desteklemiyor</string>
+    <string name="login_error_connection">Bu adres ile sunucuya bağlanılamadı</string>
+    <string name="login_error_credentials">yanlış kullanıcı adı yada şifre</string>
+    <string name="login_error_port">Geçersiz port</string>
+    <string name="login_error_brand">Sunucu versiyon uyumsuzluğu</string>
+
+    <string name="login_title_caption">Sunucu ismi:</string>
+	<string name="login_title_hint">Bir sunucu ismi ekle</string>
+    
+    <string name="host_caption">Sunucu adresi:</string>
+    <string name="host_hint">IP adresi yada URL</string>
+    <string name="login_empty_host">Sunucu adresi boş bırakılamaz</string>
+    
+    <string name="port_caption">Sunucu portu:</string>
+    <string name="port_hint">Emin değilseniz 7001 girin</string>
+    <string name="login_empty_port">Port bölümü boş bırakılamaz</string>
+    
+    <string name="login_caption">Kullanıcı adı:</string>    
+    <string name="login_hint">Kullanıcı adını girin</string>
+    <string name="login_empty_login">Kullanıcı adı boş bırakılamaz</string>
+    
+    <string name="password_caption">Şifre:</string>
+    <string name="password_hint">Şifrenizi girin</string>      
+    <string name="login_empty_pass">Şifre alanı boş bırakılamaz</string>
+    
+    <string name="login_progress_caption">Giriş yapılıyor…</string>
+    <string name="login_connecting">Bağlanıyor…</string>
+    <string name="login_version_incompatible_title">Uyumsuz versyion.</string>
+    <string name="login_version_incompatible_text">Sunucudaki NX versiyonu izleme bilgisayarındaki ile uyumsuzdur. Kameraları listeleyebilir ama izleyemezsiniz.</string>
+
+	<string name="login_saved_sessions">Oturum kaydediliyor</string>
+	<string name="login_host_title">Sunucu adresi:</string>
+	<string name="login_login_title">Kullanıcı adı:</string>
+	<string name="login_connect">Bağlan</string>
+	<string name="login_delete_confirm">Açık oturumu silmek istediğinize emin misiniz ?:</string>
+</resources>

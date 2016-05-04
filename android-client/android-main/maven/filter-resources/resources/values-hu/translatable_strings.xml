@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_description">
+        ${old.android.product.name} egy elegánsan egyszerű, élvonalbeli, új megközelítése a vállalati HD video megfigyelő rendszereknek. 
+		A hyper-optimalizált architektúrája ennek az új video menedzsment platformnak korlátlan méretezhetőséget, automatikus eszközfelismerést és konfigurációt,
+		egyszerűsített beállítást és könnyű használatot biztosít, a legalacsonyabb összköltség és fentartás mellet a piac megoldásaival szemben. 
+		A megapixel IP video ipar vezető szakemberei által tervezett ${old.android.product.name} kezeli a vállalati HD video rendszerek üzemeltetésének elsődleges akadályait és korlátait.
+    </string>
+</resources>

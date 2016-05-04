@@ -43,7 +43,7 @@ static const int METADATA_TRACK_NUM = 7;
 static const double TIME_RESYNC_THRESHOLD = 10.0; // at seconds
 static const double LOCAL_TIME_RESYNC_THRESHOLD = 500; // at ms
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
-static const QString DEFAULT_REALM(lit("NetworkOptix"));
+
 
 
 QByteArray QnRtspClient::m_guid;
@@ -58,6 +58,15 @@ static QString getValueFromString(const QString& line)
     return line.mid(index+1);
 }
 #endif
+
+namespace
+{
+    const quint8 FFMPEG_CODE = 102;
+    QString FFMPEG_STR(lit("FFMPEG"));
+    const quint8 METADATA_CODE = 126;
+    const QString METADATA_STR(lit("ffmpeg-metadata"));
+    const QString DEFAULT_REALM(lit("NetworkOptix"));
+}
 
 // --------------------- QnRtspIoDevice --------------------------
 
@@ -426,11 +435,6 @@ void QnRtspClient::usePredefinedTracks()
     if(!m_sdpTracks.isEmpty())
         return;
 
-    static const quint8 FFMPEG_CODE = 102;
-    static const QString FFMPEG_STR(QLatin1String("FFMPEG"));
-    static const quint8 METADATA_CODE = 126;
-    static const QString METADATA_STR(QLatin1String("ffmpeg-metadata"));
-
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
@@ -472,7 +476,7 @@ void QnRtspClient::updateTrackNum()
         else if (m_sdpTracks[i]->trackType == TT_AUDIO)
             m_sdpTracks[i]->trackNum = videoNum + curAudio++;
         else if (m_sdpTracks[i]->trackType == TT_METADATA) {
-            if (m_sdpTracks[i]->codecName == QLatin1String("ffmpeg-metadata"))
+            if (m_sdpTracks[i]->codecName == METADATA_STR)
                 m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
             else
                 m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
@@ -535,7 +539,7 @@ void QnRtspClient::parseSDP()
     if (mapNum >= 0) {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
-        //if (codecName == QLatin1String("ffmpeg-metadata"))
+        //if (codecName == METADATA_STR)
         //    trackNumber = METADATA_TRACK_NUM;
         QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
         m_sdpTracks << sdpTrack;
@@ -940,7 +944,7 @@ bool QnRtspClient::sendSetup()
         {
             ;
         }
-        else if (trackInfo->codecName != QLatin1String("ffmpeg-metadata"))
+        else if (trackInfo->codecName != METADATA_STR)
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -1890,7 +1894,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
         if( !readTextResponce(responseBuf) )
             return false;
 
-        nx_http::Response response;
+        nx_rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
             return false;
         m_responseCode = response.statusLine.statusCode;

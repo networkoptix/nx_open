@@ -156,8 +156,9 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
         url.setHost( urlStr );
     }
     url.setPath( lit("/get?mac") );
-    url.setUserName( getAuth().user() );
-    url.setPassword( getAuth().password() );
+    QAuthenticator auth = getAuth();
+    url.setUserName( auth.user() );
+    url.setPassword( auth.password() );
 
     nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
@@ -305,8 +306,11 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    QAuthenticator auth = getAuth();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     const auto activateWithAutoResetDoneHandler =
         [autoResetTimeoutMS, url](
@@ -673,8 +677,11 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/get?auxin"));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    QAuthenticator auth = getAuth();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     m_relayInputClient = nx_http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
@@ -745,6 +752,7 @@ bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& nam
     m_mutex.lock();
     m_mutex.unlock();
     QUrl devUrl(getUrl());
+
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 

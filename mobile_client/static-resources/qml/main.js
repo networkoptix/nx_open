@@ -42,7 +42,7 @@ function openDiscoveredSession(_host, _port, _systemName) {
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
-    stackView.setSlideTransition()
+    stackView.setScaleTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -60,7 +60,7 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
-    stackView.setSlideTransition()
+    stackView.setScaleTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -108,7 +108,7 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
                 state: "FailedSaved"
             }
         })
-        stackView.setSlideTransition()
+        stackView.setScaleTransition()
         stackView.push(pushList)
         item = stackView.get(stackView.depth - 1)
     } else {
@@ -140,7 +140,7 @@ function gotoNewSession() {
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
     if (item) {
-        stackView.setSlideTransition()
+        stackView.setScaleTransition()
         stackView.pop(item)
     } else {
         stackView.setInvertedSlideTransition()
@@ -189,7 +189,7 @@ function openSettings() {
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
-    stackView.setSlideTransition()
+    stackView.setScaleTransition()
     stackView.push(settingsPageComponent)
 }
 

@@ -115,8 +115,10 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
             .arg(m_camera->httpPort())
             .arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
 
-        targetUrl.setUserName(m_camera->getAuth().user());
-        targetUrl.setPassword(m_camera->getAuth().password());
+        QAuthenticator auth = m_camera->getAuth();
+
+        targetUrl.setUserName(auth.user());
+        targetUrl.setPassword(auth.password());
         m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
 
         ui->webView->reload();
@@ -218,8 +220,10 @@ void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*
     if (!m_camera)
         return;
 
-    authenticator->setUser(m_camera->getAuth().user());
-    authenticator->setPassword(m_camera->getAuth().password());
+    QAuthenticator auth = m_camera->getAuth();
+
+    authenticator->setUser(auth.user());
+    authenticator->setPassword(auth.password());
 }
 
 void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy & , QAuthenticator * authenticator) {

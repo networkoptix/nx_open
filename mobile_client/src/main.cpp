@@ -28,38 +28,12 @@
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
+#include <ui/helpers/font_loader.h>
 
-#include <nx/media/video_decoder_registry.h>
-#include <nx/media/audio_decoder_registry.h>
-#include <nx/media/ffmpeg_video_decoder.h>
-#include <nx/media/ffmpeg_audio_decoder.h>
-#include <nx/media/jpeg_decoder.h>
-
-
-#if defined(Q_OS_ANDROID)
-#include <nx/media/android_video_decoder.h>
-#include <nx/media/android_audio_decoder.h>
-#endif
-
+#include <nx/media/decoder_registrar.h>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include "resource_allocator.h"
-
-void initDecoders(QQuickWindow *window)
-{
-    using namespace nx::media;
-#if defined(Q_OS_ANDROID)
-    std::shared_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
-    static const int kHardwareDecodersCount = 1;
-    VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(std::move(allocator), kHardwareDecodersCount);
-    AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
-#endif
-#ifndef DISABLE_FFMPEG
-    VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
-    AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
-#endif
-    VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();
-}
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -68,11 +42,13 @@ int runUi(QGuiApplication *application) {
 
     QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
 
-#ifndef Q_OS_IOS
+    // TODO: #dklychkov Detect fonts dir for iOS.
+    QString fontsDir = QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts"));
+    QnFontLoader::loadFonts(fontsDir);
+
     QFont font;
     font.setFamily(lit("Roboto"));
     QGuiApplication::setFont(font);
-#endif
 
     QnContext context;
 
@@ -101,6 +77,7 @@ int runUi(QGuiApplication *application) {
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
+    engine.addImportPath(lit("qrc:///qml"));
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
@@ -140,7 +117,9 @@ int runUi(QGuiApplication *application) {
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    initDecoders(mainWindow.data());
+    std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
+        mainWindow.data()));
+    nx::media::DecoderRegistrar::registerDecoders(allocator);
 
     return application->exec();
 }

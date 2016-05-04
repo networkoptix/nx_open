@@ -191,6 +191,13 @@ namespace nx_http
         return BufferNpos;
     }
 
+    template<class MessageType, class MessageLineType>
+    bool parseRequestOrResponse(
+        const ConstBufferRefType& data,
+        MessageType* message,
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict = false);
+
 
     //!Parses \a data and saves header name and data to \a *headerName and \a *headerValue
     bool NX_NETWORK_API parseHeader(
@@ -342,6 +349,14 @@ namespace nx_http
         void serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary ) const;
         BufferType toString() const;
         BufferType toMultipartString(const ConstBufferRefType& boundary) const;
+    };
+
+    class NX_NETWORK_API RtspResponse
+    :
+        public Response
+    {
+    public:
+        bool parse(const ConstBufferRefType& data);
     };
 
     namespace MessageType

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accept">開始查詢</string>
+    <string name="error">錯誤</string>
+    <string name="save">保存</string>
+    <string name="edit">編輯</string>
+    <string name="delete">刪除</string>
+    <string name="add">新增</string>
+    
+    <string name="collect_log">收集記錄</string>
+
+</resources>
