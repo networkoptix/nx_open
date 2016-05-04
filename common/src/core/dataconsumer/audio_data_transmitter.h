@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/datapacket/abstract_data_packet.h>
@@ -43,3 +45,5 @@ private:
     QnMutex m_mutex;
     QnLiveStreamProviderPtr m_dataProvider;
 };
+
+#endif // #ifdef ENABLE_DATA_PROVIDERS

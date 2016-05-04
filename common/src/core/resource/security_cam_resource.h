@@ -222,7 +222,7 @@ public:
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
-        \param detailLevel Minimal time period gap (usec) that is of interest to the caller. 
+        \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
             Two time periods lying closer to each other than \a detailLevel usec SHOULD be reported as one
         \note Used only if \a QnSecurityCamResource::isDtsBased() is \a true
         \note Default implementation does nothing
@@ -232,7 +232,7 @@ public:
         qint64 msStartTime,
         qint64 msEndTime,
         int detailLevel );
-    
+
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -245,13 +245,13 @@ public:
 
     //!Set list of IO ports
     void setIOPorts(const QnIOPortDataList& ports);
-    
+
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
-    
+
     //!Returns list of IO ports's states
     virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
-    
+
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 
     // Allow getting multi video layout directly from a RTSP SDP info
@@ -260,7 +260,9 @@ public:
     bool isCameraInfoSavedToDisk(int pool) const;
     void setCameraInfoSavedToDisk(int pool);
 
+#ifdef ENABLE_DATA_PROVIDERS
     virtual QnAudioTransmitterPtr getAudioTransmitter();
+#endif
 
 public slots:
     virtual void inputPortListenerAttached();
@@ -295,7 +297,7 @@ signals:
         const QString& inputPortID,
         bool value,
         qint64 timestamp );
-    
+
     void cameraOutput(
         const QnResourcePtr& resource,
         const QString& inputPortID,
