@@ -3,6 +3,8 @@ import Nx 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
+import "private/ResourcesScreen"
+
 Page
 {
     id: resourcesScreen
@@ -14,6 +16,22 @@ Page
     QtObject
     {
         id: d
+    }
+
+    CamerasGrid
+    {
+        id: camerasGrid
+
+        anchors
+        {
+            fill: parent
+            topMargin: 12
+            bottomMargin: 12
+            leftMargin: 12
+            rightMargin: 12
+        }
+        displayMarginBeginning: anchors.topMargin
+        displayMarginEnd: anchors.bottomMargin
     }
 
     Connections

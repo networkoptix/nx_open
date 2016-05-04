@@ -23,12 +23,8 @@ ToolBar
         clip: true
     }
 
-    background: defaultBackground
-
-    Rectangle
+    background: Rectangle
     {
-        id: defaultBackground
-
         color: ColorTheme.windowBackground
 
         Rectangle

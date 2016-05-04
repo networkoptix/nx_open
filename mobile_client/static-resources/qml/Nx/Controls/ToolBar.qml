@@ -1,9 +1,6 @@
 import QtQuick 2.0
 import Nx.Controls 1.0
 
-// TODO: #dklychkov remove
-import "../../controls"
-
 ToolBarBase
 {
     id: toolBar
@@ -14,7 +11,7 @@ ToolBarBase
 
     signal leftButtonClicked()
 
-    QnIconButton
+    IconButton
     {
         id: leftButton
         anchors.verticalCenter: parent.verticalCenter
