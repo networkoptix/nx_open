@@ -130,6 +130,7 @@ var Helper = function () {
     this.userNameSmile = '☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★';
     this.userNameHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordSymb = '~!@#$%^&*()_:";\'{}[]+<>?,./qweasdzxc';
+    this.userPasswordTm = 'qweasdzxc123®™';
 
     this.inputLong300 = 'qwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkl' +
         'jzxcvbnmqwertyuiopasdfghhkljzxcvbnmqwertyuiopasdfghhkljzxcvbnm' +

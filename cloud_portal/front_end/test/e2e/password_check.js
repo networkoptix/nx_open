@@ -61,7 +61,7 @@ var PasswordFieldSuite = function () {
             });
         });
 
-        xit("password field rejects password with tm symbols", function () {
+        it("password field rejects password with tm symbols", function () {
             getToPassword().then(function(){
                 notAllowPasswordWith(self.helper.userPasswordTm);
             });
@@ -165,7 +165,6 @@ var PasswordFieldSuite = function () {
         it("password field allows password with symbols", function() {
             getToPassword().then(function(){
                 pageObj.passCheck.input.sendKeys(self.helper.userPasswordSymb);
-                self.helpBlock.click(); // blur password field
                 expect(pageObj.passCheck.input.getAttribute('value')).toContain(self.helper.userPasswordSymb);
                 expect(pageObj.passCheck.input.getAttribute('class')).toContain(self.validClass);
                 expect(self.fieldGroup.$('.form-group').getAttribute('class')).not.toContain('has-error');
