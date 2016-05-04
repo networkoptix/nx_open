@@ -8,6 +8,8 @@
 #include <map>
 #include <vector>
 
+#include <QtCore/QString>
+
 #include <nx/network/buffer.h>
 
 #include <utils/common/model_functions_fwd.h>
@@ -19,8 +21,8 @@ namespace data {
 
 struct ListeningPeer
 {
-    nx::String id;
-    nx::String endpoint;
+    QString id;
+    QString endpoint;
 };
 
 #define ListeningPeer_Fields (id)(endpoint)
@@ -37,7 +39,7 @@ struct ListeningPeerList
 struct ListeningPeersBySystem
 {
     /** system id,  */
-    std::map<nx::String, ListeningPeerList> systems;
+    std::map<QString, ListeningPeerList> systems;
 };
 
 #define ListeningPeersBySystem_Fields (systems)
