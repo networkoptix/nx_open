@@ -438,8 +438,8 @@ angular.module('webadminApp')
                         deferred.resolve("setup");
                         return;
                     }
-                    self.getCurrentUser().then(function(){
-                        deferred.resolve(error);
+                    self.getCurrentUser().then(function(data){
+                        deferred.resolve(data);
                     },function(error){
                         deferred.reject(error);
                     });

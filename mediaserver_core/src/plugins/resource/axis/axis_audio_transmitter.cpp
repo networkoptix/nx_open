@@ -10,23 +10,35 @@ namespace
 {
     static const QString kAxisAudioTransmitUrl("/axis-cgi/audio/transmit.cgi");
     static const int kConnectionTimeoutMs = 3000;
+
+    CodecID toFfmpegCodec(const QString& codec)
+    {
+        if (codec == "AAC")
+            return CODEC_ID_AAC;
+        else if (codec == "G726")
+            return CODEC_ID_ADPCM_G726;
+        else if (codec == "MULAW")
+            return CODEC_ID_PCM_MULAW;
+        else
+            return CODEC_ID_NONE;
+    }
 }
 
-bool QnAxisAudioTransmitter::isCompatible(const QnOutputAudioFormat& format) const
+bool QnAxisAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 {
     return
-        format.codec == CodecID::CODEC_ID_AAC ||
-        //format.codec == CodecID::CODEC_ID_ADPCM_G726 ||
-        format.codec == CodecID::CODEC_ID_PCM_MULAW;
+        format.codec() == "AAC" ||
+        //format.codec() == "G726" ||
+        format.codec() == "MULAW";
 }
 
-void QnAxisAudioTransmitter::setOutputFormat(const QnOutputAudioFormat& format)
+void QnAxisAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
 {
     QnMutexLocker lock(&m_mutex);
     m_outputFormat = format;
-    m_transcoder.reset(new QnFfmpegAudioTranscoder(format.codec));
-    if (format.sampleRate != QnOutputAudioFormat::kDefaultSampleRate)
-        m_transcoder->setSampleRate(format.sampleRate);
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(format.codec())));
+    if (format.sampleRate() > 0)
+        m_transcoder->setSampleRate(format.sampleRate());
 }
 
 bool QnAxisAudioTransmitter::isInitialized() const
@@ -51,18 +63,18 @@ QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 
 QString QnAxisAudioTransmitter::getAudioMimeType() const
 {
-    if (m_outputFormat.codec == CodecID::CODEC_ID_PCM_MULAW)
+    if (m_outputFormat.codec() == "MULAW")
     {
-        if (m_outputFormat.sampleRate == 8000)
+        if (m_outputFormat.sampleRate() == 8000)
             return lit("audio/g711");
         else
-            return lit("audio/axis-mulaw-%1").arg((m_outputFormat.sampleRate * 8) / 1000);
+            return lit("audio/axis-mulaw-%1").arg((m_outputFormat.sampleRate() * 8) / 1000);
     }
-    else if (m_outputFormat.codec == CodecID::CODEC_ID_ADPCM_G726)
+    else if (m_outputFormat.codec() == "G726")
     {
         return lit("audio/G726-32");
     }
-    else if (m_outputFormat.codec == CodecID::CODEC_ID_AAC)
+    else if (m_outputFormat.codec() == "AAC")
     {
         return lit("audio/mpeg4-generic");
     }
@@ -87,7 +99,8 @@ SocketAddress QnAxisAudioTransmitter::getSocketAddress() const
 
 QByteArray QnAxisAudioTransmitter::buildTransmitRequest() const
 {
-    auto  auth = m_resource->getAuth();
+    QAuthenticator auth = m_resource->getAuth();
+
     QByteArray transmitRequest;
     SocketAddress sockAddr = getSocketAddress();
 

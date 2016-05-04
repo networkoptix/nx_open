@@ -108,7 +108,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data)
+bool changeAdminPassword(PasswordData data, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -117,7 +117,11 @@ bool changeAdminPassword(PasswordData data)
 
     QnUserResourcePtr admin = qnResPool->getAdministrator();
     if (!admin)
+    {
+        if (errString)
+            *errString = lit("Temporary unavailable. Please try later.");
         return false;
+    }
 
     //making copy of admin user to be able to rollback local changed on DB update failure
     QnUserResourcePtr updatedAdmin = QnUserResourcePtr(new QnUserResource(*admin));
@@ -135,7 +139,11 @@ bool changeAdminPassword(PasswordData data)
     {
         /* check old password */
         if (!admin->checkPassword(data.oldPassword))
+        {
+            if (errString)
+                *errString = lit("Wrong current password specified");
             return false;
+        }
 
         /* set new password */
         updatedAdmin->setPassword(data.password);
@@ -144,7 +152,11 @@ bool changeAdminPassword(PasswordData data)
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
         if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password) != ec2::ErrorCode::ok)
+        {
+            if (errString)
+                *errString = lit("Internal server error. Database IO error");
             return false;
+        }
         updatedAdmin->setPassword(QString());
     }
     else
@@ -158,7 +170,11 @@ bool changeAdminPassword(PasswordData data)
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
         if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser) != ec2::ErrorCode::ok)
+        {
+            if (errString)
+                *errString = lit("Internal server error. Database IO error");
             return false;
+        }
     }
 
     //applying changes to local resource

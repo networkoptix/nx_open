@@ -82,6 +82,11 @@ private:
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
+
+    void updateCameraHistoryNonSafe(
+        const QString uniqueCameraId,
+        qint64 currentTime);
+
 private:
     mutable QnMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;

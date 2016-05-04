@@ -16,6 +16,7 @@
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/archive_camera/archive_camera.h>
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 
@@ -62,6 +63,8 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         m_searchers << new QnPlVmax480ResourceSearcher();
     #endif
+
+        m_searchers << new QnArchiveCamResourceSearcher();
 
         //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF

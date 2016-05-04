@@ -14,6 +14,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/singleton.h>
 
+#include "data/listening_peer.h"
 #include "request_processor.h"
 #include "server/stun_request_processing_helper.h"
 
@@ -99,7 +100,7 @@ public:
     /** Inserts new or returns existing element with key \a peerData.
         \note Another thread will block trying to lock \a peerData while
             \a DataLocker instance is still alive
-     */
+    */
     DataLocker insertAndLockPeerData(
         const ConnectionStrongRef& connection,
         const MediaserverData& peerData);
@@ -110,10 +111,12 @@ public:
     std::vector<MediaserverData> findPeersBySystemId(
         const nx::String& systemId) const;
 
+    data::ListeningPeersBySystem getListeningPeers() const;
+
 private:
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
 };
 
-}   //hpm
-}   //nx
+}   // namespace hpm
+}   // namespace nx

@@ -29,12 +29,14 @@ namespace hpm {
 
 MediatorFunctionalTest::MediatorFunctionalTest()
 :
-    m_port(0)
+    m_port(0),
+    m_httpPort(0)
 {
     //starting clean test
     SocketGlobalsHolder::instance()->reinitialize();
 
     m_port = (std::rand() % 10000) + 50000;
+    m_httpPort = m_port+1;
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
@@ -42,6 +44,7 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     *b = strdup("/path/to/bin");
     *b = strdup("-e");
     *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
+    *b = strdup("-http/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
     *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
 
@@ -119,6 +122,11 @@ void MediatorFunctionalTest::addArg(const char* arg)
 SocketAddress MediatorFunctionalTest::endpoint() const
 {
     return SocketAddress(HostAddress::localhost, m_port);
+}
+
+SocketAddress MediatorFunctionalTest::httpEndpoint() const
+{
+    return SocketAddress(HostAddress::localhost, m_httpPort);
 }
 
 std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>

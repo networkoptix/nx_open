@@ -1042,8 +1042,9 @@ bool QnSecurityCamResource::isIOModule() const
     return m_cachedIsIOModule.get();
 }
 
-
+#ifdef ENABLE_DATA_PROVIDERS
 QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
 {
     return nullptr;
 }
+#endif

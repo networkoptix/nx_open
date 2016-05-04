@@ -151,12 +151,14 @@ QnPlDlinkResource::QnPlDlinkResource()
 
 void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
+    QAuthenticator auth = getAuth();
+
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/common/info.cgi") );
 
     QString resourceMac = getMAC().toString();

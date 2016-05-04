@@ -191,6 +191,13 @@ namespace nx_http
         return BufferNpos;
     }
 
+    template<class MessageType, class MessageLineType>
+    bool parseRequestOrResponse(
+        const ConstBufferRefType& data,
+        MessageType* message,
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict = false);
+
 
     //!Parses \a data and saves header name and data to \a *headerName and \a *headerValue
     bool NX_NETWORK_API parseHeader(
