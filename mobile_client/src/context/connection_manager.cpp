@@ -129,16 +129,18 @@ QString QnConnectionManager::currentPassword() const
     return d->url.isValid() ? d->url.password() : QString();
 }
 
-void QnConnectionManager::connectToServer(const QUrl &url) {
+void QnConnectionManager::connectToServer(const QUrl &url)
+{
     Q_D(QnConnectionManager);
-
-    if (!url.isValid())
-        return;
 
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer(false);
 
-    d->setUrl(url);
+    QUrl fixedUrl(url);
+    if (fixedUrl.port() == -1)
+        fixedUrl.setPort(defaultServerPort());
+
+    d->setUrl(fixedUrl);
     d->doConnect();
 }
 
@@ -219,7 +221,12 @@ void QnConnectionManagerPrivate::resume() {
 
 void QnConnectionManagerPrivate::doConnect() {
     if (!url.isValid())
+    {
+        Q_Q(QnConnectionManager);
+        updateConnectionState();
+        emit q->connectionFailed(QnConnectionManager::NetworkError, QVariant());
         return;
+    }
 
     qnCommon->updateRunningInstanceGuid();
 

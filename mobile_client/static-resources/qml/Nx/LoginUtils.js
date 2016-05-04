@@ -2,7 +2,10 @@
 
 function makeUrl(host, port, login, password)
 {
-    return "http://" + login + ":" + password + "@" + host + ":" + port
+    var result = "http://" + login + ":" + password + "@" + host
+    if (port)
+        result += ":" + port
+    return result
 }
 
 function connectionErrorText(status, info)

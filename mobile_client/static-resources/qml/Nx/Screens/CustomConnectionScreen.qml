@@ -29,6 +29,7 @@ Page
         leftPadding: 16
         rightPadding: 16
         spacing: 24
+        enabled: !d.connecting
 
         property real contentWidth: width - leftPadding - rightPadding
 
@@ -36,7 +37,6 @@ Page
         {
             id: credentialsEditor
             width: parent.contentWidth
-            enabled: !d.connecting
         }
 
         Item
