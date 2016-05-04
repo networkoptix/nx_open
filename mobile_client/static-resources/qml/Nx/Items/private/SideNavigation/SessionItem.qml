@@ -82,15 +82,13 @@ SideNavigationItem
 
     onClicked:
     {
-        if (!active)
-        {
-            currentSessionId = ""
-            connectionManager.connectToServer(address, port, user, password)
-            Workflow.openResourcesScreen(systemName)
-        }
-        else
-        {
-            sideNavigation.close()
-        }
+        sideNavigation.close()
+
+        if (active)
+            return
+
+        currentSessionId = sessionId
+        connectionManager.connectToServer(LoginUtils.makeUrl(address, port, user, password))
+        Workflow.openResourcesScreen(systemName)
     }
 }

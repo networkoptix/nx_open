@@ -7,11 +7,11 @@ import com.networkoptix.qml 1.0
 Page
 {
     id: sessionsScreen
+    objectName: "sessionsScreen"
 
     leftButtonIcon: "/images/menu.png"
     padding: 16
 
-    SideNavigation { id: sideNavigation }
     onLeftButtonClicked: sideNavigation.open()
 
     ListView

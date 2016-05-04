@@ -10,6 +10,7 @@ Drawer
     id: sideNavigation
 
     position: 0
+    enabled: stackView.depth == 1
 
     Rectangle
     {
@@ -61,8 +62,12 @@ Drawer
                 onClicked:
                 {
                     sideNavigation.close()
-//                    Main.gotoNewSession()
-//                    stackView.currentItem.scrollTop()
+
+                    if (active)
+                        return
+
+                    connectionManager.disconnectFromServer(false)
+                    Workflow.openNewSessionScreen()
                 }
             }
 

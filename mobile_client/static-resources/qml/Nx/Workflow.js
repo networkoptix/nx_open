@@ -1,3 +1,5 @@
+.import Qt.labs.controls 1.0 as Controls
+
 function popCurrentScreen()
 {
     if (stackView.depth > 1)
@@ -17,17 +19,38 @@ function openNewSessionScreen()
 
 function openFailedSessionScreen(sessionId, systemName, host, port, login, password, connectionStatus, info)
 {
-    var item = stackView.push(
-            Qt.resolvedUrl("/qml/Nx/Screens/CustomConnectionScreen.qml"),
-            {
-                "sessionId": sessionId,
-                "title": systemName,
-                "host": host,
-                "port": port,
-                "login": login,
-                "password": password,
-            }
-    )
+    var item = null
+    if (stackView.get(0, Controls.StackView.ForceLoad).objectName == "sessionsScreen")
+    {
+        item = stackView.push(
+                Qt.resolvedUrl("/qml/Nx/Screens/CustomConnectionScreen.qml"),
+                {
+                    "sessionId": sessionId,
+                    "title": systemName,
+                    "host": host,
+                    "port": port,
+                    "login": login,
+                    "password": password,
+                }
+        )
+    }
+    else
+    {
+        item = stackView.replace(
+                null,
+                Qt.resolvedUrl("/qml/Nx/Screens/SessionsScreen.qml"),
+                {},
+                Qt.resolvedUrl("/qml/Nx/Screens/CustomConnectionScreen.qml"),
+                {
+                    "sessionId": sessionId,
+                    "title": systemName,
+                    "host": host,
+                    "port": port,
+                    "login": login,
+                    "password": password,
+                }
+        )
+    }
     item.showWarning(connectionStatus, info)
 }
 
@@ -61,6 +84,10 @@ function openSavedSession(sessionId, systemName, host, port, login, password)
 
 function openResourcesScreen(systemName)
 {
+    var item = stackView.get(0, Controls.StackView.ForceLoad)
+    if (item && item.objectName == "resourcesScreen")
+        return
+
     stackView.replace(
             null,
             Qt.resolvedUrl("/qml/Nx/Screens/ResourcesScreen.qml"),
