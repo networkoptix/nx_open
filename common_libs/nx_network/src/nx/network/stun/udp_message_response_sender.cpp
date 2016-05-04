@@ -44,7 +44,8 @@ SocketAddress UDPMessageResponseSender::getSourceAddress() const
     return m_sourceAddress;
 }
 
-void UDPMessageResponseSender::addOnConnectionCloseHandler(std::function<void()> /*handler*/)
+void UDPMessageResponseSender::addOnConnectionCloseHandler(
+    nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
     //TODO #ak
     NX_ASSERT(false);
