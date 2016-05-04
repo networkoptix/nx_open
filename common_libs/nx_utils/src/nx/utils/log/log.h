@@ -168,7 +168,7 @@ namespace {
  */
 static const char* relative_src_filename(const char* s)
 {
-    (void) relative_src_filename;
+    //(void) relative_src_filename;
 
     auto pos = std::string(__FILE__).find("common_libs"); //< This file resides in "common_libs".
     if (pos == std::string::npos || pos >= strlen(s))
