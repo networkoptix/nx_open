@@ -21,7 +21,9 @@
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
+#ifdef ENABLE_DATA_PROVIDERS
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
+#endif
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
