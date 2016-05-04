@@ -2,9 +2,12 @@
 * Dec 28, 2015
 * akolesnikov
 ***********************************************************/
+
 #pragma once
 
 #include <functional>
+
+#include <nx/utils/move_only_func.h>
 
 #include <utils/common/systemerror.h>
 
@@ -33,7 +36,7 @@ public:
     /**
         \note \a AbstractServerConnection::sendMessage does nothing after \a handler has been invoked
     */
-    virtual void addOnConnectionCloseHandler(std::function<void()> handler) = 0;
+    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     virtual AbstractCommunicatingSocket* socket() = 0;
 
 private:

@@ -48,13 +48,19 @@ angular.module('webadminApp')
             var confirmation = $scope.singleServer?
                 'This server will be disconnected from old server and turned into a new one':
                 'Reset system: clear system name, administrator account and cloud settings';
-            dialogs.confirmWithPassword(null,
-                confirmation,
-                'Create New System').then(function(oldPassword){
-                mediaserver.detachFromSystem(oldPassword).then(function(){
-                    //2. throw him to master
-                    $location.path('/setup');
+            dialogs.confirmWithPassword(null, confirmation, 'Create New System').then(function(oldPassword){
+                mediaserver.detachFromSystem(oldPassword).then(function(data){
+                    if(data.data.error !== '0' && data.data.error !== 0){
+                        // Some Error has happened
+                        dialogs.alert(data.data.errorString);
+                        return;
+                    }
+                    //2. reload page - he will be redirected to master
                     window.location.reload();
+                },function(error){
+                    dialogs.alert('Can\'t proceed with action: unexpected error has happened');
+                    $log.log("can't detach");
+                    $log.error(error);
                 });
             });
         };

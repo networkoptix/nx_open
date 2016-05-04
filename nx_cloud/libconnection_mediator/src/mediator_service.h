@@ -13,16 +13,25 @@
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
 
+#include <nx/network/connection_server/multi_address_server.h>
 #include <nx/utils/move_only_func.h>
+
 #include <utils/common/stoppable.h>
 
+
+namespace nx_http {
+    class HttpStreamSocketServer;
+    class MessageDispatcher;
+}   // namespace nx_http
 
 namespace nx {
 namespace hpm {
 
+class ListeningPeerPool;
+
 namespace conf {
     class Settings;
-}
+}   // namespace conf
 
 class MediatorProcess
 :
@@ -52,6 +61,12 @@ private:
     QString getDataDirectory();
     int printHelp();
     void initializeLogging(const conf::Settings& settings);
+    bool launchHttpServerIfNeeded(
+        const conf::Settings& settings,
+        const ListeningPeerPool& listeningPeerPool,
+        std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
+        std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
+            multiAddressHttpServer);
 };
 
 } // namespace hpm

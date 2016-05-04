@@ -12,6 +12,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
 
 #include "stream_socket_server.h"
@@ -121,9 +122,9 @@ namespace nx_api
         /*!
             \note It is unspecified which thread \a handler will be invoked in (usually, it is aio thread corresponding to the socket)
         */
-        void registerCloseHandler( std::function<void()>&& handler )
+        void registerCloseHandler(nx::utils::MoveOnlyFunc<void()> handler)
         {
-            m_connectionCloseHandlers.push_front( std::move(handler) );
+            m_connectionCloseHandlers.push_front(std::move(handler));
         }
 
         const std::unique_ptr<AbstractCommunicatingSocket>& socket() const
@@ -155,7 +156,7 @@ namespace nx_api
         std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
         nx::Buffer m_readBuffer;
         size_t m_bytesToSend;
-        std::forward_list<std::function<void()>> m_connectionCloseHandlers;
+        std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionCloseHandlers;
         nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
@@ -165,9 +166,7 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
             if( bytesRead == 0 )    //connection closed by remote peer
-                return m_connectionManager->closeConnection(
-                    SystemError::connectionReset,
-                    static_cast<CustomConnectionType*>(this) );
+                return handleSocketError(SystemError::connectionReset);
 
             NX_ASSERT( (size_t)m_readBuffer.size() == bytesRead );
 
@@ -197,6 +196,7 @@ namespace nx_api
 
         void handleSocketError( SystemError::ErrorCode errorCode )
         {
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
             switch( errorCode )
             {
                 case SystemError::noError:
@@ -205,22 +205,33 @@ namespace nx_api
 
                 case SystemError::connectionReset:
                 case SystemError::notConnected:
-                    return m_connectionManager->closeConnection(
+                    m_connectionManager->closeConnection(
                         errorCode,
 						static_cast<CustomConnectionType*>(this) );
+                    break;
 
                 default:
-                    return m_connectionManager->closeConnection(
+                    m_connectionManager->closeConnection(
                         errorCode,
 						static_cast<CustomConnectionType*>(this) );
+                    break;
             }
+
+            if (!watcher.objectDestroyed())
+                triggerConnectionClosedEvent();
+        }
+
+        void triggerConnectionClosedEvent()
+        {
+            auto connectionCloseHandlers = std::move(m_connectionCloseHandlers);
+            m_connectionCloseHandlers.clear();
+            for (auto& connectionCloseHandler : connectionCloseHandlers)
+                connectionCloseHandler();
         }
 
         void stopWhileInAioThread()
         {
-            for (auto& connectionCloseHandler : m_connectionCloseHandlers)
-                connectionCloseHandler();
-            m_connectionCloseHandlers.clear();
+            triggerConnectionClosedEvent();
         }
     };
 }

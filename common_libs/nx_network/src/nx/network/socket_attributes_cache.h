@@ -139,7 +139,7 @@ public:
     {
         return setAttributeValue(
             &m_socketAttributes.recvTimeout,
-            &AbstractSocket::setRecvTimeout,
+            static_cast<bool (AbstractSocket::*)(unsigned int)>(&AbstractSocket::setRecvTimeout),
             millis);
     }
     virtual bool getRecvTimeout(unsigned int* millis) const override
@@ -154,7 +154,7 @@ public:
     {
         return setAttributeValue(
             &m_socketAttributes.sendTimeout,
-            &AbstractSocket::setSendTimeout,
+            static_cast<bool (AbstractSocket::*)(unsigned int)>(&AbstractSocket::setSendTimeout),
             millis);
     }
     virtual bool getSendTimeout(unsigned int* millis) const override

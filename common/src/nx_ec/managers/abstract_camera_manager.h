@@ -149,7 +149,7 @@ namespace ec2
 
 
     signals:
-        void addedOrUpdated(const ec2::ApiCameraData& camera);
+        void addedOrUpdated(const ec2::ApiCameraData& camera, const ec2::ApiResourceParamDataList &);
         void cameraHistoryChanged(const ec2::ApiServerFootageData& cameraHistory);
         void removed(const QnUuid& id);
 

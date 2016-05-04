@@ -16,8 +16,8 @@ public:
 
     virtual bool processAudioData(QnConstAbstractMediaDataPtr &data) override;
 
-    virtual bool isCompatible(const QnOutputAudioFormat& format) const override;
-    virtual void setOutputFormat(const QnOutputAudioFormat& format) override;
+    virtual bool isCompatible(const QnAudioFormat& format) const override;
+    virtual void setOutputFormat(const QnAudioFormat& format) override;
     virtual bool isInitialized() const override;
 protected:
     virtual void pleaseStop() override;
@@ -35,5 +35,5 @@ private:
     std::atomic<bool> m_connectionEstablished;
     bool m_canProcessData;
     std::unique_ptr<nx::network::TCPSocket> m_socket;
-    QnOutputAudioFormat m_outputFormat;
+    QnAudioFormat m_outputFormat;
 };

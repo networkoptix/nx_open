@@ -166,9 +166,9 @@ namespace {
  * Debug.
  * @return Part of a source code filename which is a path relative to "nx_vms..." folder.
  */
-static const char* relative_src_filename(const char* s)
+static inline const char* relative_src_filename(const char* s)
 {
-    (void) relative_src_filename;
+    static_cast<void>(&relative_src_filename);
 
     auto pos = std::string(__FILE__).find("common_libs"); //< This file resides in "common_libs".
     if (pos == std::string::npos || pos >= strlen(s))

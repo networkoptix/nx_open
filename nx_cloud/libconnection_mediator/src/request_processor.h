@@ -11,6 +11,7 @@
 namespace nx {
 namespace hpm {
 
+/** TODO #ak replace this structure with something not related to "system" and "server" */
 struct MediaserverData
 {
     String systemId;

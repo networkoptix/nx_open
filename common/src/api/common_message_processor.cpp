@@ -96,7 +96,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
 
     auto cameraManager = connection->getCameraManager();
-    connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData));
+    connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, static_cast<void (QnCommonMessageProcessor::*)(const ec2::ApiCameraData &, const ec2::ApiResourceParamDataList &)>(&QnCommonMessageProcessor::updateResource));
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesChanged,      this, &QnCommonMessageProcessor::on_cameraUserAttributesChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
@@ -594,11 +594,16 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage
     updateResource(qnWebpage);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, const ec2::ApiResourceParamDataList &properties)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
+
+    for (const auto &prop : properties)
+        qnCamera->setProperty(prop.name, prop.value);
+    if (!properties.empty())
+        propertyDictionary->saveParams(qnCamera->getId());
 
     NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
