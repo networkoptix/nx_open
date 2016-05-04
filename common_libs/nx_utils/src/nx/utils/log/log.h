@@ -166,7 +166,7 @@ namespace {
  * Debug.
  * @return Part of a source code filename which is a path relative to "nx_vms..." folder.
  */
-static const char* relative_src_filename(const char* s)
+static inline const char* relative_src_filename(const char* s)
 {
     static_cast<void>(&relative_src_filename);
 
