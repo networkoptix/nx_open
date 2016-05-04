@@ -37,6 +37,7 @@ describe('On change password page,', function () {
 
     it("restore password", function() {
         p.helper.restorePassword(p.helper.userEmail, p.helper.userPassword);
+        p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
 
     it("password can be changed", function () {
