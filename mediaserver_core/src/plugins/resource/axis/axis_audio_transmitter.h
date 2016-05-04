@@ -35,5 +35,5 @@ private:
     std::atomic<bool> m_connectionEstablished;
     bool m_canProcessData;
     std::unique_ptr<nx::network::TCPSocket> m_socket;
-    QnOutputAudioFormat m_outputFormat;
+    QnAudioFormat m_outputFormat;
 };
