@@ -3,28 +3,6 @@
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/dataprovider/live_stream_provider.h>
 
-struct QnOutputAudioFormat
-{
-    const static int kDefaultSampleRate = -1;
-    QnOutputAudioFormat(CodecID codec, int sampleRate):
-        codec(codec),
-        sampleRate(sampleRate)
-    {
-    }
-
-    QnOutputAudioFormat():
-        codec(CODEC_ID_NONE),
-        sampleRate(kDefaultSampleRate)
-    {
-    }
-
-    bool isEmpty() const { return codec == CODEC_ID_NONE; }
-
-    CodecID codec;
-    int sampleRate;
-};
-
-
 class QnAbstractAudioTransmitter : public QnAbstractDataConsumer
 {
     Q_OBJECT
@@ -45,12 +23,12 @@ public:
      * Returns true if transmitter is compatible with AudioFormat
      * Otherwise (default) video + audio is opened
      */
-    virtual bool isCompatible(const QnOutputAudioFormat& format) const { return false; }
+    virtual bool isCompatible(const QnAudioFormat& format) const { return false; }
 
     /**
      * Set output format for transmitter
      */
-    virtual void setOutputFormat(const QnOutputAudioFormat& format) = 0;
+    virtual void setOutputFormat(const QnAudioFormat& format) = 0;
 
     /**
      * Returns true if transmitter is ready to use
