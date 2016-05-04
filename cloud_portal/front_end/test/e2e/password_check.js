@@ -13,11 +13,11 @@ var PasswordFieldSuite = function () {
     this.passwordGood = { class:'label-success', text:'good', title: '' };
 
     this.invalidClass = 'ng-invalid';
-    // this.invalidClassRequired = 'ng-invalid-required';
-    // this.invalidClassExists = 'ng-invalid-already-exists';
 
     this.fieldGroup = element(by.css('password-input'));
-    this.helpBlock = element(by.css('password-input')).element(by.css('.help-block'));
+    this.helpBlock = this.fieldGroup.element(by.css('.help-block'));
+    this.makeVisible = this.fieldGroup.element(by.css('span.input-group-addon'));
+    this.visibleInput = this.fieldGroup.element(by.css('input[type=text]'));
 
     this.check = function(getToPassword, pageObj){
 
@@ -114,6 +114,30 @@ var PasswordFieldSuite = function () {
                 pageObj.passCheck.input.clear();
                 pageObj.passCheck.input.sendKeys('123qwe ');
                 checkPasswordWarning(self.passwordIncorrect);
+            });
+        });
+
+        it("password can be made visible", function() {
+            getToPassword().then(function(){
+                pageObj.passCheck.input.sendKeys('123qwe');
+                self.makeVisible.click();
+                expect(self.visibleInput.getAttribute('value')).toContain('123qwe');
+            });
+        });
+
+        xit("symbols should be allowed in password", function() {
+        });
+
+        it("copy and paste into password field", function() {
+            getToPassword().then(function(){
+                self.makeVisible.click();
+                self.visibleInput.sendKeys('passwordToCopy');
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
+                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "c"));
+                self.visibleInput.clear();
+                expect(self.visibleInput.getAttribute('value')).not.toContain('passwordToCopy');
+                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
+                expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
             });
         });
     }
