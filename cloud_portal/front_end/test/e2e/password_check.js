@@ -12,7 +12,8 @@ var PasswordFieldSuite = function () {
     this.passwordFair = { class:'label-warning', text:'fair', title: 'Use numbers, symbols in different case and special symbols to make your password stronger' };
     this.passwordGood = { class:'label-success', text:'good', title: '' };
 
-    this.invalidClass = 'ng-invalid';
+    this.invalidClass = ' ng-invalid ';
+    this.validClass = ' ng-valid ';
 
     this.fieldGroup = element(by.css('password-input'));
     this.helpBlock = this.fieldGroup.element(by.css('.help-block'));
@@ -42,31 +43,31 @@ var PasswordFieldSuite = function () {
             checkPasswordInvalid(self.invalidClass);
         };
 
-        it("should not allow password with cyrillic symbols", function () {
+        it("password field rejects password with cyrillic symbols", function () {
             getToPassword().then(function(){
                 notAllowPasswordWith(self.helper.userPasswordCyrillic);
             });
         });
 
-        it("should not allow password with smile symbols", function () {
+        it("password field rejects password with smile symbols", function () {
             getToPassword().then(function(){
                 notAllowPasswordWith(self.helper.userPasswordSmile);
             });
         });
 
-        it("should not allow password with hieroglyph symbols", function () {
+        it("password field rejects password with hieroglyph symbols", function () {
             getToPassword().then(function(){
                 notAllowPasswordWith(self.helper.userPasswordHierog);
             });
         });
 
-        xit("should not allow password with tm symbols", function () {
+        xit("password field rejects password with tm symbols", function () {
             getToPassword().then(function(){
                 notAllowPasswordWith(self.helper.userPasswordTm);
             });
         });
 
-        it("should show warnings about password strength", function () {
+        it("password field shows warnings about password strength", function () {
             getToPassword().then(function(){
                 pageObj.passCheck.input.sendKeys('qwe');
                 checkPasswordWarning(self.passwordWeak);
@@ -95,7 +96,7 @@ var PasswordFieldSuite = function () {
             });
         });
 
-        it("should show only 1 warning about strength at a time", function () {
+        it("password field shows only 1 warning about strength at a time", function () {
             getToPassword().then(function(){
                 pageObj.passCheck.input.sendKeys('123qwe');
                 checkPasswordWarning(self.passwordCommon);
@@ -106,7 +107,7 @@ var PasswordFieldSuite = function () {
             });
         });
 
-        it("should not allow password with leading or trailing spaces", function () {
+        it("password field rejects password with leading or trailing spaces", function () {
             getToPassword().then(function(){
                 pageObj.passCheck.input.sendKeys(' 123qwe');
                 checkPasswordWarning(self.passwordIncorrect);
@@ -117,27 +118,58 @@ var PasswordFieldSuite = function () {
             });
         });
 
-        it("password can be made visible", function() {
+        it("password field input can be made visible", function() {
             getToPassword().then(function(){
-                pageObj.passCheck.input.sendKeys('123qwe');
+                pageObj.passCheck.input.sendKeys('visiblePassword');
                 self.makeVisible.click();
-                expect(self.visibleInput.getAttribute('value')).toContain('123qwe');
+                expect(self.visibleInput.getAttribute('value')).toContain('visiblePassword');
             });
         });
 
-        xit("symbols should be allowed in password", function() {
-        });
-
-        it("copy and paste into password field", function() {
+        it("password field allows copy and paste visible input", function() {
             getToPassword().then(function(){
-                self.makeVisible.click();
+                self.makeVisible.click(); // make password input human-readable
                 self.visibleInput.sendKeys('passwordToCopy');
+
+                // Copy + paste
                 self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
                 self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "c"));
                 self.visibleInput.clear();
                 expect(self.visibleInput.getAttribute('value')).not.toContain('passwordToCopy');
                 self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
                 expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
+
+                // Cut + paste
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
+                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "x"));
+                expect(self.visibleInput.getAttribute('value')).not.toContain('passwordToCopy');
+                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
+                expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
+            });
+        });
+
+        it("password field allows copy visible and paste dotted input", function() {
+            getToPassword().then(function(){
+                self.makeVisible.click(); // make password input human-readable
+                self.visibleInput.sendKeys('passwordToCopy');
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
+                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "c"));
+                self.visibleInput.clear();
+                self.makeVisible.click(); // make password input value replaced with dots
+                pageObj.passCheck.input.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
+                self.makeVisible.click(); // make password input human-readable
+                expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
+            });
+        });
+
+        it("password field allows password with symbols", function() {
+            getToPassword().then(function(){
+                pageObj.passCheck.input.sendKeys(self.helper.userPasswordSymb);
+                self.helpBlock.click(); // blur password field
+                expect(pageObj.passCheck.input.getAttribute('value')).toContain(self.helper.userPasswordSymb);
+                expect(pageObj.passCheck.input.getAttribute('class')).toContain(self.validClass);
+                expect(self.fieldGroup.$('.form-group').getAttribute('class')).not.toContain('has-error');
+                pageObj.passCheck.submit.click();
             });
         });
     }

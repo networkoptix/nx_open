@@ -34,6 +34,7 @@ describe('On change password page,', function () {
         deferred.fulfill();
         return deferred.promise;
     }, p);
+    p.helper.restorePassword(p.helper.userEmail, p.helper.userPassword);
 
     it("password can be changed", function () {
         p.currentPasswordInput.sendKeys(p.helper.userPassword);

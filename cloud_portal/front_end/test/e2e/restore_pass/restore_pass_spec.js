@@ -40,6 +40,7 @@ describe('Restore password suite', function () {
         });
         return deferred.promise;
     }, p);
+    p.helper.restorePassword(p.helper.userEmail, p.helper.userPassword);
 
     it("should be able to set new password (which is same as old)", function () {
         var userEmail = p.helper.userEmail;
