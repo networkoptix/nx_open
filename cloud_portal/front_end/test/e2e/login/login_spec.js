@@ -1,6 +1,6 @@
 'use strict';
 var LoginPage = require('./po.js');
-describe('Login dialog', function () {
+fdescribe('Login dialog', function () {
 
     var p = new LoginPage();
 
@@ -112,7 +112,6 @@ describe('Login dialog', function () {
         p.checkPasswordMissing();
 
         p.dialogCloseButton.click();
-
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(p.loginSuccessElement.isDisplayed()).toBe(false);
     });
@@ -250,18 +249,17 @@ describe('Login dialog', function () {
         return deferred.promise;
     }, p.alert.alertMessages.loginNotActive, p.alert.alertTypes.danger, true);
 
-    it("logs in with Remember Me checkmark switched on; after close browser, open browser enters same session", function () {
+    xit("logs in with Remember Me checkmark switched on; after close browser, open browser enters same session", function () {
         //check remember me function by closing browser instance and opening it again
-        p.helper.login();
     });
 
     it("displays password masked", function () {
         p.get();
         p.passwordInput.sendKeys(p.helper.userPassword);
         expect(p.passwordInput.getText()).not.toContain(p.helper.userPassword);
-        browser.takeScreenshot().then(function (png) {
-            p.helper.writeScreenShot(png, '...../masked_password.png');
-        });
+        //browser.takeScreenshot().then(function (png) {
+        //    p.helper.writeScreenShot(png, '...../masked_password.png');
+        //});
     });
 
     it("requires login, if the user has just logged out and pressed back button in browser", function () {
@@ -290,7 +288,35 @@ describe('Login dialog', function () {
         expect(accountElem.isPresent()).toBe(false);
     });
 
-    xit("allows copy-paste in input fields", function() {
+    it("allows copy-paste in input fields", function() {
+        p.get();
+        p.emailInput.sendKeys('copiedValue');
+
+        // Copy + paste
+        p.emailInput.sendKeys(protractor.Key.CONTROL, "a")
+            .sendKeys(protractor.Key.CONTROL, "c")
+            .clear()
+            .sendKeys(protractor.Key.CONTROL, "v");
+        expect(p.emailInput.getAttribute('value')).toContain('copiedValue');
+
+        p.passwordInput.clear()
+            .sendKeys(protractor.Key.CONTROL, "v")
+            .sendKeys('123');
+        expect(p.passwordInput.getAttribute('value')).toContain('copiedValue123');
+        p.emailInput.clear();
+        p.passwordInput.clear();
+
+        // Cut + paste
+        p.emailInput.sendKeys(protractor.Key.CONTROL, "a")
+            .sendKeys(protractor.Key.CONTROL, "x");
+        expect(p.emailInput.getAttribute('value')).not.toContain('copiedValue');
+        p.emailInput.sendKeys(protractor.Key.CONTROL, "v");
+        expect(p.emailInput.getAttribute('value')).toContain('copiedValue');
+
+        p.passwordInput.clear()
+            .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"))
+            .sendKeys('123');
+        expect(p.passwordInput.getAttribute('value')).toContain('copiedValue123');
     });
 
     it("should respond to Esc key and close dialog", function () {
@@ -352,7 +378,9 @@ describe('Login dialog', function () {
             browser.switchTo().window(newWindow).then(function () {
                 browser.refresh();
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
+                browser.close();
             });
+            browser.switchTo().window(oldWindow);
         });
     });
 
