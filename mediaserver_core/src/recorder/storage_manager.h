@@ -31,6 +31,7 @@
 #include <future>
 #include <mutex>
 #include <array>
+#include <vector>
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
@@ -46,6 +47,14 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
     friend class TestHelper;
+    struct ArchiveCameraData
+    {
+        ec2::ApiCameraData coreData;
+        ec2::ApiResourceParamDataList properties;
+    };
+
+    typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
+
 public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
@@ -179,9 +188,9 @@ private:
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                      ec2::ApiCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
+                                      ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
 
-    void loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ec2::ApiCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const;
+    void loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ArchiveCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const;
 
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
