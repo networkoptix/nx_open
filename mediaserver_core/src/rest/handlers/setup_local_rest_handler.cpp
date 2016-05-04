@@ -94,8 +94,9 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeAdminPassword(data)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't change password."));
+    QString errString;
+    if (!changeAdminPassword(data, &errString)) {
+        result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
 
