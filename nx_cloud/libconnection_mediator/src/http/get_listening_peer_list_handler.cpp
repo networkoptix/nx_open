@@ -12,6 +12,8 @@ namespace nx {
 namespace hpm {
 namespace http {
 
+const char* GetListeningPeerListHandler::kHandlerPath = "/statistics/listening_peer_list";
+
 GetListeningPeerListHandler::GetListeningPeerListHandler(
     const ListeningPeerPool& listeningPeerPool)
 :
