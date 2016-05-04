@@ -1,9 +1,11 @@
 #pragma once
 
 #include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/abstract_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
+
 #include <core/dataprovider/live_stream_provider.h>
-#include <core/datapacket/abstract_data_packet.h>
-#include <core/datapacket/media_data_packet.h>
+
 
 class QnAbstractAudioTransmitter : public QnAbstractDataConsumer
 {
