@@ -27,6 +27,14 @@ public:
 
     virtual ~QnCoreSettings();
 
+    void writeValueToSettings(QSettings *settings
+        , int id
+        , const QVariant &value) const;
+
+    QVariant readValueFromSettings(QSettings *settings
+        , int id
+        , const QVariant &defaultValue);
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
         QN_DECLARE_RW_PROPERTY(QnUserRecentConnectionDataList, recentUserConnections
