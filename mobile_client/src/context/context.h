@@ -24,6 +24,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
     Q_PROPERTY(QnSavedSessionsModel* savedSessionsModel READ savedSessionsModel NOTIFY savedSessionsModelChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
+    Q_PROPERTY(QString currentSessionId READ currentSessionId WRITE setCurrentSessionId NOTIFY currentSessionIdChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -79,6 +80,9 @@ public:
 
     Q_INVOKABLE bool liteMode() const;
 
+    QString currentSessionId() const;
+    void setCurrentSessionId(const QString& id);
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
@@ -88,6 +92,7 @@ signals:
     void settingsChanged();
     void liteModeChanged();
     void savedSessionsModelChanged();
+    void currentSessionIdChanged();
 
 private:
     QnConnectionManager *m_connectionManager;
@@ -98,6 +103,8 @@ private:
     QnSavedSessionsModel* m_savedSessionsModel;
 
     QScopedPointer<QnResolutionUtil> m_resolutionUtil;
+
+    QString m_currentSessionId;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

@@ -71,7 +71,7 @@ Item
                     ripple.splash(mouseArea.mouseX, mouseArea.mouseY)
             }
 
-            fadeInAnimation.stop()
+            fadeInAnimation.complete()
             fadeOutAnimation.start()
         }
     }

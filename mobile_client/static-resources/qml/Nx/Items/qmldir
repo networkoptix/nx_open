@@ -1,3 +1,5 @@
 module Nx.Items
 
 SideNavigation 1.0 SideNavigation.qml
+SessionCredentialsEditor 1.0 SessionCredentialsEditor.qml
+SessionItem 1.0 SessionItem.qml

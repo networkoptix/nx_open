@@ -2,9 +2,12 @@ module Nx.Controls
 
 Button 1.0 Button.qml
 IconButton 1.0 IconButton.qml
+CheckBox 1.0 CheckBox.qml
 StackView 1.0 StackView.qml
 ToolBar 1.0 ToolBar.qml
 SearchToolBar 1.0 SearchToolBar.qml
 PageTitleLabel 1.0 PageTitleLabel.qml
 Page 1.0 Page.qml
 MaterialEffect 1.0 MaterialEffect.qml
+ThreeDotBusyIndicator 1.0 ThreeDotBusyIndicator.qml
+WarningPanel 1.0 WarningPanel.qml

@@ -1,3 +1,4 @@
+import QtQuick 2.0
 import Nx.Controls 1.0
 
 PageBase
@@ -7,12 +8,27 @@ PageBase
     property alias title: toolBar.title
     property alias leftButtonIcon: toolBar.leftButtonIcon
     property alias titleControls: toolBar.controls
+    property alias warningText: warningPanel.text
+    property alias warningVisible: warningPanel.opened
 
     signal leftButtonClicked()
 
-    header: ToolBar
+    header: Item
     {
-        id: toolBar
-        onLeftButtonClicked: page.leftButtonClicked()
+        implicitWidth: parent.width
+        implicitHeight: toolBar.height + warningPanel.height
+
+        ToolBar
+        {
+            id: toolBar
+            leftButtonIcon: "/images/arrow_back.png"
+            onLeftButtonClicked: page.leftButtonClicked()
+        }
+
+        WarningPanel
+        {
+            id: warningPanel
+            anchors.top: toolBar.bottom
+        }
     }
 }

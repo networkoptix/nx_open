@@ -8,14 +8,11 @@ Button
 
     property string icon: ""
 
-    contentItem: Item
+    label: Image
     {
-        Image
-        {
-            anchors.centerIn: parent
-            source: control.icon
-            opacity: control.enabled ? 1.0 : 0.3
-        }
+        anchors.centerIn: parent
+        source: control.icon
+        opacity: control.enabled ? 1.0 : 0.3
     }
 
     background: MaterialEffect

@@ -4,14 +4,12 @@ import Nx 1.0
 import com.networkoptix.qml 1.0
 
 import "private/SideNavigation"
-import "../../main.js" as Main
 
 Drawer
 {
-    id: drawer
+    id: sideNavigation
 
     position: 0
-    readonly property string activeSessionId: mainWindow.currentSessionId
 
     Rectangle
     {
@@ -33,7 +31,7 @@ Drawer
             delegate: SessionItem
             {
                 width: savedSessionsList.width
-                active: activeSessionId == sessionId
+                active: currentSessionId == sessionId
 
                 sessionId: model.sessionId
                 systemName: model.systemName
@@ -59,12 +57,12 @@ Drawer
             {
                 icon: "/images/plus.png"
                 text: qsTr("New connection")
-                active: !activeSessionId
+                active: !currentSessionId
                 onClicked:
                 {
-                    drawer.close()
-                    Main.gotoNewSession()
-                    stackView.currentItem.scrollTop()
+                    sideNavigation.close()
+//                    Main.gotoNewSession()
+//                    stackView.currentItem.scrollTop()
                 }
             }
 
@@ -73,7 +71,7 @@ Drawer
                 icon: "/images/settings.png"
                 text: qsTr("Settings")
                 visible: !liteMode
-                onClicked: Main.openSettings()
+                onClicked: Workflow.openSettingsScreen()
             }
 
             VersionLabel {}

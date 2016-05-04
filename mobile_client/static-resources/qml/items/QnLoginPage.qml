@@ -1,6 +1,7 @@
 import QtQuick 2.4
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Screens 1.0
 import com.networkoptix.qml 1.0
 
 import "../controls"
@@ -23,7 +24,6 @@ Page {
     property var oldClientOfferDialog: oldClientOfferDialog
 
     title: newConnectionLabel
-    leftButtonIcon: "/images/arrow_back.png"
 
     property bool _authError: false
     property bool _serverError: false
@@ -268,7 +268,8 @@ Page {
                     Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                 }
 
-                QnThreeDotPreloader {
+                ThreeDotBusyIndicator
+                {
                     height: dp(48)
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: QnTheme.preloaderCircle
@@ -339,6 +340,25 @@ Page {
                     }
                 }
             }
+        }
+    }
+
+    QnButton
+    {
+        text: qsTr("Conntect to Another Server")
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 8
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        onClicked:
+        {
+            stackView.push(customConnectionScreenComponent)
+        }
+
+        Component
+        {
+            id: customConnectionScreenComponent
+            CustomConnectionScreen {}
         }
     }
 

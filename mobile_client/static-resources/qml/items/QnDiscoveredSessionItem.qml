@@ -1,5 +1,5 @@
 import QtQuick 2.4
-
+import Nx.Screens 1.0
 import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
@@ -68,11 +68,28 @@ Rectangle {
         }
     }
 
+    Component
+    {
+        id: customConnectionScreenComponent
+        CustomConnectionScreen {}
+    }
+
     function open()
     {
         if (isCompatible)
-            Main.openDiscoveredSession(host, port, systemName)
+        {
+            stackView.push(
+                    customConnectionScreenComponent,
+                    {
+                        "host": host,
+                        "port": port,
+                        "title": systemName
+                    }
+            )
+        }
         else
+        {
             oldClientOfferDialog.show()
+        }
     }
 }

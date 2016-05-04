@@ -1,5 +1,5 @@
 import QtQuick 2.4
-
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
 import "../controls"
@@ -133,7 +133,7 @@ Item {
     Component {
         id: thumbnailPreloaderComponent
 
-        QnThreeDotPreloader {}
+        ThreeDotBusyIndicator {}
     }
 
     Component {

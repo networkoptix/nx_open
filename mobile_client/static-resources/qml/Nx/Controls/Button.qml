@@ -9,13 +9,16 @@ Button
     id: control
 
     property color color: ColorTheme.base9
+    property color textColor: ColorTheme.windowText
     property bool flat: false
 
     property real mouseX: mouseTracker.mouseX
     property real mouseY: mouseTracker.mouseY
 
-    implicitWidth: Math.max(background ? background.implicitWidth : 0, contentItem ? contentItem.implicitWidth: 0) + leftPadding + rightPadding
-    implicitHeight: Math.max(background ? background.implicitHeight : 0, contentItem ? contentItem.implicitHeight : 0) + topPadding + bottomPadding
+    implicitWidth: Math.max(background ? background.implicitWidth : 0,
+                            label ? label.implicitWidth: 0) + leftPadding + rightPadding
+    implicitHeight: Math.max(background ? background.implicitHeight : 0,
+                             label ? label.implicitHeight : 0) + topPadding + bottomPadding
 
     padding: 6
     leftPadding: 8
@@ -24,15 +27,14 @@ Button
     font.pixelSize: 16
     font.weight: Font.DemiBold
 
-    contentItem: Text
+    label: Text
     {
+        anchors.centerIn: parent
         text: control.text
         font: control.font
         leftPadding: 8
         rightPadding: 8
-        color: ColorTheme.brand_contrast
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+        color: control.textColor
         elide: Text.ElideRight
         opacity: control.enabled ? 1.0 : 0.3
     }
@@ -43,9 +45,9 @@ Button
         implicitHeight: 40
         radius: 2
 
-        width: parent.width - leftPadding - rightPadding
+        width: parent.availableWidth
+        height: parent.availableHeight
         x: parent.leftPadding
-        height: parent.height - topPadding - bottomPadding
         y: parent.topPadding
 
         color: flat ? "transparent"

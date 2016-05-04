@@ -51,6 +51,8 @@ public:
 
     void updateConnectionState();
 
+    void setUrl(const QUrl& url);
+
 public:
     QUrl url;
     bool suspended;
@@ -73,6 +75,11 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
             d, &QnConnectionManagerPrivate::updateConnectionState);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
             d, &QnConnectionManagerPrivate::updateConnectionState);
+
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPortChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
+    connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
 }
 
 QnConnectionManager::~QnConnectionManager() {
@@ -92,6 +99,36 @@ int QnConnectionManager::defaultServerPort() const {
     return DEFAULT_APPSERVER_PORT;
 }
 
+QUrl QnConnectionManager::currentUrl() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url : QUrl();
+}
+
+QString QnConnectionManager::currentHost() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url.host() : QString();
+}
+
+int QnConnectionManager::currentPort() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url.port() : -1;
+}
+
+QString QnConnectionManager::currentLogin() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url.userName() : QString();
+}
+
+QString QnConnectionManager::currentPassword() const
+{
+    Q_D(const QnConnectionManager);
+    return d->url.isValid() ? d->url.password() : QString();
+}
+
 void QnConnectionManager::connectToServer(const QUrl &url) {
     Q_D(QnConnectionManager);
 
@@ -101,8 +138,7 @@ void QnConnectionManager::connectToServer(const QUrl &url) {
     if (connectionState() != QnConnectionManager::Disconnected)
         disconnectFromServer(false);
 
-    d->url = url;
-
+    d->setUrl(url);
     d->doConnect();
 }
 
@@ -112,7 +148,7 @@ void QnConnectionManager::disconnectFromServer(bool force) {
     if (d->connectionHandle != kInvalidHandle)
     {
         d->connectionHandle = kInvalidHandle;
-        d->url = QUrl();
+        d->setUrl(QUrl());
         d->updateConnectionState();
         return;
     }
@@ -122,7 +158,7 @@ void QnConnectionManager::disconnectFromServer(bool force) {
 
     d->doDisconnect(force);
 
-    d->url = QUrl();
+    d->setUrl(QUrl());
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
 
@@ -301,4 +337,14 @@ void QnConnectionManagerPrivate::updateConnectionState()
 
     Q_Q(QnConnectionManager);
     emit q->connectionStateChanged();
+}
+
+void QnConnectionManagerPrivate::setUrl(const QUrl& url)
+{
+    if (this->url == url)
+        return;
+
+    Q_Q(QnConnectionManager);
+    this->url = url;
+    emit q->currentUrlChanged();
 }

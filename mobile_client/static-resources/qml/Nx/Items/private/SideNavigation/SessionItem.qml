@@ -1,10 +1,7 @@
 import QtQuick 2.0
 import Nx 1.0
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
-
-import "../../../../items/QnLoginPage.js" as LoginDialog
-import "../../../../main.js" as Main
-import "../../../../controls"
 
 SideNavigationItem
 {
@@ -18,57 +15,68 @@ SideNavigationItem
     property string password
 
     implicitWidth: 200
-    implicitHeight: 72
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
+    topPadding: 12
+    bottomPadding: 12
     leftPadding: 16
     rightPadding: 16
 
-    contentItem: Item
+    contentItem: Column
     {
-        Column
+        width: parent.width
+
+        Text
         {
-            width: parent.width
-            anchors.verticalCenter: parent.verticalCenter
+            text: systemName
+            font.pixelSize: 18
+            font.weight: Font.DemiBold
+            color: ColorTheme.windowText
+            elide: Text.ElideRight
+            width: parent.width - editButton.width
+            height: 32
+            verticalAlignment: Text.AlignVCenter
 
-            Text
+            IconButton
             {
-                text: systemName
-                font.pixelSize: 18
-                font.weight: Font.DemiBold
-                color: ColorTheme.windowText
-                elide: Text.ElideRight
-                width: parent.width - editButton.width
-                height: 32
-                verticalAlignment: Text.AlignVCenter
+                id: editButton
 
-                QnIconButton
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.right
+                anchors.leftMargin: 8
+                icon: "/images/edit.png"
+
+                onClicked:
                 {
-                    id: editButton
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.right
-                    anchors.leftMargin: 8
-                    icon: "/images/edit.png"
-
-                    onClicked:
-                    {
-                        sideNavigation.close()
-                        Main.openSavedSession(sessionId, address, port, user, password, systemName)
-                    }
+                    sideNavigation.close()
+                    Workflow.openSavedSession(sessionId, systemName, address, port, user, password)
                 }
             }
+        }
 
-            Text
-            {
-                width: parent.width
-                height: 24
+        Text
+        {
+            width: parent.width
+            height: 24
 
-                text: user
-                font.pixelSize: 15
-                font.weight: Font.DemiBold
-                color: ColorTheme.contrast2
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-            }
+            text: address + ":" + port
+            font.pixelSize: 15
+            font.weight: Font.DemiBold
+            color: ColorTheme.contrast2
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
+        }
+
+        Text
+        {
+            width: parent.width
+            height: 24
+
+            text: user
+            font.pixelSize: 15
+            font.weight: Font.DemiBold
+            color: ColorTheme.contrast2
+            elide: Text.ElideRight
+            verticalAlignment: Text.AlignVCenter
         }
     }
 
@@ -76,11 +84,13 @@ SideNavigationItem
     {
         if (!active)
         {
-            connectionManager.disconnectFromServer(false)
-            mainWindow.currentSystemName = systemName
-            LoginDialog.connectToServer(sessionId, address, port, user, password)
-            if (stackView.depth > 1)
-                Main.gotoResources()
+            currentSessionId = ""
+            connectionManager.connectToServer(address, port, user, password)
+            Workflow.openResourcesScreen(systemName)
+        }
+        else
+        {
+            sideNavigation.close()
         }
     }
 }

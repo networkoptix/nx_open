@@ -2,3 +2,6 @@ module Nx
 
 Object 1.0 Object.qml
 singleton ColorTheme 1.0 ColorTheme.qml
+
+LoginUtils 1.0 LoginUtils.js
+Workflow 1.0 Workflow.js

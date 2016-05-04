@@ -116,7 +116,6 @@ Page
         id: toolBar
 
         title: resourceHelper.resourceName
-        leftButtonIcon: "/images/arrow_back.png"
         onLeftButtonClicked: Main.gotoMainScreen()
         background: Image
         {

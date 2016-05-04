@@ -117,3 +117,17 @@ bool QnContext::liteMode() const
     }
     return false;
 }
+
+QString QnContext::currentSessionId() const
+{
+    return m_currentSessionId;
+}
+
+void QnContext::setCurrentSessionId(const QString &id)
+{
+    if (m_currentSessionId == id)
+        return;
+
+    m_currentSessionId = id;
+    emit currentSessionIdChanged();
+}
