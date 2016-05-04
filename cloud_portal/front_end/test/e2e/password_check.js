@@ -18,12 +18,13 @@ var PasswordFieldSuite = function () {
     this.fieldGroup = element(by.css('password-input'));
     this.helpBlock = this.fieldGroup.element(by.css('.help-block'));
     this.makeVisible = this.fieldGroup.element(by.css('span.input-group-addon'));
+    this.maskedInput = this.fieldGroup.element(by.css('input[type=password]'));
     this.visibleInput = this.fieldGroup.element(by.css('input[type=text]'));
 
     this.check = function(getToPassword, pageObj){
 
         var checkPasswordInvalid = function (invalidClass) {
-            expect(pageObj.passCheck.input.getAttribute('class')).toContain(invalidClass);
+            expect(self.maskedInput.getAttribute('class')).toContain(invalidClass);
             expect(self.fieldGroup.$('.form-group').getAttribute('class')).toContain('has-error');
         };
 
@@ -38,7 +39,7 @@ var PasswordFieldSuite = function () {
         };
 
         var notAllowPasswordWith = function (password) {
-            pageObj.passCheck.input.sendKeys(password);
+            self.maskedInput.sendKeys(password);
             pageObj.passCheck.submit.click();
             checkPasswordInvalid(self.invalidClass);
         };
@@ -69,39 +70,39 @@ var PasswordFieldSuite = function () {
 
         it("password field shows warnings about password strength", function () {
             getToPassword().then(function(){
-                pageObj.passCheck.input.sendKeys('qwe');
+                self.maskedInput.sendKeys('qwe');
                 checkPasswordWarning(self.passwordWeak);
 
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys(self.helper.userPasswordCyrillic);
+                self.maskedInput.clear()
+                    .sendKeys(self.helper.userPasswordCyrillic);
                 checkPasswordWarning(self.passwordIncorrect);
 
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('qwerty');
+                self.maskedInput.clear()
+                    .sendKeys('qwerty');
                 checkPasswordWarning(self.passwordCommon);
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('password');
+                self.maskedInput.clear()
+                    .sendKeys('password');
                 checkPasswordWarning(self.passwordCommon);
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('12345678');
+                self.maskedInput.clear()
+                    .sendKeys('12345678');
                 checkPasswordWarning(self.passwordCommon);
 
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('asdoiu');
+                self.maskedInput.clear()
+                    .sendKeys('asdoiu');
                 checkPasswordWarning(self.passwordFair);
 
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('asdoiu2Q#');
+                self.maskedInput.clear()
+                    .sendKeys('asdoiu2Q#');
                 checkPasswordWarning(self.passwordGood);
             });
         });
 
         it("password field shows only 1 warning about strength at a time", function () {
             getToPassword().then(function(){
-                pageObj.passCheck.input.sendKeys('123qwe');
+                self.maskedInput.sendKeys('123qwe');
                 checkPasswordWarning(self.passwordCommon);
 
-                pageObj.passCheck.input.sendKeys(protractor.Key.BACK_SPACE);
+                self.maskedInput.sendKeys(protractor.Key.BACK_SPACE);
                 checkNoPasswordWarning(self.passwordCommon);
                 checkPasswordWarning(self.passwordWeak);
             });
@@ -109,18 +110,18 @@ var PasswordFieldSuite = function () {
 
         it("password field rejects password with leading or trailing spaces", function () {
             getToPassword().then(function(){
-                pageObj.passCheck.input.sendKeys(' 123qwe');
+                self.maskedInput.sendKeys(' 123qwe');
                 checkPasswordWarning(self.passwordIncorrect);
 
-                pageObj.passCheck.input.clear();
-                pageObj.passCheck.input.sendKeys('123qwe ');
+                self.maskedInput.clear()
+                    .sendKeys('123qwe ');
                 checkPasswordWarning(self.passwordIncorrect);
             });
         });
 
         it("password field input can be made visible", function() {
             getToPassword().then(function(){
-                pageObj.passCheck.input.sendKeys('visiblePassword');
+                self.maskedInput.sendKeys('visiblePassword');
                 self.makeVisible.click();
                 expect(self.visibleInput.getAttribute('value')).toContain('visiblePassword');
             });
@@ -132,18 +133,18 @@ var PasswordFieldSuite = function () {
                 self.visibleInput.sendKeys('passwordToCopy');
 
                 // Copy + paste
-                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
-                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "c"));
-                self.visibleInput.clear();
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a")
+                    .sendKeys(protractor.Key.CONTROL, "c")
+                    .clear();
                 expect(self.visibleInput.getAttribute('value')).not.toContain('passwordToCopy');
-                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "v");
                 expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
 
                 // Cut + paste
-                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
-                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "x"));
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a")
+                    .sendKeys(protractor.Key.CONTROL, "x");
                 expect(self.visibleInput.getAttribute('value')).not.toContain('passwordToCopy');
-                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
+                self.visibleInput.sendKeys(protractor.Key.CONTROL, "v");
                 expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
             });
         });
@@ -151,12 +152,12 @@ var PasswordFieldSuite = function () {
         it("password field allows copy visible and paste dotted input", function() {
             getToPassword().then(function(){
                 self.makeVisible.click(); // make password input human-readable
-                self.visibleInput.sendKeys('passwordToCopy');
-                self.visibleInput.sendKeys(protractor.Key.CONTROL, "a");
-                self.visibleInput.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "c"));
-                self.visibleInput.clear();
+                self.visibleInput.sendKeys('passwordToCopy')
+                    .sendKeys(protractor.Key.CONTROL, "a")
+                    .sendKeys(protractor.Key.CONTROL, "c")
+                    .clear();
                 self.makeVisible.click(); // make password input value replaced with dots
-                pageObj.passCheck.input.sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "v"));
+                self.maskedInput.sendKeys(protractor.Key.CONTROL, "v");
                 self.makeVisible.click(); // make password input human-readable
                 expect(self.visibleInput.getAttribute('value')).toContain('passwordToCopy');
             });
@@ -164,9 +165,9 @@ var PasswordFieldSuite = function () {
 
         it("password field allows password with symbols", function() {
             getToPassword().then(function(){
-                pageObj.passCheck.input.sendKeys(self.helper.userPasswordSymb);
-                expect(pageObj.passCheck.input.getAttribute('value')).toContain(self.helper.userPasswordSymb);
-                expect(pageObj.passCheck.input.getAttribute('class')).toContain(self.validClass);
+                self.maskedInput.sendKeys(self.helper.userPasswordSymb);
+                expect(self.maskedInput.getAttribute('value')).toContain(self.helper.userPasswordSymb);
+                expect(self.maskedInput.getAttribute('class')).toContain(self.validClass);
                 expect(self.fieldGroup.$('.form-group').getAttribute('class')).not.toContain('has-error');
                 pageObj.passCheck.submit.click();
             });
