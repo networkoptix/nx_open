@@ -821,7 +821,7 @@
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>common_libs/nx_bpi_videonode_plugin</module>
-                <!--module>edge_firmware/rpi</module-->
+                <module>edge_firmware/rpi</module>
                 <module>client.core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
