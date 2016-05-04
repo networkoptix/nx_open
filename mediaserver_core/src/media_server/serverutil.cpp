@@ -151,10 +151,11 @@ bool changeAdminPassword(PasswordData data, QString* errString)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password) != ec2::ErrorCode::ok)
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
-                *errString = lit("Internal server error. Database IO error");
+                *errString = lit("Internal server database error: %1").arg(toString(errCode));
             return false;
         }
         updatedAdmin->setPassword(QString());
@@ -169,10 +170,11 @@ bool changeAdminPassword(PasswordData data, QString* errString)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser) != ec2::ErrorCode::ok)
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
-                *errString = lit("Internal server error. Database IO error");
+                *errString = lit("Internal server database error: %1").arg(toString(errCode));
             return false;
         }
     }

@@ -34,7 +34,7 @@ public:
     virtual void updateResource(const ec2::ApiLayoutData& layout);
     virtual void updateResource(const ec2::ApiVideowallData& videowall);
     virtual void updateResource(const ec2::ApiWebPageData& webpage);
-    virtual void updateResource(const ec2::ApiCameraData& camera);
+    virtual void updateResource(const ec2::ApiCameraData& camera, const ec2::ApiResourceParamDataList &properties = ec2::ApiResourceParamDataList());
     virtual void updateResource(const ec2::ApiMediaServerData& server);
     virtual void updateResource(const ec2::ApiStorageData& storage);
 
