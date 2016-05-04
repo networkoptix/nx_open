@@ -27,7 +27,7 @@ class QnArchiveCamResource
 {
     Q_OBJECT
 public:
-    QnArchiveCamResource();
+    QnArchiveCamResource(const QnResourceParams &params);
 
 public:
     virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler) override;
