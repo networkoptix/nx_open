@@ -22,7 +22,7 @@ class GetListeningPeerListHandler
     public nx_http::AbstractFusionRequestHandler<void, data::ListeningPeersBySystem>
 {
 public:
-    constexpr static const char kHandlerPath[] = "/statistics/listening_peer_list";
+    static const char* kHandlerPath;
 
     GetListeningPeerListHandler(const ListeningPeerPool& listeningPeerPool);
 
