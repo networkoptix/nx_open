@@ -1,3 +1,5 @@
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "audio_data_transmitter.h"
 #include <utils/common/sleep.h>
 #include <QFile>
@@ -49,3 +51,5 @@ void QnAbstractAudioTransmitter::subscribe(QnLiveStreamProviderPtr dataProvider)
     dataProvider->getOwner()->inUse(this);
     start();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

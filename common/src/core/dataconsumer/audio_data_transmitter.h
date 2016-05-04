@@ -1,5 +1,6 @@
 #pragma once
 
+#ifdef ENABLE_DATA_PROVIDERS
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/media_data_packet.h>
@@ -45,3 +46,5 @@ private:
     QnMutex m_mutex;
     QnLiveStreamProviderPtr m_dataProvider;
 };
+
+#endif // #ifdef ENABLE_DATA_PROVIDERS
