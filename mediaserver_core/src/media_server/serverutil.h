@@ -68,7 +68,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 
-bool changeAdminPassword(PasswordData data);
+bool changeAdminPassword(PasswordData data, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 

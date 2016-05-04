@@ -46,8 +46,9 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeAdminPassword(passwordData)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't change password."));
+    QString errString;
+    if (!changeAdminPassword(passwordData, &errString)) {
+        result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
 
