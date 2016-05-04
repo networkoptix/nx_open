@@ -1,6 +1,14 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
+// TODO: #Elric implement this ifdef on utils/media/audioformat.h level.
+#ifndef Q_OS_WIN
+#   include <utils/media/audioformat.h>
+#else
+#   include <QtMultimedia/QAudioFormat>
+#   define QnAudioFormat QAudioFormat
+#endif
+
 #ifdef ENABLE_DATA_PROVIDERS
 
 extern "C"
@@ -12,14 +20,6 @@ extern "C"
 
 #include <QtCore/QVector>
 #include <QtCore/QRect>
-
-// TODO: #Elric implement this ifdef on utils/media/audioformat.h level.
-#ifndef Q_OS_WIN
-#   include <utils/media/audioformat.h> 
-#else
-#   include <QtMultimedia/QAudioFormat>
-#   define QnAudioFormat QAudioFormat
-#endif
 
 #include <utils/common/byte_array.h>
 #include <utils/media/sse_helper.h>
@@ -39,10 +39,10 @@ namespace nxcip {
 }
 
 // TODO: #Elric #enum
-enum MediaQuality { 
+enum MediaQuality {
     MEDIA_Quality_High = 1,  // high quality
     MEDIA_Quality_Low = 2,   // low quality
-    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
+    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'.
     // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
     MEDIA_Quality_ForceHigh,
     MEDIA_Quality_Auto,
@@ -77,7 +77,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_BOF                  = 0x00004,
         MediaFlags_LIVE                 = 0x00008,
         MediaFlags_Ignore               = 0x00010,
-                     
+
         MediaFlags_ReverseReordered     = 0x00020,
         MediaFlags_ReverseBlockStart    = 0x00040,
         MediaFlags_Reverse              = 0x00080,
@@ -98,14 +98,14 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 
     // TODO: #Elric #enum
     enum DataType {
-        VIDEO, 
-        AUDIO, 
-        CONTAINER, 
-        META_V1, 
+        VIDEO,
+        AUDIO,
+        CONTAINER,
+        META_V1,
         EMPTY_DATA
     };
 
-    //QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
+    //QnAbstractMediaData(unsigned int alignment, unsigned int capacity):
     QnAbstractMediaData( DataType _dataType);
     virtual ~QnAbstractMediaData();
 
@@ -136,7 +136,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
 
 struct QnEmptyMediaData : public QnAbstractMediaData
 {
-    QnEmptyMediaData(): 
+    QnEmptyMediaData():
         QnAbstractMediaData(EMPTY_DATA),
         m_data(16,0)
     {
@@ -164,7 +164,7 @@ typedef std::shared_ptr<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
 
-/** 
+/**
 * This structure used for serialized QnMetaDataV1
 * Timestamp and duration specified in milliseconds
 * structure can be directly mapped to deserialized memory buffer to represent MetaData
@@ -173,7 +173,7 @@ Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 struct QnMetaDataV1Light
 {
 
-    /** 
+    /**
     * Structure MUST be prepared before use by calling doMarshalling method
     */
     void doMarshalling()
@@ -207,12 +207,12 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
-    /** 
-    * Merge existing motion image with new motion image. Matrix is allowed col to col 
+    /**
+    * Merge existing motion image with new motion image. Matrix is allowed col to col
     * 0   1
     * |   |
     * \/  \/
-    * |   | 
+    * |   |
     * \/  \/
     * |   |
     * \/  \/
@@ -224,10 +224,10 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     // remove part of motion info by motion mask
     void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
 
-    // ti check if we've got motion at 
+    // ti check if we've got motion at
     static bool isMotionAt(int x, int y, char* mask);
 
-    // ti check if we've got motion at 
+    // ti check if we've got motion at
     bool isMotionAt(int x, int y) const;
 
     void setMotionAt(int x, int y);

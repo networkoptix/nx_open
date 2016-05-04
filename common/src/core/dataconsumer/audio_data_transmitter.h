@@ -2,6 +2,8 @@
 
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/dataprovider/live_stream_provider.h>
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/datapacket/media_data_packet.h>
 
 class QnAbstractAudioTransmitter : public QnAbstractDataConsumer
 {
