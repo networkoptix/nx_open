@@ -43,6 +43,12 @@
         },
         {
             "keys": [
+                "AXIS|AXISP8221"
+            ],
+            "noVideoSupport": "1"
+        },
+        {
+            "keys": [
                 "ACTI|E12A"
             ],
             "nxDeviceName": "Nx-Cube",
