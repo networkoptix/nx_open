@@ -71,22 +71,6 @@ private:
 
 Q_GLOBAL_STATIC(QnResourceDataJsonSerializer, qn_resourceDataJsonSerializer_instance)
 
-QList<QPair<QString, QString> > QnResourceData::getAllStringValues() const
-{
-    QList<QPair<QString, QString>> result;
-    for (auto it = m_dataByKey.cbegin(); it != m_dataByKey.cend(); ++it)
-    {
-        if (it.key().toLower() != lit("keys"))
-        {
-            QString v = value<QString>(it.key());
-            if (!v.isNull())
-                result.push_back(QPair<QString, QString>(it.key(), v));
-        }
-    }
-
-    return result;
-}
-
 bool QnResourceData::value(const QString &key, int type, void *value, const CopyFunction &copyFunction) const {
     auto pos = m_dataByKey.constFind(key);
     if(pos == m_dataByKey.constEnd())

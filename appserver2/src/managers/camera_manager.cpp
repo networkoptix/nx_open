@@ -11,14 +11,14 @@ namespace ec2
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraData>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveCamera);
-        emit addedOrUpdated(tran.params, ApiResourceParamDataList());
+        emit addedOrUpdated(tran.params);
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraDataList>& tran)
     {
         NX_ASSERT(tran.command == ApiCommand::saveCameras);
         for (const ApiCameraData& camera : tran.params)
-            emit addedOrUpdated(camera, ApiResourceParamDataList());
+            emit addedOrUpdated(camera);
     }
 
     void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran)
