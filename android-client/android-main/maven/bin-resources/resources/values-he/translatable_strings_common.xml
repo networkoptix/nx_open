@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="accept">אשר</string>
-    <string name="error">שגיאה</string>
-    <string name="save">שמירה</string>
-    <string name="edit">ערוך</string>
-    <string name="delete">מחק</string>
-    <string name="add">הוסף</string>
-</resources>

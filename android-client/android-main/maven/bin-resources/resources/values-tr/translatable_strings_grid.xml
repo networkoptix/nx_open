@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="clear_cache_complete_toast">Geçiçi dosyalar temizlendi</string>
-    <string name="no_network_connection_toast">Network bağlantısı bulunamadı</string>    
-</resources>

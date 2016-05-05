@@ -9,7 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
 
-class QnResourceTreeItemDelegate;
+class QnResourceItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
 class QnResourceTreeSortProxyModel;
@@ -153,7 +153,7 @@ private:
 
     QnResourceCriterion m_criterion;
 
-    QnResourceTreeItemDelegate *m_itemDelegate;
+    QnResourceItemDelegate *m_itemDelegate;
 
     QnResourceTreeSortProxyModel *m_resourceProxyModel;
 

@@ -14,6 +14,7 @@ Item
     property Component areaDelegate;
 
     property var area: (isMasked ? maskedAreaLoader.item : areaLoader.item);
+    property var maskedArea: maskedAreaLoader.item;
 
     height: area.height;
 

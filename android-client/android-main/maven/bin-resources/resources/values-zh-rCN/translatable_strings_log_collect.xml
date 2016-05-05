@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="collect_log">保存日志</string>
-    <string name="acquiring_log_progress_dialog_message">从服务器&#8230;请求日志</string>
-    <string name="chooser_title">"选择应用发送日志"</string>
-    <string name="failed_to_get_log_message">"无法从服务器获取日志信息"</string>
-    <string name="main_dialog_text">"当前应用尝试获取设备日志，日志用于应用程序的信息查询，您可对日志进行查看和修改。"</string>
-</resources>

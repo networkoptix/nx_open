@@ -77,8 +77,6 @@ private:
     QUrl currentUrl() const;
     QString currentName() const;
 
-    /** Save current connection credentials. */
-    void updateStoredConnections(const QUrl &url, const QString &name);
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

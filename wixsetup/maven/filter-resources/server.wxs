@@ -13,8 +13,6 @@
                     </Component>
                 </Directory>
 
-                <Directory Id="ServerImageFormats" Name="imageformats"></Directory>
-
                 <Component Id="ServerExecutable">
                     <File Id="ServerExe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes">
                         <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
@@ -183,18 +181,6 @@
             </Component>
         </ComponentGroup>          
 
-        <ComponentGroup Id="ServerImageFormats" Directory="ServerImageFormats">
-            <Component>
-                <File Id="Serverqgif.dll" Name="qgif4.dll" Source="$(var.QtPluginsDir)\imageformats\qgif.dll" DiskId="11" />
-            </Component>
-            <Component>
-                <File Id="Serverqjpeg.dll" Name="qjpeg4.dll" Source="$(var.QtPluginsDir)\imageformats\qjpeg.dll" DiskId="11" />
-            </Component>
-            <Component>
-                <File Id="Serverqtiff.dll" Name="qtiff4.dll" Source="$(var.QtPluginsDir)\imageformats\qtiff.dll" DiskId="11" />
-            </Component>
-        </ComponentGroup>
-
         <ComponentGroup Id="ServerOpenSSL" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="12"/>
@@ -235,7 +221,6 @@
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
-            <ComponentGroupRef Id="ServerImageFormats"/>
             <ComponentRef Id="ServerSigar"/>
 
 

@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="accept">Принять</string>
-    <string name="error">Ошибка</string>
-    <string name="save">Сохранить</string>
-    <string name="edit">Изменить</string>
-    <string name="delete">Удалить</string>
-    <string name="add">Добавить</string>
-</resources>
