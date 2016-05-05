@@ -1,7 +1,5 @@
 import QtQuick 2.4
 
-import "../main.js" as Main
-
 Item {
     id: handle
 

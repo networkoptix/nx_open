@@ -1,8 +1,5 @@
 import QtQuick 2.2
-
 import com.networkoptix.qml 1.0
-
-import "../common_functions.js" as CommonFunctions
 
 FocusScope {
     id: textField
@@ -48,7 +45,7 @@ FocusScope {
                 bottom: parent.bottom
             }
             border.width: 0
-            height: textInput.activeFocus ? CommonFunctions.dp(1) : CommonFunctions.dp(1)
+            height: 1
             color: textInput.activeFocus ? activeColor : inactiveColor
         }
 

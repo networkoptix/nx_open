@@ -1,7 +1,5 @@
 import QtQuick 2.4
 
-import "../main.js" as Main
-
 FocusScope {
     id: root
 
@@ -199,7 +197,7 @@ FocusScope {
             height: root.height
 
             focus: true
-            selectByMouse: !Main.isMobile()
+            selectByMouse: false
 
             verticalAlignment: Text.AlignVCenter
             clip: false
