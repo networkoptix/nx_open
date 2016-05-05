@@ -314,4 +314,10 @@ namespace nx_http
 
         return true;
     }
+
+    bool MultipartContentParser::isEpilogue() const
+    {
+        //TODO #ak
+        return false;
+    }
 }

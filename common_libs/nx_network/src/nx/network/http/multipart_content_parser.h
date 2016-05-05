@@ -6,7 +6,7 @@
 
 namespace nx_http
 {
-    /*!
+    /**
         Input: http multipart content stream.
         Output: separate content frames
     */
@@ -18,19 +18,21 @@ namespace nx_http
         MultipartContentParser();
         virtual ~MultipartContentParser();
 
-        //!Implementation of AbstractByteStreamFilter::processData
+        /** Implementation of AbstractByteStreamFilter::processData */
         virtual bool processData( const QnByteArrayConstRef& data ) override;
-        //!Implementation of AbstractByteStreamFilter::flush
+        /** Implementation of AbstractByteStreamFilter::flush */
         virtual size_t flush() override;
 
-        /*!
+        /**
             \return \a false, if \a contentType does not specify multipart content
             \note After this method has been called, no \a MultipartContentParser::setBoundary call is needed
         */
         bool setContentType( const StringType& contentType );
         void setBoundary( const StringType& boundary );
-        //!Returns headers of last read frame
+        /** Returns headers of last read frame */
         const nx_http::HttpHeaders& prevFrameHeaders() const;
+        /** Returns \a true if previous frame is an epilogue */
+        bool isEpilogue() const;
 
     private:
         enum ParsingState
@@ -39,11 +41,11 @@ namespace nx_http
             waitingBoundary,
             readingHeaders,
             readingTextData,
-            //!reading trailing CR of LF before binary data
+            /** reading trailing CR of LF before binary data */
             depleteLineFeedBeforeBinaryData,
-            //!reading data with Content-Length known
+            /** reading data with Content-Length known */
             readingSizedBinaryData,
-            //!reading data with Content-Length not known: searching for boundary
+            /** reading data with Content-Length not known: searching for boundary */
             readingUnsizedBinaryData
         };
 

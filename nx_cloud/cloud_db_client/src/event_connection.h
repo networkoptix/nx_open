@@ -7,8 +7,10 @@
 
 #include <string>
 
-#include <nx/network/http/asynchttpclient.h>
+#include <QtCore/QObject>
 
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/multipart_content_parser.h>
 #include <include/cdb/connection.h>
 
 
@@ -19,21 +21,22 @@ namespace cloud {
 
 class CloudModuleEndPointFetcher;
 
-}   //cloud
-}   //network
+}   //namespace cloud
+}   //namespace network
 
 namespace cdb {
 namespace cl {
 
 class EventConnection
 :
+    public QObject,
     public api::EventConnection
 {
 public:
     EventConnection(
         network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
-        const std::string& login,
-        const std::string& password);
+        std::string login,
+        std::string password);
     virtual ~EventConnection();
 
     virtual void start(
@@ -41,7 +44,22 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
 private:
+    network::cloud::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
+    const std::string m_login;
+    const std::string m_password;
+    nx_http::AsyncHttpClientPtr m_httpClient;
+    std::function<void(api::ResultCode)> m_connectCompletionHandler;
+    std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
 
+    void cdbEndpointResolved(
+        nx_http::StatusCode::Value resCode,
+        SocketAddress endpoint);
+
+private slots:
+    void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);
+    void onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
+    void onHttpClientDone(nx_http::AsyncHttpClientPtr);
+    void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 
 }   //namespace cl
