@@ -16,18 +16,25 @@ namespace hpm {
 namespace api {
 
 MediatorConnector::MediatorConnector()
-    : m_isTerminating( false )
-    , m_stunClient(std::make_shared<stun::AsyncClient>())
-    , m_endpointFetcher(
+:
+    m_isTerminating( false ),
+    m_stunClient(std::make_shared<stun::AsyncClient>()),
+    m_endpointFetcher(
         lit( "hpm" ),
-        std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
-    , m_fetchEndpointRetryTimer(
+        std::make_unique<nx::network::cloud::RandomEndpointSelector>() ),
+    m_fetchEndpointRetryTimer(
         nx::network::RetryPolicy(
             nx::network::RetryPolicy::kInfiniteRetries,
             kRetryIntervalInitial,
             2,
             kRetryIntervalMax))
 {
+}
+
+void MediatorConnector::reinitializeStunClient(
+    stun::AbstractAsyncClient::Settings stunClientSettings)
+{
+    m_stunClient = std::make_shared<stun::AsyncClient>(stunClientSettings);
 }
 
 void MediatorConnector::enable( bool waitComplete )
