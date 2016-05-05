@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <nx/network/http/asynchttpclient.h>
+
 #include <include/cdb/connection.h>
 
 
@@ -37,6 +39,9 @@ public:
     virtual void start(
         api::SystemEventHandlers eventHandlers,
         std::function<void(api::ResultCode)> completionHandler) override;
+
+private:
+
 };
 
 }   //namespace cl
