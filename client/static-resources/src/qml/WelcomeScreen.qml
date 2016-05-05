@@ -114,13 +114,13 @@ Rectangle
                         LocalSystemTile
                         {
                             property var hostsModel: QnSystemHostsModel { systemId: model.systemId}
-                            property var knownUsersModelProp:
-                                QnLastSystemConnectionsData { systemName: model.systemName; }
+                            recentUserConnectionsModel:
+                                QnRecentUserConnectionsData { systemName: model.systemName; }
 
                             visualParent: screenHolder;
 
                             systemName: model.systemName;
-                            isRecentlyConnected: (knownUsersModel ? knownUsersModel.hasConnections : false);
+                            isRecentlyConnected: (recentUserConnectionsModel ? recentUserConnectionsModel.hasConnections : false);
 
                             isValidVersion: model.isCompatibleVersion;
                             isValidCustomization: model.isCorrectCustomization;
@@ -136,7 +136,6 @@ Rectangle
 
                             isExpandable: model.isCompatible;
                             isAvailable: isExpandable;
-                            knownUsersModel: knownUsersModelProp;
                             knownHostsModel: hostsModel;
 
                             onConnectClicked:
@@ -144,7 +143,8 @@ Rectangle
                                 console.log("Connecting to local system <", systemName
                                     , ">, host <", selectedHost, "> with credentials: "
                                     , selectedUser, ":", selectedPassword);
-                                context.connectToLocalSystem(selectedHost, selectedUser, selectedPassword);
+                                context.connectToLocalSystem(selectedHost, selectedUser
+                                    , selectedPassword, storePassword, autoLogin);
                             }
 
                             enabled: (!isExpanded || !context.connectingNow);

@@ -15,7 +15,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/models/systems_model.h>
 #include <ui/models/system_hosts_model.h>
-#include <ui/models/last_system_users_model.h>
+#include <ui/models/recent_user_connections_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -33,7 +33,7 @@ namespace
 
         qmlRegisterType<QnSystemsModel>("NetworkOptix.Qml", 1, 0, "QnSystemsModel");
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
-        qmlRegisterType<QnLastSystemUsersModel>("NetworkOptix.Qml", 1, 0, "QnLastSystemConnectionsData");
+        qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsData");
 
         const auto quickWidget = new QQuickWidget();
         quickWidget->rootContext()->setContextProperty(
@@ -176,12 +176,14 @@ void QnWorkbenchWelcomeScreen::setConnectingNow(bool value)
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
     , const QString &userName
-    , const QString &password)
+    , const QString &password
+    , bool storePassword
+    , bool autoLogin)
 {
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction = [this
-        , serverUrl, userName, password]()
+        , serverUrl, userName, password, storePassword, autoLogin]()
     {
         setConnectingNow(true);
         const auto controlsGuard = QnRaiiGuard::createDestructable(
@@ -194,8 +196,11 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(const QString &serverUrl
         if (!userName.isEmpty())
             url.setUserName(userName);
 
-        menu()->trigger(QnActions::ConnectAction
-            , QnActionParameters().withArgument(Qn::UrlRole, url));
+        QnActionParameters params;
+        params.setArgument(Qn::UrlRole, url);
+        params.setArgument(Qn::StorePasswordRole, storePassword);
+        params.setArgument(Qn::AutoLoginRole, autoLogin);
+        menu()->trigger(QnActions::ConnectAction, params);
     };
 
     enum { kMinimalDelay = 1};
@@ -210,7 +215,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString &serverUrl)
         return;
 
     connectToLocalSystem(serverUrl, qnCloudStatusWatcher->cloudLogin()
-        , qnCloudStatusWatcher->cloudPassword());
+        , qnCloudStatusWatcher->cloudPassword(), false, false);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
@@ -243,12 +248,12 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString &serverUrl)
 
         if (!dialog->localLogin().isEmpty() && !dialog->localPassword().isEmpty())
         {
-            connectToLocalSystem(serverUrl, dialog->localLogin(), dialog->localPassword());
+            connectToLocalSystem(serverUrl, dialog->localLogin(), dialog->localPassword(), false, false);
         }
         else if (!dialog->cloudLogin().isEmpty() && !dialog->cloudPassword().isEmpty())
         {
             qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(dialog->cloudLogin(), dialog->cloudPassword(), true);
-            connectToLocalSystem(serverUrl, dialog->cloudLogin(), dialog->cloudPassword());
+            connectToLocalSystem(serverUrl, dialog->cloudLogin(), dialog->cloudPassword(), false, false);
         }
 
     };

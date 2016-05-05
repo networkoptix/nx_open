@@ -1,12 +1,12 @@
 
 #include "core_meta_types.h"
 
-#include <core/system_connection_data.h>
+#include <core/user_recent_connection_data.h>
 
 void QnCoreMetaTypes::initialize()
 {
-    qRegisterMetaType<QnSystemConnectionData>();
-    qRegisterMetaTypeStreamOperators<QnSystemConnectionData>();
-    qRegisterMetaType<QnSystemConnectionDataList>();
-    qRegisterMetaTypeStreamOperators<QnSystemConnectionDataList>();
+    qRegisterMetaType<QnUserRecentConnectionData>();
+    qRegisterMetaTypeStreamOperators<QnUserRecentConnectionData>();
+    qRegisterMetaType<QnUserRecentConnectionDataList>();
+    qRegisterMetaTypeStreamOperators<QnUserRecentConnectionDataList>();
 }
