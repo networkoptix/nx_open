@@ -50,7 +50,7 @@ class QnStorageManager: public QObject
     struct ArchiveCameraData
     {
         ec2::ApiCameraData coreData;
-        ec2::ApiResourceParamDataList properties;
+        ec2::ApiResourceParamWithRefDataList properties;
     };
 
     typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
@@ -167,6 +167,7 @@ public slots:
 private:
     friend class TestStorageThread;
 
+    void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnVirtualCameraResourceList &cameras,
                                     qint64 startTime, qint64 endTime, qint64 detailLevel,  bool keepSmallChunks,

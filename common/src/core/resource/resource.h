@@ -192,7 +192,8 @@ public:
     QString getProperty(const QString &key) const;
     static QString getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId);
 
-    ec2::ApiResourceParamDataList getProperties() const;
+    ec2::ApiResourceParamDataList getRuntimeProperties() const;
+    ec2::ApiResourceParamDataList getAllProperties() const;
 
     enum PropertyOptions
     {
