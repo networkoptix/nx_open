@@ -39,7 +39,7 @@ Item
                 fadeOutAnimation.duration = 500
             }
 
-            fadeInAnimation.complete()
+            fadeInAnimation.stop()
             fadeOutAnimation.start()
         }
 
@@ -85,14 +85,22 @@ Item
         opacity: 0
         radius: rounded ? width / 2 : 0
 
-        NumberAnimation on opacity
+        SequentialAnimation
         {
             id: fadeInAnimation
 
-            running: false
-            to: 1.0
-            duration: 100
-            easing.type: Easing.InOutQuad
+            PauseAnimation
+            {
+                duration: 100
+            }
+            NumberAnimation
+            {
+                target: highlightRectangle
+                property: "opacity"
+                to: 1.0
+                duration: 100
+                easing.type: Easing.InOutQuad
+            }
         }
 
         NumberAnimation on opacity
