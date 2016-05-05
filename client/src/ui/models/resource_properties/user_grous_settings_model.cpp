@@ -44,7 +44,7 @@ Qn::GlobalPermissions QnUserGroupSettingsModel::rawPermissions() const
         return Qn::NoGlobalPermissions;
 
     auto groups = qnResourceAccessManager->userGroups();
-    auto group = std::find_if(groups.cbegin(), groups.cend(), [this](const auto &elem) { return elem.id == m_userGroupId;  });
+    auto group = std::find_if(groups.cbegin(), groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId; });
     if (group == groups.cend())
         return Qn::NoGlobalPermissions;
     return group->permissions;
@@ -56,7 +56,7 @@ void QnUserGroupSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
         return;
 
     auto groups = qnResourceAccessManager->userGroups();
-    auto group = std::find_if(groups.begin(), groups.end(), [this](const auto &elem) { return elem.id == m_userGroupId;  });
+    auto group = std::find_if(groups.begin(), groups.end(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId; });
     if (group == groups.end())
         return;
     (*group).permissions = value;
@@ -85,7 +85,7 @@ QString QnUserGroupSettingsModel::groupName() const
         return QString();
 
     auto groups = qnResourceAccessManager->userGroups();
-    auto group = std::find_if(groups.cbegin(), groups.cend(), [this](const auto &elem) { return elem.id == m_userGroupId;  });
+    auto group = std::find_if(groups.cbegin(), groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId;  });
     if (group == groups.cend())
         return QString();
     return group->name;

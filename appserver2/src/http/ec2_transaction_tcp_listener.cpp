@@ -14,6 +14,8 @@
 #include "http/custom_headers.h"
 #include "audit/audit_manager.h"
 #include "settings.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 
 namespace ec2
@@ -83,6 +85,15 @@ void QnTransactionTcpProcessor::run()
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
     }
+
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    bool isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_AutoSystemName);
+    if (peerType == Qn::PT_Server && isDefaultSystemName)
+    {
+        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        return;
+    }
+
 
     d->response.headers.emplace(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
