@@ -52,17 +52,17 @@ namespace
         case Qn::AR_ViewLive:
         case Qn::AR_ViewArchive:
         case Qn::AR_ExportVideo:
-            return QnAuditItemDelegate::tr("Play");     // TODO: #vkutin Check if this tr is actually working
+            return QnAuditItemDelegate::tr("Play");
 
         case Qn::AR_UserUpdate:
-            return QnAuditItemDelegate::tr("User settings"); // TODO: #vkutin Check if this tr is actually working
+            return QnAuditItemDelegate::tr("User settings");
 
         case Qn::AR_ServerUpdate:
-            return QnAuditItemDelegate::tr("Server settings"); // TODO: #vkutin Check if this tr is actually working
+            return QnAuditItemDelegate::tr("Server settings");
 
         case Qn::AR_CameraUpdate:
         case Qn::AR_CameraInsert:
-            return QnAuditItemDelegate::tr("Camera settings"); // TODO: #vkutin Check if this tr is actually working
+            return QnAuditItemDelegate::tr("Camera settings");
 
         default:
             return QString();
