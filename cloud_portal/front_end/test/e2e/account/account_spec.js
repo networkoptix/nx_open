@@ -13,7 +13,7 @@ describe('On account page,', function () {
     });
 
     beforeEach(function() {
-        p.get(p.accountUrl);
+        p.helper.get(p.helper.urls.account);
     });
 
     p.alert.checkAlert(function(){
@@ -24,7 +24,7 @@ describe('On account page,', function () {
     }, p.alert.alertMessages.accountSuccess, p.alert.alertTypes.success, true);
 
     it("dropdown in top right corner has links: Account settings, Change password, Logout", function () {
-        p.get(p.homePageUrl);
+        p.helper.get(p.helper.urls.homepage);
         expect(p.userAccountDropdownToggle.getText()).toContain(p.helper.userEmail);
 
         p.userAccountDropdownToggle.click();
@@ -34,7 +34,7 @@ describe('On account page,', function () {
     });
 
     it("it is possible to log out", function () {
-        p.get(p.homePageUrl);
+        p.helper.get(p.helper.urls.homepage);
         p.helper.logout();
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });
@@ -152,6 +152,36 @@ describe('On account page,', function () {
         p.helper.checkElementFocusedBy(p.lastNameInput, 'id');
     });
 
-    xit("should apply changes if fields are edited in two browser instances", function () {
+    it("should apply changes if fields are edited in two browser instances", function () {
+        var browser2 = browser.forkNewDriverInstance();
+        var firstNameInput2 = browser2.element(by.model('account.first_name'));
+        var saveButton2 = browser2.element(by.css('[form=accountForm]')).element(by.buttonText('Save'));
+        var loginEmailInput2 = browser2.element(by.css('.modal-dialog')).element(by.model('auth.email'));
+        var loginPasswordInput2 = browser2.element(by.css('.modal-dialog')).element(by.model('auth.password'));
+        var loginSubmitButton2 = browser2.element(by.css('.modal-dialog')).element(by.buttonText('Login'));
+
+        // Log in in browser2
+        browser2.get(p.helper.urls.homepage);
+        browser2.waitForAngular();
+        browser2.sleep(500);
+        browser2.element(by.linkText('Login')).click();
+        loginEmailInput2.sendKeys(p.helper.userEmail);
+        loginPasswordInput2.sendKeys(p.helper.userPassword);
+        loginSubmitButton2.click();
+        browser.sleep(2000);
+
+        // Make changes in browser2
+        browser2.get(p.helper.urls.account);
+        firstNameInput2.clear().sendKeys('NameInBrowser2');
+        saveButton2.click();
+        // check that changes in first browser instance correspond to second browser
+        browser.refresh();
+        expect(p.firstNameInput.getAttribute('value')).toContain('NameInBrowser2');
+
+        p.firstNameInput.clear().sendKeys('NameInBrowser1');
+        p.saveButton.click();
+        // check that changes in second browser instance correspond to first browser
+        browser2.refresh();
+        expect(firstNameInput2.getAttribute('value')).toContain('NameInBrowser1');
     });
 });
