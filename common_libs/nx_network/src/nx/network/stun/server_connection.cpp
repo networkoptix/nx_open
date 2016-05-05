@@ -52,7 +52,8 @@ SocketAddress ServerConnection::getSourceAddress() const
     return BaseType::socket()->getForeignAddress();
 }
 
-void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler)
+void ServerConnection::addOnConnectionCloseHandler(
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     registerCloseHandler(std::move(handler));
 }
@@ -88,7 +89,7 @@ void ServerConnection::setDestructHandler( std::function< void() > handler )
 {
     QnMutexLocker lk( &m_mutex );
     NX_ASSERT( !(handler && m_destructHandler), Q_FUNC_INFO,
-                "Can not set new hadler while previous is not removed" );
+                "Can not set new handler while previous is not removed" );
 
     m_destructHandler = std::move( handler );
 }

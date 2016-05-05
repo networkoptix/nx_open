@@ -28,13 +28,13 @@
         <File Id="filC90922A08D770646675BE1C2530CC94F" KeyPath="yes" Source="$(var.AxSourceDir)\avutil-51.dll" />
       </Component>
       <Component Id="cmp3E75C8C546EE33C88133ACEE3708447D">
-        <File Id="filC26B2049C5CAB0FACDB72A6218A10F71" KeyPath="yes" Source="$(var.AxSourceDir)\icudt53.dll" />
+        <File Id="filC26B2049C5CAB0FACDB72A6218A10F71" KeyPath="yes" Source="${qt.dir}/bin/icudt53.dll" />
       </Component>
       <Component Id="cmp880E224056AF8AF4B659C54A55BC6825">
-        <File Id="filBE47A4EB21F6958D47A22DC0FE333643" KeyPath="yes" Source="$(var.AxSourceDir)\icuin53.dll" />
+        <File Id="filBE47A4EB21F6958D47A22DC0FE333643" KeyPath="yes" Source="${qt.dir}/bin/icuin53.dll" />
       </Component>
       <Component Id="cmpF6C4E8818A7BB450AEB4351BFC97B53F">
-        <File Id="fil57E27991E5A6C997720E4677A1221937" KeyPath="yes" Source="$(var.AxSourceDir)\icuuc53.dll" />
+        <File Id="fil57E27991E5A6C997720E4677A1221937" KeyPath="yes" Source="${qt.dir}/bin/icuuc53.dll" />
       </Component>
       <Component Id="cmp27388013FBAC92F7826F02F940C89D96">
         <File Id="filC7D0434DC8A22E54158D9499BABF351F" KeyPath="yes" Source="$(var.AxSourceDir)\libeay32.dll" />
@@ -55,52 +55,52 @@
         <File Id="filCA24EFE3151FF316E2ED28C88D67CDA1" KeyPath="yes" Source="$(var.AxSourceDir)\OpenAL32.dll" />
       </Component>
       <Component Id="cmpEF755C9C18FB5F827C258ED8E3F96029">
-        <File Id="fil8C06CA636A45D31A550F549215C31908" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Concurrent.dll" />
+        <File Id="fil8C06CA636A45D31A550F549215C31908" KeyPath="yes" Source="${qt.dir}/bin/Qt5Concurrent.dll" />
       </Component>
       <Component Id="cmp51C5F1A915931C2FF01CC4496E04BFA6">
-        <File Id="filC0D4B93DE1E6830AC33E23C288744D6F" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Core.dll" />
+        <File Id="filC0D4B93DE1E6830AC33E23C288744D6F" KeyPath="yes" Source="${qt.dir}/bin/Qt5Core.dll" />
       </Component>
       <Component Id="cmpD050B48FDD8D9A0E081354B8FB9C089F">
-        <File Id="fil8FDA9F298D20E879EE706694D1FC5578" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Gui.dll" />
+        <File Id="fil8FDA9F298D20E879EE706694D1FC5578" KeyPath="yes" Source="${qt.dir}/bin/Qt5Gui.dll" />
       </Component>
       <Component Id="cmp3A674E44F90243192C4FFDFC4C8ACDBF">
-        <File Id="fil54ECA21BE0BCF68C0CB07CC448B92E0C" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Multimedia.dll" />
+        <File Id="fil54ECA21BE0BCF68C0CB07CC448B92E0C" KeyPath="yes" Source="${qt.dir}/bin/Qt5Multimedia.dll" />
       </Component>
       <Component Id="cmpEA75D0F301D3779329723B21A2658F50">
-        <File Id="fil0A6D96ACE93371DA75EDC98F122E1339" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5MultimediaWidgets.dll" />
+        <File Id="fil0A6D96ACE93371DA75EDC98F122E1339" KeyPath="yes" Source="${qt.dir}/bin/Qt5MultimediaWidgets.dll" />
       </Component>
       <Component Id="cmpAA077EDCAECFB632EA72CA8D784B6157">
-        <File Id="fil967D8D1BA8D703F50AD901D3DFDFE9A2" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Network.dll" />
+        <File Id="fil967D8D1BA8D703F50AD901D3DFDFE9A2" KeyPath="yes" Source="${qt.dir}/bin/Qt5Network.dll" />
       </Component>
       <Component Id="cmpB9C1D7461302A2D2032F4EC31F56CFD9">
-        <File Id="fil29A32E0DA203277ED2B972E44BF213C9" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5OpenGL.dll" />
+        <File Id="fil29A32E0DA203277ED2B972E44BF213C9" KeyPath="yes" Source="${qt.dir}/bin/Qt5OpenGL.dll" />
       </Component>
       <Component Id="cmpA9C29AFDEB3102B6CC7A35D4AB1B0FCF">
-        <File Id="filF0B794FFB339CFC4AAC93BD0E07BDF56" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5PrintSupport.dll" />
+        <File Id="filF0B794FFB339CFC4AAC93BD0E07BDF56" KeyPath="yes" Source="${qt.dir}/bin/Qt5PrintSupport.dll" />
       </Component>
       <Component Id="cmp42E4B278E442EE6DA910B7F2AEBFEC42">
-        <File Id="fil2D0E50F74EE970E224AAA3A98411F4B4" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Qml.dll" />
+        <File Id="fil2D0E50F74EE970E224AAA3A98411F4B4" KeyPath="yes" Source="${qt.dir}/bin/Qt5Qml.dll" />
       </Component>
       <Component Id="cmpAE8E230447136A2CCB791D83ACF0EF4F">
-        <File Id="fil2633E5BECBC5178E226F7A33ED96A978" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Quick.dll" />
+        <File Id="fil2633E5BECBC5178E226F7A33ED96A978" KeyPath="yes" Source="${qt.dir}/bin/Qt5Quick.dll" />
       </Component>
       <Component Id="cmp7AEA990FA959601B0EB807FC3A181756">
-        <File Id="fil3FDF5C4FC69D8AA8475FFBC76B2DBB20" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Sql.dll" />
+        <File Id="fil3FDF5C4FC69D8AA8475FFBC76B2DBB20" KeyPath="yes" Source="${qt.dir}/bin/Qt5Sql.dll" />
       </Component>
       <Component Id="cmpFD7D972D74D81414B2836D5F8C4F5381">
-        <File Id="fil814F4252654D80B7063A24A52715D41D" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5WebKit.dll" />
+        <File Id="fil814F4252654D80B7063A24A52715D41D" KeyPath="yes" Source="${qt.dir}/bin/Qt5WebKit.dll" />
       </Component>
       <Component Id="cmp995E36BC6D7F4D99EED947CC6DF48E14">
-        <File Id="filF8B95B240BD0D49DE59E40AFB6142DDB" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5WebKitWidgets.dll" />
+        <File Id="filF8B95B240BD0D49DE59E40AFB6142DDB" KeyPath="yes" Source="${qt.dir}/bin/Qt5WebKitWidgets.dll" />
       </Component>
       <Component Id="cmpB57208B5636136E75F0270E0934FB794">
-        <File Id="fil2CDEAAA4A492364BB98065AE7AF6104A" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Widgets.dll" />
+        <File Id="fil2CDEAAA4A492364BB98065AE7AF6104A" KeyPath="yes" Source="${qt.dir}/bin/Qt5Widgets.dll" />
       </Component>
       <Component Id="cmpE6530C0D5E64E1CF47E5890EA8016112">
-        <File Id="fil9225D193AE7CABCE5C875B3ADDDF1294" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5Xml.dll" />
+        <File Id="fil9225D193AE7CABCE5C875B3ADDDF1294" KeyPath="yes" Source="${qt.dir}/bin/Qt5Xml.dll" />
       </Component>
       <Component Id="cmpDE30C0AA5FD9530A8AC7B52002236877">
-        <File Id="fil344BCE93F2E8F56E852DCE8EF6B74F21" KeyPath="yes" Source="$(var.AxSourceDir)\Qt5XmlPatterns.dll" />
+        <File Id="fil344BCE93F2E8F56E852DCE8EF6B74F21" KeyPath="yes" Source="${qt.dir}/bin/Qt5XmlPatterns.dll" />
       </Component>
       <Component Id="cmp9FB3E43AF50B8A49F737F4CDB2062581">
         <File Id="fil03348326D5B80FCCB5432727A1184AC4" KeyPath="yes" Source="$(var.AxSourceDir)\quazip.dll" />

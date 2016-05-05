@@ -53,11 +53,10 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <failOnError>false</failOnError>
-                            <target>                            
+                            <tasks>                            
                                 <chmod file="${project.basedir}/build.sh" perm="755"/>				
                                 <exec dir="${project.basedir}" executable="./build.sh" failifexecutionfails="true" failonerror="true" />
-                            </target>
+                            </tasks>
                         </configuration>
                     </execution>        
                     <execution>
@@ -67,11 +66,10 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <failOnError>false</failOnError>
-                            <target>                            
+                            <tasks>                            
                                 <chmod file="${project.build.directory}/rdep.sh" perm="755"/>				
                                 <exec dir="${project.build.directory}" executable="./rdep.sh" failifexecutionfails="true" failonerror="true" />
-                            </target>
+                            </tasks>
                         </configuration>
                     </execution>                       
                 </executions>
