@@ -28,6 +28,7 @@ ApplicationWindow
         anchors.fill: parent
         anchors.rightMargin: rightPadding
         anchors.bottomMargin: bottomPadding
+        onCurrentItemChanged: sideNavigation.close()
     }
 
     Component.onCompleted:
@@ -37,6 +38,7 @@ ApplicationWindow
         if (loginSessionManager.lastUsedSessionId)
         {
             lockScreenOrientation()
+            currentSessionId = loginSessionManager.lastUsedSessionId
             Workflow.openResourcesScreen(loginSessionManager.lastUsedSessionSystemName())
             connectionManager.connectToServer(loginSessionManager.lastUsedSessionUrl())
         }
