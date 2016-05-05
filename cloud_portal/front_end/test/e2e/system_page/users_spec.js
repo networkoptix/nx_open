@@ -1,6 +1,6 @@
 'use strict';
 var SystemPage = require('./po.js');
-describe('User list suite', function () {
+describe('User list', function () {
 
     var p = new SystemPage();
 
@@ -17,10 +17,9 @@ describe('User list suite', function () {
         p.helper.shareSystemWith(p.helper.userEmailViewer, p.helper.roles.viewer);
         p.helper.shareSystemWith(p.helper.userEmailAdvViewer, p.helper.roles.advViewer);
         p.helper.shareSystemWith(p.helper.userEmailLiveViewer, p.helper.roles.liveViewer);
-
     });
 
-    it ("Users list is visible for owner and admin", function() {
+    it ("is visible for owner and admin", function() {
         p.ownedSystem.click();
         expect(p.userList.isDisplayed()).toBe(true);
     
@@ -30,7 +29,7 @@ describe('User list suite', function () {
         expect(p.userList.isDisplayed()).toBe(true);
     });
     
-    it ("Users list is not visible for other users?", function() {
+    it ("is not visible for other users", function() {
         p.helper.logout();
         p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
         p.ownedSystem.click();
@@ -47,17 +46,17 @@ describe('User list suite', function () {
         expect(p.users.count()).toBe(0);
     });
     
-    it ("User emails and names are visible in this list", function() {
+    it ("contains user emails and names", function() {
         p.ownedSystem.click();
         expect(p.userList.getText()).toContain(p.helper.userEmailAdmin, p.helper.userFirstName);
     });
     
-    it ("Owner is always on top of the table", function() {
+    it ("always displays owner on the top of the table", function() {
         p.ownedSystem.click();
         expect(p.users.first().getText()).toContain(p.helper.userEmailOwner);
     });
     
-    it ("Pencil and cross links for each user are visible only on hover", function() {
+    it ("displays pencil and cross links for each user only on hover", function() {
         p.helper.logout();
         p.helper.login(p.helper.userEmailAdmin);
         p.ownedSystem.click();
@@ -75,7 +74,7 @@ describe('User list suite', function () {
         });
     });
     
-    it ("Edit and remove is not accessible for owner row", function() {
+    it ("does not display edit and remove for owner row", function() {
         p.helper.logout();
         p.helper.login(p.helper.userEmailAdmin);
         p.ownedSystem.click();
@@ -84,7 +83,7 @@ describe('User list suite', function () {
         expect(p.users.first().element(by.css('.glyphicon-remove')).isPresent()).toBe(false);
     });
     
-    it ("Remove user works with confirmation, after deleting another user - message appears, user list is updated", function() {
+    it ("removes user with confirmation, after deleting another user - message appears, user list is updated", function() {
         p.helper.logout();
         p.helper.login(p.helper.userEmailAdmin);
         p.ownedSystem.click();
@@ -106,7 +105,7 @@ describe('User list suite', function () {
         });
     });
     
-    it ("If user deletes himself from the table - portal asks for confirmation", function() {
+    it ("asks for confirmation, if user deletes himself from the table", function() {
         p.helper.logout();
         p.helper.login(p.helper.userEmailAdmin);
         p.ownedSystem.click();
@@ -121,7 +120,7 @@ describe('User list suite', function () {
     //
     //});
     
-    it ("User list updates after sharing", function() {
+    it ("updates after sharing", function() {
         p.helper.logout();
         p.helper.createUser(p.helper.userNameCyrillic, p.helper.userNameCyrillic).then( function(userEmail) {
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);

@@ -1,6 +1,6 @@
 'use strict';
 var SystemPage = require('./po.js');
-describe('Share suite', function () {
+describe('Sharing.', function () {
 
     var p = new SystemPage();
 
@@ -8,7 +8,7 @@ describe('Share suite', function () {
         p.helper.logout();
     });
 
-    it ("Edit permissions for user opens share dialog with locked email and visible users name", function() {
+    it ("Edit permissions for user opens share dialog with locked email and visible user name", function() {
         var viewerEmail = p.helper.userEmailViewer;
         var newName = 'visible users name';
         p.helper.login(viewerEmail);
@@ -90,7 +90,7 @@ describe('Share suite', function () {
         p.permDialogClose.click();
     });
 
-    it ("When user selects role - special hint is appearing", function() {
+    it ("When user selects role - special hint appears", function() {
         p.helper.login(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
