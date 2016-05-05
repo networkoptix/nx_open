@@ -1,6 +1,7 @@
 
 #include "core_settings.h"
 
+#include <QtCore/QLatin1String>
 #include <QtCore/QSettings>
 
 #include <nx/utils/raii_guard.h>
@@ -25,7 +26,7 @@ namespace
         const auto arrayWriteGuard = QnRaiiGuard::createDestructable(
             [settings]() { settings->endArray(); });
         
-        settings->remove(QLatin1String());  // Clear children
+        settings->remove(QString());  // Clear children
         const auto connCount = connections.size();
         for (int i = 0; i != connCount; ++i)
         {
