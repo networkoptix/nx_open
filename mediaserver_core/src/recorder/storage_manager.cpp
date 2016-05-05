@@ -519,17 +519,6 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
             qnResPool->removeResource(existCamRes);
         QnCommonMessageProcessor::instance()->updateResource(camera.coreData);
 
-        result = QnAppServerConnectionFactory::getConnection2()
-            ->getResourceManager()
-            ->save(
-                camera.properties,
-                ec2::DummyHandler::instance(),
-                &ec2::DummyHandler::onRequestDone
-            );
-
-        if (!result)
-            continue;
-
         for (const auto &prop : camera.properties)
             propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
         propertyDictionary->saveParams(camera.coreData.id);
