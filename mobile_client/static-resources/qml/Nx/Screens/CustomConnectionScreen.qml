@@ -37,6 +37,7 @@ Page
         {
             id: credentialsEditor
             width: parent.contentWidth
+            onAccepted: customConnectionScreen.connect()
         }
 
         Item
@@ -52,13 +53,7 @@ Page
                 text: qsTr("Connect")
                 color: ColorTheme.brand_main
                 textColor: ColorTheme.brand_contrast
-                onClicked:
-                {
-                    hideWarning()
-                    forceActiveFocus()
-                    d.connecting = true
-                    connectionManager.connectToServer(LoginUtils.makeUrl(host, port, login, password))
-                }
+                onClicked: customConnectionScreen.connect()
                 opacity: d.connecting ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
@@ -90,6 +85,14 @@ Page
             d.connecting = false
             showWarning(status, infoParameter)
         }
+    }
+
+    function connect()
+    {
+        hideWarning()
+        connectButton.forceActiveFocus()
+        d.connecting = true
+        connectionManager.connectToServer(LoginUtils.makeUrl(host, port, login, password))
     }
 
     function showWarning(status, info)
