@@ -14,14 +14,7 @@ RestorePasswordPage = function () {
 
     var self = this;
 
-    this.url = '/#/restore_password/';
-
     this.emailSubject = this.helper.emailSubjects.restorePass;
-
-    this.get = function (url) {
-        browser.get(url);
-        browser.waitForAngular();
-    };
 
     this.checkEmailMissing = function () {
         expect(this.emailInput.getAttribute('class')).toContain('ng-invalid-required');
@@ -33,6 +26,7 @@ RestorePasswordPage = function () {
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
     };
 
+    this.iForgotPasswordLink = element(by.linkText('I forgot my password'));
     this.emailInput = element(by.model('data.email'));
     this.emailInputWrap = this.emailInput.element(by.xpath('../..'));
     this.passwordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
@@ -86,7 +80,7 @@ RestorePasswordPage = function () {
 
         browser.controlFlow().wait(this.helper.getEmailTo(userEmail, this.emailSubject).then(function (email) {
             var regCode = self.getTokenFromEmail(email, userEmail);
-            deferred.fulfill(self.url + regCode);
+            deferred.fulfill(self.helper.urls.restore_password + '/' + regCode);
         }));
 
         return deferred.promise;

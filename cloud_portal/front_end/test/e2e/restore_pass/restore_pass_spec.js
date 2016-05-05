@@ -1,11 +1,11 @@
 'use strict';
 var RestorePasswordPage = require('./po.js');
-describe('Restore password suite', function () {
+describe('Restore password page', function () {
 
     var p = new RestorePasswordPage();
 
     beforeEach(function() {
-        p.get(p.url);
+        p.helper.get(p.helper.urls.restore_password);
     });
 
     it("should demand that email field is not empty", function () {
@@ -41,20 +41,29 @@ describe('Restore password suite', function () {
         return deferred.promise;
     }, p);
 
-    it("restore password", function() {
+    it("restores password", function() {
         p.helper.restorePassword(p.helper.userEmail, p.helper.userPassword);
     });
 
-    it("should be able to set new password (which is same as old)", function () {
+    it("should be able to set new password (which is same as old), redirect", function () {
         var userEmail = p.helper.userEmail;
         var userPassword = p.helper.userPassword;
         p.sendLinkToEmail(userEmail);
+        expect(browser.getCurrentUrl()).toContain("/restore_password/sent");
 
         browser.controlFlow().wait(p.helper.getEmailTo(userEmail, p.emailSubject).then(function (email) {
             var regCode = p.getTokenFromEmail(email, userEmail);
-            p.get(p.url + regCode);
+            p.helper.get(p.helper.urls.restore_password +  '/' + regCode);
             p.setNewPassword(userPassword);
+            expect(browser.getCurrentUrl()).toContain("/restore_password/success");
         }));
+    });
+
+    it("should not allow to access #/restore_password/sent #/restore_password/success by direct input", function () {
+        p.helper.get('#/restore_password/sent');
+        expect(browser.getCurrentUrl()).not.toContain("/restore_password/sent");
+        p.helper.get('#/restore_password/success');
+        expect(browser.getCurrentUrl()).not.toContain("/restore_password/success");
     });
 
     p.alert.checkAlert(function(){
@@ -99,7 +108,7 @@ describe('Restore password suite', function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);
-        p.get(p.url);
+        p.helper.get(p.helper.urls.restore_password); 
         p.getRestorePassLink(userEmail).then(function(url) {
             p.helper.get(url);
             p.setNewPassword(p.helper.userPasswordNew);
@@ -110,14 +119,14 @@ describe('Restore password suite', function () {
 
     it("should allow logged in user visit restore password page", function () {
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
-        p.get(p.url);
+        p.helper.get(p.helper.urls.restore_password); 
         expect(p.emailInput.isPresent()).toBe(true);
         p.helper.logout();
     });
 
     it("should log user out if he visits restore password link from email", function () {
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
-        p.get(p.url);
+        p.helper.get(p.helper.urls.restore_password); 
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {
             /* Please leave then() in browser.get(url).then(function(){});
             * Otherwise, exception is sometimes thrown
@@ -130,7 +139,16 @@ describe('Restore password suite', function () {
         });
         browser.sleep(1000);
         p.setNewPassword(p.helper.userPassword);
-        p.get("/");
+        p.helper.get();
         expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+    });
+
+    it("should handle click I forgot my password link at restore password page", function () {
+        p.helper.get(p.helper.urls.restore_password);
+        p.helper.forms.login.openLink.click();
+        p.iForgotPasswordLink.click();
+        expect(browser.getCurrentUrl()).toContain(p.helper.urls.restore_password);
+        expect(p.helper.forms.login.dialog.isPresent()).toBe(false);
+        expect(p.emailInput.isDisplayed()).toBe(true);
     });
 });

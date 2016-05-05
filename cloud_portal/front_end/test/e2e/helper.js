@@ -48,6 +48,7 @@ var Helper = function () {
 
     this.forms = {
         login: {
+            openLink: element(by.linkText('Login')),
             dialog: element(by.css('.modal-dialog')),
             emailInput: element(by.css('.modal-dialog')).element(by.model('auth.email')),
             passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
