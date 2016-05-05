@@ -1,5 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="clear_cache_complete_toast">Caches đã bị xóa</string>
-    <string name="no_network_connection_toast">Không có kết nối mạng tìm thấy</string>    
-</resources>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="promote_app_url" translatable="false">market://details?id=${new.android.packagename}</string>
-</resources>

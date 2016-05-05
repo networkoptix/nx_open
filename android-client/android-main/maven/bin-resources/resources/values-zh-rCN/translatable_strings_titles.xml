@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="title_activity_resources">摄像机</string>
-    <string name="title_activity_video">视频</string>
-    <string name="title_activity_archive">录像</string>
-	<string name="title_activity_sendlog">收集和发送日志</string>
-</resources>

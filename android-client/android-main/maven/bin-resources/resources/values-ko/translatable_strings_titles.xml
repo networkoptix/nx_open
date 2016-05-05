@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="title_activity_resources">카메라</string>
-    <string name="title_activity_video">비디오</string>
-    <string name="title_activity_archive">검색</string>
-	<string name="title_activity_sendlog">로그 보내기</string>
-</resources>

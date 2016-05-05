@@ -98,6 +98,12 @@ ComboBox
 
             KeyNavigation.tab: thisComponent.KeyNavigation.tab;
             KeyNavigation.backtab: thisComponent.KeyNavigation.backtab;
+
+            onTextChanged:
+            {
+                thisComponent.currentIndex = thisComponent.find(text.trim()
+                    , Qt.MatchExactly | Qt.MatchCaseSensitive);
+            }
         }
 
         NxLabel
@@ -192,7 +198,13 @@ ComboBox
         }
     }
 
-    onCurrentTextChanged: { updateText(); }
+    onCurrentTextChanged:
+    {
+        if (isEditMode && currentIndex == -1)
+            return;
+
+        updateText();
+    }
 
     function updateText()
     {

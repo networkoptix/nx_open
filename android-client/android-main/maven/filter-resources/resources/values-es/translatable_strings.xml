@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_description">${old.android.product.name} es elegantemente una simple etapa mas avanzada sobre una nueva aproximacion a la gestion de video 
-			de vigilancia HD en la empresa. La arquitectura hiper-optimizada de esta nueva plataforma de gestion de video proporciona una escalabilidad ilimitada, 
-			descubrimiento dispositivo automatizado y configuracion, simplificado configuracion y facilidad de uso y el menor costo total de implementacion y 
-			propiedad de cualquier solución en el mercado hoy en día. Disenado por los profesionales de la industria del video IP megapixeles, ${old.android.product.name} aborda 
-			los principales obstaculos y las limitaciones de la gestion de video de alta definicion de la empresa.</string>
-</resources>

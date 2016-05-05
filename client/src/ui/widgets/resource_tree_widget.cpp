@@ -15,7 +15,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
-#include <ui/delegates/resource_tree_item_delegate.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 
@@ -192,7 +192,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->filterFrame->setVisible(false);
     ui->selectFilterButton->setVisible(false);
 
-    m_itemDelegate = new QnResourceTreeItemDelegate(this);
+    m_itemDelegate = new QnResourceItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
@@ -459,16 +459,30 @@ void QnResourceTreeWidget::updateFilter() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-        (event->type() == QEvent::Show || event->type() == QEvent::Hide)) {
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+    case QEvent::Hide:
+        if (obj == ui->resourcesTreeView->verticalScrollBar())
             emit viewportSizeChanged();
-    } else if (obj == ui->resourcesTreeView && event->type() == QEvent::ContextMenu) {
-        QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
-        if (me->reason() == QContextMenuEvent::Mouse
-                && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
-            selectionModel()->clear();
+        break;
+
+    case QEvent::ContextMenu:
+        if (obj == ui->resourcesTreeView)
+        {
+            QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
+            if (me->reason() == QContextMenuEvent::Mouse && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
+                selectionModel()->clear();
+        }
+        break;
+
+    case QEvent::PaletteChange:
+        ui->resourcesTreeView->setPalette(palette()); // override default item view palette
+        break;
     }
+
     return base_type::eventFilter(obj, event);
 }
 
