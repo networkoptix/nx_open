@@ -166,6 +166,14 @@
         }
     },
 
+    "QScrollBar": {
+        "palette": {
+            "default": {
+                "midlight":         "dark13"
+            }
+        }
+    },
+
     "QHeaderView": {
         "palette": {
             "default": {
