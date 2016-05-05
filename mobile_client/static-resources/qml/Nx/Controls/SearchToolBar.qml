@@ -24,7 +24,7 @@ ToolBarBase
         anchors.rightMargin: 8
         spacing: 8
 
-        QnIconButton
+        IconButton
         {
             icon: "/images/arrow_back.png"
             onClicked: close()
@@ -43,10 +43,9 @@ ToolBarBase
             cursorColor: textColor
         }
 
-        QnIconButton
+        IconButton
         {
             icon: "/images/clear.png"
-            explicitRadius: 18
             onClicked: clear()
         }
     }

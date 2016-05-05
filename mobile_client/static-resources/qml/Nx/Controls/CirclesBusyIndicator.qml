@@ -1,58 +1,72 @@
-import QtQuick 2.4
+import QtQuick 2.0
+import Qt.labs.controls 1.0
+import Nx 1.0
 
-import com.networkoptix.qml 1.0
+BusyIndicator
+{
+    id: control
 
-Item {
-    id: preloader
+    property color color: ColorTheme.base13
 
-    width: dp(60)
-    height: dp(60)
+    implicitWidth: 60
+    implicitHeight: 60
 
-    Repeater {
+    contentItem: null
+
+    Repeater
+    {
         model: 3
         delegate: circle
     }
 
-    Component {
+    Component
+    {
         id: circle
 
-        Rectangle {
+        Rectangle
+        {
             id: circleRectangle
+
             anchors.centerIn: parent
             radius: width / 2
-            border.width: dp(2)
-            border.color: QnTheme.preloaderCircle
+            border.width: 2
+            border.color: control.color
             color: "transparent"
 
-            width: dp((index + 1) * 20) - border.width / 2
+            width: (index + 1) * 20 - border.width / 2
             height: width
 
-            SequentialAnimation {
-                id: animation
-                running: true
+            SequentialAnimation
+            {
+                running: control.running
 
-                PauseAnimation {
+                PauseAnimation
+                {
                     duration: index * 200
                 }
 
-                SequentialAnimation {
+                SequentialAnimation
+                {
                     loops: Animation.Infinite
 
-                    NumberAnimation {
+                    NumberAnimation
+                    {
                         duration: 500
                         target: circleRectangle
                         property: "opacity"
                         from: 0
                         to: 1
                     }
-                    NumberAnimation {
+                    NumberAnimation
+                    {
                         duration: 500
                         target: circleRectangle
                         property: "opacity"
                         from: 1
                         to: 0
                     }
-                    PauseAnimation {
+                    PauseAnimation
+                    {
                         duration: 300
                     }
                 }

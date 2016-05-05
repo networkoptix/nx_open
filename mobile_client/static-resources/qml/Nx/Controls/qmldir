@@ -10,4 +10,5 @@ PageTitleLabel 1.0 PageTitleLabel.qml
 Page 1.0 Page.qml
 MaterialEffect 1.0 MaterialEffect.qml
 ThreeDotBusyIndicator 1.0 ThreeDotBusyIndicator.qml
+CirclesBusyIndicator 1.0 CirclesBusyIndicator.qml
 WarningPanel 1.0 WarningPanel.qml
