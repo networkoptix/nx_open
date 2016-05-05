@@ -1,5 +1,4 @@
-#ifndef QN_AUDIT_LOG_DIALOG_H
-#define QN_AUDIT_LOG_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 #include <QtGui/QStandardItem>
@@ -21,32 +20,6 @@ namespace Ui {
     class AuditLogDialog;
 }
 
-class QnAuditItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware
-{
-    typedef QStyledItemDelegate base_type;
-
-public:
-    explicit QnAuditItemDelegate(QObject *parent = NULL);
-    virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
-
-    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override;
-    void setPlayButtonSize(const QSize& size) { m_playBottonSize = size; }
-    QSize playButtonSize() const { return m_playBottonSize; }
-    void setDefaultSectionHeight(int value);
-private:
-    void paintRichDateTime(QPainter * painter, const QStyleOptionViewItem & option, int dateTimeSecs) const;
-    QSize defaultSizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const;
-    QSize sizeHintForText(const QStyleOptionViewItem & option, const QString& textData, bool isBold = false) const;
-private:
-    int m_defaultSectionHeight;
-    QSize m_playBottonSize;
-    mutable int m_widthHint;
-    mutable QHash<QString, int> m_sizeHintHash;
-    mutable QHash<QString, int> m_boldSizeHintHash;
-};
-
-
-
 class QnAuditLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
@@ -66,13 +39,12 @@ protected:
 private slots:
     void updateData();
     void at_gotdata(int httpStatus, const QnAuditRecordList& data, int requestNum);
-    void at_sessionsGrid_customContextMenuRequested(const QPoint& screenPos);
+    void at_customContextMenuRequested(const QPoint& screenPos);
     void at_clipboardAction_triggered();
     void at_exportAction_triggered();
     void at_selectAllAction_triggered();
-    void at_itemPressed(const QModelIndex& index);
-    void at_itemEntered(const QModelIndex& index);
-    void at_eventsGrid_clicked(const QModelIndex& idx);
+    void at_itemButtonClicked(const QModelIndex& index);
+    void at_descriptionPressed(const QModelIndex& idx);
     void at_headerCheckStateChanged(Qt::CheckState state);
     void at_updateDetailModel();
     void at_typeCheckboxChanged();
@@ -92,16 +64,18 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec);
 
+    void setupSessionsGrid();
+    void setupCamerasGrid();
+    void setupDetailsGrid();
+
+    void setupGridCommon(QnTableView* grid, bool master);
+
     QnAuditRecordRefList filterChildDataBySessions(const QnAuditRecordRefList& checkedRows);
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
     void setupFilterCheckbox(QCheckBox* checkbox, const QColor& color, Qn::AuditRecordTypes filteredTypes);
     void processPlaybackAction(const QnAuditRecord* record);
     void triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId);
     QnAuditRecordRefList applyFilter();
-    QSize calcButtonSize() const;
-    void setupSessionsGrid();
-    void setupCamerasGrid();
-    void setupMasterGridCommon(QnTableView* gridMaster);
     void makeSessionData();
     void makeCameraData();
     void setupContextMenu(QTableView* gridMaster);
@@ -128,12 +102,7 @@ private:
     QAction *m_exportAction;
     QAction *m_clipboardAction;
     QList<QCheckBox*> m_filterCheckboxes;
-    QModelIndex m_hoveredIndex;
 
-    bool m_skipNextPressSignal;
-    QModelIndex m_skipNextSelIndex;
-    QModelIndex m_lastPressIndex;
     QnAuditItemDelegate* m_itemDelegate;
 };
 
-#endif // QN_AUDIT_LOG_DIALOG_H

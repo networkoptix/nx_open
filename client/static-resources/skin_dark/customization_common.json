@@ -159,7 +159,9 @@
             "default": {
                 "base":             "transparent",
                 "midlight":         "dark12.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)"
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light10",
+                "highlightedText":  "light4"
             }
         }
     },
