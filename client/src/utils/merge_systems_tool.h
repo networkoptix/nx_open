@@ -19,7 +19,9 @@ public:
         NotFoundError,
         StarterLicenseError,
         SafeModeError,
-        ForbiddenError
+        ForbiddenError,
+        ConfigurationError,
+        BothSystemsBoundToCloudError,
     };
 
     explicit QnMergeSystemsTool(QObject *parent = 0);

@@ -2,7 +2,7 @@
 #include "resource_pool_model.h"
 
 #include <utils/common/delete_later.h>
-#include <utils/network/nettools.h>
+#include <nx/network/nettools.h>
 #include <utils/common/string.h>
 
 #include <core/resource_management/resource_criterion.h>

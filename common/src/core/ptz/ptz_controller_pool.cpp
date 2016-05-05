@@ -1,12 +1,12 @@
 #include "ptz_controller_pool.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThreadPool>
 #include <QtCore/QAtomicInt>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 #include "abstract_ptz_controller.h"

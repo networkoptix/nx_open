@@ -1,12 +1,14 @@
 
 #include "selection.h"
 
-#include <base/server_info.h>
+#include <nx/mediaserver/api/server_info.h>
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>
 #include <models/time_zones_model.h>
 #include <models/ip_settings_model.h>
 #include <models/servers_selection_model.h>
+
+namespace api = nx::mediaserver::api;
 
 namespace 
 {
@@ -17,7 +19,7 @@ namespace
     template<typename ParameterType
         , typename GetterFunc
         , typename EqualsFunc>
-    ParameterType getSelectionValue(const rtu::ServerInfoPtrContainer &servers
+    ParameterType getSelectionValue(const api::ServerInfoPtrContainer &servers
         , const ParameterType &emptyValue
         , const ParameterType &differentValue
         , const EqualsFunc &eqFunc
@@ -26,48 +28,48 @@ namespace
         if (servers.empty())
             return emptyValue;
         
-        const rtu::ServerInfo * const firstInfo = *servers.begin();
+        const api::ServerInfo * const firstInfo = *servers.begin();
         const ParameterType &value = getter(*firstInfo);
         const auto itDifferentValue = std::find_if(servers.begin(), servers.end()
-            , [&value, &getter, &eqFunc](const rtu::ServerInfo *info) { return (!eqFunc(getter(*info), value));});
+            , [&value, &getter, &eqFunc](const api::ServerInfo *info) { return (!eqFunc(getter(*info), value));});
         return (itDifferentValue == servers.end() ? value : differentValue);
     }
 
     enum { kSingleServerSelectionCount = 1 };
     
-    int calcPort(const rtu::ServerInfoPtrContainer &servers)
+    int calcPort(const api::ServerInfoPtrContainer &servers)
     {
         enum { kDefaultPort = 0 };
         return getSelectionValue<int>(servers, kDefaultPort, kDefaultPort
-            ,  std::equal_to<int>(), [](const rtu::ServerInfo &info)
+            ,  std::equal_to<int>(), [](const api::ServerInfo &info)
         {
             return info.baseInfo().port; 
         });
     }
     
     template<typename ReturnValue, typename InitValue, typename GetterType>
-    ReturnValue calcFlags(const rtu::ServerInfoPtrContainer &servers, InitValue allSelectedValue
+    ReturnValue calcFlags(const api::ServerInfoPtrContainer &servers, InitValue allSelectedValue
         , const GetterType &getter)
     {
         ReturnValue flags = allSelectedValue;
-        for (const rtu::ServerInfo * const info: servers)
+        for (const api::ServerInfo * const info: servers)
         {
             flags &= getter(*info);
         }
         return flags;
     }
 
-    Qt::CheckState calcDHCPState(const rtu::ServerInfoPtrContainer &servers)
+    Qt::CheckState calcDHCPState(const api::ServerInfoPtrContainer &servers)
     {
         return getSelectionValue<Qt::CheckState>(servers, Qt::Unchecked, Qt::PartiallyChecked
-            , std::equal_to<Qt::CheckState>(), [](const rtu::ServerInfo &info)
+            , std::equal_to<Qt::CheckState>(), [](const api::ServerInfo &info)
         {
             if (!info.hasExtraInfo() || info.extraInfo().interfaces.empty())
                 return Qt::Unchecked;
             
-            const rtu::InterfaceInfoList &interfaces = info.extraInfo().interfaces;
+            const api::InterfaceInfoList &interfaces = info.extraInfo().interfaces;
             Qt::CheckState firstVal = interfaces.begin()->useDHCP;
-            for (const rtu::InterfaceInfo &itfInfo: interfaces)
+            for (const api::InterfaceInfo &itfInfo: interfaces)
             {
                 if (itfInfo.useDHCP != firstVal)
                     return Qt::PartiallyChecked;
@@ -76,14 +78,14 @@ namespace
         });
     }
     
-    QString calcSystemName(const rtu::ServerInfoPtrContainer &servers)
+    QString calcSystemName(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return QString();
         
         static const QString kDifferentServerNames = QString();
 
-        const auto &getter = [](const rtu::ServerInfo &info)
+        const auto &getter = [](const api::ServerInfo &info)
         {
             return info.baseInfo().systemName;
         };
@@ -92,13 +94,13 @@ namespace
             , std::equal_to<QString>(), getter);
     }
 
-    QString calcPassword(const rtu::ServerInfoPtrContainer &servers)
+    QString calcPassword(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return QString();
 
         static const QString kDifferentPasswords = QString();
-        const auto &getter = [](const rtu::ServerInfo &info) -> QString
+        const auto &getter = [](const api::ServerInfo &info) -> QString
         {
             return (info.hasExtraInfo() ? info.extraInfo().password : QString()); 
         };
@@ -107,7 +109,7 @@ namespace
             , kDifferentPasswords, std::equal_to<QString>(), getter);
     }
 
-    QDateTime calcDateTime(const rtu::ServerInfoPtrContainer &servers)
+    QDateTime calcDateTime(const api::ServerInfoPtrContainer &servers)
     {
         QDateTime defaultDateTime = QDateTime();
 
@@ -115,7 +117,7 @@ namespace
             return defaultDateTime;
         
         const qint64 now = QDateTime::currentMSecsSinceEpoch();
-        const auto &getter = [now](const rtu::ServerInfo &info) -> qint64
+        const auto &getter = [now](const api::ServerInfo &info) -> qint64
         {
             if (!info.hasExtraInfo())
                 return 0;
@@ -128,7 +130,7 @@ namespace
         const int selectedCount = servers.size();
         if (selectedCount == kSingleServerSelectionCount)
         {
-            const rtu::ServerInfo &firstInfo = **servers.begin();
+            const api::ServerInfo &firstInfo = **servers.begin();
             qint64 utcTimeMs = getter(firstInfo);
             if (utcTimeMs <= 0)
                 return defaultDateTime;
@@ -145,7 +147,7 @@ namespace
             servers, 0, 0, eq, getter);
 
         const QByteArray tz = getSelectionValue<QByteArray>(servers, QByteArray(), QByteArray()
-            , std::equal_to<QByteArray>(), [](const rtu::ServerInfo &info) -> QByteArray
+            , std::equal_to<QByteArray>(), [](const api::ServerInfo &info) -> QByteArray
         {
             return (info.hasExtraInfo() ? info.extraInfo().timeZoneId : QByteArray());
         });
@@ -155,7 +157,7 @@ namespace
     }
 
     
-    bool calcEditableInterfaces(const rtu::ServerInfoPtrContainer &servers)
+    bool calcEditableInterfaces(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return false;
@@ -171,7 +173,7 @@ namespace
         };
         
         const int ipsCount = getSelectionValue<int>(servers, kEmptyIps, kDifferentIpsCount
-            , std::equal_to<int>(), [](const rtu::ServerInfo &info) -> int
+            , std::equal_to<int>(), [](const api::ServerInfo &info) -> int
         {
             return (info.hasExtraInfo() ? info.extraInfo().interfaces.size() : kEmptyIps);  
         });
@@ -181,13 +183,13 @@ namespace
 
     /// Make sense only if all servers has one interfaces. 
     /// Calculated value will not be used in other cases
-    bool calcHasEmptyAddresses(const rtu::ServerInfoPtrContainer &servers)
+    bool calcHasEmptyAddresses(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return false;
 
         const bool aggregatedHasEmptyIps = getSelectionValue<bool>(servers, false, true
-            , std::equal_to<bool>(), [](const rtu::ServerInfo &info) -> bool
+            , std::equal_to<bool>(), [](const api::ServerInfo &info) -> bool
         {
             if (!info.hasExtraInfo())
                 return false;
@@ -205,37 +207,37 @@ namespace
     typedef std::unique_ptr<rtu::IpSettingsModel> IpSettingsModelPtr;
 
     IpSettingsModelPtr makeItfModel(bool editableInterfacess
-        , const rtu::ServerInfoPtrContainer &servers)
+        , const api::ServerInfoPtrContainer &servers)
     {
         /// Editability checked at calcEditableInterfaces.
 
         if (!editableInterfacess || servers.empty())
             return std::move(IpSettingsModelPtr(new rtu::IpSettingsModel(0
-                , rtu::InterfaceInfoList(), rtu::helpers::qml_objects_parent())));
+                , api::InterfaceInfoList(), rtu::helpers::qml_objects_parent())));
 
         const auto &firstServer = servers.front();
         if (servers.size() == kSingleServerSelectionCount)
         {
-            const rtu::InterfaceInfoList &itfs = (firstServer->hasExtraInfo() 
-                ? firstServer->extraInfo().interfaces : rtu::InterfaceInfoList());
+            const api::InterfaceInfoList &itfs = (firstServer->hasExtraInfo() 
+                ? firstServer->extraInfo().interfaces : api::InterfaceInfoList());
             return std::move(IpSettingsModelPtr(new rtu::IpSettingsModel(kSingleServerSelectionCount
                 , itfs, rtu::helpers::qml_objects_parent())));
         }
 
         /// All servers have only one interfaces due to calcEditableInterfaces() result check before call
         const auto dhcpCheckedState = getSelectionValue<Qt::CheckState>(servers, Qt::Unchecked, Qt::PartiallyChecked
-            , std::equal_to<Qt::CheckState>(), [](const rtu::ServerInfo &info) -> Qt::CheckState
+            , std::equal_to<Qt::CheckState>(), [](const api::ServerInfo &info) -> Qt::CheckState
         {
             return (!info.hasExtraInfo() ? Qt::PartiallyChecked : info.extraInfo().interfaces.first().useDHCP);
         });
 
         static const QString kEmptyAddress; 
 
-        const auto maskGetter = [](const rtu::ServerInfo &info) -> QString
+        const auto maskGetter = [](const api::ServerInfo &info) -> QString
             { return (info.hasExtraInfo() ? info.extraInfo().interfaces.first().mask : kEmptyAddress); };
-        const auto dnsGetter = [](const rtu::ServerInfo &info) -> QString
+        const auto dnsGetter = [](const api::ServerInfo &info) -> QString
             { return (info.hasExtraInfo() ? info.extraInfo().interfaces.first().dns : kEmptyAddress); };
-        const auto gatewayGetter = [](const rtu::ServerInfo &info) -> QString
+        const auto gatewayGetter = [](const api::ServerInfo &info) -> QString
             { return (info.hasExtraInfo() ? info.extraInfo().interfaces.first().gateway: kEmptyAddress); };
 
         const auto mask = getSelectionValue<QString>(servers, kEmptyAddress, kEmptyAddress
@@ -245,9 +247,9 @@ namespace
         const auto dns = getSelectionValue<QString>(servers, kEmptyAddress, kEmptyAddress
             , std::equal_to<QString>(), dnsGetter);
 
-        rtu::InterfaceInfoList addresses;
+        api::InterfaceInfoList addresses;
 
-        addresses.push_back(rtu::InterfaceInfo(rtu::Selection::kMultipleSelectionItfName
+        addresses.push_back(api::InterfaceInfo(rtu::Selection::kMultipleSelectionItfName
             , kEmptyAddress, kEmptyAddress              /// Ip and Mac case: addresses are always different for servers
             , mask, gateway, dns, dhcpCheckedState ));
         
@@ -277,13 +279,13 @@ namespace
         return (currentTz != otherTz);
     }
 
-    bool calcSafeMode(const rtu::ServerInfoPtrContainer &servers)
+    bool calcSafeMode(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty())
             return false;
         
         const bool aggregatedSafeMode = getSelectionValue<bool>(servers, false, true
-            , std::equal_to<bool>(), [](const rtu::ServerInfo &info) -> int
+            , std::equal_to<bool>(), [](const api::ServerInfo &info) -> int
         {
             return info.baseInfo().safeMode;
         });
@@ -300,7 +302,7 @@ struct rtu::Selection::Snapshot
 {
     int count;
 
-    rtu::Constants::ServerFlags flags;
+    api::Constants::ServerFlags flags;
 
     int port;
     Qt::CheckState dhcpState;
@@ -317,7 +319,7 @@ struct rtu::Selection::Snapshot
     
     bool safeMode;
 
-    rtu::Constants::SystemCommands sysCommands;
+    api::Constants::SystemCommands sysCommands;
 
     Snapshot(rtu::ServersSelectionModel *model);
 };
@@ -326,9 +328,9 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
 
     : count(model->selectedCount())
 
-    , flags(calcFlags<rtu::Constants::ServerFlags>(
-        model->selectedServers(), rtu::Constants::ServerFlag::AllFlags
-        , [](const ServerInfo &info) { return info.baseInfo().flags; }))
+    , flags(calcFlags<api::Constants::ServerFlags>(
+        model->selectedServers(), api::Constants::ServerFlag::AllFlags
+        , [](const api::ServerInfo &info) { return info.baseInfo().flags; }))
 
     , port(calcPort(model->selectedServers()))
     , dhcpState(calcDHCPState(model->selectedServers()))
@@ -345,12 +347,12 @@ rtu::Selection::Snapshot::Snapshot(rtu::ServersSelectionModel *model)
 
     , safeMode(calcSafeMode(model->selectedServers()))
 
-    , sysCommands(calcFlags<rtu::Constants::SystemCommands>(
-        model->selectedServers(), rtu::Constants::SystemCommand::AllCommands
-        , [](const ServerInfo &info) 
+    , sysCommands(calcFlags<api::Constants::SystemCommands>(
+        model->selectedServers(), api::Constants::SystemCommand::AllCommands
+        , [](const api::ServerInfo &info) 
         { 
             return (info.hasExtraInfo() ? info.extraInfo().sysCommands
-                : rtu::Constants::SystemCommand::NoCommands);
+                : api::Constants::SystemCommand::NoCommands);
         }))
 {
 }

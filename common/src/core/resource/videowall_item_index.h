@@ -2,12 +2,14 @@
 #define VIDEOWALL_ITEM_INDEX_H
 
 #include <QtCore/QMetaType>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 /**
  * This class contains all the necessary information to look up a videowall item.

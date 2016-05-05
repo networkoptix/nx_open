@@ -6,6 +6,7 @@
 #include "safe_direct_connection.h"
 
 #include <atomic>
+#include <nx/utils/log/assert.h>
 
 
 namespace Qn
@@ -26,7 +27,7 @@ namespace Qn
     EnableSafeDirectConnection::~EnableSafeDirectConnection()
     {
         //TODO #ak verifying that safeDirectDisconnect() has been called
-        Q_ASSERT( !m_globalHelper->isConnected(this) );
+        NX_ASSERT( !m_globalHelper->isConnected(this) );
     }
 
     void EnableSafeDirectConnection::directDisconnectAll()
@@ -109,7 +110,7 @@ namespace Qn
         auto it = m_receivers.find( receiver );
         if( it == m_receivers.end() )
             return;
-        Q_ASSERT( it->second.slotsInvokedCounter > 0 );
+        NX_ASSERT( it->second.slotsInvokedCounter > 0 );
         --it->second.slotsInvokedCounter;
         if( it->second.slotsInvokedCounter == 0 )
         {

@@ -1,14 +1,14 @@
 
 #include "server_archive_delegate.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <server/server_globals.h>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
@@ -57,13 +57,13 @@ qint64 QnServerArchiveDelegate::startTime() const
         ret = m_catalogHi[i] && 
               m_catalogHi[i]->minTime() != AV_NOPTS_VALUE && 
               m_catalogHi[i]->minTime() < ret ?
-                    ret = m_catalogHi[i]->minTime() :
+                    m_catalogHi[i]->minTime() :
                     ret;
 
         ret = m_catalogLow[i] && 
               m_catalogLow[i]->minTime() != AV_NOPTS_VALUE && 
               m_catalogLow[i]->minTime() < ret ?
-                    ret = m_catalogLow[i]->minTime() :
+                    m_catalogLow[i]->minTime() :
                     ret;
     }
     return ret == INT64_MAX ? AV_NOPTS_VALUE : ret*1000;
@@ -80,13 +80,13 @@ qint64 QnServerArchiveDelegate::endTime() const
         ret = m_catalogHi[i] && 
               m_catalogHi[i]->maxTime() != AV_NOPTS_VALUE && 
               m_catalogHi[i]->maxTime() > ret  ?
-                    ret = m_catalogHi[i]->maxTime() :
+                    m_catalogHi[i]->maxTime() :
                     ret;
 
         ret = m_catalogLow[i] && 
               m_catalogLow[i]->maxTime() != AV_NOPTS_VALUE && 
               m_catalogLow[i]->maxTime() > ret ?
-                    ret = m_catalogLow[i]->maxTime() :
+                    m_catalogLow[i]->maxTime() :
                     ret;
     }
     return ret == 0 ? AV_NOPTS_VALUE 
@@ -127,7 +127,7 @@ bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
     QnNetworkResourcePtr netResource = 
         qSharedPointerDynamicCast<QnNetworkResource>(resource);
 
-    Q_ASSERT(netResource != 0);
+    NX_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
     
     setCatalogs();
@@ -520,7 +520,7 @@ void QnServerArchiveDelegate::setSendMotion(bool value)
 }
 */
 
-bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
+bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch, const QSize &)
 {
     QnMutexLocker lk( &m_mutex );
 

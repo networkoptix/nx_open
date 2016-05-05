@@ -9,15 +9,15 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "ec2_thread_pool.h"
 #include "rest/request_params.h"
@@ -98,16 +98,17 @@ namespace ec2
             //else if( format == Qn::XmlFormat )
             //    tranBuffer = QnXml::serialized(tran, lit("reply"));
             else
-                assert(false);
+            {
+                NX_ASSERT(false);
+            }
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QnMutexLocker lk( &m_mutex );
-            if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
-            {
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
-                return;
-            }
+            httpClient->doPost(
+                requestUrl,
+                Qn::serializationFormatToHttpContentType(format),
+                std::move(tranBuffer));
             auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
@@ -145,11 +146,7 @@ namespace ec2
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QnMutexLocker lk( &m_mutex );
-            if( !httpClient->doGet( requestUrl ) )
-            {
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
-                return;
-            }
+            httpClient->doGet( requestUrl );
             auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
@@ -161,7 +158,7 @@ namespace ec2
             {
                 QnMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
-                assert( it != m_runningHttpRequests.end() );
+                NX_ASSERT( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
                 httpClient->terminate();
                 m_runningHttpRequests.erase( it );
@@ -221,7 +218,7 @@ namespace ec2
                 //    tran = QnXml::deserialized<OutputData>(msgBody, OutputData(), &success);
                 //    break;
             default:
-                assert(false);
+                NX_ASSERT(false);
             }
 
             if( !success)

@@ -4,7 +4,7 @@
 #include "request_handler.h"
 
 #include <utils/serialization/lexical_functions.h>
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 #include <utils/common/model_functions.h>
 #include "utils/common/util.h"
 #include "json_rest_result.h"
@@ -36,7 +36,7 @@ namespace QnFusionRestHandlerDetail
             result = QnXml::serialized(outputData, lit("reply"));
             break;
         default:
-            assert(0);
+            NX_ASSERT(0);
         }
         contentType = Qn::serializationFormatToHttpContentType(format);
     }

@@ -3,11 +3,14 @@
 
 #include <QtCore/QString>
 
-#include <assert.h>
 #include <limits.h>
 #include <stdexcept>
 
-#ifndef Q_OS_WIN
+#include <nx/utils/log/assert.h>
+
+#ifdef Q_OS_WIN
+#include <WinSock2.h>
+#else
 #include <arpa/inet.h>
 #endif
 
@@ -114,7 +117,7 @@ public:
     }
     inline unsigned showBits(unsigned num)
     {
-        assert(num <= INT_BIT);
+        NX_ASSERT(num <= INT_BIT);
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
         unsigned prevVal = 0;
@@ -146,7 +149,7 @@ public:
     inline void skipBits(unsigned num) {
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
-        assert(num <= INT_BIT);
+        NX_ASSERT(num <= INT_BIT);
         if (num <= m_bitLeft)
             m_bitLeft -= num;
         else {
@@ -190,7 +193,7 @@ public:
 
     inline void skipBits(unsigned cnt)
     {
-        assert(m_bitWrited % INT_BIT == 0);
+        NX_ASSERT(m_bitWrited % INT_BIT == 0);
         BitStreamReader reader;
         reader.setBuffer((quint8*)m_buffer, (quint8*) (m_buffer + 1));
         putBits(cnt, reader.getBits(cnt));

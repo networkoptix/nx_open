@@ -1,12 +1,14 @@
 #ifndef QN_FUSION_KEYS_H
 #define QN_FUSION_KEYS_H
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/cat.hpp>
+#endif
 
 /**
  * This macro defines a new fusion key. It must be used in global namespace.
  * Defined key can then be accessed from the QnFusion namespace.
- * 
+ *
  * \param KEY                           Key to define.
  */
 #define QN_FUSION_DEFINE_KEY(KEY)                                               \
@@ -45,7 +47,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_name QString
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QN_FUSION_LIT_CAT(":", VALUE))
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QStringLiteral(":" VALUE))
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
@@ -54,7 +56,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type())) 
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type()))
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname true
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
@@ -67,22 +69,19 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional true
 #define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
 
-
-
 /**
  * \internal
- * 
+ *
  * Produces a <tt>QStringLiteral</tt> from the given character literals.
- * Works around a MSVC bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
+ * Works around a MSVC pre-2015 bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
  */
-#define QN_FUSION_LIT_CAT(A, B)                                                 \
+#define QN_FUSION_LIT_CAT(A, B) \
     QN_FUSION_LIT_CAT_I(A, B)
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1900 //< MSVC pre-2015
 #   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A BOOST_PP_CAT(L, B))
 #else
 #   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A B)
 #endif
-
 
 #endif // QN_FUSION_KEYS_H

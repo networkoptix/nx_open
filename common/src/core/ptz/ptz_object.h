@@ -1,7 +1,9 @@
 #ifndef QN_PTZ_OBJECT_H
 #define QN_PTZ_OBJECT_H
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include <QtCore/QString>
 

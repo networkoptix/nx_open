@@ -2,6 +2,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "api/global_settings.h"
+#include <nx/utils/log/assert.h>
 
 static QnAuditManager* m_globalInstance = 0;
 
@@ -49,14 +50,16 @@ QnAuditManager* QnAuditManager::instance()
 QnAuditManager::QnAuditManager()
 {
     m_sessionCleanupTimer.restart();
-    m_enabled = QnGlobalSettings::instance()->isAuditTrailEnabled();
+    m_enabled = qnGlobalSettings->isInitialized() ?
+        qnGlobalSettings->isAuditTrailEnabled()
+        : false;
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::auditTrailEnableChanged, this,
         [this]() {
-            setEnabled(QnGlobalSettings::instance()->isAuditTrailEnabled()); 
+            setEnabled(QnGlobalSettings::instance()->isAuditTrailEnabled());
         }
     );
 
-    assert( m_globalInstance == nullptr );
+    NX_ASSERT( m_globalInstance == nullptr );
     m_globalInstance = this;
     connect(&m_timer, &QTimer::timeout, this, &QnAuditManager::at_timer);
     m_timer.start(1000 * 5);
@@ -140,10 +143,10 @@ AuditHandle QnAuditManager::notifyPlaybackStarted(const QnAuthSession& session, 
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end(); ++itr)
     {
         CameraPlaybackInfo& pbInfo = *itr;
-        if (pbInfo.session == session && pbInfo.cameraId == cameraId && pbInfo.isExport == isExport) 
+        if (pbInfo.session == session && pbInfo.cameraId == cameraId && pbInfo.isExport == isExport)
         {
             bool isLive = pbInfo.startTimeUsec == DATETIME_NOW && timestampUsec == DATETIME_NOW;
-            if (isLive || pbInfo.period.distanceToTime(timestampUsec/1000) < MIN_SEEK_DISTANCE_TO_LOG) 
+            if (isLive || pbInfo.period.distanceToTime(timestampUsec/1000) < MIN_SEEK_DISTANCE_TO_LOG)
             {
                 if (timestampUsec != DATETIME_NOW)
                     pbInfo.period.addPeriod(QnTimePeriod(timestampUsec/1000, 1));
@@ -231,15 +234,15 @@ void QnAuditManager::at_timer()
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end();)
     {
         CameraPlaybackInfo& pbInfo = itr.value();
-        if (pbInfo.handle.use_count() == 1) 
+        if (pbInfo.handle.use_count() == 1)
         {
             if (!pbInfo.timeout.isValid())
                 pbInfo.timeout.restart(); // record isn't using any more. start remove timer
-            if (pbInfo.timeout.elapsed() >= AGGREGATION_TIME_MS / 2) 
+            if (pbInfo.timeout.elapsed() >= AGGREGATION_TIME_MS / 2)
             {
                 // move to delete list
-                if ((pbInfo.isExport  && pbInfo.period.durationMs > 0) || 
-                    (pbInfo.aliveTimeout.elapsed() >= (MIN_PLAYBACK_TIME_TO_LOG + AGGREGATION_TIME_MS / 2) && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG)) 
+                if ((pbInfo.isExport  && pbInfo.period.durationMs > 0) ||
+                    (pbInfo.aliveTimeout.elapsed() >= (MIN_PLAYBACK_TIME_TO_LOG + AGGREGATION_TIME_MS / 2) && pbInfo.period.durationMs >= MIN_PLAYBACK_TIME_TO_LOG))
                 {
                     m_closedPlaybackInfo.push_back(std::move(itr.value()));
                 }
@@ -266,7 +269,7 @@ void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
         recordProcessed = false;
         for (auto itr = recordsToAggregate.begin(); itr != recordsToAggregate.end(); ++itr)
         {
-            if (itr->timeout.elapsed() > AGGREGATION_TIME_MS) 
+            if (itr->timeout.elapsed() > AGGREGATION_TIME_MS)
             {
                 // aggregate data. join other records to this one
                 QnAuditRecord record = itr->toAuditRecord();

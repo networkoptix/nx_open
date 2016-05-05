@@ -3,7 +3,8 @@
 
 #include <chrono>
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
+
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
 

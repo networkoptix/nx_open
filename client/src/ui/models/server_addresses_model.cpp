@@ -194,9 +194,6 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
             }
         }
 
-        //TODO: #dklychkov fix it in 2.4
-        url.setPort(-1);
-
         if (index.row() < m_addresses.size())
             m_addresses[index.row()] = url;
         else
@@ -233,7 +230,7 @@ QVariant QnServerAddressesModel::headerData(int section, Qt::Orientation orienta
     case AddressColumn:
         return tr("Address");
     case InUseColumn:
-        return tr("In Use");
+        return QString();
     default:
         break;
     }

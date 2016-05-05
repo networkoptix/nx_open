@@ -10,7 +10,6 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QLabel>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QFileInfo>
@@ -21,7 +20,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/math/color_transformations.h>
 #include <utils/resource_property_adaptors.h>
 
@@ -45,9 +44,8 @@
 #include <ui/style/skin.h>
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
-#include <ui/dialogs/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
-#include <ui/dialogs/file_dialog.h>
-#include <ui/dialogs/message_box.h>
+#include <ui/dialogs/common/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
+#include <ui/dialogs/common/file_dialog.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -77,6 +75,7 @@
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
+#include <ui/graphics/items/resource/button_ids.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -672,7 +671,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
             if (!QFile::rename(recordedFileName, filePath)) {
                 QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
                 CL_LOG(cl_logWARNING) cl_log.log(message, cl_logWARNING);
-                QnMessageBox::warning(display()->view(), tr("Warning"), message, QMessageBox::Ok, QMessageBox::NoButton);
+                QnMessageBox::warning(display()->view(), tr("Warning"), message, QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
                 continue;
             }
 
@@ -690,8 +689,11 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+
+#include <ui/workbench/workbench_welcome_screen.h>
+
 void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event) {
-    if(event->type() != QEvent::KeyPress)
+    if (event->type() != QEvent::KeyPress)
         return;
 
     event->accept(); /* Accept by default. */
@@ -1089,7 +1091,7 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
     menu()->trigger(QnActions::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
-    widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
+    widget->setCheckedButtons(widget->checkedButtons() & ~Qn::ZoomWindowButton);
 }
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {

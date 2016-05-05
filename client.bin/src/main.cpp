@@ -1,5 +1,4 @@
 //#define QN_USE_VLD
-
 #include <cstdint>
 
 #ifdef QN_USE_VLD
@@ -48,6 +47,7 @@ extern "C"
 #include <client/client_connection_data.h>
 #include <client/client_resource_processor.h>
 #include <client/client_startup_parameters.h>
+#include <client/system_uri_resolver.h>
 
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
@@ -58,13 +58,13 @@ extern "C"
 
 #include "decoders/video/ipp_h264_decoder.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/network/http/http_mod_manager.h>
+#include <nx/network/http/http_mod_manager.h>
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #ifdef Q_OS_WIN
     #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
@@ -76,13 +76,9 @@ extern "C"
 
 #include "plugins/plugin_manager.h"
 
-#ifdef _DEBUG
-#include "tests/auto_tester.h"
-#endif
-
 #include "api/session_manager.h"
 #include "ui/actions/action_manager.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
@@ -99,6 +95,7 @@ extern "C"
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
 #include "ui/workaround/qtbug_workaround.h"
+#include <ui/helpers/font_loader.h>
 
 #ifdef Q_OS_WIN
     #include "ui/workaround/iexplore_url_handler.h"
@@ -110,13 +107,16 @@ extern "C"
 #include "utils/common/long_runnable.h"
 
 #include "text_to_wav.h"
+
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
-#include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <network/module_finder.h>
+#include <finders/systems_finder.h>
+#include <finders/direct_systems_finder.h>
+#include <finders/cloud_systems_finder.h>
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
@@ -125,7 +125,9 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
-#include <utils/common/timermanager.h>
+
+#include <nx/network/socket_global.h>
+#include <nx/utils/timer_manager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -183,15 +185,6 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
-    //QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("memory"), QnLayoutFileStorageResource::instance);
-
-    /*
-    extern URLProtocol ufile_protocol;
-    av_register_protocol2(&ufile_protocol, sizeof(ufile_protocol));
-
-    extern URLProtocol qtufile_protocol;
-    av_register_protocol2(&qtufile_protocol, sizeof(qtufile_protocol));
-    */
 }
 
 /** Initialize log. */
@@ -271,16 +264,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /// TODO: #ynikitenkov move other initialization to QnClientModule constructor
 
-    /* Parse command line. */
-#ifdef _DEBUG
-    QnAutoTester autoTester(argc, argv);
-#endif
-
     ec2::DummyHandler dummyEc2RequestHandler;
 
     nx_http::HttpModManager httpModManager;
 
     PluginManager pluginManager;
+
+    if (!startupParams.enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
+
+    if (!startupParams.enforceMediatorEndpoint.isEmpty())
+        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+            startupParams.enforceMediatorEndpoint );
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5)
@@ -290,6 +285,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
+    qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
 
     if (!startupParams.engineVersion.isEmpty()) {
         QnSoftwareVersion version(startupParams.engineVersion);
@@ -308,7 +304,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnRuntime->setVideoWallMode(true);
         startupParams.allowMultipleClientInstances= true;
         startupParams.fullScreenDisabled = true;
-        startupParams.versionMismatchCheckDisabled = true;
+        qnRuntime->setIgnoreVersionMismatch(true);
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
 
         logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
@@ -319,7 +315,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     initLog(startupParams.logLevel, logFileNameSuffix, startupParams.ec2TranLogLevel);
 
-	// TODO: #Elric why QString???
+    // TODO: #mu ON/OFF switch in settings?
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
+
+    // TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {
         bool ok;
         Qn::LightModeFlags lightModeOverride(startupParams.lightMode.toInt(&ok));
@@ -331,7 +330,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     //TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
+#ifndef __arm__
     QnPerformanceTest::detectLightMode();
+#else
+    // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
+    //       constructor call. Need to find the way to work it around.
+#endif
 
 #ifdef Q_OS_MACX
     if (mac_isSandboxed())
@@ -356,6 +360,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
+    QnFontLoader::loadFonts(QDir(qApp->applicationDirPath()).absoluteFilePath(lit("fonts")));
 
 
 
@@ -371,18 +376,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
 
-    QApplication::setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
+    QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
     QScopedPointer<TextToWaveServer> textToWaveServer(new TextToWaveServer());
     textToWaveServer->start();
-
-#ifdef Q_WS_X11
-    //   QnX11LauncherWorkaround x11LauncherWorkaround;
-    //   application->installEventFilter(&x11LauncherWorkaround);
-#endif
 
 #ifdef Q_OS_WIN
     new QnIexploreUrlHandler(application); /* All effects are placed in the constructor. */
@@ -412,11 +412,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( startupParams.videoWallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
-    ec2::ResourceContext resCtx(
-        QnClientCameraFactory::instance(),
-        qnResPool,
-        qnResTypePool );
-	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     ec2::ApiRuntimeData runtimeData;
@@ -455,13 +450,22 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, qnRuntime->isDevMode()));
     moduleFinder->start();
 
+    // TODO: #ynikitenkov: move to common module? -> dependency on moduleFinder
+
+    typedef QScopedPointer<QnAbstractSystemsFinder> SystemsFinderPtr;
+    const QScopedPointer<QnSystemsFinder> systemsFinder(new QnSystemsFinder());
+    const SystemsFinderPtr directSystemsFinder(new QnDirectSystemsFinder());
+    const SystemsFinderPtr cloudSystemsFinder(new QnCloudSystemsFinder());
+    systemsFinder->addSystemsFinder(directSystemsFinder.data());
+    systemsFinder->addSystemsFinder(cloudSystemsFinder.data());
+
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data()));
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
     // ===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
+    QnVideoDecoderFactory::setCodecManufacture( QnVideoDecoderFactory::AUTO );
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
@@ -492,9 +496,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
 
-    if (startupParams.screen != QnStartupParameters::kInvalidScreen) {
+    if (startupParams.screen != QnStartupParameters::kInvalidScreen)
+    {
         QDesktopWidget *desktop = qApp->desktop();
-        if (startupParams.screen >= 0 && startupParams.screen < desktop->screenCount()) {
+        if (startupParams.screen >= 0 && startupParams.screen < desktop->screenCount())
+        {
             QPoint screenDelta = mainWindow->pos() - desktop->screenGeometry(mainWindow.data()).topLeft();
             mainWindow->move(desktop->screenGeometry(startupParams.screen).topLeft() + screenDelta);
         }
@@ -505,9 +511,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->action(QnActions::EffectiveMaximizeAction)->trigger();
     else
         mainWindow->updateDecorationsState();
-
-    if(startupParams.versionMismatchCheckDisabled)
-        context->action(QnActions::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
     /* Process input files. */
     bool haveInputFiles = false;
@@ -523,27 +526,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     if(!startupParams.allowMultipleClientInstances)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
-
-#ifdef _DEBUG
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
-        QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
-        autoTester.start();
-    }
-#endif
-
-    /* Process pending events before executing actions. */
-    qApp->processEvents();
-
-    // show beta version warning message for the main instance only
-    if (!startupParams.allowMultipleClientInstances &&
-        !qnRuntime->isDevMode() &&
-        QnAppInfo::beta())
-        context->action(QnActions::BetaVersionMessageAction)->trigger();
-
-#ifdef _DEBUG
-    /* Show FPS in debug. */
-    context->menu()->trigger(QnActions::ShowFpsAction);
-#endif
 
     /************************************************************************/
     /* Initializing resource searchers                                      */
@@ -576,10 +558,27 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
 
-    if (!startupParams.customUri.isEmpty()) {
-        /* Set authentication parameters from uri. */
-        QUrl appServerUrl = QUrl::fromUserInput(startupParams.customUri);
-        context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+    if (!startupParams.customUri.isEmpty())
+    {
+        QnSystemUriResolver resolver(QUrl::fromUserInput(startupParams.customUri));
+        if (resolver.isValid())
+        {
+            for (QnSystemUriResolver::Action action : resolver.result().actions)
+            {
+                switch (action)
+                {
+                case QnSystemUriResolver::Action::LoginToCloud:
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCloudCredentials(resolver.result().login, resolver.result().password, true);
+                    break;
+                case QnSystemUriResolver::Action::ConnectToServer:
+                    context->menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, resolver.result().serverUrl));
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
     }
     /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
@@ -591,7 +590,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
         if (!startupParams.videoWallGuid.isNull()) {
-            Q_ASSERT(appServerUrl.isValid());
+            NX_ASSERT(appServerUrl.isValid());
             if (!appServerUrl.isValid()) {
                 return -1;
             }
@@ -605,7 +604,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
                              .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                              .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     } else if(!startupParams.delayedDrop.isEmpty()) { /* Drop resources if needed. */
-        Q_ASSERT(startupParams.instantDrop.isEmpty());
+        NX_ASSERT(startupParams.instantDrop.isEmpty());
 
         QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
         context->menu()->trigger(QnActions::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
@@ -614,16 +613,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(QnActions::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
     }
 
-    result = application->exec();
+    // show beta version warning message for the main instance only
+    if (!startupParams.allowMultipleClientInstances &&
+        !qnRuntime->isDevMode() &&
+        QnAppInfo::beta())
+        context->action(QnActions::BetaVersionMessageAction)->trigger();
 
 #ifdef _DEBUG
-    if(autoTester.state() == QnAutoTester::Finished) {
-        if(!autoTester.succeeded())
-            result = 1;
-
-        cl_log.log(autoTester.message(), cl_logALWAYS);
-    }
+    /* Show FPS in debug. */
+    context->menu()->trigger(QnActions::ShowFpsAction);
 #endif
+
+    result = application->exec();
 
     QnResourceDiscoveryManager::instance()->stop();
 
@@ -668,7 +669,7 @@ int main(int argc, char **argv)
 
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
-    // this is neccessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
+    // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
     qApp->desktop();
 
     //adding exe dir to plugin search path

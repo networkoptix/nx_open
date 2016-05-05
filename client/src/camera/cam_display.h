@@ -7,11 +7,11 @@
 #include <utils/media/externaltimesource.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/audio_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/audio_data_packet.h>
 #include <core/resource/resource_media_layout.h>
 
-#include <decoders/video/abstractdecoder.h>
+#include <decoders/video/abstract_video_decoder.h>
 
 #include "video_stream_display.h"
 #include <map>
@@ -23,7 +23,7 @@ class QnCompressedVideoData;
 class QnArchiveStreamReader;
 class QnlTimeSource;
 
-/* 
+/*
 * This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps
 */
 class QnFpsStatistics
@@ -70,7 +70,7 @@ public:
     void playAudio(bool play);
     float getSpeed() const;
 
-    // schedule to clean up buffers all; 
+    // schedule to clean up buffers all;
     // schedule - coz I do not want to introduce mutexes
     //I assume that first incoming frame after jump is keyframe
 
@@ -156,6 +156,7 @@ protected:
     bool useSync(QnConstAbstractMediaDataPtr md);
     int getBufferingMask();
     void pauseAudio();
+
 private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
@@ -178,6 +179,10 @@ private:
     void clearMetaDataInfo();
     void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
+
+    static qint64 initialLiveBufferMkSecs();
+    static qint64 maximumLiveBufferMkSecs();
+
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -220,7 +225,7 @@ protected:
     bool m_realTimeHurryUp;
     int m_delayedFrameCount;
     QnlTimeSource* m_extTimeSrc;
-    
+
     bool m_useMtDecoding;
     int m_buffering;
     int m_executingJump;
@@ -232,7 +237,7 @@ protected:
     bool m_isStillImage;
     bool m_isLongWaiting;
     qint64 m_skippingFramesTime;
-    
+
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
     int m_audioBufferSize;

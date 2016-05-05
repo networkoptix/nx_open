@@ -1,5 +1,26 @@
 #include "frame_scaler.h"
 
+#ifdef __arm__
+
+//TODO: implement?
+void QnFrameScaler::downscale(
+    const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst,
+    DownscaleFactor factor) {}
+
+void QnFrameScaler::downscalePlate_factor2(
+    unsigned char* dst, int dstStride, const unsigned char* src,
+    int src_width, int src_stride, int src_height) {}
+
+void QnFrameScaler::downscalePlate_factor4(
+    unsigned char* dst, int dstStride, const unsigned char* src,
+    int src_width, int src_stride, int src_height) {}
+
+void QnFrameScaler::downscalePlate_factor8(
+    unsigned char* dst, int dstStride, const unsigned char* src,
+    int src_width, int src_stride, int src_height) {}
+
+#else
+
 #include <cassert>
 
 #include <emmintrin.h>
@@ -16,7 +37,7 @@ const __m128i  sse_000000ffw_intrs = _mm_setr_epi32(0x000000ff, 0x000000ff, 0x00
 void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                       const unsigned int width, const unsigned int src_stride, unsigned int height, int fillter)
 {
-    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/2,16) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(fillter, fillter, fillter, fillter, fillter, fillter, fillter, fillter); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -69,7 +90,7 @@ void downscalePlate_factor2_sse2_intr(unsigned char * dst, const unsigned int ds
 void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/4,8) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -92,7 +113,7 @@ void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const
             __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
             __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_00ffw_intrs); /* SSE2. */
 
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, s02), _mm_hadd_epi16(s10, s12)),1); /* SSSE3. */
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16_ssse3(s00, s02), _mm_hadd_epi16_ssse3(s10, s12)),1); /* SSSE3. */
 
             _mm_storel_epi64((__m128i*) dstCur, _mm_packus_epi16(rez1, rez1)); /* SSE2. */
             src1 += 2;
@@ -104,7 +125,7 @@ void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const
             __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
             __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
 
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1); /* SSSE3. */
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16_ssse3(s00, color_const_intrs), _mm_hadd_epi16_ssse3(s10, color_const_intrs)),1); /* SSSE3. */
             _mm_storel_epi64((__m128i*) dstCur, _mm_packus_epi16(rez1, rez1)); /* SSE2. */
         }
         dst += dst_stride;
@@ -116,7 +137,7 @@ void sse4_attribute downscalePlate_factor4_ssse3_intr(unsigned char * dst, const
 void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int dst_stride, const unsigned char * src,
                                        const unsigned int width, const unsigned int src_stride, unsigned int height, int filler)
 {
-    assert(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
+    NX_ASSERT(qPower2Ceil(width, 16) <= src_stride && qPower2Ceil(width/8,4) <= dst_stride);
 
     const __m128i color_const_intrs = _mm_setr_epi16(filler, filler, filler, filler, filler, filler, filler, filler); /* SSE2. */
     int xSteps = qPower2Ceil(width, 16) / 16;
@@ -140,9 +161,9 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
             __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_000000ffw_intrs); /* SSE2. */
             __m128i s12 = _mm_and_si128(_mm_loadu_si128(src2+1), sse_000000ffw_intrs); /* SSE2. */
 
-            s00 = _mm_packus_epi32(s00, s02); /* SSE4. */
-            s10 = _mm_packus_epi32(s10, s12); /* SSE4. */
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, s00), _mm_hadd_epi16(s10, s10)),1); /* SSSE3. */
+            s00 = _mm_packus_epi32_sse4(s00, s02); /* SSE4. */
+            s10 = _mm_packus_epi32_sse4(s10, s12); /* SSE4. */
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16_ssse3(s00, s00), _mm_hadd_epi16_ssse3(s10, s10)),1); /* SSSE3. */
 
             __m128i tmp = _mm_packus_epi16(rez1, rez1); /* SSE2. */
             _mm_store_ss((float*) dstCur, *(__m128*)(&tmp)); /* SSE. */
@@ -154,10 +175,10 @@ void downscalePlate_factor8_sse41_intr(unsigned char * dst, const unsigned int d
         {
             __m128i s00 = _mm_and_si128(_mm_loadu_si128(src1), sse_00ffw_intrs); /* SSE2. */
             __m128i s10 = _mm_and_si128(_mm_loadu_si128(src2), sse_00ffw_intrs); /* SSE2. */
-            s00 = _mm_packus_epi32(s00, color_const_intrs); /* SSE4. */
-            s10 = _mm_packus_epi32(s10, color_const_intrs); /* SSE4. */
+            s00 = _mm_packus_epi32_sse4(s00, color_const_intrs); /* SSE4. */
+            s10 = _mm_packus_epi32_sse4(s10, color_const_intrs); /* SSE4. */
 
-            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16(s00, color_const_intrs), _mm_hadd_epi16(s10, color_const_intrs)),1); /* SSSE3. */
+            __m128i rez1 = _mm_srli_epi16(_mm_avg_epu16(_mm_hadd_epi16_ssse3(s00, color_const_intrs), _mm_hadd_epi16_ssse3(s10, color_const_intrs)),1); /* SSSE3. */
             __m128i tmp = _mm_packus_epi16(rez1, color_const_intrs); /* SSE2. */
             _mm_store_ss((float*) dstCur, *(__m128*)(&tmp)); /* SSE. */
         }
@@ -267,7 +288,7 @@ void QnFrameScaler::downscale(const CLVideoDecoderOutput* src, CLVideoDecoderOut
     }
     else 
     {
-        assert(false);
+        NX_ASSERT(false);
     }
 }
 
@@ -346,3 +367,5 @@ void QnFrameScaler::downscalePlate_factor8(unsigned char* dst,  int dstStride, c
         src_line2+=(src_stride<<3);
     }
 }
+
+#endif

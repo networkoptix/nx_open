@@ -3,7 +3,6 @@
 #include <limits>
 
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QMessageBox>
 
 #include <QtOpenGL/QGLWidget>
 
@@ -171,7 +170,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 
         /* Set up the corresponding widget. */
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
-        Q_ASSERT(m_resourceWidget);
+        NX_ASSERT(m_resourceWidget);
         if (m_resourceWidget) {
             m_resourceWidget->setFrameOpacity(0.0);
         }
@@ -185,7 +184,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::ErrorCode errCode) {
     switch(errCode){
     case QnMotionRegion::ErrorCode::Windows:
-        QMessageBox::warning(
+        QnMessageBox::warning(
             this,
             tr("Too many motion windows"),
             tr("Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.")
@@ -194,7 +193,7 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
             );
         break;
     case QnMotionRegion::ErrorCode::Sens:
-        QMessageBox::warning(
+        QnMessageBox::warning(
             this,
             tr("Too many motion windows"),
             tr("Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.")
@@ -203,7 +202,7 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
             );
         break;
     case QnMotionRegion::ErrorCode::Masks:
-        QMessageBox::warning(
+        QnMessageBox::warning(
             this,
             tr("Too many motion windows"),
             tr("Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.")

@@ -5,7 +5,7 @@
 #include <update/updates_common.h>
 
 #include <utils/common/system_information.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 class QnAsyncHttpClientReply;
 

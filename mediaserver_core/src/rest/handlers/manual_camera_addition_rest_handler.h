@@ -1,7 +1,7 @@
 #ifndef QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H
 #define QN_MANUAL_CAMERA_ADDITION_REST_HANDLER_H
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QHostInfo>

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location) {
+    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location, dialogs) {
 
 
         mediaserver.getUser().then(function(user){
@@ -9,7 +9,7 @@ angular.module('webadminApp')
                 $location.path('/info'); //no admin rights - redirect
             }
         });
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             if(r.data.reply.ecDbReadOnly){
                 $location.path('/info'); //readonly - redirect
                 return;
@@ -17,36 +17,35 @@ angular.module('webadminApp')
         });
 
         $scope.settingsConfig = {
-            auditTrailEnabled: {label:"Audit trail enabled", type:"checkbox"},
-            cameraSettingsOptimization: {label:"Camera settings optimization", type:"checkbox"},
-            disabledVendors: {label:"Disabled vendors", type:"text"},
-            ec2AliveUpdateIntervalSec: {label:"System alive update interval", type:"number"},
-            ec2ConnectionKeepAliveTimeoutSec: {label:"Connection keep alive timeout", type:"number"},
-            ec2KeepAliveProbeCount: {label:"Connection keep alive probes", type:"number"},
-            emailFrom: {label:"Email from", type:"text"},
-            emailSignature: {label:"Email signature", type:"text"},
-            emailSupportEmail: {label:"Support Email", type:"text"},
-            ldapAdminDn: {label:"LDAP admin DN", type:"text"},
-            ldapAdminPassword: {label:"LDAP admin password", type:"text"},
-            ldapSearchBase: {label:"LDAP search base", type:"text"},
-            ldapSearchFilter: {label:"LDAP search filter", type:"text"},
-            ldapUri: {label:"LDAP URI", type:"text"},
-            serverAutoDiscoveryEnabled: {label:"Server auto discovery enabled", type:"checkbox"},
-            smtpConnectionType: {label:"SMTP connection type", type:"text"},
-            smtpHost: {label:"SMTP host", type:"text"},
-            smtpPort: {label:"SMTP port", type:"number"},
-            smtpSimple: {label:"SMTP simple", type:"checkbox"},
-            smtpTimeout: {label:"SMTP timeout", type:"number"},
-            smptPassword: {label:"SMTP password", type:"text"},
-            smtpUser: {label:"SMTP user", type:"text"},
-            updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"},
-            crossdomainEnabled: {label:"Enable webclient flash player support (crossdomain.xml)", type:"checkbox"},	    
-            arecontRtspEnabled: {label:"Arecont RTSP Enabled", type:"checkbox"},
+            auditTrailEnabled: {label:'Audit trail enabled', type:'checkbox'},
+            cameraSettingsOptimization: {label:'Camera settings optimization', type:'checkbox'},
+            disabledVendors: {label:'Disabled vendors', type:'text'},
+            ec2AliveUpdateIntervalSec: {label:'System alive update interval', type:'number'},
+            ec2ConnectionKeepAliveTimeoutSec: {label:'Connection keep alive timeout', type:'number'},
+            ec2KeepAliveProbeCount: {label:'Connection keep alive probes', type:'number'},
+            emailFrom: {label:'Email from', type:'text'},
+            emailSignature: {label:'Email signature', type:'text'},
+            emailSupportEmail: {label:'Support Email', type:'text'},
+            ldapAdminDn: {label:'LDAP admin DN', type:'text'},
+            ldapAdminPassword: {label:'LDAP admin password', type:'text'},
+            ldapSearchBase: {label:'LDAP search base', type:'text'},
+            ldapSearchFilter: {label:'LDAP search filter', type:'text'},
+            ldapUri: {label:'LDAP URI', type:'text'},
+            serverAutoDiscoveryEnabled: {label:'Server auto discovery enabled', type:'checkbox'},
+            smtpConnectionType: {label:'SMTP connection type', type:'text'},
+            smtpHost: {label:'SMTP host', type:'text'},
+            smtpPort: {label:'SMTP port', type:'number'},
+            smtpSimple: {label:'SMTP simple', type:'checkbox'},
+            smtpTimeout: {label:'SMTP timeout', type:'number'},
+            smptPassword: {label:'SMTP password', type:'text'},
+            smtpUser: {label:'SMTP user', type:'text'},
+            updateNotificationsEnabled: {label:'Update notifications enabled', type:'checkbox'},
+            arecontRtspEnabled: {label:'Arecont RTSP Enabled', type:'checkbox'},
 
-            backupNewCamerasByDefault: {label:"Backup new cameras by default",type:"checkbox"},
-            statisticsAllowed: {label:"Send statistics",type:"checkbox"},
-            backupQualities: {label:"Backup qualities",type:"text"},
-            serverDiscoveryPingTimeoutSec:{label:"Server discovery timeout",type:"number"}
+            backupNewCamerasByDefault: {label:'Backup new cameras by default',type:'checkbox'},
+            statisticsAllowed: {label:'Send statistics',type:'checkbox'},
+            backupQualities: {label:'Backup qualities',type:'text'},
+            serverDiscoveryPingTimeoutSec:{label:'Server discovery timeout',type:'number'}
         };
 
         mediaserver.systemSettings().then(function(r){
@@ -57,20 +56,20 @@ angular.module('webadminApp')
                     var type = 'text';
                     if( $scope.systemSettings[settingName] === true ||
                         $scope.systemSettings[settingName] === false ||
-                        $scope.systemSettings[settingName] === "true" ||
-                        $scope.systemSettings[settingName] === "false" ){
+                        $scope.systemSettings[settingName] === 'true' ||
+                        $scope.systemSettings[settingName] === 'false' ){
                         type = 'checkbox';
                     }
-                    $scope.settingsConfig[settingName] = {label:settingName,type:type}
+                    $scope.settingsConfig[settingName] = {label:settingName,type:type};
                 }
 
-                if($scope.settingsConfig[settingName].type == 'number'){
+                if($scope.settingsConfig[settingName].type === 'number'){
                     $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
                 }
-                if($scope.systemSettings[settingName] == 'true'){
+                if($scope.systemSettings[settingName] === 'true'){
                     $scope.systemSettings[settingName] = true;
                 }
-                if($scope.systemSettings[settingName] == 'false'){
+                if($scope.systemSettings[settingName] === 'false'){
                     $scope.systemSettings[settingName] = false;
                 }
 
@@ -82,26 +81,26 @@ angular.module('webadminApp')
             var changedSettings = {};
             var hasChanges = false;
             for(var settingName in $scope.systemSettings){
-                if($scope.settingsConfig[settingName].oldValue != $scope.systemSettings[settingName]){
+                if($scope.settingsConfig[settingName].oldValue !== $scope.systemSettings[settingName]){
                     changedSettings[settingName] = $scope.systemSettings[settingName];
                     hasChanges = true;
                 }
             }
             if(hasChanges){
                 mediaserver.systemSettings(changedSettings).then(function(r){
-                    if(typeof(r.error)!=='undefined' && r.error!=='0') {
+                    if(typeof(r.error) !== 'undefined' && r.error !== '0') {
 
                         console.log(r);
 
                         var errorToShow = r.errorString;
-                        alert('Error: ' + errorToShow);
+                        dialogs.alert('Error: ' + errorToShow);
                     }
                     else{
-                        alert('Settings saved');
+                        dialogs.alert('Settings saved');
                     }
                 },function(error){
                     console.log(error);
-                    alert('Error: Couldn\'t save settings');
+                    dialogs.alert('Error: Couldn\'t save settings');
                 });
             }
         };
@@ -170,36 +169,40 @@ angular.module('webadminApp')
                 needConfirm = 'Set reserved space is greater than free space left. Possible partial remove of the video footage is expected. Do you want to continue?';
             }
 
-            if(needConfirm && !confirm(needConfirm)) {
-                return;
-            }
+            function doSave(){
+                mediaserver.getModuleInformation().then(function(settingsReply){
+                    mediaserver.getMediaServer(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
+                        var info = mediaServerReply.data[0];
+                        // Вот тут проапдейтить флаги в стореджах
 
-            mediaserver.getSettings().then(function(settingsReply){
-                mediaserver.getMediaServer(settingsReply.data.reply.id.replace('{','').replace('}','')).then(function(mediaServerReply){
-                    var info = mediaServerReply.data[0];
-                    // Вот тут проапдейтить флаги в стореджах
+                        _.each($scope.storages,function(storageinfo){
+                            var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
+                            if(storageToUpdate) {
+                                storageToUpdate.spaceLimit = storageinfo.reservedSpace;
+                                storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
+                            }
+                        });
 
-                    _.each($scope.storages,function(storageinfo){
-                        var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
-                        if(storageToUpdate) {
-                            storageToUpdate.spaceLimit = storageinfo.reservedSpace;
-                            storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
-                        }
-                    });
-
-                    mediaserver.saveStorages(info.storages).then(function(r){
-                        if(typeof(r.error)!=='undefined' && r.error!=='0') {
-                            var errorToShow = r.errorString;
-                            alert('Error: ' + errorToShow);
-                        }
-                        else{
-                            alert('Settings saved');
-                        }
-                    },function(){
-                        alert('Error: Couldn\'t save settings');
+                        mediaserver.saveStorages(info.storages).then(function(r){
+                            if(typeof(r.error)!=='undefined' && r.error!=='0') {
+                                var errorToShow = r.errorString;
+                                dialogs.alert('Error: ' + errorToShow);
+                            }
+                            else{
+                                dialogs.alert('Settings saved');
+                            }
+                        },function(){
+                            dialogs.alert('Error: Couldn\'t save settings');
+                        });
                     });
                 });
-            });
+            }
+
+            if(needConfirm){
+                dialogs.confirm(needConfirm).then(doSave);
+            }else{
+                doSave();
+            }
         };
 
         $scope.cancel = function(){
@@ -213,26 +216,26 @@ angular.module('webadminApp')
             $scope.transLogLevel = $scope.oldTransLogLevel = data.data.reply;
         });
 
-        function errorLogLevel(error){
-            alert("Error while saving");
+        function errorLogLevel(/*error*/){
+            dialogs.alert('Error while saving');
             window.location.reload();
 
         }
         function successLogLevel(){
-            alert("Settings saved");
+            dialogs.alert('Settings saved');
             window.location.reload();
         }
 
         function changeTransactionLogLevel(){
-            if($scope.transLogLevel != $scope.oldTransLogLevel) {
-                mediaserver.logLevel(3, $scope.transLogLevel).then(successLogLevel,errorLogLevel);;
+            if($scope.transLogLevel !== $scope.oldTransLogLevel) {
+                mediaserver.logLevel(3, $scope.transLogLevel).then(successLogLevel,errorLogLevel);
                 return;
             }
             successLogLevel();
         }
 
         $scope.changeLogLevels = function(){
-            if($scope.mainLogLevel != $scope.oldMainLogLevel) {
+            if($scope.mainLogLevel !== $scope.oldMainLogLevel) {
                 mediaserver.logLevel(0, $scope.mainLogLevel).then(changeTransactionLogLevel,errorLogLevel);
                 return;
             }

@@ -2,15 +2,18 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <nx/utils/log/log.h>
+
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_properties.h"
-#include "utils/media/ffmpeg_helper.h"
 #include "utils/media/h264_utils.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/safe_direct_connection.h"
 #include "utils/common/synctime.h"
-#include "utils/common/log.h"
+
+#include <utils/media/av_codec_helper.h>
+
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
@@ -57,7 +60,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
-    Q_ASSERT(m_cameraRes);
+    NX_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
@@ -183,12 +186,13 @@ Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
             m_softMotionRole = Qn::CR_LiveVideo;
         else if (m_forcedMotionStream == lit("secondary"))
             m_softMotionRole = Qn::CR_SecondaryLiveVideo;
-        else {
+        else 
+        {
             if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
                 m_softMotionRole = Qn::CR_LiveVideo;
             else
                 m_softMotionRole = Qn::CR_SecondaryLiveVideo;
-		}
+        }
     }
     return m_softMotionRole;
 }
@@ -340,9 +344,9 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
     if (m_totalAudioFrames++ == 0 &&    // only once
         getRole() == Qn::CR_LiveVideo) // only primary stream
     {
-        // save only onece
+        // save only once
         const auto savedCodec = m_cameraRes->getProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME);
-        const auto actualCodec = codecIDToString(audioData->compressionType);
+        const QString actualCodec = QnAvCodecHelper::codecIdToString(audioData->compressionType);
         if (savedCodec.isEmpty())
         {
             m_cameraRes->setProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME, actualCodec);
@@ -353,7 +357,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
 
 void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 {
-    Q_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
+    NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
     // need to adjust fps 
@@ -380,7 +384,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
 
 
-    //Q_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and assert is appear
+    //NX_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and NX_ASSERT is appear
 
     setFps(qMax(1,newSecFps));
 }

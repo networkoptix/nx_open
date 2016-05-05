@@ -331,7 +331,7 @@ void DragProcessor::mousePressEventInternal(T *object, Event *event, bool instan
 }
 
 QGraphicsView *DragProcessor::view(QWidget *viewport) {
-    assert(viewport != NULL);
+    NX_ASSERT(viewport != NULL);
 
     return checked_cast<QGraphicsView *>(viewport->parent());
 }
@@ -385,7 +385,7 @@ void DragProcessor::redrag() {
 }
 
 void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &scenePos, const QPointF &itemPos, bool alwaysHandle) {
-    assert(m_state == Running);
+    NX_ASSERT(m_state == Running);
 
     if(m_handling) {
         m_rehandle = true;

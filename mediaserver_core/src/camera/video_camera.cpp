@@ -8,15 +8,14 @@
 #include <utils/media/media_stream_cache.h>
 #include <utils/memory/cyclic_allocator.h>
 
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/dataprovider/cpull_media_stream_provider.h"
-#include "core/dataprovider/live_stream_provider.h"
-#include "core/resource/camera_resource.h"
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <nx/streaming/media_data_packet.h>
+#include <core/dataprovider/cpull_media_stream_provider.h>
+#include <core/dataprovider/live_stream_provider.h>
+#include <core/resource/camera_resource.h>
 
-#include "decoders/video/ffmpeg.h"
-#include "media_server/settings.h"
-#include "streaming/hls/hls_types.h"
+#include <media_server/settings.h>
+#include <streaming/hls/hls_types.h>
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -38,7 +37,7 @@ public:
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
-    int copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, int cseq);
+    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq);
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
@@ -148,7 +147,7 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
     return true;
 }
 
-int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, int cseq)
+int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
 {
     int rez = 0;
     QnMutexLocker lock( &m_queueMtx );
@@ -430,7 +429,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog cat
     return getLiveReaderNonSafe( catalog );
 }
 
-int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq)
+int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
 {
     if (primaryLiveStream)
         return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq);
@@ -605,7 +604,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
 {
     QnMutexLocker lock( &m_getReaderMutex );
  
-    assert( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
+    NX_ASSERT( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
 
     if( streamQuality == MEDIA_Quality_High )
     {

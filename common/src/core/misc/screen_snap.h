@@ -5,7 +5,9 @@
 
 #include <array>
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>  {
     int screenIndex;    /**< Index of the screen. */

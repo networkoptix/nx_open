@@ -1,5 +1,4 @@
 #ifdef ENABLE_ACTI
-
 #include "acti_resource.h"
 
 #include <functional>
@@ -58,21 +57,24 @@ QnActiResource::~QnActiResource()
         const quint64 taskID = it->first;
         m_triggerOutputTasks.erase( it++ );
         lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( taskID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( taskID );
         lk.relock();
     }
 }
 
-bool QnActiResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/cgi-bin/system") );
-    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(getAuth().user()).arg(getAuth().password()) );
+    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(auth.user()).arg(auth.password()) );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
@@ -93,7 +95,7 @@ bool QnActiResource::checkIfOnlineAsync( std::function<void(bool)>&& completionH
         completionHandler( mac == resourceMac.toLatin1() );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -187,7 +189,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     QList<QSize> availResolutions;
     for(const QByteArray& r: resolutions.split(','))
         result << extractResolution(r);
-    qSort(result.begin(), result.end(), resolutionGreaterThan);
+    std::sort(result.begin(), result.end(), resolutionGreaterThan);
     return result;
 }
 
@@ -346,7 +348,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         QList<QByteArray> fps = fpsList[i].split(',');
         for(const QByteArray& data: fps)
             m_availFps[i] << data.toInt();
-        qSort(m_availFps[i]);
+        std::sort(m_availFps[i].begin(), m_availFps[i].end());
     }
 
     QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);
@@ -522,7 +524,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     }
     m_inputMonitored = false;
 
-    const QAuthenticator auth = getAuth();
+    QAuthenticator auth = getAuth();
     QUrl url = getUrl();
     url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
@@ -533,8 +535,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
             httpClient.reset();
         },
         Qt::DirectConnection );
-    if( !httpClient->doGet( url ) )
-        disconnect( httpClient.get(), nullptr, ec2::DummyHandler::instance(), nullptr );
+    httpClient->doGet( url );
 }
 
 bool QnActiResource::isInputPortMonitored() const
@@ -668,7 +669,9 @@ bool QnActiResource::setRelayOutputState(
     if( outputNumber < MIN_DIO_PORT_NUMBER || outputNumber > m_outputCount )
         return false;
 
-    const quint64 timerID = TimerManager::instance()->addTimer( this, 0 );
+    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
+        this,
+        std::chrono::milliseconds::zero());
     m_triggerOutputTasks.insert( std::make_pair( timerID, TriggerOutputTask( outputNumber, activate, autoResetTimeoutMS ) ) );
     return true;
 }
@@ -700,7 +703,8 @@ void QnActiResource::onTimer( const quint64& timerID )
 
     if( triggerOutputTask.autoResetTimeoutMS > 0 )
         m_triggerOutputTasks.insert( std::make_pair(
-            TimerManager::instance()->addTimer( this, triggerOutputTask.autoResetTimeoutMS ),
+            nx::utils::TimerManager::instance()->addTimer(
+                this, std::chrono::milliseconds(triggerOutputTask.autoResetTimeoutMS)),
             TriggerOutputTask( triggerOutputTask.outputID, !triggerOutputTask.active, 0 ) ) );
 }
 
@@ -721,8 +725,7 @@ void QnActiResource::initializeIO( const QMap<QByteArray, QByteArray>& systemInf
 
 bool QnActiResource::getParamPhysical(const QString& id, QString& value)
 {
-    QSet<QString> idList;
-    idList << id;
+    QSet<QString> idList = {id};
     QnCameraAdvancedParamValueList result;
     if(!getParamsPhysical(idList, result))
         return false;
@@ -740,8 +743,7 @@ bool QnActiResource::getParamPhysical(const QString& id, QString& value)
 
 bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
 {
-    QnCameraAdvancedParamValueList values;
-    values << QnCameraAdvancedParamValue(id, value);
+    QnCameraAdvancedParamValueList values = {QnCameraAdvancedParamValue(id, value)};
     QnCameraAdvancedParamValueList result;
 
     return setParamsPhysical(values, result);
@@ -751,7 +753,6 @@ bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdva
 {
     bool success = true;
     const auto params = getParamsByIds(idList);
-
     const auto queries = buildGetParamsQueries(params);
     const auto queriesResults = executeParamsQueries(queries, success);
     parseParamsQueriesResult(queriesResults, params, result);
@@ -852,7 +853,7 @@ QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, con
     auto templateValues = unresolvedTemplate.split(",");
     auto cameraValues = valueFromCamera.split(",");
 
-    for(size_t i = 0; i < templateValues.size(); i++)
+    for (int i = 0; i < templateValues.size(); i++)
     {
         if(i >= cameraValues.size())
             break;
@@ -1024,16 +1025,13 @@ void QnActiResource::extractParamValues(const QString &paramValue, const QString
     const auto paramValues = paramValue.split(',');
     const auto paramCount = paramNames.size();
 
-    for(size_t i = 0; i < paramCount; i++)
+    for (int i = 0; i < paramCount; i++)
     {
         auto name = paramNames.at(i).mid(1);
         if(i < paramCount - 1)
             result[name] = paramValues.at(i);
         else
-        {
-            result[name] = QStringList(paramValues.mid(i)).join(',');
-            return;
-        }
+            result[name] = paramValues.mid(i).join(',');
     }
 }
 
@@ -1140,9 +1138,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
     if (!loadAdvancedParametersTemplateFromFile(
             params,
             lit(":/camera_advanced_params/") + templateFile))
-    {
         return;
-    }
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters(params);
     m_advancedParameters = params.filtered(supportedParams);

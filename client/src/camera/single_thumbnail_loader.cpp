@@ -21,8 +21,8 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     : base_type(parent)
     , m_request()
 {
-    Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
-    Q_ASSERT_X(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
+    NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
+    NX_ASSERT(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
 
     m_request.camera = camera;
     m_request.msecSinceEpoch = msecSinceEpoch;

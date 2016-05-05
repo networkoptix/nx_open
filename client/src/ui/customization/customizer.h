@@ -3,7 +3,9 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
+
+#include <ui/style/generic_palette.h>
 
 #include "customization.h"
 
@@ -22,6 +24,8 @@ public:
     const QnCustomization &customization() const;
 
     void customize(QObject *object);
+
+    QnGenericPalette genericPalette() const;
 
 private:
     QScopedPointer<QnCustomizerPrivate> d;

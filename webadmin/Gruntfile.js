@@ -9,6 +9,7 @@
 
 module.exports = function (grunt) {
 
+    var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
 
@@ -19,6 +20,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
     grunt.loadNpmTasks('grunt-wiredep');
+    grunt.loadNpmTasks('grunt-zip-directories');
+
 
 
     // Define the configuration for all the tasks
@@ -28,15 +31,14 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'dist'
+            dist: 'static'
         },
 
         // Automatically inject Bower components into the app
         wiredep: {
             target: {
                 src: [
-                    '<%= yeoman.app %>/login.html',
-                    '<%= yeoman.app %>/index.html',
+                    '<%= yeoman.app %>/*.html',
                     '<%= yeoman.app %>/index.xsl'
                 ],
                 ignorePath: '<%= yeoman.app %>/'
@@ -67,7 +69,8 @@ module.exports = function (grunt) {
                     livereload: '<%= connect.options.livereload %>'
                 },
                 files: [
-                    '<%= yeoman.app %>/{,*/}*.html',
+                    '<%= yeoman.app %>/**/*.html',
+                    '<%= yeoman.app %>/views/**',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
@@ -77,7 +80,7 @@ module.exports = function (grunt) {
         // The actual grunt server settings
         connect: {
             options: {
-                port: 9000,
+                port: 10000,
                 // Change this to '0.0.0.0' to access the server from outside.
                 hostname: '0.0.0.0',
                 livereload: 35729
@@ -153,6 +156,21 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.1.5.126', port: 7001},
                 {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
 
+
+                // kds
+                /* {context: '/api/',      host: '10.0.2.137', port: 7000},
+                 {context: '/ec2/',      host: '10.0.2.137', port: 7000},
+                 {context: '/hls/',      host: '10.0.2.137', port: 7000},
+                 {context: '/media/',    host: '10.0.2.137', port: 7000},
+                 {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
+
+                //Vitaly Kutin
+                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.197', port: 7001},
+                {context: '/hls/',      host: '10.0.3.197', port: 7001},
+                {context: '/media/',    host: '10.0.3.197', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
+
                 // Olya - external
                 /*{context: '/api/',      host: '95.31.136.2', port: 7011},
                 {context: '/ec2/',      host: '95.31.136.2', port: 7011},
@@ -167,8 +185,15 @@ module.exports = function (grunt) {
                 {context: '/media/',    host: '10.0.2.169', port: 7011},
                 {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
 
+                // Nx1 Cloud 3.0
+                /*{context: '/api/',      host: '10.0.3.65', port: 7001},
+                {context: '/ec2/',      host: '10.0.3.65', port: 7001},
+                {context: '/hls/',      host: '10.0.3.65', port: 7001},
+                {context: '/media/',    host: '10.0.3.65', port: 7001},
+                {context: '/proxy/',    host: '10.0.3.65', port: 7001}/**/
+
                 // Sasha
-                {context: '/api/',      host: '10.0.2.119', port: 7042},
+                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
                 {context: '/ec2/',      host: '10.0.2.119', port: 7042},
                 {context: '/hls/',      host: '10.0.2.119', port: 7042},
                 {context: '/media/',    host: '10.0.2.119', port: 7042},
@@ -182,11 +207,35 @@ module.exports = function (grunt) {
                 {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/',      host: '10.0.2.232', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.232', port: 7001},
-                {context: '/hls/',      host: '10.0.2.232', port: 7001},
-                {context: '/media/',    host: '10.0.2.232', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.232', port: 7001}/**/
+                /*{context: '/api/',      host: '10.0.2.232', port: 7002},
+                {context: '/ec2/',      host: '10.0.2.232', port: 7002},
+                {context: '/hls/',      host: '10.0.2.232', port: 7002},
+                {context: '/media/',    host: '10.0.2.232', port: 7002},
+                {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
+
+
+                //Surface
+                /*{context: '/api/',      host: '10.0.3.203', port: 7001},
+                 {context: '/ec2/',      host: '10.0.3.203', port: 7001},
+                 {context: '/hls/',      host: '10.0.3.203', port: 7001},
+                 {context: '/media/',    host: '10.0.3.203', port: 7001},
+                 {context: '/proxy/',    host: '10.0.3.203', port: 7001}/**/
+
+
+                //Dell - Burbank
+                /*{context: '/api/',      host: '10.1.5.130', port: 7001},
+                 {context: '/ec2/',      host: '10.1.5.130', port: 7001},
+                 {context: '/hls/',      host: '10.1.5.130', port: 7001},
+                 {context: '/media/',    host: '10.1.5.130', port: 7001},
+                 {context: '/proxy/',    host: '10.1.5.130', port: 7001}/**/
+
+
+                //Parallels - Burbank
+                {context: '/api/',      host: '10.1.5.139', port: 7001},
+                {context: '/ec2/',      host: '10.1.5.139', port: 7001},
+                {context: '/hls/',      host: '10.1.5.139', port: 7001},
+                {context: '/media/',    host: '10.1.5.139', port: 7001},
+                {context: '/proxy/',    host: '10.1.5.139', port: 7001}/**/
 
             ],
             livereload: {
@@ -222,6 +271,8 @@ module.exports = function (grunt) {
             test: {
                 options: {
                     middleware: function (connect, options) {
+
+                        var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
                             options.base = [options.base];
                         }
@@ -231,16 +282,16 @@ module.exports = function (grunt) {
 
                         // Serve static files.
                         options.base.forEach(function (base) {
-                            middlewares.push(connect.static(base));
+                            middlewares.push(serveStatic(base));
                         });
 
                         // Make directory browse-able.
-                        var directory = options.directory || options.base[options.base.length - 1];
-                        middlewares.push(connect.directory(directory));
+                        // var directory = options.directory || options.base[options.base.length - 1];
+                        // middlewares.push(connect.directory(directory));
 
                         return middlewares;
                     },
-                    port: 9000,
+                    port: 10000,
 
                     base: [
                         '.tmp',
@@ -284,7 +335,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js'
+                '<%= yeoman.app %>/scripts/**/*.js',
+                '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
                 options: {
@@ -309,12 +361,22 @@ module.exports = function (grunt) {
                 ]
             },
             server: '.tmp',
-
             publish:{
                 files:[
                     {
                         dot: true,
-                        src: '<%= yeoman.dist %>/../../mediaserver_core/maven/bin-resources/additional-resources/static/*'
+                        src: '<%= yeoman.app %>/../../../' + package_dir + '/external.dat'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            },
+            zip:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.app %>/../external.dat'
                     }
                 ],
                 options: {
@@ -341,7 +403,7 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the app
-       
+
         // Compiles Sass to CSS and generates necessary files if requested
         compass: {
             options: {
@@ -389,7 +451,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: ['<%= yeoman.app %>/login.html','<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
+            html: ['<%= yeoman.app %>/*.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -531,12 +593,37 @@ module.exports = function (grunt) {
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
             },
-            publish:{
+            zip:{
                 expand: true,
                 nonull:true,
-                cwd: '<%= yeoman.app %>/../dist',
-                dest: '../mediaserver_core/maven/bin-resources/additional-resources/static/',
-                src: '**'
+                cwd: '<%= yeoman.app %>/../',
+                dest: '<%= yeoman.app %>/../../../' + package_dir,
+                src: 'external.dat'
+            }
+        },
+        compress: {
+            external: {
+                options: {
+                    archive: '<%= yeoman.app %>/../external.dat',
+                    mode: 'zip'
+                },
+                files: [
+                    { src: '<%= yeoman.dist %>/**' }
+                ]
+            }
+        },
+        shell: {
+            deploy: {
+                command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+            },
+            merge: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
+            },
+            version: {
+                command: 'hg parent > static/version.txt'
+            },
+            print_version:{
+                command: 'hg parent'
             }
         },
 
@@ -581,7 +668,7 @@ module.exports = function (grunt) {
 
             }
         },
-        protractor_webdriver: {
+        'protractor_webdriver': {
             options:{
 
             },
@@ -627,6 +714,7 @@ module.exports = function (grunt) {
         'autoprefixer',
         'connect:test',
         'protractor_webdriver',
+        'shell:print_version',
         'protractor:all',
         'newer:jshint'
         //'karma'
@@ -649,7 +737,8 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'shell:version'
     ]);
 
     grunt.registerTask('default', [
@@ -661,13 +750,26 @@ module.exports = function (grunt) {
 
     grunt.registerTask('publish', [
         'build',
+        'clean:zip',
         'clean:publish',
-        'copy:publish'
+        'compress:external'
     ]);
 
 
     grunt.registerTask('pub', [
         'publish'
+    ]);
+
+    grunt.registerTask('merge', [
+        'shell:merge'
+    ]);
+
+    grunt.registerTask('deploy', [
+        'publish',
+        'copy:zip',
+        'shell:deploy',
+        'clean:zip',
+        'clean:publish'
     ]);
 
     grunt.registerTask('demo', [

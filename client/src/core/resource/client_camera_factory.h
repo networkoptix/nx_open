@@ -2,14 +2,15 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include <core/resource/resource_factory.h>
 
-class QnClientCameraFactory: public QObject, public QnResourceFactory, public Singleton<QnClientCameraFactory> {
+//TODO: #rename file
+class QnClientResourceFactory: public QObject, public QnResourceFactory, public Singleton<QnClientResourceFactory> {
     Q_OBJECT
 public:
-    QnClientCameraFactory(QObject *parent = NULL): QObject(parent) {}
+    QnClientResourceFactory(QObject *parent = NULL): QObject(parent) {}
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
 };

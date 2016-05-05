@@ -1,6 +1,8 @@
 #ifndef QN_CAMERA_ADVANCED_PARAM_WIDGET_FACTORY_H
 #define QN_CAMERA_ADVANCED_PARAM_WIDGET_FACTORY_H
 
+#include <QtWidgets/QWidget>
+
 #include <core/resource/camera_advanced_param.h>
 
 class QnAbstractCameraAdvancedParamWidget: public QWidget {

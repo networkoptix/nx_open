@@ -9,11 +9,11 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
-#include "motion/motion_estimation.h"
-#include "core/datapacket/audio_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
-#include "core/resource/resource_fwd.h"
-#include "media_streamdataprovider.h"
+#include <motion/motion_estimation.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
 #include <utils/common/safe_direct_connection.h>
 

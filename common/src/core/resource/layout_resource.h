@@ -2,7 +2,7 @@
 #define QN_LAYOUT_RESOURCE_H
 
 #include <QtCore/QRectF>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <recording/time_period.h>
 
@@ -15,7 +15,7 @@ class QnLayoutResource: public QnResource {
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource(const QnResourceTypePool* resTypePool);
+    QnLayoutResource();
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
@@ -81,6 +81,13 @@ public:
     /** Locked state - locked layout cannot be modified in any way */
     bool locked() const;
     void setLocked(bool value);
+
+    /** Check if layout is an exported file. */
+    bool isFile() const;
+
+    /** Check if layout is global. */
+    bool isGlobal() const;
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

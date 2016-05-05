@@ -1,55 +1,36 @@
 #ifndef QN_COMMON_GLOBALS_H
 #define QN_COMMON_GLOBALS_H
 
+#define BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
-
-#define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
-#include <cstdint>
+#include <limits>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
 
-#include <limits>
-
-/**
- * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
- * The only sane use case is for generating metainformation for enums in
- * namespaces (e.g. for use with <tt>QnEnumNameMapper</tt>).
- */
-#define Q_NAMESPACE                                                             \
-    extern const QMetaObject staticMetaObject;                                  \
-    extern const QMetaObject &getStaticMetaObject();                            \
-
-
-#ifdef Q_MOC_RUN
-class Qn
-#else
-namespace Qn
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
 #endif
-{
-#ifdef Q_MOC_RUN
-    Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
-            ConnectionRole ResourceStatus BitratePerGopType
-            StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
-            RebuildAction BackupAction
-            FailoverPriority)
-    Q_FLAGS(Borders Corners
-            ResourceFlags
-            CameraCapabilities
-            PtzDataFields PtzCapabilities PtzTraits
-            MotionTypes TimePeriodTypes
-            ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes)
-public:
-#else
-    Q_NAMESPACE
-#endif
+QN_DECLARE_METAOBJECT_HEADER(Qn,
+    Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
+    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
+    ConnectionRole ResourceStatus BitratePerGopType
+    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+    ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+    RebuildAction BackupAction FailoverPriority
+    Permission GlobalPermission
+    ,
+    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
+    MotionTypes TimePeriodTypes
+    ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
+    Permissions GlobalPermissions
+    )
+
 
     // TODO: #Elric #5.0 use Qt::Edge ?
     /**
@@ -278,6 +259,7 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    //TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
@@ -327,8 +309,10 @@ public:
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
+        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+
+        web_page = url | remote,   /**< Web-page resource */
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -361,15 +345,16 @@ public:
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
-        SF_None         = 0x0,
-        SF_Edge         = 0x1,
-        SF_RemoteEC     = 0x2,
-        SF_HasPublicIP  = 0x4,
-        SF_IfListCtrl   = 0x8,
-        SF_timeCtrl     = 0x10,
-        SF_AutoSystemName = 0x20,
-        SF_ArmServer      = 0x40,
-        SF_Has_HDD      = 0x80,
+        SF_None             = 0x000,
+        SF_Edge             = 0x001,
+        SF_RemoteEC         = 0x002,
+        SF_HasPublicIP      = 0x004,
+        SF_IfListCtrl       = 0x008,
+        SF_timeCtrl         = 0x010,
+        SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+        SF_ArmServer        = 0x040,
+        SF_Has_HDD          = 0x080,
+        SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -535,7 +520,6 @@ public:
 
         /* Context-based. */
         CurrentLayoutResourceRole,
-        CurrentUserResourceRole,
         CurrentLayoutMediaItemsRole,
         CurrentMediaServerResourcesRole,
 
@@ -551,6 +535,11 @@ public:
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
+        ConnectionAliasRole,                        /**< Role for alias of connection. Used in QnActions::ConnectAction, QnLoginDialog. */
+        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials 
+                                                        (or to the last system) automatically next time */
+        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
+                                                         Used in QnActions::ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
@@ -693,6 +682,7 @@ public:
         CsvFormat           = 3,
         XmlFormat           = 4,
         CompressedPeriodsFormat = 5, // used for chunks data only
+        UrlQueryFormat      = 6,     //will be added in future for parsing url query (e.g., name1=val1&name2=val2)
 
         UnsupportedFormat   = -1
     };
@@ -825,6 +815,115 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
     /**
+     * Flags describing the actions permitted for the user to do with the
+     * selected resource. Calculated in runtime.
+     */
+    enum Permission
+    {
+        /* Generic permissions. */
+        NoPermissions                   = 0x0000,   /**< No access */
+
+        ReadPermission                  = 0x0001,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
+        WritePermission                 = 0x0002,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */
+        SavePermission                  = 0x0004,   /**< Generic save access. Entity can be saved to the server. */
+        RemovePermission                = 0x0008,   /**< Generic delete permission. */
+        ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
+        WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
+
+        /* Layout-specific permissions. */
+        AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
+        EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
+        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
+
+        /* User-specific permissions. */
+        WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
+        WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
+        CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
+        ReadEmailPermission             = ReadPermission,
+        WriteEmailPermission            = WritePasswordPermission,
+        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
+                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
+
+        /* Media-specific permissions. */
+        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+
+        /* Camera-specific permissions. */
+        WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
+
+        AllPermissions = 0xFFFFFFFF
+    };
+
+    Q_DECLARE_FLAGS(Permissions, Permission)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Permission)
+
+
+
+    /**
+     * Flags describing global user capabilities, independently of resources. Stored in the database.
+     * QFlags uses int internally, so we are limited to 32 bits.
+     */
+    enum GlobalPermission
+    {
+        /* Generic permissions. */
+        NoGlobalPermissions                     = 0x00000000,   /**< No access */
+
+        GlobalOwnerPermission                   = 0x00000001,   /**< Root, can edit admins. */
+        GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
+        GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
+        /* DeprecatedGlobalEditUsersPermission  = 0x00000008 */
+        /*DeprecatedEditCamerasPermission       = 0x00000010 */
+        GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
+        /*DeprecatedViewExportArchivePermission = 0x00000040 */
+        GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
+        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
+        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
+        GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
+        GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
+        /*DeprecatedPanicPermission             = 0x00001000 */
+        GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
+
+        /* Resources access permissions */
+        GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
+        GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
+        GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
+
+        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
+
+        /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
+        DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */
+        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */
+        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Deprecated. Can view and export archives of available cameras. */
+        DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
+
+        /* Shortcuts. */
+
+        /* Live viewer has access to all cameras by default */
+        GlobalLiveViewerPermissionSet       = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+
+        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission,
+
+        /* PTZ here is intended - for SpaceX, see VMS-2208 */
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalPtzControlPermission,
+
+        /* Actions in ActiveX plugin mode are limited. */
+        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalPtzControlPermission,
+
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalEditCamerasPermission | GlobalPtzControlPermission,
+
+        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
+                                              GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
+                                              GlobalAccessAllServersPermission  ,
+        GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
+    };
+
+    Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissions)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
+
+
+
+    /**
      * Invalid value for a timezone UTC offset.
      */
     static const qint64 InvalidUtcOffset = std::numeric_limits<qint64>::max();
@@ -868,6 +967,9 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
+template<typename T>
+QString toString( const T& t ) { return t.toString(); }
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),
     (metatype)
@@ -889,7 +991,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
+    ,
     (metatype)(numeric)(lexical)
 )
 

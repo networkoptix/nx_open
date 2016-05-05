@@ -14,6 +14,7 @@
 #include <QtGui/QVector4D>
 
 #include <common/config.h>
+#include <nx/utils/log/assert.h>
 
 #include "fuzzy.h"
 
@@ -105,12 +106,12 @@ inline bool qIsPower2(T value) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Ceil(unsigned int value, int step) {
-    DEBUG_CODE(assert(qIsPower2(step)));
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
 inline quint64 qPower2Ceil(quint64 value, int step) {
-    DEBUG_CODE(assert(qIsPower2(step)));
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
@@ -120,7 +121,7 @@ inline quint64 qPower2Ceil(quint64 value, int step) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Floor(unsigned int value, int step) {
-    DEBUG_CODE(assert(qIsPower2(step)));
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return value & ~(step - 1);
 }
 
@@ -158,7 +159,7 @@ inline double qMod(double l, double r) {
  */
 template<class T, class Step>
 T qCeil(T value, Step step) {
-    DEBUG_CODE(assert(step > 0));
+    DEBUG_CODE(NX_ASSERT(step > 0));
     T mod = qMod(value, static_cast<T>(step));
     return QnMathDetail::qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
 }
@@ -170,7 +171,7 @@ T qCeil(T value, Step step) {
  */
 template<class T, class Step>
 T qFloor(T value, Step step) {
-    DEBUG_CODE(assert(step > 0));
+    DEBUG_CODE(NX_ASSERT(step > 0));
     return value - qMod(value, static_cast<T>(step));
 }
 
@@ -181,7 +182,7 @@ T qFloor(T value, Step step) {
  */
 template<class T, class Step>
 T qRound(T value, Step step) {
-    DEBUG_CODE(assert(step > 0));
+    DEBUG_CODE(NX_ASSERT(step > 0));
     return qFloor(value + static_cast<T>(step) / 2, step);
 }
 

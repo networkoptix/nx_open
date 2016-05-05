@@ -5,11 +5,11 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include "core/dataprovider/spush_media_stream_provider.h"
-#include "core/resource/resource_media_layout.h"
-#include "network/ffmpeg_rtp_parser.h"
-#include "network/multicodec_rtp_reader.h"
-#include "utils/network/simple_http_client.h"
+#include <core/dataprovider/spush_media_stream_provider.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/nx_rtp_parser.h>
+#include <network/multicodec_rtp_reader.h>
+#include <nx/network/simple_http_client.h>
 
 class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 {
@@ -40,7 +40,7 @@ private:
 
     TCPSocketPtr m_socket;
     quint8 m_recvBuffer[65536];
-    QnFfmpegRtpParser m_parsers[MEDIA_STREAM_COUNT];
+    QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
     QElapsedTimer m_keepaliveTimer;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     mutable QnMutex m_audioLayoutMutex;

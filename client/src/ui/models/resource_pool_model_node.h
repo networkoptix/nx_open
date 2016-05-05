@@ -3,7 +3,7 @@
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QString>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <client/client_globals.h>
 
@@ -152,7 +152,7 @@ private:
     bool m_modified;
 
     /** Whether this resource is checked. */
-    Qt::CheckState m_checked;
+    Qt::CheckState m_checkState;
 
     //TODO: #GDM #Common implement cache invalidating in case of permissions change
     /** Whether this resource can be renamed, cached value. */

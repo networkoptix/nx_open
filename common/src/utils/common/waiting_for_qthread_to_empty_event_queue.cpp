@@ -5,7 +5,7 @@
 
 #include "waiting_for_qthread_to_empty_event_queue.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "qcoreapplication.h"
 

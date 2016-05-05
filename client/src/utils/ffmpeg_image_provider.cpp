@@ -2,7 +2,7 @@
 
 #include <core/resource/resource.h>
 
-#include <decoders/video/ffmpeg.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
@@ -50,7 +50,7 @@ void QnFfmpegImageProvider::doLoadAsync() {
     frame->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice | QnAbstractMediaData::MediaFlags_StillImage;  
 
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-    CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+    QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);
     if (!decoder.decode(frame, &outFrame))
         return;
 

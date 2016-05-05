@@ -45,10 +45,10 @@ QVariant QnLdapUserListModel::data(const QModelIndex &index, int role) const {
         default:
             break;
         } // switch (column)
-        break;    
+        break;
     case Qt::CheckStateRole:
         if (index.column() == CheckBoxColumn)
-            return m_checkedUserLogins.contains(user.login);
+            return m_checkedUserLogins.contains(user.login) ? Qt::Checked : Qt::Unchecked;
         break;
     case LoginRole:
         return user.login;
@@ -128,13 +128,17 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString &log
     if (state == Qt::PartiallyChecked)
         return;
 
-    if (login.isEmpty()) {
+    if (login.isEmpty())
+    {
         m_checkedUserLogins.clear();
-        if (state == Qt::Checked) {
+        if (state == Qt::Checked)
+        {
             for (const QnLdapUser &user: m_userList)
                 m_checkedUserLogins.insert(user.login);
         }
-    } else {
+    }
+    else
+    {
         if (state == Qt::Checked)
             m_checkedUserLogins.insert(login);
         else if (state == Qt::Unchecked)
@@ -142,15 +146,17 @@ void QnLdapUserListModel::setCheckState(Qt::CheckState state, const QString &log
     }
 
 
-    if (login.isEmpty()) {
+    if (login.isEmpty())
+    {
         emit dataChanged(index(0, CheckBoxColumn), index(m_userList.size() - 1, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
     }
-    else {
+    else
+    {
         auto row = userIndex(login);
         if (row >= 0)
             emit dataChanged(index(row, CheckBoxColumn), index(row, CheckBoxColumn), QVector<int>() << Qt::CheckStateRole);
     }
-        
+
 }
 
 QnLdapUsers QnLdapUserListModel::users() const {

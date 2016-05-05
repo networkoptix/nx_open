@@ -11,7 +11,7 @@
 
 #include <core/resource/videowall_resource.h>
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <ui/help/help_topics.h>

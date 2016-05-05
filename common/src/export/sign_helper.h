@@ -9,7 +9,7 @@
 
 #include <utils/common/cryptographic_hash.h>
 
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
 static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographicHash::Md5;
@@ -23,7 +23,7 @@ class QnSignHelper
 public:
     QnSignHelper();
     void setLogo(QPixmap logo);
-    QnCompressedVideoDataPtr createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
+    QnCompressedVideoDataPtr createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
 
     /** Get signature from encoded frame */
     QByteArray getSign(const AVFrame* frame, int signLen);
@@ -42,6 +42,7 @@ public:
     //TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void updateDigest(const QnConstMediaContextPtr& context, QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
 
     /** Return initial signature as filler */
@@ -62,6 +63,8 @@ private:
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);
+    static void doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigest(CodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
 
 private:
     QPixmap m_logo;

@@ -4,14 +4,14 @@
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QElapsedTimer>
 
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "network/rtp_stream_parser.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "network/rtpsession.h"
-#include "utils/media/externaltimesource.h"
-#include "rtsp/rtsp_ffmpeg_encoder.h"
-#include "utils/common/adaptive_sleep.h"
-#include "camera/video_camera.h"
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/abstract_data_packet.h>
+#include <nx/streaming/rtsp_client.h>
+#include <utils/media/externaltimesource.h>
+#include <rtsp/rtsp_ffmpeg_encoder.h>
+#include <utils/common/adaptive_sleep.h>
+#include <camera/video_camera.h>
 
 class QnRtspConnectionProcessor;
 
@@ -132,6 +132,6 @@ private:
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
     int m_videoChannels;
-    bool m_needKeyData[CL_MAX_CHANNELS];
+    std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

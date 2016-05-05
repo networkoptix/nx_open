@@ -4,10 +4,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <statistics/statistics_fwd.h>
 #include <api/server_rest_connection_fwd.h>
+
+#include <nx/utils/uuid.h>
 
 class QnStatisticsManager : public Connective<QObject>
     , public Singleton<QnStatisticsManager>
@@ -45,6 +47,8 @@ public:
     void resetStatistics();
 
 private:
+    bool isStatisticsSendingAllowed() const;
+
     void unregisterModule(const QString &alias);
 
     QnStatisticValuesHash getValues() const;

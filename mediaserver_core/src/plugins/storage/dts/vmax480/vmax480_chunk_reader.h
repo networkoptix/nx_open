@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_VMAX
 
-#include "plugins/resource/archive/abstract_archive_delegate.h"
+#include <nx/streaming/abstract_archive_delegate.h>
 #include "vmax480_stream_fetcher.h"
 #include "utils/common/long_runnable.h"
 #include "recording/time_period_list.h"

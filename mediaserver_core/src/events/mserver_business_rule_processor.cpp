@@ -15,8 +15,7 @@
 
 #include <database/server_db.h>
 
-#include "camera/camera_pool.h"
-#include "decoders/video/ffmpeg.h"
+#include <camera/camera_pool.h>
 
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>
@@ -24,18 +23,18 @@
 #include <media_server/serverutil.h>
 
 #include <utils/math/math.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "camera/get_image_helper.h"
 #include "core/resource_management/resource_properties.h"
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
-#include <nxemail/email_manager_impl.h>
+#include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
-#include <utils/common/timermanager.h>
+#include <nx/utils/timer_manager.h>
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
-#include <nxemail/mustache/mustache_helper.h>
+#include <nx/email/mustache/mustache_helper.h>
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
 #include "core/resource/resource_name.h"
@@ -152,11 +151,11 @@ struct QnEmailAttachmentData {
             imagePath = lit(":/skin/email_attachments/server.png");
             break;
         default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All cases must be implemented.");
+            NX_ASSERT(false, Q_FUNC_INFO, "All cases must be implemented.");
             break;
         }
 
-        Q_ASSERT_X(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+        NX_ASSERT(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
     }
 
     QString templatePath;
@@ -181,7 +180,7 @@ QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
     {
         const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
         lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( taskID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( taskID );
         lk.relock();
         if( m_aggregatedEmails.begin()->periodicTaskID == taskID )  //task has not been removed in sendAggregationEmail while we were waiting
             m_aggregatedEmails.erase( m_aggregatedEmails.begin() );
@@ -262,9 +261,9 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action)
 {
-    Q_ASSERT(action);
+    NX_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
-    //Q_ASSERT(camera);
+    //NX_ASSERT(camera);
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
@@ -283,7 +282,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
 {
-    Q_ASSERT(action);
+    NX_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
@@ -374,7 +373,7 @@ QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUui
 
 bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
 {
-    Q_ASSERT( action );
+    NX_ASSERT( action );
 
     QStringList recipients = getRecipients(action);
 
@@ -419,7 +418,8 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams());
 
-    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
+    QString messageBody;
+    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
     ec2::ApiEmailData data(
         recipients,
@@ -465,9 +465,9 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
     {
         aggregatedData.action = QnSendMailBusinessActionPtr( new QnSendMailBusinessAction( *action ) );
         using namespace std::placeholders;
-        aggregatedData.periodicTaskID = TimerManager::instance()->addTimer(
+        aggregatedData.periodicTaskID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnMServerBusinessRuleProcessor::sendAggregationEmail, this, aggregationKey),
-            emailAggregationPeriodMS );
+            std::chrono::milliseconds(emailAggregationPeriodMS));
     }
 
     ++aggregatedData.eventCount;

@@ -1,12 +1,13 @@
 
 #include "statistics_settings_watcher.h"
 
+#include <nx/network/http/asynchttpclient.h>
+
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <utils/common/delayed.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <common/common_module.h>
-#include <api/server_rest_connection.h>
-#include <core/resource/media_server_resource.h>
 
 namespace
 {
@@ -41,7 +42,7 @@ void QnStatisticsSettingsWatcher::updateSettings()
 void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
 {
     const bool correctDelay = (delayMs >= 0);
-    Q_ASSERT_X(correctDelay, Q_FUNC_INFO, "Delay could not be less than 0!");
+    NX_ASSERT(correctDelay, Q_FUNC_INFO, "Delay could not be less than 0!");
 
     if (!correctDelay || m_handle)
         return;

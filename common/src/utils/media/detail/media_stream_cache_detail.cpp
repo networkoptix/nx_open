@@ -8,8 +8,8 @@
 #include "media_stream_cache_detail.h"
 #include "utils/media/media_stream_cache.h"
 
-#include <core/datapacket/media_data_packet.h>
-#include <utils/common/log.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/utils/log/log.h>
 
 
 namespace detail
@@ -303,7 +303,7 @@ int MediaStreamCache::blockData( quint64 timestamp )
 
     if( !m_dataBlockings.emplace( blockingID, timestamp ).second )
     {
-        Q_ASSERT( false );
+        NX_ASSERT( false );
     }
 
     return blockingID;
@@ -317,7 +317,7 @@ void MediaStreamCache::moveBlocking( int blockingID, quint64 timestampToMoveTo )
     std::map<int, quint64>::iterator it = m_dataBlockings.find( blockingID );
     if( it == m_dataBlockings.end() )
     {
-        Q_ASSERT( false );
+        NX_ASSERT( false );
         return;
     }
 
@@ -332,7 +332,7 @@ void MediaStreamCache::unblockData( int blockingID )
     std::map<int, quint64>::iterator it = m_dataBlockings.find( blockingID );
     if( it == m_dataBlockings.end() )
     {
-        Q_ASSERT( false );
+        NX_ASSERT( false );
         return;
     }
     m_dataBlockings.erase( it );

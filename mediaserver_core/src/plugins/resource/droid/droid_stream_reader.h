@@ -3,11 +3,11 @@
 
 #ifdef ENABLE_DROID
 
-#include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/simple_http_client.h"
+#include <core/dataprovider/spush_media_stream_provider.h>
+#include <nx/network/simple_http_client.h>
 #include "droid_resource.h"
-#include "utils/network/socket.h"
-#include "network/rtpsession.h"
+#include <nx/network/socket.h>
+#include <nx/streaming/rtsp_client.h>
 
 class CLH264RtpParser;
 
@@ -42,9 +42,9 @@ private:
     int m_videoPort;
     int m_audioPort;
     int m_dataPort;
-    RTPSession m_rtpSession;
-    RTPIODevice* m_videoIoDevice;
-    RTPIODevice* m_audioIoDevice;
+    QnRtspClient m_rtpSession;
+    QnRtspIoDevice* m_videoIoDevice;
+    QnRtspIoDevice* m_audioIoDevice;
     CLH264RtpParser* m_h264Parser;
     bool m_gotSDP;
 };

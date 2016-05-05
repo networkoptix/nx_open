@@ -1,23 +1,24 @@
 #include <QtCore/QMap>
 
 #include "rtsp_data_consumer.h"
-#include "core/datapacket/media_data_packet.h"
-#include "rtsp_connection.h"
-#include "utils/common/util.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "camera/video_camera.h"
-#include "camera/camera_pool.h"
-#include "utils/common/sleep.h"
-#include "network/rtpsession.h"
-#include "core/dataprovider/abstract_streamdataprovider.h"
-#include "utils/common/synctime.h"
-#include "core/resource/security_cam_resource.h"
-#include "recorder/recording_manager.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+
+#include <nx/streaming/media_data_packet.h>
+#include <rtsp/rtsp_connection.h>
+#include <utils/common/util.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <camera/video_camera.h>
+#include <camera/camera_pool.h>
+#include <utils/common/sleep.h>
+#include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <utils/common/synctime.h>
+#include <core/resource/security_cam_resource.h>
+#include <recorder/recording_manager.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 const auto checkConstantsEquality = []()
 {
-    assert((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
+    NX_ASSERT((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
     return true;
 }();
 
@@ -72,8 +73,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_timer.start();
     QnMutexLocker lock( &m_allConsumersMutex );
     m_allConsumers << this;
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_needKeyData[i] = false;
+    m_needKeyData.fill(false);
 }
 
 void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
@@ -150,7 +150,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     QnMutexLocker lock( &m_liveTimingControlMtx );
     if (m_lastLiveTime == (qint64)AV_NOPTS_VALUE)
         return false;
-    Q_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
+    NX_ASSERT(m_firstLiveTime != (qint64)AV_NOPTS_VALUE);
     //qint64 elapsed = m_liveTimer.elapsed()*1000;
     bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
 
@@ -217,7 +217,7 @@ void QnRtspDataConsumer::cleanupQueueToPos(int lastIndex, int ch)
             const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>( m_dataQueue.atUnsafe(i).get());
             if (!video || video->channelNumber == ch)
             {
-                m_dataQueue.remoteAtUnsafe(i);
+                m_dataQueue.removeAtUnsafe(i);
                 --currentIndex;
                 m_someDataIsDropped = true;
             }
@@ -374,7 +374,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
             buildRtspTcpHeader(rtpTcpChannel, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
             sendBuffer.write(m_rtspTcpHeader, rtpHeaderSize);
-            Q_ASSERT(!codecCtxData.isEmpty());
+            NX_ASSERT(!codecCtxData.isEmpty());
             m_owner->bufferData(codecCtxData);
         }
     }
@@ -440,7 +440,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
 
 void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
-    Q_ASSERT( speed > 0 );
+    NX_ASSERT( speed > 0 );
     m_streamingSpeed = speed <= 0 ? 1 : speed;
 }
 
@@ -479,7 +479,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             m_owner->sendBuffer(m_sendBuffer);
         }
         else  if (metadataTrack->mediaSocket) {
-            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
             metadataTrack->mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
@@ -509,8 +509,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
 
 void QnRtspDataConsumer::setNeedKeyData()
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_needKeyData[i] = true;
+    m_needKeyData.fill(true);
 }
 
 bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
@@ -528,7 +527,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
     {
-        Q_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
+        NX_ASSERT( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) );
         //TODO #ak changing packet's timestamp. It is OK for archive, but generally unsafe.
             //Introduce safe solution
         if( !media->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE) )
@@ -675,7 +674,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             m_owner->sendBuffer(m_sendBuffer);
         }
         else {
-            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
             AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }

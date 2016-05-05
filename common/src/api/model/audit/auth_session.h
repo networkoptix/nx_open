@@ -1,7 +1,7 @@
 #ifndef __QN_AUTH_SESSION_H__
 #define __QN_AUTH_SESSION_H__
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/model_functions_fwd.h>
 
 struct QnAuthSession

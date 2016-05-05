@@ -45,7 +45,7 @@ void QnFisheyeSettingsWidget::updateFromParams(const QnMediaDewarpingParams &par
             ui->viewDownButton->setChecked(true);
             break;
         default:
-            Q_ASSERT_X( __LINE__, Q_FUNC_INFO, "Unsupported value");
+            NX_ASSERT( __LINE__, Q_FUNC_INFO, "Unsupported value");
     }
 
     ui->angleSpinBox->setValue(params.fovRot);

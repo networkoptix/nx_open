@@ -8,7 +8,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <utils/network/http/qnbytearrayref.h>
+#include <nx/network/http/qnbytearrayref.h>
 #include <utils/common/software_version.h>
 
 

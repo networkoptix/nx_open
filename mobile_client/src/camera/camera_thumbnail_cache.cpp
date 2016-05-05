@@ -5,7 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
-#include <utils/jpeg.h>
+#include <nx/media/jpeg.h>
 
 namespace {
 
@@ -147,7 +147,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
             {
                 if (!pixmap.isNull())
                 {
-                    thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
+                    thumbnailId = getThumbnailId(id, thumbnailData.time);
                     m_pixmaps.remove(thumbnailData.thumbnailId);
                     m_pixmaps.insert(thumbnailId, pixmap);
                     thumbnailLoaded = true;

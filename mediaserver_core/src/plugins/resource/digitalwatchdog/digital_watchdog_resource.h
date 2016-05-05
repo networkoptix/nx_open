@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <core/datapacket/media_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
 #include <core/resource/camera_resource.h>
 #include <memory>
 
@@ -11,7 +11,7 @@
 
 #include <plugins/resource/onvif/onvif_resource.h>
 
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "dw_resource_settings.h"
 

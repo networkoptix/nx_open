@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
@@ -41,19 +41,17 @@ namespace ec2
         //!Implementation of AbstractECConnectionFactory::testConnectionAsync
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) override;
         //!Implementation of AbstractECConnectionFactory::connectAsync
-        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+        virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
                                   impl::ConnectHandlerPtr handler ) override;
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) override;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) override;
-        virtual void setContext( const ResourceContext& resCtx ) override;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
         QnMutex m_mutex;
-        ResourceContext m_resCtx;
         Settings m_settingsInstance;
         std::unique_ptr<QnDbManager> m_dbManager;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
@@ -65,7 +63,7 @@ namespace ec2
         bool m_sslEnabled;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
-        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler, 
+        int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler,
                                                const ApiClientInfoData& clientInfo );
         template<class Handler>
         void connectToOldEC( const QUrl& ecURL, Handler completionFunc );
@@ -86,7 +84,8 @@ namespace ec2
         //!Called on server side to handle connection request from remote host
         ErrorCode fillConnectionInfo(
             const ApiLoginData& loginInfo,
-            QnConnectionInfo* const connectionInfo );
+            QnConnectionInfo* const connectionInfo,
+            nx_http::Response* response = nullptr);
         int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         ErrorCode getSettings( std::nullptr_t, ApiResourceParamDataList* const outData );
@@ -100,11 +99,16 @@ namespace ec2
         template<class InputDataType, class OutputDataType>
             void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
 
-        template<class InputType, class OutputType, class HandlerType>
+        template<class InputType, class OutputType>
             void registerFunctorHandler(
                 QnRestProcessorPool* const restProcessorPool,
                 ApiCommand::Value cmd,
-                HandlerType handler );
+                std::function<ErrorCode(InputType, OutputType*)> handler);
+        template<class InputType, class OutputType>
+            void registerFunctorWithResponseHandler(
+                QnRestProcessorPool* const restProcessorPool,
+                ApiCommand::Value cmd,
+                std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler);
 
         template<class Function>
             void statisticsCall(const Function& function);

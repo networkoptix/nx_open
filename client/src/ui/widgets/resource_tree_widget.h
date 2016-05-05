@@ -9,7 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
 
-class QnResourceTreeItemDelegate;
+class QnResourceItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
 class QnResourceTreeSortProxyModel;
@@ -27,9 +27,6 @@ namespace Qn {
         /** Last row is hidden if there is not enough space to fully show it. */
         HideLastRow = 0x1,
 
-        /** Set background opacity to items. */
-        BackgroundOpacity = 0x2,
-
         /** Set Qt::BypassGraphicsProxyWidget flag to items. */
         BypassGraphicsProxy = 0x4
     };
@@ -38,7 +35,7 @@ namespace Qn {
 
 class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
-    
+
     typedef QWidget base_type;
 
 public:
@@ -156,7 +153,7 @@ private:
 
     QnResourceCriterion m_criterion;
 
-    QnResourceTreeItemDelegate *m_itemDelegate;
+    QnResourceItemDelegate *m_itemDelegate;
 
     QnResourceTreeSortProxyModel *m_resourceProxyModel;
 

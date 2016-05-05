@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # SRC_DIR=../../..
 
 
@@ -30,9 +32,9 @@ BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
 BETA=""
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
+if [[ "${beta}" == "true" ]]; then
+  BETA="-beta"
+fi
 PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
@@ -43,7 +45,7 @@ PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
-STRIP="`find ${root.dir}/mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
+STRIP=${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip
 
 
 for i in "$@"
@@ -64,19 +66,16 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
+libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnxemail.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_streaming.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
-libQt5Concurrent.so.5.2.1 \
-libQt5Core.so.5.2.1 \
-libQt5Gui.so.5.2.1 \
-libQt5Multimedia.so.5.2.1 \
-libQt5Network.so.5.2.1 \
-libQt5Sql.so.5.2.1 \
-libQt5Xml.so.5.2.1 \
-libQt5XmlPatterns.so.5.2.1 \
 libquazip.so.1.0.0 \
 libsasl2.so.3.0.0 \
 liblber-2.4.so.2.10.5 \
@@ -118,6 +117,14 @@ do
 done
 popd
 
+#copying qt libs
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+for var in $QTLIBS
+do
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+done
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
@@ -144,16 +151,19 @@ pushd $BUILD_DIR
 tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
 
 if [ ! -z $TARGET_DIR ]; then
-  cp $PACKAGE_NAME $TARGET_DIR 
+  cp $PACKAGE_NAME $TARGET_DIR
 fi
 
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+
+set +e
 cp -P $LIBS_DIR/*.debug ${project.build.directory}
 cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/*.debug ${project.build.directory}
 cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/*.debug ${project.build.directory}
 tar czf ./$PACKAGE_NAME-debug-symbols.tar.gz ./*.debug
+set -e
 rm -Rf $BUILD_DIR
 
 mkdir -p zip

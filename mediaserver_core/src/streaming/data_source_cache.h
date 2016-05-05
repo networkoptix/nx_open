@@ -8,12 +8,12 @@
 #include <map>
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <transcoding/transcoder.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "streaming_chunk_cache_key.h"
 
@@ -37,7 +37,7 @@ typedef QSharedPointer<DataSourceContext> DataSourceContextPtr;
 
 class DataSourceCache
 :
-    public TimerEventHandler
+    public nx::utils::TimerEventHandler
 {
 public:
     static const unsigned int DEFAULT_LIVE_TIME_MS = 3*1000;

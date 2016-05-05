@@ -1,51 +1,71 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
     A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
+    It should also be possible to have one maven project per solution project,
     and have a parent pom to deletegate the build.
   -->
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <artifactId>mjpg_link</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness HTTP Stream Plugin</name>  
+    <name>HD Witness HTTP Stream Plugin</name>
 
     <properties>
         <product.title>${project.name}</product.title>
         <guid>${mjpg_link.guid}</guid>
-        <!--Global libs-->
+
         <qt.libs>core network</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib -lssleay32 -llibeay32</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>        
-        <!--Global defines-->
-        <global.defines/>
-        <linux.defines/>
-        <mac.defines/>
-        <!--Specific os defines-->
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming</global.libs>
+        <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib</windows.oslibs>
+
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
+
+        <rdep.packages>openssl</rdep.packages>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>            
-        </dependency>
-    </dependencies>  
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>           
+    </dependencies>
 </project>

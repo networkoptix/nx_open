@@ -31,12 +31,12 @@ namespace ec2
 
 
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QString *value) {
-        assert(command == "getHelp");
+        NX_ASSERT(command == "getHelp");
         return deserialize(params, lit("group"), value);
     }
 
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, ApiStoredFilePath *value) {
-        assert(command != "getHelp");
+        NX_ASSERT(command != "getHelp");
         return deserialize(params, lit("folder"), &(value->path)); // ApiStoredFilePath
     }
 

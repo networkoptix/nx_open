@@ -7,13 +7,13 @@
 
 #include <functional>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/http/auth_tools.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/simple_http_client.h>
 
 #include <rest/active_connections_rest_handler.h>
 
@@ -23,6 +23,8 @@
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "nx_ec/data/api_camera_history_data.h"
+#include <nx_ec/data/api_access_rights_data.h>
+#include <nx_ec/data/api_user_group_data.h>
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -151,8 +153,6 @@ namespace ec2
          */
         registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-        //AbstractResourceManager::getResource
-        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>(p, ApiCommand::getResource);
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiResourceStatusData>(p, ApiCommand::setResourceStatus);
 
@@ -192,7 +192,7 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>(p, ApiCommand::getStatusList);
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>(p, ApiCommand::getMediaServers);
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
@@ -245,7 +245,7 @@ namespace ec2
          * %return Return object in requested format
          * %// AbstractMediaServerManager::getServersEx
          */
-        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataExList>(p, ApiCommand::getMediaServersEx);
 
         registerUpdateFuncHandler<ApiStorageDataList>(p, ApiCommand::saveStorages);
 
@@ -286,7 +286,7 @@ namespace ec2
         //AbstractCameraManager::save
         registerUpdateFuncHandler<ApiCameraDataList>(p, ApiCommand::saveCameras);
         //AbstractCameraManager::getCameras
-        registerGetFuncHandler<QnUuid, ApiCameraDataList>(p, ApiCommand::getCameras);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataList>(p, ApiCommand::getCameras);
 
         //AbstractCameraManager::saveUserAttributes
         registerUpdateFuncHandler<ApiCameraAttributesDataList>(p, ApiCommand::saveCameraUserAttributesList);
@@ -392,7 +392,6 @@ namespace ec2
         /**%apidoc GET /ec2/getCameraUserAttributes
          * Read additional camera attributes.
          * %// TODO: This function is named inconsistently - should end with 'List'.
-         * %// TODO: Not published param[opt] id Server unique Id.
          * %param[default] format
          * %return List of additional camera attributes objects for all cameras in the requested format.
          *     %param cameraID Camera unique id.
@@ -486,7 +485,7 @@ namespace ec2
          *         %value CameraBackup_Default A default value is used for backup options.
          * %// AbstractCameraManager::getUserAttributes
          */
-        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraAttributesDataList>(p, ApiCommand::getCameraUserAttributes);
 
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiServerFootageData>(p, ApiCommand::addCameraHistoryItem);
@@ -504,7 +503,6 @@ namespace ec2
         /**%apidoc GET /ec2/getCamerasEx
          * Read camera list.
          * %param[default] format
-         * %param[opt] id Server unique Id
          * %return List of objects with camera information formatted in the requested format.
          *     %// From struct ApiResourceData:
          *     %param id Camera unique Id.
@@ -624,7 +622,7 @@ namespace ec2
          *         such information as full ONVIF URL, camera maximum fps, etc.
          * %// AbstractCameraManager::getCamerasEx
          */
-        registerGetFuncHandler<QnUuid, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
+        registerGetFuncHandler<std::nullptr_t, ApiCameraDataExList>(p, ApiCommand::getCamerasEx);
 
         /**%apidoc GET /ec2/getStorages
          * Read the list of current storages.
@@ -687,6 +685,34 @@ namespace ec2
          */
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>(p, ApiCommand::getUsers);
 
+        /**%apidoc GET /ec2/getUserGroups
+        * Return user groups registered in the system.
+        * %param[default] format
+        * %return Return object in requested format
+        * %// AbstractUserManager::getUserGroups
+        */
+        registerGetFuncHandler<std::nullptr_t, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
+
+        /**%apidoc GET /ec2/getAccessRights
+        * Return list of accessible resources ids for each user in the system.
+        * %param[default] format
+        * %return Return object in requested format
+        * %// AbstractUserManager::getAccessRights
+        */
+        registerGetFuncHandler<std::nullptr_t, ApiAccessRightsDataList>(p, ApiCommand::getAccessRights);
+
+        /**%apidoc POST /ec2/setAccessRights
+        * <p>
+        * Parameters should be passed as a JSON object in POST message body with
+        * content type "application/json". Example of such object can be seen in
+        * the result of the corresponding GET function.
+        * </p>
+        * %param userId User unique id.
+        * %param resourceIds List of accessible resources ids.
+        * %// AbstractUserManager::setAccessRights
+        */
+        registerUpdateFuncHandler<ApiAccessRightsData>(p, ApiCommand::setAccessRights);
+
         /**%apidoc POST /ec2/saveUser
          * <p>
          * Parameters should be passed as a JSON object in POST message body with
@@ -703,10 +729,20 @@ namespace ec2
          *     a previously received object, use false when creating a new one.
          *     %value false
          *     %value true
-         * %param permissions Should have one of the fixed values.
-         *     %value 12206 Admin
-         *     %value 4014 Advanced viewer
-         *     %value 128 Live viewer
+ * %param permissions Combination (via "|") of the following flags:
+         *     %value GlobalOwnerPermission Root, can edit admins.
+         *     %value GlobalAdminPermission Admin, can edit other non-admins.
+         *     %value GlobalEditLayoutsPermission Can create and edit layouts.
+         *     %value GlobalEditServersPermissions Can edit server settings.
+         *     %value GlobalViewLivePermission Can view live stream of available cameras.
+         *     %value GlobalViewArchivePermission Can view archives of available cameras.
+         *     %value GlobalExportPermission Can export archives of available cameras.
+         *     %value GlobalEditCamerasPermission Can edit camera settings.
+         *     %value GlobalPtzControlPermission Can change camera's PTZ state.
+         *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+         *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
+         *     %value GlobalAccessAllServersPermission Has access to all servers
          * %param email User's email.
          * %param digest HA1 digest hash from user password, as per RFC 2069. When modifying an
          *     existing user, supply empty string. When creating a new user, calculate the value
@@ -741,6 +777,43 @@ namespace ec2
          */
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUser);
 
+
+        /**%apidoc POST /ec2/saveUserGroup
+        * <p>
+        * Parameters should be passed as a JSON object in POST message body with
+        * content type "application/json". Example of such object can be seen in
+        * the result of the corresponding GET function.
+        * </p>
+        * %param id Group unique id. Should be generated when creating a new group.
+        * %param name Group name.
+        * %param permissions Combination (via "|") of the following flags:
+        *     %value GlobalEditLayoutsPermission Can create and edit layouts.
+        *     %value GlobalEditServersPermissions Can edit server settings.
+        *     %value GlobalViewLivePermission Can view live stream of available cameras.
+        *     %value GlobalViewArchivePermission Can view archives of available cameras.
+        *     %value GlobalExportPermission Can export archives of available cameras.
+        *     %value GlobalEditCamerasPermission Can edit camera settings.
+        *     %value GlobalPtzControlPermission Can change camera's PTZ state.
+        *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+        *     %value GlobalAccessAllCamerasPermission Has access to all cameras
+        *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
+        *     %value GlobalAccessAllServersPermission Has access to all servers
+        * %// AbstractUserManager::saveGroup
+        */
+        registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
+
+        /**%apidoc POST /ec2/removeUserGroup
+        * Delete the specified user group.
+        * <p>
+        * Parameters should be passed as a JSON object in POST message body with
+        * content type "application/json". Example of such object can be seen in
+        * the result of the corresponding GET function.
+        * </p>
+        * %param id User unique id.
+        * %// AbstractUserManager::removeUserGroup
+        */
+        registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeUserGroup);
+
         /**%apidoc GET /ec2/getVideowalls
          * Return list of video walls
          * %param[default] format
@@ -753,6 +826,11 @@ namespace ec2
         //AbstractVideowallManager::remove
         registerUpdateFuncHandler<ApiIdData>(p, ApiCommand::removeVideowall);
         registerUpdateFuncHandler<ApiVideowallControlMessageData>(p, ApiCommand::videowallControl);
+
+		registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( p, ApiCommand::getWebPages );
+        registerUpdateFuncHandler<ApiWebPageData>( p, ApiCommand::saveWebPage );
+        //AbstractWebPageManager::remove
+        registerUpdateFuncHandler<ApiIdData>( p, ApiCommand::removeWebPage );
 
         /**%apidoc GET /ec2/getLayouts
          * Return list of user layout
@@ -1001,10 +1079,10 @@ namespace ec2
         registerGetFuncHandler<ApiStoredFilePath, qint64>(p, ApiCommand::dumpDatabaseToFile);
 
         //AbstractECConnectionFactory
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::connect,
-            std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
-        registerFunctorHandler<ApiLoginData, QnConnectionInfo>(p, ApiCommand::testConnection,
-            std::bind(&Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2));
+        registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( p, ApiCommand::connect,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3 ) );
+        registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( p, ApiCommand::testConnection,
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2, _3) );
 
         /**%apidoc GET /ec2/getSettings
          * Read general system settings such as email address
@@ -1037,12 +1115,6 @@ namespace ec2
         //    new QnRestTransactionReceiver());
     }
 
-    void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
-    {
-        m_resCtx = resCtx;
-        m_timeSynchronizationManager->setContext(m_resCtx);
-    }
-
     void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
     {
         m_settingsInstance.loadParams( std::move( confParams ) );
@@ -1060,7 +1132,7 @@ namespace ec2
         {
             QnMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, connectionInfo, url ) );
                 if( !m_directConnection->initialized() )
                 {
                     connectionInitializationResult = ec2::ErrorCode::dbError;
@@ -1101,8 +1173,10 @@ namespace ec2
         NX_LOG( lit("%1 to %2 with %3").arg( Q_FUNC_INFO ).arg( addr.toString() ).arg( info ),
                 cl_logDEBUG1 );
 
-        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
-            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
+        auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo )
+        {
+            remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler);
+        };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
         return reqID;
@@ -1201,7 +1275,7 @@ namespace ec2
                     return connectToOldEC(
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
-                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
+                            if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= QnSoftwareVersion( 2, 3, 0 ) )
                                 handler->done(  //somehow, connected to 2.3 server with old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
                                     reqID,
                                     ErrorCode::ioError,
@@ -1227,7 +1301,6 @@ namespace ec2
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
-            m_resCtx,
             connectionInfoCopy));
         handler->done(
             reqID,
@@ -1265,7 +1338,8 @@ namespace ec2
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         const ApiLoginData& loginInfo,
-        QnConnectionInfo* const connectionInfo )
+        QnConnectionInfo* const connectionInfo,
+        nx_http::Response* response)
     {
         connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = isCompatibilityMode() ? QString() : QnAppInfo::productNameShort();
@@ -1277,6 +1351,9 @@ namespace ec2
         connectionInfo->allowSslConnections = m_sslEnabled;
         connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
+        if (response)
+            connectionInfo->effectiveUserName =
+                nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
 
 		if (!loginInfo.clientInfo.id.isNull())
         {
@@ -1374,14 +1451,30 @@ namespace ec2
             new QueryHttpHandler2<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor) );
     }
 
-    template<class InputType, class OutputType, class HandlerType>
+    template<class InputType, class OutputType>
     void Ec2DirectConnectionFactory::registerFunctorHandler(
         QnRestProcessorPool* const restProcessorPool,
         ApiCommand::Value cmd,
-        HandlerType handler )
+        std::function<ErrorCode(InputType, OutputType*)> handler )
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new FlexibleQueryHttpHandler<InputType, OutputType, HandlerType>(cmd, handler) );
+            new FlexibleQueryHttpHandler<InputType, OutputType>(
+                cmd,
+                std::move(handler)));
+    }
+
+    //!Registers handler which is able to modify HTTP response
+    template<class InputType, class OutputType>
+    void Ec2DirectConnectionFactory::registerFunctorWithResponseHandler(
+        QnRestProcessorPool* const restProcessorPool,
+        ApiCommand::Value cmd,
+        std::function<ErrorCode(InputType, OutputType*, nx_http::Response*)> handler)
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new FlexibleQueryHttpHandler<InputType, OutputType>(
+                cmd,
+                std::move(handler)));
     }
 }

@@ -28,7 +28,7 @@
 #include <string.h>
 
 #include <QtCore/QFile>
-#include <utils/network/nettools.h>
+#include <nx/network/nettools.h>
 
 
 DiscoveryManager::DiscoveryManager()

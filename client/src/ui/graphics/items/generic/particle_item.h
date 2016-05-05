@@ -1,8 +1,8 @@
 #ifndef QN_PARTICLE_ITEM_H
 #define QN_PARTICLE_ITEM_H
 
-#include <QGraphicsObject>
-#include <QBrush>
+#include <QtWidgets/QGraphicsObject>
+#include <QtGui/QBrush>
 
 /**
  * A radial gradient particle item.

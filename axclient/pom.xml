@@ -1,68 +1,74 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
+
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>axclient</artifactId>
     <packaging>pom</packaging>
-    <name>Client ActiveX Component</name>
+    <name>NX Witness Client ActiveX Component</name>
 
     <properties>
         <guid>${axclient.guid}</guid>
         <product.title>${client.name}</product.title>
+        <product.display.title>${client.display.name}</product.display.title>
+        
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
         <template>lib</template>
-        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!--Global libs-->
-        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
 
-        <linux.oslibs>-lcrypto -lz</linux.oslibs>
-        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines/>
-        <linux.defines/>
-        <mac.defines/>          
+        <qt.libs>core core-private gui network opengl xml xmlpatterns sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -lclient -lcloud_db_client</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lOle32 -lwinmm -ld3d9</windows.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+        
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox</rdep.packages>
+        <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
     </properties>
 
-    <dependencies>
+<dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>appserver2</artifactId>
+            <artifactId>nx_streaming</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>     
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>appserver2</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
-        </dependency>           
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -71,16 +77,16 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client.core/pom.xml</systemPath>
-        </dependency>       
-        
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>client</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>           
-    </dependencies> 
+    </dependencies>
 
 </project>

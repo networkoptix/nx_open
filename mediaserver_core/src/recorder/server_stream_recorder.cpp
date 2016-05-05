@@ -8,7 +8,7 @@
 #include <common/common_globals.h>
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
@@ -22,12 +22,14 @@
 #include <business/business_event_connector.h>
 #include <business/events/reasoned_business_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
 static const int MOTION_PREBUFFER_SIZE = 8;
+static const float HIGH_DATA_LIMIT = 0.7;
+static const float LOW_DATA_LIMIT = 0.3;
 
 QnServerStreamRecorder::QnServerStreamRecorder(
     const QnResourcePtr                 &dev,
@@ -103,7 +105,7 @@ void QnServerStreamRecorder::at_recordingFinished(
     if (status.lastError == QnStreamRecorder::NoError)
         return;
 
-    Q_ASSERT(m_mediaServer);
+    NX_ASSERT(m_mediaServer);
     if (m_mediaServer) {
         if (!m_diskErrorWarned)
         {
@@ -147,20 +149,17 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     if (!isRunning())
         return;
 
-    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || (size_t)m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
-    if (!m_rebuildBlocked && halfQueueReached)
+    bool isNotOwerflowed;
     {
-        m_rebuildBlocked = true;
-        DeviceFileCatalog::rebuildPause(this);
-    }
-    else if (m_rebuildBlocked && !halfQueueReached)
-    {
-        m_rebuildBlocked = false;
-        DeviceFileCatalog::rebuildResume(this);
+        QnMutexLocker lock(&m_queueSizeMutex);
+        isNotOwerflowed = m_queuedSize <= m_maxRecordQueueSizeBytes &&
+            (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
+
+        pauseRebuildIfHighData(&lock);
+        resumeRebuildIfLowData(&lock);
     }
 
-    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
-    if (!rez) 
+    if (!isNotOwerflowed)
     {
         if (!m_recordingContextVector.empty())
         {
@@ -185,8 +184,10 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
         m_dataQueue.clear();
+
         QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize = 0;
+        resumeRebuild(&lock);
         return;
     }
 
@@ -224,7 +225,7 @@ void QnServerStreamRecorder::updateStreamParams()
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
             }
             else {
-                Q_ASSERT(camera);
+                NX_ASSERT(camera);
                 liveProvider->setFps(camera->getMaxFps()-5);
                 liveProvider->setQuality(Qn::QualityHighest);
             }
@@ -245,7 +246,7 @@ void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr
 {
     m_lastMediaTime = media->timestamp;
 
-    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
+    NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "Dual streaming helper must be defined!");
     QnConstMetaDataV1Ptr metaData = std::dynamic_pointer_cast<const QnMetaDataV1>(media);
     if (metaData) {
         m_dualStreamingHelper->onMotion(metaData.get());
@@ -493,7 +494,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             int scheduleTimeMs = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600+dt.time().minute()*60+dt.time().second();
             scheduleTimeMs *= 1000;
 
-            QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
+            QnScheduleTaskList::iterator itr = std::upper_bound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
             if (itr > m_schedule.begin())
                 --itr;
 
@@ -522,6 +523,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     {
         QnMutexLocker lock( &m_queueSizeMutex );
         m_queuedSize -= media->dataSize();
+        resumeRebuildIfLowData(&lock);
     }
 
     // for empty schedule we record all time
@@ -534,7 +536,7 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 {
     QnMutexLocker lock( &m_scheduleMutex );
     m_schedule = cameraRes->getScheduleTasks();
-    Q_ASSERT_X(m_dualStreamingHelper, Q_FUNC_INFO, "DualStreaming helper must be defined!");
+    NX_ASSERT(m_dualStreamingHelper, Q_FUNC_INFO, "DualStreaming helper must be defined!");
     m_lastSchedulePeriod.clear();
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
@@ -548,21 +550,59 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 bool QnServerStreamRecorder::isRedundantSyncOn() const
 {
     auto mediaServer = qnCommon->currentServer();
-    Q_ASSERT(mediaServer);
+    NX_ASSERT(mediaServer);
 
     if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
         return false;
 
     auto cam = m_device.dynamicCast<QnSecurityCamResource>();
-    Q_ASSERT(cam);
+    NX_ASSERT(cam);
 
     Qn::CameraBackupQualities cameraBackupQualities = cam->getActualBackupQualities();
 
     if (m_catalog == QnServer::HiQualityCatalog)
         return cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality);
 
-    Q_ASSERT_X(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
+    NX_ASSERT(m_catalog == QnServer::LowQualityCatalog, Q_FUNC_INFO, "Only two options are allowed");
     return cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality);
+}
+
+bool QnServerStreamRecorder::pauseRebuildIfHighData(QnMutexLockerBase* locker)
+{
+    if (!m_rebuildBlocked && (
+        (float)m_queuedSize > m_maxRecordQueueSizeBytes * HIGH_DATA_LIMIT ||
+        (float)m_dataQueue.size() > m_maxRecordQueueSizeElements * HIGH_DATA_LIMIT))
+    {
+        m_rebuildBlocked = true;
+        locker->unlock();
+        DeviceFileCatalog::rebuildPause(this);
+        return true;
+    }
+
+    return false;
+}
+
+bool QnServerStreamRecorder::resumeRebuildIfLowData(QnMutexLockerBase* locker)
+{
+    if (m_rebuildBlocked && (
+        (float)m_queuedSize < m_maxRecordQueueSizeBytes * LOW_DATA_LIMIT &&
+        (float)m_dataQueue.size() < m_maxRecordQueueSizeElements * LOW_DATA_LIMIT))
+    {
+        resumeRebuild(locker);
+        return true;
+    }
+
+    return false;
+}
+
+void QnServerStreamRecorder::resumeRebuild(QnMutexLockerBase* locker)
+{
+    if (m_rebuildBlocked)
+    {
+        m_rebuildBlocked = false;
+        locker->unlock();
+        DeviceFileCatalog::rebuildResume(this);
+    }
 }
 
 void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
@@ -570,7 +610,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
     if (!m_fixedFileName)
     {
         QnNetworkResourcePtr netResource = qSharedPointerDynamicCast<QnNetworkResource>(m_device);
-        Q_ASSERT_X(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
+        NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
 
         auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot(provider);
@@ -656,14 +696,10 @@ void QnServerStreamRecorder::endOfRun()
     if(m_device->getStatus() == Qn::Recording)
         m_device->setStatus(Qn::Online);
 
-    if (m_rebuildBlocked) {
-        m_rebuildBlocked = false;
-        DeviceFileCatalog::rebuildResume(this);
-    }
-
     QnMutexLocker lock( &m_queueSizeMutex );
     m_dataQueue.clear();
     m_queuedSize = 0;
+    resumeRebuild(&lock);
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(const QnDualStreamingHelperPtr& helper)

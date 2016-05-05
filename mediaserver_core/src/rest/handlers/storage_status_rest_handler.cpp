@@ -39,7 +39,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
             return CODE_INVALID_PARAMETER;
     }
 
-    Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage must exist here");
+    NX_ASSERT(storage, Q_FUNC_INFO, "Storage must exist here");
     bool exists = !storage.isNull();
 
     QnStorageStatusReply reply;

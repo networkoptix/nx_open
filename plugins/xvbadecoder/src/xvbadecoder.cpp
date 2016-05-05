@@ -180,7 +180,7 @@ QnXVBADecoder::QnXVBAOpenGLPictureData::QnXVBAOpenGLPictureData( const QSharedPo
 		ctx->glTexture ),
     m_ctx( ctx )
 {
-    Q_ASSERT_X(
+    NX_ASSERT(
     		ctx->state == XVBASurfaceContext::readyToRender,
     		"QnXVBADecoder::QnXVBAOpenGLPictureData::QnXVBAOpenGLPictureData",
     		QString::fromAscii("ctx->state = %1").arg(ctx->state).toAscii().data() );
@@ -376,8 +376,8 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         //since decoder may require some more data to finish picture decoding
         //We can just remember, that this frame with pts is being decoded to this surface
 
-    Q_ASSERT( m_hardwareAccelerationEnabled );
-    Q_ASSERT( m_context );
+    NX_ASSERT( m_hardwareAccelerationEnabled );
+    NX_ASSERT( m_context );
 
     if( !m_decodeSession && !createDecodeSession() )
         return false;
@@ -417,7 +417,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     checkSurfaces(
         analyzeSrcDataResult ? &targetSurfaceCtx : NULL,    //could not find any slice in input data ? no need to create surface
         &decodedPicSurface );
-    Q_ASSERT( !decodedPicSurface || decodedPicSurface->state <= XVBASurfaceContext::renderingInProgress );
+    NX_ASSERT( !decodedPicSurface || decodedPicSurface->state <= XVBASurfaceContext::renderingInProgress );
 
     if( decodedPicSurface )
     {
@@ -567,7 +567,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     }
 #endif
 
-    Q_ASSERT( targetSurfaceCtx->state == XVBASurfaceContext::ready );
+    NX_ASSERT( targetSurfaceCtx->state == XVBASurfaceContext::ready );
     m_decodeStartInput.target_surface = targetSurfaceCtx->surface;
     m_prevOperationStatus = XVBAStartDecodePicture( &m_decodeStartInput );
     if( m_prevOperationStatus != Success )
@@ -1068,7 +1068,7 @@ bool QnXVBADecoder::readSequenceHeader( const QnCompressedVideoDataPtr& data )
          curNalu = nextNalu )
     {
         nextNalu = NALUnit::findNextNAL( curNalu, dataEnd );
-        Q_ASSERT( nextNalu > curNalu );
+        NX_ASSERT( nextNalu > curNalu );
         const quint8* curNaluEnd = nextNalu == dataEnd ? dataEnd : (nextNalu - H264_START_CODE_PREFIX_LENGTH);
         //skipping trailing_zero_bits
         for( --curNaluEnd; (curNaluEnd > curNalu) && (*curNaluEnd == 0); --curNaluEnd ) {}
@@ -1119,7 +1119,7 @@ bool QnXVBADecoder::analyzeInputBufSlices(
     {
     	const quint8* curNaluWithPrefix = curNalu - H264_START_CODE_PREFIX_LENGTH;
         nextNalu = NALUnit::findNextNAL( curNalu, dataEnd );
-        Q_ASSERT( nextNalu > curNalu );
+        NX_ASSERT( nextNalu > curNalu );
         //const quint8* curNaluEnd = nextNalu == dataEnd ? dataEnd : (nextNalu - H264_START_CODE_PREFIX_LENGTH);
         const quint8* curNaluEnd = nextNalu == dataEnd ? dataEnd : (nextNalu - H264_START_CODE_PREFIX_LENGTH);
         //skipping trailing_zero_bits
@@ -1340,7 +1340,7 @@ void QnXVBADecoder::checkSurfaces( QSharedPointer<XVBASurfaceContext>* const tar
                 break;
 
             case XVBASurfaceContext::decodingInProgress:
-           		Q_ASSERT( false );
+           		NX_ASSERT( false );
 
             case XVBASurfaceContext::ready:
             case XVBASurfaceContext::renderingInProgress:
@@ -1487,7 +1487,7 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
     outFrame->height = m_sps.getHeight();
 
 #ifdef USE_OPENGL_SURFACE
-    Q_ASSERT( !decodedPicSurface || decodedPicSurface->state <= XVBASurfaceContext::renderingInProgress );
+    NX_ASSERT( !decodedPicSurface || decodedPicSurface->state <= XVBASurfaceContext::renderingInProgress );
 	outFrame->picData =	QSharedPointer<QnAbstractPictureData>( new QnXVBAOpenGLPictureData( decodedPicSurface ) );
 #else
 	XVBA_Get_Surface_Input getIn;
@@ -1961,10 +1961,10 @@ Status QnXVBADecoder::XVBADecodePicture( XVBA_Decode_Picture_Input* decode_pictu
 #ifndef DUMP_BY_SLICES
     //assuming XVBA_DATA_BUFFER precedes XVBA_DATA_CTRL_BUFFER
     const XVBABufferDescriptor* dataBufferDescriptor = decode_picture_input->buffer_list[0];
-    Q_ASSERT( decode_picture_input->buffer_list[0]->buffer_type == XVBA_DATA_BUFFER );
+    NX_ASSERT( decode_picture_input->buffer_list[0]->buffer_type == XVBA_DATA_BUFFER );
     for( size_t i = 1; i < decode_picture_input->num_of_buffers_in_list; ++i )
     {
-        Q_ASSERT( decode_picture_input->buffer_list[i]->buffer_type == XVBA_DATA_CTRL_BUFFER );
+        NX_ASSERT( decode_picture_input->buffer_list[i]->buffer_type == XVBA_DATA_CTRL_BUFFER );
         const XVBADataCtrl* ctrl = reinterpret_cast<const XVBADataCtrl*>( decode_picture_input->buffer_list[i]->bufferXVBA );
         m_inStream.write( (const char*)dataBufferDescriptor->bufferXVBA + ctrl->SliceDataLocation, ctrl->SliceBytesInBuffer );
     }
@@ -1994,8 +1994,8 @@ Status QnXVBADecoder::XVBADecodePicture( XVBA_Decode_Picture_Input* decode_pictu
 #ifdef JOIN_SLICES
 void QnXVBADecoder::appendSlice( XVBABufferDescriptor* leftSliceBuffer, const quint8* rightSliceNALU, size_t rightSliceNALUSize )
 {
-    Q_ASSERT( leftSliceBuffer->data_size_in_buffer > 0 );
-    Q_ASSERT( !m_pps.entropy_coding_mode_flag );
+    NX_ASSERT( leftSliceBuffer->data_size_in_buffer > 0 );
+    NX_ASSERT( !m_pps.entropy_coding_mode_flag );
 
     cl_log.log( QString::fromAscii("QnXVBADecoder. Appending slice. %1").arg(lastErrorText()), cl_logDEBUG1 );
 

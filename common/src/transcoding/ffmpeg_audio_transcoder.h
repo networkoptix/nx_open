@@ -17,7 +17,7 @@ public:
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
     virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
-    bool open(const QnMediaContextPtr& codecCtx);
+    bool open(const QnConstMediaContextPtr& context);
     bool isOpened() const;
     AVCodecContext* getCodecContext();
     virtual bool existMoreData() const override;
@@ -32,7 +32,7 @@ private:
     QnByteArray m_resampledData;
 
     qint64 m_lastTimestamp;
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     
     bool m_downmixAudio;
     int m_frameNum;

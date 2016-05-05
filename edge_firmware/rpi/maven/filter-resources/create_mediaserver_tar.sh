@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # SRC_DIR=../../
 
 
@@ -17,7 +19,9 @@
 #     fi
 #     echo "$h"
 # }
-TOOLCHAIN_PREFIX=/usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-
+
+TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
+TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -65,19 +69,16 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
+libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnxemail.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_streaming.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
-libQt5Concurrent.so.5.2.1 \
-libQt5Core.so.5.2.1 \
-libQt5Gui.so.5.2.1 \
-libQt5Multimedia.so.5.2.1 \
-libQt5Network.so.5.2.1 \
-libQt5Sql.so.5.2.1 \
-libQt5Xml.so.5.2.1 \
-libQt5XmlPatterns.so.5.2.1 \
 libsigar.so \
 libsasl2.so.3.0.0 \
 liblber-2.4.so.2.10.5 \
@@ -118,17 +119,25 @@ do
 done
 popd
 
+#copying qt libs
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+for var in $QTLIBS
+do
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+done
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 mkdir -p $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 cp $BINS_DIR/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+cp $BINS_DIR/external.dat $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 if [ ! -z "$STRIP" ]; then
   $TOOLCHAIN_PREFIX"objcopy" --only-keep-debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver $DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug
   $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver.debug $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
   $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/mediaserver
 fi
-
 
 #copying plugins
 if [ -e "$BINS_DIR/plugins" ]; then
@@ -155,9 +164,11 @@ cp -R ./opt $BUILD_DIR
 
 
 #additional platform specific files
-cp -R ./root $BUILD_DIR
-mkdir -p $BUILD_DIR/root/tools/nx
-cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
+    cp -R ./root $BUILD_DIR
+    mkdir -p $BUILD_DIR/root/tools/nx
+    cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
+fi
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
@@ -165,7 +176,8 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d

@@ -1,11 +1,12 @@
 #include "mobile_client_message_processor.h"
 
 #include <core/resource/resource.h>
+#include <core/resource/mobile_client_camera_factory.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
     base_type()
@@ -27,17 +28,16 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
     base_type::updateResource(resource);
 
     if (resource->getId() == qnCommon->remoteGUID())
-        updateMainServerApiUrl();
+        updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());
 }
 
-void QnMobileClientMessageProcessor::resetResources(const QnResourceList &resources) {
-    base_type::resetResources(resources);
-
-    updateMainServerApiUrl();
+QnResourceFactory* QnMobileClientMessageProcessor::getResourceFactory() const
+{
+    return QnMobileClientCameraFactory::instance();
 }
 
-void QnMobileClientMessageProcessor::updateMainServerApiUrl() {
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+void QnMobileClientMessageProcessor::updateMainServerApiUrl(const QnMediaServerResourcePtr& server)
+{
     if (!server)
         return;
 

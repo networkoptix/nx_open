@@ -8,6 +8,8 @@
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
+#include <boost/optional/optional.hpp>
+
 extern "C"
 {
     #include <libavformat/avformat.h>
@@ -17,9 +19,9 @@ extern "C"
 
 #include <core/ptz/item_dewarping_params.h>
 
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -27,6 +29,8 @@ extern "C"
 #include "utils/color_space/image_correction.h"
 #include "core/resource/resource_consumer.h"
 #include "transcoding/filters/filter_helper.h"
+
+#include <boost/optional.hpp>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;

@@ -1,6 +1,6 @@
 #include "mandatory.h"
 
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 bool defaultValidateFunction( const QString &text ) {
     return !text.trimmed().isEmpty();
@@ -10,7 +10,7 @@ void declareMandatoryField( QLabel* label, QLineEdit* lineEdit /* = nullptr*/, V
     if (!lineEdit)
         lineEdit = qobject_cast<QLineEdit*>(label->buddy());
 
-    Q_ASSERT_X(label && lineEdit, Q_FUNC_INFO, "Widgets must be set here");
+    NX_ASSERT(label && lineEdit, Q_FUNC_INFO, "Widgets must be set here");
     if (!label || !lineEdit)
         return;
 

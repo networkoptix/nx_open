@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "util.h"
+#include <nx/utils/log/assert.h>
 
 namespace
 {
@@ -21,7 +22,7 @@ namespace
     // @return Resulting text length
     int elideTextNode(QDomNode &node
         , int maxLength
-        , const QString &tail)
+        , const QString &/*tail*/)
     {
         auto textNode = node.toText();
         if (textNode.isNull())
@@ -447,17 +448,17 @@ QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseS
 {
     QStringList result = list;
     if (caseSensitive == Qt::CaseSensitive)
-        qSort(result.begin(), result.end(), [](const QString &left, const QString &right) {
+        std::sort(result.begin(), result.end(), [](const QString &left, const QString &right) {
             return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
         });
     else
-        qSort(result.begin(), result.end(), naturalStringLess);
+        std::sort(result.begin(), result.end(), naturalStringLess);
     return result;
 }
 
 void naturalStringCompareTestCase(const QString &l, const QString &r, int value) {
-    assert(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
-    assert(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
+    NX_ASSERT(qBound(-1, naturalStringCompare(l, r, Qt::CaseInsensitive), 1) == value);
+    NX_ASSERT(qBound(-1, naturalStringCompare(r, l, Qt::CaseInsensitive), 1) == -value);
 }
 
 void naturalStringCompareTest() {
@@ -514,6 +515,11 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
+QString makeHref(const QString &text, const QUrl &url)
+{
+    return lit("<a href=\"%2\">%1</a>").arg(text, url.toString());
+}
+
 QString elideHtml(const QString &html, int maxLength, const QString &tail)
 {
     QDomDocument dom;
@@ -521,4 +527,59 @@ QString elideHtml(const QString &html, int maxLength, const QString &tail)
     auto root = dom.documentElement();
     elideDomNode(root, maxLength, tail);
     return dom.toString();
+}
+
+QByteArray generateRandomName(int length)
+{
+    static const char kAlphaAndDigits[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    static const size_t kDigitsCount = 10;
+    static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
+
+    if (!length)
+        return QByteArray();
+
+    QByteArray str;
+    str.resize(length);
+    str[0] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
+    for (int i = 1; i < length; ++i)
+        str[i] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
+
+    return str;
+}
+
+QString bytesToString(uint64_t bytes, int precision)
+{
+    double number = static_cast<double>(bytes);
+    size_t suffix = 0;
+
+    while (number >= kByteSuffixLimit
+        && suffix <= kByteSuffexes.size())
+    {
+        number /= kByteSuffixLimit;
+        ++suffix;
+    }
+
+    if (suffix == 0)
+        return lm("%1").arg(number, 0, 'g', precision);
+
+    return lm("%1%2").arg(number, 0, 'g', precision).arg(
+        QChar::fromLatin1(kByteSuffexes[suffix - 1]));
+}
+
+uint64_t stringToBytes(const QString& str, bool* isOk)
+{
+    const auto subDouble = [&](double multi)
+    {
+        return static_cast<uint64_t>(
+            QStringRef(&str, 0, str.size() - 1).toDouble(isOk) * multi);
+    };
+
+    for (size_t i = 0; i < kByteSuffexes.size(); ++i)
+    {
+        if (str.endsWith(QChar::fromLatin1(kByteSuffexes[i]), Qt::CaseInsensitive))
+            return subDouble(std::pow(kByteSuffixLimit, static_cast<double>(i + 1)));
+    }
+
+    // NOTE: avoid double to be the most presice
+    return str.toULongLong(isOk);
 }

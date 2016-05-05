@@ -10,15 +10,15 @@
 #include <memory>
 #include <type_traits>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <onvif/stdsoap2.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
-#include <utils/network/socket.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/socket.h>
+#include <nx/network/http/httptypes.h>
 
 #include "soap_wrapper.h"
 
@@ -104,7 +104,7 @@ public:
             socket = std::move(m_socket);
         }
         if( socket )
-            socket->terminateAsyncIO( true );
+            socket->pleaseStopSync();
     }
 
     template<class GSoapAsyncCallWrapperType>
@@ -128,7 +128,7 @@ public:
         \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
     */
     template<class RequestType, class ResultHandler>
-    bool callAsync(RequestType&& request, ResultHandler&& resultHandler)
+    void callAsync(RequestType&& request, ResultHandler&& resultHandler)
     {
         m_state = init;
         m_extCompletionHandler = std::forward<ResultHandler>(resultHandler);
@@ -142,7 +142,7 @@ public:
 
         //NOTE not locking mutex because all public method calls are synchronized
             //by caller and no request interleaving is allowed
-        m_socket.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
+        m_socket = SocketFactory::createStreamSocket( false, SocketFactory::NatTraversalType::nttDisabled );
 
         m_syncWrapper->getProxy()->soap->user = this;
         m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
@@ -163,19 +163,20 @@ public:
         const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
 
         using namespace std::placeholders;
-        if( !m_socket->setSendTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
+        if (!m_socket->setSendTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
             !m_socket->setRecvTimeout(SOAP_SOCKET_TIMEOUT_MS) ||
-            !m_socket->setNonBlockingMode( true ) ||
-            !m_socket->connectAsync(
-                SocketAddress( endpoint.host(), endpoint.port( nx_http::DEFAULT_HTTP_PORT ) ),
-                std::bind( &GSoapAsyncCallWrapper::onConnectCompleted, this, _1 ) ) )
+            !m_socket->setNonBlockingMode(true))
         {
-            m_socket.reset();
-            m_extCompletionHandler = std::function<void(int)>();
-            return false;
+            m_socket->post(std::bind(
+                &GSoapAsyncCallWrapper::onConnectCompleted,
+                this,
+                SystemError::getLastOSErrorCode()));
+            return;
         }
 
-        return true;
+        m_socket->connectAsync(
+            SocketAddress(endpoint.host(), endpoint.port(nx_http::DEFAULT_HTTP_PORT)),
+            std::bind(&GSoapAsyncCallWrapper::onConnectCompleted, this, _1));
     }
 
     SyncWrapper* syncWrapper() const
@@ -226,27 +227,20 @@ private:
         //serializing request
         m_state = sendingRequest;
         (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
-        assert( !m_serializedRequest.isEmpty() );
+        NX_ASSERT( !m_serializedRequest.isEmpty() );
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         soap_destroy( m_syncWrapper->getProxy()->soap );
         soap_end(m_syncWrapper->getProxy()->soap);
 
-        {
-            QnMutexLocker lk( &m_mutex );
-            if( !m_socket )
-                return;
-            //sending request
-            using namespace std::placeholders;
-            if( !m_socket->sendAsync(
-                    m_serializedRequest,
-                    std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2)) )
-            {
-                m_state = done;
-                lk.unlock();
-                return m_resultHandler(SOAP_FAULT);
-            }
-        }
+        QnMutexLocker lk( &m_mutex );
+        if( !m_socket )
+            return;
+        //sending request
+        using namespace std::placeholders;
+        m_socket->sendAsync(
+            m_serializedRequest,
+            std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2));
     }
 
     void onRequestSent( SystemError::ErrorCode errorCode, size_t bytesSent )
@@ -257,7 +251,7 @@ private:
             return m_resultHandler( SOAP_FAULT );
         }
 
-        assert( bytesSent == m_serializedRequest.size() );
+        NX_ASSERT( bytesSent == (size_t)m_serializedRequest.size() );
         m_state = receivingResponse;
 
         m_responseBuffer.reserve( READ_BUF_SIZE );
@@ -267,14 +261,9 @@ private:
             if( !m_socket )
                 return;
             using namespace std::placeholders;
-            if( !m_socket->readSomeAsync(
-                    &m_responseBuffer,
-                    std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
-            {
-                m_state = done;
-                lk.unlock();
-                return m_resultHandler(SOAP_FAULT);
-            }
+            m_socket->readSomeAsync(
+                &m_responseBuffer,
+                std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2));
         }
     }
 
@@ -283,7 +272,7 @@ private:
         static const int MIN_SOCKET_READ_SIZE = 4096;
         static const int READ_BUFFER_GROW_STEP = 4096;
 
-        assert( m_state == receivingResponse );
+        NX_ASSERT( m_state == receivingResponse );
 
         if( errorCode || bytesRead == 0 )
         {
@@ -306,14 +295,9 @@ private:
             if( !m_socket )
                 return;
             using namespace std::placeholders;
-            if( !m_socket->readSomeAsync(
-                    &m_responseBuffer,
-                    std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
-            {
-                m_state = done;
-                lk.unlock();
-                return m_resultHandler(SOAP_FAULT);
-            }
+            m_socket->readSomeAsync(
+                &m_responseBuffer,
+                std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2));
         }
     }
 

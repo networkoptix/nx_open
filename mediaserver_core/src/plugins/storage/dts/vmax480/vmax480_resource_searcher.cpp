@@ -3,9 +3,9 @@
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/simple_http_client.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include <QtCore/QUrlQuery>
@@ -28,22 +28,9 @@ QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
 {
 }
 
-static QnPlVmax480ResourceSearcher* inst;
-
-void QnPlVmax480ResourceSearcher::initStaticInstance( QnPlVmax480ResourceSearcher* _instance )
-{
-    inst = _instance;
-}
-
-QnPlVmax480ResourceSearcher* QnPlVmax480ResourceSearcher::instance()
-{
-    return inst;
-}
-
-
 void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
-                                                const HostAddress& host, 
-                                                const UpnpDeviceInfo& devInfo,
+                                                const SocketAddress& deviceEndpoint,
+                                                const nx_upnp::DeviceInfo& devInfo,
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
@@ -61,7 +48,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         return;
     int channles = devInfo.modelName.mid( channelCountStartIndex, channelCountEndIndex-channelCountStartIndex ).toInt();
     QString name = QLatin1String("DW-VF") + QString::number(channles);  //DW-VF is a registered resource type
-    
+
     int apiPort = VMAX_API_PORT;
     int httpPort = QUrl(devInfo.presentationUrl).port(80);
 
@@ -77,7 +64,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     QMap<int, QByteArray> camNames;
     bool camNamesReaded = false;
 
-    QString groupName = QString(QLatin1String("VMAX %1")).arg(host.toString());
+    QString groupName = QString(QLatin1String("VMAX %1")).arg(deviceEndpoint.address.toString());
 
     for (int i = 0; i < channles; ++i)
     {
@@ -89,7 +76,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         bool needHttpData = true;
 
         QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
-        if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording)) 
+        if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording))
         {
             resource->setName(existsRes->getName());
             int existHttpPort = QUrlQuery(QUrl(existsRes->getUrl()).query()).queryItemValue(lit("http_port")).toInt();
@@ -98,11 +85,11 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
             // Prevent constant http pullig. But if http port is changed update api port as well.
             needHttpData = existHttpPort != httpPort;
         }
-        
+
         if (needHttpData)
         {
             if (!camNamesReaded) {
-                CLSimpleHTTPClient client(host.toString(), httpPort, TCP_TIMEOUT, QAuthenticator());
+                CLSimpleHTTPClient client(deviceEndpoint.address.toString(), httpPort, TCP_TIMEOUT, QAuthenticator());
                 if (vmaxAuthenticate(client, auth)) {
                     QByteArray descrPage = readDescriptionPage(client);
                     if (!descrPage.isEmpty()) {
@@ -121,11 +108,11 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         (resource.dynamicCast<QnPlVmax480Resource>())->setModel(name);
         resource->setMAC(mac);
 
-        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(host.toString()).arg(apiPort).arg(i+1).arg(httpPort));
+        resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(deviceEndpoint.address.toString()).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
         resource->setDefaultAuth(auth);
         resource->setGroupName(groupName);
-        QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host.toString()).arg(apiPort);
+        QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(deviceEndpoint.address.toString()).arg(apiPort);
         resource->setGroupId(groupId);
 
         result << resource;
@@ -199,7 +186,7 @@ int QnPlVmax480ResourceSearcher::getApiPort(const QByteArray& answer) const
 {
     int result = 0;
     int portIndex = answer.indexOf("param name=\\\"port\\\"");
-    if (portIndex > 0) 
+    if (portIndex > 0)
     {
         static const QByteArray VALUE_PATTERN("value=\\\"");
         int valIndex = answer.indexOf(VALUE_PATTERN, portIndex);
@@ -219,7 +206,7 @@ QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(const QByteArray&
     int pos = answer.indexOf(pattern1);
     while (pos >= 0) {
         int chNum = extractNum(answer, pos + pattern1.length());
-        if (chNum > 0) 
+        if (chNum > 0)
         {
             int valuePos = answer.indexOf(pattern2, pos);
             if (valuePos > 0) {

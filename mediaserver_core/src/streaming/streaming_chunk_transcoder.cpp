@@ -4,16 +4,16 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
-#include <utils/common/log.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/timer_manager.h>
 
 #include "ondemand_media_data_provider.h"
 #include "live_media_cache_reader.h"
@@ -72,7 +72,7 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
     }
 
     for( auto val: m_taskIDToTranscode )
-        TimerManager::instance()->joinAndDeleteTimer( val.first );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( val.first );
 
     std::for_each(
         m_transcodeThreads.begin(),
@@ -103,7 +103,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     auto camera = qnCameraPool->getVideoCamera( resource );
-    Q_ASSERT( camera );
+    NX_ASSERT( camera );
 
     //validating transcoding parameters
     if( !validateTranscodingParameters( transcodeParams ) )
@@ -170,7 +170,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 return false;
             }
 
-            QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(dp.data());
+            QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
             if( !archiveReader || !archiveReader->open() )
             {
                 NX_LOG( lit("StreamingChunkTranscoder::transcodeAsync. Failed (2) to create archive data provider (resource %1)").
@@ -215,7 +215,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         {
             //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS, scheduling transcoding on data availability
             pair<map<int, TranscodeContext>::iterator, bool> p = m_scheduledTranscodings.insert( make_pair( newTranscodingID, TranscodeContext() ) );
-            Q_ASSERT( p.second );
+            NX_ASSERT( p.second );
 
             p.first->second.mediaResource = cameraResource;
             p.first->second.dataSourceCtx = dataSourceCtx;
@@ -314,9 +314,9 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
     const int transcodeID,
     int delayMSec )
 {
-    const quint64 taskID = TimerManager::instance()->addTimer(
+    const quint64 taskID = nx::utils::TimerManager::instance()->addTimer(
         this,
-        delayMSec );
+        std::chrono::milliseconds(delayMSec));
 
     QnMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;
@@ -374,7 +374,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         }
         else
         {
-            assert( false );
+            NX_ASSERT( false );
             videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
         }
     }

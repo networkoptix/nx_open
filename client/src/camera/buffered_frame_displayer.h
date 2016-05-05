@@ -2,7 +2,7 @@
 #define QN_BUFFERED_FRAME_DISPLAYER_H
 
 #include <QtCore/QTime>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>

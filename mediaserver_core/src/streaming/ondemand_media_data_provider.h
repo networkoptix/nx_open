@@ -8,11 +8,11 @@
 #include <deque>
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
-#include <core/dataprovider/abstract_streamdataprovider.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 

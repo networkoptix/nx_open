@@ -41,7 +41,7 @@ QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QnModuleFinder *moduleFin
     m_clientMode(clientMode),
     m_moduleFinder(moduleFinder)
 {
-    Q_ASSERT(moduleFinder);
+    NX_ASSERT(moduleFinder);
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnDirectModuleFinderHelper::at_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnDirectModuleFinderHelper::at_resourceRemoved);
@@ -88,8 +88,8 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
     QnUrlSet additionalUrls;
     QnUrlSet ignoredUrls;
 
-    for (const QHostAddress &address: server->getNetAddrList()) {
-        QUrl url = makeUrl(address.toString(), port);
+    for (const auto &address: server->getNetAddrList()) {
+        QUrl url = makeUrl(address.address.toString(), address.port);
         urls.insert(url);
         addUrl(url, m_urls);
     }

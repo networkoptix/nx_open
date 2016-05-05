@@ -3,7 +3,7 @@
 
 #include <QtSql/QSqlDatabase>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 class QSqlDatabase;
 
@@ -42,16 +42,22 @@ public:
     QnDbHelper();
     virtual ~QnDbHelper();
 
-    bool execSQLFile(const QString& fileName, QSqlDatabase& database) const;
-    bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details) const;
-    bool execSQLQuery(QSqlQuery *query, const char* details) const;
-
     virtual QnDbTransaction* getTransaction() = 0;
-    //const QnDbTransaction* getTransaction() const;
 
     bool applyUpdates(const QString &dirName);
     virtual bool beforeInstallUpdate(const QString& updateName);
     virtual bool afterInstallUpdate(const QString& updateName);
+
+    static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);
+    /*!
+        \param scriptData SQL commands separated with ;
+    */
+    static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
+    //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
+    static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
+
+    static bool execSQLQuery(QSqlQuery *query, const char* details);
+    static bool prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details);
 
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);

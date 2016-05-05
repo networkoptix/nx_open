@@ -1,0 +1,98 @@
+
+@import '_theme_palette';
+@import '_theme_variables';
+
+@import '../../bower_components/sass-bootstrap/lib/bootstrap';
+
+@import '_theme_override';
+
+html {
+  position: relative;
+  height: 100%;
+}
+body {
+  margin-top:10px;
+}
+
+/* add beta-symbol after product name everywhere */
+.product-name.add-version:after{
+  content: "\03B2";
+  font-style: italic;
+  opacity: 0.5;
+  font-size: 90%;
+}
+
+
+.inline-block{
+  display: inline-block;
+}
+
+@mixin kill-glyphicon{
+  background-size: 176px 152px;
+  background-image: url('../images/native-theme/wizard_sprite.png');
+  &:before{
+    content:none;
+  }
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/native-theme/wizard_sprite@2x.png');
+  }
+}
+
+.master-success .preloader{
+
+  background-image: url('../images/native-theme/preloader.gif');
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/native-theme/preloader@2x.png');
+  }
+}
+
+
+
+.ui-select-bootstrap > .btn-default-focus{
+  box-shadow: none;
+  outline:none;
+  border-color: $input-border;
+  background-color: $dark10;
+}
+.ui-select-bootstrap > .btn-default-focus > .btn,
+.ui-select-bootstrap > .ui-select-match > .btn{
+  background-color: $input-bg;
+  border-color: $input-border;
+  color: $input-color;
+  font-weight: normal;
+  padding-left:8px;
+  padding-right:8px;
+}
+.ui-select-bootstrap .ui-select-choices-row>a{
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+/* touched, invalid - highlight with red */
+.ui-select-container.ng-invalid.ng-touched .btn{
+  border-color: $state-danger-text;
+}
+
+/* touched, but focused - not highlight with red */
+.ui-select-container > .btn-default-focus > .btn{
+  border-color: $input-border !important;
+}
+
+
+.ui-select-choices{
+  background-color: $light4 !important;
+  color:$dark4 !important;;
+}
+
+.ui-select-choices-row:hover {
+  background-color: $light2 !important;
+  color:$dark2 !important;
+}
+
+
+.ui-select-choices-row.active {
+  background-color: $brand_core !important;
+}
+

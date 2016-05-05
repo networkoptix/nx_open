@@ -495,7 +495,7 @@ void QnScheduleGridWidget::setCellRecordingType(const QPoint &cell, const Qn::Re
 
 void QnScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
 {
-    assert(isValidCell(cell));
+    NX_ASSERT(isValidCell(cell));
 
     setCellValueInternal(cell, m_defaultParams);
     update();
@@ -503,22 +503,22 @@ void QnScheduleGridWidget::updateCellValueInternal(const QPoint& cell)
 
 void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellParams &value) 
 {
-    assert(isValidCell(cell));
+    NX_ASSERT(isValidCell(cell));
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
-    if(qEqual(value, &value[ParamCount], localValue)) {
+    if(std::equal(value, &value[ParamCount], localValue)) {
         return;
     }
 
-    qCopy(value, &value[ParamCount], localValue);
+    std::copy(value, &value[ParamCount], localValue);
 
     emit cellValueChanged(cell);
 }
 
 void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, ParamType type, const QVariant &value) 
 {
-    assert(isValidCell(cell));
-    assert(type >= 0 && type < ParamCount);
+    NX_ASSERT(isValidCell(cell));
+    NX_ASSERT(type >= 0 && type < ParamCount);
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
     if(localValue[type] == value)

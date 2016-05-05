@@ -2,7 +2,7 @@
 
 #include <core/dataconsumer/audio_data_transmitter.h>
 #include <core/resource/security_cam_resource.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 
 class QnAxisAudioTransmitter : public QnAbstractAudioTransmitter
@@ -34,6 +34,6 @@ private:
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
     std::atomic<bool> m_connectionEstablished;
     bool m_canProcessData;
-    std::unique_ptr<TCPSocket> m_socket;
+    std::unique_ptr<nx::network::TCPSocket> m_socket;
     QnAudioFormat m_outputFormat;
 };

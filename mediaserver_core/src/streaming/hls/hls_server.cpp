@@ -18,10 +18,11 @@
 #include <core/resource/media_resource.h>
 
 #include <network/authenticate_helper.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <utils/media/av_codec_helper.h>
 #include <utils/media/media_stream_cache.h>
 #include <utils/common/app_info.h>
 
@@ -110,12 +111,12 @@ namespace nx_hls
                     break;
 
                 case sProcessingMessage:
-                    Q_ASSERT( false );
+                    NX_ASSERT( false );
                     break;
 
                 case sSending:
                 {
-                    Q_ASSERT( !m_writeBuffer.isEmpty() );
+                    NX_ASSERT( !m_writeBuffer.isEmpty() );
 
                     int bytesSent = 0;
                     if( m_useChunkedTransfer )
@@ -254,7 +255,7 @@ namespace nx_hls
         {
             //video is not in h.264 format
             NX_LOG( lit("Error. HLS request to resource %1 with codec %2").
-                arg(camResource->getUniqueId()).arg(codecIDToString(lastVideoFrame->compressionType)), cl_logWARNING );
+                arg(camResource->getUniqueId()).arg(QnAvCodecHelper::codecIdToString(lastVideoFrame->compressionType)), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
         }
 
@@ -346,7 +347,7 @@ namespace nx_hls
 
     bool QnHttpLiveStreamingProcessor::prepareDataToSend()
     {
-        Q_ASSERT( m_writeBuffer.isEmpty() );
+        NX_ASSERT( m_writeBuffer.isEmpty() );
 
         if( !m_chunkInputStream )
             return false;
@@ -442,7 +443,7 @@ namespace nx_hls
                 return result;
             if( !HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS ) )
             {
-                assert( false );
+                NX_ASSERT( false );
             }
         }
 
@@ -546,7 +547,7 @@ namespace nx_hls
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
-        Q_ASSERT( session );
+        NX_ASSERT( session );
 
         std::multimap<QString, QString>::const_iterator hiQualityIter = requestParams.find( StreamingParams::HI_QUALITY_PARAM_NAME );
         std::multimap<QString, QString>::const_iterator loQualityIter = requestParams.find( StreamingParams::LO_QUALITY_PARAM_NAME );
@@ -574,7 +575,7 @@ namespace nx_hls
         NX_LOG( lit("Prepared playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
         nx_hls::Playlist playlist;
-        assert( !chunkList.empty() );
+        NX_ASSERT( !chunkList.empty() );
         playlist.mediaSequence = chunkList[0].mediaSequence;
         playlist.closed = isPlaylistClosed;
 
@@ -886,7 +887,7 @@ namespace nx_hls
                     NX_LOG( lit("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
                     return nx_http::StatusCode::noContent;
                 }
-                assert( videoCamera->hlsLivePlaylistManager(quality) );
+                NX_ASSERT( videoCamera->hlsLivePlaylistManager(quality) );
                 newHlsSession->setPlaylistManager(
                     quality,
                     std::make_shared<nx_hls::HlsPlayListManagerWeakRefProxy>(
@@ -945,7 +946,7 @@ namespace nx_hls
             //estimating bitrate as we can
             QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High, 0);
             if( videoFrame )
-                bandwidth = videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
+                bandwidth = (int) videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
         }
         if( bandwidth == -1 )
             bandwidth = DEFAULT_PRIMARY_STREAM_BITRATE;

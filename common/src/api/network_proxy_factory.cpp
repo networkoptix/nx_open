@@ -39,7 +39,7 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
         url.setPort(proxy.port());
 
         if (!proxy.user().isEmpty()) {
-            Q_ASSERT( via );
+            NX_ASSERT( via );
             QUrlQuery urlQuery(url);
             auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
             urlQuery.addQueryItem(
@@ -56,7 +56,7 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
         return url;
     }
     default:
-        Q_ASSERT(0);
+        NX_ASSERT(0);
     }
 
     return baseUrl;
@@ -113,7 +113,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
 			id = server->getId();
         QnRoute route = QnRouter::instance()->routeTo(id);
         if (!route.gatewayId.isNull() || camera) {
-            Q_ASSERT(!route.addr.isNull() || route.reverseConnect);
+            NX_ASSERT(!route.addr.isNull() || route.reverseConnect);
 
             if (route.reverseConnect)
                 // reverse connection is not supported for a client

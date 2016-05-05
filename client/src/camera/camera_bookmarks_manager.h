@@ -6,7 +6,7 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 /** Singleton, used to create, update, delete, fetch and cache bookmarks. */
 class QnCameraBookmarksManager : public QObject, public Singleton<QnCameraBookmarksManager>

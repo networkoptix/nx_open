@@ -1,93 +1,110 @@
 #include "checkboxed_header_view.h"
 
-QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(int checkBoxColumn, QWidget *parent):
+#include <ui/style/helper.h>
+#include <utils/common/scoped_painter_rollback.h>
+
+QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(int checkBoxColumn, QWidget* parent):
     base_type(Qt::Horizontal, parent),
     m_checkBoxColumn(checkBoxColumn),
     m_checkState(Qt::Unchecked)
 {
+    setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     connect(this, &QnCheckBoxedHeaderView::sectionClicked, this, &QnCheckBoxedHeaderView::at_sectionClicked);
 }
 
-Qt::CheckState QnCheckBoxedHeaderView::checkState() const {
+Qt::CheckState QnCheckBoxedHeaderView::checkState() const
+{
     return m_checkState;
 }
 
-void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state) {
-    if (state == m_checkState)
-        return;
-    m_checkState = state;
-    emit checkStateChanged(state);
-    update();
+void QnCheckBoxedHeaderView::setCheckState(Qt::CheckState state)
+{
+    if (state != m_checkState)
+    {
+        m_checkState = state;
+        emit checkStateChanged(state);
+        update();
+    }
 }
 
-void QnCheckBoxedHeaderView::paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const {
+void QnCheckBoxedHeaderView::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const
+{
     base_type::paintSection(painter, rect, logicalIndex);
 
-    if (logicalIndex == m_checkBoxColumn) {
-        if (!rect.isValid())
-            return;
-        QStyleOptionButton opt;
-        opt.initFrom(this);
-
-        QStyle::State state = QStyle::State_Raised;
-        if (isEnabled())
-            state |= QStyle::State_Enabled;
-        if (window()->isActiveWindow())
-            state |= QStyle::State_Active;
-
-        switch(m_checkState) {
-        case Qt::Checked:
-            state |= QStyle::State_On;
-            break;
-        case Qt::Unchecked:
-            state |= QStyle::State_Off;
-            break;
-        default:
-            state |= QStyle::State_NoChange;
-            break;
-        }
-
-        opt.rect = rect.adjusted(4, 0, 0, 0);
-        opt.state |= state;
-        opt.text = QString();
-        style()->drawControl(QStyle::CE_CheckBox, &opt, painter, this);
+    if (logicalIndex != m_checkBoxColumn)
         return;
+
+    if (!rect.isValid())
+        return;
+
+    QStyleOptionViewItem opt;
+    opt.initFrom(this);
+    opt.displayAlignment = defaultAlignment();
+    opt.features = QStyleOptionViewItem::HasCheckIndicator;
+    opt.state |= QStyle::State_Raised;
+    opt.state &= ~QStyle::State_HasFocus;
+
+    if ((opt.state & QStyle::State_MouseOver) && (logicalIndexAt(mapFromGlobal(QCursor::pos())) != logicalIndex))
+        opt.state &= ~QStyle::State_MouseOver;
+
+    opt.rect = rect;
+    opt.rect = style()->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &opt, this);
+
+    switch(m_checkState)
+    {
+    case Qt::Checked:
+        opt.state |= QStyle::State_On;
+        break;
+    case Qt::Unchecked:
+        opt.state |= QStyle::State_Off;
+        break;
+    default:
+        opt.state |= QStyle::State_NoChange;
+        break;
     }
+
+    QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(rect));
+    style()->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &opt, painter, this);
 }
 
-QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const {
-    QSize size = base_type::sectionSizeFromContents(logicalIndex);
-    if (logicalIndex != m_checkBoxColumn)
-        return size;
-    size.setWidth(15);
-    return size;
-}
-
-void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
-    if (logicalIndex != m_checkBoxColumn)
-        return;
-    if (m_checkState != Qt::Checked)
-        setCheckState(Qt::Checked);
-    else
-        setCheckState(Qt::Unchecked);
-}
-
-void QnCheckBoxedHeaderView::mouseReleaseEvent(QMouseEvent *e)
+QSize QnCheckBoxedHeaderView::sectionSizeFromContents(int logicalIndex) const
 {
-    int pos = orientation() == Qt::Horizontal ? e->x() : e->y();
+    if (logicalIndex == m_checkBoxColumn)
+    {
+        QStyleOptionViewItem opt;
+        opt.initFrom(this);
+        opt.displayAlignment = defaultAlignment();
+        opt.features = QStyleOptionViewItem::HasCheckIndicator;
+        return style()->sizeFromContents(QStyle::CT_ItemViewItem, &opt, QSize(), this);
+    }
+
+    return base_type::sectionSizeFromContents(logicalIndex);
+}
+
+void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex)
+{
+    if (logicalIndex == m_checkBoxColumn)
+        setCheckState(m_checkState != Qt::Checked ? Qt::Checked : Qt::Unchecked);
+}
+
+void QnCheckBoxedHeaderView::mouseReleaseEvent(QMouseEvent* event)
+{
+    int pos = orientation() == Qt::Horizontal ? event->x() : event->y();
     int section = logicalIndexAt(pos);
-    if (section == 0) {
+    if (section == m_checkBoxColumn)
+    {
         emit sectionClicked(section);
     }
-    else {
-        base_type::mouseReleaseEvent(e);
+    else
+    {
+        base_type::mouseReleaseEvent(event);
     }
 }
 
-void QnCheckBoxedHeaderView::mousePressEvent(QMouseEvent *e)
+void QnCheckBoxedHeaderView::mousePressEvent(QMouseEvent* event)
 {
-    int pos = orientation() == Qt::Horizontal ? e->x() : e->y();
+    int pos = orientation() == Qt::Horizontal ? event->x() : event->y();
     int section = logicalIndexAt(pos);
-    if (section != 0)
-        base_type::mousePressEvent(e);
+    if (section != m_checkBoxColumn)
+        base_type::mousePressEvent(event);
 }

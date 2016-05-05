@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 
@@ -139,7 +139,7 @@ public:
     }
 
     DWORD checkError(const char *expression, DWORD status) const {
-        assert(expression);
+        NX_ASSERT(expression);
 
         if(status == ERROR_SUCCESS)
             return status;
@@ -186,7 +186,7 @@ public:
     }
 
     void readDiskCounterValues(PDH_HCOUNTER counter, QHash<int, HddItem> *items) {
-        assert(items);
+        NX_ASSERT(items);
         items->clear();
         
         DWORD bufferSize = 0, itemCount = 0;

@@ -25,6 +25,14 @@ function findRootChild(item, objectName) {
     return null
 }
 
+function isItemParentedBy(item, parent)
+{
+    var p = item.parent
+    while (p && p != parent)
+        p = p.parent
+    return p == parent
+}
+
 function isMobile() {
     return Qt.platform.os == "android" || Qt.platform.os == "ios" || Qt.platform.os == "winphone" || Qt.platform.os == "blackberry"
 }
@@ -34,7 +42,7 @@ function openDiscoveredSession(_host, _port, _systemName) {
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
-    stackView.setSlideTransition()
+    stackView.setScaleTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -52,7 +60,7 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
-    stackView.setSlideTransition()
+    stackView.setScaleTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -100,7 +108,7 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
                 state: "FailedSaved"
             }
         })
-        stackView.setSlideTransition()
+        stackView.setScaleTransition()
         stackView.push(pushList)
         item = stackView.get(stackView.depth - 1)
     } else {
@@ -132,7 +140,7 @@ function gotoNewSession() {
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
     if (item) {
-        stackView.setSlideTransition()
+        stackView.setScaleTransition()
         stackView.pop(item)
     } else {
         stackView.setInvertedSlideTransition()
@@ -181,19 +189,30 @@ function openSettings() {
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
-    stackView.setSlideTransition()
+    stackView.setScaleTransition()
     stackView.push(settingsPageComponent)
 }
 
-function backPressed() {
-    if (sideNavigation.open) {
+function backPressed()
+{
+    if (sideNavigation.open)
+    {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage") {
+    }
+    else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage")
+    {
         // First stack item is always resources page.
         return false
-    } else if (stackView.depth >= 2) {
+    }
+    else if (stackView.depth >= 2)
+    {
         gotoMainScreen()
+        return true
+    }
+    else if (liteMode)
+    {
+        gotoNewSession()
         return true
     }
 
@@ -204,8 +223,26 @@ function keyIsBack(key) {
     if (key === Qt.Key_Back)
         return true
 
-//    if (key === Qt.Key_Backspace)
-//        return true
+    if (liteMode)
+    {
+        if (key == Qt.Key_Escape)
+            return true
+    }
 
     return false
+}
+
+function focusNextItem(item, forward)
+{
+    if (forward == undefined)
+        forward = true
+
+    var next = item.nextItemInFocusChain(forward)
+    if (next)
+        next.forceActiveFocus()
+}
+
+function focusPrevItem(item)
+{
+    focusNextItem(item, false)
 }

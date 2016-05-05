@@ -1,6 +1,31 @@
 $icon-font-path: "../fonts/";
 
-@import 'sass-bootstrap/lib/_variables.scss';
+@import '../bower_components/sass-bootstrap/lib/_variables.scss';
+
+@mixin kill-glyphicon{
+  background-size: 176px 152px;
+  background-image: url('../images/icons/wizard_sprite.png');
+  &:before{
+    content:none;
+  }
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/wizard_sprite@2x.png');
+  }
+}
+
+
+.master-success .preloader{
+  background-image: url('../images/icons/preloader.gif');
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/preloader@2x.gif');
+  }
+}
+
+
+
+@import 'master';
 
 *{
   font-family: "Roboto";
@@ -135,9 +160,21 @@ body {
   top:0;
   padding-top:57px;
 }
-.scroll-container{
-  height:100%;
-  overflow:auto;
+
+@media screen and (min-height: $screen-sm-min) {
+  body.api-xml{
+    overflow: hidden;
+  }
+
+  .scroll-container {
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+code{
+  display:inline-block;
+  white-space: normal;
 }
 
 /* all links */
@@ -226,12 +263,6 @@ body {
 /* inactive icon for settings */
 .icon-inactive{
   color:silver;
-}
-
-/*inplace edit styles*/
-.inplace-edit{
-  display:inline-block;
-  margin-top:-3px;
 }
 
 .read-container{
@@ -434,4 +465,20 @@ span.danger{
 }
 .navbar-default{
   border:none;
+}
+
+.cloud-dialog-frame{
+  border: none;
+  width: 100%;
+  height: 400px;
+}
+
+
+.master .panel-footer {
+  min-height: 55px;
+}
+
+
+.modal-dialog.modal-sm{
+  width:450px;
 }

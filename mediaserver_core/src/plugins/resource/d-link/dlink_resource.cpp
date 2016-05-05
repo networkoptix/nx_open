@@ -2,7 +2,7 @@
 
 #include "dlink_resource.h"
 
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "dlink_stream_reader.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
@@ -68,7 +68,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
 {
     if (resolutions.size()==0)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
         return QSize(0,0);
     }
 
@@ -94,7 +94,7 @@ QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 
     if (possibleBitrates.size()==0)
     {
-        Q_ASSERT(false);
+        NX_ASSERT(false);
         return QByteArray();
     }
 
@@ -109,7 +109,7 @@ QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 // returns next up frame rate 
 int QnDlink_cam_info::frameRateCloseTo(int fr)
 {
-    Q_ASSERT(possibleFps.size()>0);
+    NX_ASSERT(possibleFps.size()>0);
 
     int result = possibleFps.at(0);
 
@@ -149,14 +149,16 @@ QnPlDlinkResource::QnPlDlinkResource()
     setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
+    QAuthenticator auth = getAuth();
+
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/common/info.cgi") );
 
     QString resourceMac = getMAC().toString();
@@ -192,7 +194,7 @@ bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
         completionHandler( false );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -314,14 +316,14 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     }
 
 
-    qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
-    qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
+    std::sort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), std::greater<int>());
+    std::sort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
     
     for (auto itr = profilesMap.begin(); itr != profilesMap.end(); ++itr) {
         itr.value().number = itr.key();
         m_camInfo.profiles << itr.value();
     }
-    qSort(m_camInfo.profiles.begin(), m_camInfo.profiles.end(), profileCompare);
+    std::sort(m_camInfo.profiles.begin(), m_camInfo.profiles.end(), profileCompare);
 
     // =======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)
@@ -363,8 +365,8 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
 static void setBitAt(int x, int y, unsigned char* data)
 {
-    Q_ASSERT(x<32);
-    Q_ASSERT(y<16);
+    NX_ASSERT(x<32);
+    NX_ASSERT(y<16);
 
     int offset = (y * 32 + x) / 8;
     data[offset] |= 0x01 << (x&7);

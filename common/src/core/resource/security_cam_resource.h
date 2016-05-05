@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QtGui/QRegion>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
 
@@ -259,8 +259,8 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-    bool isCameraInfoSavedToDisk(int pool) const;
-    void setCameraInfoSavedToDisk(int pool);
+    bool isCameraInfoSavedToDisk(const QString &storageUrl) const;
+    void setCameraInfoSavedToDisk(const QString &storageUrl);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAudioTransmitterPtr getAudioTransmitter();
@@ -361,7 +361,7 @@ private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 
-    mutable std::map<int, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
+    mutable std::map<QString, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 
 private slots:
     void resetCachedValues();

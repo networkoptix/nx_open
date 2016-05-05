@@ -6,6 +6,11 @@
 
 #include <utils/memory/abstract_allocator.h>
 
+/**
+ * Not less than FF_INPUT_BUFFER_PADDING_SIZE.
+ */
+#define QN_BYTE_ARRAY_PADDING 32
+
 class QByteArray;
 
 /**
@@ -75,7 +80,7 @@ public:
      */
     void uncheckedWrite( const char *data, unsigned int size );
     //{
-    //    Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    //    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
     //    memcpy(m_data + m_size, data, size);
     //    m_size += size;
     //}

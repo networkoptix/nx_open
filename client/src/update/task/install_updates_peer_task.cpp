@@ -14,7 +14,7 @@
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <utils/common/delete_later.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <network/router.h>
 
 namespace {
@@ -66,7 +66,7 @@ void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion &version) {
 }
 
 void QnInstallUpdatesPeerTask::finish(int errorCode, const QSet<QnUuid> &failedPeers) {
-    qnResPool->disconnect(this);
+    disconnect(qnResPool, nullptr, this, nullptr);
     m_ecConnection.reset();
     m_checkTimer->stop();
     m_serverByRequest.clear();
@@ -124,7 +124,7 @@ void QnInstallUpdatesPeerTask::doStart() {
     connect(progressTimer, &QTimer::timeout,  this, [this, peersSize] {
         int progress = (checkTimeout - m_checkTimer->remainingTime()) * 100 / checkTimeout;
         progress = qBound(0, progress, 100);
-        
+
         /* Count finished peers. */
         int totalProgress = (peersSize - m_pendingPeers.size()) * 100;
 
@@ -140,7 +140,7 @@ void QnInstallUpdatesPeerTask::doStart() {
 
             /* Count processing peers. */
             totalProgress += peerProgress;
-        }      
+        }
 
         emit progressChanged(totalProgress / peersSize);
     });
@@ -211,7 +211,7 @@ void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
     m_pingTimer->setInterval(pingInterval);
 
     if (!m_ecConnection)
-        m_ecConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(m_ecServer.data(), QnUuid(), true), &qnDeleteLater);
+        m_ecConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(m_ecServer, QnUuid(), true), &qnDeleteLater);
 
     m_ecConnection->modulesInformation(this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
 }

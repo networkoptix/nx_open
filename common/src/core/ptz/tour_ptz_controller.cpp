@@ -1,7 +1,7 @@
 #include "tour_ptz_controller.h"
 
 #include <QtCore/QMetaObject>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/serialization/json_functions.h>
 #include <utils/common/long_runnable.h>
@@ -19,8 +19,8 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController))
 {
-    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
         m_executor->moveToThread(qnPtzPool->executorThread()); 

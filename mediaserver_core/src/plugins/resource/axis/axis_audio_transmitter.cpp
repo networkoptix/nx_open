@@ -1,7 +1,10 @@
+
 #include "axis_audio_transmitter.h"
+
+#include <nx/network/http/httptypes.h>
+#include <nx/network/simple_http_client.h>
 #include <utils/common/sleep.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/simple_http_client.h>
+
 
 namespace
 {
@@ -49,7 +52,7 @@ QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
     m_resource(res),
     m_connectionEstablished(false),
     m_canProcessData(false),
-    m_socket(new TCPSocket())
+    m_socket(new nx::network::TCPSocket())
 {
 }
 
@@ -96,7 +99,8 @@ SocketAddress QnAxisAudioTransmitter::getSocketAddress() const
 
 QByteArray QnAxisAudioTransmitter::buildTransmitRequest() const
 {
-    auto  auth = m_resource->getAuth();
+    QAuthenticator auth = m_resource->getAuth();
+
     QByteArray transmitRequest;
     SocketAddress sockAddr = getSocketAddress();
 

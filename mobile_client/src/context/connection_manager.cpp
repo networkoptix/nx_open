@@ -117,6 +117,9 @@ void QnConnectionManager::disconnectFromServer(bool force) {
         return;
     }
 
+    if (d->connectionState == Disconnected || d->connectionState == Connecting)
+        return;
+
     d->doDisconnect(force);
 
     d->url = QUrl();
@@ -249,7 +252,7 @@ void QnConnectionManagerPrivate::doConnect() {
 
 void QnConnectionManagerPrivate::doDisconnect(bool force) {
     if (!force)
-        QnGlobalSettings::instance()->synchronizeNow();
+        qnGlobalSettings->synchronizeNow();
 
     disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
 

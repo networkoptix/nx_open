@@ -29,7 +29,7 @@ PlDroidStreamReader::PlDroidStreamReader(const QnResourcePtr& res):
     m_h264Parser(0),
     m_gotSDP(0)
 {
-    m_tcpSock.reset( SocketFactory::createStreamSocket() );
+    m_tcpSock = SocketFactory::createStreamSocket();
 
     m_droidRes = qSharedPointerDynamicCast<QnDroidResource>(res);
 
@@ -113,8 +113,8 @@ CameraDiagnostics::Result PlDroidStreamReader::openStreamInternal(bool isCameraC
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(m_resource->getUrl(), m_connectionPort);
     }
 
-    m_videoIoDevice = new RTPIODevice(&m_rtpSession, false);
-    m_audioIoDevice = new RTPIODevice(&m_rtpSession, false);
+    m_videoIoDevice = new QnRtspIoDevice(&m_rtpSession, false);
+    m_audioIoDevice = new QnRtspIoDevice(&m_rtpSession, false);
     m_h264Parser = new CLH264RtpParser();
 
     {

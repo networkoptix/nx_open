@@ -45,15 +45,15 @@ class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget {
 
     typedef QnStyledTooltipWidget base_type;
 public:
-    QnResourceBrowserToolTipWidget(QGraphicsItem *parent = 0);
+    QnResourceBrowserToolTipWidget(QGraphicsItem* parent = nullptr);
 
     /**
      * Set tooltip text.
      * \param text                      New text for this tool tip's label.
      * \reimp
      */
-    void setText(const QString &text);
-    void setPixmap(const QPixmap &pixmap);
+    void setText(const QString& text);
+    void setPixmap(const QPixmap& pixmap);
 
     void setThumbnailVisible(bool visible);
 
@@ -61,7 +61,7 @@ public:
     QnUuid resourceId() const;
 
     //reimp
-    void pointTo(const QPointF &pos);
+    void pointTo(const QPointF& pos);
     virtual void updateTailPos() override;
 
 signals:
@@ -86,7 +86,7 @@ public:
         TabCount
     };
 
-    QnResourceBrowserWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    QnResourceBrowserWidget(QWidget* parent = nullptr, QnWorkbenchContext* context = nullptr);
 
     virtual ~QnResourceBrowserWidget();
 
@@ -104,45 +104,46 @@ public:
 
     virtual Qn::ActionScope currentScope() const override;
 
-    QComboBox *typeComboBox() const;
+    QComboBox* typeComboBox() const;
 
     virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
-    void setToolTipParent(QGraphicsWidget *widget);
+    void setToolTipParent(QGraphicsWidget* widget);
 
 signals:
-    void activated(const QnResourcePtr &resource);
+    void activated(const QnResourcePtr& resource);
     void currentTabChanged();
     void selectionChanged();
 
 protected:
-    virtual void contextMenuEvent(QContextMenuEvent *) override;
-    virtual void wheelEvent(QWheelEvent *event) override;
-    virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual void keyReleaseEvent(QKeyEvent *event) override;
-    virtual void timerEvent(QTimerEvent *event) override;
+    virtual void contextMenuEvent(QContextMenuEvent* ) override;
+    virtual void wheelEvent(QWheelEvent* event) override;
+    virtual void mousePressEvent(QMouseEvent* event) override;
+    virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    virtual void keyReleaseEvent(QKeyEvent* event) override;
+    virtual void timerEvent(QTimerEvent* event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
-    virtual QString toolTipAt(const QPointF &pos) const override;
-    virtual bool showOwnTooltip(const QPointF &pos) override;
+    virtual QString toolTipAt(const QPointF& pos) const override;
+    virtual bool showOwnTooltip(const QPointF& pos) override;
 
-    QnResourceTreeWidget *currentTreeWidget() const;
-    QItemSelectionModel *currentSelectionModel() const;
-    QModelIndex itemIndexAt(const QPoint &pos) const;
+    QnResourceTreeWidget* currentTreeWidget() const;
+    QItemSelectionModel* currentSelectionModel() const;
+    QModelIndex itemIndexAt(const QPoint& pos) const;
 
-    bool isLayoutSearchable(QnWorkbenchLayout *layout) const;
-    QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
-    QnResourceSearchSynchronizer *layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const;
-    QString layoutFilter(QnWorkbenchLayout *layout) const;
-    void setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const;
+    bool isLayoutSearchable(QnWorkbenchLayout* layout) const;
+    QnResourceSearchProxyModel* layoutModel(QnWorkbenchLayout* layout, bool create) const;
+    QnResourceSearchSynchronizer* layoutSynchronizer(QnWorkbenchLayout* layout, bool create) const;
+    QString layoutFilter(QnWorkbenchLayout* layout) const;
+    void setLayoutFilter(QnWorkbenchLayout* layout, const QString& filter) const;
 
     void killSearchTimer();
-    void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
+    void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
 
-    void setupInitialModelCriteria(QnResourceSearchProxyModel *model) const;
+    void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
@@ -155,14 +156,14 @@ private slots:
 
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
-    
+
     void at_workbench_itemChanged(Qn::ItemRole role);
-    void at_layout_itemAdded(QnWorkbenchItem *item);
-    void at_layout_itemRemoved(QnWorkbenchItem *item);
+    void at_layout_itemAdded(QnWorkbenchItem* item);
+    void at_layout_itemRemoved(QnWorkbenchItem* item);
 
     void at_showUrlsInTree_changed();
 
-    void at_thumbnailReady(QnUuid resourceId, const QPixmap &pixmap);
+    void at_thumbnailReady(QnUuid resourceId, const QPixmap& pixmap);
     void at_thumbnailClicked();
 private:
     QScopedPointer<Ui::ResourceBrowserWidget> ui;
@@ -170,11 +171,11 @@ private:
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
-    QnResourcePoolModel *m_resourceModel;
+    QnResourcePoolModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
 
-    QnCameraThumbnailManager *m_thumbnailManager;
+    QnCameraThumbnailManager* m_thumbnailManager;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
 };

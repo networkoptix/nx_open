@@ -4,7 +4,7 @@
 
 #include <core/resource/resource.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 struct FffmpegLog
 {
@@ -12,7 +12,7 @@ struct FffmpegLog
     {
         Q_UNUSED(level)
             Q_UNUSED(ptr)
-            Q_ASSERT(fmt && "NULL Pointer");
+            NX_ASSERT(fmt && "NULL Pointer");
 
         if (!fmt) {
             return;
@@ -144,7 +144,7 @@ void QnDesktopStreamreader::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
     if (m_frame)
         av_free(m_frame);

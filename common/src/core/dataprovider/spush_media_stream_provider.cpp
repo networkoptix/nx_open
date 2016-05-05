@@ -4,8 +4,8 @@
 
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
-#include <utils/common/log.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/simple_http_client.h>
 
 #include <core/resource/camera_resource.h>
 
@@ -191,7 +191,7 @@ void CLServerPushStreamReader::run()
             {
                 if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
                 {
-                    Q_ASSERT(false);
+                    NX_ASSERT(false);
                     continue;
                 }
 
@@ -270,7 +270,7 @@ void CLServerPushStreamReader::pleaseReopenStream()
 
 void CLServerPushStreamReader::at_resourceChanged(const QnResourcePtr& res)
 {
-    Q_ASSERT_X(res == getResource(), Q_FUNC_INFO, "Make sure we are listening to correct resource");
+    NX_ASSERT(res == getResource(), Q_FUNC_INFO, "Make sure we are listening to correct resource");
     if (QnSecurityCamResourcePtr camera = res.dynamicCast<QnSecurityCamResource>()) {
         if (m_cameraAudioEnabled != camera->isAudioEnabled())
             pleaseReopenStream();

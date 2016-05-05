@@ -1,21 +1,26 @@
+
 #include "third_party_stream_reader.h"
 
 #ifdef ENABLE_THIRD_PARTY
 
 #include <algorithm>
+
 #include <QtCore/QTextStream>
 
-#include "core/datapacket/third_party_audio_data_packet.h"
-#include "core/datapacket/third_party_video_data_packet.h"
-#include "network/multicodec_rtp_reader.h"
-#include "plugins/plugin_tools.h"
-#include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/utils/log/log.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
-#include "utils/common/log.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/network/http/httptypes.h"
-#include "version.h"
-#include "utils/media/frame_type_extractor.h"
+#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <network/multicodec_rtp_reader.h>
+
+#include <utils/common/app_info.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/frame_type_extractor.h>
+
+#include "third_party_audio_data_packet.h"
+#include "third_party_video_data_packet.h"
+
 
 namespace
 {
@@ -23,7 +28,7 @@ namespace
     {
         CodecID codecId = packet->compressionType;
 
-        Q_ASSERT_X( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
 
         if( !packet || codecId != CODEC_ID_H264 )
             return false;
@@ -63,7 +68,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     m_cameraCapabilities( 0 )
 {
     m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
-    Q_ASSERT( m_thirdPartyRes );
+    NX_ASSERT( m_thirdPartyRes );
 
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
@@ -75,7 +80,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
     stop();
 }
 
-static int sensitivityToMask[10] = 
+static int sensitivityToMask[10] =
 {
     255, //  0
     26,
@@ -113,7 +118,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
             for( int y = rect.top(); y <= rect.bottom(); ++y )
                 for( int x = rect.left(); x <= rect.right(); ++x )
                 {
-                    assert( y < motionMask->width() && x < motionMask->height() );
+                    NX_ASSERT( y < motionMask->width() && x < motionMask->height() );
                     motionMask->setPixel( y, x, sensitivityToMask[sens] );
                     //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
                     //m_motionSensMask[x * MD_HEIGHT + y] = sens;
@@ -149,7 +154,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
-    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+    QAuthenticator auth = m_thirdPartyRes->getAuth();
+    m_camManager.setCredentials( auth.user(), auth.password() );
 
     m_mediaEncoder2.reset();
     m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
@@ -256,7 +262,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
-            rtspStreamReader->setUserAgent(lit(QN_PRODUCT_NAME));
+            rtspStreamReader->setUserAgent(QnAppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
@@ -319,7 +325,7 @@ void ThirdPartyStreamReader::pleaseStop()
     else if( m_builtinStreamReader )
     {
         QnStoppable* stoppable = dynamic_cast<QnStoppable*>(m_builtinStreamReader.get());
-        //TODO #ak preferred way to remove dynamic_cast from here and inherit QnAbstractMediaStreamProvider from QnStoppable. 
+        //TODO #ak preferred way to remove dynamic_cast from here and inherit QnAbstractMediaStreamProvider from QnStoppable.
             //But, this will require virtual inheritance since CLServerPushStreamReader (base of MJPEGStreamReader) indirectly inherits QnStoppable.
         if( stoppable )
             stoppable->pleaseStop();
@@ -532,7 +538,16 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                     {
                         //adding motion data
                         QnMetaDataV1Ptr motion( new QnMetaDataV1() );
-                        motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                        const nxcip::Picture& motionPicture = *srcMotionData;
+
+                        if( motionPicture.pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                        {
+                            NX_ASSERT( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
+                            NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
+
+                            motion->assign( motionPicture.data(), srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                        }
+
                         motion->timestamp = srcVideoPacket->timestamp();
                         motion->channelNumber = packet->channelNumber();
                         motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -558,7 +573,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             break;    //end of data
 
         default:
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             break;
     }
 
@@ -602,33 +617,35 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
 {
     const CodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
-    m_audioContext = QnMediaContextPtr( new QnMediaContext(ffmpegCodecId) );
+    const auto context = new QnAvCodecMediaContext(ffmpegCodecId);
+    m_audioContext = QnConstMediaContextPtr(context);
+    const auto av = context->getAvCodecContext();
 
     //filling mediaPacket->context
-    m_audioContext->ctx()->codec_id = ffmpegCodecId;
-    m_audioContext->ctx()->codec_type = AVMEDIA_TYPE_AUDIO;
+    av->codec_id = ffmpegCodecId;
+    av->codec_type = AVMEDIA_TYPE_AUDIO;
 
-    m_audioContext->ctx()->sample_rate = audioFormat.sampleRate;
-    m_audioContext->ctx()->bit_rate = audioFormat.bitrate;
+    av->sample_rate = audioFormat.sampleRate;
+    av->bit_rate = audioFormat.bitrate;
 
-    m_audioContext->ctx()->channels = audioFormat.channels;
+    av->channels = audioFormat.channels;
     //setByteOrder(QnAudioFormat::LittleEndian);
     switch( audioFormat.sampleFmt )
     {
         case nxcip::AudioFormat::stU8:
-            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_U8;
+            av->sample_fmt = AV_SAMPLE_FMT_U8;
             break;
         case nxcip::AudioFormat::stS16:
-            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_S16;
+            av->sample_fmt = AV_SAMPLE_FMT_S16;
             break;
         case nxcip::AudioFormat::stS32:
-            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_S32;
+            av->sample_fmt = AV_SAMPLE_FMT_S32;
             break;
         case nxcip::AudioFormat::stFLT:
-            m_audioContext->ctx()->sample_fmt = AV_SAMPLE_FMT_FLT;
+            av->sample_fmt = AV_SAMPLE_FMT_FLT;
             break;
         default:
-            assert( false );
+            NX_ASSERT( false );
     }
 
     //if (c->extradata_size > 0)
@@ -636,11 +653,11 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     //    extraData.resize(c->extradata_size);
     //    memcpy(&extraData[0], c->extradata, c->extradata_size);
     //}
-    m_audioContext->ctx()->channel_layout = audioFormat.channelLayout;
-    m_audioContext->ctx()->block_align = audioFormat.blockAlign;
-    m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
-    m_audioContext->ctx()->time_base.num = 1;
-    m_audioContext->ctx()->time_base.den = audioFormat.sampleRate;
+    av->channel_layout = audioFormat.channelLayout;
+    av->block_align = audioFormat.blockAlign;
+    av->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
+    av->time_base.num = 1;
+    av->time_base.den = audioFormat.sampleRate;
 
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }

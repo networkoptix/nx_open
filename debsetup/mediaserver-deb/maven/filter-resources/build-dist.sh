@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 COMPANY_NAME=${deb.customization.company.name}
 
 PACKAGENAME=${installer.name}-mediaserver
@@ -15,9 +17,9 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 BETA=""
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
+if [[ "${beta}" == "true" ]]; then
+  BETA="-beta"
+fi
 
 FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
 
@@ -51,16 +53,25 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 # Copy dbsync 2.2
-cp -r $SERVER_SHARE_PATH/dbsync-2.2 $SHARESTAGE
+cp -r ${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2 $SHARESTAGE
 cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
 cp -r $SERVER_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
-rm -f $LIBSTAGE/*.debug
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE
+cp -P ${qt.dir}/lib/libicu*.so* $LIBSTAGE
+
+#copying qt libs
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+for var in $QTLIBS
+do
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $LIBSTAGE
+done
 
 #cp -r $SERVER_SQLDRIVERS_PATH $BINSTAGE
 
@@ -86,6 +97,7 @@ chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,certgen}
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
 install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 
 # Copy mediaserver startup script
@@ -109,10 +121,7 @@ install -m 644 debian/templates $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
-cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
-cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
-cp -P $SERVER_LIB_PLUGIN_PATH/*.debug ${project.build.directory}
-tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
+
 (cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
 mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

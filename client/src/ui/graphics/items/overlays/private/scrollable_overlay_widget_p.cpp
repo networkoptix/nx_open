@@ -190,7 +190,7 @@ void QnScrollableOverlayWidgetPrivate::setMaxFillCoeff( const QSizeF &coeff ) {
     if (qFuzzyEquals(m_maxFillCoeff, coeff))
         return;
 
-    Q_ASSERT_X(qBetween(0.01, coeff.width(), 1.001) && qBetween(0.01, coeff.height(), 1.001), Q_FUNC_INFO, "Invalid values");
+    NX_ASSERT(qBetween(0.01, coeff.width(), 1.001) && qBetween(0.01, coeff.height(), 1.001), Q_FUNC_INFO, "Invalid values");
 
     m_maxFillCoeff = coeff;
 

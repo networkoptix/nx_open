@@ -7,7 +7,7 @@
 #include <network/tcp_connection_priv.h>
 #include <media_server/server_update_tool.h>
 #include <utils/update/update_utils.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <api/model/upload_update_reply.h>
 

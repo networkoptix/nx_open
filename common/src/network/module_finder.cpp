@@ -3,7 +3,8 @@
 #include <QtCore/QCryptographicHash>
 
 #include <api/global_settings.h>
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
+#include <nx/network/socket_global.h>
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
@@ -166,7 +167,7 @@ QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const
 std::chrono::milliseconds QnModuleFinder::pingTimeout() const
 {
     // ModuleFinder uses amplified timeout to fix possible temporary problems
-    // in QnMulticastModuleFinder (e.g. extend default timeouts 15 sec to 30 min)
+    // in QnMulticastModuleFinder (e.g. extend default timeouts 15 sec to 30 sec)
     return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout() * 2;
 }
 
@@ -280,29 +281,29 @@ Qn::ResourceStatus QnModuleFinder::moduleStaus(const QnUuid &id) const
     return m_moduleItemById.value(id).status;
 }
 
-void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address)
+void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &endpoint)
 {
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     if (moduleInformation.id == qnCommon->moduleGUID()) {
-        handleSelfResponse(moduleInformation, address);
+        handleSelfResponse(moduleInformation, endpoint);
         return;
     }
 
-    QnUuid oldId = m_idByAddress.value(address);
+    QnUuid oldId = m_idByAddress.value(endpoint);
     if (!oldId.isNull() && oldId != moduleInformation.id)
     {
         NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 since peer id mismatch (old %2, new %3)")
-            .arg(address.toString()).arg(oldId.toString()).arg(moduleInformation.id.toString()),
+            .arg(endpoint.toString()).arg(oldId.toString()).arg(moduleInformation.id.toString()),
             cl_logDEBUG1);
-        removeAddress(address, true, ignoredUrlsForServer(oldId));
+        removeAddress(endpoint, true, ignoredUrlsForServer(oldId));
     }
 
     bool ignoredAddress = false;
     QSet<QUrl> ignoredUrls = ignoredUrlsForServer(moduleInformation.id);
-    if (ignoredUrls.contains(addressToUrl(address.address, address.port)) ||
-        ignoredUrls.contains(addressToUrl(address.address)))
+    if (ignoredUrls.contains(addressToUrl(endpoint.address, endpoint.port)) ||
+        ignoredUrls.contains(addressToUrl(endpoint.address)))
     {
         ignoredAddress = true;
     }
@@ -346,42 +347,42 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             item.lastConflictResponse = currentTime;
 
             if (item.conflictResponseCount >= kNoticeableConflictCount && item.conflictResponseCount % kNoticeableConflictCount == 0) {
-                NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2")
-                       .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logWARNING);
+                NX_LOGX(lit("Server %1 conflict: %2")
+                       .arg(moduleInformation.id.toString()).arg(endpoint.toString()), cl_logWARNING);
             }
 
             return;
         }
 
-        item.primaryAddress = SocketAddress();
+        updatePrimaryAddress(item, SocketAddress());
 
         lk.unlock();
 
-        foreach (const SocketAddress &address, item.addresses)
+        foreach (const SocketAddress &endpoint, item.addresses)
         {
             NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to server conflict")
-                .arg(address.toString()), cl_logDEBUG1);
-            removeAddress(address, true);
+                .arg(endpoint.toString()), cl_logDEBUG1);
+            removeAddress(endpoint, true);
         }
     }
 
-    m_lastResponse[address] = currentTime;
+    m_lastResponse[endpoint] = currentTime;
 
     if (item.moduleInformation != moduleInformation) {
-        NX_LOG(lit("QnModuleFinder: Module %1 has been changed.").arg(moduleInformation.id.toString()), cl_logDEBUG2);
+        NX_LOGX(lit("Module %1 has been changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
         emit moduleChanged(moduleInformation);
 
         if (item.moduleInformation.port != moduleInformation.port) {
             QnMutexLocker lk(&m_itemsMutex);
-            item.primaryAddress = SocketAddress();
+            updatePrimaryAddress(item, SocketAddress());
             lk.unlock();
 
-            foreach (const SocketAddress &address, item.addresses) {
-                if (address.port == item.moduleInformation.port)
+            foreach (const SocketAddress &endpoint, item.addresses) {
+                if (endpoint.port == item.moduleInformation.port)
                 {
                     NX_LOG(lit("QnModuleFinder::at_responseReceived. Removing address %1 due to module information change")
-                        .arg(address.toString()), cl_logDEBUG1);
-                    removeAddress(address, true);
+                        .arg(endpoint.toString()), cl_logDEBUG1);
+                    removeAddress(endpoint, true);
                 }
             }
         }
@@ -389,8 +390,9 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         QnMutexLocker lk(&m_itemsMutex);
 
         item.moduleInformation = moduleInformation;
+
         if (item.primaryAddress.port == 0 && !ignoredAddress)
-            item.primaryAddress = address;
+            updatePrimaryAddress(item, endpoint);
 
         SocketAddress addressToSend = item.primaryAddress;
         item.status = calculateModuleStatus(item.moduleInformation, item.status);
@@ -401,7 +403,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         if (item.primaryAddress.port > 0)
             sendModuleInformation(moduleInformation, addressToSend, statusToSend);
         else
-            sendModuleInformation(moduleInformation, address, Qn::Offline);
+            sendModuleInformation(moduleInformation, endpoint, Qn::Offline);
     }
 
     lk.relock();
@@ -413,25 +415,30 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         return;
 
     int count = item.addresses.size();
-    item.addresses.insert(address);
-    m_idByAddress[address] = moduleInformation.id;
+    item.addresses.insert(endpoint);
+    m_idByAddress[endpoint] = moduleInformation.id;
+    const auto cloudModuleId = moduleInformation.cloudId();
+    if (!cloudModuleId.isEmpty() && endpoint.address.isResolved())
+        nx::network::SocketGlobals::addressResolver().addFixedAddress(
+            cloudModuleId, endpoint);
+
     if (count < item.addresses.size()) {
-        if (!ignoredAddress && isBetterAddress(address.address, item.primaryAddress.address)) {
-            item.primaryAddress = address;
+        if (!ignoredAddress && isBetterAddress(endpoint.address, item.primaryAddress.address)) {
+            updatePrimaryAddress(item, endpoint);
             Qn::ResourceStatus status = item.status;
 
             lk.unlock();
 
-            sendModuleInformation(moduleInformation, address, status);
+            sendModuleInformation(moduleInformation, endpoint, status);
         }
         else {
             lk.unlock();
         }
 
-        NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
-               .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
+        NX_LOGX(lit("New module URL: %1 %2")
+               .arg(moduleInformation.id.toString()).arg(endpoint.toString()), cl_logDEBUG1);
 
-        emit moduleAddressFound(moduleInformation, address);
+        emit moduleAddressFound(moduleInformation, endpoint);
     }
 }
 
@@ -460,7 +467,7 @@ void QnModuleFinder::at_timer_timeout()
 void QnModuleFinder::at_server_auxUrlsChanged(const QnResourcePtr &resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    Q_ASSERT_X(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
+    NX_ASSERT(!server.isNull(), Q_FUNC_INFO, "server resource is expected");
     if (!server)
         return;
 
@@ -494,8 +501,9 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
     bool alreadyLost = it->primaryAddress.isNull();
 
-    if (it->primaryAddress == address) {
-        it->primaryAddress = pickPrimaryAddress(it->addresses, ignoredUrls);
+    if (it->primaryAddress == address) 
+    {
+        updatePrimaryAddress(*it, pickPrimaryAddress(it->addresses, ignoredUrls));
         alreadyLost = it->primaryAddress.isNull();
 
         SocketAddress addressToSend = it->primaryAddress;
@@ -513,14 +521,17 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
         lk.unlock();
     }
 
-    NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
+    NX_LOGX(lit("Module URL lost: %1 %2:%3")
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
+
     emit moduleAddressLost(moduleInformation, address);
+    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+        moduleInformation.cloudId(), address);
 
     if (!it->addresses.isEmpty())
         return;
 
-    NX_LOG(lit("QnModuleFinder: Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+    NX_LOGX(lit("Module %1 is lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
 
     QnModuleInformation moduleInformationCopy = moduleInformation;
     SocketAddress primaryAddress = it->primaryAddress;
@@ -596,10 +607,20 @@ void QnModuleFinder::removeModule(const QnUuid &id)
         addresses.append(it->primaryAddress);
     }
 
-    for (const SocketAddress &address: addresses)
+    for (const SocketAddress &address : addresses)
     {
         NX_LOG(lit("QnModuleFinder::removeModule(%1). Removing address %2")
             .arg(id.toString()).arg(address.toString()), cl_logDEBUG1);
         removeAddress(address, false);
     }
+}
+
+void QnModuleFinder::updatePrimaryAddress(ModuleItem &item
+    , const SocketAddress &address)
+{
+    if (item.primaryAddress == address)
+        return;
+
+    item.primaryAddress = address;
+    emit modulePrimaryAddressChanged(item.moduleInformation, address);
 }

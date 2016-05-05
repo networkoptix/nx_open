@@ -1,4 +1,5 @@
 #include "recording_manager.h"
+
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
 #include <core/resource/storage_resource.h>
@@ -10,14 +11,14 @@
 #include "api/app_server_connection.h"
 #include "api/global_settings.h"
 #include "recording/stream_recorder.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include <business/business_event_rule.h>
@@ -34,6 +35,9 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
+
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
 static const qint64 UPDATE_CAMERA_HISTORY_PERIOD_MSEC = 60 * 1000;
@@ -149,7 +153,7 @@ Recorders QnRecordingManager::findRecorders(const QnResourcePtr& res) const
     return m_recordMap.value(res);
 }
 
-QnServerStreamRecorder* QnRecordingManager::createRecorder(const QnResourcePtr &res, const QnAbstractMediaStreamDataProviderPtr& reader, 
+QnServerStreamRecorder* QnRecordingManager::createRecorder(const QnResourcePtr &res, const QnAbstractMediaStreamDataProviderPtr& reader,
                                                            QnServer::ChunksCatalog catalog, const QnDualStreamingHelperPtr& dualStreamingHelper)
 {
     QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, catalog, reader.data());
@@ -189,7 +193,7 @@ bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& ca
         recorders.recorderHiRes->startForcedRecording(quality, fps, beforeThreshold, afterThreshold, maxDuration);
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->startForcedRecording(quality, fps, beforeThreshold, afterThreshold, maxDuration);
-    
+
     // start recorder threads
     startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
 
@@ -233,7 +237,7 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 }
 
 bool QnRecordingManager::startOrStopRecording(
-    const QnResourcePtr& res, const QnVideoCameraPtr& camera, 
+    const QnResourcePtr& res, const QnVideoCameraPtr& camera,
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
@@ -267,7 +271,7 @@ bool QnRecordingManager::startOrStopRecording(
             float currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().getFps() : 0;
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) && 
+            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) &&
                                     cameraRes->hasDualStreaming2() && providerLow;
             if (runSecondStream)
             {
@@ -288,7 +292,7 @@ bool QnRecordingManager::startOrStopRecording(
             }
         }
     }
-    else 
+    else
     {
         bool needStopHi = recorderHiRes && recorderHiRes->isRunning();
         bool needStopLow = recorderLowRes && recorderLowRes->isRunning();
@@ -378,11 +382,11 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
     //QnMutexLocker lock( &m_mutex );
 
     QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.constFind(camera); // && m_recordMap.value(camera).recorderHiRes->isRunning();
-    if (itr != m_recordMap.constEnd() && ownResource) 
+    if (itr != m_recordMap.constEnd() && ownResource)
     {
-        if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled()) 
+        if (itr->recorderHiRes && itr->recorderHiRes->isAudioPresent() != camera->isAudioEnabled())
             itr->recorderHiRes->setNeedReopen();
-        if (itr->recorderLowRes && itr->recorderLowRes->isAudioPresent() != camera->isAudioEnabled()) 
+        if (itr->recorderLowRes && itr->recorderLowRes->isAudioPresent() != camera->isAudioEnabled())
             itr->recorderLowRes->setNeedReopen();
     }
 }
@@ -397,7 +401,7 @@ void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &re
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
-    if (camera) 
+    if (camera)
     {
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
@@ -556,7 +560,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     QnCamLicenseUsageHelper helper;
 
     QStringList disabledCameras;
-    
+
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnVirtualCameraResourceList& ownCameras = getLocalControlledCameras();
     for(const QnVirtualCameraResourcePtr& camera: ownCameras)
@@ -569,7 +573,12 @@ void QnRecordingManager::at_licenseMutexLocked()
             camera->setScheduleDisabled(true);
             QList<QnUuid> idList;
             idList << camera->getId();
-            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributePool::instance()->getAttributesList(idList));
+
+            QnCameraUserAttributesList userAttributes = QnCameraUserAttributePool::instance()->getAttributesList(idList);
+            ec2::ApiCameraAttributesDataList apiAttributes;
+            fromResourceListToApi(userAttributes, apiAttributes);
+
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(apiAttributes);
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
@@ -588,7 +597,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
         //TODO: #gdm move (de)serializing of encoded reason params to common place
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras.join(L';')); 
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras.join(L';'));
     }
 }
 
@@ -634,7 +643,7 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
 
         archiveReader->setArchiveDelegate(del);
         return archiveReader;
-        
+
     }
     else  if (role == Qn::CR_Archive)
     {

@@ -13,11 +13,11 @@
 
 #include <QtCore/QObject>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include "functor_proxy_helper.h"
-#include "singleton.h"
+#include <nx/utils/singleton.h>
 
 
 namespace Qn

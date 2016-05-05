@@ -5,9 +5,9 @@
 #include "pluginusagewatcher.h"
 
 #include <QtCore/QDateTime>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 static const size_t SHARED_MEMORY_SIZE = 16*1024;
@@ -184,7 +184,7 @@ void PluginUsageWatcher::run()
 
 bool PluginUsageWatcher::lockSharedMemory()
 {
-    Q_ASSERT( !m_sharedMemoryLocked );
+    NX_ASSERT( !m_sharedMemoryLocked );
     m_sharedMemoryLocked = m_sharedMemoryLocker.lock();
     if( !m_sharedMemoryLocked )
     {
@@ -196,7 +196,7 @@ bool PluginUsageWatcher::lockSharedMemory()
 
 bool PluginUsageWatcher::unlockSharedMemory()
 {
-    Q_ASSERT( m_sharedMemoryLocked );
+    NX_ASSERT( m_sharedMemoryLocked );
     m_sharedMemoryLocked = !m_sharedMemoryLocker.unlock();
     if( m_sharedMemoryLocked )
     {
@@ -231,19 +231,19 @@ UsageRecord PluginUsageWatcher::currentUsage() const
         ++it )
     {
         unsigned int framePictureSize = 0;
-        if( (*it)->getTypedVal( DecoderParameter::framePictureSize, &framePictureSize ) )
+        if( (*it)->get( DecoderParameter::framePictureSize, &framePictureSize ) )
             rec.framePictureSize += framePictureSize;
 
         double fps = 0;
-        if( (*it)->getTypedVal( DecoderParameter::fps, &fps ) )
+        if( (*it)->get( DecoderParameter::fps, &fps ) )
             rec.fps += fps;
 
         quint64 pixelsPerSecond = 0;
-        if( (*it)->getTypedVal( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
+        if( (*it)->get( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
             rec.pixelsPerSecond += pixelsPerSecond;
 
         quint64 videoMemoryUsage = 0;
-        if( (*it)->getTypedVal( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
+        if( (*it)->get( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
             rec.videoMemoryUsage += videoMemoryUsage;
     }
     rec.simultaneousStreamCount = static_cast<quint32>(m_currentSessions.size());

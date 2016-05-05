@@ -7,7 +7,7 @@
 
 #include <common/common_globals.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include "camera_bookmark_fwd.h"
 

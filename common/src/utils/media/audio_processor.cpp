@@ -65,7 +65,7 @@ int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
     else if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 || ctx->sample_fmt == AV_SAMPLE_FMT_FLT)
         down_mix_to_stereo<qint32>((qint32*)data, ctx->channels, size);
     else
-        Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
+        NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
 
     return size / ctx->channels * 2;
 }
@@ -83,7 +83,7 @@ QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFor
             down_mix_to_stereo<qint32>((qint32*)(audio.data()), format.channelCount(), audio.size());
         else
         {
-            Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
+            NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
         }
         audio.resize(audio.size() / format.channelCount() * 2);
         format.setChannelCount(2);
@@ -93,7 +93,7 @@ QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFor
 
 QnCodecAudioFormat QnAudioProcessor::float2int16(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+    NX_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
     qint32* inP = (qint32*)(audio.data());
     qint16* outP = (qint16*)inP;
@@ -114,7 +114,7 @@ QnCodecAudioFormat QnAudioProcessor::float2int16(QnByteArray& audio, QnCodecAudi
 
 QnCodecAudioFormat QnAudioProcessor::int32Toint16(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+    NX_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
     qint32* inP = (qint32*)(audio.data());
     qint16* outP = (qint16*)inP;
@@ -134,7 +134,7 @@ QnCodecAudioFormat QnAudioProcessor::int32Toint16(QnByteArray& audio, QnCodecAud
 
 QnCodecAudioFormat QnAudioProcessor::float2int32(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+    NX_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
     qint32* inP = (qint32*)(audio.data());
     int len = audio.size()/4;

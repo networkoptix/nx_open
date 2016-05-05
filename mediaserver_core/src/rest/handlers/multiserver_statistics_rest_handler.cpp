@@ -4,7 +4,7 @@
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <api/helpers/empty_request_data.h>
 #include <api/helpers/send_statistics_request_data.h>
 #include <rest/helpers/request_context.h>
@@ -388,7 +388,7 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &request.metricsList);
 
-    Q_ASSERT_X(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
+    NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
     if (!correctJson)
         return nx_http::StatusCode::invalidParameter;
 

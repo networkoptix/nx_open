@@ -33,12 +33,12 @@ QnAbstractStatisticsSettingsLoader::~QnAbstractStatisticsSettingsLoader()
 
 QnStatisticsSettings QnAbstractStatisticsSettingsLoader::settings()
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual method called!");
+    NX_ASSERT(false, Q_FUNC_INFO, "Pure virtual method called!");
     return QnStatisticsSettings();
 }
 
 bool QnAbstractStatisticsSettingsLoader::settingsAvailable()
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "Pure virtual method called!");
+    NX_ASSERT(false, Q_FUNC_INFO, "Pure virtual method called!");
     return false;
 }

@@ -86,7 +86,8 @@
         "text" :            "window.text",
         "subText" :         "palette.contrast.color_2",
         "separator" :       "palette.base.color_4",
-        "disabledText" :    "palette.base.color_17"
+        "disabledText" :    "palette.base.color_17",
+        "selectionBorder" : "palette.contrast.color_5"
     },
 
     "sessionItem" : {
@@ -163,6 +164,7 @@
         "playPauseBackground" : "#32171c1f",
         "navigationPanelBackground" : "palette.base.color_3",
         "offlineDimmer" :       "#cc171c1f",
-        "cameraStatus" :        "palette.base.color_13"
+        "cameraStatus" :        "palette.base.color_13",
+        "versionText" :         "palette.base.color_15"
     }
 }

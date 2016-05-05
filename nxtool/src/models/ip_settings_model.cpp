@@ -4,8 +4,9 @@
 #include <functional>
 
 #include <base/types.h>
-#include <base/selection.h>
 #include <helpers/model_change_helper.h>
+
+namespace api = nx::mediaserver::api;
 
 namespace
 {
@@ -80,7 +81,7 @@ bool rtu::IpSettingsModel::Impl::isSingleSelection() const
     return m_isSingleSelection;
 }
 
-const rtu::InterfaceInfoList &rtu::IpSettingsModel::Impl::interfaces() const
+const api::InterfaceInfoList &rtu::IpSettingsModel::Impl::interfaces() const
 {
     return m_addresses;
 }
@@ -100,7 +101,7 @@ QVariant rtu::IpSettingsModel::Impl::data(const QModelIndex &index
         return QVariant();
     }
     
-    const InterfaceInfo &info = m_addresses.at(row);
+    const api::InterfaceInfo &info = m_addresses.at(row);
     switch(role)
     {
     case kAdapterNameRoleId:
@@ -142,7 +143,7 @@ bool rtu::IpSettingsModel::isSingleSelection() const
     return m_impl->isSingleSelection();
 }
 
-const rtu::InterfaceInfoList &rtu::IpSettingsModel::interfaces() const
+const api::InterfaceInfoList &rtu::IpSettingsModel::interfaces() const
 {
     return m_impl->interfaces();
 }

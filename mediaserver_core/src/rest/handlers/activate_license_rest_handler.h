@@ -3,7 +3,7 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <utils/common/model_functions_fwd.h>
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 
 class QnActivateLicenseRestHandler: public QnJsonRestHandler {
     Q_OBJECT

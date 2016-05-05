@@ -1,14 +1,13 @@
 #ifndef NX_H264_UTILS_H
 #define NX_H264_UTILS_H
 
-#ifdef ENABLE_DATA_PROVIDERS
 
 #include <map>
 
 #include <QtCore/QSize>
 #include <QtCore/QString>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 
 /*!
@@ -16,10 +15,8 @@
     Those are suitable for SDP
 */
 void extractSpsPps(
-    const QnCompressedVideoDataPtr& videoData,
+    const QnConstCompressedVideoDataPtr& videoData,
     QSize* const newResolution,
     std::map<QString, QString>* const customStreamParams);
-
-#endif
 
 #endif  //NX_H264_UTILS_H

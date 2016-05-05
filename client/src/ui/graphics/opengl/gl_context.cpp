@@ -11,7 +11,7 @@
 
 #include <QtOpenGL/QGLContext>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #ifdef Q_OS_LINUX
 #include <QtX11Extras/QX11Info>
@@ -53,7 +53,7 @@ GLContext::GLContext( const QGLWidget* shareWidget )
 GLContext::~GLContext()
 {
 #ifdef Q_OS_WIN
-    Q_ASSERT( IsWindow(widToHwnd(m_winID)) );
+    NX_ASSERT( IsWindow(widToHwnd(m_winID)) );
 
     if( m_handle != NULL )
     {
@@ -88,7 +88,7 @@ bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
     }
     else
     {
-        Q_ASSERT( IsWindow( widToHwnd(m_winID) ) );
+        NX_ASSERT( IsWindow( widToHwnd(m_winID) ) );
         m_dc = GetDC( widToHwnd(m_winID) );
     }
     BOOL res = wglMakeCurrent( m_dc, m_handle );
@@ -226,7 +226,7 @@ void GLContext::initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith 
     m_winID = m_widget->winId();
 
 #ifdef Q_OS_WIN
-    Q_ASSERT( IsWindow( widToHwnd(m_winID) ) );
+    NX_ASSERT( IsWindow( widToHwnd(m_winID) ) );
 
     HDC dc = GetDC( widToHwnd(m_winID) );
     //reading pixel format of src window

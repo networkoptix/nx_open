@@ -4,7 +4,7 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QSettings>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtGui/QColor>
 
 #include <utils/serialization/json_functions.h>
@@ -320,7 +320,7 @@ void QnPropertyStorage::unlock() const {
 }
 
 void QnPropertyStorage::notify(int id) const {
-    assert(m_lockDepth > 0);
+    NX_ASSERT(m_lockDepth > 0);
 
     m_pendingNotifications.insert(id);
 }

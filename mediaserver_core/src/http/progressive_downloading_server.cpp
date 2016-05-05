@@ -8,7 +8,7 @@
 
 #include <server/server_globals.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
@@ -18,10 +18,10 @@
 #include <network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
+#include "nx/streaming/abstract_data_consumer.h"
 #include "core/resource/camera_resource.h"
 
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 
 #include "transcoding/transcoder.h"
@@ -89,7 +89,7 @@ public:
 
     void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
-        CLDataQueue tmpQueue(20);
+        QnDataPacketQueue tmpQueue(20);
         camera->copyLastGop(true, 0, tmpQueue, 0);
 
         if (tmpQueue.size() > 0)
@@ -388,9 +388,9 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
         nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
-        d->killTimerID = TimerManager::instance()->addTimer(
+        d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
             this,
-            sessionLiveTimeoutSec*MS_PER_SEC );
+            std::chrono::milliseconds(sessionLiveTimeoutSec*MS_PER_SEC));
 
     setObjectName( "QnProgressiveDownloadingConsumer" );
 }
@@ -410,7 +410,7 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
         d->killTimerID = 0;
     }
     if( killTimerID )
-        TimerManager::instance()->joinAndDeleteTimer( killTimerID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( killTimerID );
 
     stop();
 }

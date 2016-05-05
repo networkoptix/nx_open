@@ -3,7 +3,6 @@
 
 #include <QtCore/QUrl>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QMessageBox>
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
@@ -11,7 +10,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <ui/common/ui_resource_name.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/actions/action_manager.h>
@@ -150,8 +149,8 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 }
 
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
-    Q_ASSERT(context()->user()->isAdmin());
-    if (!context()->user()->isAdmin())
+    NX_ASSERT(context()->user()->isOwner());
+    if (!context()->user()->isOwner())
         return;
 
     m_discoverer.clear();
@@ -292,6 +291,12 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         case QnMergeSystemsTool::SafeModeError:
             message = tr("System is in safe mode.");
             break;
+        case QnMergeSystemsTool::ConfigurationError:
+            message = tr("Cloud not configure remote system");
+            break;
+        case QnMergeSystemsTool::BothSystemsBoundToCloudError:
+            message = tr("Both systems are bound to the cloud");
+            break;
         default:
             break;
         }
@@ -299,7 +304,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         if (!message.isEmpty())
             message.prepend(lit("\n"));
 
-        QMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+        QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
 
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 

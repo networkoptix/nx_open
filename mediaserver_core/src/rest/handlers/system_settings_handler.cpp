@@ -8,7 +8,7 @@
 #include <api/global_settings.h>
 #include <api/resource_property_adaptor.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 class QnSystemSettingsReply

@@ -5,8 +5,6 @@
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QPushButton>
 
-#include <camera/camera_thumbnail_manager.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
@@ -23,16 +21,18 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-namespace {
-    class QnColoringProxyModel: public QIdentityProxyModel {
+namespace
+{
+    class QnColoringProxyModel: public QIdentityProxyModel
+    {
     public:
         QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject *parent = 0):
             QIdentityProxyModel(parent),
             m_delegate(delegate)
-        {
-        }
+        {}
 
-        QVariant data(const QModelIndex &proxyIndex, int role) const override {
+        QVariant data(const QModelIndex &proxyIndex, int role) const override
+        {
             if (role == Qt::TextColorRole && m_delegate && !m_delegate->isValid(resource(proxyIndex)))
                 return QBrush(QColor(qnGlobals->errorTextColor()));
             return QIdentityProxyModel::data(proxyIndex, role);
@@ -52,36 +52,18 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
     base_type(parent),
+    ui(new Ui::ResourceSelectionDialog),
     m_resourceModel(NULL),
     m_delegate(NULL),
-    m_thumbnailManager(NULL),
     m_target(target),
-    m_screenshotIndex(0),
     m_updating(false)
 {
-    init();
-}
-
-QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
-    base_type(parent),
-    m_resourceModel(NULL),
-    m_delegate(NULL),
-    m_thumbnailManager(NULL),
-    m_target(CameraResourceTarget),
-    m_screenshotIndex(0),
-    m_updating(false)
-{
-    init();
-}
-
-void QnResourceSelectionDialog::init() {
-
-    ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
-    switch (m_target) {
+    switch (m_target)
+    {
     case UserResourceTarget:
         setWindowTitle(tr("Select Users..."));
         ui->detailsWidget->hide();
@@ -104,8 +86,12 @@ void QnResourceSelectionDialog::init() {
 }
 
 
-void QnResourceSelectionDialog::initModel() {
+QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent) :
+    QnResourceSelectionDialog(CameraResourceTarget, parent)
+{}
 
+void QnResourceSelectionDialog::initModel()
+{
     QnResourcePoolModel::Scope scope;
 
     switch (m_target) {
@@ -138,11 +124,9 @@ void QnResourceSelectionDialog::initModel() {
 
     ui->delegateFrame->setVisible(false);
 
-    if (m_target == CameraResourceTarget) {
+    if (m_target == CameraResourceTarget)
+    {
         connect(ui->resourcesWidget->treeView(), &QAbstractItemView::entered, this, &QnResourceSelectionDialog::updateThumbnail);
-        m_thumbnailManager = new QnCameraThumbnailManager(this);
-        m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->contentSize());
-        connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnResourceSelectionDialog::at_thumbnailReady);
         updateThumbnail(QModelIndex());
     }
 
@@ -152,11 +136,13 @@ void QnResourceSelectionDialog::initModel() {
 QnResourceSelectionDialog::~QnResourceSelectionDialog() {}
 
 
-QnResourceList QnResourceSelectionDialog::selectedResources() const {
+QnResourceList QnResourceSelectionDialog::selectedResources() const
+{
     return selectedResourcesInner();
 }
 
-void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selected) {
+void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selected)
+{
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         setSelectedResourcesInner(selected);
@@ -164,7 +150,8 @@ void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selec
     at_resourceModel_dataChanged();
 }
 
-QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelIndex &parent) const {
+QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelIndex &parent) const
+{
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(parent); ++i){
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
@@ -172,7 +159,7 @@ QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelInd
             result.append(selectedResourcesInner(idx));
 
         QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
-        bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         if (!checked)
             continue;
 
@@ -186,7 +173,8 @@ QnResourceList QnResourceSelectionDialog::selectedResourcesInner(const QModelInd
     return result;
 }
 
-int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent) {
+int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent)
+{
     int count = 0;
     for (int i = 0; i < m_resourceModel->rowCount(parent); ++i) {
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
@@ -211,16 +199,19 @@ int QnResourceSelectionDialog::setSelectedResourcesInner(const QnResourceList &s
     return count;
 }
 
-void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
         event->ignore();
         return;
     }
     base_type::keyPressEvent(event);
 }
 
-void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {
-    Q_ASSERT(!m_delegate);
+void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate)
+{
+    NX_ASSERT(!m_delegate);
     m_delegate = delegate;
     if (m_delegate) {
         m_delegate->init(ui->delegateFrame);
@@ -239,11 +230,13 @@ void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *d
     at_resourceModel_dataChanged();
 }
 
-QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() const {
+QnResourceSelectionDialogDelegate* QnResourceSelectionDialog::delegate() const
+{
     return m_delegate;
 }
 
-QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const {
+QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const
+{
     QAbstractItemView *treeView = ui->resourcesWidget->treeView();
     if(!treeView->model())
         return QModelIndex();
@@ -251,7 +244,8 @@ QModelIndex QnResourceSelectionDialog::itemIndexAt(const QPoint &pos) const {
     return treeView->indexAt(childPos);
 }
 
-void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
+void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index)
+{
     QModelIndex baseIndex = index.column() == Qn::NameColumn
         ? index
         : index.sibling(index.row(), Qn::NameColumn);
@@ -262,29 +256,18 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        m_tooltipResourceId = camera->getId();
-        m_thumbnailManager->selectResource(camera);
-        ui->screenshotWidget->show();
+        ui->previewWidget->setTargetResource(camera->getId());
+        ui->previewWidget->show();
     }
     else
     {
-        ui->screenshotWidget->hide();
+        ui->previewWidget->hide();
     }
 }
 
-void QnResourceSelectionDialog::at_resourceModel_dataChanged() {
+void QnResourceSelectionDialog::at_resourceModel_dataChanged()
+{
     if (m_updating)
         return;
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_delegate || m_delegate->validate(selectedResources()));
-}
-
-void QnResourceSelectionDialog::at_thumbnailReady(QnUuid resourceId, const QPixmap &thumbnail) {
-    if (m_tooltipResourceId != resourceId)
-        return;
-    m_screenshotIndex = 1 - m_screenshotIndex;
-    if (m_screenshotIndex == 0)
-        ui->screenshotLabel->setPixmap(thumbnail);
-    else
-        ui->screenshotLabel_2->setPixmap(thumbnail);
-    ui->screenshotWidget->setCurrentIndex(m_screenshotIndex);
 }

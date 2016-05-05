@@ -3,8 +3,10 @@
 //
 #include <utils/common/app_info.h>
 
-//unused variable, why was in required?
-#define QN_BUILDENV_PATH                "${environment.dir}"
+int QnAppInfo::ec2ProtoVersion()
+{
+    return ${nxec.ec2ProtoVersion};
+}
 
 QString QnAppInfo::organizationName() {
     return QStringLiteral("${company.name}");
@@ -15,7 +17,7 @@ QString QnAppInfo::linuxOrganizationName() {
 }
 
 QString QnAppInfo::realm() {
-    return QStringLiteral("${deb.customization.company.name}");
+    return QStringLiteral("VMS");
 }
 
 QString QnAppInfo::applicationVersion() {
@@ -154,6 +156,14 @@ QString QnAppInfo::helpUrl() {
 
 QString QnAppInfo::updateGeneratorUrl() {
     return QStringLiteral("${update.generator.url}");
+}
+
+QString QnAppInfo::cloudPortalUrl() {
+    return QStringLiteral("${cloud.portalUrl}");
+}
+
+QString QnAppInfo::cloudName() {
+    return QStringLiteral("${cloud.name}");
 }
 
 int QnAppInfo::freeLicenseCount() {

@@ -2,9 +2,10 @@
 
 #include <network/router.h>
 #include <http/custom_headers.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <utils/common/systemerror.h>
 #include <core/resource/resource_fwd.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -51,11 +52,9 @@ void runMultiserverDownloadRequest(QUrl url
     {
         context->executeGuarded([url, requestCompletionFunc, headers, context]()
         {
-            if (nx_http::downloadFileAsync(url, requestCompletionFunc, headers,
-                nx_http::AsyncHttpClient::authDigestWithPasswordHash))
-            {
-                context->incRequestsCount();
-            }
+            nx_http::downloadFileAsync(url, requestCompletionFunc, headers,
+                                       nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+            context->incRequestsCount();
         });
     };
 
@@ -78,11 +77,10 @@ void runMultiserverUploadRequest(QUrl url
         context->executeGuarded([url, data, completionFunc, headers
             , contentType, context, user, password]()
         {
-            if (nx_http::uploadDataAsync(url, data, contentType, headers
-                , completionFunc, nx_http::AsyncHttpClient::authDigestWithPasswordHash))
-            {
-                context->incRequestsCount();
-            }
+            nx_http::uploadDataAsync(url, data, contentType, headers
+                , completionFunc, nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+
+            context->incRequestsCount();
         });
     };
 

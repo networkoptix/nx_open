@@ -31,7 +31,7 @@ private:
  */
 class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
-    
+
     typedef Connective<QObject> base_type;
 public:
     QnWorkbenchAccessController(QObject *parent = NULL);
@@ -40,7 +40,6 @@ public:
     /**
      * \param resource                  Resource to get permissions for.
      * \returns                         Permissions for the given resource.
-     *                                  Includes global permissions if requested for the current user.
      */
     Qn::Permissions permissions(const QnResourcePtr &resource) const;
 
@@ -51,39 +50,26 @@ public:
      *                                  include required permissions.
      */
     bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const;
-    
+
     /**
      * \param resources                 List of resources to get combined permissions for.
      * \returns                         Bitwise AND combination of permissions for the provided resources.
      */
-    template<class ResourceList>
-    Qn::Permissions permissions(const ResourceList &resources, const typename ResourceList::const_iterator * = NULL /* Let SFINAE filter out non-lists. */) const {
-        Qn::Permissions result = Qn::AllPermissions;
-        foreach(const QnResourcePtr &resource, resources)
-            result &= permissions(resource);
-        return result;
-    }
+    Qn::Permissions permissions(const QnResourceList &resources) const;
 
     /**
      * \returns                         Global permissions of the current user,
      *                                  adjusted to take deprecation and superuser status into account.
      *                                  Same as <tt>permissions(context()->user())</tt>.
      */
-    Qn::Permissions globalPermissions() const;
-
-    /**
-     * \param user                      User to get global permissions for.
-     * \returns                         Global permissions of the given user,
-     *                                  adjusted to take deprecation and superuser status into account.
-     */
-    Qn::Permissions globalPermissions(const QnUserResourcePtr &user) const;
+    Qn::GlobalPermissions globalPermissions() const;
 
     /**
      * \param requiredPermissions       Global permissions to check.
      * \returns                         Whether actual global permissions
      *                                  include required permissions.
      */
-    bool hasGlobalPermissions(Qn::Permissions requiredPermissions) const;
+    bool hasGlobalPermission(Qn::GlobalPermission requiredPermissions) const;
 
     /**
      * \param resource                  Resource to get permissions change notifier for.
@@ -94,14 +80,14 @@ public:
 
 signals:
     /**
-     * \param resource                  Resource for which permissions have changed. 
+     * \param resource                  Resource for which permissions have changed.
      *                                  Guaranteed not to be null.
      */
     void permissionsChanged(const QnResourcePtr &resource);
 
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
-    
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 private:
@@ -110,15 +96,11 @@ private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource) const;
-    Qn::Permissions calculatePermissions(const QnUserResourcePtr &user) const;
-    Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout) const;
-    Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera) const;
-    Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive) const;
-    Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server) const;
-    Qn::Permissions calculatePermissions(const QnVideoWallResourcePtr &videoWall) const;
-
+    Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr &layout) const;
+    Qn::GlobalPermissions calculateGlobalPermissions() const;
 private:
-    struct PermissionsData {
+    struct PermissionsData
+    {
         PermissionsData(): permissions(0), notifier(NULL) {}
 
         Qn::Permissions permissions;
@@ -126,7 +108,7 @@ private:
     };
 
     QnUserResourcePtr m_user;
-    Qn::Permissions m_userPermissions;
+    Qn::GlobalPermissions m_globalPermissions;
     bool m_readOnlyMode;
     mutable QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };

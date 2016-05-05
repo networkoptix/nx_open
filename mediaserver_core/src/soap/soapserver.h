@@ -13,7 +13,7 @@
 #include <plugins/resource/onvif/onvif_notification_consumer.h>
 #include <utils/common/long_runnable.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 //!Listenes for incoming soap requests. Implemented using gsoap
 /*!

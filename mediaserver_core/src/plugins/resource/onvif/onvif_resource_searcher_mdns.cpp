@@ -9,8 +9,8 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/wsseapi.h"
 
-#include "utils/network/nettools.h"
-#include "utils/network/mdns.h"
+#include <nx/network/nettools.h>
+#include <nx/network/mdns.h>
 #include "utils/common/sleep.h"
 
 #include <QtNetwork/QUdpSocket>

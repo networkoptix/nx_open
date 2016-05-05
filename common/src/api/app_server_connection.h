@@ -1,7 +1,7 @@
 #ifndef QN_APP_SERVER_CONNECTION_H
 #define QN_APP_SERVER_CONNECTION_H
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/request_param.h>
 #include <utils/common/software_version.h>
@@ -20,7 +20,7 @@
 class QnAppServerConnectionFactory;
 class QnApiSerializer;
 
-class QN_EXPORT QnAppServerConnectionFactory 
+class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
     QnAppServerConnectionFactory();
@@ -33,12 +33,12 @@ public:
     static void setUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
     static void setCurrentVersion(const QnSoftwareVersion &version);
-    
-    /** If the client is started in videowall mode, videowall's guid is stored here. */ 
+
+    /** If the client is started in videowall mode, videowall's guid is stored here. */
     static QnUuid videowallGuid();
     static void setVideowallGuid(const QnUuid &uuid);
 
-    /** If the client is started in videowall mode, instance's guid is stored here. */ 
+    /** If the client is started in videowall mode, instance's guid is stored here. */
     static QnUuid instanceGuid();
     static void setInstanceGuid(const QnUuid &uuid);
 
@@ -62,6 +62,6 @@ private:
     QnResourceFactory *m_resourceFactory;
 };
 
-bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection);
+bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection);
 
 #endif // QN_APP_SERVER_CONNECTION_H

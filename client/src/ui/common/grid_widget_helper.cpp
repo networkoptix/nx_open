@@ -3,12 +3,11 @@
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QTableView>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
-#include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
 
 #include <utils/common/string.h>
 
@@ -37,24 +36,24 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
+                QDialogButtonBox::StandardButton button = QnMessageBox::information(
                     parent,
                     tr("Save As"),
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
-                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
+                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
                 );
 
-                if(button == QMessageBox::Cancel || button == QMessageBox::No)
+                if(button == QDialogButtonBox::Cancel || button == QDialogButtonBox::No)
                     return;
             }
         }
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
+            QnMessageBox::critical(
                 parent,
                 tr("Could not overwrite file"),
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
-                QMessageBox::Ok
+                QDialogButtonBox::Ok
             );
             continue;
         }
@@ -97,7 +96,7 @@ void QnGridWidgetHelper::getGridData(QTableView *grid, const QLatin1Char &textDe
     if(list.isEmpty())
         return;
 
-    qSort(list);
+    std::sort(list.begin(), list.end());
 
     QString textResult, htmlResult;
 

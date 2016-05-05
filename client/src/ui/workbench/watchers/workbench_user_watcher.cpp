@@ -8,9 +8,9 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -33,24 +33,21 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if(m_user == user)
         return;
 
-    if (m_user) {
+    if (m_user)
         disconnect(m_user, NULL, this, NULL);
-        if (m_permissionsNotifier)
-            disconnect(m_permissionsNotifier, NULL, this, NULL);
-    }
 
     m_user = user;
     m_userPassword = QString();
-    m_userDigest = user ? user->getDigest() : QByteArray();
-    m_userPermissions = accessController()->globalPermissions(user);
-    m_permissionsNotifier = user ? accessController()->notifier(user) : NULL;
+    m_userDigest = QByteArray();
+    m_userPermissions = Qn::NoGlobalPermissions;
 
-    if (m_user) {
-        connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
-
+    if (m_user)
+    {
+        m_userDigest = m_user->getDigest();
+        m_userPermissions = qnResourceAccessManager->globalPermissions(m_user);
+        connect(m_user, &QnResource::resourceChanged,        this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
         connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
     }
-
 
     emit userChanged(user);
 }
@@ -124,11 +121,12 @@ void QnWorkbenchUserWatcher::at_user_resourceChanged(const QnResourcePtr &resour
     emit reconnectRequired();
 }
 
-void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &user) {
+void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &user)
+{
     if (!m_user || user.dynamicCast<QnUserResource>() != m_user)
         return;
 
-    Qn::Permissions newPermissions = accessController()->globalPermissions(m_user);
+    Qn::GlobalPermissions newPermissions = qnResourceAccessManager->globalPermissions(m_user);
     /* Reconnect if some permissions were changed*/
     const bool reconnect = (newPermissions != m_userPermissions);
     m_userPermissions = newPermissions;

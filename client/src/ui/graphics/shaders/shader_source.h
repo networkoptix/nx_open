@@ -1,7 +1,9 @@
 #ifndef QN_SHADER_SOURCE_H
 #define QN_SHADER_SOURCE_H
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/stringize.hpp>
+#endif
 
 #include <QtCore/QByteArray>
 

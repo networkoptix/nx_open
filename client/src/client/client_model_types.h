@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_MODEL_TYPES_H
 #define QN_CLIENT_MODEL_TYPES_H
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -131,7 +131,8 @@ QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
 /**
  * Set of options how to display client background.
  */
-struct QnClientBackground {
+struct QnClientBackground
+{
     QnClientBackground():
         animationEnabled(true),
         animationMode(Qn::DefaultAnimation),
@@ -142,6 +143,7 @@ struct QnClientBackground {
         imageOpacity(0.5)
     {}
 
+    //TODO: #GDM cleanup animation fields. Main problem is in the settings migrating. Image settings will be lost.
     bool animationEnabled;
     Qn::BackgroundAnimationMode animationMode;
     QColor animationCustomColor;

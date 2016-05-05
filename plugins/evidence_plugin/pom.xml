@@ -10,12 +10,12 @@
     <parent>
         <artifactId>plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.2.1-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <artifactId>evidence_plugin</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Evidence camera integration plugin</name>	
@@ -23,19 +23,9 @@
     <properties>
         <guid>${evidence_plugin.guid}</guid>
         <product.title>${evidence_plugin.name}</product.title>	
-        <!--Global libs-->
+
         <qt.libs>core network xml</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
-        <global.libs/>
-        <!--Specific os libs used-->
-        <windows.oslibs/>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>        
-        <!--Global defines-->
-        <global.defines/>
-        <mac.defines/>
-        <linux.defines/>
-        <!--Specific os defines-->
+
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties>  
     <dependencies>
@@ -70,6 +60,14 @@
                 <scope>system</scope>
                 <systemPath>${root.dir}/common/pom.xml</systemPath>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>nx_streaming</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type> 
+                <scope>system</scope>
+                <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+            </dependency>           
         </dependencies>        
     </profiles>	
 </project>

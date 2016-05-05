@@ -1,22 +1,19 @@
 TEMPLATE = app
 
-DEFINES += CL_FORCE_LOGO
-#TRANSLATIONS += ${basedir}/translations/client_en.ts \
-
-#				${basedir}/translations/client_ru.ts \
-#				${basedir}/translations/client_zh-CN.ts \
-#				${basedir}/translations/client_fr.ts \
-#				${basedir}/translations/client_jp.ts \
-#				${basedir}/translations/client_ko.ts \
-#				${basedir}/translations/client_pt-BR.ts \
 
 INCLUDEPATH += \
-    ${root.dir}/appserver2/src/ \
-    ${root.dir}/client.core/src/
+    ${root.dir}/appserver2/src \
+    ${root.dir}/client.core/src
 
-unix: !ios {
-    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+# Ignore missing platform-dependent libs required for libproxydecoder.so
+LIBS += -Wl,--allow-shlib-undefined
+
+unix: !mac {
+    LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    LIBS += "-Wl,-rpath-link,$$OPENSSL_DIR/lib"
 }
+
+QML_IMPORT_PATH = ${basedir}/static-resources/qml
 
 android {
     QT += androidextras
@@ -24,11 +21,25 @@ android {
 # TODO: #dklychkov make this not hardcoded
     PRE_TARGETDEPS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcommon.a \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libappserver2.a
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libappserver2.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_audio.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_media.a \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_streaming.a
     
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcrypto.so \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libssl.so
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libssl.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libopenal.so
+
+    ANDROID_EXTRA_LIBS += \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavutil.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavcodec.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavformat.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavdevice.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libpostproc.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libswscale.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libswresample.so \
+        $$OUTPUT_PATH/lib/$$CONFIGURATION/libavfilter.so
 
     ANDROID_PACKAGE_SOURCE_DIR = ${basedir}/${arch}/android
 
@@ -56,3 +67,5 @@ ios {
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
     XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=mobile_client.entitlements
 }
+
+SOURCES += ${project.build.directory}/mobile_client_app_info_impl.cpp

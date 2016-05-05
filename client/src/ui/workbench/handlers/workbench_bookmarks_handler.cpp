@@ -21,7 +21,6 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
@@ -52,10 +51,6 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 
     /* Reset hint flag for each user. */
     connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
-}
-
-ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
-    return QnAppServerConnectionFactory::getConnection2();
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
@@ -95,7 +90,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
-    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
+    NX_ASSERT(bookmark.isValid(), Q_FUNC_INFO, "Dialog must not allow to create invalid bookmarks");
     if (!bookmark.isValid())
         return;
 
@@ -146,8 +141,8 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     if (QnMessageBox::information(mainWindow(),
             tr("Confirm Deletion"), message,
-            QnMessageBox::Ok | QnMessageBox::Cancel,
-            QnMessageBox::Cancel) != QnMessageBox::Ok)
+            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
@@ -165,8 +160,8 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
 
     if (QnMessageBox::information(mainWindow(),
         tr("Confirm Deletion"), message,
-        QnMessageBox::Ok | QnMessageBox::Cancel,
-        QnMessageBox::Cancel) != QnMessageBox::Ok)
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
         return;
 
     for (const auto bookmark: bookmarks)

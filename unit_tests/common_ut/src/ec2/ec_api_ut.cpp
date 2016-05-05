@@ -10,8 +10,8 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/httpclient.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/httpclient.h>
 
 
 class RequestsGenerator
@@ -60,16 +60,12 @@ public:
                      Qt::DirectConnection );
             newClient->setResponseReadTimeoutMs( 60*1000 );
             const Request& request = getRequestToPerform();
-            bool result = false;
             if( request.requestType == Request::GET_REQUEST )
-                result = newClient->doGet( request.url );
+                newClient->doGet( request.url );
             else
-                result = newClient->doPost( request.url, "application/json", request.body );
-            if( result )
-            {
-                ++m_requestsStarted;
-                m_runningRequests.push_back( std::move(newClient) );
-            }
+                newClient->doPost( request.url, "application/json", request.body );
+            ++m_requestsStarted;
+            m_runningRequests.push_back( std::move(newClient) );
         }
 
         if( httpClient )
@@ -82,7 +78,7 @@ public:
 
     void start()
     {
-        assert( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
+        NX_ASSERT( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
         for( int i = 0; i < m_maxSimultaneousRequestsCount; ++i )
             startAnotherClient( nx_http::AsyncHttpClientPtr() );
     }

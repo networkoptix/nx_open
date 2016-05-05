@@ -21,6 +21,7 @@
 #include <client/client_runtime_settings.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/warnings.h>
 
 
 namespace {
@@ -80,7 +81,7 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     setShowcaseUrl(QUrl(QnAppInfo::showcaseUrl()));
     setSettingsUrl(QUrl(QnAppInfo::settingsUrl()));
 
-    /* Set names. */
+    /* Set names (compatibility with 1.0). */
     setName(MEDIA_FOLDER,           lit("mediaRoot"));
     setName(EXTRA_MEDIA_FOLDERS,    lit("auxMediaRoot"));
     setName(DOWNMIX_AUDIO,          lit("downmixAudio"));
@@ -92,7 +93,7 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QJsonObject jsonObject;
         if(!QJson::deserialize(file.readAll(), &jsonObject)) {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Client settings file could not be parsed!");
+            NX_ASSERT(false, Q_FUNC_INFO, "Client settings file could not be parsed!");
         } else {
             updateFromJson(jsonObject.value(lit("settings")).toObject());
         }
@@ -102,7 +103,7 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     load();
 
     /* Update showcase url from external source. */
-    Q_ASSERT_X(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
+    NX_ASSERT(!isShowcaseEnabled(), Q_FUNC_INFO, "Paxton dll crashes here, make sure showcase fucntionality is disabled");
     if (isShowcaseEnabled())
         loadFromWebsite();
 
@@ -169,12 +170,21 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
 //             return defaultValue;
 //         }
     case LIGHT_MODE:
-        {
-            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-            if (baseValue.type() == QVariant::Int)  //compatibility mode
-                return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
-            return baseValue;
-        }
+    {
+        QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+        if (baseValue.type() == QVariant::Int)  //compatibility mode
+            return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
+        return baseValue;
+    }
+    case CLOUD_PASSWORD:
+        return xorDecrypt(base_type::readValueFromSettings(settings, id, defaultValue).toString(), xorKey);
+
+    case WORKBENCH_PANES:
+    {
+        QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant()).value<QByteArray>();
+        return QVariant::fromValue(QJson::deserialized<QnPaneSettingsMap>(asJson, defaultValue.value<QnPaneSettingsMap>()));
+    }
+
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
         break;
@@ -185,7 +195,8 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
         return;
 
-    switch(id) {
+    switch(id)
+    {
     case LAST_USED_CONNECTION:
         settings->beginGroup(QLatin1String("AppServerConnections"));
         settings->beginGroup(QLatin1String("lastUsed"));
@@ -193,7 +204,8 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         settings->endGroup();
         settings->endGroup();
         break;
-    case CUSTOM_CONNECTIONS: {
+    case CUSTOM_CONNECTIONS:
+    {
         settings->beginWriteArray(QLatin1String("AppServerConnections"));
         settings->remove(QLatin1String("")); /* Clear children. */
         int i = 0;
@@ -213,12 +225,17 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
         break;
     }
-    case AUDIO_VOLUME: {
+    case AUDIO_VOLUME:
+    {
         settings->beginGroup(QLatin1String("audioControl"));
         settings->setValue(QLatin1String("volume"), value);
         settings->endGroup();
         break;
     }
+    case CLOUD_PASSWORD:
+        base_type::writeValueToSettings(settings, id, xorEncrypt(value.toString(), xorKey));
+        break;
+
     case UPDATE_FEED_URL:
     //case SHOWCASE_URL:
     //case SHOWCASE_ENABLED:
@@ -228,6 +245,14 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
     case NO_CLIENT_UPDATE:
         break; /* Not to be saved to settings. */
+
+    case WORKBENCH_PANES:
+    {
+        QByteArray asJson = QJson::serialized(value.value<QnPaneSettingsMap>());
+        base_type::writeValueToSettings(settings, id, asJson);
+        break;
+    }
+
     default:
         base_type::writeValueToSettings(settings, id, value);
         break;

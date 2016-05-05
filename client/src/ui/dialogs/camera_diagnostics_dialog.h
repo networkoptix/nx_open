@@ -1,13 +1,13 @@
 #ifndef QN_CAMERA_DIAGNOSTICS_DIALOG_H
 #define QN_CAMERA_DIAGNOSTICS_DIALOG_H
 
-#include <QDialog>
-#include <QScopedPointer>
+#include <QtWidgets/QDialog>
+#include <QtCore/QScopedPointer>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class CameraDiagnosticsDialog;

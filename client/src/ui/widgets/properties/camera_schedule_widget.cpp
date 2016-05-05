@@ -2,7 +2,6 @@
 #include "ui_camera_schedule_widget.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtWidgets/QMessageBox>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -22,7 +21,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -729,8 +728,9 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     ui->licensesUsageWidget->loadData(&helper);
 }
 
-void QnCameraScheduleWidget::updateLicensesButtonVisible() {
-    ui->licensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+void QnCameraScheduleWidget::updateLicensesButtonVisible()
+{
+    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
 }
 
 void QnCameraScheduleWidget::updateRecordSpinboxes(){
@@ -854,13 +854,13 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     using boost::algorithm::all_of;
 
     if(m_cameras.size() > 1) {
-        QMessageBox::warning(
+        QnMessageBox::warning(
             this,
             tr("Warning"),
             tr("Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.")
             );
     } else /* One camera */ {
-        Q_ASSERT_X(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
+        NX_ASSERT(m_cameras.size() == 1, Q_FUNC_INFO, "Following options are valid only for singular camera");
         QnVirtualCameraResourcePtr camera = m_cameras.first();
 
         // TODO: #GDM #Common duplicate code.
@@ -868,17 +868,17 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
         bool hasMotion = all_of(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {return camera->hasMotion(); });
 
         if (hasMotion && !hasDualStreaming) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
                 tr("Warning"),
                 tr("Dual-Streaming is not supported on this camera."));
         } else if(!hasMotion && !hasDualStreaming) {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
                 tr("Warning"),
                 tr("Dual-Streaming and Motion Detection are not available on this camera."));
         } else /* Has dual streaming but not motion */ {
-            QMessageBox::warning(
+            QnMessageBox::warning(
                 this,
                 tr("Warning"),
                 tr("Motion Recording is disabled. Please go to the motion setup page to setup the cameras's motion area and sensitivity."));

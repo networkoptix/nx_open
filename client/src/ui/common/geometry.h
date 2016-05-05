@@ -330,6 +330,24 @@ public:
     static QSize eroded(const QSize &size, const QMargins &amount);
 
     /**
+     * Erodes the given size by the given amount.
+     *
+     * \param size                      Size to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded size.
+     */
+    static QSize eroded(const QSize &size, int amount);
+
+    /**
+     * Erodes the given size by the given amount.
+     *
+     * \param size                      Size to erode.
+     * \param amount                    Erosion amount.
+     * \returns                         Eroded size.
+     */
+    static QSize eroded(const QSizeF &size, qreal amount);
+
+    /**
      * \param size                      Reference size.
      * \param otherSize                 Size to check for containment.
      * \returns                         Whether the reference size contains the given size.

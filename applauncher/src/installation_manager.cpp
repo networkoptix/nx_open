@@ -10,7 +10,7 @@
 #include <QtCore/QRegExp>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/update/zip_utils.h>
 
 

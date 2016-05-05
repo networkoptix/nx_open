@@ -4,7 +4,7 @@
 #include <QtGui/QRegion>
 #include <QtCore/QFile>
 #include <QSharedPointer>
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "utils/media/sse_helper.h"
 #include "recorder/device_file_catalog.h"
 #include <core/resource/resource_fwd.h>

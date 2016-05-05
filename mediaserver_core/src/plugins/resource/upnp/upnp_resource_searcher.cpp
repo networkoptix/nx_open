@@ -1,23 +1,83 @@
 #include "upnp_resource_searcher.h"
 #include "utils/common/sleep.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/simple_http_client.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include "core/resource_management/resource_pool.h"
-#include "utils/network/nettools.h"
-#include "utils/network/system_socket.h"
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
 
-static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
+static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
 static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
 static const int RECV_BUFFER_SIZE = 1024*1024;
+
+using nx::network::UDPSocket;
+
+// TODO: #mu try to replace with UpnpDeviceDescriptionHandler when upnp camera is avaliable
+
+//!Partial parser for SSDP description xml (UPnP(TM) Device Architecture 1.1, 2.3)
+class UpnpResourceDescriptionSaxHandler: public QXmlDefaultHandler
+{
+    nx_upnp::DeviceInfo m_deviceInfo;
+    QString m_currentElementName;
+public:
+    virtual bool startDocument()
+    {
+        return true;
+    }
+
+    virtual bool startElement(const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/)
+    {
+        m_currentElementName = qName;
+        return true;
+    }
+
+    virtual bool characters(const QString& ch)
+    {
+        if (m_currentElementName == QLatin1String("friendlyName"))
+            m_deviceInfo.friendlyName = ch;
+        else if (m_currentElementName == QLatin1String("manufacturer"))
+            m_deviceInfo.manufacturer = ch;
+        else if (m_currentElementName == QLatin1String("modelName"))
+            m_deviceInfo.modelName = ch;
+        else if (m_currentElementName == QLatin1String("serialNumber"))
+            m_deviceInfo.serialNumber = ch;
+        else if (m_currentElementName == QLatin1String("presentationURL"))
+            m_deviceInfo.presentationUrl = ch;
+
+        return true;
+    }
+
+    virtual bool endElement(const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/)
+    {
+        m_currentElementName.clear();
+        return true;
+    }
+
+    virtual bool endDocument()
+    {
+        return true;
+    }
+
+    /*
+    QString friendlyName() const { return m_friendlyName; }
+    QString manufacturer() const { return m_manufacturer; }
+    QString modelName() const { return m_modelName; }
+    QString serialNumber() const { return m_serialNumber; }
+    QString presentationUrl() const { return m_presentationUrl; }
+    */
+    nx_upnp::DeviceInfo deviceInfo() const { return m_deviceInfo; }
+};
+
+
 
 
 // ====================================================================
@@ -64,6 +124,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         }
 
 
+
         /*
         if (!sock->joinGroup(groupAddress.toString(), iface.address.toString()))
         {
@@ -81,7 +142,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > UPNPDeviceSearcher::cacheTimeout()) {
+    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::cacheTimeout()) {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
     }
@@ -139,7 +200,7 @@ void QnUpnpResourceSearcher::processDeviceXml(
     //TODO/IMPL checking Content-Type of received description (MUST be upnp xml description to continue)
 
     //parsing description xml
-    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    UpnpResourceDescriptionSaxHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );
@@ -236,28 +297,17 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 //// class QnUpnpResourceSearcherAsync
 ////////////////////////////////////////////////////////////
 
-QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync()
-{
-    UPNPDeviceSearcher::instance()->registerHandler( this );
-}
-
-QnUpnpResourceSearcherAsync::~QnUpnpResourceSearcherAsync()
-{
-    if (UPNPDeviceSearcher::instance())
-        UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
-}
-
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {
     m_resList.clear();
-    UPNPDeviceSearcher::instance()->processDiscoveredDevices( this );
+    nx_upnp::DeviceSearcher::instance()->processDiscoveredDevices( this );
     return m_resList;
 }
 
 bool QnUpnpResourceSearcherAsync::processPacket(
     const QHostAddress& localInterfaceAddress,
-    const HostAddress& discoveredDevAddress,
-    const UpnpDeviceInfo& devInfo,
+    const SocketAddress& discoveredDevAddress,
+    const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& xmlDevInfo )
 {
     const int resListSizeBak = m_resList.size();

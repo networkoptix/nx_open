@@ -5,7 +5,7 @@
 #ifdef ENABLE_ARECONT
 
 #include <utils/common/util.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "../resource/av_resource.h"
 

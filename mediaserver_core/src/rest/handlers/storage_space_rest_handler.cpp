@@ -20,7 +20,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 namespace
 {

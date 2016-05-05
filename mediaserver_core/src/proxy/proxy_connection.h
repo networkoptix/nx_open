@@ -1,7 +1,7 @@
 #ifndef __PROXY_CONNECTION_H_
 #define __PROXY_CONNECTION_H_
 
-#include <QHostAddress>
+#include <QtNetwork/QHostAddress>
 #include "network/universal_request_processor.h"
 
 class QnAbstractStreamDataProvider;

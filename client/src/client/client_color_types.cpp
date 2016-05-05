@@ -9,7 +9,6 @@
 #include <utils/common/model_functions.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
-    tickmark = QColor(255, 255, 255, 255);
     positionMarker = QColor(255, 255, 255, 196);
     indicator = QColor(128, 160, 192, 128);
 
@@ -33,11 +32,16 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     separator = QColor(255, 255, 255, 64);
 
-    dateOverlay = QColor(255, 255, 255, 48);
-    dateOverlayAlternate = withAlpha(selection, 48);
+    dateBarBackgrounds.push_back(QColor(255, 255, 255, 48));
+    dateBarText = QColor(255, 255, 255, 255);
 
-    pastLastMinute = QColor(24, 24, 24, 255);
-    futureLastMinute = QColor(0, 0, 0, 255);
+    pastLastMinuteBackground = QColor(24, 24, 24, 127);
+    futureLastMinuteBackground = QColor(0, 0, 0, 127);
+    pastLastMinuteStripe = QColor(24, 24, 24, 38);
+    futureLastMinuteStripe = QColor(0, 0, 0, 38);
+
+    tickmarkLines.push_back(QColor(255, 255, 255, 255));
+    tickmarkText.push_back(QColor(255, 255, 255, 255));
 }
 
 QnTimeScrollBarColors::QnTimeScrollBarColors() {
@@ -226,7 +230,6 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     high    = QColor(0xff5500);
 }
 
-
 QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
 {
     text    = QColor(0xff, 0xff, 0xff, 0x99);
@@ -234,6 +237,15 @@ QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
     window  = QColor(0x00, 0x4b, 0x80, 0xcc);
 }
 
+QnResourceItemColors::QnResourceItemColors()
+{
+    mainText = QColor(0x91a7b2);
+    mainTextSelected = QColor(0xe1e7eA);
+    mainTextAccented = QColor(0x2fa2db);
+    extraText = QColor(0x53707f);
+    extraTextSelected = QColor(0xa5b7c0);
+    extraTextAccented = QColor(0x117297);
+}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

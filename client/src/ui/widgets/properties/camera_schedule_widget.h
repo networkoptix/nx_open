@@ -3,6 +3,7 @@
 #include <QtWidgets/QWidget>
 
 #include <core/misc/schedule_task.h>
+#include <core/resource/resource_fwd.h>
 
 #include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>

@@ -1,0 +1,132 @@
+
+.master-modal {
+  overflow-y: auto;
+  display: block;
+
+  @media screen and (min-height: 550px) {
+    margin-top: 135px;
+  }
+}
+
+
+.master {
+  width: 510px;
+  margin: 0 auto;
+
+  .panel-body {
+    height: 315px;
+    position: relative;
+  }
+
+  .vertical-center {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin: -60px 0 0 0 !important;
+  }
+
+  .vertical-bottom {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  h2 {
+    margin-top: 30px;
+    margin-bottom: 16px;
+  }
+
+  p.master-description {
+    height: 32px;
+    line-height: 1.6;
+  }
+
+  .master-controls {
+    margin-top: 24px;
+  }
+
+  form {
+    display: inline-block;
+    width: 240px;
+    &.wide {
+      width: 320px;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 8px;
+  }
+
+
+  .dropdown {
+    text-align: left;
+  }
+
+  .alert {
+    padding: 10px;
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
+
+  a.external,
+  a.external:hover {
+    text-decoration: underline;
+  }
+
+  .master-success {
+    height: 70px;
+    font-size: 80px;
+
+    .glyphicon.glyphicon-cloud {
+      @include kill-glyphicon;
+      width: 64px;
+      height: 64px;
+      background-position: 0px -90px;
+    }
+
+    .glyphicon.glyphicon-ok {
+      @include kill-glyphicon;
+      width: 88px;
+      height: 88px;
+      background-position: 0px 0px;
+    }
+
+    .glyphicon.glyphicon-remove-circle {
+      @include kill-glyphicon;
+      width: 16px;
+      height: 16px;
+      background-position: -88px 0px;
+    }
+
+    .preloader {
+      display: inline-block;
+      background-repeat: no-repeat;
+      background-size: 66px 14px;
+
+      margin-bottom: 20px;
+      width: 66px;
+      height: 14px;
+    }
+  }
+
+  .glyphicon.glyphicon-arrow-left {
+    @include kill-glyphicon;
+    width: 20px;
+    height: 12px;
+    background-position: -64px -88px;
+
+  }
+
+  .glyphicon.glyphicon-arrow-right {
+    @include kill-glyphicon;
+    width: 20px;
+    height: 12px;
+    background-position: -64px -100px;
+
+  }
+}
+

@@ -109,7 +109,7 @@ public:
         const stree::AbstractResourceReader& rc1,
         const stree::AbstractResourceReader& rc2 );
 
-    virtual bool get( int resID, QVariant* const value ) const;
+    virtual bool getAsVariant( int resID, QVariant* const value ) const;
 
 private:
     const stree::ResourceNameSet& m_rns;

@@ -1,7 +1,7 @@
 #ifndef __EC2_TRANSACTION_SERVER_H__
 #define __EC2_TRANSACTION_SERVER_H__
 
-#include "core/dataconsumer/abstract_data_consumer.h"
+#include "nx/streaming/abstract_data_consumer.h"
 #include "network/tcp_connection_processor.h"
 #include "network/tcp_listener.h"
 

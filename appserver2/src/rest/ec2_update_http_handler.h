@@ -7,14 +7,14 @@
 #define EC2_UPDATE_HTTP_HANDLER_H
 
 #include <QtCore/QByteArray>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <common/common_module.h>
 
 #include <rest/server/request_handler.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/common/model_functions.h>
 #include <transaction/transaction.h>
 
@@ -50,7 +50,7 @@ namespace ec2
             const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             QByteArray& /*result*/,
-            QByteArray&, /*contentType*/ 
+            QByteArray&, /*contentType*/
             const QnRestConnectionProcessor*) override
         {
             return nx_http::StatusCode::badRequest;

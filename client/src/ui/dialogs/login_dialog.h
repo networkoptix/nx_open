@@ -9,7 +9,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <client/client_settings.h>
-#include <ui/dialogs/dialog.h>
+#include <ui/dialogs/common/dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"
@@ -20,7 +20,7 @@ class QStandardItem;
 class QUrl;
 
 class QnWorkbenchContext;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 
@@ -77,8 +77,6 @@ private:
     QUrl currentUrl() const;
     QString currentName() const;
 
-    /** Save current connection credentials. */
-    void updateStoredConnections(const QUrl &url, const QString &name);
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

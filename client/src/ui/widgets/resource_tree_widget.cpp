@@ -15,12 +15,11 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
-#include <ui/delegates/resource_tree_item_delegate.h>
+#include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 
 #include <ui/style/noptix_style.h>
-#include <ui/style/proxy_style.h>
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
@@ -39,8 +38,8 @@ public:
         m_filterEnabled(false)
     {}
 
-    bool isFilterEnabled() { 
-        return m_filterEnabled; 
+    bool isFilterEnabled() {
+        return m_filterEnabled;
     }
 
     void setFilterEnabled(bool enabled) {
@@ -72,41 +71,62 @@ protected:
         Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
         Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        /* "Other Systems" must be the last element */
-        bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
-        bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
-        if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
-            return rightOtherSystems;
+        {
+            /* "Other Systems" must be the last element */
+            bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
+            bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
+            if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
+                return rightOtherSystems;
+        }
 
-        /* Local node must be just before "other systems". */
-        bool leftLocal = leftNode == Qn::LocalNode;
-        bool rightLocal = rightNode == Qn::LocalNode;
-        if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
-            return rightLocal;
+        {
+            /* Local node must be just before "other systems". */
+            bool leftLocal = leftNode == Qn::LocalNode;
+            bool rightLocal = rightNode == Qn::LocalNode;
+            if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
+                return rightLocal;
+        }
+
+        {
+            /* WebPages node must be just before "Local". */
+            bool leftWebPages = leftNode == Qn::WebPagesNode;
+            bool rightWebPages = rightNode == Qn::WebPagesNode;
+            if(leftWebPages ^ rightWebPages) /* One of the nodes is a local node, but not both. */
+                return rightWebPages;
+        }
 
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
-        bool leftVideoWall = leftResource.dynamicCast<QnVideoWallResource>();
-        bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
-        if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
-            return rightVideoWall;
 
-        bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
-        bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
-        if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
-            return rightIncompatible;
+        {
+            bool leftVideoWall = leftResource.dynamicCast<QnVideoWallResource>();
+            bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
+            if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
+                return rightVideoWall;
+        }
 
-        // checking pairs of VideoWallItemNode + VideoWallMatrixNode
-        if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
-            && leftNode != rightNode)
-            return rightNode == Qn::VideoWallItemNode;   
+        {
+            bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
+            bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
+            if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+                return rightIncompatible;
+        }
 
-        /* Sort by name. */
-        QString leftDisplay = left.data(Qt::DisplayRole).toString();
-        QString rightDisplay = right.data(Qt::DisplayRole).toString();
-        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
-        if(result != 0)
-            return result < 0;
+        {
+            // checking pairs of VideoWallItemNode + VideoWallMatrixNode
+            if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
+                && leftNode != rightNode)
+                return rightNode == Qn::VideoWallItemNode;
+        }
+
+        {
+            /* Sort by name. */
+            QString leftDisplay = left.data(Qt::DisplayRole).toString();
+            QString rightDisplay = right.data(Qt::DisplayRole).toString();
+            int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
+            if(result != 0)
+                return result < 0;
+        }
 
         /* We want the order to be defined even for items with the same name. */
         if(leftResource && rightResource) {
@@ -133,7 +153,7 @@ protected:
                 state = Qt::Unchecked;
 
         QModelIndex checkRoot = root.sibling(root.row(), Qn::CheckColumn);
-        if (checkRoot.data(Qt::CheckStateRole) == state)
+        if (checkRoot.data(Qt::CheckStateRole).toInt() == state)
             return;
         base_type::setData(checkRoot, state, Qt::CheckStateRole);
         setCheckStateRecursiveUp(root, state);
@@ -172,7 +192,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->filterFrame->setVisible(false);
     ui->selectFilterButton->setVisible(false);
 
-    m_itemDelegate = new QnResourceTreeItemDelegate(this);
+    m_itemDelegate = new QnResourceItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
@@ -194,8 +214,8 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
 }
 
 QAbstractItemModel *QnResourceTreeWidget::model() const {
-    return m_resourceProxyModel 
-        ? m_resourceProxyModel->sourceModel() 
+    return m_resourceProxyModel
+        ? m_resourceProxyModel->sourceModel()
         : nullptr;
 }
 
@@ -220,6 +240,13 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
+        QIcon icon = m_resourceProxyModel->index(0, 0).data(Qt::DecorationRole).value<QIcon>();
+        if (!icon.isNull())
+        {
+            static const QSize kMaxDeviceIndependentSize(128, 128);
+            ui->resourcesTreeView->setIconSize(icon.actualSize(kMaxDeviceIndependentSize));
+        }
+
         connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)),   this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this, &QnResourceTreeWidget::beforeRecursiveOperation);
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
@@ -240,7 +267,7 @@ const QnResourceCriterion &QnResourceTreeWidget::criterion() const {
 
 void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion) {
     m_criterion = criterion;
-    
+
     updateFilter();
 }
 
@@ -292,9 +319,9 @@ QnResourcePoolModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDeleg
     while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
         sourceModel = proxy->sourceModel();
 
-    if (QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel)) 
+    if (QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel))
         return resourceModel->customColumnDelegate();
-   
+
 
     return nullptr;
 }
@@ -305,7 +332,7 @@ void QnResourceTreeWidget::setCustomColumnDelegate(QnResourcePoolModelCustomColu
         sourceModel = proxy->sourceModel();
 
     QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel);
-    Q_ASSERT_X(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
+    NX_ASSERT(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
 
     if (!resourceModel)
         return;
@@ -324,11 +351,6 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags) {
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
-
-    if (flags & Qn::BackgroundOpacity)
-        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
-    else
-        ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, QVariant());
 
     if (flags & Qn::BypassGraphicsProxy) {
         ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
@@ -437,16 +459,30 @@ void QnResourceTreeWidget::updateFilter() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
-        (event->type() == QEvent::Show || event->type() == QEvent::Hide)) {
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::Show:
+    case QEvent::Hide:
+        if (obj == ui->resourcesTreeView->verticalScrollBar())
             emit viewportSizeChanged();
-    } else if (obj == ui->resourcesTreeView && event->type() == QEvent::ContextMenu) {
-        QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
-        if (me->reason() == QContextMenuEvent::Mouse
-                && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
-            selectionModel()->clear();
+        break;
+
+    case QEvent::ContextMenu:
+        if (obj == ui->resourcesTreeView)
+        {
+            QContextMenuEvent* me = static_cast<QContextMenuEvent *>(event);
+            if (me->reason() == QContextMenuEvent::Mouse && !ui->resourcesTreeView->indexAt(me->pos()).isValid())
+                selectionModel()->clear();
+        }
+        break;
+
+    case QEvent::PaletteChange:
+        ui->resourcesTreeView->setPalette(palette()); // override default item view palette
+        break;
     }
+
     return base_type::eventFilter(obj, event);
 }
 
@@ -459,18 +495,21 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
     base_type::mousePressEvent(event);
 }
 
-void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
+void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index)
+{
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
         emit activated(resource);
 }
 
-void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index) {
+void QnResourceTreeWidget::at_treeView_spacePressed(const QModelIndex &index)
+{
     if (!m_checkboxesVisible)
         return;
+
     QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
 
-    bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
+    bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
     int inverted = checked ? Qt::Unchecked : Qt::Checked;
     m_resourceProxyModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
 }
@@ -494,13 +533,13 @@ void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index) {
         return; /* Will be processed by delegate. */
 
     QModelIndex checkIndex = index.sibling(index.row(), Qn::CheckColumn);
-    if(QAbstractItemModel *model = ui->resourcesTreeView->model()) {
+    if(QAbstractItemModel *model = ui->resourcesTreeView->model())
+    {
         int checkState = model->data(checkIndex, Qt::CheckStateRole).toInt();
-        if(checkState == Qt::Checked) {
+        if(checkState == Qt::Checked)
             checkState = Qt::Unchecked;
-        } else {
+        else
             checkState = Qt::Checked;
-        }
         model->setData(checkIndex, checkState, Qt::CheckStateRole);
     }
 }

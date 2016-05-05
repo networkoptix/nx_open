@@ -6,7 +6,6 @@
 namespace ec2
 {
     enum class ErrorCode;
-    struct QnFullResourceData; // TODO: #Elric move these out?
     struct QnPeerTimeInfo;
     typedef QList<QnPeerTimeInfo> QnPeerTimeInfoList;
 
@@ -33,6 +32,9 @@ namespace ec2
 
     class AbstractVideowallManager;
     typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
+
+    class AbstractWebPageManager;
+    typedef std::shared_ptr<AbstractWebPageManager> AbstractWebPageManagerPtr;
 
     class AbstractStoredFileManager;
     typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;

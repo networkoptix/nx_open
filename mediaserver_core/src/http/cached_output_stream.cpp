@@ -6,7 +6,7 @@
 #include "cached_output_stream.h"
 
 #include <network/tcp_connection_processor.h>
-#include <utils/network/socket.h>
+#include <nx/network/socket.h>
 
 
 CachedOutputStream::CachedOutputStream( QnTCPConnectionProcessor* const tcpOutput )

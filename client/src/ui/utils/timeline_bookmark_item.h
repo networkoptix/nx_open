@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include <boost/optional/optional.hpp>
+#endif
 
 #include <core/resource/camera_bookmark.h>
 

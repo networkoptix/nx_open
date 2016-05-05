@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "audit_manager_fwd.h"
 #include "api/model/audit/audit_record.h"

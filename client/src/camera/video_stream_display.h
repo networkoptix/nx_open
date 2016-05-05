@@ -7,7 +7,7 @@ extern "C"
     #include <libswscale/swscale.h>
 }
 
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #include <utils/common/stoppable.h>
 #include "frame_scaler.h"
 #include "transcoding/filters/filter_helper.h"

@@ -24,9 +24,8 @@ android-no-sdk {
     INSTALLS += target
 }
 
-OUTPUT_PATH = ${project.build.directory}
-DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
-
 export(INSTALLS)
 
 RC_FILE = ${project.build.directory}/nxtool.rc
+
+SOURCES += ${project.build.directory}/nxtool_app_info_impl.cpp

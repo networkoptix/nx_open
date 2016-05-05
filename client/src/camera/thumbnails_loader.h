@@ -3,7 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMetaType>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QStack>
 
 #include <utils/common/long_runnable.h>
@@ -11,7 +11,7 @@
 
 #include "thumbnail.h"
 
-#include "plugins/resource/archive/abstract_archive_delegate.h"
+#include <nx/streaming/abstract_archive_delegate.h>
 
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;

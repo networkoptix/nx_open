@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QString>
 
 #include "stree/resourcenameset.h"
@@ -49,7 +49,7 @@ private:
     mutable QnMutex m_treeMutex;
 
     void updateTree();
-    void loadXml( const QString& filePath, stree::AbstractNode** const treeRoot );
+    std::unique_ptr<stree::AbstractNode> loadXml(const QString& filePath);
 };
 
 #endif  //PREDEFINEDUSAGECALCULATOR_H

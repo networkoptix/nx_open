@@ -10,6 +10,8 @@ Uninstallable=no
 CreateAppDir=no
 ArchitecturesAllowed={#Arch}
 LicenseFile=License.rtf
+WizardImageFile=innosetup.bmp
+WizardSmallImageFile=innosetup_small.bmp
 
 [Languages]
 #if Lang == "ru-ru"

@@ -1,7 +1,7 @@
 #ifdef ENABLE_ARECONT
 
-#include <utils/common/log.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/http/httptypes.h>
 
 #include "../dataprovider/av_rtsp_stream_reader.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"

@@ -17,11 +17,12 @@
 #include "proxy_connection_processor_p.h"
 #include "transaction/transaction_message_bus.h"
 
-#include <utils/common/log.h>
+#include <nx/network/compat_poll.h>
+#include <nx/network/socket.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
-#include "utils/network/compat_poll.h"
-#include "utils/network/socket.h"
+
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
 #include "media_server/server_message_processor.h"
@@ -81,7 +82,7 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
         return 443;
     else if (p == "rtsp")
         return 554;
-    else 
+    else
         return -1;
 }
 
@@ -149,10 +150,12 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             return QString();
 #endif
 
-        d->dstSocket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket(url.scheme() == lit("https")));
+        d->dstSocket = QSharedPointer<AbstractStreamSocket>(
+            SocketFactory::createStreamSocket(url.scheme() == lit("https"))
+            .release());
         d->dstSocket->setRecvTimeout(d->connectTimeout.count());
         d->dstSocket->setSendTimeout(d->connectTimeout.count());
-        if (!d->dstSocket->connect(url.host().toLatin1().data(), url.port())) {
+        if (!d->dstSocket->connect(SocketAddress(url.host().toLatin1().data(), url.port()))) {
             d->socket->close();
             return QString(); // now answer from destination address
         }
@@ -206,7 +209,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
         if (host.startsWith("{"))
-            dstRoute.id = host;
+            dstRoute.id = QnUuid::fromStringSafe(host);
 
         urlPath = urlPath.mid(hostEndPos);
 
@@ -237,17 +240,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
     QnUuid cameraGuid;
     if( xCameraGuidIter != d->request.headers.end() )
-        cameraGuid = xCameraGuidIter->second;
+        cameraGuid = QnUuid::fromStringSafe(xCameraGuidIter->second);
     else
-        cameraGuid = d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
+        cameraGuid = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
     if (!cameraGuid.isNull()) {
         if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
-            dstRoute.id = camera->getParentId().toString();
+            dstRoute.id = camera->getParentId();
     }
 
     nx_http::HttpHeaders::const_iterator itr = d->request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
     if (itr != d->request.headers.end())
-        dstRoute.id = itr->second;
+        dstRoute.id = QnUuid::fromStringSafe(itr->second);
 
     if (dstRoute.id == qnCommon->moduleGUID()) {
         if (!cameraGuid.isNull())
@@ -496,11 +499,11 @@ void QnProxyConnectionProcessor::doSmartProxy()
             if( fds[0].revents & POLLIN )    //if polled returned connection closed or error state, recv will fail and we will process error
             {
                 int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-                if (readed < 1) 
+                if (readed < 1)
                     return;
 
                 d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-                if (isFullMessage(d->clientRequest)) 
+                if (isFullMessage(d->clientRequest))
                 {
                     parseRequest();
                     QString path = d->request.requestLine.url.path();
@@ -510,10 +513,10 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     updateClientRequest(dstUrl, dstRoute);
                     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
                     bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString() || d->lastConnectedUrl == dstUrl;
-                    if (isSameAddr) 
+                    if (isSameAddr)
                     {
                         d->dstSocket->send(d->clientRequest);
-                        if (isWebSocket) 
+                        if (isWebSocket)
                         {
                             if( rez == 2 ) //same as FD_ISSET(d->dstSocket->handle(), &read_set), since we have only 2 sockets
                                 if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.get(), READ_BUFFER_SIZE))
@@ -532,7 +535,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
 
                         d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
 
-                        if (isWebSocket) 
+                        if (isWebSocket)
                         {
                             doRawProxy(); // switch to binary mode
                             return;

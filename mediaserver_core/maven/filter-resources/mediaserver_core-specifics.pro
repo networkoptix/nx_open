@@ -1,14 +1,9 @@
 TEMPLATE = lib
 
-include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
-include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
-
-exists( ${libdir}/libcreateprocess.pri ) {
-  include(${libdir}/libcreateprocess.pri)
-}
-
 INCLUDEPATH += ${root.dir}/appserver2/src/
-INCLUDEPATH += ${root.dir}/common_libs/nxemail/src/
+INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
+INCLUDEPATH += ${root.dir}/common_libs/nx_email/src/
+INCLUDEPATH += ${root.dir}/common_libs/nx_network/src/
 
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug
@@ -20,3 +15,4 @@ INCLUDEPATH += ${root.dir}/common_libs/nxemail/src/
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
 
+SOURCES += ${project.build.directory}/mediaserver_core_app_info_impl.cpp

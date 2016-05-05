@@ -1,7 +1,7 @@
 syntax: glob
-syntax: glob
 ecs.db-shm
 ecs.db-wal
+*.swp
 *.cache
 *make.cache
 *-build*
@@ -24,12 +24,13 @@ ecs.db-wal
 *.vcxproj.filters
 *.vcproj
 *.tlog
+*.o
 *.lastbuildstate
 !launcher*.vcproj
-compatibility_info.cpp
 *_tmp.py*
 donotrebuild
 vms.pro
+.idea
 
 .DS_Store
 Debug
@@ -37,17 +38,19 @@ Release
 
 .directory
 
-x86
-x64
-arm-isd
-arm-isd_s2
-arm-rpi
-arm-bpi
-target
-target-isd
-target-isd_s2
-target-rpi
-target-bpi
+*/x86/*
+*/x64/*
+*/arm/*
+*/arm-isd/*
+*/arm-isd_s2/*
+*/arm-rpi/*
+*/arm-bpi/*
+*/target/*
+*/target-isd/*
+*/target-isd_s2/*
+*/target-rpi/*
+*/target-bpi/*
+*/target-tx1/*
 
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
@@ -58,9 +61,13 @@ build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/top_level.t
 build_environment/python/build_packages/ecapi_pb2/pb2.proto
 build_environment/target
 build_environment/target/buildenv.timestamp
-build_environment/x86
-build_environment/x64
-build_environment/arm
+build-jom
+build-vs
+build-ninja
+
+android-build/*
+app_process
+libc.so
 
 build_environment/maven/filter-resources/current_config
 
@@ -95,16 +102,8 @@ applauncher/src/version.h
 applauncher/src/ipch
 applauncher/src/client.vcproj
 applauncher/client.mak*
-applauncher/x86
-applauncher/x64
-applauncher/arm
 
-axiscamplugin/x86
-axiscamplugin/x64
-axiscamplugin/arm
-
-build_environment/dependencies/x86
-build_environment/dependencies/x64
+build_environment/target-android
 
 client/bin
 client/build
@@ -115,18 +114,10 @@ client/src/version.h
 client/src/ipch
 client/src/client.vcproj
 client/client.mak*
-client/x86
-client/x64
-client/arm
-client/client_lite/x86
-client/client_lite/x64
-client/client_lite/arm
 
 client/contrib/bespin/debug
 client/contrib/bespin/release
 client/contrib/bespin/Makefile*
-client/contrib/bespin/x86*
-client/contrib/bespin/x64*
 client/contrib/qtcolorpicker/Makefile*
 client/contrib/qtcolorpicker/buildlib
 client/contrib/qtcolorpicker/examples/Makefile*
@@ -137,14 +128,6 @@ client/contrib/qtcolorpicker/examples/simple/debug
 client/contrib/qtcolorpicker/lib/*.ilk
 client/src/*.vsp
 
-client.core/x86
-client.core/x64
-client.core/arm
-
-client.bin/x86
-client.bin/x64
-client.bin/arm
-
 common/bin
 common/build
 common/src/common.pro
@@ -153,28 +136,13 @@ common/src/Makefile
 common/src/common.vcproj
 common/src/common.pri
 common/common.mak*
-common/x86
-common/x64
-common/arm
 common/src/version.h
 
-cpp/x86
-cpp/x64
+nx_cloud/cloud_
 
 debsetup/mediaserver-deb/package
-debsetup/mediaserver-deb/x86
-debsetup/mediaserver-deb/x64
-debsetup/client-deb/x86
-debsetup/client-deb/x64
 debsetup/appserver-deb/package
-debsetup/appserver-deb/x86
-debsetup/appserver-deb/x64
 debsetup/repo
-deploy/x64
-deploy/x86
-
-genericrtspplugin/x86
-genericrtspplugin/x64
 
 mediaserver/bin
 mediaserver/build
@@ -183,9 +151,6 @@ mediaserver/src/version.h
 mediaserver/src/*.vsp
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
-mediaserver/x86
-mediaserver/x64
-mediaserver/arm
 
 mediaproxy/bin
 mediaproxy/build
@@ -193,9 +158,6 @@ mediaproxy/src/version.h
 mediaproxy/src/mediaproxy.vcproj
 mediaproxy/src/mediaproxy.pro
 mediaproxy/mediaproxy.mak*
-mediaproxy/x86
-mediaproxy/x64
-mediaproxy/arm
 
 vmaxproxy/bin
 vmaxproxy/build
@@ -203,15 +165,6 @@ vmaxproxy/src/version.h
 vmaxproxy/src/mediaproxy.vcproj
 vmaxproxy/src/mediaproxy.pro
 vmaxproxy/mediaproxy.mak*
-vmaxproxy/x86
-vmaxproxy/x64
-vmaxproxy/arm
-
-xvbadecoder/x86
-xvbadecoder/x64
-
-quicksyncdecoder/x86
-quicksyncdecoder/x64
 
 testcamera/bin
 testcamera/build
@@ -220,9 +173,6 @@ testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
 testcamera/testcamera.mak*
 testcamera/build
-testcamera/x86
-testcamera/x64
-testcamera/arm
 
 help/target
 
@@ -230,25 +180,12 @@ traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
 traytool/traytool.mak*
-traytool/x86
-traytool/x64
-traytool/arm
-
-nxtool/x86
-nxtool/x64
-nxtool/arm
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
 wixsetup/CustomActions/CustomActions.aps
 wixsetup/version.bat
 wixsetup/bin
-wixsetup/x86
-wixsetup/wixsetup-client-only/x86
-wixsetup/wixsetup-full/x86
-wixsetup/x64
-wixsetup/wixsetup-client-only/x64
-wixsetup/wixsetup-full/x64
 
 My Amplifier XE Results*
 My Inspector XE Results*
@@ -277,40 +214,17 @@ ios-client/HDWitness/Settings.bundle/Root.plist
 ios-client/Podfile.lock
 ios-client/.ruby-version
 
-launcher/x86
-launcher/x64
-launcher/arm
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
 
-
-axiscamplugin/x86
-axiscamplugin/x64
-axiscamplugin/arm
 axiscamplugin/docs/
 appserver/hostedfiles/*
 
-genericrtspplugin/x86
-genericrtspplugin/x64
-genericrtspplugin/arm
-
-
-image_library_plugin/x86
-image_library_plugin/x64
-image_library_plugin/arm
-
-
 nx_sdk/nx_sdk
 nx_storage_sdk/nx_storage_sdk
-holepuncher/x86
-holepuncher/x64
-holepuncher/arm
-
 
 libonvif/.build/
 
-plugins/*/arm
-debsetup/*/arm
 edge_firmware/isd/*.tar.gz
 
 .vagrant
@@ -325,6 +239,9 @@ html
 
 webadmin/node_modules
 webadmin/dist
+webadmin/static
+webadmin/external.zip
+webadmin/external.dat
 webadmin/.tmp
 webadmin/.idea
 webadmin/.sass-cache
@@ -336,11 +253,13 @@ plugins\acs\Paxton\CustomProperties.cs
 plugins/NxControl/NxControl.cs
 
 mobile_client/build-*
-mobile_client/x86
-mobile_client/x64
-mobile_client/arm
 
 statserver/.venv
 statserver/build
 statserver/dist
 statserver/statserver.egg-info
+
+syntax: regexp
+^core$
+^Makefile$
+

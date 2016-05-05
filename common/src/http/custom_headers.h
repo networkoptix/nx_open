@@ -27,6 +27,8 @@ namespace Qn
     static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
     //!Guid of peer which initiated request
     static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";
+    static const QByteArray EFFECTIVE_USER_NAME_HEADER_NAME = "X-Nx-Effective-User";
+    static const QByteArray API_RESULT_CODE_HEADER_NAME = "X-Nx-Result-Code";
     static const QByteArray RTT_MS_HEADER_NAME = "X-Nx-rtt-ms";
 
     static const QByteArray EC2_SYSTEM_NAME_HEADER_NAME = "X-Nx-EC-SYSTEM-NAME";

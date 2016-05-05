@@ -9,6 +9,7 @@
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
+#include "../archive_camera/archive_camera.h"
 #include "../sony/sony_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resource/flex_watch/flexwatch_resource.h"
@@ -43,6 +44,7 @@ static const char* IGNORE_VENDORS[][2] =
     {"*", "DWCA-*"},      // NEW ISD cameras rebrended to DW
 	{"*", "DWEA-*"},      // NEW ISD cameras rebrended to DW
     {"*", "DWCS-*"},       // NEW ISD cameras rebrended to DW
+    {"Network Optix", "*"}, // Nx cameras
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
     {"Network Optix", "*"} // Nx Cameras
 };
@@ -179,8 +181,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
-        soapWrapper.setLogin(existResource->getAuth().user());
-        soapWrapper.setPassword(existResource->getAuth().password());
+        QAuthenticator auth = existResource->getAuth();
+
+        if (!auth.isNull())
+        {
+            soapWrapper.setLogin(auth.user());
+            soapWrapper.setPassword(auth.password());
+        }
     }
     else if (!info.defaultLogin.isEmpty()) {
         soapWrapper.setLogin(info.defaultLogin);

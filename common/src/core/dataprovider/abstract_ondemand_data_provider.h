@@ -11,7 +11,7 @@
 
 #include <QObject>
 
-#include "../datapacket/abstract_data_packet.h"
+#include <nx/streaming/abstract_data_packet.h>
 
 
 //!Interface of class, providing data on demand (pull mode)

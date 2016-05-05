@@ -27,7 +27,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         mediaserver.systemSettings().then(function(r){
             $scope.webclientDisabled = r.data.reply.settings.crossdomainEnabled == 'false' ;
-            console.log($scope.webclientDisabled, r.data.reply.settings.crossdomainEnabled);
         });
 
         var isAdmin = false;
@@ -66,7 +65,7 @@ angular.module('webadminApp').controller('ViewCtrl',
 
         $scope.settings = {id: ''};
 
-        mediaserver.getSettings().then(function (r) {
+        mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
                 id: r.data.reply.id
             };

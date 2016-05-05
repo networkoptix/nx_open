@@ -4,7 +4,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QFile>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 
 namespace {

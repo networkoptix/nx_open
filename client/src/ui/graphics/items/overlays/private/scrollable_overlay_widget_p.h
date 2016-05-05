@@ -3,7 +3,7 @@
 #include <ui/graphics/items/generic/graphics_scroll_area.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 class QnScrollableOverlayWidgetPrivate
 {

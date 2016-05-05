@@ -14,7 +14,7 @@ extern "C"
 }
 
 #include "utils/media/frame_info.h"
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
@@ -37,7 +37,7 @@ private:
     int transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result);
 
 private:
-    QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
+    QVector<QnFfmpegVideoDecoder*> m_videoDecoders;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;
 
     quint8* m_videoEncodingBuffer;

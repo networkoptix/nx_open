@@ -8,7 +8,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/common/geometry.h>
 
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include "ui/graphics/opengl/gl_shortcuts.h"
 #include "opengl_renderer.h"

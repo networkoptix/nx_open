@@ -139,6 +139,10 @@ class QnPlOnvifResource;
 typedef QnSharedResourcePointer<QnPlOnvifResource> QnPlOnvifResourcePtr;
 typedef QnSharedResourcePointerList<QnPlOnvifResource> QnPlOnvifResourceList;
 
+class QnArchiveCamResource;
+typedef QnSharedResourcePointer<QnArchiveCamResource> QnArchiveCamResourcePtr;
+typedef QnSharedResourcePointerList<QnArchiveCamResource> QnArchiveCamResourceList;
+
 class QnPlIsdResource;
 typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
@@ -176,6 +180,10 @@ typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 
 class QnAviResource;
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
+
+class QnWebPageResource;
+typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
+typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
 
 
 #endif // QN_RESOURCE_FWD_H

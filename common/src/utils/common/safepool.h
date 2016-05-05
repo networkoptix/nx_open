@@ -8,9 +8,9 @@
 
 #include <map>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 
 //!Associative thread-safe container, which allows to lock elements from accessing from other threads
@@ -130,7 +130,7 @@ public:
                 return const_iterator( m_dataDict.end() );
 
             syncCtxIter = m_syncCtxDict.find( key );
-            Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
+            NX_ASSERT( syncCtxIter != m_syncCtxDict.end() );
             if( !syncCtxIter->second.locked )
                 break;
             m_cond.wait( lk.mutex() );
@@ -158,7 +158,7 @@ public:
                 return iterator( m_dataDict.end() );
 
             syncCtxIter = m_syncCtxDict.find( key );
-            Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
+            NX_ASSERT( syncCtxIter != m_syncCtxDict.end() );
             if( !syncCtxIter->second.locked )
                 break;
             m_cond.wait( lk.mutex() );
@@ -184,7 +184,7 @@ public:
         }
 
         typename SyncCtxDict::iterator syncCtxIter = m_syncCtxDict.find( key );
-        Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
+        NX_ASSERT( syncCtxIter != m_syncCtxDict.end() );
         if( syncCtxIter->second.locked )
             return false;
 
@@ -198,8 +198,8 @@ public:
         QnMutexLocker lk( &m_mutex );
 
         typename SyncCtxDict::iterator syncCtxIter = m_syncCtxDict.find( it->first );
-        Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
-        Q_ASSERT( syncCtxIter->second.locked );
+        NX_ASSERT( syncCtxIter != m_syncCtxDict.end() );
+        NX_ASSERT( syncCtxIter->second.locked );
 
         syncCtxIter->second.locked = false;
         m_cond.wakeAll();

@@ -12,9 +12,10 @@
 #include <type_traits>
 #include <utility>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/log/assert.h>
 #include <QtCore/QThreadPool>
 #include <QtCore/QSharedPointer>
 
@@ -153,7 +154,7 @@ namespace QnConcurrent
 
             void taskStoppedNonSafe()
             {
-                assert( m_startedTaskCount >= 1 );
+                NX_ASSERT( m_startedTaskCount >= 1 );
                 --m_startedTaskCount;
             }
 
@@ -329,7 +330,7 @@ namespace QnConcurrent
             void operator()( const std::pair<typename Container::iterator, int>& val )
             {
                 auto futureImplStrongRef = m_futureImpl.toStrongRef();
-                assert( futureImplStrongRef );
+                NX_ASSERT( futureImplStrongRef );
 
                 //const auto& result = m_function( *val.first );
                 //launching next task
@@ -464,7 +465,7 @@ namespace QnConcurrent
 
             if( !futureImpl->incStartedTaskCountIfAllowed() )
             {
-                Q_ASSERT( false );
+                NX_ASSERT( false );
             }
             auto functor = std::bind( &detail::TaskExecuter<Container, Function>::operator(), taskExecutor, nextElement );
             threadPool->start(
@@ -514,7 +515,7 @@ namespace QnConcurrent
         };
         if( !futureImpl->incStartedTaskCountIfAllowed() )
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
         }
         threadPool->start(
             new detail::QnRunnableTask<decltype(taskRunFunction)>( taskRunFunction ),

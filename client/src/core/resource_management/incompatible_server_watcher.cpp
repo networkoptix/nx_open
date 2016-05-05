@@ -3,7 +3,7 @@
 #include <api/common_message_processor.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
 namespace
@@ -236,6 +236,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
         if (!isSuitable(serverData))
             return;
 
+        NX_ASSERT(serverData.status != Qn::Offline, Q_FUNC_INFO, "Offline status is a mark to remove fake server.");
         QnMediaServerResourcePtr server = makeResource(serverData);
         {
             QnMutexLocker lock(&mutex);
@@ -256,13 +257,13 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
         QnMediaServerResourcePtr server =
                 qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
 
-        Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
+        NX_ASSERT(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
 
         if (!server)
             return;
 
-        server->setFakeServerModuleInformation(serverData);
         server->setStatus(serverData.status);
+        server->setFakeServerModuleInformation(serverData);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())
@@ -310,7 +311,7 @@ QnUuid QnIncompatibleServerWatcherPrivate::getFakeId(const QnUuid &realId) const
 QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
         const ec2::ApiDiscoveredServerData &serverData)
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource(qnResTypePool));
+    QnMediaServerResourcePtr server(new QnMediaServerResource());
 
     server->setId(QnUuid::createUuid());
     server->setStatus(serverData.status, true);

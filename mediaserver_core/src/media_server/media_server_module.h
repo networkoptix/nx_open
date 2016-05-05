@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
 
 class QnCommonModule;
@@ -11,7 +11,7 @@ class QnCommonModule;
 class QnMediaServerModule: public QObject, public QnInstanceStorage, public Singleton<QnMediaServerModule> {
     Q_OBJECT;
 public:
-    QnMediaServerModule(QObject *parent = NULL);
+    QnMediaServerModule(const QString& enforcedMediatorEndpoint = QString(), QObject *parent = NULL);
     virtual ~QnMediaServerModule();
 
     using Singleton<QnMediaServerModule>::instance;

@@ -29,7 +29,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/network/ip_range_checker.h>
+#include <nx/network/ip_range_checker.h>
 #include "common/common_module.h"
 #include "core/resource/media_server_resource.h"
 
@@ -74,6 +74,7 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
+    base_type(),
     m_ready( false ),
     m_state( InitialSearch ),
     m_discoveryUpdateIdx(0),
@@ -96,6 +97,7 @@ void QnResourceDiscoveryManager::setReady(bool ready)
 
 void QnResourceDiscoveryManager::start( Priority priority )
 {
+    updateSearchersUsage();
     QnLongRunnable::start( priority );
     //moveToThread( this );
 }
@@ -103,7 +105,6 @@ void QnResourceDiscoveryManager::start( Priority priority )
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QnMutexLocker locker( &m_searchersListMutex );
-    updateSearcherUsage(serv, isRedundancyUsing());
     m_searchersList.push_back(serv);
 }
 
@@ -129,10 +130,10 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     if (resourceType.isNull())
         return result;
 
-    if (resourceType->getName() == lit("Storage"))
+    if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(params.url));
-        assert(result); //storage can not be null
+        NX_ASSERT(result); //storage can not be null
     }
     else
     {
@@ -362,11 +363,10 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {
         QnResourceList foundResources = *itr;
-        for (int i = 0; i < foundResources.size(); ++i) {
-            QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(foundResources.at(i));
-            if (camera)
+        for (const QnResourcePtr &resource: foundResources) {
+            if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
                 camera->setManuallyAdded(true);
-            resources << camera;
+            resources << resource;
         }
     }
 }
@@ -467,7 +467,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( camRes->getPhysicalId() );
         if( existingRes )
         {
-            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>( existingRes.data() );
+            /* Speed optimization for ARM servers. --ak */
+            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>(existingRes.data());
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
 #ifdef EDGE_SERVER
@@ -522,6 +523,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
             return false;
 
         const QnResourcePtr& rpResource = qnResPool->getResourceByUniqueId((*it)->getUniqueId());
+        /* Speed optimization for ARM servers. --ak */
         QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(rpResource.data());
         if (rpNetRes) {
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
@@ -531,7 +533,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
         }
         else {
-            ++it; // new resource => shouls keep it
+            ++it; // new resource => should keep it
         }
     }
 
@@ -541,35 +543,43 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera)
 {
     QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+    QAuthenticator auth = camera->getAuth();
+    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
     for (int i = 0; i < m_searchersList.size(); ++i) {
         if (m_searchersList[i]->isResourceTypeSupported(resType->getId()))
             inserted.value().searcher = m_searchersList[i];
     }
 }
 
-bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
+int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
 {
     QnMutexLocker lock( &m_searchersListMutex );
+    int added = 0;
     for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
-        for (int i = 0; i < m_searchersList.size(); ++i)
+        for (QnAbstractResourceSearcher* searcher: m_searchersList)
         {
-            if (m_searchersList[i]->isResourceTypeSupported(itr.value().resType->getId()))
-            {
-                QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
-                inserted.value().searcher = m_searchersList[i];
-            }
+            if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
+                continue;
+
+            QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
+            inserted.value().searcher = searcher;
+            ++added;
+            break;
         }
     }
-    return true;
+
+    return added;
 }
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
     const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server)
+    {
+        disconnect(server, nullptr, this, nullptr);
         updateSearchersUsage();
+    }
 
     QnMutexLocker lock( &m_searchersListMutex );
     QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
@@ -581,8 +591,9 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
 void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
     const QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server) {
-        connect(server.data(), &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+    if (server)
+    {
+        connect(server, &QnMediaServerResource::redundancyChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
         updateSearchersUsage();
     }
 
@@ -594,7 +605,8 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
             return;
         if (!m_manualCameraMap.contains(camera->getUrl())) {
             QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            QAuthenticator auth = camera->getAuth();
+            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())
@@ -628,7 +640,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
             if (!vcRes)
                 continue;
 
-            Q_ASSERT(unit.factory!=0);
+            NX_ASSERT(unit.factory!=0);
 
 #ifdef ENABLE_DATA_PROVIDERS
             vcRes->lockDTSFactory();
@@ -657,15 +669,9 @@ bool QnResourceDiscoveryManager::isRedundancyUsing() const
     return false;
 }
 
-void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable) {
+void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable)
+{
     // TODO: #Elric strictly speaking, we must do this under lock.
-
-    QSet<QString> disabledVendorsForAutoSearch;
-    //TODO #ak edge server MUST always discover edge camera despite disabledVendors setting,
-        //but MUST check disabledVendors for all other vendors (if they enabled on edge server)
-#ifndef EDGE_SERVER
-    disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
-#endif
 
     DiscoveryMode discoveryMode = DiscoveryMode::fullyEnabled;
     if( searcher->isLocal() ||                  // local resources should always be found
@@ -675,6 +681,13 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
     }
     else
     {
+        QSet<QString> disabledVendorsForAutoSearch;
+        //TODO #ak edge server MUST always discover edge camera despite disabledVendors setting,
+        //but MUST check disabledVendors for all other vendors (if they enabled on edge server)
+#ifndef EDGE_SERVER
+        disabledVendorsForAutoSearch = qnGlobalSettings->disabledVendorsSet();
+#endif
+
         //no lower_bound, since QSet is built on top of hash
         if( disabledVendorsForAutoSearch.contains(searcher->manufacture()+lit("=partial")) )
             discoveryMode = DiscoveryMode::partiallyEnabled;

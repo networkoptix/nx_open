@@ -1,0 +1,98 @@
+$font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@import '_theme_palette';
+
+// Brand colors
+// -------------------------
+
+$brand-primary:         $blue10;
+$brand-info:            $blue8;
+
+$gray-darker:            $light4;
+$gray-dark:              $light8;
+$gray:                   $dark17;
+$gray-light:             $dark11;
+$gray-lighter:           $dark7;
+
+
+$body-bg:                 $dark2;
+$text-color:              $light;
+
+$link-color:              $blue12;
+$link-hover-color:        $link;
+
+
+/* Panels */
+$panel-border-radius:       0;
+$panel-footer-bg:           transparent;
+$panel-bg:                  $window;
+$panel-default-heading-bg:  $dark12;
+$panel-default-text:        $buttonText;
+
+$panel-inner-border:        transparent;
+
+$panel-default-border:      $panel-default-heading-bg;
+/* This hack is to make header and dialog have a bit different colors:
+$panel-default-border:      transparent;
+*/
+
+/* Buttons */
+$padding-base-vertical: 4px;
+$padding-base-horizontal: 8px;
+
+$btn-font-weight:         600;
+
+
+$btn-default-color:  $buttonText;
+$btn-default-bg:     $button;
+$btn-default-border: $button;
+
+$btn-primary-color:   $brightText ;
+$btn-primary-bg:      $brand-primary;
+$btn-primary-border:  $brand-primary;
+
+/* Headings */
+$headings-color:          $light2;
+$headings-font-weight:    lighter;
+
+/* Inputs */
+
+$input-color:   $text;
+$input-bg:      $shadow;
+$input-border:  $shadow_d1;
+$input-bg-disabled: transparentize($shadow,0.8);
+
+/* Common parameters */
+$font-size-base:          13px;
+
+$border-radius-base:      2px;
+$border-radius-large:     2px;
+$border-radius-small:     2px;
+
+$common-border-color:   $dark14;
+
+$dropdown-border:                         $common-border-color;
+$navbar-default-toggle-border-color:      $common-border-color;
+$nav-tabs-border-color:                   $common-border-color;
+$nav-tabs-active-link-hover-border-color: $common-border-color;
+$nav-tabs-justified-link-border-color:    $common-border-color;
+$pagination-border:                       $common-border-color;
+$pagination-hover-border:                 $common-border-color;
+$pagination-disabled-border:              $common-border-color;
+$list-group-border:                       $common-border-color;
+$thumbnail-border:                        $common-border-color;
+
+
+$font-size-h2:           24px; // ~20px
+
+/*
+$font-size-large:         ceil($font-size-base * 1.15); // ~16px
+$font-size-small:         ceil($font-size-base * 0.85); // ~12px
+
+$font-size-h1:            ceil($font-size-base * 1.57); // ~22px
+
+$font-size-h3:            ceil($font-size-base * 1.3);  // ~18px
+$font-size-h4:            ceil($font-size-base * 1.15); // ~16px
+$font-size-h5:            $font-size-base;
+$font-size-h6:            ceil($font-size-base * 0.85); // ~12px
+*/

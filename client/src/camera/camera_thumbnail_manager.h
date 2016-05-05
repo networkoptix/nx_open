@@ -8,7 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 class QnCameraThumbnailManager : public QObject
 {
@@ -26,6 +26,8 @@ public:
     virtual ~QnCameraThumbnailManager();
 
     void selectResource(const QnVirtualCameraResourcePtr &camera);
+
+    QSize thumbnailSize() const;
     void setThumbnailSize(const QSize &size);
 
     QPixmap statusPixmap(ThumbnailStatus status);

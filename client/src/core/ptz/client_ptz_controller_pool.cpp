@@ -42,7 +42,7 @@ void QnClientPtzControllerPool::cacheCameraPresets(const QnVirtualCameraResource
         return;
 
     auto controller = this->controller(camera);
-    Q_ASSERT_X(controller, Q_FUNC_INFO, "Controller must exist here");
+    NX_ASSERT(controller, Q_FUNC_INFO, "Controller must exist here");
     if (!controller)
         return;
 

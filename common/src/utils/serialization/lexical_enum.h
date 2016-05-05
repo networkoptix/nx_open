@@ -43,6 +43,11 @@ public:
 
     void insert(int value, const QString &name);
     void insert(int value, const char *name);
+    //!"enum class" support
+    template<typename T> typename std::enable_if<std::is_enum<T>::value, void>::type
+        insert(T value, const QString &name) { insert(static_cast<int>(value), name); }
+    template<typename T> typename std::enable_if<std::is_enum<T>::value, void>::type
+        insert(T value, const char* name) { insert(static_cast<int>(value), name); }
     void clear();
 
     bool isFlagged() const;

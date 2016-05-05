@@ -46,12 +46,15 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <platform/environment.h>
 
 #include <recording/time_period_list.h>
 
@@ -64,25 +67,23 @@
 
 #include <ui/dialogs/about_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
-#include <ui/dialogs/user_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
-#include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/business_rules_dialog.h>
-#include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
-#include <ui/dialogs/layout_settings_dialog.h>
-#include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/media_file_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
-#include <ui/dialogs/non_modal_dialog_constructor.h>
+#include <ui/dialogs/common/non_modal_dialog_constructor.h>
+#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -125,7 +126,6 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/local_file_cache.h>
-#include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
@@ -136,7 +136,7 @@
 #include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 
@@ -187,7 +187,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
      * File dialog execution will be failed. (see a comment in qcocoafiledialoghelper.mm)
      * To make dialogs work we're using queued connection here. */
     connect(action(QnActions::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
-    connect(action(QnActions::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(QnActions::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
 
     connect(action(QnActions::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
@@ -221,7 +220,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(QnActions::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
-    connect(action(QnActions::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
+
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(QnActions::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(QnActions::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
@@ -236,7 +235,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(QnActions::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(action(QnActions::RemoveFromServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
-    connect(action(QnActions::NewUserAction),                          SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
     connect(action(QnActions::RenameResourceAction),                   SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
     connect(action(QnActions::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
     connect(action(QnActions::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
@@ -263,7 +261,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
     connect(action(QnActions::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(QnActions::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
-    connect(action(QnActions::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
+    connect(action(QnActions::VersionMismatchMessageAction),           &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered);
     connect(action(QnActions::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(QnActions::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
@@ -327,15 +325,19 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
 #endif
 
     {
-        //TODO: #GDM #Common refactor duplicated code
+        //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
+        if (isServer && QnMediaServerResource::isFakeServer(resource))
+            return;
+
+        bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool isExportedLayout = snapshotManager()->isFile(layout);
+        bool isExportedLayout = layout->isFile();
 
-        bool allowed = isServer || isMediaResource;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        bool allowed = nonVideo || isMediaResource;
+        bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
         if(!allowed || forbidden)
             return;
     }
@@ -549,7 +551,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 
         /* Delete orphaned layouts. */
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>())
-            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            if(snapshotManager()->isLocal(layout) && !layout->isFile())
                 resourcePool()->removeResource(layout);
     }
 
@@ -559,7 +561,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode()) {
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+            if(snapshotManager()->isLocal(layout) && !layout->isFile())
                 resourcePool()->removeResource(layout);
         }
     }
@@ -735,7 +737,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 
     QnResourceList filtered;
     foreach (const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page))
             filtered << resource;
     }
     if (filtered.isEmpty())
@@ -907,19 +909,23 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             menu()->trigger(QnActions::OpenInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-            if (layout->hasFlags(Qn::url | Qn::local | Qn::layout)) {
+            if (layout->isFile())
+            {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
-                    //TODO: #GDM #Common refactor duplicated code
+                    //TODO: #GDM #Common refactor duplicated code VMS-1725
                     hasLocal |= resource->hasFlags(Qn::url | Qn::local | Qn::media)
                             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
                     if (hasLocal)
                         break;
                 }
                 if (hasLocal)
+                {
                     QnMessageBox::warning(mainWindow(),
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
+                    return;
+                }
             }
         }
     }
@@ -971,11 +977,9 @@ void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered()
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     QStringList filters;
-    //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
     filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
-    //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
 
     QStringList files = QnFileDialog::getOpenFileNames(mainWindow(),
@@ -987,23 +991,6 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
 
     if (!files.isEmpty())
         menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(files));
-}
-
-void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
-    QStringList filters;
-    filters << tr("All Supported (*.layout)");
-    filters << tr("Layouts (*.layout)");
-    filters << tr("All files (*.*)");
-
-    QString fileName = QnFileDialog::getOpenFileName(mainWindow(),
-                                                     tr("Open File"),
-                                                     QString(),
-                                                     filters.join(lit(";;")),
-                                                     0,
-                                                     QnCustomFileDialog::fileDialogOptions());
-
-    if(!fileName.isEmpty())
-        menu()->trigger(QnActions::DropResourcesAction, addToResourcePool(fileName).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -1289,7 +1276,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = qnSettings->maxPreviewSearchItems();
 
     if(period.durationMs < steps[1]) {
-        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
+        QnMessageBox::warning(mainWindow(), tr("Unable to perform preview search."), tr("Selected time period is too short to perform preview search. Please select a longer period."), QDialogButtonBox::Ok);
         return;
     }
 
@@ -1363,7 +1350,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
     /* Construct and add a new layout. */
-    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if(context()->user())
@@ -1478,10 +1465,10 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
                         tr("Process in progress..."),
                         tr("Device addition is already in progress. "
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
-                        QMessageBox::Ok | QMessageBox::Cancel,
-                        QMessageBox::Cancel
+                        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                        QDialogButtonBox::Cancel
             );
-            if (result != QMessageBox::Ok)
+            if (result != QDialogButtonBox::Ok)
                 return;
         }
         dialog->setServer(server);
@@ -1552,7 +1539,7 @@ void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
     if(resource.isNull())
         return;
 
-    QnEnvironment::showInGraphicalShell(mainWindow(), resource->getUrl());
+    QnEnvironment::showInGraphicalShell(resource->getUrl());
 }
 
 void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered() {
@@ -1620,7 +1607,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         return true;
 
     /* Resource cannot have both of these flags at once. */
-    Q_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
+    NX_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
 
     foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
         if (!resource->hasFlags(checkedFlags))
@@ -1733,9 +1720,13 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
     {
         qnResourcesChangesManager->saveVideoWall(videowall, [name](const QnVideoWallResourcePtr &videowall) { videowall->setName(name); } );
     }
+	else if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+    {
+        qnResourcesChangesManager->saveWebPage(webPage, [name](const QnWebPageResourcePtr &webPage) {  webPage->setName(name); });
+    }
     else
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid resource type to rename");
+        NX_ASSERT(false, Q_FUNC_INFO, "Invalid resource type to rename");
     }
 }
 
@@ -1891,28 +1882,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     deleteResources(moreResourceToDelete);
 }
 
-void QnWorkbenchActionHandler::at_newUserAction_triggered() {
-    QnUserResourcePtr user(new QnUserResource());
-    user->setPermissions(Qn::GlobalLiveViewerPermissions);
-
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setUser(user);
-    dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    setHelpTopic(dialog.data(), Qn::NewUser_Help);
-    do {
-        if(!dialog->exec())
-            return;
-        dialog->submitToResource();
-    } while (!validateResourceName(user, user->getName()));
-
-    user->setId(QnUuid::createUuid());
-    user->setTypeByName(lit("User"));
-
-    qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
-    user->setPassword(QString()); // forget the password now
-}
-
 void QnWorkbenchActionHandler::closeApplication(bool force) {
     /* Try close, if force - exit anyway. */
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
@@ -1940,118 +1909,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 
     QnNonModalDialogConstructor<QnAdjustVideoDialog> dialogConstructor(m_adjustVideoDialog, mainWindow());
     adjustVideoDialog()->setWidget(widget);
-}
-
-void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
-    QnActionParameters params = menu()->currentParameters(sender());
-    QnUserResourcePtr user = params.resource().dynamicCast<QnUserResource>();
-    if(!user)
-        return;
-
-    Qn::Permissions permissions = accessController()->permissions(user);
-    if(!(permissions & Qn::ReadPermission))
-        return;
-
-    QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setWindowTitle(tr("User Settings"));
-    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
-
-    dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
-
-    QnUserSettingsDialog::ElementFlags zero(0);
-
-    QnUserSettingsDialog::ElementFlags flags =
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-        ((permissions & Qn::WritePermission) ? QnUserSettingsDialog::Editable : zero);
-
-    QnUserSettingsDialog::ElementFlags loginFlags =
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-        ((permissions & Qn::WriteNamePermission) ? QnUserSettingsDialog::Editable : zero);
-
-    QnUserSettingsDialog::ElementFlags passwordFlags =
-        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : zero) | /* There is no point to display flag edit field if password cannot be changed. */
-        ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Editable : zero);
-    passwordFlags &= flags;
-
-    QnUserSettingsDialog::ElementFlags accessRightsFlags =
-        ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable : zero);
-    accessRightsFlags &= flags;
-
-    QnUserSettingsDialog::ElementFlags emailFlags =
-        ((permissions & Qn::ReadEmailPermission) ? QnUserSettingsDialog::Visible : zero) |
-        ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
-    emailFlags &= flags;
-
-    QnUserSettingsDialog::ElementFlags enabledFlags =
-        ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable | QnUserSettingsDialog::Visible : zero);
-    enabledFlags &= flags;
-
-    dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
-    dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
-    dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
-    dialog->setElementFlags(QnUserSettingsDialog::Email, emailFlags);
-    dialog->setElementFlags(QnUserSettingsDialog::Enabled, enabledFlags);
-
-
-    // TODO #Elric: This is a totally evil hack. Store password hash/salt in user.
-    QString currentPassword = QnAppServerConnectionFactory::url().password();
-    if(user == context()->user()) {
-        dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
-        dialog->setCurrentPassword(currentPassword);
-    } else {
-        dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    }
-
-    dialog->setUser(user);
-    if(!dialog->exec() || !dialog->hasChanges())
-        return;
-
-    if (!(permissions & Qn::SavePermission))
-        return;
-
-    qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
-        dialog->submitToResource();
-    });
-
-    //TODO: #GDM SafeMode what to rollback if current password changes cannot be saved?
-
-    QString newPassword = user->getPassword();
-    user->setPassword(QString());
-
-    if (user != context()->user() || newPassword.isEmpty() || newPassword == currentPassword)
-        return;
-
-
-    /* Password was changed. Change it in global settings and hope for the best. */
-    QUrl url = QnAppServerConnectionFactory::url();
-    url.setPassword(newPassword);
-
-    // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-    context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
-
-    QnAppServerConnectionFactory::setUrl(url);
-
-    /* QnAppServerConnectionFactory::url() contains user name in lower case. We'd better use the original name for UI. */
-    url.setUserName(user->getName());
-
-    QnConnectionDataList savedConnections = qnSettings->customConnections();
-    if (!savedConnections.isEmpty()
-        && !savedConnections.first().url.password().isEmpty()
-        && qnUrlEqual(savedConnections.first().url, url))
-    {
-        QnConnectionData current = savedConnections.takeFirst();
-        current.url = url;
-        savedConnections.prepend(current);
-        qnSettings->setCustomConnections(savedConnections);
-    }
-
-    QnConnectionData lastUsed = qnSettings->lastUsedConnection();
-    if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url)) {
-        lastUsed.url = url;
-        qnSettings->setLastUsedConnection(lastUsed);
-    }
 }
 
 void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
@@ -2202,21 +2059,19 @@ void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filenam
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(QnActions::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
-    //if (!action(QnActions::TogglePanicModeAction)->isChecked()) {
 
+    // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
+        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
-
-    //}
 }
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
+        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
     action(QnActions::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)
@@ -2259,7 +2114,7 @@ struct ItemPositionCmp {
 
 void QnWorkbenchActionHandler::at_tourTimer_timeout() {
     QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
-    qSort(items.begin(), items.end(), ItemPositionCmp());
+    std::sort(items.begin(), items.end(), ItemPositionCmp());
 
     if(items.empty()) {
         action(QnActions::ToggleTourModeAction)->setChecked(false);
@@ -2326,6 +2181,9 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     if (qnCommon->isReadOnly())
         return;
 
+    if (qnRuntime->ignoreVersionMismatch())
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if(!watcher->hasMismatches())
         return;
@@ -2375,14 +2233,14 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox> > messageBox(
         new QnWorkbenchStateDependentDialog<QnMessageBox>(mainWindow()));
-    messageBox->setIcon(QMessageBox::Warning);
+    messageBox->setIcon(QnMessageBox::Warning);
     messageBox->setWindowTitle(tr("Version Mismatch"));
     messageBox->setText(message);
     messageBox->setTextFormat(Qt::RichText);
-    messageBox->setStandardButtons(QMessageBox::Cancel);
+    messageBox->setStandardButtons(QDialogButtonBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
+    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(QnActions::SystemUpdateAction);
     }, Qt::QueuedConnection);
@@ -2451,7 +2309,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
 
     if (!success) {
-        QMessageBox::critical(
+        QnMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process not found."),
                     tr("Cannot restart the client.") + L'\n'

@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "rtp_stream_parser.h"
+#include <nx/streaming/rtp_stream_parser.h>
 
 // used for G711, G726 e.t.c simple audio codecs with one frame per packet
 
@@ -14,13 +14,13 @@ public:
     virtual ~QnSimpleAudioRtpParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
     void setCodecId(CodecID codecId);
     void setBitsPerSample(int value);
     void setSampleFormat(AVSampleFormat sampleFormat);
 private:
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
     int m_frequency;
     int m_channels;

@@ -1,6 +1,7 @@
 #include "desktop_client_message_processor.h"
 
 #include <core/resource_management/incompatible_server_watcher.h>
+#include <core/resource/client_camera_factory.h>
 
 QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor() :
     base_type(),
@@ -28,6 +29,11 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
     base_type::disconnectFromConnection(connection);
 
     disconnect(connection->getDiscoveryManager(), nullptr, this, nullptr);
+}
+
+QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const
+{
+    return QnClientResourceFactory::instance();
 }
 
 void QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers(

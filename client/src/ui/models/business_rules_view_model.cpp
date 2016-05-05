@@ -8,6 +8,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
+#include <utils/math/math.h>
 
 
 QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :
@@ -200,7 +201,7 @@ int QnBusinessRulesViewModel::createRule() {
 }
 
 void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rule) {
-    Q_ASSERT_X(rule, Q_FUNC_INFO, "Rule must exist");
+    NX_ASSERT(rule, Q_FUNC_INFO, "Rule must exist");
     if (!rule)
         return;
 

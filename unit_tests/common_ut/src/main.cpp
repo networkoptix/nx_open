@@ -7,23 +7,40 @@
 
 #include <QCoreApplication>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
 
-
-int main( int argc, char **argv )
+int main(int argc, char **argv)
 {
 #if 0
-    QCoreApplication app( argc, argv );
-
-    QnLog::initLog("DEBUG2");
     cl_log.create(
-        "C:\\tmp\\ut\\log_file",
-        10*1024*1024,
-        25,
-        QnLogLevel::cl_logDEBUG2 );
+        "c:/tmp/common_ut.log",
+        50*1024*1024,
+        1,
+        cl_logDEBUG2);
 #endif
-
+	
+	nx::network::SocketGlobals::InitGuard sgGuard;
     ::testing::InitGoogleTest(&argc, argv);
-    const int result = RUN_ALL_TESTS();
-    return result;
+
+    for (int i = 0; i < argc; ++i)
+    {
+        static const std::string SOCKET("--enforce-socket=");
+        static const std::string LOG("--log=");
+
+        std::string arg(argv[i]);
+        if (arg.find(SOCKET) == 0)
+        {
+            SocketFactory::enforceStreamSocketType(
+                QString::fromStdString(arg.substr(SOCKET.length())));
+        }
+        else
+        if (arg.find(LOG) == 0)
+        {
+            QnLog::initLog(QString::fromStdString(arg.substr(LOG.length())));
+        }
+    }
+
+    return RUN_ALL_TESTS();
 }

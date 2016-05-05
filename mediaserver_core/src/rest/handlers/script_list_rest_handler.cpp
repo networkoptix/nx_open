@@ -1,5 +1,5 @@
 #include "script_list_rest_handler.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <QDir>
 #include "media_server/serverutil.h"
 

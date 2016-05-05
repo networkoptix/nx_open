@@ -13,6 +13,8 @@
 #include "api_layout_data.h"
 #include "api_user_data.h"
 
+#include <utils/common/model_functions_fwd.h>
+
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data
 //       and keep report 100% anonimous)
@@ -60,7 +62,7 @@ namespace ec2 {
         ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
 
         // overrides ApiMediaServerDataEx::storages for fusion
-        ApiStorageDataStatisticsList storages;
+        std::vector<ApiStorageDataStatistics> storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
     (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
@@ -93,19 +95,31 @@ namespace ec2 {
     };
 #define ApiUserDataStatistics_Fields (id)(isAdmin)(permissions)(isLdap)(isEnabled)
 
+    struct ApiStatisticsReportInfo
+    {
+        QnUuid id;
+        qint64 number;
+
+        ApiStatisticsReportInfo();
+    };
+#define ApiStatisticsReportInfo_Fields (id)(number)
+
     struct ApiSystemStatistics
     {
         QnUuid systemId;
-		
-        ApiBusinessRuleStatisticsList       businessRules;
-        ApiCameraDataStatisticsList         cameras;
-        ApiClientInfoDataList               clients;
-        ApiLicenseStatisticsList            licenses;
-        ApiMediaServerDataStatisticsList    mediaservers;
-        ApiLayoutDataList                   layouts;
-        ApiUserDataStatisticsList           users;
+        ApiStatisticsReportInfo reportInfo;
+
+        std::vector<ApiBusinessRuleStatistics> businessRules;
+        std::vector<ApiCameraDataStatistics> cameras;
+        std::vector<ApiClientInfoData> clients;
+        std::vector<ApiLicenseStatistics> licenses;
+        std::vector<ApiMediaServerDataStatistics> mediaservers;
+        std::vector<ApiLayoutData> layouts;
+        std::vector<ApiUserDataStatistics> users;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)(users)
+#define ApiSystemStatistics_Fields (systemId) \
+    (mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)(users) \
+    (reportInfo)
 
     struct ApiStatisticsServerInfo
     {
@@ -114,6 +128,20 @@ namespace ec2 {
         QString status;
     };
 #define ApiStatisticsServerInfo_Fields (systemId)(url)(status)
+
+#define API_STATISTICS_DATA_TYPES \
+    (ApiCameraDataStatistics) \
+    (ApiStorageDataStatistics) \
+    (ApiMediaServerDataStatistics) \
+    (ApiLicenseStatistics) \
+    (ApiBusinessRuleStatistics) \
+    (ApiUserDataStatistics) \
+    (ApiStatisticsReportInfo) \
+    (ApiSystemStatistics) \
+    (ApiStatisticsServerInfo)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( \
+    API_STATISTICS_DATA_TYPES, (ubjson)(xml)(json)(csv_record));
 
 } // namespace ec2
 

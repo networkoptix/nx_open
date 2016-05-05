@@ -7,8 +7,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QCoreApplication>
 
 #include "warnings.h"

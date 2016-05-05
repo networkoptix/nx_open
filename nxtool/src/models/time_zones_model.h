@@ -3,7 +3,7 @@
 
 #include <QStringListModel>
 
-#include <base/types.h>
+#include <nx/mediaserver/api/server_info.h>
 
 namespace rtu
 {
@@ -17,7 +17,8 @@ namespace rtu
         Q_PROPERTY(int currentTimeZoneIndex READ currentTimeZoneIndex NOTIFY currentTimeZoneIndexChanged)
 
     public:
-        explicit TimeZonesModel(const ServerInfoPtrContainer &selectedServers
+        explicit TimeZonesModel(
+            const nx::mediaserver::api::ServerInfoPtrContainer &selectedServers
             , QObject *parent = nullptr);
         
         virtual ~TimeZonesModel();

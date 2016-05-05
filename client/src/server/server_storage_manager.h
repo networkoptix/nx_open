@@ -10,7 +10,7 @@
 
 #include <server/server_storage_manager_fwd.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
 /** Client-side class to monitor server-related storages state: rebuild and backup process. */

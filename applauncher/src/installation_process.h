@@ -15,7 +15,7 @@
 #include <api/applauncher_api.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/joinable.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <plugins/videodecoder/stree/node.h>
 #include <plugins/videodecoder/stree/resourcenameset.h>
 

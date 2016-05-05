@@ -15,20 +15,19 @@
 #include <QSettings>
 
 #include <utils/common/stoppable.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 #include "abstract_request_processor.h"
 #include "installation_manager.h"
 #include "installation_process.h"
 #include "task_server_new.h"
-#include "version.h"
 
 class ApplauncherProcess
 :
     public QObject,
     public QnStoppable,
     public AbstractRequestProcessor,
-    public TimerEventHandler
+    public nx::utils::TimerEventHandler
 {
     Q_OBJECT
 

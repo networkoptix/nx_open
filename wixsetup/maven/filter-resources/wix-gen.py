@@ -8,13 +8,13 @@ properties_dir='${root.dir}/wixsetup/${arch}'
 #    os.makedirs(properties_dir)
 #os.system("echo ${install.type}=${finalName}.msi >> %s/installer.properties " % properties_dir)
 
-generated_items = ['dbsync', 'help', 'vox', 'bg']
+generated_items = ['vs2015crt', 'fonts', 'qml', 'dbsync', 'help', 'vox', 'bg']
 
 if '${nxtool}' == 'true':
     generated_items += ['qtquickcontrols']
 
 for wxs in generated_items:
-    p = subprocess.Popen('${init.python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE)
+    p = subprocess.Popen('${init.python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE, stderr=subprocess.STDOUT)
     out, err = p.communicate()
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
     print out

@@ -75,7 +75,7 @@ public:
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 
-    //!this function is called if resource changes state from offline to online or so 
+    //!this function is called if resource changes state from offline to online or so
     /*!
         \note If \a QnResource::init is already running in another thread, this method exits immediately and returns false
         \return true, if initialization attempt is done (with success or failure). false, if \a QnResource::init is already running in other thread
@@ -93,7 +93,7 @@ public:
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;
-    
+
     // flags like network media and so on
     virtual Qn::ResourceFlags flags() const;
     inline bool hasFlags(Qn::ResourceFlags flags) const { return (this->flags() & flags) == flags; }
@@ -117,7 +117,7 @@ public:
     virtual QString toString() const;
     virtual QString toSearchString() const;
 
-    
+
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource);
 
@@ -135,7 +135,7 @@ public:
 #ifdef ENABLE_DATA_PROVIDERS
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
-#endif 
+#endif
 
 
     // return true if no error
@@ -145,15 +145,12 @@ public:
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
     //void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
-#endif 
+#endif
 
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
     // in this case we need to request additional information later.
     // unknownResource - tels if we need that additional information
     virtual bool unknownResource() const;
-
-    // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
-    virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
 
 #ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
@@ -188,11 +185,13 @@ public:
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
     /* Note that these functions hide property API inherited from QObject.
-     * This is intended as this API cannot be used with QnResource anyway 
+     * This is intended as this API cannot be used with QnResource anyway
      * because of threading issues. */
 
     bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key) const;
+    static QString getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId);
+
     ec2::ApiResourceParamDataList getProperties() const;
 
     enum PropertyOptions
@@ -237,7 +236,7 @@ signals:
     void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success) const;
 
     void asyncParamsGetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
-    
+
     //!Emitted on completion of every async set started with setParamAsync
     /*!
         \param paramValue in case \a result == false, this value cannot be relied on
@@ -275,7 +274,7 @@ public:
 
     void getParamPhysicalAsync(const QString &id);
     void setParamPhysicalAsync(const QString &id, const QString &value);
-    
+
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 protected:
@@ -331,7 +330,7 @@ protected:
     QString m_name;
 
     /** Url of this resource, if any. */
-    QString m_url; 
+    QString m_url;
 private:
     struct LocalPropertyValue
     {
@@ -369,12 +368,12 @@ private:
 
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags;
-    
+
     QDateTime m_lastDiscoveredTime;
 
     QStringList m_tags;
 
-    bool m_initialized;    
+    bool m_initialized;
     QnMutex m_initAsyncMutex;
 
     qint64 m_lastInitTime;

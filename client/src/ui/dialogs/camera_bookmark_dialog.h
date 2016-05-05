@@ -4,7 +4,7 @@
 #include <QtCore/QScopedPointer>
 
 #include <core/resource/camera_bookmark_fwd.h>
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 namespace Ui {
 class QnCameraBookmarkDialog;

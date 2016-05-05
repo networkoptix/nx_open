@@ -33,7 +33,7 @@ QTransform sharpTransform(const QTransform &transform, bool *corrected)
 }
 
 void paintPixmapSharp( QPainter *painter, const QPixmap &pixmap, const QPointF &position ) {
-    Q_ASSERT_X(painter, Q_FUNC_INFO, "Painter must exist here");
+    NX_ASSERT(painter, Q_FUNC_INFO, "Painter must exist here");
     if (!painter || pixmap.isNull())
         return;
 

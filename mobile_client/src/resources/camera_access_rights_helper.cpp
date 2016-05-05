@@ -1,17 +1,12 @@
 #include "camera_access_rights_helper.h"
 
+#include <nx/utils/log/assert.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <watchers/user_watcher.h>
 #include <common/common_module.h>
-#include <common/user_permissions.h>
-
-namespace {
-    bool userIsAdmin(const QnUserResourcePtr &user) {
-        return user->isAdmin() || (user->getPermissions() & Qn::GlobalProtectedPermission);
-    }
-}
 
 class QnCameraAccessRightsHelperPrivate : public QObject {
     QnCameraAccessRightsHelper * const q_ptr;
@@ -59,7 +54,7 @@ void QnCameraAccessRightsHelper::setResourceId(const QString &id)
         return;
 
     Q_D(QnCameraAccessRightsHelper);
-    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
     d->updateAccessRights();
 }
 
@@ -78,9 +73,12 @@ QnCameraAccessRightsHelperPrivate::QnCameraAccessRightsHelperPrivate(QnCameraAcc
 
 void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
-    if (camera && user) {
-        canViewArchive = userIsAdmin(user) || user->getPermissions() & Qn::GlobalViewArchivePermission;
-    } else {
+    if (camera && user)
+    {
+        canViewArchive = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
+    }
+    else
+    {
         canViewArchive = false;
     }
 

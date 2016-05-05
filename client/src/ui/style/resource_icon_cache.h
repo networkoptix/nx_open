@@ -8,17 +8,19 @@
 
 /**
  * Cache for resource icons with overlaid status.
- * 
+ *
  * Note that this class is not thread-safe.
  */
-class QnResourceIconCache: public QObject {
+class QnResourceIconCache: public QObject
+{
     Q_OBJECT;
     Q_FLAGS(Key KeyPart);
 
 public:
-    enum KeyPart {
+    enum KeyPart
+    {
         Unknown,
-        Local,
+        LocalServer,
         Server,
         Servers,
         Layout,
@@ -34,6 +36,8 @@ public:
         OtherSystem,
         OtherSystems,
         IOModule,
+        WebPage,
+        WebPages,
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,
@@ -49,11 +53,11 @@ public:
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
 
-    QnResourceIconCache(QObject *parent = NULL);
+    QnResourceIconCache(QObject* parent = nullptr);
 
     virtual ~QnResourceIconCache();
 
-    QIcon icon(const QnResourcePtr &resource);
+    QIcon icon(const QnResourcePtr& resource);
 
     /**
      * @brief icon
@@ -63,18 +67,18 @@ public:
      */
     QIcon icon(Key key, bool unchecked = false);
 
-    static Key key(const QnResourcePtr &resource);
+    static Key key(const QnResourcePtr& resource);
 
     /**
      * @brief setKey            Bind custom key to the provided resource instance.
      * @param resource          Target resource.
      * @param key               Custom key.
      */
-    static void setKey(QnResourcePtr &resource, Key key);
+    static void setKey(QnResourcePtr& resource, Key key);
 
-    static QnResourceIconCache *instance();
+    static QnResourceIconCache* instance();
 
-    
+
 private:
     QHash<Key, QIcon> m_cache;
 };

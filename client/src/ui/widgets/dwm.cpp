@@ -12,7 +12,20 @@
 #include <utils/common/invocation_event.h>
 
 #ifdef QN_HAS_DWM
-#include <QtWidgets/private/qwidget_p.h>
+#if QT_VERSION == 0x050201
+#include <QtWidgets/5.2.1/QtWidgets/private/qwidget_p.h>
+#elif QT_VERSION == 0x050401
+#include <QtWidgets/5.4.1/QtWidgets/private/qwidget_p.h>
+#elif QT_VERSION == 0x050500
+#include <QtWidgets/5.5.0/QtWidgets/private/qwidget_p.h>
+#elif QT_VERSION == 0x050501
+#include <QtWidgets/5.5.1/QtWidgets/private/qwidget_p.h>
+#elif QT_VERSION == 0x050600
+#include <QtWidgets/5.6.0/QtWidgets/private/qwidget_p.h>
+#else
+#error "Include proper header here!"
+#endif
+
 #include <qt_windows.h>
 #include <utils/qt5port_win.h>
 
@@ -20,7 +33,7 @@
 #include <Windows.h>
 #include <WindowsX.h>
 
-/* The following definitions are from <dwmapi.h>. 
+/* The following definitions are from <dwmapi.h>.
  * They are here so that everything would compile even if we don't have that include file. */
 
 #define WM_DWMCOMPOSITIONCHANGED        0x031E      /**< Composition changed window message. */
@@ -56,14 +69,14 @@ typedef enum _DWMWINDOWATTRIBUTE {
     DWMWA_HAS_ICONIC_BITMAP,
     DWMWA_DISALLOW_PEEK,
     DWMWA_EXCLUDED_FROM_PEEK,
-    DWMWA_LAST 
+    DWMWA_LAST
 } DWMWINDOWATTRIBUTE;
 
 typedef enum _DWMNCRENDERINGPOLICY {
     DWMNCRP_USEWINDOWSTYLE,
     DWMNCRP_DISABLED,
     DWMNCRP_ENABLED,
-    DWMNCRP_LAST 
+    DWMNCRP_LAST
 } DWMNCRENDERINGPOLICY;
 
 typedef boost::remove_pointer<LRESULT>::type RESULT;
@@ -121,7 +134,7 @@ public:
     PtrDwmGetColorizationColor dwmGetColorizationColor;
     PtrDwmDefWindowProc dwmDefWindowProc;
     PtrDwmSetWindowAttribute dwmSetWindowAttribute;
-    
+
     /** Widget frame margins specified by the user. */
     QMargins userFrameMargins;
 
@@ -159,9 +172,9 @@ void QnDwmPrivate::init(QWidget *widget) {
     dwmDefWindowProc                = (PtrDwmDefWindowProc)             dwmLib.resolve("DwmDefWindowProc");
     dwmSetWindowAttribute           = (PtrDwmSetWindowAttribute)        dwmLib.resolve("DwmSetWindowAttribute");
 
-    hasDwm = 
+    hasDwm =
         hasApi &&
-        dwmIsCompositionEnabled != NULL && 
+        dwmIsCompositionEnabled != NULL &&
         dwmExtendFrameIntoClientArea != NULL &&
         dwmEnableBlurBehindWindow != NULL &&
         dwmGetColorizationColor != NULL &&
@@ -226,9 +239,9 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     blurBehind.fEnable = enable;
     blurBehind.dwFlags = DWM_BB_ENABLE;
     blurBehind.hRgnBlur = NULL;
-    
+
     status = d->dwmEnableBlurBehindWindow(widToHwnd(d->widget->winId()), &blurBehind);
-    
+
     return SUCCEEDED(status);
 #else
     Q_UNUSED(enable)
@@ -246,9 +259,9 @@ bool QnDwm::isCompositionEnabled() const {
 
     HRESULT status = S_OK;
     BOOL result = false;
-    
+
     status = d->dwmIsCompositionEnabled(&result);
-    
+
     if (SUCCEEDED(status)) {
         return result;
     } else {
@@ -273,13 +286,13 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
     winMargins.cxRightWidth     = margins.right();
     winMargins.cyBottomHeight   = margins.bottom();
     winMargins.cyTopHeight      = margins.top();
-    
+
     status = d->dwmExtendFrameIntoClientArea(widToHwnd(d->widget->winId()), &winMargins);
-    
+
     if(SUCCEEDED(status)) {
         /* Make sure that the extended frame is visible by setting the WNDCLASS's
-         * background brush to transparent black. 
-         * This also eliminates artifacts with white (default background color) 
+         * background brush to transparent black.
+         * This also eliminates artifacts with white (default background color)
          * fields appearing in client area when the window is resized. */
         HGDIOBJ blackBrush = GetStockObject(BLACK_BRUSH);
         DWORD result = SetClassLongPtr(widToHwnd(d->widget->winId()), GCLP_HBRBACKGROUND, (LONG_PTR) blackBrush);
@@ -406,14 +419,14 @@ bool QnDwm::widgetEvent(QEvent *event) {
 
 #ifdef QN_HAS_DWM
     if(d->overrideFrameMargins) {
-        /* Qt calculates frame margins based on window's style, 
+        /* Qt calculates frame margins based on window's style,
          * not on actual margins specified by WM_NCCALCSIZE. We fix that. */
         QWidgetData *data = qt_qwidget_data(d->widget);
         if(data->fstrut_dirty)
             d->updateFrameStrut();
 
-        /* This is needed because when going out of full screen, position calculation 
-         * breaks despite the fact that frame struts are set. Moving the widget fixes that. 
+        /* This is needed because when going out of full screen, position calculation
+         * breaks despite the fact that frame struts are set. Moving the widget fixes that.
          * However, we cannot move it right away, because if it was restored from minimized state,
          * then its position is not yet initialized. */
         if(event->type() == QEvent::WindowStateChange) {
@@ -423,7 +436,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
         }
 
         if(event->type() == QnEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
-            d->widget->move(d->widget->pos()); 
+            d->widget->move(d->widget->pos());
     }
 #endif // QN_HAS_DWM
 
@@ -472,8 +485,8 @@ bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
 
     /* From WM_NCCALCSIZE docs:
      *
-     * If wParam is TRUE, it specifies that the application should indicate which 
-     * part of the client area contains valid information. 
+     * If wParam is TRUE, it specifies that the application should indicate which
+     * part of the client area contains valid information.
      * The system copies the valid information to the specified area within the new client area.
      *
      * If wParam is FALSE, the application does not need to indicate the valid part of the client area. */
@@ -487,7 +500,7 @@ bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     RECT sourceGeometry = params->rgrc[1];
 
     /* Prepare output.
-     * 
+     *
      * 0 - the coordinates of the new client rectangle resulting from the move or resize.
      * 1 - the valid destination rectangle.
      * 2 - the valid source rectangle. */
@@ -519,7 +532,7 @@ bool QnDwmPrivate::compositionChangedEvent(MSG *message, long *result) {
 bool QnDwmPrivate::activateEvent(MSG *message, long *result) {
     if(overrideFrameMargins)
         message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
-    
+
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
     return true;
 }
@@ -598,14 +611,14 @@ bool QnDwmPrivate::getMinMaxInfoEvent(MSG *message, long *result) {
     if(!overrideFrameMargins)
         return false; /* Default codepath is OK. */
 
-    /* Adjust the maximized size and position to fit the work area of the correct monitor. 
-     * 
-     * If we don't do this, customized window will overlap the task bar when maximized. 
+    /* Adjust the maximized size and position to fit the work area of the correct monitor.
+     *
+     * If we don't do this, customized window will overlap the task bar when maximized.
      * See http://blogs.msdn.com/b/llobo/archive/2006/08/01/684535.aspx. */
     HMONITOR monitor = MonitorFromWindow(message->hwnd, MONITOR_DEFAULTTONEAREST);
-    if(!monitor) 
+    if(!monitor)
         return false;
-    
+
     MONITORINFO monitorInfo;
     monitorInfo.cbSize = sizeof(MONITORINFO);
     if(GetMonitorInfoW(monitor, &monitorInfo) == 0)

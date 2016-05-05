@@ -5,7 +5,7 @@
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
-#include <QShowEvent>
+#include <QtGui/QShowEvent>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -17,10 +17,10 @@
 #include <ui/common/grid_widget_helper.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -64,7 +64,7 @@ namespace {
         {}
 
         virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override {
-            Q_ASSERT(index.isValid());
+            NX_ASSERT(index.isValid());
 
             QStyleOptionViewItem opt = option;
             initStyleOption(&opt, index);

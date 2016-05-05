@@ -1,20 +1,19 @@
+
 #include "long_runnable.h"
 
 #include <cassert>
+#include <cstdlib>
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <nx/utils/thread/thread_util.h>
 
 #include <common/systemexcept_win32.h>
 #include <common/systemexcept_linux.h>
-
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-#   include <sys/types.h>
-#   include <linux/unistd.h>
-static pid_t gettid(void) { return syscall(__NR_gettid); }
-#endif
+#include <utils/common/warnings.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -39,7 +38,7 @@ public:
     void createdNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable && !m_created.contains(runnable));
+        NX_ASSERT(runnable && !m_created.contains(runnable));
 
         m_created.insert(runnable);
     }
@@ -47,7 +46,7 @@ public:
     void startedNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable && !m_running.contains(runnable));
+        NX_ASSERT(runnable && !m_running.contains(runnable));
 
         m_running.insert(runnable);
     }
@@ -55,7 +54,7 @@ public:
     void finishedNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable); //  && m_running.contains(runnable)
+        NX_ASSERT(runnable); //  && m_running.contains(runnable)
 
         m_running.remove(runnable);
         if(m_running.isEmpty())
@@ -65,7 +64,7 @@ public:
     void destroyedNotify(QnLongRunnable *runnable) {
         QnMutexLocker locker( &m_mutex );
 
-        assert(runnable && m_created.contains(runnable));
+        NX_ASSERT(runnable && m_created.contains(runnable));
 
         m_created.remove(runnable);
     }
@@ -113,18 +112,20 @@ static const size_t DEFAULT_THREAD_STACK_SIZE = 128*1024;
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
-QnLongRunnable::QnLongRunnable(): 
+QnLongRunnable::QnLongRunnable( bool isTrackedByPool ):
     m_needStop(false),
     m_onPause(false),
     m_systemThreadId(0)
 {
     DEBUG_CODE(m_type = NULL);
 
-    if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
-        m_pool = pool->d;
-        m_pool->createdNotify(this);
-    } else {
-        qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+    if(isTrackedByPool) {
+        if(QnLongRunnablePool *pool = QnLongRunnablePool::instance()) {
+            m_pool = pool->d;
+            m_pool->createdNotify(this);
+        //} else {
+        //    qnWarning("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.");
+        }
     }
 
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
@@ -166,7 +167,7 @@ void QnLongRunnable::pauseDelay() {
         m_semaphore.tryAcquire(1, 50);
 }
 
-std::uintptr_t QnLongRunnable::systemThreadId() const {
+uintptr_t QnLongRunnable::systemThreadId() const {
     return m_systemThreadId;
 }
 
@@ -177,16 +178,9 @@ void QnLongRunnable::initSystemThreadId() {
     m_systemThreadId = currentThreadSystemId();
 }
 
-std::uintptr_t QnLongRunnable::currentThreadSystemId()
+uintptr_t QnLongRunnable::currentThreadSystemId()
 {
-#if defined(Q_OS_LINUX)
-    /* This one is purely for debugging purposes.
-    * QThread::currentThreadId is implemented via pthread_self,
-    * which is not an identifier you see in GDB. */
-    return gettid();
-#else
-    return reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
-#endif
+    return ::currentThreadSystemId();
 }
 
 void QnLongRunnable::smartSleep(int ms) {
@@ -220,7 +214,7 @@ void QnLongRunnable::stop() {
     DEBUG_CODE(
         if(m_type) {
             const std::type_info *type = &typeid(*this);
-            assert(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
+            NX_ASSERT(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
 
             m_type = NULL; /* So that we don't check it again. */
         }
@@ -231,6 +225,9 @@ void QnLongRunnable::stop() {
 }
 
 void QnLongRunnable::at_started() {
+    initSystemThreadId();
+    srand(::time(NULL));
+
 #ifdef _WIN32
     win32_exception::installThreadSpecificUnhandledExceptionHandler();
 #endif

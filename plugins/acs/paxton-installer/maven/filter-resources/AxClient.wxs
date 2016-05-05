@@ -3,7 +3,7 @@
   <Fragment>
     <DirectoryRef Id="AxClientDir">
       <Component Id="cmpB3D4F3658BAA459B93E5CFB40B240519">
-        <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.AxSourceDir)\ax${ax.className}2.dll">
+        <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.AxSourceDir)\ax${ax.className}${parsedVersion.majorVersion}.dll">
           <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
             <ProgId Id="axhdwitness.Ax${ax.className}.${nxec.ec2ProtoVersion}" Description="Ax${ax.className} Class">
               <ProgId Id="axhdwitness.Ax${ax.className}" Description="Ax${ax.className} Class" />
@@ -114,12 +114,6 @@
       <Component Id="cmpC1102E56F9C36DCAC27979F5C82FA156">
         <File Id="fil476BCE7D25707F67787B7E21A8855261" KeyPath="yes" Source="$(var.AxSourceDir)\swscale-2.dll" />
       </Component>
-      <Component Id="cmp99566ED8A215FB88596EF331660AFB5C">
-        <File Id="fil65CDF7CD386FA2058DBC50FAEE9AA134" KeyPath="yes" Source="$(var.AxSourceDir)\wrap_oal.dll" />
-      </Component>
-      <Component Id="cmp90D7BD1DF030B8037665DC74A4AF4D80">
-        <File Id="fil6F9E5F20D0B83AC4795F8A12C6557E66" KeyPath="yes" Source="$(var.AxSourceDir)\zlibwapi.dll" />
-      </Component>
       <Directory Id="dirAC1018FAFBD12AB1F52C7FFED327C154" Name="imageformats">
         <Component Id="cmpB3390B82888592C4DA8719158B9B8F55">
           <File Id="filBCF131E9B40421F0D79414070A159793" KeyPath="yes" Source="$(var.AxSourceDir)\imageformats\qgif.dll" />
@@ -140,11 +134,6 @@
         </Component>
         <Component Id="cmp76A0B8BAD93376696703C5B0838B1921">
           <File Id="filD1ED1C741D8B75DF71FB1AD3FF178961" KeyPath="yes" Source="$(var.AxSourceDir)\platforms\qwindows.dll" />
-        </Component>
-      </Directory>
-      <Directory Id="dirB3323877C0BB6A34947EFF84214541AF" Name="styles">
-        <Component Id="cmp74465E0B91CD3BF33F41857A6EF6E2AD">
-          <File Id="fil5C913B0F3FB13BED65EAF427F5B93113" KeyPath="yes" Source="$(var.AxSourceDir)\styles\bespin.dll" />
         </Component>
       </Directory>
     </DirectoryRef>
@@ -185,15 +174,12 @@
       <ComponentRef Id="cmpA6F1BE5D2036CD53EAA4A4F2E38823BA" />
       <ComponentRef Id="cmpA39F076DC929158C0A26D80AF4281F68" />
       <ComponentRef Id="cmpC1102E56F9C36DCAC27979F5C82FA156" />
-      <ComponentRef Id="cmp99566ED8A215FB88596EF331660AFB5C" />
-      <ComponentRef Id="cmp90D7BD1DF030B8037665DC74A4AF4D80" />
       <ComponentRef Id="cmpB3390B82888592C4DA8719158B9B8F55" />
       <ComponentRef Id="cmp0C752DD2D0420B95CD0A5FD1CEB664D4" />
       <ComponentRef Id="cmpC8FCB355B6595A456855C5BFCACAAB8A" />
       <ComponentRef Id="cmpA269DE43DCAC1C47E19BFB85CB81C32F" />
       <ComponentRef Id="cmpAB7F9529338C67C891DA1A7C85DCB5BE" />
       <ComponentRef Id="cmp76A0B8BAD93376696703C5B0838B1921" />
-      <ComponentRef Id="cmp74465E0B91CD3BF33F41857A6EF6E2AD" />
       <ComponentRef Id="cmpB3D4F3658BAA459B93E5CFB40B240519" />
     </ComponentGroup>
   </Fragment>

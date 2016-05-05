@@ -3,13 +3,14 @@
 #include "vmax480_tcp_server.h"
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QString>
 
-#include "core/datapacket/audio_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include "vmax480_stream_fetcher.h"
-#include "network/tcp_connection_priv.h"
+#include <network/tcp_connection_priv.h>
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
 
 static const int UUID_LEN = 38;
@@ -26,7 +27,7 @@ class QnVMax480ConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivat
 {
 public:
     QString tcpID;
-    QnMediaContextPtr context;
+    QnConstMediaContextPtr context;
     VMaxStreamFetcher* streamFetcher;
     int openedChannels;
     static QnMutex connectMutex;
@@ -321,13 +322,15 @@ void QnVMax480ConnectionProcessor::run()
             }
 
             if (!d->context) {
-                d->context = QnMediaContextPtr(new QnMediaContext(codecID));
-                d->context->ctx()->channels = vMaxAudioHeader[0];
-                d->context->ctx()->sample_rate = *(quint16*)(vMaxAudioHeader+2);
-                d->context->ctx()->sample_fmt = sampleFormat;
-                d->context->ctx()->time_base.num = 1;
-                d->context->ctx()->bits_per_coded_sample = vMaxAudioHeader[1];
-                d->context->ctx()->time_base.den = d->context->ctx()->sample_rate;
+                const auto context = new QnAvCodecMediaContext(codecID);
+                d->context = QnConstMediaContextPtr(context);
+                const auto av = context->getAvCodecContext();
+                av->channels = vMaxAudioHeader[0];
+                av->sample_rate = *(quint16*)(vMaxAudioHeader+2);
+                av->sample_fmt = sampleFormat;
+                av->time_base.num = 1;
+                av->bits_per_coded_sample = vMaxAudioHeader[1];
+                av->time_base.den = av->sample_rate;
             }
 
             QnWritableCompressedAudioData* audio = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize, d->context);

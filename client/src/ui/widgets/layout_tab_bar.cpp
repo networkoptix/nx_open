@@ -1,7 +1,7 @@
 #include "layout_tab_bar.h"
 
 #include <QtCore/QVariant>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <QtGui/QContextMenuEvent>
 #include <QtWidgets/QStyle>
@@ -30,6 +30,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/custom_style.h>
 
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
@@ -43,8 +44,9 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     setMovable(false);
     setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     setDrawBase(false);
-    setShape(QTabBar::RoundedNorth);
     setTabsClosable(true);
+    setElideMode(Qt::ElideRight);
+    setTabShape(this, style::TabShape::Rectangular);
 
     connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));
@@ -71,11 +73,11 @@ QnLayoutTabBar::~QnLayoutTabBar() {
 }
 
 void QnLayoutTabBar::checkInvariants() const {
-    assert(m_layouts.size() == count());
+    NX_ASSERT(m_layouts.size() == count());
 
     if(workbench() && m_submit && m_update) {
-        assert(workbench()->layouts() == m_layouts);
-        assert(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex() || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
+        NX_ASSERT(workbench()->layouts() == m_layouts);
+        NX_ASSERT(workbench()->layoutIndex(workbench()->currentLayout()) == currentIndex() || workbench()->layoutIndex(workbench()->currentLayout()) == -1);
     }
 }
 
@@ -231,6 +233,12 @@ void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
     }
     QTabBar::mouseReleaseEvent(event);
     event->accept();
+}
+
+void QnLayoutTabBar::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+    updateGeometry();
 }
 
 void QnLayoutTabBar::at_workbench_layoutsChanged() {

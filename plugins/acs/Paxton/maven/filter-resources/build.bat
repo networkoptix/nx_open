@@ -2,7 +2,7 @@
 rem del /F /Q ${libdir}//$arch//bin//${build.configuration}//${project.artifactId}.exe
 IF ["${force_x86}"] == ["true"] (set ARCH=x86) ELSE (set ARCH=${arch})
 
-call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat" %ARCH%
+call "%${VCVars}%\..\..\VC\vcvarsall.bat" %ARCH%
 
 rem set CONFIG1=%1 
 rem set CONFIG2=%2

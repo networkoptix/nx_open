@@ -1,7 +1,7 @@
 #ifdef ENABLE_ISD
 
 #include <utils/math/math.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "isd_stream_reader.h"
 #include "isd_resource.h"
@@ -38,14 +38,18 @@ QnPlIsdResource::QnPlIsdResource()
     setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
 }
 
-bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiUrl.setUserName( auth.user());
+    apiUrl.setPassword( auth.password() );
+
     apiUrl.setPath( lit("/api/param.cgi") );
     apiUrl.setQuery( lit("req=Network.1.MacAddress") );
 
@@ -66,7 +70,7 @@ bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completion
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -86,8 +90,11 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     QUrl apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
-    apiRequestUrl.setUserName( getAuth().user() );
-    apiRequestUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiRequestUrl.setUserName( auth.user() );
+    apiRequestUrl.setPassword( auth.password() );
     apiRequestUrl.setHost( getHostAddress() );
     apiRequestUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 
@@ -120,7 +127,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
 
-    qSort(resolutions.begin(), resolutions.end(), sizeCompare);
+    std::sort(resolutions.begin(), resolutions.end(), sizeCompare);
 
     {
         QnMutexLocker lock( &m_mutex );
@@ -189,7 +196,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         fpsList.push_back(fpsS.trimmed().toInt());
     }
 
-    qSort(fpsList.begin(),fpsList.end(), qGreater<int>());
+    std::sort(fpsList.begin(),fpsList.end(), std::greater<int>());
 
     if (fpsList.size()<1)
         return CameraDiagnostics::UnknownErrorResult();

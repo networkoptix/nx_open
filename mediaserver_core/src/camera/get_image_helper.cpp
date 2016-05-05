@@ -7,7 +7,7 @@
 #include "core/resource/camera_resource.h"
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
-#include "decoders/video/ffmpeg.h"
+#include <decoders/video/ffmpeg_video_decoder.h>
 
 static const int MAX_GOP_LEN = 100;
 
@@ -126,7 +126,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
     if (!video)
         return QSharedPointer<CLVideoDecoderOutput>();
 
-    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
+    QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     bool gotFrame = false;
 
     if (time == DATETIME_NOW) {
@@ -228,7 +228,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         result.append((const char*) m_videoEncodingBuffer, encoded);
         qFreeAligned(m_videoEncodingBuffer);
     }
-    QnFfmpegHelper::deleteCodecContext(videoEncoderCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
 
     return result;
 }
@@ -246,7 +246,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
 
     QnServerArchiveDelegate serverDelegate;
     if( !useHQ )
-        serverDelegate.setQuality( MEDIA_Quality_Low, true );
+        serverDelegate.setQuality( MEDIA_Quality_Low, true, QSize() );
 
     QList<QnAbstractImageFilterPtr> filterChain;
 

@@ -7,7 +7,6 @@
 #include <QtGui/QHelpEvent>
 #include <QtWidgets/QWhatsThis>
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QMessageBox>
 
 #include "help_topic_accessor.h"
 #include "online_help_detector.h"
@@ -91,7 +90,7 @@ QUrl QnHelpHandler::urlForTopic(int topic) const {
     if (!m_onlineHelpRoot.isEmpty())
         return QUrl(m_onlineHelpRoot + lit("/") + topicPath);
     else
-        QMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
+        QnMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
 
     return QUrl();
 }

@@ -7,14 +7,15 @@
 #define EC2_BASE_QUERY_HTTP_HANDLER_H
 
 #include <QtCore/QByteArray>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <rest/server/request_handler.h>
+#include <rest/server/rest_connection_processor.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "ec2_thread_pool.h"
 #include "request_params.h"
@@ -53,7 +54,7 @@ namespace ec2
             const QnRequestParamList& params,
             QByteArray& result,
             QByteArray& contentType,
-            const QnRestConnectionProcessor*) override
+            const QnRestConnectionProcessor* owner) override
         {
             InputData inputData;
             QString command = path.split(L'/').last();
@@ -82,7 +83,7 @@ namespace ec2
                     } else if(format == Qn::XmlFormat) {
                         result = QnXml::serialized(outputData, lit("reply"));
                     } else {
-                        assert(false);
+                        NX_ASSERT(false);
                     }
                 }
                 errorCode = _errorCode;
@@ -95,7 +96,8 @@ namespace ec2
 
             static_cast<Derived*>(this)->processQueryAsync(
                 inputData,
-                queryDoneHandler );
+                queryDoneHandler,
+                owner);
 
             QnMutexLocker lk( &m_mutex );
             while( !finished )
@@ -148,7 +150,10 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processQueryAsync( const InputData& inputData, HandlerType handler )
+        void processQueryAsync(
+            const InputData& inputData,
+            HandlerType handler,
+            const QnRestConnectionProcessor* /*connection*/)
         {
             m_queryProcessor->template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
@@ -163,34 +168,54 @@ namespace ec2
 
 
 
-    template<class InputData, class OutputData, class QueryHandlerType>
+    template<class InputData, class OutputData>
     class FlexibleQueryHttpHandler
     :
-        public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> >
+        public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData> >
     {
-        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > base_type; 
+        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData> > base_type; 
 
     public:
-        FlexibleQueryHttpHandler( ApiCommand::Value cmdCode, QueryHandlerType queryHandler )
+        FlexibleQueryHttpHandler(
+            ApiCommand::Value cmdCode,
+            std::function<ErrorCode(InputData, OutputData*)> queryHandler )
         :
             base_type( cmdCode ),
-            m_queryHandler( queryHandler )
+            m_queryHandler(
+                [queryHandler](InputData input, OutputData* output, nx_http::Response* /*response*/)->ErrorCode {
+                    return queryHandler(std::move(input), output);
+                })
+        {
+        }
+
+        FlexibleQueryHttpHandler(
+            ApiCommand::Value cmdCode,
+            std::function<ErrorCode(InputData, OutputData*, nx_http::Response*)> queryHandler )
+        :
+            base_type( cmdCode ),
+            m_queryHandler(std::move(queryHandler))
         {
         }
 
         template<class HandlerType>
-        void processQueryAsync( const InputData& inputData, HandlerType handler )
+        void processQueryAsync(
+            const InputData& inputData,
+            HandlerType handler,
+            const QnRestConnectionProcessor* connection)
         {
             QnConcurrent::run( Ec2ThreadPool::instance(),
-                [this, inputData, handler]() {
+                [this, inputData, handler, connection]() {
                     OutputData output;
-                    const ErrorCode errorCode = m_queryHandler( inputData, &output );
+                    const ErrorCode errorCode = m_queryHandler(
+                        inputData,
+                        &output,
+                        connection->response());
                     handler( errorCode, output );
                 } );
         }
 
     private:
-        QueryHandlerType m_queryHandler;
+        std::function<ErrorCode(InputData, OutputData*, nx_http::Response*)> m_queryHandler;
     };
 }
 

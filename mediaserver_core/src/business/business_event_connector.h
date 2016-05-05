@@ -4,7 +4,7 @@
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
-#include <core/datapacket/abstract_data_packet.h>
+#include <nx/streaming/abstract_data_packet.h>
 
 #include <business/business_fwd.h>
 #include "business/business_event_parameters.h"

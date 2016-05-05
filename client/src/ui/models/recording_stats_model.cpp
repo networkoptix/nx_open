@@ -122,7 +122,7 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
             for (const QnCamRecordingStatsData &data: m_data)
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
-            //Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Total %n devices",      "", cameras.size()),
@@ -181,7 +181,7 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex &index) const
             result =  0.0;
         break;
     }
-    Q_ASSERT(qBetween(0.0, result, 1.00001));
+    NX_ASSERT(qBetween(0.0, result, 1.00001));
     return qBound(0.0, result, 1.0);
 }
 

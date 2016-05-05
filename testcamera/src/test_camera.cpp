@@ -3,7 +3,7 @@
 
 #include <QDebug>
 
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
 #include "plugins/resource/test_camera/testcamera_const.h"

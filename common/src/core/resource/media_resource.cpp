@@ -9,7 +9,7 @@
 
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
-#include "core/dataprovider/abstract_streamdataprovider.h"
+#include "nx/streaming/abstract_stream_data_provider.h"
 
 namespace {
     const QString customAspectRatioKey          = lit("overrideAr");

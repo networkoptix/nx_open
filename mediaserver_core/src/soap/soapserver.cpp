@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 
 

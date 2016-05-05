@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include <base/types.h>
-#include <base/server_info.h>
+#include <nx/mediaserver/api/server_info.h>
 
 namespace rtu
 {
@@ -30,6 +30,10 @@ namespace rtu
         Q_PROPERTY(QObject *failedModel READ failedModel NOTIFY changesApplied)
 
     public:
+        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+        typedef nx::mediaserver::api::ExtraServerInfo ExtraServerInfo;
+        typedef nx::mediaserver::api::ServerInfoPtrContainer ServerInfoPtrContainer;
+
         static ApplyChangesTaskPtr create(const ChangesetPointer &changeset
             , const ServerInfoPtrContainer &target);
 
@@ -61,7 +65,7 @@ namespace rtu
     public:
         /// Discovery events
 
-        void serverDiscovered(const rtu::BaseServerInfo &info);
+        void serverDiscovered(const BaseServerInfo &info);
 
         void serversDisappeared(const IDsVector &ids);
 

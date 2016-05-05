@@ -2,7 +2,7 @@
 #define __RESOURCE_PROPERTY_DICTIONARY_H
 
 #include "utils/common/threadsafe_item_storage.h"
-#include "utils/common/singleton.h"
+#include <nx/utils/singleton.h>
 #include "nx_ec/data/api_fwd.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/impl/ec_api_impl.h"
@@ -16,7 +16,7 @@ class QnResourcePropertyDictionary: public QObject,
 public:
     QnResourcePropertyDictionary(QObject *parent = NULL);
 
-    void saveParams(const QnUuid& resourceId);
+    bool saveParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);
     int saveParamsAsync(const QList<QnUuid>& resourceId);
     

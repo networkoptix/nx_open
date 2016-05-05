@@ -3,11 +3,11 @@
 
 #include <QtCore/QtGlobal>
 
-#include "core/resource/resource.h"
-#include "plugins/resource/archive/abstract_archive_resource.h"
-#include "desktop_data_provider_wrapper.h"
-#include "core/resource/resource_fwd.h"
-#include "plugins/resource/desktop_camera/desktop_camera_connection.h"
+#include <core/resource/resource.h>
+#include <nx/streaming/abstract_archive_resource.h>
+#include <plugins/resource/desktop_win/desktop_data_provider_wrapper.h>
+#include <core/resource/resource_fwd.h>
+#include <plugins/resource/desktop_camera/desktop_camera_connection.h>
 
 #ifdef _WIN32
 

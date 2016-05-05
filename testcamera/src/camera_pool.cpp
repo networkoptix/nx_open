@@ -26,7 +26,7 @@ public:
 protected:
     virtual void run() override
     {
-        std::auto_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket() );
+        std::auto_ptr<AbstractDatagramSocket> discoverySock( SocketFactory::createDatagramSocket().release() );
         if( m_localInterfacesToListen.isEmpty() )
             discoverySock->bind( SocketAddress( HostAddress::anyHost, TestCamConst::DISCOVERY_PORT ) );
         else

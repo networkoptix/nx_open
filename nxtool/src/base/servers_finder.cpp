@@ -17,8 +17,7 @@
 #include <QJsonDocument>
 #include <QRegularExpression>
 
-#include <base/server_info.h>
-#include <base/requests.h>
+#include <nx/mediaserver/api/client.h>
 
 #include <helpers/itf_helpers.h>
 
@@ -34,11 +33,13 @@
     #error Not supported target os
 #endif
 
+namespace api = nx::mediaserver::api;
+
 namespace
 {
     const QHostAddress kMulticastGroupAddress = QHostAddress("239.255.11.11");
     const quint16 kMulticastGroupPort = 5007;
-    
+
     const QByteArray kSearchRequestBody("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
     const int kSearchRequestSize = kSearchRequestBody.size();
 }
@@ -46,12 +47,12 @@ namespace
 namespace
 {
     const QString kMediaServerType = "Media Server";
-    
+
     const QString kApplicationTypeTag = "application";
     const QString kTypeTag = "type";
     const QString kReplyTag = "reply";
-      
-    enum 
+
+    enum
     {
         kUpdateServersInfoInterval = 2000
         , kUnknownHostTimeout = 60 * 1000
@@ -82,16 +83,16 @@ namespace
             , reinterpret_cast<const char*>(&request), sizeof(request)) == kNoError);
     }
 
-    
-    bool isDifferentFlags(const rtu::BaseServerInfo &first
-        , const rtu::BaseServerInfo &second
-        , rtu::Constants::ServerFlags excludeFlags)
+
+    bool isDifferentFlags(const api::BaseServerInfo &first
+        , const api::BaseServerInfo &second
+        , api::Constants::ServerFlags excludeFlags)
     {
-        const rtu::Constants::ServerFlags firstFlags = (first.flags & ~excludeFlags);
-        const rtu::Constants::ServerFlags secondFlags = (second.flags & ~excludeFlags);
+        const api::Constants::ServerFlags firstFlags = (first.flags & ~excludeFlags);
+        const api::Constants::ServerFlags secondFlags = (second.flags & ~excludeFlags);
         return (firstFlags != secondFlags);
     }
-    
+
     typedef bool IsServerPeerType;
     typedef QPair<QUuid, IsServerPeerType> MagicData;
 
@@ -109,7 +110,7 @@ namespace
         static const char kValueDelimiter = ':';
         static const QByteArray kSeedTag = "seed";
         static const QByteArray kPeerTypeTag = "peerType";
-        
+
         const auto fieldsData = extraData.split(kFieldsDelimiter);
         for (QString field: fieldsData)
         {
@@ -117,7 +118,7 @@ namespace
             const bool isPeerType = field.contains(kPeerTypeTag);
             if (!isSeed && !isPeerType)
                 continue;
-                
+
             field.remove(QRegularExpression("[{}\"]"));
             const auto value = field.trimmed().split(kValueDelimiter).back();
             if (isSeed)
@@ -130,28 +131,28 @@ namespace
     }
 }
 
-namespace 
+namespace
 {
     bool parseUdpPacket(const QJsonObject &jsonResponseObj
-        , rtu::BaseServerInfo &info)
+        , api::BaseServerInfo *info)
     {
         const auto &itReply = jsonResponseObj.find(kReplyTag);
-        const QJsonObject &jsonObject = (itReply != jsonResponseObj.end() 
+        const QJsonObject &jsonObject = (itReply != jsonResponseObj.end()
             ? itReply.value().toObject() : jsonResponseObj);
-        
+
         const auto &itAppType = jsonObject.find(kApplicationTypeTag);
-        const bool isCorrectApp = 
+        const bool isCorrectApp =
             (itAppType != jsonObject.end() && itAppType.value().toString() == kMediaServerType);
         const auto &itNativeType = jsonObject.find(kTypeTag);
-        const bool isCorrectNative = 
+        const bool isCorrectNative =
             (itNativeType != jsonObject.end() && itNativeType.value().toString() == kMediaServerType);
         if (!isCorrectApp && !isCorrectNative)
             return false;
-        
+
 //        if (!jsonObject.value("systemName").toString().contains("000_nx1_"))
 //            return false;
 
-        rtu::parseModuleInformationReply(jsonObject, info);
+        api::Client::parseModuleInformationReply(jsonObject, info);
         return true;
     }
 
@@ -159,16 +160,16 @@ namespace
     {
         qint64 timestamp;
         qint64 visibleAddressTimestamp;
-        rtu::BaseServerInfo info;
+        api::BaseServerInfo info;
 
         ServerInfoData(qint64 newTimestamp
-            , rtu::BaseServerInfo newInfo);
+            , const api::BaseServerInfo &newInfo);
     };
 
     ServerInfoData::ServerInfoData(qint64 newTimestamp
-        , rtu::BaseServerInfo newInfo)
+        , const api::BaseServerInfo &newInfo)
         : timestamp(newTimestamp)
-        , visibleAddressTimestamp(- newTimestamp * 2) /// for correct first initialization 
+        , visibleAddressTimestamp(- newTimestamp * 2) /// for correct first initialization
         , info(newInfo)
     {
     }
@@ -181,7 +182,7 @@ class rtu::ServersFinder::Impl : public QObject
 {
 public:
     Impl(rtu::ServersFinder *owner);
-    
+
     virtual ~Impl();
 
 public:
@@ -189,12 +190,12 @@ public:
 
 private:
     typedef QSharedPointer<QUdpSocket> SocketPtr;
-    
+
     void updateServerByMulticast(const QUuid &id
         , const QString &address);
 
     void updateOutdatedByMulticast();
-    
+
     void checkOutdatedServers();
 
     typedef QHash<QString, qint64> Hosts;
@@ -203,15 +204,15 @@ private:
         , int lifetime);
 
     void updateServers();
-    
+
     /// Reads answers to sent "magic" messages
     void readResponseData(const SocketPtr &socket);
 
-    bool processNewServer(BaseServerInfo info
+    bool processNewServer(api::BaseServerInfo *info
         , const QString &host
-        , bool accessibleByHttp);
+        , api::HttpAccessMethod httpAccessMethod);
 
-    /// Reads incomming "magic" packets
+    /// Reads incoming "magic" packets
     void readMagicData();
 
     bool readMagicPacket();
@@ -258,7 +259,7 @@ rtu::ServersFinder::Impl::Impl(rtu::ServersFinder *owner)
     m_msecCounter.start();
 }
 
-rtu::ServersFinder::Impl::~Impl() 
+rtu::ServersFinder::Impl::~Impl()
 {
     m_timer.stop();
     for(auto &socket: m_sockets)
@@ -270,11 +271,11 @@ rtu::ServersFinder::Impl::~Impl()
 void rtu::ServersFinder::Impl::updateServerByMulticast(const QUuid &id
     , const QString &address)
 {
-    const auto successful = [this, address](const BaseServerInfo &info)
-        { processNewServer(info, address, false); };
+    const auto successful = [this, address](BaseServerInfo *info)
+        { processNewServer(info, address, api::HttpAccessMethod::kUdp); };
 
-    const auto failed = [this, address](const RequestError /* errorCode */
-        , Constants::AffectedEntities /* affectedEntities */)
+    const auto failed = [this, address](const api::Client::ResultCode /* errorCode */
+        , api::Client::AffectedEntities /* affectedEntities */)
     {
         if (m_knownHosts.find(address) != m_knownHosts.end())
             return;
@@ -282,7 +283,7 @@ void rtu::ServersFinder::Impl::updateServerByMulticast(const QUuid &id
         /// if entity
         /// 1) discoverable from current network
         /// 2) but has not added to known servers list up to now
-        /// 3) and not available by multicast 
+        /// 3) and not available by multicast
         /// - we assume that it is not a server (may be client, for example)
         if (helpers::isDiscoverableFromCurrentNetwork(address))
             return;
@@ -291,7 +292,7 @@ void rtu::ServersFinder::Impl::updateServerByMulticast(const QUuid &id
             emit m_owner->unknownAdded(address);
     };
 
-    multicastModuleInformation(id, successful, failed, kMulticastUpdatePeriod / 2);
+    api::Client::multicastModuleInformation(id, successful, failed, kMulticastUpdatePeriod / 2);
 }
 void rtu::ServersFinder::Impl::updateOutdatedByMulticast()
 {
@@ -307,7 +308,7 @@ void rtu::ServersFinder::Impl::updateOutdatedByMulticast()
 void rtu::ServersFinder::Impl::checkOutdatedServers()
 {
     const qint64 currentTime = m_msecCounter.elapsed();
-    
+
     IDsVector forRemove;
     for(const auto &infoData: m_infos)
     {
@@ -316,12 +317,12 @@ void rtu::ServersFinder::Impl::checkOutdatedServers()
         if ((currentTime - lastUpdateTime) > kServerAliveTimeout)
             forRemove.push_back(info.id);
     }
-    
+
     if (!forRemove.empty())
     {
         for(const auto &id: forRemove)
             m_infos.remove(id);
-        
+
         emit m_owner->serversRemoved(forRemove);
     }
 }
@@ -348,7 +349,7 @@ void rtu::ServersFinder::Impl::updateServers()
 {
     updateOutdatedByMulticast();
     checkOutdatedServers();
-    
+
     checkOutdatedHosts(m_knownHosts, kServerAliveTimeout);
     const QStringList removedUnknownHosts =
         checkOutdatedHosts(m_unknownHosts, kUnknownHostTimeout);
@@ -433,8 +434,8 @@ void rtu::ServersFinder::Impl::readResponseData(const SocketPtr &socket)
            return false;
 
         BaseServerInfo info;
-        if (parseUdpPacket(QJsonDocument::fromJson(data.data()).object(), info))
-            processNewServer(info, sender.toString(), true);
+        if (parseUdpPacket(QJsonDocument::fromJson(data.data()).object(), &info))
+            processNewServer(&info, sender.toString(), api::HttpAccessMethod::kTcp);
 
         return true;
     };
@@ -492,7 +493,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
     if (!magicData.first.isNull() && !magicData.second)  /// Extra magic data exist, but peer is not a server.
         return true;                                     /// So, drop this entity. Possibly it is a new client or something else
 
-    const auto &firstTimeProcessor = 
+    const auto &firstTimeProcessor =
         [this, address, magicData](const Callback &secondTimeProcessor)
     {
         const bool isKnown = (m_knownHosts.find(address) != m_knownHosts.end());
@@ -503,7 +504,7 @@ bool rtu::ServersFinder::Impl::readMagicPacket()
         {
             if (secondTimeProcessor)    /// Called at first time
             {
-                /// try to add unknown or discover by multicast after period * 3 
+                /// try to add unknown or discover by multicast after period * 3
                 /// - to have a chance to discover entity as known or by Http first
                 enum { kDelayTimeout = kUpdateServersInfoInterval * 3};
                 QTimer::singleShot(kDelayTimeout, secondTimeProcessor);
@@ -530,7 +531,7 @@ bool rtu::ServersFinder::Impl::readPendingPacket(const SocketPtr &socket
     , quint16 *port)
 {
     const int pendingDataSize = socket->pendingDatagramSize();
-    
+
     enum { kZeroSymbol = 0 };
     data.resize(pendingDataSize);
     data.fill(kZeroSymbol);
@@ -555,34 +556,34 @@ bool rtu::ServersFinder::Impl::readPendingPacket(const SocketPtr &socket
     return true;
 }
 
-bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
+bool rtu::ServersFinder::Impl::processNewServer(api::BaseServerInfo *info
     , const QString &host
-    , bool accessibleByHttp)
+    , api::HttpAccessMethod httpAccessMethod)
 {
-    info.hostAddress = host;
-    info.accessibleByHttp = accessibleByHttp;
+    info->hostAddress = host;
+    info->httpAccessMethod = httpAccessMethod;
 
     onEntityDiscovered(host, m_knownHosts);
     if (m_unknownHosts.remove(host))
         emit m_owner->unknownRemoved(host);
 
-    const auto it = m_infos.find(info.id);
+    const auto it = m_infos.find(info->id);
     const qint64 timestamp = m_msecCounter.elapsed();
 
     if (it == m_infos.end()) /// If new server multicast arrived
     {
-        m_infos.insert(info.id, ServerInfoData(timestamp, info));
-        emit m_owner->serverAdded(info);
+        m_infos.insert(info->id, ServerInfoData(timestamp, *info));
+        emit m_owner->serverAdded(*info);
     }
-    else if (accessibleByHttp                                      ///< Gives chance to http to discover server.
+    else if (httpAccessMethod == api::HttpAccessMethod::kTcp //< Gives chance to http to discover server.
         || ((timestamp - it->timestamp) > kMulticastUpdatePeriod)) /// Http access method has priority under multicast
-                                                                                            
+
     {
         it->timestamp = timestamp; /// Update alive info
         BaseServerInfo &oldInfo = it->info;
 
         bool displayAddressOutdated = false;
-        info.displayAddress = oldInfo.displayAddress;
+        info->displayAddress = oldInfo.displayAddress;
         if (oldInfo.displayAddress == host)
         {
             it->visibleAddressTimestamp = timestamp;
@@ -590,25 +591,25 @@ bool rtu::ServersFinder::Impl::processNewServer(rtu::BaseServerInfo info
         else if ((timestamp - it->visibleAddressTimestamp) > kServerAliveTimeout)
         {
             it->visibleAddressTimestamp = timestamp;
-            info.displayAddress = host;
+            info->displayAddress = host;
             displayAddressOutdated = true;
         }
 
-        if ((info != it->info) || displayAddressOutdated
-            || isDifferentFlags(info, it->info, Constants::IsFactoryFlag))
+        if ((*info != it->info) || displayAddressOutdated
+            || isDifferentFlags(*info, it->info, api::Constants::IsFactoryFlag))
         {
-            oldInfo.name = info.name;
-            oldInfo.systemName = info.systemName;
-            oldInfo.port = info.port;
-            oldInfo.displayAddress = info.displayAddress;
+            oldInfo.name = info->name;
+            oldInfo.systemName = info->systemName;
+            oldInfo.port = info->port;
+            oldInfo.displayAddress = info->displayAddress;
 
-            emit m_owner->serverChanged(info);
+            emit m_owner->serverChanged(*info);
         }
     }
 
-    emit m_owner->serverDiscovered(info);
+    emit m_owner->serverDiscovered(*info);
 
-    const auto itWaited = std::find(m_waitedServers.begin(), m_waitedServers.end(), info.id);
+    const auto itWaited = std::find(m_waitedServers.begin(), m_waitedServers.end(), info->id);
     if (itWaited == m_waitedServers.end())
         return true;
 

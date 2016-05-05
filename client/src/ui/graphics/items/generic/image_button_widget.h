@@ -1,7 +1,9 @@
 #ifndef QN_IMAGE_BUTTON_WIDGET_H
 #define QN_IMAGE_BUTTON_WIDGET_H
 
+#ifndef Q_MOC_RUN
 #include <boost/array.hpp>
+#endif
 
 #include <QtGui/QPixmap>
 #include <QtGui/QOpenGLFunctions>

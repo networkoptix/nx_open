@@ -6,8 +6,10 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 
 
-namespace Qn {
-    enum FrameShape {
+namespace Qn
+{
+    enum FrameShape
+    {
         NoFrame,
         RectangularFrame,
         RoundedRectangularFrame,
@@ -16,7 +18,8 @@ namespace Qn {
     };
 }
 
-class FramedBase {
+class FramedBase
+{
 public:
     FramedBase();
     virtual ~FramedBase();
@@ -31,46 +34,52 @@ public:
     void setFrameStyle(Qt::PenStyle frameStyle);
 
     QBrush frameBrush() const;
-    void setFrameBrush(const QBrush &frameBrush);
+    void setFrameBrush(const QBrush& frameBrush);
 
     QColor frameColor() const;
-    void setFrameColor(const QColor &frameColor);
+    void setFrameColor(const QColor& frameColor);
 
     QBrush windowBrush() const;
-    void setWindowBrush(const QBrush &windowBrush);
+    void setWindowBrush(const QBrush& windowBrush);
 
     QColor windowColor() const;
-    void setWindowColor(const QColor &windowColor);
+    void setWindowColor(const QColor& windowColor);
 
     qreal roundingRadius() const;
     void setRoundingRadius(qreal roundingRadius);
 
-    const QPainterPath &customFramePath() const;
-    void setCustomFramePath(const QPainterPath &customFramePath);
+    const QPainterPath& customFramePath() const;
+    void setCustomFramePath(const QPainterPath& customFramePath);
+
+    Qt::Edges frameBorders() const;
+    void setFrameBorders(Qt::Edges borders);
 
 protected:
-    void paintFrame(QPainter *painter, const QRectF &rect);
+    void paintFrame(QPainter* painter, const QRectF& rect);
 
-    void initSelf(QGraphicsWidget *self);
+    void initSelf(QGraphicsWidget* self);
 
 private:
-    QGraphicsWidget *m_self;
+    QGraphicsWidget* m_self;
     qreal m_frameWidth;
     qreal m_roundingRadius;
     Qt::PenStyle m_frameStyle;
     Qn::FrameShape m_frameShape;
     QPainterPath m_customFramePath;
     QRectF m_customFramePathBoundingRect;
+    Qt::Edges m_frameBorders;
 };
 
 
 template<class Base>
-class Framed: public Base, public FramedBase {
+class Framed: public Base, public FramedBase
+{
 public:
     QN_FORWARD_CONSTRUCTOR(Framed, Base, { FramedBase::initSelf(this); })
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override {
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override
+    {
         FramedBase::paintFrame(painter, Base::rect());
         Base::paint(painter, option, widget);
     }
@@ -79,10 +88,11 @@ protected:
 
 /**
  * A graphics frame widget that does not use style for painting.
- * 
+ *
  * Frame width and color are configurable.
  */
-class QnFramedWidget: public Framed<GraphicsWidget> {
+class QnFramedWidget: public Framed<GraphicsWidget>
+{
     Q_OBJECT
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
     Q_PROPERTY(Qn::FrameShape frameShape READ frameShape WRITE setFrameShape)
@@ -92,10 +102,11 @@ class QnFramedWidget: public Framed<GraphicsWidget> {
     Q_PROPERTY(QBrush windowBrush READ windowBrush WRITE setWindowBrush)
     Q_PROPERTY(QColor windowColor READ windowColor WRITE setWindowColor)
     Q_PROPERTY(qreal roundingRadius READ roundingRadius WRITE setRoundingRadius)
+    Q_PROPERTY(Qt::Edges frameBorders READ frameBorders WRITE setFrameBorders)
     typedef Framed<GraphicsWidget> base_type;
 
 public:
-    QnFramedWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
+    QnFramedWidget(QGraphicsItem* parent = NULL, Qt::WindowFlags windowFlags = 0): base_type(parent, windowFlags) {}
 };
 
 

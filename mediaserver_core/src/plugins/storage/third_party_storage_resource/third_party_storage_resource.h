@@ -5,7 +5,7 @@
 
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/third_party/third_party_storage.h"
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnThirdPartyStorageResource
     : public QnStorageResource

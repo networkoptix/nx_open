@@ -12,11 +12,11 @@
 #include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/async_http_client_reply.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/async_http_client_reply.h>
 
 #include <utils/common/app_info.h>
 
@@ -147,14 +147,9 @@ void QnDirectModuleFinder::activateRequests() {
         std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
         connect(reply.get(), &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
-        NX_LOG(lit("QnDirectModuleFinder. Sending request to %1").arg(url.toString()), cl_logDEBUG2);
-        if (!client->doGet(url))
-        {
-            NX_LOG(lit("QnDirectModuleFinder. Error sending request to %1").arg(url.toString()), cl_logWARNING);
-            return;
-        }
+        client->doGet(url);
 
-        Q_ASSERT_X(!m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO);
+        NX_ASSERT(!m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO);
         m_activeRequests.insert(url, reply.release());
     }
 
@@ -183,8 +178,8 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
         .arg(!reply->isFailed()).arg(url.toString()), cl_logDEBUG1);
 
     const auto replyIter = m_activeRequests.find(url);
-    Q_ASSERT_X(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
-    Q_ASSERT_X(replyIter.value() == reply, "Reply that is not in the set of active requests has finished! (2)", Q_FUNC_INFO);
+    NX_ASSERT(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
+    NX_ASSERT(replyIter.value() == reply, "Reply that is not in the set of active requests has finished! (2)", Q_FUNC_INFO);
     if (replyIter != m_activeRequests.end())
         m_activeRequests.erase(replyIter);
 
@@ -236,7 +231,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {
     NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout"), cl_logDEBUG2);
-        
+
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     for (const QUrl &url: m_urls) {
@@ -248,14 +243,14 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
             if (currentTime - lastCheck < aliveCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (1) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(aliveCheckInterval().count()), cl_logDEBUG1);
+                    .arg(url.toString()).arg(currentTime - lastCheck).arg(aliveCheckInterval().count()), cl_logDEBUG2);
                 continue;
             }
         } else {
             if (currentTime - lastCheck < discoveryCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (2) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(discoveryCheckInterval().count()), cl_logDEBUG1);
+                    .arg(url.toString()).arg(currentTime - lastCheck).arg(discoveryCheckInterval().count()), cl_logDEBUG2);
                 continue;
             }
         }

@@ -3,11 +3,11 @@
 
 #include <algorithm>
 
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "abstract_renderer.h"
 #include "gl_renderer.h"
@@ -272,7 +272,7 @@ void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
         else {
             index = maxStart + maxInterval/2;
         }
-        Q_ASSERT( m_reverseQueue[index]->data[0] || m_reverseQueue[index]->picData );
+        NX_ASSERT( m_reverseQueue[index]->data[0] || m_reverseQueue[index]->picData );
         m_reverseSizeInBytes -= avpicture_get_size((PixelFormat) m_reverseQueue[index]->format, m_reverseQueue[index]->width, m_reverseQueue[index]->height);
         m_reverseQueue[index]->reallocate(0,0,0);
     }
@@ -461,7 +461,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         // todo: all renders MUST have same GL context!!!
         const QnAbstractRenderer* renderer = m_renderList.isEmpty() ? 0 : *m_renderList.constBegin();
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
-        dec = CLVideoDecoderFactory::createDecoder(
+        dec = QnVideoDecoderFactory::createDecoder(
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL);
@@ -751,7 +751,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
     {
         if (enableFrameQueue) 
         {
-            Q_ASSERT(!outFrame->isExternalData());
+            NX_ASSERT(!outFrame->isExternalData());
             if (m_bufferedFrameDisplayer)
             {
                 bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);

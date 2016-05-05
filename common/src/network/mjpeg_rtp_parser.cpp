@@ -2,10 +2,10 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
-#include "rtp_stream_parser.h"
-#include "rtpsession.h"
-#include "utils/common/synctime.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
+#include <utils/common/synctime.h>
 
 #if 0
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
@@ -369,7 +369,7 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
+bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -501,13 +501,15 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         m_frameSize = 0;
     }
 
+    // See ToDo in the header.
+    /*
     if (!m_context) 
     {
-        m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_MJPEG));
+        m_context = QnMediaContextPtr(new QnAvCodecMediaContext(CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? PIX_FMT_YUV420P : PIX_FMT_YUV422P;
         //m_jpegHeader.Initialize(qApp->organizationName().toLatin1().constData(), qApp->applicationName().toLatin1().constData(), "");
     }
-
+    */
 
     //m_frameData.write((const char*)curPtr, bytesLeft);
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));

@@ -6,8 +6,8 @@
 #include <QtCore/QList>
 
 #include "core/resource_management/resource_searcher.h"
-#include "utils/network/nettools.h"
-#include "utils/network/socket.h"
+#include <nx/network/nettools.h>
+#include <nx/network/socket.h>
 
 
 class QnPlDroidResourceSearcher : public QnAbstractNetworkResourceSearcher

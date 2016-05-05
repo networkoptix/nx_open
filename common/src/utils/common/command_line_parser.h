@@ -128,5 +128,22 @@ private:
 };
 
 
-#endif // QN_COMMAND_LINE_PARSER_H
+//!Stand-alone & simple function for parsing arguments
+/*!
+    Supports both "-a value" and "--arg=value" syntax. "-" and "--" are ommitted
+*/
+void parseCmdArgs(
+    int argc,
+    char **argv,
+    std::multimap<QString, QString>* const args);
 
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    QString* const value);
+bool readArg(
+    const std::multimap<QString, QString>& args,
+    const QString& name,
+    int* const value);
+
+#endif // QN_COMMAND_LINE_PARSER_H

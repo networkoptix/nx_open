@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
 

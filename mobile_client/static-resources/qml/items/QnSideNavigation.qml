@@ -14,6 +14,8 @@ QnNavigationDrawer {
 
     color: QnTheme.sideNavigationBackground
 
+    enabled: open
+
     QnFlickable {
         id: flickable
 
@@ -67,7 +69,8 @@ QnNavigationDrawer {
                         id: savedSessionsModel
                     }
 
-                    QnSessionItem {
+                    QnSessionItem
+                    {
                         sessionId: model.sessionId
                         systemName: model.systemName
                         address: model.address
@@ -75,6 +78,10 @@ QnNavigationDrawer {
                         user: model.user
                         password: model.password
                         active: activeSessionId == sessionId
+                        activeFocusOnTab: true
+                        Keys.onDownPressed: Main.focusNextItem(this)
+                        Keys.onUpPressed: Main.focusPrevItem(this)
+                        Keys.onReturnPressed: open()
                     }
                 }
             }
@@ -111,8 +118,14 @@ QnNavigationDrawer {
             text: qsTr("New connection")
             icon: "image://icon/plus.png"
             active: !activeSessionId
+            activeFocusOnTab: true
+            Keys.onDownPressed: Main.focusNextItem(this)
+            Keys.onUpPressed: Main.focusPrevItem(this)
+            Keys.onReturnPressed: open()
+            onClicked: open()
 
-            onClicked: {
+            function open()
+            {
                 panel.hide()
                 Main.gotoNewSession()
                 stackView.currentItem.scrollTop()
@@ -123,14 +136,80 @@ QnNavigationDrawer {
             id: settingsButton
             text: qsTr("Settings")
             icon: "image://icon/settings.png"
+            activeFocusOnTab: true
+            Keys.onDownPressed: Main.focusNextItem(this)
+            Keys.onUpPressed: Main.focusPrevItem(this)
+            visible: !liteMode
 
             onClicked: Main.openSettings()
+        }
+
+        Text
+        {
+            id: versionText
+            text: applicationInfo.version()
+            x: dp(16)
+            height: dp(48)
+            width: parent.width - 2 * x
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: sp(13)
+            color: QnTheme.versionText
+
+            MouseArea
+            {
+                anchors.fill: parent
+                onDoubleClicked: copyToClipboard(versionText.text)
+            }
         }
 
         Item {
             width: parent.width
             height: navigationBarPlaceholder.height + dp(8)
             visible: navigationBarPlaceholder.height > 1
+        }
+    }
+
+    onOpenChanged:
+    {
+        stackView.enabled = !open
+
+        if (open)
+        {
+            var itemToFocus = undefined
+
+            if (activeSessionId)
+            {
+                for (var i = 0; i < savedSessionsList.count; ++i)
+                {
+                    var item = savedSessionsList.itemAt(i)
+                    if (item.sessionId == activeSessionId)
+                    {
+                        itemToFocus = item
+                    }
+                }
+            }
+
+            if (!itemToFocus)
+                itemToFocus = newConnectionButton
+
+            itemToFocus.forceActiveFocus()
+        }
+        else
+        {
+            stackView.forceActiveFocus()
+        }
+    }
+
+    Keys.onReleased:
+    {
+        if (Main.keyIsBack(event.key))
+        {
+            if (Main.backPressed())
+                event.accepted = true
+        }
+        else if (event.key == Qt.Key_F2)
+        {
+            sideNavigation.open = !sideNavigation.open
         }
     }
 }

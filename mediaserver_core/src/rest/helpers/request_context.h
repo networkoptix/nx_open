@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 template<typename Request>
 class QnMultiserverRequestContext

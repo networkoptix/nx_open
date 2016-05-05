@@ -2,7 +2,7 @@
 
 #include <api/global_settings.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
 #include <recorder/storage_manager.h>
@@ -183,7 +183,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         {   // update sync data
             QnMutexLocker lk(&m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
-            assert(syncDataIt != m_syncData.cend());
+            NX_ASSERT(syncDataIt != m_syncData.cend());
             auto catalogSize = fromCatalog->size();
             int curFileIndex = fromCatalog->findFileIndex(
                 chunkKey.chunk.startTimeMs, 
@@ -276,7 +276,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         }
         else
         {
-            Q_ASSERT(bitrate > 0);
+            NX_ASSERT(bitrate > 0);
             qint64 fileSize = fromFile->size();
             const qint64 timeToWrite = (fileSize / bitrate) * 1000;
                             
@@ -519,7 +519,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
 void QnScheduleSync::renewSchedule()
 {
     auto server = qnCommon->currentServer();
-    Q_ASSERT(server);
+    NX_ASSERT(server);
 
     auto oldSchedule = m_schedule;
     if (server) {

@@ -1,5 +1,5 @@
 #include "test_camera_processor.h"
-#include "utils/network/tcp_connection_priv.h"
+#include <nx/network/tcp_connection_priv.h>
 #include "test_camera.h"
 #include "camera_pool.h"
 

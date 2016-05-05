@@ -7,9 +7,9 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/simple_http_client.h"
-#include "core/datapacket/media_data_packet.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/simple_http_client.h>
+#include "nx/streaming/media_data_packet.h"
 
 
 class QDomElement;
@@ -18,7 +18,7 @@ class QDomElement;
 class QnPlAreconVisionResource : public QnPhysicalCameraResource
 {
     Q_OBJECT
-
+    friend class QnPlArecontResourceSearcher;
 public:
     static const QString MANUFACTURE;
 
@@ -30,21 +30,15 @@ public:
 
     bool isPanoramic() const;
     bool isDualSensor() const;
-    virtual bool isAbstractResource() const override;
 
     virtual void setHostAddress(const QString& ip) override;
 
     virtual bool getDescription() {return true;};
 
-    // ========
-    bool unknownResource() const;
-    virtual QnResourcePtr updateResource();
-    // ========
-
     //!Implementation of QnNetworkResource::ping
     virtual bool ping() override;
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
-    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
 
     virtual QString getDriverName() const override;
 

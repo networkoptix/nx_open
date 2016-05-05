@@ -7,10 +7,12 @@
 
 #include <base/types.h>
 
+namespace nx { namespace mediaserver { namespace api {
+    struct BaseServerInfo;
+}}}
+
 namespace rtu
 {
-    struct BaseServerInfo;
-    
     class ServersFinder : public QObject
     {
         Q_OBJECT
@@ -24,6 +26,8 @@ namespace rtu
 
     public:
         void waitForServer(const QUuid &id);
+
+        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
 
     signals:
         void serverAdded(const BaseServerInfo &baseInfo);

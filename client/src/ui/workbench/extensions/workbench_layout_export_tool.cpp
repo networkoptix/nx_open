@@ -69,7 +69,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
     m_stopped(false),
     m_currentCamera(0)
 {
-    m_layout.reset(new QnLayoutResource(qnResTypePool));
+    m_layout.reset(new QnLayoutResource());
     m_layout->setId(layout->getId()); //before update() uuid's must be the same
     m_layout->update(layout);
 
@@ -229,8 +229,9 @@ bool QnLayoutExportTool::exportMetadata(const QnLayoutExportTool::ItemInfoList &
     }
 
     /* Layout background */
-    if (!m_layout->backgroundImageFilename().isEmpty()) {
-        bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
+    if (!m_layout->backgroundImageFilename().isEmpty())
+    {
+        bool exportedLayout = m_layout->isFile();  // we have changed background to an exported layout
         QScopedPointer<QnAppServerImageCache> cache;
         if (exportedLayout)
             cache.reset(new QnLocalFileCache(this));
@@ -399,7 +400,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
 void QnLayoutExportTool::at_camera_exportFinished(
     const QnStreamRecorder::ErrorStruct &status,
     const QString                       &filename
-) 
+)
 {
     Q_UNUSED(filename)
     if (status.lastError != QnClientVideoCamera::NoError) {
@@ -433,7 +434,7 @@ void QnLayoutExportTool::at_camera_exportFinished(
 
     if (error) {
         QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        Q_ASSERT_X(camRes, Q_FUNC_INFO, "Make sure camera exists");
+        NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
         //: "Could not export camera AXIS1334"
         m_errorMessage = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(

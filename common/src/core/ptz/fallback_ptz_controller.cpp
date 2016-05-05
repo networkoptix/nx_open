@@ -4,7 +4,6 @@
 
 #include <core/resource/resource.h>
 
-#include <utils/common/event_loop.h>
 #include <utils/common/warnings.h>
 
 QnFallbackPtzController::QnFallbackPtzController(const QnPtzControllerPtr &mainController, const QnPtzControllerPtr &fallbackController):

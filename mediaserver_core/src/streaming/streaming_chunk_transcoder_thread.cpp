@@ -7,7 +7,7 @@
 #include <fstream>
 
 #include <transcoding/ffmpeg_transcoder.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/h264_utils.h>
 
 #ifdef _DEBUG
@@ -175,7 +175,7 @@ void StreamingChunkTranscoderThread::run()
         }
 
         QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
-        Q_ASSERT( srcMediaData );
+        NX_ASSERT( srcMediaData );
 
         if (srcMediaData->dataType == QnAbstractMediaData::VIDEO &&
             srcMediaData->channelNumber != transcodeIter->second->transcodeParams.channel())
@@ -269,7 +269,7 @@ void StreamingChunkTranscoderThread::onStreamDataAvailable( AbstractOnDemandData
 
     //marking, that data is available
     map<int, std::unique_ptr<TranscodeContext>>::const_iterator it = m_transcodeContext.find( dsIter->second );
-    Q_ASSERT( it != m_transcodeContext.end() );
+    NX_ASSERT( it != m_transcodeContext.end() );
     it->second->dataAvailable = true;
 
     m_cond.wakeAll();

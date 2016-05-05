@@ -24,8 +24,8 @@ namespace
         , const ValueType &value
         , const QnStatisticsStoragePtr &storage)
     {
-        Q_ASSERT_X(!name.isEmpty(), Q_FUNC_INFO, "Name could not be empty!");
-        Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
+        NX_ASSERT(!name.isEmpty(), Q_FUNC_INFO, "Name could not be empty!");
+        NX_ASSERT(storage, Q_FUNC_INFO, "Storage has not set!");
 
         if (!storage || name.isEmpty())
             return;
@@ -48,7 +48,7 @@ namespace
 
     QnStringsSet getLastFilters(const QnStatisticsStoragePtr &storage)
     {
-        Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
+        NX_ASSERT(storage, Q_FUNC_INFO, "Storage has not set!");
 
         if (!storage)
             return QnStringsSet();
@@ -60,7 +60,7 @@ namespace
 
     qint64 getLastSentTime(const QnStatisticsStoragePtr &storage)
     {
-        Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage has not set!");
+        NX_ASSERT(storage, Q_FUNC_INFO, "Storage has not set!");
 
         enum { kMinLastTimeMs = 0 };
         if (!storage)
@@ -151,6 +151,11 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
     return true;
 }
 
+bool QnStatisticsManager::isStatisticsSendingAllowed() const
+{
+    return qnGlobalSettings->isInitialized() && qnGlobalSettings->isStatisticsAllowed();
+}
+
 void QnStatisticsManager::unregisterModule(const QString &alias)
 {
     m_modules.remove(alias);
@@ -180,7 +185,7 @@ void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
 
     connect(m_updateSettingsTimer, &QTimer::timeout, m_settings.get(), [this]()
     {
-        if (qnGlobalSettings->isStatisticsAllowed() && m_settings)
+        if (isStatisticsSendingAllowed() && m_settings)
             m_settings->updateSettings();
     });
 
@@ -193,7 +198,7 @@ void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
         m_updateSettingsTimer->start();
     });
 
-    if (!qnGlobalSettings->isStatisticsAllowed())
+    if (!isStatisticsSendingAllowed())
         return;
 
     if (m_settings->settingsAvailable())
@@ -226,7 +231,7 @@ QnStatisticValuesHash QnStatisticsManager::getValues() const
 void QnStatisticsManager::sendStatistics()
 {
     if (!m_settings || !m_storage || m_handle
-        || !qnGlobalSettings->isStatisticsAllowed())
+        || !isStatisticsSendingAllowed())
     {
         return;
     }
@@ -307,7 +312,7 @@ void QnStatisticsManager::sendStatistics()
 
 void QnStatisticsManager::saveCurrentStatistics()
 {
-    Q_ASSERT_X(!m_clientId.isNull(), Q_FUNC_INFO
+    NX_ASSERT(!m_clientId.isNull(), Q_FUNC_INFO
         , "Can't save client statistics without client identifier!");
 
     if (m_clientId.isNull())

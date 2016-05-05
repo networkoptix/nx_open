@@ -1,0 +1,432 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="2a556fb8-5ed0-4be5-9131-9518e3906812" Bounds="1721.91434890423,-1124.41336849136,280.557082627731,255.609470335824" Group="Expanded" Label="nx::mediaserver::api (libnx_mediaserver_api)" UseManualLocation="True" />
+    <Node Id="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Bounds="1424.50732649142,-813.251810786343,456.937622178512,315.664733927898" Group="Expanded" Label="nx::rest (libnx_rest)" UseManualLocation="True" />
+    <Node Id="@1021" Category="CodeSchema_ProjectItem" Bounds="2498.86399102684,-876.545029818167,167.03300427445,26.0019445379601" FilePath="$(VsSolution)\src\base\apply_changes_task.cpp" Label="apply_changes_task.cpp" UseManualLocation="True" />
+    <Node Id="@1023" Category="CodeSchema_ProjectItem" Bounds="2086.44852163257,-787.93007010137,190.542898141117,26.0019445379601" FilePath="$(VsSolution)\src\models\servers_selection_model.cpp" Label="servers_selection_model.cpp" UseManualLocation="True" />
+    <Node Id="@1031" Category="CodeSchema_ProjectItem" Bounds="2555.79934078809,-995.101243197073,196.44453131445,26.0019445379601" FilePath="$(VsSolution)\src\models\changes_progress_model.cpp" Label="changes_progress_model.cpp" UseManualLocation="True" />
+    <Node Id="@1037" Category="CodeSchema_ProjectItem" Bounds="2583.40124215364,-458.864783986806,89.4054565958377,26.0016559779331" FilePath="$(VsSolution)\src\main.cpp" Label="main.cpp" UseManualLocation="True">
+      <Category Ref="Category2" />
+    </Node>
+    <Node Id="@1039" Category="CodeSchema_ProjectItem" Bounds="2525.33444747538,-696.937028109182,110.156056221116,26.0019445379601" FilePath="$(VsSolution)\src\base\selection.cpp" Label="selection.cpp" UseManualLocation="True" />
+    <Node Id="@1047" Category="CodeSchema_ProjectItem" Bounds="2130.8005670659,-954.493821322073,136.04193227445,26.0019445379601" FilePath="$(VsSolution)\src\base\servers_finder.cpp" Label="servers_finder.cpp" UseManualLocation="True" />
+    <Node Id="@1051" Category="CodeSchema_ProjectItem" Bounds="2095.05733750507,-656.678361116994,172.288157021116,26.0019445379601" FilePath="$(VsSolution)\src\helpers\server_info_manager.cpp" Label="server_info_manager.cpp" UseManualLocation="True" />
+    <Node Id="@1053" Category="CodeSchema_ProjectItem" Bounds="2341.58198852975,-1029.6938382823,158.719079581117,25.9429330482562" FilePath="$(VsSolution)\src\base\changes_manager.cpp" Label="changes_manager.cpp" UseManualLocation="True" />
+    <Node Id="@1059" Category="CodeSchema_ProjectItem" Bounds="2649.74814090912,-345.3632581079,104.14696181926,26.0016559779332" FilePath="$(VsSolution)\src\models\buttons.cpp" Label="buttons.cpp" UseManualLocation="True" />
+    <Node Id="@1075" Category="CodeSchema_ProjectItem" Bounds="1689.94938215548,-604.504418584484,171.49556651445,26.0022331811165" FilePath="$(VsSolution)\src\helpers\multicast\multicast_http_client.cpp" Label="multicast_http_client.cpp" UseManualLocation="True" />
+    <Node Id="@1077" Category="CodeSchema_ProjectItem" Bounds="1612.57934995121,-717.249635591031,116.344273501116,26.0019445379602" FilePath="$(VsSolution)\src\helpers\rest_client.cpp" Label="rest_client.cpp" UseManualLocation="True" />
+    <Node Id="@1081" Category="CodeSchema_ProjectItem" Bounds="2490.64853211947,-345.19089482665,122.53636494543,26.0016559779332" FilePath="$(VsSolution)\src\base\rtu_context.cpp" Label="rtu_context.cpp" UseManualLocation="True">
+      <Category Ref="Category1" />
+    </Node>
+    <Node Id="@175" Category="CodeSchema_ProjectItem" Bounds="1491.55725938418,-603.96188534689,149.644680221116,26.0019445379601" FilePath="$(VsSolution)\src\helpers\multicast\multicast_http_fwd.h" Label="multicast_http_fwd.h" UseManualLocation="True" />
+    <Node Id="@2" Category="CodeSchema_PoundIncludeFile" Bounds="2066.44852163257,-1125.69591717168,718.679940335596,531.061859172038" FilePath="$(VsSolution)\src\nxtool-x64.vcxproj" Group="Expanded" Label="Classes" Language="{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}" UseManualLocation="True" />
+    <Node Id="@377" Category="CodeSchema_ProjectItem" Bounds="2511.97193280819,-932.530465652162,154.242657821116,25.9852673778264" FilePath="$(VsSolution)\src\base\apply_changes_task.h" Label="apply_changes_task.h" UseManualLocation="True">
+      <Category Ref="Category1" />
+    </Node>
+    <Node Id="@413" Category="CodeSchema_ProjectItem" Bounds="2093.4883641285,-843.93251150762,177.686601821116,26.0019445379601" FilePath="$(VsSolution)\src\models\servers_selection_model.h" Label="servers_selection_model.h" UseManualLocation="True">
+      <Category Ref="Category1" />
+    </Node>
+    <Node Id="@417" Category="CodeSchema_ProjectItem" Bounds="2388.12579421673,-640.63639118076,172.498899847783,26.0022331811163" FilePath="$(VsSolution)\src\models\time_zones_model.h" Label="time_zones_model.h/cpp" UseManualLocation="True">
+      <Category Ref="Category4" />
+    </Node>
+    <Node Id="@419" Category="CodeSchema_ProjectItem" Bounds="2595.51289545371,-640.934975165135,169.615566514451,26.0022331811163" FilePath="$(VsSolution)\src\models\ip_settings_model.h" Label="ip_settings_model.h/cpp" UseManualLocation="True">
+      <Category Ref="Category4" />
+    </Node>
+    <Node Id="@421" Category="CodeSchema_ProjectItem" Bounds="2555.61298699496,-1051.10328787481,183.58823499445,26.0019445379601" FilePath="$(VsSolution)\src\models\changes_progress_model.h" Label="changes_progress_model.h" UseManualLocation="True">
+      <Category Ref="Category6" />
+    </Node>
+    <Node Id="@423" Category="CodeSchema_ProjectItem" Bounds="2348.17292475059,-811.415565985448,210.605566514449,26.0022331811163" FilePath="$(VsSolution)\src\models\changes_summary_model.h" Label="changes_summary_model.h/cpp" UseManualLocation="True">
+      <Category Ref="Category4" />
+    </Node>
+    <Node Id="@425" Category="CodeSchema_ProjectItem" Bounds="1743.21558739637,-543.589379521984,115.142233181116,26.0022331811165" FilePath="$(VsSolution)\src\helpers\multicast\authutil.h" Label="authutil.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@533" Category="CodeSchema_ProjectItem" Bounds="2533.10182903382,-752.939225374807,97.299759901116,26.0019445379601" FilePath="$(VsSolution)\src\base\selection.h" Label="selection.h" UseManualLocation="True">
+      <Category Ref="Category6" />
+    </Node>
+    <Node Id="@577" Category="CodeSchema_ProjectItem" Bounds="1850.54916847955,-972.408538266747,131.922233181116,26.002233181116" FilePath="$(VsSolution)\src\base\server_info.h" Label="server_info.h/cpp" UseManualLocation="True">
+      <Category Ref="Category4" />
+    </Node>
+    <Node Id="@601" Category="CodeSchema_ProjectItem" Bounds="2609.32785639121,-813.746376532323,138.40556651445,26.0022331811163" FilePath="$(VsSolution)\src\helpers\awaiting_op.h" Label="awaiting_op.h/cpp" UseManualLocation="True">
+      <Category Ref="Category4" />
+    </Node>
+    <Node Id="@635" Category="CodeSchema_ProjectItem" Bounds="1741.91440448215,-914.806218930809,151.958899847783,26.0022331811165" FilePath="$(VsSolution)\src\helpers\version_holder.h" Label="version_holder.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@639" Category="CodeSchema_ProjectItem" Bounds="2137.35310487434,-1010.49592703496,123.18563595445,26.0019445379601" FilePath="$(VsSolution)\src\base\servers_finder.h" Label="servers_finder.h" UseManualLocation="True">
+      <Category Ref="Category1" />
+    </Node>
+    <Node Id="@647" Category="CodeSchema_ProjectItem" Bounds="2100.10525498746,-712.663735915834,159.41033963445,25.9852673778263" FilePath="$(VsSolution)\src\helpers\server_info_manager.h" Label="server_info_manager.h" UseManualLocation="True" />
+    <Node Id="@649" Category="CodeSchema_ProjectItem" Bounds="2346.28043417153,-1085.69581717168,145.899092594449,26.0019445379601" FilePath="$(VsSolution)\src\base\changes_manager.h" Label="changes_manager.h" UseManualLocation="True">
+      <Category Ref="Category1" />
+    </Node>
+    <Node Id="@675" Category="CodeSchema_ProjectItem" Bounds="2183.34241161799,-348.052462415753,190.34556651445,26.0022331811163" FilePath="$(VsSolution)\src\helpers\model_change_helper.h" Label="model_change_helper.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@677" Category="CodeSchema_ProjectItem" Bounds="2261.24357535497,-404.054812269269,136.762233181116,26.0022331811163" FilePath="$(VsSolution)\src\helpers\time_helper.h" Label="time_helper.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@759" Category="CodeSchema_ProjectItem" Bounds="2282.84765864351,-462.195552347105,78.7117814477824,26.0019445379601" FilePath="$(VsSolution)\src\base\types.h" Label="types.h" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@795" Category="CodeSchema_ProjectItem" Bounds="2657.0098869812,-401.365257009267,91.2943681126017,26.0016559779332" FilePath="$(VsSolution)\src\models\buttons.h" Label="buttons.h" UseManualLocation="True" />
+    <Node Id="@803" Category="CodeSchema_ProjectItem" Bounds="1946.47582795913,-401.876467542707,128.998899847783,26.0022331811163" FilePath="$(VsSolution)\src\helpers\itf_helpers.h" Label="itf_helpers.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@805" Category="CodeSchema_ProjectItem" Bounds="1958.80472444351,-345.874117689191,138.578899847783,26.0022331811163" FilePath="$(VsSolution)\src\helpers\qml_helpers.h" Label="qml_helpers.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@815" Category="CodeSchema_ProjectItem" Bounds="2068.71200839403,-472.025798318785,100.988697181116,26.0019445379602" FilePath="$(VsSolution)\src\base\constants.h" Label="constants.h" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@817" Category="CodeSchema_ProjectItem" Bounds="1854.01828143528,-1084.41326849136,78.8822331811163,26.0022331811163" FilePath="$(VsSolution)\src\base\requests.h" Label="client.h" UseManualLocation="True">
+      <Category Ref="Category2" />
+    </Node>
+    <Node Id="@845" Category="CodeSchema_ProjectItem" Bounds="2353.2428498808,-956.098335760838,128.728899847783,26.0022331811163" FilePath="$(VsSolution)\src\base\changeset.h" Label="changeset.h/cpp" UseManualLocation="True" />
+    <Node Id="@853" Category="CodeSchema_ProjectItem" Bounds="1444.50732649142,-661.091973516124,130.16556651445,26.0022331811164" FilePath="$(VsSolution)\src\helpers\http_client.h" Label="http_client.h/cpp" UseManualLocation="True">
+      <Category Ref="Category9" />
+    </Node>
+    <Node Id="@855" Category="CodeSchema_ProjectItem" Bounds="1650.7286863547,-660.506737920421,158.63556651445,26.0022331811163" FilePath="$(VsSolution)\src\helpers\multicast\multicast_http_client.h" Label="multicast_http_client.h" UseManualLocation="True" />
+    <Node Id="@857" Category="CodeSchema_ProjectItem" Bounds="1616.87712701746,-773.251710786343,103.487977181117,26.0019445379601" FilePath="$(VsSolution)\src\helpers\rest_client.h" Label="rest_client.h" UseManualLocation="True">
+      <Category Ref="Category2" />
+    </Node>
+    <Node Id="@885" Category="CodeSchema_ProjectItem" Bounds="1506.50280256564,-543.740899297374,203.02556651445,26.0022331811164" FilePath="$(VsSolution)\src\helpers\multicast\multicast_http_transport.h" Label="multicast_http_transport.h/cpp" UseManualLocation="True" />
+    <Node Id="@903" Category="CodeSchema_ProjectItem" Bounds="2496.5367430353,-402.863013967275,109.683771238771,26.0016559779332" FilePath="$(VsSolution)\src\base\rtu_context.h" Label="rtu_context.h" UseManualLocation="True" />
+    <Node Id="Main" Bounds="2470.64853211947,-498.864883986806,303.245377625011,199.67537111419" Group="Expanded" UseManualLocation="True" />
+    <Node Id="Requests.cpp" Category="CodeSchema_ProjectItem" Bounds="1767.12850360325,-1028.41091863784,91.7422331811163,26.0022331811163" Label="client.cpp" UseManualLocation="True" />
+    <Node Id="Utils" Bounds="1926.47582795913,-512.025898318785,491.52998057695,212.15411381071" Group="Expanded" Label="LiteUtils" UseManualLocation="True" />
+  </Nodes>
+  <Links>
+    <Link Source="2a556fb8-5ed0-4be5-9131-9518e3906812" Target="@577" Category="Contains" />
+    <Link Source="2a556fb8-5ed0-4be5-9131-9518e3906812" Target="@635" Category="Contains" />
+    <Link Source="2a556fb8-5ed0-4be5-9131-9518e3906812" Target="@817" Category="Contains" />
+    <Link Source="2a556fb8-5ed0-4be5-9131-9518e3906812" Target="Requests.cpp" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@1075" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@1077" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@175" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@425" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@853" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@855" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@857" Category="Contains" />
+    <Link Source="6c37773a-ecb3-43c9-b790-b0db884e1f5b" Target="@885" Category="Contains" />
+    <Link Source="@1021" Target="@377" Category="PoundInclude" Bounds="2583.93910425504,-897.609184368483,2.5252592056172,21.0641545503163" />
+    <Link Source="@1021" Target="@423" Category="PoundInclude" Bounds="2487.24046404497,-850.543085280207,69.4084519662706,35.0688709785292" />
+    <Link Source="@1021" Target="@533" Category="PoundInclude" Bounds="2581.86362759647,-850.543085280207,0.450729468885584,88.6039763527384" />
+    <Link Source="@1021" Target="@601" Category="PoundInclude" Bounds="2602.2860556227,-850.543085280207,48.8036123780075,31.8752314822086" />
+    <Link Source="@1021" Target="@677" Category="PoundInclude" Bounds="2340.82480009378,-850.543085280207,234.600903242489,438.552409613517" />
+    <Link Source="@1021" Target="@805" Category="PoundInclude" Bounds="2048.17479016393,-850.543085280207,520.626177657353,498.444999171256" />
+    <Link Source="@1021" Target="@817" Category="PoundInclude" Bounds="1912.64925228164,-1061.47302565197,625.739917258386,184.927995833807" />
+    <Link Source="@1021" Target="@845" Category="PoundInclude" Bounds="2452.640471924,-926.183062523281,102.811968678944,49.6380327051145" />
+    <Link Source="@1023" Target="@413" Category="PoundInclude" Bounds="2181.86197560325,-808.931103789618,0.22938666660184,21.001033688248" />
+    <Link Source="@1023" Target="@647" Category="PoundInclude" Bounds="2180.36837766528,-761.92812556341,1.02171508837046,40.2672853756951" />
+    <Link Source="@1023" Target="@675" Category="PoundInclude" Bounds="2184.58083834076,-761.92812556341,89.1392795212323,405.085955704083" />
+    <Link Source="@1023" Target="@815" Bounds="2123.52620225809,-761.92812556341,55.6210341359983,281.073533256889" />
+    <Link Source="@1031" Target="@377" Category="PoundInclude" Bounds="2609.05817825819,-969.099298659113,31.4708018888596,30.3240461563905" />
+    <Link Source="@1031" Target="@421" Category="PoundInclude" Bounds="2649.99834080116,-1016.1634708411,2.48769748837503,21.062227644024" />
+    <Link Source="@1031" Target="@675" Category="PoundInclude" Bounds="2290.57759223928,-969.099308492739,355.899068319959,613.262704285814" />
+    <Link Source="@1037" Target="@795" Category="PoundInclude" Bounds="2644.96066628387,-432.863128008873,33.7130739155314,26.001410912042" />
+    <Link Source="@1037" Target="@815" Category="PoundInclude" Bounds="2178.69763923513,-457.486286890049,404.703514302892,10.4662661924534" />
+    <Link Source="@1037" Target="@903" Category="PoundInclude" Bounds="2576.45997181442,-432.863128008873,33.8321871399653,24.6940882777182" />
+    <Link Source="@1039" Target="@413" Category="PoundInclude" Bounds="2225.98259212353,-814.812979997473,319.221743327213,117.875951888291" />
+    <Link Source="@1039" Target="@417" Category="PoundInclude" Bounds="2506.81064521098,-670.935083571222,49.1157206817606,26.0781369746148" />
+    <Link Source="@1039" Target="@419" Category="PoundInclude" Bounds="2603.60627585972,-670.935083571222,45.6695872967052,25.599471883504" />
+    <Link Source="@1039" Target="@533" Category="PoundInclude" Bounds="2580.72338010621,-717.93985317879,0.502260378488245,21.0028250696082" />
+    <Link Source="@1039" Target="@577" Category="PoundInclude" Bounds="1956.15655614458,-942.95708817947,592.922811762394,246.020060070288" />
+    <Link Source="@1039" Target="@677" Category="PoundInclude" Bounds="2346.61092111953,-670.935083571222,222.669149569401,260.044030512059" />
+    <Link Source="@1039" Target="@805" Category="PoundInclude" Bounds="2056.14401032141,-670.935083571222,503.81437640269,320.23312211895" />
+    <Link Source="@1047" Target="@639" Category="PoundInclude" Bounds="2198.85041044532,-975.494004697905,0.0466447715498362,21.0001833758315" />
+    <Link Source="@1047" Target="@803" Category="PoundInclude" Bounds="2018.29115021951,-928.491876784113,176.111080365368,518.094249222699" />
+    <Link Source="@1047" Target="@817" Category="PoundInclude" Bounds="1932.29881000274,-1054.8875447352,235.965257416491,100.393723413128" />
+    <Link Source="@1051" Target="@577" Category="PoundInclude" Bounds="1933.19176343411,-939.509347673205,237.110334507652,282.830986556211" />
+    <Link Source="@1051" Target="@647" Category="PoundInclude" Bounds="2180.35669504226,-677.681244297243,0.521751892225893,21.0028831802489" />
+    <Link Source="@1051" Target="@817" Bounds="1893.39626849549,-1051.06037119367,278.620309409736,394.382010076675" />
+    <Link Source="@1053" Target="@377" Category="PoundInclude" Bounds="2443.38516580992,-1003.75090523404,115.435655052458,66.7168918539539" />
+    <Link Source="@1053" Target="@413" Category="PoundInclude" Bounds="2206.12992934226,-1003.75090523404,198.152435488083,154.289120528559" />
+    <Link Source="@1053" Target="@421" Category="PoundInclude" Bounds="2500.30106811087,-1028.59040297515,46.3517598615294,4.37593227116986" />
+    <Link Source="@1053" Target="@639" Category="PoundInclude" Bounds="2269.50517243301,-1009.84890703062,72.0768160967427,6.24269564091321" />
+    <Link Source="@1053" Target="@649" Category="PoundInclude" Bounds="2419.9026061028,-1050.69807735469,0.6422757158698,21.0042390723916" />
+    <Link Source="@1053" Target="@845" Category="PoundInclude" Bounds="2418.60323697644,-1003.75090523404,1.75085848900972,38.6617842206485" />
+    <Link Source="@1053" Target="@903" Category="PoundInclude" Bounds="2423.73336754866,-1003.75091506767,125.457964427353,582.903832437658" />
+    <Link Source="@1059" Target="@675" Category="PoundInclude" Bounds="2382.68773840552,-334.389622550279,267.06031388797,1.69641558955527" />
+    <Link Source="@1059" Target="@795" Category="PoundInclude" Bounds="2702.01557081699,-366.364602351789,0.313302328229383,21.0013442438889" />
+    <Link Source="@1075" Target="@425" Index="1" Bounds="1781.0520337872,-578.502185403368,10.9522504888591,26.5910337241748" />
+    <Link Source="@1075" Target="@855" Index="1" Bounds="1746.33091589496,-627.528559754915,18.7682952618552,23.0241411704309" />
+    <Link Source="@1075" Target="@885" Bounds="1652.35472650056,-578.502185403368,87.4648631575913,31.6950312158366" />
+    <Link Source="@1077" Target="@853" Index="1" Bounds="1555.39945177228,-691.247691053071,78.0419132020593,27.1942492380623" />
+    <Link Source="@1077" Target="@855" Index="1" Bounds="1684.33715996565,-691.247691053071,25.6211387903945,24.5184547312182" />
+    <Link Source="@1077" Target="@857" Index="1" Bounds="1669.45780562785,-738.256271195227,0.799111981333454,21.0066356041955" />
+    <Link Source="@1081" Target="@377" Category="PoundInclude" Bounds="2552.73961019699,-897.563172799122,34.9627516145583,552.372277972472" />
+    <Link Source="@1081" Target="@413" Category="PoundInclude" Bounds="2197.32426806348,-810.699571207014,344.958373722598,465.508676380364" />
+    <Link Source="@1081" Target="@421" Category="PoundInclude" Bounds="2556.15636814883,-1016.1804208177,88.3250211100067,661.803982477167" />
+    <Link Source="@1081" Target="@533" Category="PoundInclude" Bounds="2552.86798707655,-717.961276942007,27.2756633494223,372.770382115357" />
+    <Link Source="@1081" Target="@639" Category="PoundInclude" Bounds="2210.06145091405,-976.543603195474,334.957805637746,631.352708368824" />
+    <Link Source="@1081" Target="@649" Category="PoundInclude" Bounds="2423.26934960829,-1050.84379823306,128.748588834707,696.467359892534" />
+    <Link Source="@1081" Target="@677" Category="PoundInclude" Bounds="2387.42204888929,-375.748754755445,115.398389412177,30.5578636956465" />
+    <Link Source="@1081" Target="@803" Category="PoundInclude" Bounds="2084.42565860971,-381.178474312656,406.222784894142,42.5681141055645" />
+    <Link Source="@1081" Target="@815" Bounds="2172.19712817423,-443.492311897752,335.365785932042,98.3014208379536" />
+    <Link Source="@1081" Target="@817" Bounds="1896.91131017244,-1051.75551226631,643.171022086904,706.564617439665" />
+    <Link Source="@1081" Target="@903" Category="PoundInclude" Bounds="2551.58389465776,-367.861749691194,0.211521067293234,22.6708548645445" />
+    <Link Source="@2" Target="@1021" Category="Contains" />
+    <Link Source="@2" Target="@1023" Category="Contains" />
+    <Link Source="@2" Target="@1031" Category="Contains" />
+    <Link Source="@2" Target="@1039" Category="Contains" />
+    <Link Source="@2" Target="@1047" Category="Contains" />
+    <Link Source="@2" Target="@1051" Category="Contains" />
+    <Link Source="@2" Target="@1053" Category="Contains" />
+    <Link Source="@2" Target="@377" Category="Contains" />
+    <Link Source="@2" Target="@413" Category="Contains" />
+    <Link Source="@2" Target="@417" Category="Contains" />
+    <Link Source="@2" Target="@419" Category="Contains" />
+    <Link Source="@2" Target="@421" Category="Contains" />
+    <Link Source="@2" Target="@423" Category="Contains" />
+    <Link Source="@2" Target="@533" Category="Contains" />
+    <Link Source="@2" Target="@601" Category="Contains" />
+    <Link Source="@2" Target="@639" Category="Contains" />
+    <Link Source="@2" Target="@647" Category="Contains" />
+    <Link Source="@2" Target="@649" Category="Contains" />
+    <Link Source="@2" Target="@845" Category="Contains" />
+    <Link Source="@377" Target="@577" Category="PoundInclude" Bounds="1991.45563057513,-954.964787414066,520.516302233063,30.8553325454894" />
+    <Link Source="@377" Target="@759" Category="PoundInclude" Bounds="2334.02244054174,-906.545198274335,247.698332565714,436.522030763441" />
+    <Link Source="@413" Target="@759" Category="PoundInclude" Bounds="2187.09533920192,-817.93056696966,127.248163100742,347.284424415206" />
+    <Link Source="@413" Target="@817" Bounds="1915.99360607148,-1052.65285661537,250.720915069192,208.720345107749" />
+    <Link Source="@417" Target="@577" Bounds="1946.10667917296,-941.805923217017,506.407575615887,301.169532036257" Label=".cpp" />
+    <Link Source="@417" Target="@675" Bounds="2292.22485890588,-614.634157999644,173.447243723588,259.102742965931" Label=".cpp" />
+    <Link Source="@417" Target="@677" Bounds="2342.27645635626,-614.634157999644,124.14415828914,202.902307005349" Label=".cpp" />
+    <Link Source="@417" Target="@759" Category="PoundInclude" Bounds="2339.13049782028,-614.634157999644,124.15757839074,145.590574843751" Label=".h" />
+    <Link Source="@419" Target="@577" Category="PoundInclude" Bounds="1954.72466659072,-942.823388112594,695.637701454697,301.888412947459" Label=".h" />
+    <Link Source="@419" Target="@675" Bounds="2303.6243063708,-614.932721300067,358.860138219988,261.578899742648" Label=".cpp" />
+    <Link Source="@419" Target="@759" Index="1" />
+    <Link Source="@419" Target="@759" Category="PoundInclude" Bounds="2439.56558412523,136.400779245298,246.150061722672,190.447613387291" Label=".h" />
+    <Link Source="@421" Target="@759" Category="PoundInclude" Bounds="2333.73348173903,-1025.10132265289,306.494292186631,555.027207118328" />
+    <Link Source="@423" Target="@577" Bounds="1968.4942219795,-943.821597791777,441.61841266066,132.406031806329" Label=".cpp" />
+    <Link Source="@423" Target="@675" Bounds="2286.6034745169,-785.413332804332,161.96316323379,428.941094400522" Label=".cpp" />
+    <Link Source="@423" Target="@759" Category="PoundInclude" Bounds="2330.25739600148,-785.413332804332,118.331177024816,314.793316455629" Label=".h" />
+    <Link Source="@533" Target="@577" Category="PoundInclude" Bounds="1964.46535791198,-943.586608980237,577.878604823464,190.64738360543" />
+    <Link Source="@577" Target="@635" Category="PoundInclude" Bounds="1847.92345020656,-946.406305085631,46.3286388813501,27.0607750987613" />
+    <Link Source="@601" Target="@759" Category="PoundInclude" Bounds="2341.78786335876,-787.744122667254,323.565014620768,319.227694763672" Label=".h" />
+    <Link Source="@639" Target="@759" Category="PoundInclude" Bounds="2201.86853435841,-984.493982497,115.438469870793,513.517565385019" />
+    <Link Source="@647" Target="@817" Bounds="1908.96629136706,-1051.2810950204,260.835946285183,338.617359104567" />
+    <Link Source="@649" Target="@759" Category="PoundInclude" Bounds="2325.61053405856,-1059.69385194977,91.5962897104919,588.605332767598" />
+    <Link Source="@795" Target="@759" Category="PoundInclude" Bounds="2370.44650204305,-441.48107342757,286.563296322521,45.8181994420048" />
+    <Link Source="@817" Target="@577" Category="PoundInclude" Bounds="1896.13506421759,-1058.41103531024,15.8853511461969,77.1872451691754" />
+    <Link Source="@817" Target="@857" Bounds="1682.45318042042,-1058.41103531024,187.774171402159,277.703724480632" />
+    <Link Source="@845" Target="@677" Bounds="2333.11326925953,-930.096102579722,82.4219617787694,517.153461355383" />
+    <Link Source="@845" Target="@759" Category="PoundInclude" Bounds="2326.42177217408,-930.096102579722,88.6741920263039,459.063896968528" />
+    <Link Source="@845" Target="@805" Bounds="2041.23532881389,-930.096102579722,368.073208982686,576.635731831693" />
+    <Link Source="@845" Target="@817" Category="PoundInclude" Bounds="1912.77324627339,-1063.3702760088,450.263174887574,107.271940247959" />
+    <Link Source="@855" Target="@175" Index="1" Bounds="1612.51713036974,-634.504504739305,79.8980183602348,27.6036936177363" />
+    <Link Source="@885" Target="@175" Index="1" Bounds="1580.48654805041,-570.557015799862,18.5402607555002,26.8161165024884" />
+    <Link Source="@903" Target="@759" Category="PoundInclude" Bounds="2370.26631518684,-436.7513293433,130.895724317842,33.8883191428768" />
+    <Link Source="Main" Target="@1037" Category="Contains" />
+    <Link Source="Main" Target="@1059" Category="Contains" />
+    <Link Source="Main" Target="@1081" Category="Contains" />
+    <Link Source="Main" Target="@795" Category="Contains" />
+    <Link Source="Main" Target="@903" Category="Contains" />
+    <Link Source="Requests.cpp" Target="@635" Bounds="1813.55972474739,-1002.40868545672,3.3866530307323,78.6108068973464" />
+    <Link Source="Requests.cpp" Target="@817" Bounds="1831.67860340042,-1053.2695785959,35.7149702228367,24.8586599580583" />
+    <Link Source="Utils" Target="@675" Category="Contains" />
+    <Link Source="Utils" Target="@677" Category="Contains" />
+    <Link Source="Utils" Target="@759" Category="Contains" />
+    <Link Source="Utils" Target="@803" Category="Contains" />
+    <Link Source="Utils" Target="@805" Category="Contains" />
+    <Link Source="Utils" Target="@815" Category="Contains" />
+  </Links>
+  <Categories>
+    <Category Id="Category1" Label="Category 1" Background="#FFE51400" IsTag="True" />
+    <Category Id="Category2" Label="Category 2" Background="#FF339933" IsTag="True" />
+    <Category Id="Category4" Label="Category 4" Background="#FF1BA1E2" IsTag="True" />
+    <Category Id="Category6" Label="Category 6" Background="#FFA1260D" IsTag="True" />
+    <Category Id="Category9" Label="Category 9" Background="#FF00539C" IsTag="True" />
+    <Category Id="CodeSchema_PoundIncludeFile" Label="C++ Project File" BasedOn="File" Background="#FFEFEFEF" CanBeDataDriven="True" IsProviderRoot="False" NavigationActionLabel="C++ Project File" />
+    <Category Id="CodeSchema_ProjectItem" Label="Project Item" BasedOn="File" CanBeDataDriven="True" DefaultAction="Node:Both:CodeSchema_Type" Icon="File" NavigationActionLabel="Project Items" />
+    <Category Id="Contains" Label="Contains" Description="Whether the source of the link contains the target object" CanBeDataDriven="False" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="Contained By" IsContainment="True" OutgoingActionLabel="Contains" />
+    <Category Id="File" Label="File" CanBeDataDriven="True" DefaultAction="Microsoft.Contains" Icon="File" NavigationActionLabel="Files" />
+    <Category Id="PoundInclude" Label="#include" CanBeDataDriven="True" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="#include By" OutgoingActionLabel="#include" />
+  </Categories>
+  <Properties>
+    <Property Id="Background" Label="Background" Description="The background color" DataType="System.Windows.Media.Brush" />
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CanLinkedNodesBeDataDriven" Label="CanLinkedNodesBeDataDriven" Description="CanLinkedNodesBeDataDriven" DataType="System.Boolean" />
+    <Property Id="DefaultAction" Label="DefaultAction" Description="DefaultAction" DataType="System.String" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="FilePath" Label="File Path" Description="File Path" DataType="System.String" />
+    <Property Id="Group" Label="Group" Description="Display the node as a group" DataType="Microsoft.VisualStudio.GraphModel.GraphGroupStyle" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="Icon" Label="Icon" Description="Icon" DataType="System.String" />
+    <Property Id="IncomingActionLabel" Label="IncomingActionLabel" Description="IncomingActionLabel" DataType="System.String" />
+    <Property Id="IsContainment" DataType="System.Boolean" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="IsProviderRoot" Label="IsProviderRoot" Description="IsProviderRoot" DataType="System.Boolean" />
+    <Property Id="IsTag" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="Language" Label="Language" Description="Language" DataType="System.String" />
+    <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
+    <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="UseManualLocation" DataType="System.Boolean" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+  </Properties>
+  <QualifiedNames>
+    <Name Id="Assembly" Label="Assembly" ValueType="Uri" />
+    <Name Id="File" Label="File" ValueType="Uri" />
+  </QualifiedNames>
+  <IdentifierAliases>
+    <Alias n="1" Uri="Assembly=$(VsSolutionUri)/src/nxtool-x64.vcxproj" />
+    <Alias n="2" Id="(@1)" />
+    <Alias n="174" Uri="File=$(VsSolutionUri)/src/helpers/multicast/multicast_http_fwd.h" />
+    <Alias n="175" Id="(@1 @174)" />
+    <Alias n="376" Uri="File=$(VsSolutionUri)/src/base/apply_changes_task.h" />
+    <Alias n="377" Id="(@1 @376)" />
+    <Alias n="412" Uri="File=$(VsSolutionUri)/src/models/servers_selection_model.h" />
+    <Alias n="413" Id="(@1 @412)" />
+    <Alias n="416" Uri="File=$(VsSolutionUri)/src/models/time_zones_model.h" />
+    <Alias n="417" Id="(@1 @416)" />
+    <Alias n="418" Uri="File=$(VsSolutionUri)/src/models/ip_settings_model.h" />
+    <Alias n="419" Id="(@1 @418)" />
+    <Alias n="420" Uri="File=$(VsSolutionUri)/src/models/changes_progress_model.h" />
+    <Alias n="421" Id="(@1 @420)" />
+    <Alias n="422" Uri="File=$(VsSolutionUri)/src/models/changes_summary_model.h" />
+    <Alias n="423" Id="(@1 @422)" />
+    <Alias n="424" Uri="File=$(VsSolutionUri)/src/helpers/multicast/authutil.h" />
+    <Alias n="425" Id="(@1 @424)" />
+    <Alias n="532" Uri="File=$(VsSolutionUri)/src/base/selection.h" />
+    <Alias n="533" Id="(@1 @532)" />
+    <Alias n="576" Uri="File=$(VsSolutionUri)/src/base/server_info.h" />
+    <Alias n="577" Id="(@1 @576)" />
+    <Alias n="600" Uri="File=$(VsSolutionUri)/src/helpers/awaiting_op.h" />
+    <Alias n="601" Id="(@1 @600)" />
+    <Alias n="634" Uri="File=$(VsSolutionUri)/src/helpers/version_holder.h" />
+    <Alias n="635" Id="(@1 @634)" />
+    <Alias n="638" Uri="File=$(VsSolutionUri)/src/base/servers_finder.h" />
+    <Alias n="639" Id="(@1 @638)" />
+    <Alias n="646" Uri="File=$(VsSolutionUri)/src/helpers/server_info_manager.h" />
+    <Alias n="647" Id="(@1 @646)" />
+    <Alias n="648" Uri="File=$(VsSolutionUri)/src/base/changes_manager.h" />
+    <Alias n="649" Id="(@1 @648)" />
+    <Alias n="674" Uri="File=$(VsSolutionUri)/src/helpers/model_change_helper.h" />
+    <Alias n="675" Id="(@1 @674)" />
+    <Alias n="676" Uri="File=$(VsSolutionUri)/src/helpers/time_helper.h" />
+    <Alias n="677" Id="(@1 @676)" />
+    <Alias n="758" Uri="File=$(VsSolutionUri)/src/base/types.h" />
+    <Alias n="759" Id="(@1 @758)" />
+    <Alias n="794" Uri="File=$(VsSolutionUri)/src/models/buttons.h" />
+    <Alias n="795" Id="(@1 @794)" />
+    <Alias n="802" Uri="File=$(VsSolutionUri)/src/helpers/itf_helpers.h" />
+    <Alias n="803" Id="(@1 @802)" />
+    <Alias n="804" Uri="File=$(VsSolutionUri)/src/helpers/qml_helpers.h" />
+    <Alias n="805" Id="(@1 @804)" />
+    <Alias n="814" Uri="File=$(VsSolutionUri)/src/base/constants.h" />
+    <Alias n="815" Id="(@1 @814)" />
+    <Alias n="816" Uri="File=$(VsSolutionUri)/src/base/requests.h" />
+    <Alias n="817" Id="(@1 @816)" />
+    <Alias n="844" Uri="File=$(VsSolutionUri)/src/base/changeset.h" />
+    <Alias n="845" Id="(@1 @844)" />
+    <Alias n="852" Uri="File=$(VsSolutionUri)/src/helpers/http_client.h" />
+    <Alias n="853" Id="(@1 @852)" />
+    <Alias n="854" Uri="File=$(VsSolutionUri)/src/helpers/multicast/multicast_http_client.h" />
+    <Alias n="855" Id="(@1 @854)" />
+    <Alias n="856" Uri="File=$(VsSolutionUri)/src/helpers/rest_client.h" />
+    <Alias n="857" Id="(@1 @856)" />
+    <Alias n="884" Uri="File=$(VsSolutionUri)/src/helpers/multicast/multicast_http_transport.h" />
+    <Alias n="885" Id="(@1 @884)" />
+    <Alias n="902" Uri="File=$(VsSolutionUri)/src/base/rtu_context.h" />
+    <Alias n="903" Id="(@1 @902)" />
+    <Alias n="1020" Uri="File=$(VsSolutionUri)/src/base/apply_changes_task.cpp" />
+    <Alias n="1021" Id="(@1 @1020)" />
+    <Alias n="1022" Uri="File=$(VsSolutionUri)/src/models/servers_selection_model.cpp" />
+    <Alias n="1023" Id="(@1 @1022)" />
+    <Alias n="1030" Uri="File=$(VsSolutionUri)/src/models/changes_progress_model.cpp" />
+    <Alias n="1031" Id="(@1 @1030)" />
+    <Alias n="1036" Uri="File=$(VsSolutionUri)/src/main.cpp" />
+    <Alias n="1037" Id="(@1 @1036)" />
+    <Alias n="1038" Uri="File=$(VsSolutionUri)/src/base/selection.cpp" />
+    <Alias n="1039" Id="(@1 @1038)" />
+    <Alias n="1046" Uri="File=$(VsSolutionUri)/src/base/servers_finder.cpp" />
+    <Alias n="1047" Id="(@1 @1046)" />
+    <Alias n="1050" Uri="File=$(VsSolutionUri)/src/helpers/server_info_manager.cpp" />
+    <Alias n="1051" Id="(@1 @1050)" />
+    <Alias n="1052" Uri="File=$(VsSolutionUri)/src/base/changes_manager.cpp" />
+    <Alias n="1053" Id="(@1 @1052)" />
+    <Alias n="1058" Uri="File=$(VsSolutionUri)/src/models/buttons.cpp" />
+    <Alias n="1059" Id="(@1 @1058)" />
+    <Alias n="1074" Uri="File=$(VsSolutionUri)/src/helpers/multicast/multicast_http_client.cpp" />
+    <Alias n="1075" Id="(@1 @1074)" />
+    <Alias n="1076" Uri="File=$(VsSolutionUri)/src/helpers/rest_client.cpp" />
+    <Alias n="1077" Id="(@1 @1076)" />
+    <Alias n="1080" Uri="File=$(VsSolutionUri)/src/base/rtu_context.cpp" />
+    <Alias n="1081" Id="(@1 @1080)" />
+  </IdentifierAliases>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Category 5" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category5')" />
+      <Setter Property="Background" Value="#FF9B4F96" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 6" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category6')" />
+      <Setter Property="Background" Value="#FFA1260D" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 1" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category1')" />
+      <Setter Property="Background" Value="#FFE51400" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 3" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category3')" />
+      <Setter Property="Background" Value="#FF3EBCED" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 4" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category4')" />
+      <Setter Property="Background" Value="#FF1BA1E2" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 9" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category9')" />
+      <Setter Property="Background" Value="#FF00539C" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 8" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category8')" />
+      <Setter Property="Background" Value="#FF44CCCC" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 10" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category10')" />
+      <Setter Property="Background" Value="#FF672878" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 7" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category7')" />
+      <Setter Property="Background" Value="#FF347A30" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Category 2" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Category2')" />
+      <Setter Property="Background" Value="#FF339933" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="C++ Project File" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_PoundIncludeFile')" />
+      <Setter Property="Background" Value="#FFEFEFEF" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Externals" ValueLabel="Has category">
+      <Condition Expression="HasCategory('Externals')" />
+      <Setter Property="Background" Value="#FFA08080" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Source File" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_ProjectItem')" />
+      <Setter Property="Background" Value="#FFC0C0C0" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="#include Group" ValueLabel="Has category">
+      <Condition Expression="HasCategory('CodeSchema_PoundIncludeGroup')" />
+      <Setter Property="Background" Value="#FFEFEFEF" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Comment" ValueLabel="Has comment">
+      <Condition Expression="HasCategory('Comment')" />
+      <Setter Property="Background" Value="#FFFFFACD" />
+      <Setter Property="Stroke" Value="#FFE5C365" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="NodeRadius" Value="2" />
+      <Setter Property="MaxWidth" Value="250" />
+    </Style>
+  </Styles>
+  <Paths>
+    <Path Id="VsSolution" Value="C:\develop\netoptix_vms\nxtool" />
+    <Path Id="VsSolutionUri" Value="file:///C:/develop/netoptix_vms/nxtool" />
+  </Paths>
+</DirectedGraph>

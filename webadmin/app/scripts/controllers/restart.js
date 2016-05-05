@@ -19,7 +19,7 @@ angular.module('webadminApp')
 
         $scope.refresh = reload;
         function pingServer(){
-            var request = serverWasDown ? mediaserver.getSettings(statisticUrl): mediaserver.statistics(statisticUrl);
+            var request = serverWasDown ? mediaserver.getModuleInformation(statisticUrl): mediaserver.statistics(statisticUrl);
             request.then(function(result){
                 if(serverWasDown || result.data.reply.uptimeMs < oldUptime )
                 {

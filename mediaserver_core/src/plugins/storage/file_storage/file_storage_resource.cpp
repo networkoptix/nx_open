@@ -4,7 +4,7 @@
 #include <QtCore/QDir>
 
 #include "file_storage_resource.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
@@ -94,7 +94,9 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ).toInt();;
 
 #ifdef Q_OS_WIN
-        if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
+        if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite) 
+            systemFlags = 0;
+        else if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }

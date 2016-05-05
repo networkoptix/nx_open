@@ -8,12 +8,12 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 extern "C"
 {
-#include <sigar.h>
-#include <sigar_format.h>
+#include <sigar/sigar.h>
+#include <sigar/sigar_format.h>
 }
 
 
@@ -52,7 +52,7 @@ public:
     }
 
     int checkError(const char *expression, int status) const {
-        assert(expression);
+        NX_ASSERT(expression);
 
         if(status == SIGAR_OK)
             return status;
@@ -79,7 +79,7 @@ public:
             return 0.0;
 
         if(!lastUsageByHddName.contains(hdd.name)) { /* Is this the first call? */
-            lastUsageByHddName[hdd.name] = current; 
+            lastUsageByHddName[hdd.name] = current;
             return 0.0;
         }
 
@@ -238,7 +238,7 @@ qreal QnSigarMonitor::totalCpuUsage() {
         return 0.0;
 
     if(d->cpu.total == 0) { /* Is this the first call? */
-        d->cpu = cpu; 
+        d->cpu = cpu;
         return 0.0;
     }
 
@@ -324,12 +324,12 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
     for(uint i = 0; i < networkInterfaces.number; i++) {
         QString interfaceName = QLatin1String(networkInterfaces.data[i]);
         if (interfaceNames.contains(interfaceName))
-            continue; /* Skip duplicate interface entries. */ 
+            continue; /* Skip duplicate interface entries. */
 
         sigar_net_interface_config_t config;
         if (INVOKE(sigar_net_interface_config_get(d->sigar, interfaceName.toLatin1().constData(), &config) != SIGAR_OK))
             continue;
-       
+
         /* Interface is down. */
         if ((config.flags & (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) ) != (SIGAR_IFF_UP | SIGAR_IFF_RUNNING) )
             continue;
@@ -346,7 +346,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
             if(interfaceMacs.contains(load.macAddress))
                 continue; /* Skip entries with duplicate macs. */
 
-            /* Detect virtual interfaces. */ 
+            /* Detect virtual interfaces. */
             for(size_t i = 0; i < arraysize(virtualMacs); i++) {
                 if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
                     load.type = VirtualInterface;

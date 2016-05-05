@@ -6,7 +6,7 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QTabletEvent>
 #include <QtGui/QKeyEvent>
-#include <QInputMethodEvent>
+#include <QtGui/QInputMethodEvent>
 #include <QtGui/QFocusEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QMoveEvent>
@@ -17,7 +17,7 @@
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QDragMoveEvent>
 #include <QtGui/QDragLeaveEvent>
-#include <QShowEvent>
+#include <QtGui/QShowEvent>
 #include <QtGui/QHideEvent>
 #include <QtGui/QActionEvent>
 #include <QtWidgets/QGraphicsView>
@@ -26,8 +26,8 @@
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
-#include <QGraphicsSceneHelpEvent>
-#include <QGraphicsSceneHoverEvent>
+#include <QtWidgets/QGraphicsSceneHelpEvent>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>
@@ -169,7 +169,7 @@ void Instrument::ensureUninstalled() {
 }
 
 QGraphicsView *Instrument::view(QWidget *viewport) {
-    assert(viewport != NULL);
+    NX_ASSERT(viewport != NULL);
 
     return checked_cast<QGraphicsView *>(viewport->parent());
 }
@@ -199,7 +199,7 @@ QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPointF &sce
 }
 
 QList<QGraphicsItem *> Instrument::items(const QGraphicsSceneMouseEvent *event) const {
-    assert(event != NULL);
+    NX_ASSERT(event != NULL);
 
     if (m_scene == NULL) {
         if (!isInstalled()) {
@@ -275,7 +275,7 @@ void Instrument::recursiveDisable() {
 }
 
 void Instrument::sendInstalledNotifications(bool installed) {
-    assert(isInstalled()); /* Must be actually installed. */
+    NX_ASSERT(isInstalled()); /* Must be actually installed. */
 
     if(installed) {
         installedNotify();

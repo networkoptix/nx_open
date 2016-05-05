@@ -8,7 +8,9 @@
 #include <QtCore/QMetaType>
 #endif
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include <utils/common/model_functions_fwd.h>
 
@@ -28,7 +30,7 @@ public:
     /**
      * Creates a software version object from a string. Note that this function
      * also supports OpenGL style version strings like "2.0.6914 WinXP SSE/SSE2/SSE3/3DNow!".
-     * 
+     *
      * \param versionString             Version string.
      */
     explicit QnSoftwareVersion(const QString &versionString);
@@ -39,24 +41,34 @@ public:
 
     bool isNull() const;
 
-    int major() const {
+    int major() const
+    {
         return m_data[0];
     }
 
-    int minor() const {
+    int minor() const
+    {
         return m_data[1];
     }
 
-    int bugfix() const {
+    int bugfix() const
+    {
         return m_data[2];
     }
 
-    int build() const {
+    int build() const
+    {
         return m_data[3];
     }
 
-    friend bool isCompatible(const QnSoftwareVersion &l, const QnSoftwareVersion &r) {
-        return l.m_data[0] == r.m_data[0] && l.m_data[1] == r.m_data[1];
+    bool isCompatible(const QnSoftwareVersion &r) const
+    {
+        return m_data[0] == r.m_data[0] && m_data[1] == r.m_data[1];
+    }
+
+    friend bool isCompatible(const QnSoftwareVersion &l, const QnSoftwareVersion &r)
+    {
+        return l.isCompatible(r);
     }
 
     friend bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r);

@@ -48,11 +48,11 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
     m_thumbnailManager = context->instance<QnCameraThumbnailManager>();
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallScreenWidget::at_thumbnailReady);
 
+    setOption(QnResourceWidget::WindowRotationForbidden, true);
+
     updateItems();
     updateButtonsVisibility();
     updateTitleText();
-
-    setOption(QnResourceWidget::WindowRotationForbidden, true);
     setInfoVisible(true, false);
     updateInfoText();
 }
@@ -76,7 +76,7 @@ Qn::RenderStatus QnVideowallScreenWidget::paintChannelBackground(QPainter *paint
     return Qn::NewFrameRendered;
 }
 
-QnResourceWidget::Buttons QnVideowallScreenWidget::calculateButtonsVisibility() const {
+int QnVideowallScreenWidget::calculateButtonsVisibility() const {
     return 0;
 }
 
@@ -126,7 +126,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
         m_mainOverlayWidget->setLayout(m_mainLayout);
         m_mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_mainOverlayWidget->setOpacity(1.0);
-        addOverlayWidget(m_mainOverlayWidget, UserVisible, true);
+        addOverlayWidget(m_mainOverlayWidget, detail::OverlayParams(UserVisible, true));
     }
 
     while (m_mainLayout->count() > 0) {
@@ -165,7 +165,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
     if (m_items.size() > 1 || (m_items.size() == 1 && partOfScreen(m_items.first().screenSnaps))) {
         foreach (const QnVideoWallItem &item, m_items) {
             QnVideowallItemWidget *itemWidget = createItem(item.uuid);
-            assert(QnScreenSnap::snapsPerScreen() == 2);    //in other case layout should be reimplemented
+            NX_ASSERT(QnScreenSnap::snapsPerScreen() == 2);    //in other case layout should be reimplemented
 
             if (item.screenSnaps.left().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);

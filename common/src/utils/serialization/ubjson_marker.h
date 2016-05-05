@@ -10,6 +10,7 @@ namespace QnUbjson {
         FalseMarker         = 'F',
         UInt8Marker         = 'U',
         Int8Marker          = 'i',
+        UInt16Marker        = 'u',
         Int16Marker         = 'I',
         Int32Marker         = 'l',
         Int64Marker         = 'L',
@@ -36,13 +37,30 @@ namespace QnUbjson {
 
     inline QnUbjson::Marker markerFromChar(char c) {
         switch (c) {
-        case 'Z': case 'T': case 'F': case 'U': case 'i': case 'I': case 'l':
-        case 'L': case 'd': case 'D': case 'H': case 'C': case 'S':
-        case '[': case ']': case '{': case '}':
-        case 'N': case '$': case '#':
-            return static_cast<QnUbjson::Marker>(c);
+        case NullMarker:
+        case TrueMarker:
+        case FalseMarker:
+        case UInt8Marker:
+        case Int8Marker:
+        case UInt16Marker:
+        case Int16Marker:
+        case Int32Marker:
+        case Int64Marker:
+        case FloatMarker:
+        case DoubleMarker:
+        case BigNumberMarker:
+        case Latin1CharMarker:
+        case Utf8StringMarker:
+        case ArrayStartMarker:
+        case ArrayEndMarker:
+        case ObjectStartMarker:
+        case ObjectEndMarker:
+        case NoopMarker:
+        case ContainerTypeMarker:
+        case ContainerSizeMarker:
+            return static_cast<Marker>(c);
         default:    
-            return QnUbjson::InvalidMarker;
+            return InvalidMarker;
         }
     }
 
@@ -52,19 +70,20 @@ namespace QnUbjson {
 
     inline bool isValidContainerType(Marker marker) {
         switch (marker) {
-        case QnUbjson::NullMarker:
-        case QnUbjson::TrueMarker:
-        case QnUbjson::FalseMarker:
-        case QnUbjson::UInt8Marker:
-        case QnUbjson::Int8Marker:
-        case QnUbjson::Int16Marker:
-        case QnUbjson::Int32Marker:
-        case QnUbjson::Int64Marker:
-        case QnUbjson::FloatMarker:
-        case QnUbjson::DoubleMarker:
-        case QnUbjson::BigNumberMarker:
-        case QnUbjson::Latin1CharMarker:
-        case QnUbjson::Utf8StringMarker:
+        case NullMarker:
+        case TrueMarker:
+        case FalseMarker:
+        case UInt8Marker:
+        case Int8Marker:
+        case UInt16Marker:
+        case Int16Marker:
+        case Int32Marker:
+        case Int64Marker:
+        case FloatMarker:
+        case DoubleMarker:
+        case BigNumberMarker:
+        case Latin1CharMarker:
+        case Utf8StringMarker:
             return true;
         default:
             return false;

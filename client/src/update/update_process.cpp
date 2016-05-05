@@ -1,7 +1,7 @@
 #include "update_process.h"
 
 #include <QtCore/QFutureWatcher>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
@@ -20,7 +20,7 @@
 #include <utils/common/sleep.h>
 #include <utils/update/update_utils.h>
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <api/runtime_info_manager.h>
 
@@ -83,7 +83,7 @@ void QnUpdateProcess::run() {
     checkForUpdatesTask->start();
 
     exec();
- 
+
     if (m_updateResult == QnUpdateResult::Cancelled) {
         if (m_currentTask)
             m_currentTask->cancel();
@@ -183,7 +183,7 @@ void QnUpdateProcess::setPeerStage(const QnUuid &peerId, QnPeerUpdateStage stage
         return;
 
     QnPeerUpdateInformation &info = m_updateInformationById[peerId];
-    if (info.stage == stage) 
+    if (info.stage == stage)
         return;
 
     info.stage = stage;
@@ -257,7 +257,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         info.updateInformation = m_updateFiles.value(server->getSystemInfo());
 
         if (!info.updateInformation) {
-            Q_ASSERT_X(0, "No update info for server", Q_FUNC_INFO);
+            NX_ASSERT(0, "No update info for server", Q_FUNC_INFO);
             return;
         }
 
@@ -300,9 +300,9 @@ void QnUpdateProcess::finishUpdate(QnUpdateResult::Value value) {
 
 void QnUpdateProcess::installClientUpdate() {
     /* Check if we skip this step. */
-    if (m_clientRequiresInstaller 
+    if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
-        || qnSettings->isClientUpdateDisabled() 
+        || qnSettings->isClientUpdateDisabled()
         || m_clientUpdateFile->version == qnCommon->engineVersion())
     {
             NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);

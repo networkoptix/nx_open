@@ -1,9 +1,10 @@
 #ifndef QN_NETWORK_RESOURCE_H
 #define QN_NETWORK_RESOURCE_H
 
+#include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
-#include "utils/network/mac_address.h"
+#include <nx/network/mac_address.h>
 #include "resource.h"
 
 class QnTimePeriodList;
@@ -42,6 +43,7 @@ public:
     void setDefaultAuth(const QString &user, const QString &password);
     void setDefaultAuth(const QAuthenticator &auth);
 
+    static QAuthenticator getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId);
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called
@@ -96,10 +98,9 @@ public:
         \note Implementation MUST check not only camera address:port accessibility, but also check some unique parameters of camera
         \note Default implementation returns false
     */
-    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler );
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
     static QnUuid uniqueIdToId(const QString& uniqId);
-    virtual bool isAbstractResource() const { return false; }
     virtual void initializationDone() override;
 
 private:

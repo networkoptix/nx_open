@@ -4,7 +4,7 @@
 
 #include "predefinedusagecalculator.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "stree/streesaxhandler.h"
 #include "stree/node.h"
@@ -46,8 +46,8 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
     //analyzing output
     qlonglong maxPixelsPerSecond = 0;
     qlonglong currentPixelsPerSecond = 0;
-    if( rc.getTypedVal( DecoderParameter::pixelsPerSecond, &maxPixelsPerSecond ) &&
-        inputParams.getTypedVal( DecoderParameter::pixelsPerSecond, &currentPixelsPerSecond ) )
+    if( rc.get( DecoderParameter::pixelsPerSecond, &maxPixelsPerSecond ) &&
+        inputParams.get( DecoderParameter::pixelsPerSecond, &currentPixelsPerSecond ) )
     {
         if( currentPixelsPerSecond >= maxPixelsPerSecond )
             return false;
@@ -55,8 +55,8 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
 
     qlonglong maxVideoMemoryUsage = 0;
     qlonglong currentVideoMemoryUsage = 0;
-    if( rc.getTypedVal( DecoderParameter::videoMemoryUsage, &maxVideoMemoryUsage ) &&
-        inputParams.getTypedVal( DecoderParameter::videoMemoryUsage, &currentVideoMemoryUsage ) )
+    if( rc.get( DecoderParameter::videoMemoryUsage, &maxVideoMemoryUsage ) &&
+        inputParams.get( DecoderParameter::videoMemoryUsage, &currentVideoMemoryUsage ) )
     {
         if( currentVideoMemoryUsage >= maxVideoMemoryUsage )
             return false;
@@ -64,8 +64,8 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
 
     int maxSimultaneousStreamCount = 0;
     int currentSimultaneousStreamCount = 0;
-    if( rc.getTypedVal( DecoderParameter::simultaneousStreamCount, &maxSimultaneousStreamCount ) &&
-        inputParams.getTypedVal( DecoderParameter::simultaneousStreamCount, &currentSimultaneousStreamCount ) )
+    if( rc.get( DecoderParameter::simultaneousStreamCount, &maxSimultaneousStreamCount ) &&
+        inputParams.get( DecoderParameter::simultaneousStreamCount, &currentSimultaneousStreamCount ) )
     {
         if( currentSimultaneousStreamCount >= maxSimultaneousStreamCount )
             return false;
@@ -76,20 +76,15 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
 
 void PredefinedUsageCalculator::updateTree()
 {
-    stree::AbstractNode* newTree = NULL;
-    loadXml( m_predefinedDataFilePath, &newTree );
-    if( !newTree )
-        return;
-
-    std::unique_ptr<stree::AbstractNode> oldTree;
+    if (auto newTree = loadXml(m_predefinedDataFilePath))
     {
-        QnMutexLocker lk( &m_treeMutex );
-        oldTree = std::move(m_currentTree);
-        m_currentTree.reset( newTree );
+        QnMutexLocker lk(&m_treeMutex);
+        m_currentTree = std::move(newTree);
     }
 }
 
-void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::AbstractNode** const treeRoot )
+std::unique_ptr<stree::AbstractNode> PredefinedUsageCalculator::loadXml(
+    const QString& filePath)
 {
     stree::SaxHandler xmlHandler( m_rns );
 
@@ -101,15 +96,15 @@ void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::Abstrac
     if( !xmlFile.open( QIODevice::ReadOnly ) )
     {
         NX_LOG( lit( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlFile.errorString()), cl_logERROR );
-        return;
+        return std::unique_ptr<stree::AbstractNode>();
     }
     QXmlInputSource input( &xmlFile );
     NX_LOG( lit( "Parsing stree xml file (%1)" ).arg(filePath), cl_logDEBUG1 );
     if( !reader.parse( &input ) )
     {
         NX_LOG( lit( "Failed to parse stree xml (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
-        return;
+        return std::unique_ptr<stree::AbstractNode>();
     }
 
-    *treeRoot = xmlHandler.releaseTree();
+    return xmlHandler.releaseTree();
 }

@@ -1,15 +1,9 @@
-/**********************************************************
-* 1 oct 2013
-* a.kolesnikov
-***********************************************************/
-
 #ifndef ABSTRACT_BYTE_STREAM_FILTER_H
 #define ABSTRACT_BYTE_STREAM_FILTER_H
 
 #include <memory>
 
-#include "../network/http/qnbytearrayref.h"
-
+#include <nx/network/http/qnbytearrayref.h>
 
 //!Interface for class doing something with byte stream
 /*!
@@ -68,7 +62,7 @@ namespace nx_bsf
     AbstractByteStreamFilterPtr last( const AbstractByteStreamFilterPtr& beginPtr );
     //!Inserts element \a what at position pointed to by \a _where (\a _where will be placed after \a what)
     /*!
-        \note if \a _where could not be found in the chain, assert will trigger
+        \note if \a _where could not be found in the chain, NX_ASSERT will trigger
         \return beginning of the new filter chain (it can change if \a _where equals to \a beginPtr)
     */
     AbstractByteStreamFilterPtr insert(

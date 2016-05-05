@@ -1,22 +1,22 @@
-#ifndef QN_CLIENT_GLOBALS_H
-#define QN_CLIENT_GLOBALS_H
+#pragma once
 
 #include <QtCore/QMetaType>
 
-#include <common/user_permissions.h>
 #include <utils/common/model_functions_fwd.h>
 
-namespace Qn {
-
+namespace Qn
+{
     /**
      * Type of a node in resource tree displayed to the user.
      */
-    enum NodeType {
+    enum NodeType
+    {
         RootNode,               /**< Root node for the tree. */
         LocalNode,              /**< Root node for local resources. */
         ServersNode,            /**< Root node for remote resources. */
         OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
+        WebPagesNode,           /**> Root node for webpages. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
@@ -33,7 +33,6 @@ namespace Qn {
         NodeTypeCount
     };
 
-
     /**
      * Role of an item on the scene.
      *
@@ -41,7 +40,8 @@ namespace Qn {
      *
      * Also note that the order is important. Code in <tt>workbench.cpp</tt> relies on it.
      */
-    enum ItemRole {
+    enum ItemRole
+    {
         ZoomedRole,         /**< Item is zoomed. */
         RaisedRole,         /**< Item is raised. */
         SingleSelectedRole, /**< Item is the only selected item on a workbench. */
@@ -51,11 +51,11 @@ namespace Qn {
         ItemRoleCount
     };
 
-
     /**
      * Item-specific flags. Are part of item's serializable state.
      */
-    enum ItemFlag {
+    enum ItemFlag
+    {
         Pinned = 0x1,                       /**< Item is pinned to the grid. Items are not pinned by default. */
         PendingGeometryAdjustment = 0x2     /**< Geometry adjustment is pending.
                                              * Center of item's combined geometry defines desired position.
@@ -64,7 +64,6 @@ namespace Qn {
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ItemFlags)
 
-
     /**
      * Layer of a graphics item on the scene.
      *
@@ -72,7 +71,8 @@ namespace Qn {
      * and guarantees that items from the layers with higher numbers are always
      * displayed on top of those from the layers with lower numbers.
      */
-    enum ItemLayer {
+    enum ItemLayer
+    {
         EMappingLayer,              /**< Layer for E-Mapping background. */
         BackLayer,                  /**< Back layer. */
         RaisedConeBgLayer,          /**< Layer for origin cone when item is not raised anymore. */
@@ -89,11 +89,11 @@ namespace Qn {
         LayerCount
     };
 
-
     /**
      * Flags describing how viewport margins affect viewport geometry.
      */
-    enum MarginFlag {
+    enum MarginFlag
+    {
         /** Viewport margins affect how viewport size is bounded. */
         MarginsAffectSize = 0x1,
 
@@ -103,12 +103,12 @@ namespace Qn {
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(MarginFlags)
 
-
     /**
      * Flags describing the differences between instances of the same resource
      * on the client and on the Server.
      */
-    enum ResourceSavingFlag {
+    enum ResourceSavingFlag
+    {
         /** Resource is local and has never been saved to Server. */
         ResourceIsLocal = 0x1,
 
@@ -122,33 +122,10 @@ namespace Qn {
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
     /**
-     * \param permissions               Permission flags containing some deprecated values.
-     * \returns                         Permission flags with deprecated values replaced with new ones.
-     */
-    inline Qn::Permissions undeprecate(Qn::Permissions permissions) {
-        Qn::Permissions result = permissions;
-
-        if(result & Qn::DeprecatedEditCamerasPermission) {
-            result &= ~Qn::DeprecatedEditCamerasPermission;
-            result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
-        }
-
-        if(result & Qn::DeprecatedViewExportArchivePermission) {
-            result &= ~Qn::DeprecatedViewExportArchivePermission;
-            result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
-        }
-
-        if(result & Qn::GlobalProtectedPermission)
-            result |= Qn::GlobalPanicPermission;
-
-        return result;
-    }
-
-
-    /**
      * Time display mode.
      */
-    enum TimeMode {
+    enum TimeMode
+    {
         ServerTimeMode,
         ClientTimeMode
     };
@@ -156,7 +133,8 @@ namespace Qn {
     /**
      * Columns in the resource tree model.
      */
-    enum ResourceTreeColumn {
+    enum ResourceTreeColumn
+    {
         NameColumn,     /**< Resource icon and name. */
         CustomColumn,   /**< Additional column for custom information. */
         CheckColumn,    /**< Checkbox for resource selection. */
@@ -166,7 +144,8 @@ namespace Qn {
     /**
      * Overlay for resource widgets.
      */
-    enum ResourceStatusOverlay {
+    enum ResourceStatusOverlay
+    {
         EmptyOverlay,
         PausedOverlay,
         LoadingOverlay,
@@ -189,18 +168,19 @@ namespace Qn {
      * Note that the order is important here --- higher values are prioritized
      * when calculating cumulative status of several rendering operations.
      */
-    enum RenderStatus {
+    enum RenderStatus
+    {
         NothingRendered,    /**< No frames to render, so nothing was rendered. */
         CannotRender,       /**< Something went wrong. */
         OldFrameRendered,   /**< No new frames available, old frame was rendered. */
         NewFrameRendered    /**< New frame was rendered. */
     };
 
-
     /**
      * Video resolution adjustment mode for RADASS.
      */
-    enum ResolutionMode {
+    enum ResolutionMode
+    {
         AutoResolution,
         HighResolution,
         LowResolution,
@@ -210,7 +190,8 @@ namespace Qn {
     /**
      * Modes of layout export.
      */
-    enum LayoutExportMode {
+    enum LayoutExportMode
+    {
         LayoutLocalSave,
         LayoutLocalSaveAs,
         LayoutExport
@@ -219,11 +200,12 @@ namespace Qn {
     /**
      * Flags describing the client light mode.
      */
-    enum LightModeFlag {
+    enum LightModeFlag
+    {
         LightModeNoAnimation        = 0x0001,           /**< Disable all client animations. */
         LightModeSmallWindow        = 0x0002,           /**< Decrease minimum window size. */
         LightModeNoSceneBackground  = 0x0004,           /**< Disable gradient scene background. */
-        LightModeNoOpacity          = 0x0008,           /**< Disable opacity in ui widgets. */
+
         LightModeNoNotifications    = 0x0010,           /**< Disable notifications panel. */
         LightModeSingleItem         = 0x0020,           /**< Limit number of simultaneous items on the scene to 1. */
         LightModeNoShadows          = 0x0040,           /**< Disable shadows on ui elements. */
@@ -236,7 +218,7 @@ namespace Qn {
                                     | LightModeNoNotifications | LightModeNoShadows
                                     | LightModeNoNewWindow | LightModeNoLayoutBackground
                                     | LightModeNoZoomWindows,
-        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
+        LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows,
         LightModeFull               = 0x7FFFFFFF
 
     };
@@ -244,25 +226,49 @@ namespace Qn {
     Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
 
-
-    enum ClientSkin {
+    enum ClientSkin
+    {
         DarkSkin,
         LightSkin
     };
 
-    enum BackgroundAnimationMode {
+    enum BackgroundAnimationMode
+    {
         DefaultAnimation,
         RainbowAnimation,
         CustomAnimation
     };
 
-    enum ImageBehaviour {
+    enum ImageBehaviour
+    {
         StretchImage,
         CropImage,
         FitImage,
         TileImage
     };
 
+    /**
+    Workbench pane state
+    */
+    enum class PaneState
+    {
+        Unpinned,       /**< pane is unpinned           */
+        Opened,         /**< pane is pinned and opened  */
+        Closed          /**< pane is pinned and closed  */
+    };
+
+    /**
+    Workbench pane id enumeration
+    */
+    enum class WorkbenchPane
+    {
+        Title,          /**< title pane         */
+        Tree,           /**< resource tree pane */
+        Notifications,  /**< notifications pane */
+        Navigation,     /**< navigation pane    */
+        Calendar,       /**< calendar pane      */
+        Thumbnails      /**< thumbnails pane    */
+    };
 
 } // namespace Qn
 
@@ -272,7 +278,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour),
+    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour)(Qn::PaneState)(Qn::WorkbenchPane),
     (metatype)(lexical)(datastream)
     )
 
@@ -281,34 +287,33 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (metatype)(numeric)
     )
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::Permission)(Qn::Permissions),
-    (lexical)
-    )
 
-//TODO: #GDM #2.4 move back to client_module_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.
+//TODO: #GDM #2.4 move back to client_model_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.
 //Looks like problem is in gcc-4.8.1
 
-inline QDataStream &operator<<(QDataStream &stream, const Qn::BackgroundAnimationMode &value) {
+inline QDataStream &operator<<(QDataStream &stream, const Qn::BackgroundAnimationMode &value)
+{
     return stream << static_cast<int>(value);
 }
 
-inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value) {
+inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value)
+{
     int tmp;
     stream >> tmp;
     value = static_cast<Qn::BackgroundAnimationMode>(tmp);
     return stream;
 }
 
-inline QDataStream &operator<<(QDataStream &stream, const Qn::ImageBehaviour &value) {
+inline QDataStream &operator<<(QDataStream &stream, const Qn::ImageBehaviour &value)
+{
     return stream << static_cast<int>(value);
 }
 
-inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value) {
+inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value)
+{
     int tmp;
     stream >> tmp;
     value = static_cast<Qn::ImageBehaviour>(tmp);
     return stream;
 }
 
-#endif // QN_CLIENT_GLOBALS_H

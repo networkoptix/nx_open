@@ -3,20 +3,21 @@
 
 #include <QTimeZone>
 
-#include <base/server_info.h>
 #include <helpers/time_helper.h>
 #include <helpers/model_change_helper.h>
+
+namespace api = nx::mediaserver::api;
 
 namespace
 {
     enum { kInvalidIndex = -1 };
-    
+
     const QByteArray utcIanaTemplate = "UTC";
     const QByteArray gmtIanaTemplate = "GMT";
     const QString utcKeyword = "Universal";
 
     const QList<QByteArray> utcAliases = [] {
-        return QList<QByteArray>() 
+        return QList<QByteArray>()
             << "Etc/GMT"
             << "Etc/GMT+0"
             << "Etc/UCT"
@@ -30,25 +31,25 @@ namespace
             << "UCT"
             << "Universal";
     }();
-    
+
     bool isDeprecatedTimeZone(const QByteArray &zoneIanaId) {
-        return 
+        return
                zoneIanaId.contains(utcIanaTemplate)     // UTC+03:00
             || zoneIanaId.contains(gmtIanaTemplate)     // Etc/GMT+3
             ;
-    }  
-  
+    }
+
     const QByteArray kDiffTimeZonesId = "<Different>";
     const QByteArray kUnknownTimeZoneId = "<Unknown>";
-  
-    
-    QByteArray selectionTimeZoneId(const rtu::ServerInfoPtrContainer &servers)
+
+
+    QByteArray selectionTimeZoneId(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty() || !servers.first()->hasExtraInfo())
             return kDiffTimeZonesId;
 
         const QByteArray timeZoneId = servers.first()->extraInfo().timeZoneId;
-        for (rtu::ServerInfo *info: servers)
+        for (api::ServerInfo *info: servers)
         {
             if (!info->hasExtraInfo() || (timeZoneId != info->extraInfo().timeZoneId))
                 return kDiffTimeZonesId;
@@ -61,18 +62,18 @@ class rtu::TimeZonesModel::Impl
 {
 public:
     Impl(rtu::TimeZonesModel *owner
-        , const rtu::ServerInfoPtrContainer &selectedServers);
-    
+        , const api::ServerInfoPtrContainer &selectedServers);
+
     Impl(rtu::TimeZonesModel *owner
         , const Impl &other);
 
     virtual ~Impl();
-    
+
 public:
     bool isValidValue(int index);
-    
+
     int initIndex() const;
-    
+
     int currentTimeZoneIndex() const;
 
     int rowCount() const;
@@ -83,7 +84,7 @@ public:
     int timeZoneIndexById(const QByteArray &id) const;
 
 private:
-    void initTimeZones();  
+    void initTimeZones();
 
 private:
     struct TzInfo {
@@ -100,7 +101,7 @@ private:
         }
 
         QString displayName;
-        int standardTimeOffset;        
+        int standardTimeOffset;
         QList<QByteArray> ids;
     };
 
@@ -112,7 +113,7 @@ private:
 };
 
 rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
-    , const rtu::ServerInfoPtrContainer &selectedServers)
+    , const api::ServerInfoPtrContainer &selectedServers)
     : m_owner(owner)
     , m_timeZones()
     , m_initTimeZoneId(selectionTimeZoneId(selectedServers))
@@ -149,7 +150,7 @@ bool rtu::TimeZonesModel::Impl::isValidValue(int index)
 {
     if ((index >= m_timeZones.size()) || (index < 0))
         return false;
-    
+
     const auto &value = m_timeZones[index];
     return ((value.primaryId() != kUnknownTimeZoneId) && (value.primaryId() != kDiffTimeZonesId));
 }
@@ -272,13 +273,13 @@ QByteArray rtu::TimeZonesModel::Impl::timeZoneIdByIndex(int index) const {
 
 ///
 
-rtu::TimeZonesModel::TimeZonesModel(const ServerInfoPtrContainer &selectedServers
+rtu::TimeZonesModel::TimeZonesModel(const api::ServerInfoPtrContainer &selectedServers
     , QObject *parent)
     : QAbstractListModel(parent)
     , m_helper(CREATE_MODEL_CHANGE_HELPER(this))
     , m_impl(new Impl(this, selectedServers))
 {
-    
+
 }
 
 rtu::TimeZonesModel::~TimeZonesModel()

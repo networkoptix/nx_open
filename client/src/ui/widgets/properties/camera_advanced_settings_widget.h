@@ -1,5 +1,4 @@
-#ifndef QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
-#define QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -45,7 +44,7 @@ private:
     void updatePage();
 
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
-    void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
+    void at_proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator * authenticator);
 private:
     enum class Page {
         Empty,
@@ -60,5 +59,3 @@ private:
     QnMutex m_cameraMutex;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
 };
-
-#endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H

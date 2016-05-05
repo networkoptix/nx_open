@@ -6,15 +6,15 @@
 #include <map>
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/http/linesplitter.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "core/datapacket/media_data_packet.h"
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/linesplitter.h>
+#include <nx/network/http/asynchttpclient.h>
+#include "nx/streaming/media_data_packet.h"
 #include "../onvif/onvif_resource.h"
 
 

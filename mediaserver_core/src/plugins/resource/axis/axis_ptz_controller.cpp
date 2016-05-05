@@ -6,7 +6,7 @@
 
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 #include <utils/serialization/lexical_functions.h>
 
 #include <core/resource_management/resource_data_pool.h>
@@ -190,7 +190,8 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     }
 }
 
-CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
+CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const
+{
     return new CLSimpleHTTPClient(
         m_resource->getHostAddress(), 
         QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 

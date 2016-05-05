@@ -1,18 +1,21 @@
 #ifndef resource_pool_h_1537
 #define resource_pool_h_1537
 
+#include <functional>
+
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
+#include <utils/common/connective.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -29,10 +32,11 @@ class CLRecorderDevice;
  *
  * If resource is conflicting it must not be placed in resource pool.
  */
-class QN_EXPORT QnResourcePool : public QObject, public Singleton<QnResourcePool>
+class QN_EXPORT QnResourcePool : public Connective<QObject>, public Singleton<QnResourcePool>
 {
     Q_OBJECT
 
+    typedef Connective<QObject> base_type;
 public:
     enum Filter
     {
@@ -59,11 +63,24 @@ public:
     { removeResources(QnResourceList() << resource); }
 
     QnResourceList getResources() const;
-    QnResourceList getResources(const QVector<QnUuid>& idList) const;
-    QnResourceList getResources(const std::vector<QnUuid>& idList) const;
+
+    template <class IDList>
+    QnResourceList getResources(IDList idList) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        QnResourceList result;
+        for (const auto& id : idList)
+        {
+            const auto itr = m_resources.find(id);
+            if (itr != m_resources.end())
+                result.push_back(itr.value());
+        }
+        return result;
+    }
 
     template <class Resource>
-    QnSharedResourcePointerList<Resource> getResources() const {
+    QnSharedResourcePointerList<Resource> getResources() const
+    {
         QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr &resource : m_resources)
@@ -72,43 +89,40 @@ public:
         return result;
     }
 
-    template <class Resource>
-    QnSharedResourcePointerList<Resource> getResources(const QVector<QnUuid>& idList) const {
+    template <class Resource, class IDList>
+    QnSharedResourcePointerList<Resource> getResources(const IDList& idList) const
+    {
         QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
-        for (const auto& id: idList) {
+        for (const auto& id: idList)
+        {
             const auto itr = m_resources.find(id);
             if (itr != m_resources.end()) {
-                if(QnSharedResourcePointer<Resource> derived = itr.value().template dynamicCast<Resource>())
+                if (QnSharedResourcePointer<Resource> derived = itr.value().template dynamicCast<Resource>())
                     result.push_back(derived);
             }
         }
         return result;
     }
 
-    template <class Resource>
-    QnSharedResourcePointerList<Resource> getResources(const std::vector<QnUuid>& idList) const {
+    QnResourcePtr getResource(std::function<bool(const QnResourcePtr&)> filter) const
+    {
         QnMutexLocker locker(&m_resourcesMtx);
-        QnSharedResourcePointerList<Resource> result;
-        for (const auto& id: idList) {
-            const auto itr = m_resources.find(id);
-            if (itr != m_resources.end()) {
-                if(QnSharedResourcePointer<Resource> derived = itr.value().template dynamicCast<Resource>())
-                    result.push_back(derived);
-            }
-        }
-        return result;
+        auto itr = std::find_if( m_resources.begin(), m_resources.end(), filter);
+        return itr != m_resources.end() ? itr.value() : QnResourcePtr();
     }
 
     template <class Resource>
-    QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const {
+    QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const
+    {
         QnMutexLocker locker(&m_resourcesMtx);
         auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&id](const QnResourcePtr &resource) { return resource->getUniqueId() == id; });
         return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
     }
 
     template <class Resource>
-    QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const {
+    QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const
+    {
         QnMutexLocker locker(&m_resourcesMtx);
         auto itr = m_resources.find(id);
         return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
@@ -146,8 +160,8 @@ public:
     QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
     QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
-    QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
+
 
     QnUserResourcePtr getAdministrator() const;
 

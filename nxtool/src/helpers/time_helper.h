@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <memory>
 #include <QDateTime>
 #include <QTimeZone>
 
@@ -29,4 +30,5 @@ namespace rtu
             , const QByteArray &timeZoneId);
     };
 
+    typedef std::shared_ptr<DateTime> DateTimePointer;
 }

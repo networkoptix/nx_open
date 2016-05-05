@@ -11,7 +11,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class CameraAdditionDialog;
@@ -56,7 +56,7 @@ private:
      * Fill table with the received cameras info.
      * \returns number of new cameras.
      */
-    int fillTable(const QnManualCameraSearchCameraList &cameras);
+    int fillTable(const QnManualResourceSearchList &cameras);
     void removeAddedCameras();
     void updateSubnetMode();
 
@@ -67,7 +67,7 @@ private:
     void updateTitle();
     void clearServerStatus();
     void updateServerStatus(const QString &errorMessage);
-private slots: 
+private slots:
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();
     void at_endIPLineEdit_textChanged(QString value);

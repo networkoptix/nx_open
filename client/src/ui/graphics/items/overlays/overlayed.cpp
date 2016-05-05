@@ -43,35 +43,42 @@ int detail::OverlayedBase::overlayWidgetIndex(QGraphicsWidget *widget) const {
     return -1;
 }
 
-void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget, OverlayVisibility visibility, bool autoRotate, bool bindToViewport, qreal z) {
-    if(!widget) {
+void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
+    , const OverlayParams &params)
+{
+    if(!widget)
+    {
         qnNullWarning(widget);
         return;
     }
 
     QnViewportBoundWidget *boundWidget = dynamic_cast<QnViewportBoundWidget *>(widget);
-    if(bindToViewport && !boundWidget) {
+    if(params.bindToViewport && !boundWidget)
+    {
         QGraphicsLinearLayout *boundLayout = new QGraphicsLinearLayout();
-        boundLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+        boundLayout->setContentsMargins(params.margins.left()
+            , params.margins.top(), params.margins.right(), params.margins.bottom());
         boundLayout->addItem(widget);
 
         boundWidget = new QnViewportBoundWidget();
         boundWidget->setLayout(boundLayout);
         boundWidget->setAcceptedMouseButtons(0);
     }
+
     QGraphicsWidget *childWidget = boundWidget ? boundWidget : widget;
     childWidget->setParentItem(m_widget);
-    childWidget->setZValue(z);
+    childWidget->setZValue(params.z);
 
     QnFixedRotationTransform *rotationTransform = NULL;
-    if(autoRotate) {
+    if(params.autoRotate)
+    {
         rotationTransform = new QnFixedRotationTransform(widget);
         rotationTransform->setTarget(widget);
         rotationTransform->setAngle(m_overlayRotation);
     }
 
     OverlayWidget overlay;
-    overlay.visibility = visibility;
+    overlay.visibility = params.visibility;
     overlay.widget = widget;
     overlay.childWidget = childWidget;
     overlay.boundWidget = boundWidget;
@@ -176,7 +183,7 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     else
         widget->setOpacity(opacity);
 
-    Q_ASSERT_X(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
+    NX_ASSERT(isOverlayWidgetVisible(widget) == visible, Q_FUNC_INFO, "Validate checking function");
 }
 
 bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
@@ -192,3 +199,16 @@ bool detail::OverlayedBase::isOverlayWidgetVisible(QGraphicsWidget* widget)
     }
     return !qFuzzyIsNull(widget->opacity());
 }
+
+detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility
+    , bool autoRotate
+    , bool bindToViewport
+    , qreal z
+    , const QMarginsF &margins)
+
+    : visibility(visibility)
+    , autoRotate(autoRotate)
+    , bindToViewport(bindToViewport)
+    , z(z)
+    , margins(margins)
+{}

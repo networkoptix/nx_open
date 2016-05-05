@@ -16,7 +16,7 @@
 #include "third_party_resource.h"
 #include "../mdns/mdns_resource_searcher.h"
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
-#include "plugins/resource/upnp/upnp_device_searcher.h"
+#include <nx/network/upnp/upnp_device_searcher.h>
 #include "plugins/camera_plugin.h"
 #include "plugins/camera_plugin_qt_wrapper.h"
 
@@ -62,8 +62,8 @@ protected:
     //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const HostAddress& host,
-        const UpnpDeviceInfo& devInfo,
+        const SocketAddress& host,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) override;
     //!Implementation of QnAbstractResourceSearcher::findResources

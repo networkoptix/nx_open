@@ -56,8 +56,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection) {
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
+        //TODO: #GDM in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
     } else if (m_connected) { // double init by null is allowed
-        Q_ASSERT(!qnCommon->remoteGUID().isNull());
+        NX_ASSERT(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
         qnCommon->setRemoteGUID(QnUuid());
@@ -126,13 +127,9 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
         layout->requestStore();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>()) {
-        if (user->isAdmin())
+        if (user->isOwner())
             qnCommon->updateModuleInformation();
     }
-}
-
-void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
-    QnCommonMessageProcessor::resetResources(resources);
 }
 
 void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
@@ -193,7 +190,7 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
     qnCommon->setLocalSystemName(systemName);
 }
 
-void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);

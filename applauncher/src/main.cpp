@@ -10,10 +10,11 @@
 #include <QThread>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
-#include "version.h"
+#include <nx/network/socket_global.h>
 
+#include <applauncher_app_info.h>
 #include "applauncher_process.h"
 #include "installation_process.h"
 #include "rdir_syncher.h"
@@ -123,7 +124,7 @@ int main( int argc, char* argv[] )
     QtSingleCoreApplication app( SERVICE_NAME, argc, argv );
     QDir::setCurrent( QCoreApplication::applicationDirPath() );
 
-    QString appName = QStringLiteral(QN_APPLICATION_NAME);  //TODO: #GDM implement the common way
+    QString appName = QnApplauncherAppInfo::applicationName();
     
     QSettings globalSettings( QSettings::SystemScope, QnAppInfo::organizationName(), appName );
     QSettings userSettings( QSettings::UserScope, QnAppInfo::organizationName(), appName );
@@ -133,7 +134,6 @@ int main( int argc, char* argv[] )
 
     if (mirrorListUrl.isEmpty())
         NX_LOG( "MirrorListUrl is empty", cl_logWARNING );
-
     if( displayHelp )
     {
         printHelp();
@@ -169,7 +169,7 @@ int main( int argc, char* argv[] )
 
     ProcessUtils::initialize();
 
-    QScopedPointer<TimerManager> timerManager(new TimerManager());
+    QScopedPointer<nx::utils::TimerManager> timerManager(new nx::utils::TimerManager());
     ApplauncherProcess applauncherProcess(
         &userSettings,
         &installationManager,
@@ -296,7 +296,7 @@ int doInstallation(
             break;
 
         default:
-            assert( false );
+            NX_ASSERT( false );
     }
 
     return 0;
@@ -306,7 +306,7 @@ int doInstallation(
 #include <fstream>
 #include <string.h>
 
-#include <utils/network/http/httpclient.h>
+#include <nx/network/http/httpclient.h>
 
 //--rsync --dir=c:/temp/1 --url=http://enk.me/clients/2.1/default/windows/x64/
 //--rsync --dir=c:/tmp/1/ --url=http://downloads.hdwitness.com/clients/2.1/default/windows/x64/

@@ -13,7 +13,7 @@
 #include "nx_ec/data/api_lock_data.h"
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
@@ -90,7 +90,7 @@ namespace ec2
         template<class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
-            Q_ASSERT(tran.command != ApiCommand::NotDefined);
+            NX_ASSERT(tran.command != ApiCommand::NotDefined);
             QnMutexLocker lock( &m_mutex );
             if (m_connections.isEmpty())
                 return;
@@ -269,6 +269,8 @@ namespace ec2
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
         void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
         void emitRemotePeerUnauthorized(const QnUuid& id);
+        void onEc2ConnectionSettingsChanged();
+
     private:
         /** Info about us. */
         Qn::PeerType m_localPeerType;

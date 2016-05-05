@@ -10,7 +10,7 @@ extern "C"
 #include <QtCore/QUrlQuery>
 
 #include "core/resource/network_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 

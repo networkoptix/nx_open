@@ -18,14 +18,14 @@ extern "C"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 #include "ui/common/geometry.h"
 
 #include "plugins/resource/avi/thumbnails_archive_delegate.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 
-#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
+#include "nx/streaming/rtsp_client_archive_delegate.h"
 
 #include "utils/media/frame_info.h"
 
@@ -73,7 +73,7 @@ QnThumbnailsLoader::QnThumbnailsLoader(const QnMediaResourcePtr &resource, QnThu
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
-    Q_ASSERT_X(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
+    NX_ASSERT(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
 
     if (!supportedResource(resource))
         return;
@@ -368,7 +368,7 @@ void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 end
 }
 
 void QnThumbnailsLoader::run() {
-    assert(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
+    NX_ASSERT(QThread::currentThread() == this); /* This function is supposed to be run from thumbnail rendering thread only. */
 
     m_helper = new QnThumbnailsLoaderHelper(this);
     connect(this, SIGNAL(processingRequested()), m_helper, SLOT(process()), Qt::QueuedConnection);
@@ -419,12 +419,12 @@ void QnThumbnailsLoader::process() {
         {
             if (server->getStatus() != Qn::Online)
                 continue;
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(nullptr));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_mode == Mode::Default)
-                rtspDelegate->setQuality(MEDIA_Quality_Low, true);
+                rtspDelegate->setQuality(MEDIA_Quality_Low, true, QSize());
             else
-                rtspDelegate->setQuality(MEDIA_Quality_High, true);
+                rtspDelegate->setQuality(MEDIA_Quality_High, true, QSize());
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
             rtspDelegate->setCamera(camera);
             rtspDelegate->setFixedServer(server);
@@ -462,7 +462,7 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
         if (frame)
         {
-            CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+            QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 

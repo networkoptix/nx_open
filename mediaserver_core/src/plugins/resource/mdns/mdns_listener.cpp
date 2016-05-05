@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <utils/network/nettools.h>
-#include <utils/network/system_socket.h>
-#include <utils/network/socket_factory.h>
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
+#include <nx/network/socket_factory.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -20,6 +20,8 @@ static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
 static QString groupAddress(QLatin1String("224.0.0.251"));
 
 
+using nx::network::UDPSocket;
+
 // -------------- QnMdnsListener ------------
 
 static QnMdnsListener* QnMdnsListener_instance = nullptr;
@@ -31,7 +33,7 @@ QnMdnsListener::QnMdnsListener()
     updateSocketList();
     readDataFromSocket();
 
-    assert(QnMdnsListener_instance == nullptr);
+    NX_ASSERT(QnMdnsListener_instance == nullptr);
     QnMdnsListener_instance = this;
 }
 
@@ -150,7 +152,7 @@ void QnMdnsListener::updateSocketList()
         }
     }
 
-    m_receiveSocket = SocketFactory::createDatagramSocket();
+    m_receiveSocket = SocketFactory::createDatagramSocket().release();
     m_receiveSocket->setReuseAddrFlag(true);
     m_receiveSocket->bind( SocketAddress( HostAddress::anyHost, MDNS_PORT ) );
 

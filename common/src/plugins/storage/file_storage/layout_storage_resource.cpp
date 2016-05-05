@@ -169,7 +169,7 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         {
             QnLayoutFile* storage = *itr;
             if (storage->openMode() & QIODevice::WriteOnly)
-                Q_ASSERT_X(false, Q_FUNC_INFO, "Can't open several files for writing");
+                NX_ASSERT(false, Q_FUNC_INFO, "Can't open several files for writing");
         }
     }
 #endif
@@ -418,7 +418,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 
 #ifdef _DEBUG
     qint64 testPos = 0;
-    Q_ASSERT_X(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
+    NX_ASSERT(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
 #endif
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qt4Hash(fileName));

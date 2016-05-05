@@ -9,12 +9,12 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/delete_later.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 // -------------------------------------------------------------------------- //

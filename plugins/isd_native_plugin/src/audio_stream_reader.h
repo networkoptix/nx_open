@@ -19,15 +19,15 @@
 #include <isd/amux/amux_iface.h>
 #endif
 #include <utils/media/pts_to_clock_mapper.h>
-#include <utils/network/aio/aioeventhandler.h>
-#include <utils/network/aio/pollable.h>
+#include <nx/network/aio/aioeventhandler.h>
+#include <nx/network/aio/pollable.h>
 
 #include "isd_audio_packet.h"
 
 
 class AudioStreamReader
 :
-    public aio::AIOEventHandler<Pollable>
+    public nx::network::aio::AIOEventHandler<nx::network::Pollable>
 {
 public:
     AudioStreamReader();
@@ -50,13 +50,13 @@ private:
     std::unique_ptr<Amux> m_amux;
     nxcip::AudioFormat m_audioFormat;
     size_t m_prevReceiverID;
-    std::unique_ptr<Pollable> m_pollable;
+    std::unique_ptr<nx::network::Pollable> m_pollable;
     bool m_initializedInitially;
     PtsToClockMapper m_ptsMapper;
     int m_framesSinceTimeResync;
     bool m_amuxStarted;
 
-    virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
+    virtual void eventTriggered( nx::network::Pollable* obj, nx::network::aio::EventType eventType ) throw();
 
     bool initializeAmux( bool getFormatOnly = false );
     void closeAmux();

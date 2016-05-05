@@ -11,7 +11,7 @@
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "network/module_finder.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "client/client_settings.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
@@ -34,6 +34,10 @@ namespace {
             return QnMergeSystemsTool::StarterLicenseError;
         else if (str == lit("SAFE_MODE"))
             return QnMergeSystemsTool::SafeModeError;
+        else if (str == lit("CONFIGURATION_ERROR"))
+            return QnMergeSystemsTool::ConfigurationError;
+        else if (str == lit("BOTH_SYSTEMS_BOUND_TO_CLOUD"))
+            return QnMergeSystemsTool::BothSystemsBoundToCloudError;
         else
             return QnMergeSystemsTool::InternalError;
     }
@@ -65,7 +69,7 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password)
 int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings)
 {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
-    Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
+    NX_ASSERT(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
     NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl()).arg(url.toString()), cl_logDEBUG1);
     return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
@@ -73,7 +77,7 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
 int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password)
 {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
-    Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
+    NX_ASSERT(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
     return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 

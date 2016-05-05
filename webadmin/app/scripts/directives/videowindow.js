@@ -384,7 +384,7 @@ angular.module('webadminApp')
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
                             // Some problem happened. We must reload video here
                             $timeout(srcChanged);
-                        };
+                        }
 
                         if(!format){
                             scope.native = false;
@@ -421,6 +421,8 @@ angular.module('webadminApp')
                 }
 
                 scope.$watch("vgSrc",srcChanged);
+
+                scope.$on('$destroy',recyclePlayer);
             }
         }
     }]);

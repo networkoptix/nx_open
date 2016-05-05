@@ -78,7 +78,7 @@ int QnPtzTourSpotsModel::speedToIndex(qreal speed) {
 
 QString QnPtzTourSpotsModel::speedToString(qreal speed) {
     static QList<QString> names(QList<QString>() << tr("Lowest") << tr("Low") << tr("Normal") << tr("High") << tr("Highest"));
-    Q_ASSERT(names.size() == allSpeedValues.size());
+    NX_ASSERT(names.size() == allSpeedValues.size());
 
     int index = speedToIndex(speed);
     return index == -1 ? QString() : names[index];
@@ -102,7 +102,7 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
 
 QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const {
     QnPtzPresetList result = m_presets;
-    qSort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
+    std::sort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringLess(l.name, r.name);
     });
     return result;

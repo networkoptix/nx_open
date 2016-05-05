@@ -5,7 +5,7 @@
 #include <ui/graphics/opengl/gl_functions.h>
 
 #include <utils/common/id.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/threaded_image_loader.h>
 
 namespace {

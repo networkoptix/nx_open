@@ -4,7 +4,6 @@
 #include <set>
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -13,9 +12,13 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
-#include <utils/common/singleton.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 #include "api/server_rest_connection_fwd.h"
+
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+
 
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
@@ -90,7 +93,7 @@ public:
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
-    enum class StartResult 
+    enum class StartResult
     {
         ommited,    //< request doesn't start because of data is up to date, callback wont called.
         started,    //< async IO started success. callback will called.

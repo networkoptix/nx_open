@@ -4,6 +4,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
 
+#include <nx/utils/log/log.h>
+
 #include <business/business_strings_helper.h>
 
 #include <camera/single_thumbnail_loader.h>
@@ -39,7 +41,6 @@
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <health/system_health_helper.h>
 
-#include <utils/common/log.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
@@ -50,7 +51,6 @@
 
 namespace
 {
-    const qreal widgetHeight = 24;
     const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
 
     /** We limit the maximal number of notification items to prevent crashes due
@@ -164,15 +164,14 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 {
     m_statusPixmapManager->setThumbnailSize(kDefaultThumbnailSize);
 
-    qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
-
-    auto newButton = [this, buttonSize](QnActions::IDType actionId, int helpTopicId)
+    int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
+    auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
     {
         const auto statAlias = lit("%1_%2").arg(lit("notifications_collection_widget")
             , QnLexical::serialized(actionId));
         QnImageButtonWidget *button = new QnImageButtonWidget(statAlias, m_headerWidget);
         button->setDefaultAction(action(actionId));
-        button->setFixedSize(buttonSize);
+        button->setFixedSize(button->defaultAction()->icon().actualSize(QSize(maxIconSize, maxIconSize)));
         button->setCached(true);
         if (helpTopicId != Qn::Empty_Help)
             setHelpTopic(button, helpTopicId);
@@ -183,10 +182,9 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         return button;
     };
 
-    qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
-    controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
+    controlsLayout->setContentsMargins(2.0, 1.0, 2.0, 0.0);
     controlsLayout->addStretch();
 
     controlsLayout->addItem(newButton(QnActions::OpenBusinessLogAction, Qn::MainWindow_Notifications_EventLog_Help));
@@ -313,7 +311,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera && QnBusiness::isSourceCameraRequired(eventType))
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Event has occurred without its camera");
+        NX_ASSERT(false, Q_FUNC_INFO, "Event has occurred without its camera");
         NX_LOG(lit("Event %1 has occurred without its camera").arg(eventType), cl_logWARNING);
         return;
     }
@@ -321,7 +319,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server && QnBusiness::isSourceServerRequired(eventType))
     {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Event has occurred without its server");
+        NX_ASSERT(false, Q_FUNC_INFO, "Event has occurred without its server");
         NX_LOG(lit("Event %1 has occurred without its server").arg(eventType), cl_logWARNING);
         return;
     }
@@ -587,7 +585,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction( const QnAbstractBusinessAc
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params ) {
     QString messageText = QnSystemHealthStringsHelper::messageName(message);
-    Q_ASSERT_X(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
     if (messageText.isEmpty())
         return;
 
@@ -686,7 +684,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         );
         break;
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Undefined system health message ");
+        NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
         break;
     }
 

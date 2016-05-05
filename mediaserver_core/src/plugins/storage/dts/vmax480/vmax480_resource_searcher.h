@@ -14,14 +14,10 @@ public:
     QnPlVmax480ResourceSearcher();
     ~QnPlVmax480ResourceSearcher();
 
-    static void initStaticInstance( QnPlVmax480ResourceSearcher* _instance );
-    static QnPlVmax480ResourceSearcher* instance();
-
-
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const HostAddress& host,
-        const UpnpDeviceInfo& devInfo,
+        const SocketAddress& deviceEndpoint,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) override;
 

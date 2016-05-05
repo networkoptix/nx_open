@@ -37,9 +37,15 @@
         },
         {
             "keys": [
-               "Network Optix|Nx-Fisheye-05925"
+                "Network Optix|Nx-Fisheye-05925"
             ],
             "advancedParametersTemplate": "nx-fisheye.xml"
+        },
+        {
+            "keys": [
+                "AXIS|AXISP8221"
+            ],
+            "noVideoSupport": "1"
         },
         {
             "keys": [
@@ -62,7 +68,12 @@
             "nxDeviceName": "Nx-Fisheye",
             "nxDeviceModel": "Nx-Fisheye-05925"
         },
-
+        {
+            "keys": [
+                "Camera"
+            ],
+            "forceONVIF": false
+        },
         {
             "keys": [
                 "VISTA|*",
@@ -254,7 +265,7 @@
         },
     {
             "keys": [
-                "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
+                "Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },

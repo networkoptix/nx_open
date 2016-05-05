@@ -1,14 +1,14 @@
 #include "client_video_camera.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <plugins/resource/archive/rtsp_client_archive_delegate.h>
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include "http/custom_headers.h"
 
 #include <recording/time_period.h>
@@ -38,16 +38,16 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
 {
     if (m_reader) {
         m_reader->addDataProcessor(&m_camdispay);
-        if (QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(m_reader.data())) {
-            connect(archiveReader, &QnAbstractArchiveReader::streamPaused,       &m_camdispay, &QnCamDisplay::onReaderPaused,        Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::streamResumed,      &m_camdispay, &QnCamDisplay::onReaderResumed,       Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::prevFrameOccured,   &m_camdispay, &QnCamDisplay::onPrevFrameOccured,    Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::nextFrameOccured,   &m_camdispay, &QnCamDisplay::onNextFrameOccured,    Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::slowSourceHint,     &m_camdispay, &QnCamDisplay::onSlowSourceHint,      Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::beforeJump,         &m_camdispay, &QnCamDisplay::onBeforeJump,          Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::jumpOccured,        &m_camdispay, &QnCamDisplay::onJumpOccured,         Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::jumpCanceled,       &m_camdispay, &QnCamDisplay::onJumpCanceled,        Qt::DirectConnection);
-            connect(archiveReader, &QnAbstractArchiveReader::skipFramesTo,       &m_camdispay, &QnCamDisplay::onSkippingFrames,      Qt::DirectConnection);
+        if (QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(m_reader.data())) {
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamPaused,       &m_camdispay, &QnCamDisplay::onReaderPaused,        Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::streamResumed,      &m_camdispay, &QnCamDisplay::onReaderResumed,       Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::prevFrameOccured,   &m_camdispay, &QnCamDisplay::onPrevFrameOccured,    Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::nextFrameOccured,   &m_camdispay, &QnCamDisplay::onNextFrameOccured,    Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::slowSourceHint,     &m_camdispay, &QnCamDisplay::onSlowSourceHint,      Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::beforeJump,         &m_camdispay, &QnCamDisplay::onBeforeJump,          Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpOccured,        &m_camdispay, &QnCamDisplay::onJumpOccured,         Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::jumpCanceled,       &m_camdispay, &QnCamDisplay::onJumpCanceled,        Qt::DirectConnection);
+            connect(archiveReader, &QnAbstractArchiveStreamReader::skipFramesTo,       &m_camdispay, &QnCamDisplay::onSkippingFrames,      Qt::DirectConnection);
         }
     }
 
@@ -121,7 +121,7 @@ QnCamDisplay* QnClientVideoCamera::getCamDisplay()
     return &m_camdispay;
 }
 
-const QnStatistics* QnClientVideoCamera::getStatistics(int channel)
+const QnMediaStreamStatistics* QnClientVideoCamera::getStatistics(int channel)
 {
     if (m_reader)
         return m_reader->getStatistics(channel);
@@ -141,7 +141,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
                                             QnImageFilterHelper transcodeParams)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
-    Q_ASSERT_X(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
+    NX_ASSERT(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
     qint64 endTimeUs = timePeriod.durationMs > 0
         ? timePeriod.endTimeMs() * 1000ll
         : DATETIME_NOW;
@@ -150,7 +150,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     if (!m_exportRecorder)
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
-        m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
+        m_exportReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
         if (!m_exportReader)
         {
             delete tmpReader;
@@ -164,7 +164,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             return;
         }
 
-        connect(m_exportReader, &QnAbstractArchiveReader::finished, this, [this]()
+        connect(m_exportReader, &QnAbstractArchiveStreamReader::finished, this, [this]()
         {
             {
                 QnMutexLocker lock(&m_exportMutex);

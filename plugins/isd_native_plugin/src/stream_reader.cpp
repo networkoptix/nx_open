@@ -29,7 +29,7 @@
 #include <QMutexLocker>
 
 #include <plugins/resource/third_party/motion_data_picture.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
 #include "ilp_video_packet.h"
@@ -244,7 +244,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         }
     }
 
-    assert( m_epollFD != -1 );
+    NX_ASSERT( m_epollFD != -1 );
     //polling audio and video streams
     for( ;; )
     {
@@ -283,7 +283,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 #endif
             else
             {
-                assert( false );
+                NX_ASSERT( false );
                 return nxcip::NX_IO_ERROR;
             }
 

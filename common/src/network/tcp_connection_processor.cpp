@@ -2,19 +2,15 @@
 
 #include <QtCore/QTime>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
-#include <utils/network/flash_socket/types.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/http/http_mod_manager.h>
+#include <nx/network/flash_socket/types.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_mod_manager.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
-#include "err.h"
-
-#include "version.h"
-
 
 #ifndef Q_OS_WIN
 #   include <netinet/tcp.h>
@@ -107,7 +103,7 @@ int QnTCPConnectionProcessor::isFullMessage(
         *fullMessageSize = expectedSize;
     if (expectedSize > message.size())
         return 0;
-    else 
+    else
         return expectedSize;
 }
 
@@ -333,7 +329,7 @@ bool QnTCPConnectionProcessor::readRequest()
     {
         int readed;
         readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-        if (readed > 0) 
+        if (readed > 0)
         {
             //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
@@ -374,10 +370,10 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
     if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
     {
-        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest 
+        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest
         //    can contain multiple interleaved requests.
         //    Have to parse them!
-        assert( d->interleavedMessageData.isEmpty() );
+        NX_ASSERT( d->interleavedMessageData.isEmpty() );
         d->interleavedMessageData = d->clientRequest;    //no copying here!
         d->clientRequest.clear();
         d->interleavedMessageDataPos = 0;
@@ -445,6 +441,8 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
 {
     Q_D(const QnTCPConnectionProcessor);
     other.d_ptr->clientRequest = d->clientRequest;
+    other.d_ptr->request = d->request;
+    other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
     other.d_ptr->authUserId = d->authUserId;
 }
@@ -472,7 +470,7 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket.clear();    
+    d->socket.clear();
 }
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
@@ -512,15 +510,17 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
 
-    result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+    result.id = QnUuid::fromStringSafe(nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     if (result.id.isNull())
-        result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
+        result.id = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
     const QUrlQuery query(d->request.requestLine.url.query());
     if (result.id.isNull())
-        result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
-    if (result.id.isNull()) {
+        result.id = QnUuid::fromStringSafe(query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)));
+    if (result.id.isNull())
+    {
         QByteArray nonce = d->request.getCookieValue("auth");
-        if (!nonce.isEmpty()) {
+        if (!nonce.isEmpty())
+        {
             QCryptographicHash md5Hash( QCryptographicHash::Md5 );
             md5Hash.addData( nonce );
             result.id = QnUuid::fromRfc4122(md5Hash.result());

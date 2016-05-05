@@ -4,7 +4,7 @@
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
@@ -248,16 +248,12 @@ QString extractWord(int index, const QByteArray& rawData)
 }*/
 
 void QnPlISDResourceSearcher::processPacket(
-        const QHostAddress& discoveryAddr,
-        const HostAddress& host,
-        const UpnpDeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo,
-        QnResourceList& result )
+    const QHostAddress& /*discoveryAddr*/,
+    const SocketAddress& /*deviceEndpoint*/,
+    const nx_upnp::DeviceInfo& devInfo,
+    const QByteArray& /*xmlDevInfo*/,
+    QnResourceList& result )
 {
-
-    QAuthenticator auth;
-    auth.setUser(DEFAULT_ISD_USERNAME);
-    auth.setPassword(DEFAULT_ISD_PASSWORD);
 
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
@@ -270,14 +266,17 @@ void QnPlISDResourceSearcher::processPacket(
     if( existingRes )
     {
         cameraMAC = existingRes->getMAC();
-        cameraAuth = existingRes->getAuth();
+
+        auto existAuth = existingRes->getAuth();
+        if (!existAuth.isNull())
+            cameraAuth = existAuth;
     }
 
-    createResource( devInfo, cameraMAC, auth, result );
+    createResource( devInfo, cameraMAC, cameraAuth, result );
 }
 
 void QnPlISDResourceSearcher::createResource(
-    const UpnpDeviceInfo& devInfo,
+    const nx_upnp::DeviceInfo& devInfo,
     const QnMacAddress& mac,
     const QAuthenticator& auth,
     QnResourceList& result )

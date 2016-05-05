@@ -34,8 +34,8 @@ namespace aux
                return -1;
 
             int ecode;
-            uint32_t fsize = m_io->size(&ecode);
-            
+            m_io->size(&ecode);
+
             if (ecode != nx_spl::error::NoError)
                 return -1;
 
@@ -142,11 +142,11 @@ namespace aux
             return m_impl->seek(offset);
         }
 
-        virtual bool truncate( qint64 newFileSize) override
+        virtual bool truncate( qint64 /*newFileSize*/) override
         {
             // Generally, third-party storages aren't supposed to
             // support truncating.
-            assert(false);
+            NX_ASSERT(false);
             return false;
         }
 
@@ -222,7 +222,7 @@ void QnThirdPartyStorageResource::openStorage(
         );
 
     void* queryResult = nullptr;
-    if (queryResult = sp->queryInterface(nx_spl::IID_Storage))
+    if ((queryResult = sp->queryInterface(nx_spl::IID_Storage)))
     {
         m_storage.reset(
             static_cast<nx_spl::Storage*>(queryResult),

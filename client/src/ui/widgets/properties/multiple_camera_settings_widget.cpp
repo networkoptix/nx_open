@@ -3,8 +3,6 @@
 
 #include <limits>
 
-#include <QtWidgets/QMessageBox>
-
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
@@ -16,7 +14,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/style/warning_style.h>
+#include <ui/style/custom_style.h>
 #include <ui/widgets/licensing/licenses_propose_widget.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
@@ -163,11 +161,13 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
     for(const QnVirtualCameraResourcePtr &camera: m_cameras)
     {
-        QString cameraLogin = camera->getAuth().user();
+        QAuthenticator auth = camera->getAuth();
+
+        QString cameraLogin = auth.user();
         if (!login.isEmpty() || !m_loginWasEmpty)
             cameraLogin = login;
 
-        QString cameraPassword = camera->getAuth().password();
+        QString cameraPassword = auth.password();
         if (!password.isEmpty() || !m_passwordWasEmpty)
             cameraPassword = password;
 
@@ -230,17 +230,17 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream() {
     if (ui->expertSettingsWidget->isSecondStreamEnabled())
         return true;
 
-    auto button = QMessageBox::warning(this,
+    auto button = QnMessageBox::warning(this,
         tr("Invalid Schedule"),
         tr("Second stream is disabled on these cameras. Motion + LQ option has no effect. "\
         "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-        QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
-        QMessageBox::Yes);
+        QDialogButtonBox::StandardButtons(QDialogButtonBox::Yes|QDialogButtonBox::No | QDialogButtonBox::Cancel),
+        QDialogButtonBox::Yes);
     switch (button) {
-    case QMessageBox::Yes:
+    case QDialogButtonBox::Yes:
         ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
         return true;
-    case QMessageBox::No:
+    case QDialogButtonBox::No:
         ui->expertSettingsWidget->setSecondStreamEnabled();
         return true;
     default:
@@ -297,9 +297,11 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             {
                 QSet<QString> logins, passwords;
 
-                for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
-                    logins.insert(camera->getAuth().user());
-                    passwords.insert(camera->getAuth().password());
+                for (const QnVirtualCameraResourcePtr &camera: m_cameras)
+                {
+                    QAuthenticator auth = camera->getAuth();
+                    logins.insert(auth.user());
+                    passwords.insert(auth.password());
                 }
 
                 if (logins.size() == 1) {
@@ -429,7 +431,7 @@ int QnMultipleCameraSettingsWidget::tabIndex(Qn::CameraSettingsTab tab) const {
     case Qn::ExpertCameraSettingsTab:
         return ui->tabWidget->indexOf(ui->expertTab);
     default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
         break;
     }
     return -1;

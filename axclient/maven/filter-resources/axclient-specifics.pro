@@ -4,16 +4,13 @@ DEF_FILE = ${basedir}/contrib/activeqt/control/qaxserver.def
 
 DEFINES += HDW_SDK
 # CL_TRIAL_MODE 
-DEFINES += CL_FORCE_LOGO
 
-INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
-                ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
-                ${qt.dir}/include/QtGui/$$QT_VERSION/ \
-                ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
-                ${root.dir}/appserver2/src/ \
-                ${root.dir}/client.core/src/ \
-                ${root.dir}/client/src/
+INCLUDEPATH +=  ${root.dir}/appserver2/src \
+                ${root.dir}/client.core/src \
+                ${root.dir}/client/src
               
+LIBS += $$FESTIVAL_LIB
+
 CONFIG(debug, debug|release) {
   QMAKE_POST_LINK = ..\${arch}\post.bat debug ${arch};
 }
@@ -39,3 +36,9 @@ win32 {
 # idlc.variable_out = GENERATED_SOURCES
 # QMAKE_EXTRA_COMPILERS += idlc
 
+HEADERS += ${project.build.directory}/axclient/axclient_app_info.h
+
+win32 {
+    PRECOMPILED_HEADER = StdAfx.h
+    PRECOMPILED_SOURCE = StdAfx.cpp
+}    

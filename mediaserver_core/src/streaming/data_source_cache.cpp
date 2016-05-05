@@ -4,7 +4,7 @@
 
 #include "data_source_cache.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "streaming_chunk_cache_key.h"
 
@@ -14,6 +14,8 @@ DataSourceCache::DataSourceCache()
     m_terminated( false )
 {
 }
+
+const unsigned int DataSourceCache::DEFAULT_LIVE_TIME_MS;
 
 DataSourceCache::~DataSourceCache()
 {
@@ -27,12 +29,12 @@ DataSourceCache::~DataSourceCache()
     }
 
     for( auto val: timers )
-        TimerManager::instance()->joinAndDeleteTimer( val.first );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( val.first );
 }
 
 DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
 {
-    TimerManager::TimerGuard timerGuard;
+    nx::utils::TimerManager::TimerGuard timerGuard;
     QnMutexLocker lk( &m_mutex );
 
     //searching reader in cache
@@ -44,7 +46,7 @@ DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
         {
             //taking existing reader which is already at required position (from previous chunk)
             DataSourceContextPtr item = it->second.first;
-            timerGuard = TimerManager::TimerGuard( it->second.second );
+            timerGuard = nx::utils::TimerManager::TimerGuard( it->second.second );
             //timerGuard will remove timer after unlocking mutex
             m_timers.erase( timerGuard.get() );
             it = m_cachedDataProviders.erase( it );
@@ -65,9 +67,9 @@ void DataSourceCache::put(
     const unsigned int livetimeMs )
 {
     QnMutexLocker lk( &m_mutex );
-    const quint64 timerID = TimerManager::instance()->addTimer(
+    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
         this,
-        livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs );
+        std::chrono::milliseconds(livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs));
     m_cachedDataProviders.emplace( key, std::make_pair( data, timerID ) );
     m_timers[timerID] = key;
 }
@@ -76,14 +78,14 @@ void DataSourceCache::removeRange(
     const StreamingChunkCacheKey& beginKey,
     const StreamingChunkCacheKey& endKey )
 {
-    std::list<TimerManager::TimerGuard> timerGuards;
+    std::list<nx::utils::TimerManager::TimerGuard> timerGuards;
     QnMutexLocker lk( &m_mutex );
     for( auto
         it = m_cachedDataProviders.lower_bound( beginKey );
         it != m_cachedDataProviders.end() && (it->first < endKey);
          )
     {
-        timerGuards.emplace_back( TimerManager::TimerGuard( it->second.second ) );
+        timerGuards.emplace_back( nx::utils::TimerManager::TimerGuard( it->second.second ) );
         it = m_cachedDataProviders.erase( it );
     }
 }

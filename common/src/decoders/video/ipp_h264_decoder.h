@@ -3,7 +3,7 @@
 
 #ifdef Q_OS_WIN
 
-#include "abstractdecoder.h"
+#include "abstract_video_decoder.h"
 
 
 class IPPH264Decoder : public QnAbstractVideoDecoder

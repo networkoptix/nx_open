@@ -2,10 +2,10 @@
 #define __SYNCPLAY_WRAPPER_H__
 
 #include <utils/media/externaltimesource.h>
-#include <core/dataprovider/abstract_streamdataprovider.h>
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnAbstractArchiveDelegate;
 class QnArchiveSyncPlayWrapperPrivate;
 
@@ -15,9 +15,9 @@ class QnArchiveSyncPlayWrapper: public QObject, public QnlTimeSource, public QnA
 public:
     QnArchiveSyncPlayWrapper(QObject *parent = NULL);
     virtual ~QnArchiveSyncPlayWrapper();
-    void addArchiveReader(QnAbstractArchiveReader* reader, QnlTimeSource* cam);
+    void addArchiveReader(QnAbstractArchiveStreamReader* reader, QnlTimeSource* cam);
     
-    void removeArchiveReader(QnAbstractArchiveReader* reader);
+    void removeArchiveReader(QnAbstractArchiveStreamReader* reader);
 
     virtual qint64 getCurrentTime() const;
     virtual qint64 getDisplayedTime() const;
@@ -68,7 +68,7 @@ private slots:
     void onJumpCanceled(qint64 time);
 
 private:
-    void onConsumerBlocksReaderInternal(QnAbstractArchiveReader* reader, bool value);
+    void onConsumerBlocksReaderInternal(QnAbstractArchiveStreamReader* reader, bool value);
 private:
     friend class QnSyncPlayArchiveDelegate;
 

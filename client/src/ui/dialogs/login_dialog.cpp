@@ -8,7 +8,6 @@
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 
 #include <api/app_server_connection.h>
@@ -23,7 +22,6 @@
 #include <core/resource/resource.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/dialogs/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
@@ -38,9 +36,9 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/url.h>
 
-#include "plugins/resource/avi/avi_resource.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
-#include "plugins/resource/avi/filetypesupport.h"
+#include <plugins/resource/avi/avi_resource.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <plugins/resource/avi/filetypesupport.h>
 
 #include "connection_testing_dialog.h"
 
@@ -48,8 +46,8 @@
 
 #include <utils/connection_diagnostics_helper.h>
 
-#include "compatibility.h"
 #include <utils/common/app_info.h>
+#include <ui/style/custom_style.h>
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -105,11 +103,13 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 {
     ui->setupUi(this);
 
+    setAccentStyle(ui->buttonBox->button(QDialogButtonBox::Ok));
+
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
 
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
-    Q_ASSERT(bbLayout);
+    NX_ASSERT(bbLayout);
     if (bbLayout) {
         QLabel* versionLabel = new QLabel(ui->buttonBox);
         versionLabel->setText(tr("Version %1").arg(QnAppInfo::applicationVersion()));
@@ -168,10 +168,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
-    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
-        qnSettings->setAutoLogin(state == Qt::Checked);
-    });
-
+    
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged,         this, &QnLoginDialog::at_moduleFinder_moduleChanged);
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound,    this, &QnLoginDialog::at_moduleFinder_moduleChanged);
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,            this, &QnLoginDialog::at_moduleFinder_moduleLost);
@@ -200,7 +197,7 @@ QUrl QnLoginDialog::currentUrl() const {
 void QnLoginDialog::accept() {
     QUrl url = currentUrl();
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Login Information"), tr("The login information you have entered is not valid."));
+        QnMessageBox::warning(this, tr("Invalid Login Information"), tr("The login information you have entered is not valid."));
         return;
     }
 
@@ -220,9 +217,15 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
-            menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
-            updateStoredConnections(url, name);
+        {
+            QnActionParameters params;
+            params.setArgument(Qn::UrlRole, url);
+            params.setArgument(Qn::AutoLoginRole, ui->autoLoginCheckBox->isChecked());
+            params.setArgument(Qn::StorePasswordRole, true);
+            params.setArgument(Qn::ConnectionAliasRole, name);
+            menu()->trigger(QnActions::ConnectAction, params);
             break;
+        }
         case QnConnectionDiagnosticsHelper::Result::RestartRequested:
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break; // to avoid cycle
@@ -313,17 +316,22 @@ void QnLoginDialog::resetSavedSessionsModel() {
     }
 }
 
-void QnLoginDialog::resetAutoFoundConnectionsModel() {
+void QnLoginDialog::resetAutoFoundConnectionsModel()
+{
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
-    if (m_foundEcs.size() == 0) {
+    if (m_foundEcs.size() == 0)
+    {
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
-    } else {
-        foreach (const QnEcData& data, m_foundEcs) {
+    }
+    else
+    {
+        foreach (const QnEcData& data, m_foundEcs)
+        {
             QUrl url = data.url;
 
-            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(QString(), data.version, data.protoVersion);
+            auto compatibilityCode = QnConnectionDiagnosticsHelper::validateConnectionLight(QString(), data.protoVersion);
 
             bool isCompatible = (compatibilityCode == QnConnectionDiagnosticsHelper::Result::Success);
 
@@ -378,32 +386,6 @@ void QnLoginDialog::updateUsability() {
     }
 }
 
-void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
-    QnConnectionDataList connections = qnSettings->customConnections();
-
-    QUrl urlToSave(url);
-    if (!ui->autoLoginCheckBox->isChecked())
-        urlToSave.setPassword(QString());
-
-    QnConnectionData connectionData(name, urlToSave);
-    qnSettings->setLastUsedConnection(connectionData);
-
-    // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
-
-    QnConnectionData selected = connections.getByName(name);
-    if (qnUrlEqual(selected.url, url)) {
-        connections.removeOne(selected.name);
-        connections.prepend(selected);    /* Reorder. */
-    } else {
-        // save "Last used connection"
-        QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        connections.prepend(last);
-    }
-    qnSettings->setCustomConnections(connections);
-}
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -426,7 +408,7 @@ void QnLoginDialog::at_testButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Parameters"), tr("The information you have entered is not valid."));
+        QnMessageBox::warning(this, tr("Invalid Parameters"), tr("The information you have entered is not valid."));
         return;
     }
 
@@ -449,13 +431,13 @@ void QnLoginDialog::at_saveButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid Paramaters"), tr("Entered hostname is not valid."));
+        QnMessageBox::warning(this, tr("Invalid Paramaters"), tr("Entered hostname is not valid."));
         ui->hostnameLineEdit->setFocus();
         return;
     }
 
     if (url.host().length() == 0) {
-        QMessageBox::warning(this, tr("Invalid Paramaters"), tr("Host field cannot be empty."));
+        QnMessageBox::warning(this, tr("Invalid Paramaters"), tr("Host field cannot be empty."));
         ui->hostnameLineEdit->setFocus();
         return;
     }
@@ -483,17 +465,17 @@ void QnLoginDialog::at_saveButton_clicked() {
     bool autoLogin = qnSettings->autoLogin();
 
     if (connections.contains(name)){
-        QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists."),
+        QDialogButtonBox::StandardButton button = QnMessageBox::warning(this, tr("Connection already exists."),
                                                                   tr("A connection with this name already exists. Do you want to overwrite it?"),
-                                                                  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                                                                  QMessageBox::Yes);
+                                                                  QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                                                                  QDialogButtonBox::Yes);
         switch(button) {
-        case QMessageBox::Cancel:
+        case QDialogButtonBox::Cancel:
             return;
-        case QMessageBox::No:
+        case QDialogButtonBox::No:
             name = connections.generateUniqueName(name);
             break;
-        case QMessageBox::Yes:
+        case QDialogButtonBox::Yes:
             connections.removeOne(name);
             break;
         default:
@@ -524,9 +506,9 @@ void QnLoginDialog::at_deleteButton_clicked() {
     if (!connections.contains(name))
         return;
 
-    if (QMessageBox::warning(this, tr("Delete Connections"),
+    if (QnMessageBox::warning(this, tr("Delete Connections"),
                                    tr("Are you sure you want to delete this connection: %1?").arg(L'\n' + name),
-                             QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
+                             QDialogButtonBox::Yes, QDialogButtonBox::No) == QDialogButtonBox::No)
         return;
 
 

@@ -4,10 +4,9 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsProxyWidget>
 
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -53,9 +52,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setFocusPolicy(Qt::ClickFocus);
     setCursor(Qt::ArrowCursor);
 
-    setAutoFillBackground(true);
-
-    setPaletteColor(this, QPalette::Window, Qt::black);
+    setFrameShape(Qn::RectangularFrame);
+    setFrameBorders(Qt::TopEdge);
+    setFrameColor(palette().color(QPalette::Midlight));
+    setFrameWidth(1.0);
 
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(QnActions::JumpToStartAction);
@@ -80,128 +80,117 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_muteButton = newActionButton(QnActions::ToggleMuteAction);
     m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));
-    m_muteButton->setPreferredSize(20, 20);
+    m_muteButton->setPreferredSize(24, 24);
 
     m_liveButton = newActionButton(QnActions::JumpToLiveAction);
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
-    m_liveButton->setPreferredSize(48, 24);
+    m_liveButton->setPreferredSize(52, 24);
 
     m_syncButton = newActionButton(QnActions::ToggleSyncAction);
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
-    m_syncButton->setPreferredSize(48, 24);
+    m_syncButton->setPreferredSize(52, 24);
 
     m_bookmarksModeButton = newActionButton(QnActions::BookmarksModeAction);
     m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
-    m_bookmarksModeButton->setPreferredSize(48, 24);
+    m_bookmarksModeButton->setPreferredSize(34, 24);
 
     m_calendarButton = newActionButton(QnActions::ToggleCalendarAction);
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
-    m_calendarButton->setPreferredSize(48, 24);
+    m_calendarButton->setPreferredSize(34, 24);
 
+    m_thumbnailsButton = newActionButton(QnActions::ToggleThumbnailsAction);
+    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
+    m_thumbnailsButton->setPreferredSize(34, 24);
+
+    /* Create clock label. */
+    QnClockLabel *clockLabel = new QnClockLabel(this);
+    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
+    clockLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    clockLabel->setPreferredHeight(28.0);
 
     /* Create sliders. */
     m_speedSlider = new QnSpeedSlider(this);
     m_speedSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_speedSlider->installEventFilter(this);
+    m_speedSlider->setPreferredHeight(28.0);
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
     m_volumeSlider->toolTipItem()->setParentItem(parent);
+    m_volumeSlider->setPreferredHeight(28.0);
 
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
-    m_timeSlider->setRulerHeight(70.0);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
+    m_timeScrollBar->setPreferredHeight(16);
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
 
     /* Put it all into layouts. */
-    QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    buttonsLayout->setSpacing(2);
-    buttonsLayout->addItem(m_jumpBackwardButton);
-    buttonsLayout->setAlignment(m_jumpBackwardButton, Qt::AlignCenter);
-    buttonsLayout->addItem(m_stepBackwardButton);
-    buttonsLayout->setAlignment(m_stepBackwardButton, Qt::AlignCenter);
-    buttonsLayout->addItem(m_playButton);
-    buttonsLayout->setAlignment(m_playButton, Qt::AlignCenter);
-    buttonsLayout->addItem(m_stepForwardButton);
-    buttonsLayout->setAlignment(m_stepForwardButton, Qt::AlignCenter);
-    buttonsLayout->addItem(m_jumpForwardButton);
-    buttonsLayout->setAlignment(m_jumpForwardButton, Qt::AlignCenter);
+    QGraphicsLinearLayout* leftButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    leftButtonsLayout->setSpacing(1);
+    leftButtonsLayout->addItem(m_jumpBackwardButton);
+    leftButtonsLayout->addItem(m_stepBackwardButton);
+    leftButtonsLayout->addItem(m_playButton);
+    leftButtonsLayout->addItem(m_stepForwardButton);
+    leftButtonsLayout->addItem(m_jumpForwardButton);
 
-    QnClockLabel *clockLabel = new QnClockLabel(this);
-    clockLabel->setAlignment(Qt::AlignCenter);
+    QGraphicsLinearLayout* leftLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    leftLayout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    leftLayout->setContentsMargins(6, 0, 6, 0);
+    leftLayout->setSpacing(0);
+    leftLayout->setMinimumHeight(88.0);
+    leftLayout->addItem(m_speedSlider);
+    leftLayout->addItem(leftButtonsLayout);
+    leftLayout->addItem(clockLabel);
 
-    QGraphicsLinearLayout *leftLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
-    leftLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-    leftLayoutV->setContentsMargins(0, 3, 0, 0);
-    leftLayoutV->setSpacing(0);
-    leftLayoutV->setMinimumHeight(87.0);
-    leftLayoutV->addItem(m_speedSlider);
-    leftLayoutV->addItem(buttonsLayout);
-    leftLayoutV->addItem(clockLabel);
+    QGraphicsLinearLayout* rightLayoutTop = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutTop->setContentsMargins(0, 0, 0, 0);
+    rightLayoutTop->setSpacing(3);
+    rightLayoutTop->addItem(m_muteButton);
+    rightLayoutTop->addItem(m_volumeSlider);
+    rightLayoutTop->setAlignment(m_muteButton, Qt::AlignLeft | Qt::AlignCenter);
 
-    GraphicsWidget *leftWidget = new GraphicsWidget();
-    leftWidget->setLayout(leftLayoutV);
+    QGraphicsLinearLayout* rightLayoutMiddle = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutMiddle->setContentsMargins(0, 0, 0, 0);
+    rightLayoutMiddle->setSpacing(2);
+    rightLayoutMiddle->addItem(m_liveButton);
+    rightLayoutMiddle->addItem(m_syncButton);
 
-    QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
-    rightLayoutHU->setContentsMargins(0, 0, 0, 0);
-    rightLayoutHU->setSpacing(3);
-    rightLayoutHU->addItem(m_muteButton);
-    rightLayoutHU->addItem(m_volumeSlider);
+    QGraphicsLinearLayout* rightLayoutBottom = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutBottom->setContentsMargins(0, 0, 0, 0);
+    rightLayoutBottom->setSpacing(2);
+    rightLayoutBottom->addItem(m_bookmarksModeButton);
+    rightLayoutBottom->addItem(m_calendarButton);
+    rightLayoutBottom->addItem(m_thumbnailsButton);
 
-    QGraphicsLinearLayout *rightLayoutHM = new QGraphicsLinearLayout(Qt::Horizontal);
-    rightLayoutHM->setContentsMargins(0, 0, 0, 0);
-    rightLayoutHM->setSpacing(3);
-    rightLayoutHM->addItem(m_liveButton);
-    rightLayoutHM->addItem(m_syncButton);
+    QGraphicsLinearLayout* rightLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    rightLayout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    rightLayout->setContentsMargins(6, 2, 6, 6);
+    rightLayout->setSpacing(2);
+    rightLayout->setMinimumHeight(88.0);
+    rightLayout->addItem(rightLayoutTop);
+    rightLayout->addItem(rightLayoutMiddle);
+    rightLayout->addItem(rightLayoutBottom);
 
-    QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
-    rightLayoutHL->setContentsMargins(0, 0, 0, 0);
-    rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_bookmarksModeButton);
-    rightLayoutHL->addItem(m_calendarButton);
-
-    QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
-    rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-    rightLayoutV->setContentsMargins(0, 3, 0, 3);
-    rightLayoutV->setSpacing(0);
-    rightLayoutV->setMinimumHeight(87.0);
-    rightLayoutV->addItem(rightLayoutHU);
-    rightLayoutV->addItem(rightLayoutHM);
-    rightLayoutV->addItem(rightLayoutHL);
-
-    QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    QGraphicsLinearLayout* sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
     sliderLayout->setContentsMargins(0, 0, 0, 0);
     sliderLayout->setSpacing(0);
     sliderLayout->addItem(m_timeSlider);
-    sliderLayout->setStretchFactor(m_timeSlider, 0x1000);
     sliderLayout->addItem(m_timeScrollBar);
 
-    QGraphicsLinearLayout *leftLayoutVV = new QGraphicsLinearLayout(Qt::Vertical);
-    leftLayoutVV->setContentsMargins(0, 0, 0, 0);
-    leftLayoutVV->setSpacing(0);
-    leftLayoutVV->addStretch(1);
-    leftLayoutVV->addItem(leftWidget);
-
-    QGraphicsLinearLayout *rightLayoutVV = new QGraphicsLinearLayout(Qt::Vertical);
-    rightLayoutVV->setContentsMargins(0, 0, 0, 0);
-    rightLayoutVV->setSpacing(0);
-    rightLayoutVV->addStretch(1);
-    rightLayoutVV->addItem(rightLayoutV);
-
-    QGraphicsLinearLayout *mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    mainLayout->setContentsMargins(5, 0, 5, 0);
-    mainLayout->setSpacing(10);
-    mainLayout->addItem(leftLayoutVV);
+    QGraphicsLinearLayout* mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    mainLayout->addItem(leftLayout);
+    mainLayout->setAlignment(leftLayout, Qt::AlignLeft | Qt::AlignBottom);
     mainLayout->addItem(sliderLayout);
-    mainLayout->setStretchFactor(sliderLayout, 0x1000);
-    mainLayout->addItem(rightLayoutVV);
+    mainLayout->addItem(rightLayout);
+    mainLayout->setAlignment(rightLayout, Qt::AlignLeft | Qt::AlignBottom);
     setLayout(mainLayout);
-
 
     /* Set up handlers. */
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
@@ -225,7 +214,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(action(QnActions::ToggleSyncAction),   SIGNAL(triggered()),                        this,           SLOT(at_syncButton_clicked()));
     connect(action(QnActions::ToggleMuteAction),   SIGNAL(toggled(bool)),                      m_volumeSlider, SLOT(setMute(bool)));
 
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged,    this,  [this]()
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this, [this]()
     {
         const auto currentWidget = navigator()->currentWidget();
         if (currentWidget)
@@ -255,7 +244,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()), Qt::QueuedConnection);
-
 
     /* Register actions. */
     addAction(action(QnActions::PreviousFrameAction));
@@ -288,8 +276,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
+    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_bookmarksModeButton, Qn::Bookmarks_Usage_Help);
-
 
     /* Run handlers */
     updateMuteButtonChecked();
@@ -309,19 +297,22 @@ QnNavigationItem::~QnNavigationItem()
 {
 }
 
-
 // -------------------------------------------------------------------------- //
 // Updaters
 // -------------------------------------------------------------------------- //
-void QnNavigationItem::updateSpeedSliderParametersFromNavigator() {
+void QnNavigationItem::updateSpeedSliderParametersFromNavigator()
+{
     qreal minimalSpeed = navigator()->minimalSpeed();
     qreal maximalSpeed = navigator()->maximalSpeed();
 
     qreal speedStep, defaultSpeed;
-    if(m_playButton->isChecked()) {
+    if (m_playButton->isChecked())
+    {
         speedStep = 1.0;
         defaultSpeed = 1.0;
-    } else {
+    }
+    else
+    {
         speedStep = 0.25;
         defaultSpeed = 0.0;
         maximalSpeed = qMin(qMax(1.0, maximalSpeed * speedStep), maximalSpeed);
@@ -336,8 +327,9 @@ void QnNavigationItem::updateSpeedSliderParametersFromNavigator() {
     m_speedSlider->setDefaultSpeed(defaultSpeed);
 }
 
-void QnNavigationItem::updateSpeedSliderSpeedFromNavigator() {
-    if(m_updatingNavigatorFromSpeedSlider)
+void QnNavigationItem::updateSpeedSliderSpeedFromNavigator()
+{
+    if (m_updatingNavigatorFromSpeedSlider)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
@@ -346,8 +338,9 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator() {
     updatePlayButtonChecked();
 }
 
-void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider() {
-    if(m_updatingSpeedSliderFromNavigator)
+void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider()
+{
+    if (m_updatingSpeedSliderFromNavigator)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingNavigatorFromSpeedSlider, true);
@@ -355,22 +348,29 @@ void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider() {
     updatePlaybackButtonsPressed();
 }
 
-void QnNavigationItem::updatePlaybackButtonsPressed() {
+void QnNavigationItem::updatePlaybackButtonsPressed()
+{
     qreal speed = navigator()->speed();
 
-    if(qFuzzyCompare(speed, 1.0) || qFuzzyIsNull(speed) || (speed > 0.0 && speed < 1.0)) {
+    if (qFuzzyCompare(speed, 1.0) || qFuzzyIsNull(speed) || (speed > 0.0 && speed < 1.0))
+    {
         m_stepForwardButton->setPressed(false);
         m_stepBackwardButton->setPressed(false);
-    } else if(speed > 1.0) {
+    }
+    else if (speed > 1.0)
+    {
         m_stepForwardButton->setPressed(true);
         m_stepBackwardButton->setPressed(false);
-    } else if(speed < 0.0) {
+    }
+    else if (speed < 0.0)
+    {
         m_stepForwardButton->setPressed(false);
         m_stepBackwardButton->setPressed(true);
     }
 }
 
-void QnNavigationItem::updatePlaybackButtonsIcons() {
+void QnNavigationItem::updatePlaybackButtonsIcons()
+{
     bool playing = m_playButton->isChecked();
 
     // TODO: #Elric this is cheating!
@@ -387,7 +387,8 @@ void QnNavigationItem::updatePlaybackButtonsIcons() {
     updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
 
-void QnNavigationItem::updateJumpButtonsTooltips() {
+void QnNavigationItem::updateJumpButtonsTooltips()
+{
     bool hasPeriods = navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsPeriods;
 
     // TODO: #Elric this is cheating!
@@ -430,7 +431,6 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
      * - - if has footage: jump backward
      * - - if NOT on the live (has footage by default): jump forward
      */
-
 
     /* If not playable, it is a local image, all buttons must be disabled. */
     bool playable = navigator()->isPlayingSupported();
@@ -475,36 +475,39 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
     m_speedSlider->setEnabled(playable);
 }
 
-void QnNavigationItem::updateMuteButtonChecked() {
+void QnNavigationItem::updateMuteButtonChecked()
+{
     m_muteButton->setChecked(m_volumeSlider->isMute());
 }
 
-void QnNavigationItem::updateLiveButtonChecked() {
+void QnNavigationItem::updateLiveButtonChecked()
+{
     m_liveButton->setChecked(navigator()->isLive());
 
     /* This is needed as button's enabled state will be updated from its action. */ // TODO
     updateLiveButtonEnabled();
 }
 
-void QnNavigationItem::updateLiveButtonEnabled() {
+void QnNavigationItem::updateLiveButtonEnabled()
+{
     bool enabled = navigator()->isLiveSupported();
-
     m_liveButton->setEnabled(enabled);
 }
 
-void QnNavigationItem::updateSyncButtonChecked() {
+void QnNavigationItem::updateSyncButtonChecked()
+{
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-
     m_syncButton->setChecked(streamSynchronizer->isEffective() && streamSynchronizer->isRunning());
 }
 
-void QnNavigationItem::updateSyncButtonEnabled() {
+void QnNavigationItem::updateSyncButtonEnabled()
+{
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-
     m_syncButton->setEnabled(streamSynchronizer->isEffective() && (navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync));
 }
 
-void QnNavigationItem::updatePlayButtonChecked() {
+void QnNavigationItem::updatePlayButtonChecked()
+{
     m_playButton->setChecked(navigator()->isPlaying());
 }
 
@@ -512,41 +515,45 @@ void QnNavigationItem::updatePlayButtonChecked() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event) {
-    if(watched == m_speedSlider && event->type() == QEvent::GraphicsSceneWheel)
+bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_speedSlider && event->type() == QEvent::GraphicsSceneWheel)
         return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
+
+    if (event->type() == QEvent::PaletteChange)
+        setFrameColor(palette().color(QPalette::Midlight));
 
     return base_type::eventFilter(watched, event);
 }
 
-bool QnNavigationItem::at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event) {
-    if(event->delta() > 0) {
+bool QnNavigationItem::at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    if (event->delta() > 0)
         m_stepForwardButton->click();
-    } else if(event->delta() < 0) {
+    else if (event->delta() < 0)
         m_stepBackwardButton->click();
-    } else {
+    else
         return false;
-    }
 
     return true;
 }
 
-void QnNavigationItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
+void QnNavigationItem::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
     base_type::wheelEvent(event);
-
     event->accept(); /* Don't let wheel events escape into the scene. */
 }
 
-void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
     base_type::mousePressEvent(event);
-
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
-void QnNavigationItem::at_liveButton_clicked() {
+void QnNavigationItem::at_liveButton_clicked()
+{
     /* Reset speed. It MUST be done before setLive(true) is called. */
     navigator()->setSpeed(1.0);
-
     navigator()->setLive(true);
 
     /* Move time scrollbar so that maximum is visible. */
@@ -554,50 +561,57 @@ void QnNavigationItem::at_liveButton_clicked() {
     m_timeScrollBar->setValue(m_timeScrollBar->maximum());
 
     /* Reset button's checked state. */
-    if(!m_liveButton->isChecked())
+    if (!m_liveButton->isChecked())
         m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
 }
 
-void QnNavigationItem::at_syncButton_clicked() {
+void QnNavigationItem::at_syncButton_clicked()
+{
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
-    if (m_syncButton->isChecked()) {
+    if (m_syncButton->isChecked())
         streamSynchronizer->setState(navigator()->currentWidget());
-    } else {
-        streamSynchronizer->setState(NULL);
-    }
+    else
+        streamSynchronizer->setState(nullptr);
 }
 
-void QnNavigationItem::at_stepBackwardButton_clicked() {
+void QnNavigationItem::at_stepBackwardButton_clicked()
+{
     if (!m_stepBackwardButton->isEnabled())
         return;
 
-    if(m_playButton->isChecked()) {
+    if (m_playButton->isChecked())
+    {
         m_speedSlider->speedDown();
-        if(qFuzzyIsNull(m_speedSlider->speed()))
+        if (qFuzzyIsNull(m_speedSlider->speed()))
             m_speedSlider->speedDown(); /* Skip 'pause'. */
-    } else {
+    }
+    else
+    {
         navigator()->stepBackward();
     }
 }
 
-void QnNavigationItem::at_stepForwardButton_clicked() {
+void QnNavigationItem::at_stepForwardButton_clicked()
+{
     if (!m_stepForwardButton->isEnabled())
         return;
 
-    if(m_playButton->isChecked()) {
+    if (m_playButton->isChecked())
+    {
         m_speedSlider->speedUp();
-        if(qFuzzyIsNull(m_speedSlider->speed()))
+        if (qFuzzyIsNull(m_speedSlider->speed()))
             m_speedSlider->speedUp(); /* Skip 'pause'. */
-    } else {
+    }
+    else
+    {
         navigator()->stepForward();
     }
 }
 
 QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 {
-    const auto statAlias = lit("%1_%2").arg(lit("navigation_item")
-        , QnLexical::serialized(id));
+    const auto statAlias = lit("%1_%2").arg(lit("navigation_item"), QnLexical::serialized(id));
     QnImageButtonWidget *button = new QnImageButtonWidget(statAlias);
     button->setDefaultAction(action(id));
     button->setCached(true);

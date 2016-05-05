@@ -1,16 +1,39 @@
 'use strict';
 
 angular.module('webadminApp', [
-    'ipCookie',
     'ngResource',
     'ngSanitize',
     'ngRoute',
     //'ngTouch',
     'ui.bootstrap',
     'tc.chartjs',
+    'ui.select',
     'ngStorage'
-]).config(function ($routeProvider) {
-    $routeProvider
+]).config(function($sceDelegateProvider) {
+    $sceDelegateProvider.resourceUrlWhitelist([
+        'self',
+        Config.cloud.portalWhiteList]);
+}).config(function ($routeProvider) {
+
+    var universalResolves = {
+        currentUser: ['mediaserver',function(mediaserver){
+            return mediaserver.resolveNewSystemAndUser();
+        }]
+    };
+
+    var customRouteProvider = angular.extend({}, $routeProvider, {
+        when: function(path, route) {
+            route.resolve = (route.resolve) ? route.resolve : {};
+            angular.extend(route.resolve, universalResolves);
+            $routeProvider.when(path, route);
+            return this;
+        },
+        otherwise:function(route){
+            $routeProvider.otherwise( route);
+        }
+    });
+
+    customRouteProvider
         .when('/settings', {
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
@@ -71,17 +94,14 @@ angular.module('webadminApp', [
             templateUrl: 'views/log.html',
             controller: 'LogCtrl'
         })
-        .when('/log', {
-            templateUrl: 'views/log.html',
-            controller: 'LogCtrl'
+        .when('/setup', {
+            templateUrl: 'views/dialogs/setup.html',
+            controller: 'SetupCtrl'
         })
         .otherwise({
             redirectTo: '/view'
         });
-});
-
-
-angular.module('webadminApp').run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
     var original = $location.path;
     $location.path = function (path, reload) {
         if (reload === false) {

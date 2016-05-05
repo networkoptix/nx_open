@@ -15,10 +15,12 @@ public:
     bool isConnected() const;
 
     virtual void updateResource(const QnResourcePtr &resource) override;
-    virtual void resetResources(const QnResourceList &resources) override;
+
+protected:
+    virtual QnResourceFactory* getResourceFactory() const override;
 
 private:
-    void updateMainServerApiUrl();
+    void updateMainServerApiUrl(const QnMediaServerResourcePtr& server);
 };
 
 #endif // MOBILE_CLIENT_MESSAGE_PROCESSOR_H

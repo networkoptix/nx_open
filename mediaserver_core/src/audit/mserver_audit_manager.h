@@ -3,10 +3,10 @@
 
 #include <QElapsedTimer>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "audit/audit_manager.h"
-#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_peer_alive_data.h"
 
 class QnMServerAuditManager: public QnAuditManager
 {

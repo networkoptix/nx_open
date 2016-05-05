@@ -7,7 +7,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/param.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/model_functions.h>
 
 QnCameraAdvancedParamValue::QnCameraAdvancedParamValue() {}
@@ -119,13 +119,13 @@ bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 
 QStringList QnCameraAdvancedParameter::getRange() const 
 {
-    Q_ASSERT(dataType == DataType::Enumeration);
+    NX_ASSERT(dataType == DataType::Enumeration);
     return range.split(L',', QString::SkipEmptyParts);
 }
 
 QStringList QnCameraAdvancedParameter::getInternalRange() const 
 {
-    Q_ASSERT(dataType == DataType::Enumeration);
+    NX_ASSERT(dataType == DataType::Enumeration);
     return internalRange.split(L',', QString::SkipEmptyParts);
 }
 
@@ -153,9 +153,9 @@ QString QnCameraAdvancedParameter::toInternalRange(const QString& value) const
 
 void QnCameraAdvancedParameter::getRange(double &min, double &max) const 
 {
-    Q_ASSERT(dataType == DataType::Number);
+    NX_ASSERT(dataType == DataType::Number);
     QStringList values = range.split(L',');
-    Q_ASSERT(values.size() == 2);
+    NX_ASSERT(values.size() == 2);
     if (values.size() != 2)
         return;
     min = values[0].toDouble();
@@ -164,13 +164,13 @@ void QnCameraAdvancedParameter::getRange(double &min, double &max) const
 
 void QnCameraAdvancedParameter::setRange(int min, int max) 
 {
-    Q_ASSERT(dataType == DataType::Number);
+    NX_ASSERT(dataType == DataType::Number);
     range = lit("%1,%2").arg(min).arg(max);
 }
 
 void QnCameraAdvancedParameter::setRange(double min, double max) 
 {
-    Q_ASSERT(dataType == DataType::Number);
+    NX_ASSERT(dataType == DataType::Number);
     range = lit("%1,%2").arg(min).arg(max);
 }
 

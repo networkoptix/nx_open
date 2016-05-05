@@ -124,11 +124,13 @@
             <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist140" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <?if ${build.configuration} = debug ?>
                 <Merge Id="VCRedist90Debug" SourceFile="MergeModules\Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
                 <Merge Id="VCRedist90PolicyDebug" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>                
                 <Merge Id="VCRedist100Debug" SourceFile="MergeModules\Microsoft_VC100_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
                 <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
+                <Merge Id="VCRedist140Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
             <?endif?>
         </DirectoryRef>
 
@@ -152,6 +154,13 @@
             <MergeRef Id="VCRedist110"/>
             <?if ${build.configuration} = debug ?>
                 <MergeRef Id="VCRedist110Debug"/>
+            <?endif?>
+        </Feature>
+
+        <Feature Id="VCRedistVS14" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist140"/>
+            <?if ${build.configuration} = debug ?>
+                <MergeRef Id="VCRedist140Debug"/>
             <?endif?>
         </Feature>
 

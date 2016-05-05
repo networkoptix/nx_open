@@ -7,13 +7,11 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/performance.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
-
-#include <ui/dialogs/message_box.h>
 
 #ifdef Q_OS_LINUX
 #include <X11/X.h>
@@ -65,6 +63,6 @@ void QnPerformanceTest::detectLightMode() {
         message += QCoreApplication::translate("QnPerformanceTest", "For full-featured mode please use another computer.");
         QnMessageBox::warning(NULL, 0,
                               QCoreApplication::translate("QnPerformanceTest", "Warning!"), message,
-                              QMessageBox::StandardButtons(QMessageBox::Ok), QMessageBox::Ok);
+                              QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok), QDialogButtonBox::Ok);
     }
 }

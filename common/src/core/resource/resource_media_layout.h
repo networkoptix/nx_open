@@ -7,8 +7,9 @@
 #include <QtCore/QStringList>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
+#include <QtCore/QSharedPointer>
 
-#include <core/datapacket/abstract_media_context.h>
+#include <nx/streaming/media_context.h>
 
 #include <common/common_globals.h>
 
@@ -31,9 +32,9 @@ class QnResourceAudioLayout: public QnResourceLayout {
 public:
     struct AudioTrack {
         AudioTrack() {} 
-        AudioTrack(QnAbstractMediaContextPtr codecContext, const QString &description): codecContext(codecContext), description(description) {}
+        AudioTrack(const QnConstMediaContextPtr& codecContext, const QString &description): codecContext(codecContext), description(description) {}
 
-        QnAbstractMediaContextPtr codecContext;
+        QnConstMediaContextPtr codecContext;
         QString description;
     };
 

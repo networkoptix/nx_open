@@ -15,11 +15,10 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
-#include <database/server_db.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 namespace
 {
@@ -59,7 +58,7 @@ namespace
             bool success = false;
             if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
-                Q_ASSERT_X(success, Q_FUNC_INFO, "We should receive correct answer here");
+                NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
             }
 
             ctx->executeGuarded([ctx, success, remoteData, &outputData]()
@@ -100,7 +99,7 @@ namespace
             bool success = false;
             if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok ) {
                 remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
-                Q_ASSERT_X(success, Q_FUNC_INFO, "We should receive correct answer here");
+                NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
             }
 
             ctx->executeGuarded([ctx, success, remoteData, &outputData]()

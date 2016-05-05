@@ -92,7 +92,7 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(const QString &mixedString, con
     setString(IOModule, true, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
     setString(IOModule, false, ioModuleString.isEmpty() ? lit("<invalid>") : ioModuleString);
 
-    Q_ASSERT_X(isValid(), Q_FUNC_INFO, "Invalid string set");
+    NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
 }
 
 QnCameraDeviceStringSet::QnCameraDeviceStringSet(
@@ -110,12 +110,12 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(
     setString(IOModule, false,  ioModuleSigularString);
     setString(IOModule, true,   ioModulePluralString);
 
-    Q_ASSERT_X(isValid(), Q_FUNC_INFO, "Invalid string set");
+    NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
 }
 
 QString QnCameraDeviceStringSet::getString(QnCameraDeviceType deviceType, bool plural) const {
-    Q_ASSERT_X(isValid(), Q_FUNC_INFO, "Invalid string set");
-    Q_ASSERT_X(deviceType < QnCameraDeviceType::Count, Q_FUNC_INFO, "Check if device type is valid");
+    NX_ASSERT(isValid(), Q_FUNC_INFO, "Invalid string set");
+    NX_ASSERT(deviceType < QnCameraDeviceType::Count, Q_FUNC_INFO, "Check if device type is valid");
     if (deviceType >= QnCameraDeviceType::Count)
         deviceType = QnCameraDeviceType::Mixed;
     return plural
@@ -152,7 +152,7 @@ QString QnDeviceDependentStrings::getNumericName(const QnVirtualCameraResourceLi
     default:
         break;
     }
-    Q_ASSERT_X(deviceType == Mixed, Q_FUNC_INFO, "All fixed device types should be handled");
+    NX_ASSERT(deviceType == Mixed, Q_FUNC_INFO, "All fixed device types should be handled");
     return QnResourceNameStrings::numericDevices(devices.size(), capitalize);
 }
 

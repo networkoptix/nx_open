@@ -268,11 +268,6 @@ public:
         SaveCurrentLayoutAsAction,
 
         /**
-         * Opens a file dialog and opens selected layouts.
-         */
-        OpenLayoutAction,
-
-        /**
          * Opens a file dialog and adds selected files to the current layout,
          * or opens the selected layouts.
          */
@@ -804,6 +799,11 @@ public:
         NewUserAction,
 
         /**
+         * Opens a webpage creation dialog.
+         */
+        NewWebPageAction,
+
+        /**
          * Opens a videowall creation dialog.
          */
         NewVideoWallAction,
@@ -1020,11 +1020,6 @@ public:
         JumpToLiveAction,
         ToggleSyncAction,
 
-        /**
-         * Toggle the background animation.
-         */
-        ToggleBackgroundAnimationAction,
-
         /* Debug actions. */
 
         /**
@@ -1058,6 +1053,31 @@ public:
          * Opens the Audit Log dialog.
          */
         OpenAuditLogAction,
+
+        /**
+         * Opens Login to Cloud dialog.
+         */
+        LoginToCloud,
+
+        /**
+         * Logs out the user from cloud clearing the stored password.
+         */
+        LogoutFromCloud,
+
+        /**
+        * Opens cloud portal in the browser at register page.
+        */
+        OpenCloudRegisterUrl,
+
+        /**
+         * Opens cloud portal in the browser.
+         */
+        OpenCloudMainUrl,
+
+        /**
+         * Opens cloud account management page in the browser.
+         */
+        OpenCloudManagementUrl,
 
         ActionCount,
 

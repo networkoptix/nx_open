@@ -2,11 +2,11 @@
 
 #include <openssl/evp.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/string.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 #include "core/resource/camera_resource.h"
 
@@ -835,7 +835,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     if( p.second )
     {
         ctx = new ProbeContext();
-        ctx->sock.reset( SocketFactory::createDatagramSocket() );
+        ctx->sock = SocketFactory::createDatagramSocket();
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
         if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
@@ -887,7 +887,7 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         return false;
     ProbeContext& ctx = *it->second;
 
-    Q_ASSERT( ctx.soapWsddProxy.soap );
+    NX_ASSERT( ctx.soapWsddProxy.soap );
 
     //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
     for( ;; )

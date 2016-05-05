@@ -6,7 +6,7 @@
 #include <QtCore/QQueue>
 #include <QtCore/QFile>
 #include <QtCore/QString>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QStringList>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>

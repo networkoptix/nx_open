@@ -329,32 +329,32 @@ public:
     }
 
     virtual float getAvarageWritingUsage() const override {
-        assert(0);
+        NX_ASSERT(0);
         return 0.0;
     }
 
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return QnAbstractStorageResource::FileInfoList();
     }
 
     virtual qint64 getFileSize(const QString&) const override {
-        assert(0);
+        NX_ASSERT(0);
         return 0;
     }
 
     virtual bool removeFile(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
     virtual bool removeDir(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
     virtual bool renameFile(const QString&, const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
@@ -363,22 +363,23 @@ public:
     }
 
     virtual bool isDirExists(const QString&) override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
     virtual qint64 getFreeSpace() override {
-        assert(0);
+        NX_ASSERT(0);
         return 0;
     }
 
     virtual int getCapabilities() const override {
-        assert(0);
-        return 0;
+        return QnAbstractStorageResource::cap::DBReady || QnAbstractStorageResource::cap::ReadFile || 
+            QnAbstractStorageResource::cap::WriteFile || QnAbstractStorageResource::cap::RemoveFile || 
+            QnAbstractStorageResource::cap::ListFile;
     }
 
     virtual bool initOrUpdate() const override {
-        assert(0);
+        NX_ASSERT(0);
         return true;
     }
 
@@ -419,7 +420,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
-    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     std::unique_ptr<QnStorageManager> storageManager;
     if (!qnNormalStorageMan) {
@@ -447,17 +448,17 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 
     QnStorageResourcePtr storage1 = QnStorageResourcePtr(new MockStorageResource1); 
     storage1->setUrl("url1");
-    storage1->setId("{45FF0AD9-649B-4EDC-B032-13603EA37077}"); 
+    storage1->setId(QnUuid("{45FF0AD9-649B-4EDC-B032-13603EA37077}"));
     storage1->setUsedForWriting(true);
 
     QnStorageResourcePtr storage2 = QnStorageResourcePtr(new MockStorageResource2);
     storage2->setUrl("url2");
-    storage2->setId("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"); 
+    storage2->setId(QnUuid("{22E3AD7E-F4E7-4AE5-AD70-0790B05B4566}"));
     storage2->setUsedForWriting(true);
 
     QnStorageResourcePtr storage3 = QnStorageResourcePtr(new MockStorageResource3);
     storage3->setUrl("url3");
-    storage3->setId("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"); 
+    storage3->setId(QnUuid("{30E7F3EA-F4DB-403F-B9DD-66A38DA784CF}"));
     storage3->setUsedForWriting(true);
 
     qnNormalStorageMan->addStorage(storage1);

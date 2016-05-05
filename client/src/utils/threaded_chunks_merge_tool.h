@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utils/common/long_runnable.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>

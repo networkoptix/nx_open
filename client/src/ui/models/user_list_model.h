@@ -7,10 +7,10 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/customization/customized.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 class QnUserListModelPrivate;
-class QnUserListModel : public Customized<QAbstractListModel>, public QnWorkbenchContextAware {
+class QnUserListModel : public Customized<QAbstractListModel>
+{
     Q_OBJECT
     Q_PROPERTY(QnUserManagementColors colors READ colors WRITE setColors)
     typedef Customized<QAbstractListModel> base_type;
@@ -22,7 +22,6 @@ public:
         PermissionsColumn,
         LdapColumn,
         EnabledColumn,
-        EditIconColumn,
 
         ColumnCount
     };
@@ -47,7 +46,8 @@ private:
 };
 
 
-class QnSortedUserListModel : public QSortFilterProxyModel, public QnWorkbenchContextAware {
+class QnSortedUserListModel : public QSortFilterProxyModel
+{
     typedef QSortFilterProxyModel base_type;
 
 public:

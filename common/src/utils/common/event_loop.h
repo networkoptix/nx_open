@@ -2,22 +2,16 @@
 #define QN_EVENT_LOOP_H
 
 #include <QtCore/QThread>
-#if QT_VERSION == 0x050201
-#include <QtCore/5.2.1/QtCore/private/qthread_p.h>
-#elif QT_VERSION == 0x050401
-#include <QtCore/5.4.1/QtCore/private/qthread_p.h>
-#elif QT_VERSION == 0x050500
-#include <QtCore/5.5.0/QtCore/private/qthread_p.h>
-#elif QT_VERSION == 0x050501
-#include <QtCore/5.5.1/QtCore/private/qthread_p.h>
-#else
-#error "Include proper header here!"
+
+#ifndef Q_OS_ANDROID
+    #include <utils/common/qt_private_headers.h>
+    #include QT_CORE_PRIVATE_HEADER(qthread_p.h)
 #endif
 
 /**
  * \param thread                        Thread to check.
  * \returns                             Whether the given thread has a running event loop.
- * 
+ *
  * \note                                This function always returns true if Qt
  *                                      private headers were not available during
  *                                      compilation. Therefore it should be used for

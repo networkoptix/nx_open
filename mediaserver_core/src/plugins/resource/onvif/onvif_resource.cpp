@@ -19,24 +19,25 @@
 #include <onvif/soapEventBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
+#include <onvif/soapStub.h>
 
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/common/timermanager.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/timer_manager.h>
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
-#include "soapStub.h"
 #include "onvif_ptz_controller.h"
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include "utils/common/timermanager.h"
+#include <nx/utils/timer_manager.h>
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
 #include "core/onvif/onvif_config_data.h"
@@ -131,7 +132,7 @@ public:
         if (isH264) {
             for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
                 h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
-            qSort(h264Profiles);
+            std::sort(h264Profiles.begin(), h264Profiles.end());
 
             if (resp.Options->H264->FrameRateRange)
                 frameRateMax = resp.Options->H264->FrameRateRange->Max;
@@ -263,7 +264,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
             lk.unlock();
 
-            TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
+            nx::utils::TimerManager::instance()->joinAndDeleteTimer( timerID );    //garantees that no onTimer(timerID) is running on return
             if( !outputTask.active )
             {
                 //returning port to inactive state
@@ -368,12 +369,17 @@ typedef GSoapAsyncCallWrapper <
     NetIfacesResp
 > GSoapDeviceGetNetworkIntfAsyncWrapper;
 
-bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    const QAuthenticator auth( getAuth() );
+    QAuthenticator auth = getAuth();
+
     const QString deviceUrl = getDeviceOnvifUrl();
     if( deviceUrl.isEmpty() )
-        return false;
+    {
+        //calling completionHandler(false)
+        nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
+        return;
+    }
 
     std::unique_ptr<DeviceSoapWrapper> soapWrapper( new DeviceSoapWrapper(
         deviceUrl.toStdString(),
@@ -399,7 +405,7 @@ bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
         };
 
     NetIfacesReq request;
-    return asyncWrapper->callAsync(
+    asyncWrapper->callAsync(
         request,
         onvifCallCompletionFunc );
 }
@@ -482,7 +488,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    DeviceSoapWrapper deviceSoapWrapper(getDeviceOnvifUrl().toStdString(), getAuth().user(), getAuth().password(), m_timeDrift);
+    QAuthenticator auth = getAuth();
+
+    DeviceSoapWrapper deviceSoapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     CapabilitiesResp capabilitiesResponse;
     auto result = fetchOnvifCapabilities( &deviceSoapWrapper, &capabilitiesResponse );
     if( !result )
@@ -702,7 +710,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
 
     if (m_secondaryResolution != EMPTY_RESOLUTION_PAIR) {
-        Q_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
+        NX_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
             m_secondaryResolution.height() <= SECONDARY_STREAM_MAX_RESOLUTION.height());
         return;
     }
@@ -727,7 +735,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
             m_primaryResolution = resolution;
             m_secondaryResolution = tmp;
 
-            Q_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
+            NX_ASSERT(m_secondaryResolution.width() <= SECONDARY_STREAM_MAX_RESOLUTION.width() &&
                 m_secondaryResolution.height() <= SECONDARY_STREAM_MAX_RESOLUTION.height());
 
             return;
@@ -816,7 +824,9 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
 {
     OnvifResExtInfo extInfo;
-    CameraDiagnostics::Result result =  readDeviceInformation(getDeviceOnvifUrl(), getAuth(), m_timeDrift, &extInfo);
+
+    QAuthenticator auth = getAuth();
+    CameraDiagnostics::Result result =  readDeviceInformation(getDeviceOnvifUrl(), auth, m_timeDrift, &extInfo);
     if (result) {
         if (getName().isEmpty())
             setName(extInfo.name);
@@ -1022,7 +1032,7 @@ void QnPlOnvifResource::notificationReceived(
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     CameraDiagnostics::Result result = fetchAndSetVideoEncoderOptions(soapWrapper);
@@ -1057,7 +1067,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsLocal& o
 {
     QnMutexLocker lock( &m_mutex );
     m_secondaryResolutionList = opts.resolutions;
-    qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
+    std::sort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
 
 void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsLocal& opts) {
@@ -1110,7 +1120,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     {
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
 
     }
 
@@ -1144,7 +1154,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     {
         QnMutexLocker lock( &m_mutex );
         m_resolutionList = opts.resolutions;
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreaterThan);
     }
 
     QnMutexLocker lock( &m_mutex );
@@ -1404,7 +1414,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo( const CapabilitiesResp& capabilitie
         return true;
     }
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     DeviceIOWrapper soapWrapper(
         m_deviceIOUrl,
         auth.user(),
@@ -1427,7 +1437,7 @@ bool QnPlOnvifResource::fetchPtzInfo() {
     if(m_ptzUrl.isEmpty())
         return false;
 
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     PtzSoapWrapper ptz (getPtzUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     _onvifPtz__GetConfigurations request;
@@ -1447,9 +1457,9 @@ bool QnPlOnvifResource::setRelayOutputState(
     QnMutexLocker lk( &m_ioPortMutex );
 
     using namespace std::placeholders;
-    const quint64 timerID = TimerManager::instance()->addTimer(
+    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, active, autoResetTimeoutMS),
-        0 );
+        std::chrono::milliseconds::zero());
     m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, active, autoResetTimeoutMS);
     return true;
 }
@@ -1529,7 +1539,8 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     }
     localAddress = sock->getLocalAddress().address.toString();
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
+
     NotificationProducerSoapWrapper soapWrapper(
         m_eventCapabilities->XAddr,
         auth.user(),
@@ -1615,14 +1626,15 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     if( m_renewSubscriptionTimerID )
     {
-        TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+        nx::utils::TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
         m_renewSubscriptionTimerID = 0;
     }
-    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+    m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+        std::chrono::milliseconds(
+            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND));
 
     if (m_appStopping)
         return false;
@@ -1642,7 +1654,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
 CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList)
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     ProfilesReq request;
@@ -1800,7 +1812,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
-    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
+    std::sort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
     /*
     if (optionsList.size() <= m_channelNumer)
@@ -2145,7 +2157,7 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source, const QRect& maxR
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source)
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
 
     SetVideoSrcConfigReq request;
@@ -2173,7 +2185,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
 
 bool QnPlOnvifResource::detectVideoSourceCount()
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     _onvifMedia__GetVideoSources request;
@@ -2207,7 +2219,7 @@ bool QnPlOnvifResource::detectVideoSourceCount()
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     _onvifMedia__GetVideoSources request;
@@ -2268,7 +2280,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchVideoSourceToken()
 
 QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     VideoSrcOptionsReq request;
@@ -2304,7 +2316,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     VideoSrcConfigsReq request;
@@ -2359,7 +2371,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     AudioSrcConfigsReq request;
@@ -2534,7 +2546,7 @@ bool QnPlOnvifResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &p
     return loadXmlParametersInternal(params, lit(":/camera_advanced_params/onvif.xml"));
 }
 
-bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const 
+bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const
 {
     QFile paramsTemplateFile(paramsTemplateFileName);
 #ifdef _DEBUG
@@ -2549,7 +2561,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
 }
 
 void QnPlOnvifResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     QString imagingUrl = getImagingUrl();
     if (!imagingUrl.isEmpty()) {
         m_imagingParamsProxy.reset(new QnOnvifImagingProxy(imagingUrl.toLatin1().data(),  auth.user(), auth.password(), m_videoSourceToken.toStdString(), m_timeDrift) );
@@ -2588,7 +2600,7 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
 
     SetVideoConfigReq request;
@@ -2625,7 +2637,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         return;
     m_renewSubscriptionTimerID = 0;
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
         m_onvifNotificationSubscriptionReference.isEmpty()
             ? m_eventCapabilities->XAddr
@@ -2665,7 +2677,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 
             _oasisWsnB2__Unsubscribe request;
             _oasisWsnB2__UnsubscribeResponse response;
-            const int soapCallResult = soapWrapper.unsubscribe(request, response);
+            soapWrapper.unsubscribe(request, response);
 
             QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
             registerNotificationConsumer();
@@ -2679,11 +2691,12 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         ? (response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime)
         : DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     using namespace std::placeholders;
-    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+    m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+        std::chrono::milliseconds(
+            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND));
 }
 
 void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& encoderId)
@@ -2794,7 +2807,7 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
 
     {
         QnMutexLocker lk( &m_ioPortMutex );
-        Q_ASSERT( !m_inputMonitored );
+        NX_ASSERT( !m_inputMonitored );
         m_inputMonitored = true;
     }
 
@@ -2827,9 +2840,9 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
 
     //removing timer
     if( nextPullMessagesTimerIDBak > 0 )
-        TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
     if( renewSubscriptionTimerIDBak > 0 )
-        TimerManager::instance()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
     //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -2994,7 +3007,7 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     EventSoapWrapper soapWrapper(
         m_eventCapabilities->XAddr,
         auth.user(),
@@ -3050,15 +3063,16 @@ bool QnPlOnvifResource::createPullPointSubscription()
         using namespace std::placeholders;
         if( m_renewSubscriptionTimerID )
         {
-            TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+            nx::utils::TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
             m_renewSubscriptionTimerID = 0;
         }
 
-        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+        m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+            std::chrono::milliseconds(
+                (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
                 ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-                : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+                : renewSubsciptionTimeoutSec)*MS_PER_SECOND));
     }
 
     m_eventMonitorType = emtPullPoint;
@@ -3066,19 +3080,19 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
     if( m_nextPullMessagesTimerID != 0 )
     {
-        TimerManager::instance()->deleteTimer( m_nextPullMessagesTimerID );
+        nx::utils::TimerManager::instance()->deleteTimer( m_nextPullMessagesTimerID );
         m_nextPullMessagesTimerID = 0;
     }
 
-    m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
+    m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::pullMessages, this, std::placeholders::_1),
-        PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
+        std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
     return true;
 }
 
 void QnPlOnvifResource::removePullPointSubscription()
 {
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     SubscriptionManagerSoapWrapper soapWrapper(
         m_onvifNotificationSubscriptionReference.isEmpty()
             ? m_eventCapabilities->XAddr
@@ -3137,7 +3151,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     if( m_asyncPullMessagesCallWrapper )
         return; //previous request is still running, new timer will be added within completion handler
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
 
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
@@ -3189,21 +3203,10 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     );
 
     using namespace std::placeholders;
-    if( asyncPullMessagesCallWrapper->callAsync(
-            request,
-            std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1)) )
-    {
-        m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
-    }
-    else
-    {
-        using namespace std::placeholders;
-        //will try later
-        Q_ASSERT( m_nextPullMessagesTimerID == 0 );
-        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-    }
+    asyncPullMessagesCallWrapper->callAsync(
+        request,
+        std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1));
+    m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
 }
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
@@ -3232,11 +3235,11 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
 
         if( m_renewSubscriptionTimerID )
         {
-            TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
+            nx::utils::TimerManager::instance()->deleteTimer( m_renewSubscriptionTimerID );
             m_renewSubscriptionTimerID = 0;
         }
 
-        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+        m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
             [this]( quint64 timerID )
             {
                 QnMutexLocker lk( &m_ioPortMutex );
@@ -3251,7 +3254,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
                 createPullPointSubscription();
                 lk.relock();
             },
-            0 );
+            std::chrono::milliseconds::zero() );
         return;
     }
 
@@ -3263,11 +3266,11 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         return;
 
     using namespace std::placeholders;
-    Q_ASSERT( m_nextPullMessagesTimerID == 0 );
+    NX_ASSERT( m_nextPullMessagesTimerID == 0 );
     if( m_nextPullMessagesTimerID == 0 )    //otherwise, we already have timer somehow
-        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
+        m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
+            std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(
@@ -3275,7 +3278,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     int resultCode,
     const _onvifEvents__PullMessagesResponse& response)
 {
-    Q_ASSERT( resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND );
+    NX_ASSERT( resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND );
 
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 
@@ -3295,7 +3298,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 
 bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs )
 {
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
         auth.user(),
@@ -3350,7 +3353,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
 
 bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo )
 {
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
         auth.user(),
@@ -3457,7 +3460,8 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     }
 
     //modifying output
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
+
     DeviceSoapWrapper soapWrapper(
         getDeviceOnvifUrl().toStdString(),
         auth.user(),
@@ -3481,9 +3485,9 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     {
         //adding task to reset port state
         using namespace std::placeholders;
-        const quint64 timerID = TimerManager::instance()->addTimer(
+        const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, !active, 0),
-            autoResetTimeoutMS );
+            std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);
     }
 #endif
@@ -3517,7 +3521,7 @@ void QnPlOnvifResource::afterConfigureStream()
 
 void QnPlOnvifResource::updateFirmware()
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
 
     DeviceInfoReq request;
@@ -3533,7 +3537,9 @@ void QnPlOnvifResource::updateFirmware()
 
 CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
 {
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), getAuth().user(), getAuth().password(), m_timeDrift);
+    QAuthenticator auth = getAuth();
+
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
     CapabilitiesResp response;
     auto result = fetchOnvifCapabilities( &soapWrapper, &response );
     if( !result )
@@ -3557,7 +3563,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchOnvifCapabilities(
     DeviceSoapWrapper* const soapWrapper,
     CapabilitiesResp* const response )
 {
-    QAuthenticator auth(getAuth());
+    QAuthenticator auth = getAuth();
 
     //Trying to get onvif URLs
     CapabilitiesReq request;

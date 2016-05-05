@@ -8,7 +8,7 @@
 #include "network/module_information.h"
 #include "network/tcp_connection_priv.h"
 #include "utils/common/app_info.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 
 //#define START_LICENSES_DEBUG
 
@@ -30,19 +30,22 @@ int QnPingSystemRestHandler::executeGet(
 
     if (url.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, lit("url"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, lit("url")));
         return CODE_OK;
     }
 
     if (!url.isValid())
     {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("url"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::InvalidParameter, lit("url")));
         return CODE_OK;
     }
 
     if (password.isEmpty())
     {
-        result.setError(QnJsonRestResult::MissingParameter, lit("password"));
+        result.setError(QnRestResult::ErrorDescriptor(
+            QnJsonRestResult::MissingParameter, lit("password")));
         return CODE_OK;
     }
 

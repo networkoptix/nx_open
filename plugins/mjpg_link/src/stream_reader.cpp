@@ -24,10 +24,10 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
-#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
-#include <utils/common/log.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/custom_output_stream.h>
 
 #include "ilp_empty_packet.h"
@@ -58,7 +58,7 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
     m_isInGetNextData( 0 ),
     m_timeProvider(timeProvider)
 {
-    assert(m_timeProvider);
+    NX_ASSERT(m_timeProvider);
     setFps( fps );
 
     using namespace std::placeholders;
@@ -69,7 +69,7 @@ StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
 
 StreamReader::~StreamReader()
 {
-    assert( m_isInGetNextData == 0 );
+    NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
 }
 

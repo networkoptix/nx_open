@@ -3,8 +3,8 @@
 
 #include <QtCore/QtGlobal>
 
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 
 class QnDesktopDataProvider;
 

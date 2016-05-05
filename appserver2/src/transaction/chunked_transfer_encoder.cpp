@@ -6,7 +6,7 @@
 #   include <arpa/inet.h>
 #endif
 
-#include <utils/network/socket.h>
+#include <nx/network/socket.h>
 #include <utils/serialization/binary_stream.h>
 
 

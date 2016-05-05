@@ -690,7 +690,7 @@
   <customwidget>
    <class>QnIpLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>ui/widgets/ip_line_edit.h</header>
+   <header>ui/widgets/common/ip_line_edit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

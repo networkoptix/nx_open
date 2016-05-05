@@ -15,16 +15,16 @@
 #include <transaction/transaction_transport_header.h>
 
 #include "utils/common/id.h"
-#include <utils/common/log.h>
-#include <utils/common/uuid.h>
-#include <utils/network/abstract_socket.h>
-#include "utils/network/http/asynchttpclient.h"
-#include <utils/network/http/auth_cache.h>
-#include "utils/network/http/httpstreamreader.h"
-#include "utils/network/http/http_message_stream_parser.h"
-#include "utils/network/http/multipart_content_parser.h"
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
+#include <nx/network/abstract_socket.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/auth_cache.h>
+#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_message_stream_parser.h>
+#include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #ifdef _DEBUG
 #include <common/common_module.h>
@@ -114,6 +114,9 @@ public:
 
     void setBeforeDestroyCallback(std::function<void ()> ttFinishCallback);
 
+    std::chrono::milliseconds connectionKeepAliveTimeout() const;
+    int keepAliveProbeCount() const;
+
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -128,16 +131,16 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
     {
         QnTransactionTransportHeader header(_header);
-        assert(header.processedPeers.contains(m_localPeer.id));
+        NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
         header.fillSequence();
 #ifdef _DEBUG
 
         for (const QnUuid& peer: header.dstPeers) {
-            Q_ASSERT(!peer.isNull());
-            //Q_ASSERT(peer != qnCommon->moduleGUID());
+            NX_ASSERT(!peer.isNull());
+            //NX_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
-        Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
+        NX_ASSERT(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
         if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))

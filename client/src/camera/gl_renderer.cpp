@@ -6,11 +6,11 @@
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <QtWidgets/QErrorMessage>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
@@ -126,7 +126,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     //m_extraMin(-PI/4.0),
     //m_extraMax(PI/4.0) // rotation range
 {
-    Q_ASSERT( context );
+    NX_ASSERT( context );
 
     applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
     
@@ -207,7 +207,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 break;
 
             case PIX_FMT_YUVA420P:
-                Q_ASSERT( isYV12ToRgbaShaderUsed() );
+                NX_ASSERT( isYV12ToRgbaShaderUsed() );
                 drawYVA12VideoTexture(
                     picLock,
                     QnGeometry::subRect(picLock->textureRect(), sourceRect),
@@ -219,7 +219,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 break;
 
             case PIX_FMT_YUV420P:              
-                Q_ASSERT( isYV12ToRgbShaderUsed() );
+                NX_ASSERT( isYV12ToRgbShaderUsed() );
                 drawYV12VideoTexture(
                     picLock,
                     QnGeometry::subRect(picLock->textureRect(), sourceRect),
@@ -231,7 +231,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                 break;
 
             case PIX_FMT_NV12:
-                Q_ASSERT( isNV12ToRgbShaderUsed() );
+                NX_ASSERT( isNV12ToRgbShaderUsed() );
                 drawNV12VideoTexture(
                     QnGeometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
@@ -241,7 +241,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
             default:
                 //other formats must be converted to PIX_FMT_YUV420P or PIX_FMT_NV12 before picture uploading
-                Q_ASSERT( false );
+                NX_ASSERT( false );
         }
 
         QnMutexLocker lock( &m_mutex );

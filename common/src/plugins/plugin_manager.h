@@ -15,8 +15,8 @@
 #include <QtCore/QString>
 #include <QtCore/QSettings>
 
-#include <utils/common/singleton.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "plugin_api.h"
 #include "plugin_container_api.h"

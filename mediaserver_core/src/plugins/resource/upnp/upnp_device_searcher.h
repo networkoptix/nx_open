@@ -7,29 +7,21 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QElapsedTimer>
-#include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
 #include <QtCore/QString>
+#include <QtNetwork/QHostAddress>
+#include <QtXml/QXmlDefaultHandler>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
-#include <utils/common/timermanager.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/nettools.h>
-#include <utils/network/socket.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/nettools.h>
+#include <nx/network/socket.h>
+#include <nx/network/upnp/upnp_device_description.h>
 
-
-//Contains some info about discovered UPnP device
-struct UpnpDeviceInfo
-{
-    QString friendlyName;
-    QString manufacturer;
-    QString modelName;
-    QString serialNumber;
-    QString presentationUrl;
-};
 
 //!Receives discovered devices info
 class UPNPSearchHandler
@@ -47,7 +39,7 @@ public:
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const HostAddress& discoveredDevAddress,
-        const UpnpDeviceInfo& devInfo,
+        const nx_upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo ) = 0;
 };
 
@@ -62,7 +54,7 @@ public:
 class UPNPDeviceSearcher
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public QnStoppable
 {
     Q_OBJECT
@@ -108,7 +100,7 @@ private:
         //!Device uuid. Places as a separater member because it becomes known before \a devInfo
         QByteArray uuid;
         QUrl descriptionUrl;
-        UpnpDeviceInfo devInfo;
+        nx_upnp::DeviceInfo devInfo;
         QByteArray xmlDevInfo;
     };
 
@@ -117,7 +109,7 @@ private:
     class UPNPDescriptionCacheItem
     {
     public:
-        UpnpDeviceInfo devInfo;
+        nx_upnp::DeviceInfo devInfo;
         QByteArray xmlDevInfo;
         qint64 creationTimestamp;
 

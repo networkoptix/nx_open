@@ -4,9 +4,9 @@
 
 #include "hls_live_playlist_manager.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <utils/media/media_stream_cache.h>
 
@@ -187,7 +187,7 @@ namespace nx_hls
                     m_chunks.pop_front();
                 }
 
-                Q_ASSERT( !m_chunks.empty() );
+                NX_ASSERT( !m_chunks.empty() );
 
                 while( !m_timestampToBlock.empty() && (m_timestampToBlock.front().second < m_chunks.front().startTimestamp) )
                 {

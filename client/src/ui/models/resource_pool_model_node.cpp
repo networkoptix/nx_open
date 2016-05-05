@@ -4,6 +4,7 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -32,12 +33,13 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     m_parent(NULL),
     m_status(Qn::Online),
     m_modified(false),
-    m_checked(Qt::Unchecked)
+    m_checkState(Qt::Unchecked)
 {
-    assert(type == Qn::LocalNode ||
+    NX_ASSERT(type == Qn::LocalNode ||
            type == Qn::ServersNode ||
            type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
+           type == Qn::WebPagesNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
            type == Qn::SystemNode ||
@@ -49,7 +51,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::LocalNode:
         m_displayName = m_name = tr("Local");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::LocalServer);
         break;
     case Qn::ServersNode:
         m_displayName = m_name = tr("System");
@@ -63,6 +65,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     case Qn::UsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+        break;
+    case Qn::WebPagesNode:
+        m_displayName = m_name = tr("Web Pages");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::WebPages);
+        m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::BastardNode:
         m_displayName = m_name = QLatin1String("_HIDDEN_"); /* This node is always hidden. */
@@ -98,10 +105,10 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_parent(NULL),
     m_status(Qn::Offline),
     m_modified(false),
-    m_checked(Qt::Unchecked)
+    m_checkState(Qt::Unchecked)
 {
-    assert(model != NULL);
-    assert(nodeType == Qn::ResourceNode ||
+    NX_ASSERT(model != NULL);
+    NX_ASSERT(nodeType == Qn::ResourceNode ||
            nodeType == Qn::EdgeNode);
 
     setResource(resource);
@@ -121,9 +128,9 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_parent(NULL),
     m_status(Qn::Offline),
     m_modified(false),
-    m_checked(Qt::Unchecked)
+    m_checkState(Qt::Unchecked)
 {
-    assert(model != NULL);
+    NX_ASSERT(model != NULL);
 
     m_editable.checked = false;
 }
@@ -141,8 +148,8 @@ void QnResourcePoolModelNode::clear() {
     setParent(NULL);
 
     if (m_type == Qn::ItemNode ||
-        m_type == Qn::ResourceNode || 
-        m_type == Qn::VideoWallItemNode || 
+        m_type == Qn::ResourceNode ||
+        m_type == Qn::VideoWallItemNode ||
         m_type == Qn::EdgeNode)
     {
         setResource(QnResourcePtr());
@@ -150,10 +157,10 @@ void QnResourcePoolModelNode::clear() {
 }
 
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
-    assert(
+    NX_ASSERT(
         m_type == Qn::ItemNode ||
-        m_type == Qn::ResourceNode || 
-        m_type == Qn::VideoWallItemNode || 
+        m_type == Qn::ResourceNode ||
+        m_type == Qn::VideoWallItemNode ||
         m_type == Qn::EdgeNode);
 
     if(m_resource == resource)
@@ -223,7 +230,7 @@ void QnResourcePoolModelNode::update() {
     } else if (m_type == Qn::VideoWallMatrixNode) {
         m_status = Qn::Online;
         m_searchString = QString();
-        m_flags = 0; 
+        m_flags = 0;
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
         foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
@@ -288,9 +295,13 @@ void QnResourcePoolModelNode::setState(State state) {
 }
 
 bool QnResourcePoolModelNode::calculateBastard() const {
-    switch(m_type) {
+    switch(m_type)
+    {
     case Qn::ItemNode:
-        return m_resource.isNull();
+    {
+        /* Hide non-readable resources. */
+        return !m_resource || !m_model->accessController()->permissions(m_resource).testFlag(Qn::ReadPermission);
+    }
 
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
@@ -302,6 +313,9 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::OtherSystemsNode:
         return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled() || m_children.isEmpty();
 
+    case Qn::WebPagesNode:
+        return m_children.isEmpty();
+
     case Qn::RecorderNode:
     case Qn::SystemNode:
         return m_children.isEmpty();
@@ -309,15 +323,15 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
         if (!m_resource)
-            return true; 
-        
+            return true;
+
         /* Hide non-readable resources. */
-        if (!(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission))
-            return true; 
+        if (!m_model->accessController()->permissions(m_resource).testFlag(Qn::ReadPermission))
+            return true;
 
         if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
-            /* Hide local layouts that are not file-based. */ 
-            if (m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout))
+            /* Hide local layouts that are not file-based. */
+            if (m_model->snapshotManager()->isLocal(layout) && !layout->isFile())
                 return true;
 
             /* Hide "Preview Search" layouts */
@@ -337,10 +351,10 @@ bool QnResourcePoolModelNode::calculateBastard() const {
             if ((m_flags & Qn::local_server) == Qn::local_server)
                 return true;
 
-            //TODO: #Elric hack hack hack
+            //TODO: #Elric hack hack hack VMS-1725
             if ((m_flags & Qn::local_media) == Qn::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")))
                 return true;
-            
+
             /* Hide edge servers, camera will be displayed instead. */
             if (QnMediaServerResource::isHiddenServer(m_resource) &&
                 !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
@@ -353,19 +367,19 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     case Qn::EdgeNode:
         /* Hide resource nodes without resource. */
         if (!m_resource)
-            return true; 
+            return true;
 
         /* Hide non-readable resources. */
-        return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); 
+        return !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission);
 
     case Qn::UsersNode:
-        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
-        
+        return !m_model->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+
     case Qn::ServersNode:
-        return !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+        return !m_model->accessController()->hasGlobalPermission(Qn::GlobalEditServersPermissions);
 
     default:
-        Q_ASSERT("Should never get here");
+        NX_ASSERT("Should never get here");
         return false;
     }
 }
@@ -425,7 +439,7 @@ void QnResourcePoolModelNode::setParent(QnResourcePoolModelNode *parent) {
 }
 
 QModelIndex QnResourcePoolModelNode::index(int col) {
-    assert(isValid()); /* Only valid nodes have indices. */
+    NX_ASSERT(isValid()); /* Only valid nodes have indices. */
 
     if(m_parent == NULL)
         return QModelIndex(); /* That's root node. */
@@ -434,8 +448,8 @@ QModelIndex QnResourcePoolModelNode::index(int col) {
 }
 
 QModelIndex QnResourcePoolModelNode::index(int row, int col) {
-    assert(isValid()); /* Only valid nodes have indices. */
-    assert(m_parent != NULL && row == m_parent->m_children.indexOf(this));
+    NX_ASSERT(isValid()); /* Only valid nodes have indices. */
+    NX_ASSERT(m_parent != NULL && row == m_parent->m_children.indexOf(this));
 
     return m_model->createIndex(row, col, this);
 }
@@ -454,7 +468,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
-            m_editable.value = (m_model->context()->accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
+            m_editable.value = m_model->context()->accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -473,12 +487,12 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
     case Qn::ItemNode:
-        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall))
+        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;
     case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
-        result |= Qt::ItemIsDragEnabled; 
+        result |= Qt::ItemIsDragEnabled;
         break;
     default:
         break;
@@ -508,7 +522,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         break;
     case Qt::CheckStateRole:
         if (column == Qn::CheckColumn)
-            return m_checked;
+            return m_checkState;
         break;
     case Qn::ResourceRole:
         if(m_resource)
@@ -520,8 +534,8 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         break;
     case Qn::ItemUuidRole:
         if (
-            m_type == Qn::ItemNode 
-            || m_type == Qn::VideoWallItemNode 
+            m_type == Qn::ItemNode
+            || m_type == Qn::VideoWallItemNode
             || m_type == Qn::VideoWallMatrixNode
             )
             return QVariant::fromValue<QnUuid>(m_uuid);
@@ -543,12 +557,13 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return Qn::Videowall_Display_Help;
         } else if(m_type == Qn::VideoWallMatrixNode) {
             return Qn::Videowall_Matrix_Help;
-        } else if(m_flags & Qn::layout) {
-            if(m_model->context()->snapshotManager()->isFile(m_resource.dynamicCast<QnLayoutResource>())) {
-                return Qn::MainWindow_Tree_MultiVideo_Help;
-            } else {
-                return Qn::MainWindow_Tree_Layouts_Help;
-            }
+        }
+        else if(m_flags & Qn::layout)
+        {
+            if (QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>())
+                if (layout->isFile())
+                    return Qn::MainWindow_Tree_MultiVideo_Help;
+            return Qn::MainWindow_Tree_Layouts_Help;
         } else if(m_flags & Qn::user) {
             return Qn::MainWindow_Tree_Users_Help;
         } else if(m_flags & Qn::local) {
@@ -574,8 +589,9 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
 }
 
 bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int column) {
-    if (column == Qn::CheckColumn && role == Qt::CheckStateRole){
-        m_checked = (Qt::CheckState)value.toInt();
+    if (column == Qn::CheckColumn && role == Qt::CheckStateRole)
+    {
+        m_checkState = static_cast<Qt::CheckState>(value.toInt());
         changeInternal();
         return true;
     }
@@ -635,7 +651,7 @@ void QnResourcePoolModelNode::setModified(bool modified) {
 }
 
 void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child) {
-    assert(child->parent() == this);
+    NX_ASSERT(child->parent() == this);
 
     if(isValid() && !isBastard()) {
         QModelIndex index = this->index(Qn::NameColumn);
@@ -660,7 +676,7 @@ void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child
 }
 
 void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
-    assert(child->parent() == this);
+    NX_ASSERT(child->parent() == this);
 
     if(isValid() && !isBastard()) {
         QModelIndex index = this->index(Qn::NameColumn);

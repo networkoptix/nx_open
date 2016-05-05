@@ -1,15 +1,16 @@
 #ifndef QN_SERIALIZATION_SQL_FUNCTIONS_H
 #define QN_SERIALIZATION_SQL_FUNCTIONS_H
 
-#include <utils/common/uuid.h>
+#include <string>
+
+#include <nx/utils/uuid.h>
 
 #include "sql.h"
 #include "sql_macros.h"
 #include "enum.h"
-#include "recording/time_period.h"
 
 // TODO: #Elric enumz!
-// TODO: #Elric #EC2 static assert for enum size.
+// TODO: #Elric #EC2 static NX_ASSERT for enum size.
 
 namespace QnSqlDetail {
     template<class T>
@@ -77,8 +78,16 @@ inline void serialize_field(const QString &value, QVariant *target) {
     *target = QVariant::fromValue<QString>(value.isNull() ? lit("") : value);
 }
 
+inline void serialize_field(const std::string &value, QVariant *target) {
+    *target = QVariant::fromValue<QString>(QString::fromStdString(value));
+}
+
 inline void deserialize_field(const QVariant &value, QString *target) { 
     *target = value.value<QString>();
+}
+
+inline void deserialize_field(const QVariant &value, std::string *target) { 
+    *target = value.value<QString>().toStdString();
 }
 
 

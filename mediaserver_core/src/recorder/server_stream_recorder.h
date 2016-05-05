@@ -5,13 +5,13 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "recording/stream_recorder.h"
-#include "core/misc/schedule_task.h"
-#include "recorder/device_file_catalog.h"
-#include "recording/time_period.h"
-#include "motion/motion_estimation.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "dualstreaming_helper.h"
+#include <recording/stream_recorder.h>
+#include <core/misc/schedule_task.h>
+#include <recorder/device_file_catalog.h>
+#include <recording/time_period.h>
+#include <motion/motion_estimation.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <recorder/dualstreaming_helper.h>
 
 #include <business/business_fwd.h>
 
@@ -82,6 +82,9 @@ private:
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
     bool isPanicMode() const;
     bool isRedundantSyncOn() const;
+    bool pauseRebuildIfHighData(QnMutexLockerBase* locker);
+    bool resumeRebuildIfLowData(QnMutexLockerBase* locker);
+    void resumeRebuild(QnMutexLockerBase* locker);
 private slots:
     void at_recordingFinished(
         const ErrorStruct   &status,

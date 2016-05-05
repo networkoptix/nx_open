@@ -50,7 +50,7 @@ void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<Abstra
         }
     }
 
-    Q_ASSERT_X(!isClientConnectedInternal(userId), Q_FUNC_INFO, "Camera should definitely be disconnected here");
+    NX_ASSERT(!isClientConnectedInternal(userId), Q_FUNC_INFO, "Camera should definitely be disconnected here");
 
     ClientConnectionInfo info(connection, userName, userId);
     m_connections << info;
@@ -126,7 +126,7 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid &reso
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    Q_ASSERT_X(resourceType, Q_FUNC_INFO, "Desktop camera resource type not found");
+    NX_ASSERT(resourceType, Q_FUNC_INFO, "Desktop camera resource type not found");
     if (!resourceType)
         return result;
 

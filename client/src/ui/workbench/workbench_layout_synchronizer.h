@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QMetaType>
 #include <QtCore/QSet>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <utils/common/connective.h>
 

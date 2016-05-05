@@ -13,6 +13,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -137,6 +138,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
     QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
     QnResourceList videowalls;
+    QnResourceList webPages;
 
     foreach( QnResourcePtr res, resources )
     {
@@ -148,12 +150,15 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
             servers.push_back( res );
         if( res.dynamicCast<QnVideoWallResource>() )
             videowalls.push_back( res );
+        if( res.dynamicCast<QnWebPageResource>() )
+            webPages.push_back( res );
     }
 
     m_resources = media;
     m_resources << layouts;
     m_resources << servers;
     m_resources << videowalls;
+    m_resources << webPages;
 
     m_videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 

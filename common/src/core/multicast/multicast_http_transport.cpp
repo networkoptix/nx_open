@@ -6,6 +6,14 @@
 #include <sys/socket.h>
 #endif
 
+#include <QtNetwork/QNetworkInterface>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#endif
+
+#include <nx/utils/log/assert.h>
+
 namespace QnMulticast
 {
 
@@ -65,7 +73,7 @@ bool setRecvBufferSize(int fd, unsigned int buff_size )
     return ::setsockopt(fd, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) == 0;
 }
 
-static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QString& multicastIF)  
+static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QString& multicastIF)
 {
     struct ip_mreq multicastRequest;
 
@@ -80,7 +88,7 @@ static bool joinMulticastGroup(int fd, const QString &multicastGroup, const QStr
     return true;
 }
 
-bool leaveMulticastGroup(int fd, const QString &multicastGroup, const QString& multicastIF)  
+bool leaveMulticastGroup(int fd, const QString &multicastGroup, const QString& multicastIF)
 {
     struct ip_mreq multicastRequest;
 
@@ -122,9 +130,9 @@ bool setMulticastIF(int fd, const QString& multicastIF)
 // ----------- Packet ------------------
 
 Packet::Packet():
-    magic(PROTO_MAGIC), 
-    version(PROTO_VERSION), 
-    messageSize(0), 
+    magic(PROTO_MAGIC),
+    version(PROTO_VERSION),
+    messageSize(0),
     offset(0)
 {
 
@@ -221,7 +229,7 @@ QSet<QString> Transport::getLocalAddressList() const
 
 void Transport::initSockets(const QSet<QString>& addrList)
 {
-    if (m_recvSocket) 
+    if (m_recvSocket)
     {
         // unsabscribe socket from old multicast list
         for (const QString& ipv4Addr: m_localAddressList)
@@ -244,7 +252,7 @@ void Transport::initSockets(const QSet<QString>& addrList)
         // QT joinMulticastGroup has a bug: it takes first address from the interface. It fail if the first addr is a IPv6 addr
         if (!joinMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr))
             continue;
-        
+
         auto sendSocket = std::shared_ptr<QUdpSocket>(new QUdpSocket());
         if (!sendSocket->bind(QHostAddress(ipv4Addr))) {
             qWarning() << "Failed to open Multicast Http send socket";
@@ -267,7 +275,7 @@ QString Transport::localAddress() const
 void Transport::at_timer()
 {
     at_socketReadyRead();
-    
+
     QnMutexLocker lock(&m_mutex);
     for (auto itr = m_requests.begin(); itr != m_requests.end();)
     {
@@ -281,7 +289,7 @@ void Transport::at_timer()
         else
             ++itr;
     }
-    
+
     // 2. check if interface list changed
     if (m_checkInterfacesTimer.hasExpired(INTERFACE_LIST_CHECK_INTERVAL))
     {
@@ -399,8 +407,8 @@ QUuid Transport::addRequest(const Request& request, ResponseCallback callback, i
 void Transport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
 {
     QByteArray encodedData = packet.serialize();
-    Q_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
-    for (int i = 0; i < SEND_RETRY_COUNT; ++i) 
+    NX_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
+    for (int i = 0; i < SEND_RETRY_COUNT; ++i)
     {
         for (auto& socket: m_sendSockets)
             transportConnection.dataToSend << TransportPacket(socket, encodedData);
@@ -513,14 +521,14 @@ void Transport::at_socketReadyRead()
             m_processedRequests.insert(packet.requestId, 0);
             // all data has been received
             bool ok;
-            if (packet.messageType == MessageType::response) 
+            if (packet.messageType == MessageType::response)
             {
                 Response response = parseResponse(transportData, &ok);
                 response.serverId = packet.serverId;
                 if (transportData.responseCallback)
                     transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
             }
-            else if (packet.messageType == MessageType::request) 
+            else if (packet.messageType == MessageType::request)
             {
                 Request request = parseRequest(transportData, &ok);
                 if (ok && m_requestCallback)
@@ -563,7 +571,7 @@ void Transport::sendNextData()
                 request.dataToSend.dequeue(); // skip packet
             }
         }
-        
+
         if (request.dataToSend.isEmpty() && !request.responseCallback)
             itr = m_requests.erase(itr); // no answer is required. clear data after send
         else

@@ -7,7 +7,6 @@
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QMessageBox>
 
 #include <camera/cam_display.h>
 #include <camera/single_thumbnail_loader.h>
@@ -21,15 +20,16 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <platform/environment.h>
+
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/fisheye_image_filter.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/dialogs/custom_file_dialog.h>
-#include <ui/dialogs/progress_dialog.h>
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
-#include <ui/dialogs/message_box.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/progress_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -39,7 +39,6 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <utils/common/string.h>
-#include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 #include <utils/aspect_ratio.h>
 
@@ -425,13 +424,13 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QnMessageBox::information(
+                QDialogButtonBox::StandardButton button = QnMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
                     tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
-                    QMessageBox::Yes | QMessageBox::No
+                    QDialogButtonBox::Yes | QDialogButtonBox::No
                     );
-                if (button == QMessageBox::No)
+                if (button == QDialogButtonBox::No)
                     continue;
             }
         }
@@ -442,11 +441,11 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
             return false;
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
+            QnMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file."),
                 tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
-                QMessageBox::Ok
+                QDialogButtonBox::Ok
                 );
             continue;
         }
@@ -512,7 +511,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     if (result.isNull() || !result.save(filename)) {
         hideProgress();
 
-        QMessageBox::critical(
+        QnMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot."),
             tr("An error occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
@@ -594,7 +593,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-        Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
+        NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
         if (camera)
             imageProvider = new QnSingleThumbnailLoader(camera, localParameters.utcTimestampMsec, 0);
         else

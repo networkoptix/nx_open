@@ -2,7 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/audio_data_packet.h"
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include "utils/media/audio_processor.h"
 #include "utils/media/ffmpeg_helper.h"
 
@@ -21,7 +22,7 @@ namespace
         }
         return result;
     }
-        
+
     int getMaxAudioChannels(AVCodec* avCodec)
     {
         if (!avCodec->channel_layouts)
@@ -74,8 +75,8 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     if (m_resampleCtx)
         audio_resample_close(m_resampleCtx);
 
-    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
-    QnFfmpegHelper::deleteCodecContext(m_decoderContext);
+    QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_decoderContext);
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -91,8 +92,10 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
     return open(audio->context);
 }
 
-bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
+bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 {
+    NX_ASSERT(context);
+
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
@@ -105,7 +108,7 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
     //m_encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     m_encoderCtx->sample_fmt = avCodec->sample_fmts[0] != AV_SAMPLE_FMT_NONE ? avCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
 
-    m_encoderCtx->channels = codecCtx->ctx()->channels;
+    m_encoderCtx->channels = context->getChannels();
     int maxEncoderChannels = getMaxAudioChannels(avCodec);
 
     if (m_encoderCtx->channels > maxEncoderChannels)
@@ -114,11 +117,11 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
             m_downmixAudio = true; //< downmix to stereo inplace before ffmpeg based resample (just not change behaviour, keep as in the previous version)
         m_encoderCtx->channels = maxEncoderChannels;
     }
-    
+    m_encoderCtx->sample_rate = context->getSampleRate();
     if (m_dstSampleRate > 0)
         m_encoderCtx->sample_rate = m_dstSampleRate;
     else
-        m_encoderCtx->sample_rate = getDefaultDstSampleRate(codecCtx->ctx()->sample_rate, avCodec);
+        m_encoderCtx->sample_rate = getDefaultDstSampleRate(context->getSampleRate(), avCodec);
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
@@ -131,16 +134,16 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
         return false;
     }
 
-    avCodec = avcodec_find_decoder(codecCtx->ctx()->codec_id);
+    avCodec = avcodec_find_decoder(context->getCodecId());
     m_decoderContext = avcodec_alloc_context3(0);
-    avcodec_copy_context(m_decoderContext, codecCtx->ctx());
+    QnFfmpegHelper::mediaContextToAvCodecContext(m_decoderContext, context);
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
         m_lastErrMessage = tr("Could not initialize audio decoder.");
         return false;
     }
 
-    m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
+    m_context = QnConstMediaContextPtr(new QnAvCodecMediaContext(m_encoderCtx));
     m_frameNum = 0;
     return true;
 }
@@ -211,11 +214,11 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         int decodedAudioSize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
         // TODO: #vasilenko avoid using deprecated methods
 
-        bool needResample= 
+        bool needResample=
             m_encoderCtx->channels != m_decoderContext->channels ||
             m_encoderCtx->sample_rate != m_decoderContext->sample_rate ||
             m_encoderCtx->sample_fmt != m_decoderContext->sample_fmt;
-        
+
         QnByteArray& bufferToDecode = needResample ? m_unresampledData : m_resampledData;
         quint8* decodedDataEndPtr = (quint8*) bufferToDecode.data() + bufferToDecode.size();
 
@@ -226,15 +229,15 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         if (len < 0)
             return -3;
 
-        if (decodedAudioSize > 0) 
+        if (decodedAudioSize > 0)
         {
             if (m_downmixAudio)
                 decodedAudioSize = QnAudioProcessor::downmix(decodedDataEndPtr, decodedAudioSize, m_decoderContext);
             bufferToDecode.resize(bufferToDecode.size() + decodedAudioSize);
-            
+
             if (needResample)
             {
-                if (m_resampleCtx == 0) 
+                if (m_resampleCtx == 0)
                 {
                     m_resampleCtx = av_audio_resample_init(
                         m_encoderCtx->channels,
@@ -245,19 +248,19 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                         m_decoderContext->sample_fmt,
                         16, 10, 0, 0.8);
                 }
-                
+
                 int inSamples = bufferToDecode.size() / fullSampleSize(m_decoderContext);
                 int outSamlpes = audio_resample(
-                    m_resampleCtx, 
-                    (short*) (m_resampledData.data() + m_resampledData.size()), 
-                    (short*) m_unresampledData.data(), 
+                    m_resampleCtx,
+                    (short*) (m_resampledData.data() + m_resampledData.size()),
+                    (short*) m_unresampledData.data(),
                     inSamples);
                 int resampledDataBytes = outSamlpes * fullSampleSize(m_encoderCtx);
                 m_resampledData.resize(m_resampledData.size() + resampledDataBytes);
                 m_unresampledData.clear();
             }
         }
-        Q_ASSERT(m_resampledData.size() < AVCODEC_MAX_AUDIO_FRAME_SIZE);
+        NX_ASSERT(m_resampledData.size() < AVCODEC_MAX_AUDIO_FRAME_SIZE);
     }
 
     if( !result )
@@ -270,7 +273,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
     // TODO: #vasilenko avoid using deprecated methods
     int encoded = 0;
-    while (encoded == 0 && m_resampledData.size() >= encoderFrameSize) 
+    while (encoded == 0 && m_resampledData.size() >= encoderFrameSize)
     {
         encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_resampledData.data());
         if (encoded < 0)

@@ -6,20 +6,21 @@
 #include <QtCore/QElapsedTimer>
 #include <QCryptographicHash>
 
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
-#include "utils/network/ping.h"
-#include "utils/network/socket.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/rtsp/rtsp_types.h"
+#include <nx/network/ping.h>
+#include <nx/network/socket.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 
 #include <recording/time_period_list.h>
 
 
-QnNetworkResource::QnNetworkResource(): 
+QnNetworkResource::QnNetworkResource():
     QnResource(),
     m_authenticated(true),
     m_networkStatus(0),
@@ -106,11 +107,31 @@ void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
                 lit("%1:%2").arg(auth.user()).arg(auth.password()));
 }
 
+QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
+{
+    //TODO: #GDM think about code duplication
+    NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
+    QString value = getResourceProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+    if (value.isNull())
+        value = getResourceProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+    const QStringList& credentialsList = value.split(lit(":"));
+    QAuthenticator auth;
+    if (credentialsList.size() >= 1)
+        auth.setUser(credentialsList[0]);
+    if (credentialsList.size() >= 2)
+        auth.setPassword(credentialsList[1]);
+    return auth;
+}
+
 QAuthenticator QnNetworkResource::getAuth() const
 {
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    if (value.isNull())
+        return QAuthenticator();
+
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if( credentialsList.size() >= 1 )
@@ -241,9 +262,10 @@ bool QnNetworkResource::ping()
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
-bool QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    return false;
+    //calling completionHandler(false) in aio_thread
+    nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
@@ -291,7 +313,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
 {
-    Q_ASSERT(!uniqId.isEmpty());
+    NX_ASSERT(!uniqId.isEmpty());
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(uniqId.toUtf8());
     QnUuid id = QnUuid::fromRfc4122(md5.result());
@@ -307,17 +329,17 @@ void QnNetworkResource::initializationDone()
 }
 
 void QnNetworkResource::setAuth(const QString &user, const QString &password)
-{ 
-    QAuthenticator auth; 
-    auth.setUser(user); 
-    auth.setPassword(password); 
-    setAuth(auth); 
+{
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+    setAuth(auth);
 }
 
 void QnNetworkResource::setDefaultAuth(const QString &user, const QString &password)
-{ 
-    QAuthenticator auth; 
-    auth.setUser(user); 
-    auth.setPassword(password); 
-    setDefaultAuth(auth); 
+{
+    QAuthenticator auth;
+    auth.setUser(user);
+    auth.setPassword(password);
+    setDefaultAuth(auth);
 }

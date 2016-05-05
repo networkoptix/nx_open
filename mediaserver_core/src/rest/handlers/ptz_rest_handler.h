@@ -2,7 +2,7 @@
 #define QN_PTZ_REST_HANDLER_H
 
 #include <QtCore/QElapsedTimer>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/ptz/ptz_fwd.h>
 

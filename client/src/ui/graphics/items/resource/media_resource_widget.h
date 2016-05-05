@@ -9,7 +9,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
+struct QnMetaDataV1;
+typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
+
 #include <core/resource/motion_window.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
@@ -18,9 +20,10 @@
 #include <core/ptz/media_dewarping_params.h>
 
 #include <client/client_globals.h>
-#include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <camera/resource_display.h> //< TODO: #Elric FWD!
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
+#include <utils/media/sse_helper.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -34,15 +37,6 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button ScreenshotButton    = static_cast<Button>(0x008);
-    static const Button MotionSearchButton  = static_cast<Button>(0x010);
-    static const Button PtzButton           = static_cast<Button>(0x020);
-    static const Button FishEyeButton       = static_cast<Button>(0x040);
-    static const Button ZoomWindowButton    = static_cast<Button>(0x080);
-    static const Button EnhancementButton   = static_cast<Button>(0x100);
-    static const Button DbgScreenshotButton = static_cast<Button>(0x200);
-    static const Button IoModuleButton      = static_cast<Button>(0x400);
-
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
 
@@ -147,7 +141,7 @@ protected:
     virtual QString calculateDetailsText() const override;
     virtual QString calculatePositionText() const override;
     virtual QString calculateTitleText() const override;
-    virtual Buttons calculateButtonsVisibility() const override;
+    virtual int calculateButtonsVisibility() const override;
     virtual QCursor calculateCursor() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
@@ -260,7 +254,7 @@ private:
     mutable bool m_motionSensitivityValid;
 
     /** Binary mask for the current motion region. */
-    mutable QList<__m128i *> m_binaryMotionMask;
+    mutable QList<simd128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;

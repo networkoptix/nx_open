@@ -1,6 +1,5 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
 
@@ -15,9 +14,8 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
-#include <ui/dialogs/message_box.h>
-#include <ui/dialogs/progress_dialog.h>
-#include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include <ui/dialogs/common/progress_dialog.h>
+#include <ui/dialogs/common/workbench_state_dependent_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
@@ -40,7 +38,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
+        QnMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
         return;
     }
 
@@ -83,7 +81,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
         password = dialog.textValue();
 
         if (password.isEmpty())
-            QMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
+            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
         else
             break;
     }
@@ -187,10 +185,10 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
         "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
         "If you understand this and would like to proceed please click Merge to continue.\n");
 
-    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
-    messageBox.addButton(tr("Merge"), QnMessageBox::AcceptRole);
+    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Merge"), QDialogButtonBox::AcceptRole);
 
-    return messageBox.exec() != QnMessageBox::Cancel;
+    return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
 bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(

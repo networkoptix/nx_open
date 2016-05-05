@@ -4,12 +4,12 @@
 #ifdef ENABLE_ARCHIVE
 
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <camera/data/camera_data_fwd.h>
+#include <common/common_globals.h>
 #include <camera/loaders/abstract_camera_data_loader.h>
 
-#include <common/common_globals.h>
 
 /**
  * Time period loader that can be used to load recorded time periods from exported layout

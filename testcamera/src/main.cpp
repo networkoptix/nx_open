@@ -1,5 +1,3 @@
-#include "version.h"
-
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
@@ -14,7 +12,9 @@
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/storage_plugin_factory.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
 
+#include <utils/common/app_info.h>
 
 QString doUnquote(const QString& fileName)
 {
@@ -30,31 +30,30 @@ void ffmpegInit()
 {
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
-    QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
 }
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-    QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-    QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+    QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
+    QCoreApplication::setApplicationName("Nx Witness Test Camera");
+    QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
-    
-    ffmpegInit();  
-    
+
+    ffmpegInit();
+
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
 
-    QnCommonModule common();
+    QnCommonModule common;
     QnSyncTime syncTime;
 
     new QnLongRunnablePool();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
-    qDebug() << QN_APPLICATION_NAME << "version" << QN_APPLICATION_VERSION;
-    
+    qDebug() << qApp->applicationName() << "version" << qApp->applicationVersion();
+
     if (argc == 1)
     {
         qDebug() << "usage:";

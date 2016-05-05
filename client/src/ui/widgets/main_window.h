@@ -9,7 +9,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/view/graphics_scene.h>
 
-#include "emulated_frame_widget.h"
+#include <ui/widgets/common/emulated_frame_widget.h>
 
 class QTabBar;
 class QBoxLayout;
@@ -17,7 +17,6 @@ class QSpacerItem;
 class QToolButton;
 
 class QnActionManager;
-class QnGradientBackgroundPainter;
 class QnLayoutTabBar;
 class QnGraphicsView;
 class QnDwm;
@@ -28,6 +27,7 @@ class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
+class QnMainWindowTitleBarWidget;
 
 class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -37,16 +37,13 @@ class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware
 public:
     enum Option {
         TitleBarDraggable = 0x1,    /**< Window can be moved by dragging the title bar. */
-        WindowButtonsVisible = 0x2, /**< Window has default title bar buttons. That is, close, maximize and minimize buttons. */
     };
     Q_DECLARE_FLAGS(Options, Option);
 
     QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
     virtual ~QnMainWindow();
 
-    bool isTitleVisible() const {
-        return m_titleVisible;
-    }
+    bool isTitleVisible() const;
 
     Options options() const;
     void setOptions(Options options);
@@ -68,8 +65,6 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void dropEvent(QDropEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
     virtual void moveEvent(QMoveEvent *event) override;
@@ -79,53 +74,46 @@ protected:
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
 protected slots:
+    void setWelcomeScreenVisible(bool visible);
     void setTitleVisible(bool visible);
-    void setWindowButtonsVisible(bool visible);
     void setMaximized(bool maximized);
     void setFullScreen(bool fullScreen);
     void minimize();
 
-    void toggleTitleVisibility();
-
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
-    void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:
+    void updateWidgetsVisibility();
+
     void showFullScreen();
     void showNormal();
-
-    void skipDoubleClick();
 
     void updateScreenInfo();
 
     void updateHelpTopic();
 
 private:
+    QnDwm *m_dwm;
+
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGraphicsView> m_view;
     QScopedPointer<QnGraphicsScene> m_scene;
     QScopedPointer<QnWorkbenchController> m_controller;
     QScopedPointer<QnWorkbenchUi> m_ui;
 
-    QnLayoutTabBar *m_tabBar;
-    QToolButton *m_mainMenuButton;
+    QStackedWidget * const m_currentPageHolder;
 
-    QBoxLayout *m_titleLayout;
-    QBoxLayout *m_windowButtonsLayout;
+    QnMainWindowTitleBarWidget *m_titleBar;
     QBoxLayout *m_viewLayout;
     QBoxLayout *m_globalLayout;
 
+    bool m_welcomeScreenVisible;
     bool m_titleVisible;
-
-    /** Set the flag to skip next double-click. Used to workaround invalid double click when
-     *  the first mouse click was handled and changed the widget state. */
-    bool m_skipDoubleClick;
 
     QnResourceList m_dropResources;
 
-    QnDwm *m_dwm;
     bool m_drawCustomFrame;
 
     Options m_options;
@@ -135,7 +123,6 @@ private:
     /** This field is used to restore geometry after switching to fullscreen and back. Do not used in MacOsX due to its fullscreen mode. */
     QRect m_storedGeometry;
 #endif
-    bool m_enableBackgroundAnimation;
 
     bool m_inFullscreenTransition;
 };

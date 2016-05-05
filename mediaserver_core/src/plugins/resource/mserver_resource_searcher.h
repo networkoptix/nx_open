@@ -10,10 +10,14 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "utils/common/long_runnable.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 
+namespace nx {
+namespace network {
 class UDPSocket;
+}   //network
+}   //nx
 struct QnCameraConflictList;
 
 class QnMServerResourceSearcher : public QnLongRunnable

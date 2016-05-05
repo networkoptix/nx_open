@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 #include <utils/common/ini_section.h>
 #include <utils/common/warnings.h>
 
@@ -36,7 +36,7 @@ QnVistaFocusPtzController::QnVistaFocusPtzController(const QnPtzControllerPtr &b
     m_capabilities(Qn::NoPtzCapabilities),
     m_isMotor(false)
 {
-    assert(m_resource);
+    NX_ASSERT(m_resource);
 
     init();
 }

@@ -1,6 +1,9 @@
+
 #include "workbench_alarm_layout_handler.h"
 
 #include <api/runtime_info_manager.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <utils/aspect_ratio.h>
 
 #include <business/actions/abstract_business_action.h>
 
@@ -32,9 +35,9 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <nx/streaming/archive_stream_reader.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
-
+#include <nx/streaming/archive_stream_reader.h>
 #include <utils/aspect_ratio.h>
 #include <utils/common/delayed.h>
 
@@ -43,9 +46,9 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
     public:
         QnAlarmLayoutResource():
-            QnLayoutResource(qnResTypePool)
+            QnLayoutResource()
         {
-            Q_ASSERT_X(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
+            NX_ASSERT(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
 
             setId(QnUuid::createUuid());
             addFlags(Qn::local);
@@ -192,7 +195,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     QnAlarmLayoutResourcePtr alarmLayout;
 
     QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
-    Q_ASSERT_X(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
+    NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
     if (!layouts.empty()) {
         alarmLayout = layouts.first();
     } else {
@@ -216,7 +219,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
         return false;
 
     QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
-    Q_ASSERT_X(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
+    NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
     if (layouts.empty())
         return false;
 
@@ -224,7 +227,7 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
 }
 
 void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item ) {
-    Q_ASSERT_X(layout && item, Q_FUNC_INFO, "Objects must exist here");
+    NX_ASSERT(layout && item, Q_FUNC_INFO, "Objects must exist here");
     if (!item)
         return;
 
@@ -259,7 +262,7 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
     auto clientInstanceManager = qnCommon->instance<QnClientInstanceManager>();
-    Q_ASSERT_X(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
+    NX_ASSERT(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
     if (!clientInstanceManager)
         return true;
 

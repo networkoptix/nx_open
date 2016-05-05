@@ -6,7 +6,7 @@
 
 #include <limits>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
@@ -43,7 +43,7 @@ namespace nx_hls
         m_prevGeneratedChunkDuration( 0 ),
         m_discontinuityDetected( false )
     {
-        Q_ASSERT( m_maxChunkNumberInPlaylist > 0 );
+        NX_ASSERT( m_maxChunkNumberInPlaylist > 0 );
     }
 
     ArchivePlaylistManager::~ArchivePlaylistManager()
@@ -62,7 +62,8 @@ namespace nx_hls
 
         if( !archiveDelegate->setQuality(
                 m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
-                true ) )
+                true,
+                QSize()) )
             return false;
         m_delegate.reset( new QnThumbnailsArchiveDelegate(archiveDelegate) );
         m_delegate->setRange( m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec );
@@ -143,7 +144,7 @@ namespace nx_hls
             if( nextData->timestamp != m_prevChunkEndTimestamp )
                 break;
         }
-        Q_ASSERT( nextData->timestamp != m_prevChunkEndTimestamp );
+        NX_ASSERT( nextData->timestamp != m_prevChunkEndTimestamp );
         if( nextData->timestamp == m_prevChunkEndTimestamp )
             return false;
         const qint64 currentChunkEndTimestamp = nextData->timestamp;
@@ -159,7 +160,7 @@ namespace nx_hls
                 m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec) )
             {
                 chunkData.duration = m_currentArchiveChunk.durationUsec - (m_prevChunkEndTimestamp - m_currentArchiveChunk.startTimeUsec);
-                Q_ASSERT( chunkData.duration > 0 );
+                NX_ASSERT( chunkData.duration > 0 );
             }
             else
             {

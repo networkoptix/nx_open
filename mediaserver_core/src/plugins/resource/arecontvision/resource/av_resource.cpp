@@ -13,12 +13,12 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <utils/common/timermanager.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/nettools.h>
-#include <utils/network/ping.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/nettools.h>
+#include <nx/network/ping.h>
 
 #include "core/resource/resource_command_processor.h"
 #include "core/resource/resource_command.h"
@@ -133,62 +133,18 @@ void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
     QnNetworkResource::setHostAddress(hostAddr);
 }
 
-bool QnPlAreconVisionResource::unknownResource() const
-{
-    return isAbstractResource();
-}
-
-QnResourcePtr QnPlAreconVisionResource::updateResource()
-{
-    QString model;
-    QString model_release;
-
-    if (!getParamPhysical(lit("model"), model))
-        return QnNetworkResourcePtr(0);
-
-    if (!getParamPhysical(lit("model=releasename"), model_release))
-        return QnNetworkResourcePtr(0);
-
-    if (model_release != model) {
-        //this camera supports release name
-        model = model_release;
-    }
-    else
-    {
-        //old camera; does not support release name; but must support fullname
-        if (getParamPhysical(lit("model=fullname"), model_release))
-            model = model_release;
-    }
-
-    QnNetworkResourcePtr result(createResourceByName(model));
-    if (result)
-    {
-        result->setName(model);
-        result->setHostAddress(getHostAddress());
-        (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
-        result->setMAC(getMAC());
-        result->setId(getId());
-        result->setFlags(flags());
-    }
-    else
-    {
-        NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
-    }
-
-    return result;
-}
-
 bool QnPlAreconVisionResource::ping()
 {
     QnConcurrent::QnFuture<bool> result(1);
-    if( !checkIfOnlineAsync( [&result]( bool onlineOrNot ) {
-            result.setResultAt(0, onlineOrNot); } ) )
-        return false;
+    checkIfOnlineAsync(
+        [&result]( bool onlineOrNot ) {
+            result.setResultAt(0, onlineOrNot);
+        } );
     result.waitForFinished();
     return result.resultAt(0);
 }
 
-bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     //checking that camera is alive and on its place
     const QString& urlStr = getUrl();
@@ -200,8 +156,9 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
         url.setHost( urlStr );
     }
     url.setPath( lit("/get?mac") );
-    url.setUserName( getAuth().user() );
-    url.setPassword( getAuth().password() );
+    QAuthenticator auth = getAuth();
+    url.setUserName( auth.user() );
+    url.setPassword( auth.password() );
 
     nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
@@ -234,12 +191,7 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
              this, httpReqCompletionHandler,
              Qt::DirectConnection );
 
-    if( !httpClientCaptured->doGet( url ) )
-    {
-        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
-        return false;
-    }
-    return true;
+    httpClientCaptured->doGet( url );
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
@@ -354,8 +306,11 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    QAuthenticator auth = getAuth();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     const auto activateWithAutoResetDoneHandler =
         [autoResetTimeoutMS, url](
@@ -370,7 +325,7 @@ bool QnPlAreconVisionResource::setRelayOutputState(
             }
 
             //scheduling auto-reset
-            TimerManager::instance()->addTimer(
+            nx::utils::TimerManager::instance()->addTimer(
                 [url](qint64){
                     auto resetOutputUrl = url;
                     resetOutputUrl.setPath(lit("/set?auxout=off"));
@@ -378,15 +333,16 @@ bool QnPlAreconVisionResource::setRelayOutputState(
                         resetOutputUrl,
                         [](SystemError::ErrorCode, int, nx_http::BufferType){});
                 },
-                autoResetTimeoutMS);
+                std::chrono::milliseconds(autoResetTimeoutMS));
         };
 
     const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
 
     if (activate && (autoResetTimeoutMS > 0))
-        return nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
+        nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
     else
-        return nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+        nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+    return true;
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
@@ -679,7 +635,7 @@ bool QnPlAreconVisionResource::isPanoramic(QnResourceTypePtr resType)
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 {
-    Q_ASSERT_X(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
+    NX_ASSERT(false, Q_FUNC_INFO, "QnPlAreconVisionResource is abstract.");
     return 0;
 }
 
@@ -721,8 +677,11 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/get?auxin"));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    QAuthenticator auth = getAuth();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     m_relayInputClient = nx_http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
@@ -735,7 +694,8 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
                 inputPortStateRequestDone(std::move(client));
             },
             Qt::DirectConnection);
-    return m_relayInputClient->doGet(url);
+    m_relayInputClient->doGet(url);
+    return true;
 }
 
 void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
@@ -787,17 +747,12 @@ bool QnPlAreconVisionResource::isRTSPSupported() const
                value<bool>(lit("isRTSPSupported"), true);
 }
 
-bool QnPlAreconVisionResource::isAbstractResource() const
-{
-    QnUuid baseTypeId = qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract"));
-    return getTypeId() == baseTypeId;
-}
-
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)
 {
     m_mutex.lock();
     m_mutex.unlock();
     QUrl devUrl(getUrl());
+
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 

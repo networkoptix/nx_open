@@ -2,10 +2,10 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "rtp_stream_parser.h"
-#include "rtpsession.h"
-#include "utils/common/synctime.h"
-#include "utils/common/log.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
+#include <utils/common/synctime.h>
+#include <nx/utils/log/log.h>
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
@@ -159,7 +159,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
     const quint8            *rtpBuffer,
     quint32                 rtpTime,
-    const RtspStatistic     &statistics
+    const QnRtspStatistic   &statistics
 )
 {
     int addHeaderSize = 0;
@@ -202,7 +202,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
 
     if( (spsNaluStartOffset != (size_t)-1) )
         //decoding sps to detect stream resolution change
-        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, spsNaluSize ) );
+        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, (int) spsNaluSize ) );
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
@@ -278,7 +278,7 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType, const quint8* data, int da
     }
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
+bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     quint8* rtpBuffer = rtpBufferBase + bufferOffset;

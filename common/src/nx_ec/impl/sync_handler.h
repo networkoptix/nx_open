@@ -6,8 +6,8 @@
 #ifndef SYNC_HANDLER_H
 #define SYNC_HANDLER_H
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include "ec_api_impl.h"
 

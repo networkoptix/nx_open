@@ -3,7 +3,7 @@
 
 #include <QUrl>
 #include "utils/common/long_runnable.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "network/universal_request_processor.h"
 
 class QnProxySenderConnectionPrivate;

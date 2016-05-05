@@ -6,7 +6,7 @@
 #ifndef MEDIA_SERVER_USER_ATTRIBUTES_H
 #define MEDIA_SERVER_USER_ATTRIBUTES_H
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include <utils/common/model_functions_fwd.h>
 

@@ -70,6 +70,11 @@ namespace ec2
         return AbstractVideowallManagerPtr();
     }
 
+    AbstractWebPageManagerPtr OldEcConnection::getWebPageManager()
+    {
+        return AbstractWebPageManagerPtr();
+    }
+
     AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager()
     {
         return AbstractStoredFileManagerPtr();

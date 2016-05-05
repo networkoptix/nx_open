@@ -2,12 +2,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup</artifactId>
     <packaging>pom</packaging>
@@ -18,10 +18,14 @@
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
+        <DbSync22Dir>${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2</DbSync22Dir>
         <nxtool>false</nxtool>
         <final.artifact.name>${installer.name}</final.artifact.name>
-        <NxtoolQuickControlsDir>${root.dir}\nxtool\${arch}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
+        <NxtoolQuickControlsDir>${libdir}\${arch}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
+        <ClientFontsDir>${libdir}\${arch}\bin\${build.configuration}\fonts</ClientFontsDir>
+        <ClientQmlDir>${libdir}\${arch}\bin\${build.configuration}\qml</ClientQmlDir>
+        <Vs2015crtDir>${environment.dir}\wix\vs2015crt\${arch}</Vs2015crtDir>
+        <rdep.packages>appserver-2.2.1 vcredist-2012 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
@@ -135,9 +139,6 @@
                         <configuration>
                             <encoding>utf-8</encoding>
                             <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
-                            <!-- <excludes>
-										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->	
                             <ignoreMissingFile>true</ignoreMissingFile>                                    
                             <replacements>
                                 <replacement>

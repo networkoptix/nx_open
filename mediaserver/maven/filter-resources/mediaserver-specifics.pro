@@ -1,16 +1,6 @@
 TEMPLATE = app
 CONFIG += console
 
-exists( ${libdir}/libcreateprocess.pri ) {
-  include(${libdir}/libcreateprocess.pri)
-}
-exists( ${libdir}/sasl2.pri ) {
-  include(${libdir}/sasl2.pri)
-}
-exists( ${libdir}/openldap.pri ) {
-  include(${libdir}/openldap.pri)
-}
-
 INCLUDEPATH += ${root.dir}/appserver2/src/
 INCLUDEPATH += ${root.dir}/mediaserver_core/src/
 
@@ -20,4 +10,8 @@ INCLUDEPATH += ${root.dir}/mediaserver_core/src/
   ext_debug2.commands = $$QMAKE_OBJCOPY --only-keep-debug $(TARGET) $(TARGET).debug; $(STRIP) -g $(TARGET); $$QMAKE_OBJCOPY --add-gnu-debuglink=$(TARGET).debug $(TARGET); touch $(TARGET).debug
   ext_debug.depends = $(TARGET).debug
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
+}
+
+unix:!mac {
+    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }

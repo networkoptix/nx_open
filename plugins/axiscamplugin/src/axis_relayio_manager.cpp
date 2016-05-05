@@ -252,7 +252,7 @@ void AxisRelayIOManager::startInputPortMonitoringPriv( int asyncCallID )
 
     QMutexLocker lk( &m_mutex );
     std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
-    Q_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
+    NX_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
     asyncCallIter->second.resultCode = nxcip::NX_NO_ERROR;
     asyncCallIter->second.done = true;
     m_cond.wakeAll();
@@ -275,7 +275,7 @@ void AxisRelayIOManager::stopInputPortMonitoringPriv( int asyncCallID )
     disconnect( AxisCameraPlugin::instance()->networkAccessManager(), SIGNAL(finished(QNetworkReply*)), this, SLOT(onConnectionFinished(QNetworkReply*)) );
 
     std::map<int, AsyncCallContext>::iterator asyncCallIter = m_awaitedAsyncCallIDs.find( asyncCallID );
-    Q_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
+    NX_ASSERT( asyncCallIter != m_awaitedAsyncCallIDs.end() );
     asyncCallIter->second.done = true;
     m_cond.wakeAll();
 }
@@ -283,7 +283,7 @@ void AxisRelayIOManager::stopInputPortMonitoringPriv( int asyncCallID )
 void AxisRelayIOManager::onMonitorDataAvailable()
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(QObject::sender());
-    Q_ASSERT( reply );
+    NX_ASSERT( reply );
 
     while( reply->canReadLine() )
     {

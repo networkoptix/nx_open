@@ -3,9 +3,9 @@
 
 #include <utils/media/externaltimesource.h>
 
-#include <plugins/resource/archive/abstract_archive_delegate.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnArchiveSyncPlayWrapper;
 class QnAbstractArchiveDelegate;
 
@@ -14,7 +14,7 @@ class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
+    QnSyncPlayArchiveDelegate(QnAbstractArchiveStreamReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();
 
     virtual bool open(const QnResourcePtr &resource);
@@ -36,7 +36,7 @@ public:
     //virtual void setSendMotion(bool value);
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize& size) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
     virtual void setSendMotion(bool value) override;
 
@@ -49,7 +49,7 @@ private:
     //QnMutex m_mutex;
     //bool m_usePrebuffer;
     //QnAbstractMediaDataPtr m_nextData;
-    QnAbstractArchiveReader* m_reader; 
+    QnAbstractArchiveStreamReader* m_reader; 
     QPointer<QnArchiveSyncPlayWrapper> m_syncWrapper;
     QnAbstractArchiveDelegate* m_ownerDelegate;
 };

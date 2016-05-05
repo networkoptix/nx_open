@@ -1,24 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client Library</name>
+    <name>NX Witness Client Library</name>
 
     <dependencies>
         <dependency>
@@ -29,7 +23,34 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
+		
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>           
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>           
+        
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
@@ -37,7 +58,7 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
-        </dependency>			
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -47,31 +68,24 @@
             <scope>system</scope>
             <systemPath>${root.dir}/client.core/pom.xml</systemPath>
         </dependency>
-    </dependencies>	
+    </dependencies>
 
     <properties>
         <guid>${client.guid}</guid>
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
         <template>lib</template>
-        <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lclient.core -lquazip</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lFestival -lestools -leststring -lestbase -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx -lFestival -lestools -leststring -lestbase</mac.oslibs>
-        <!--Global defines-->
-        <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
+
+        <qt.libs>core core-private gui widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -ludt -lcloud_db_client</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
+        <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
+
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
         <buildLib>sharedlib</buildLib>
+        <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf help</rdep.packages>
+        <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
     </properties>
     <profiles>
         <profile>
@@ -109,21 +123,6 @@
         </profile>
 
         <profile>
-            <id>webkit-win</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>webkit</name>
-                    <value>!false</value>
-                </property>
-            </activation>
-            <properties>
-                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-            </properties>
-        </profile>
-        <profile>
             <id>windows-staticlib</id>
             <activation>
                 <os>
@@ -134,5 +133,24 @@
                 <buildLib>staticlib</buildLib>
             </properties>
         </profile>
-    </profiles>
+
+        <profile>
+            <id>linux-arm-tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <!-- cut off festival -->
+                <rdep.packages>openssl ffmpeg quazip roboto-ttf</rdep.packages>
+            </properties>
+        </profile>
+   </profiles>
 </project>

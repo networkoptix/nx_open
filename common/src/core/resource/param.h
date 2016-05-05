@@ -58,6 +58,8 @@ namespace Qn
     static const QString FULL_VERSION = lit("fullVersion");
     static const QString SYSTEM_RUNTIME = lit("systemRuntime");
     static const QString BOOKMARK_COUNT = lit("bookmarkCount");
+    static const QString HDD_LIST = lit("hddList");
+    static const QString HDD_LIST_FILE = lit("/tmp/hddlist");
 
     // Storage
     static const QString SPACE = lit("space");

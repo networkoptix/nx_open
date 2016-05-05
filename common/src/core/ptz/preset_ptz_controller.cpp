@@ -41,7 +41,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(lit("ptzPresets"), QnPtzPresetRecordHash(), this))
 {
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_adaptor->setResource(baseController->resource());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::PresetsPtzField); }, Qt::QueuedConnection);

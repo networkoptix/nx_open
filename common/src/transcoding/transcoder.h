@@ -12,8 +12,8 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include "core/datapacket/audio_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/audio_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/filter_helper.h"
 

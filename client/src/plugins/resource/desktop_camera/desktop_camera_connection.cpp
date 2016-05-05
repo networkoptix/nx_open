@@ -18,7 +18,7 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
-        QnAbstractDataConsumer(20), 
+        QnAbstractDataConsumer(20),
         m_sequence(0),
         m_owner(owner),
         m_needVideoData(false)
@@ -53,13 +53,13 @@ protected:
             return false;
 
         int streamIndex = media->channelNumber;
-        Q_ASSERT(streamIndex <= 1);
+        NX_ASSERT(streamIndex <= 1);
 
         m_serializers[streamIndex].setDataPacket(media);
         m_owner->sendLock();
         while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
         {
-            Q_ASSERT(sendBuffer.size() < 65536 - 4);
+            NX_ASSERT(sendBuffer.size() < 65536 - 4);
             quint8 header[4];
             header[0] = '$';
             header[1] = streamIndex;
@@ -71,8 +71,8 @@ protected:
             AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
             qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
 
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(), 
-                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++); 
+            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(),
+                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -209,7 +209,6 @@ QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, c
     QnLongRunnable(),
     m_owner(owner),
     m_server(server),
-    connection(0),
     processor(0)
 {
 }
@@ -232,11 +231,13 @@ void QnDesktopCameraConnection::pleaseStop()
         QnMutexLocker lock( &m_mutex );
         if (processor)
             processor->pleaseStop();
-        if (connection)
-            connection->getSocket()->close();
+        if (httpClient)
+            httpClient->pleaseStop();
+        if (tcpSocket)
+            tcpSocket->shutdown();
     }
 
-    QnLongRunnable::pleaseStop();
+    base_type::pleaseStop();
 }
 
 void QnDesktopCameraConnection::run()
@@ -244,37 +245,47 @@ void QnDesktopCameraConnection::run()
     while (!m_needStop)
     {
         QAuthenticator auth;
+        auth.setUser(QnAppServerConnectionFactory::url().userName());
+        auth.setPassword(QnAppServerConnectionFactory::url().password());
         {
-            QnMutexLocker lock( &m_mutex );
-            delete processor;
-            processor = 0;
-            delete connection;
-            connection = 0;
-
-            auth.setUser(QnAppServerConnectionFactory::url().userName());
-            auth.setPassword(QnAppServerConnectionFactory::url().password());
-
-            connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
-            connection->addHeader("user-name", auth.user().toUtf8());
-            connection->addHeader("user-id", qnCommon->moduleGUID().toByteArray());
+            QnMutexLocker lock(&m_mutex);
+            tcpSocket.reset();
+            processor.reset();
+            httpClient.reset(new nx_http::HttpClient());
         }
+
+        httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
+        httpClient->addAdditionalHeader("user-id", qnCommon->moduleGUID().toByteArray());
+        httpClient->setSendTimeoutMs(CONNECT_TIMEOUT);
+        httpClient->setResponseReadTimeoutMs(CONNECT_TIMEOUT);
+
+        httpClient->setUserName(auth.user());
+        httpClient->setUserPassword(auth.password());
 
         if (auth.user().isEmpty() || auth.password().isEmpty()) {
             terminatedSleep(1000 * 10);
             continue;
         }
 
-        CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));
-        if (status != CL_HTTP_SUCCESS) {
+        QUrl url(m_server->getApiUrl());
+        url.setPath(lit("/desktop_camera"));
+
+        if (!httpClient->doGet(url))
+        {
             terminatedSleep(1000 * 10);
             continue;
         }
 
-        processor = new QnDesktopCameraConnectionProcessor(connection->getSocket(), 0, m_owner);
+        {
+            QnMutexLocker lock(&m_mutex);
+            tcpSocket = httpClient->takeSocket();
+            httpClient.reset();
+            processor.reset(new QnDesktopCameraConnectionProcessor(tcpSocket, 0, m_owner));
+        }
 
         QElapsedTimer timeout;
         timeout.start();
-        while (!m_needStop && connection->getSocket()->isConnected())
+        while (!m_needStop && tcpSocket->isConnected())
         {
             if (processor->readRequest()) {
                 processor->parseRequest();
@@ -289,10 +300,7 @@ void QnDesktopCameraConnection::run()
     }
 
     QnMutexLocker lock( &m_mutex );
-
-    delete processor;
-    delete connection;
-
-    processor = 0;
-    connection = 0;
+    processor.reset();
+    httpClient.reset();
+    tcpSocket.reset();
 }

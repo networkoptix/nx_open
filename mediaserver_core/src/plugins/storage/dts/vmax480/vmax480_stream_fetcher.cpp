@@ -97,7 +97,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
     m_seekTimer.restart();
     m_eofReached = false;
 
-    for(CLDataQueue* dataQueue: m_dataConsumers) {
+    for(QnDataPacketQueue* dataQueue: m_dataConsumers) {
         if (dataQueue)
             dataQueue->clear();
     }
@@ -174,7 +174,11 @@ bool VMaxStreamFetcher::vmaxConnect()
             m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
 
         if (m_vmaxConnection) {
-            m_vmaxConnection->vMaxConnect(m_res->getUrl(), getCurrentChannelMask(), m_res->getAuth(), m_isLive);
+            m_vmaxConnection->vMaxConnect(
+                m_res->getUrl(),
+                getCurrentChannelMask(),
+                m_res->getAuth(),
+                m_isLive);
             return true;
         }
     }
@@ -278,7 +282,7 @@ int VMaxStreamFetcher::getMaxQueueSize() const
     for (ConsumersMap::const_iterator itr = m_dataConsumers.constBegin(); itr != m_dataConsumers.constEnd(); ++itr)
     {
         //QnVmax480DataConsumer* consumer = itr.key();
-        CLDataQueue* queue = itr.value();
+        QnDataPacketQueue* queue = itr.value();
         maxQueueSize = qMax(queue->size(), maxQueueSize);
     }
     return maxQueueSize;
@@ -382,7 +386,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
         return false;
 
     QnMutexLocker lock( &m_mutex );
-    m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
+    m_dataConsumers.insert(consumer, new QnDataPacketQueue(MAX_QUEUE_SIZE));
     if (count) {
         *count = 0;
         for(QnVmax480DataConsumer* c: m_dataConsumers.keys())
@@ -535,7 +539,7 @@ QnAbstractDataPacketPtr VMaxStreamFetcher::getNextData(QnVmax480DataConsumer* co
     if (!safeOpen()) 
         return QnAbstractDataPacketPtr();
             
-    CLDataQueue* dataQueue = 0;
+    QnDataPacketQueue* dataQueue = 0;
     {
         QnMutexLocker lock( &m_mutex );
         ConsumersMap::Iterator itr = m_dataConsumers.find(consumer);

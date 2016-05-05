@@ -1,0 +1,158 @@
+/* Here we override some default bootstrap styles and behavior for our purposes */
+
+
+@import '_theme_variables';
+
+/*
+These hacks are to make header and dialog have a bit different colors
+
+.panel-heading{
+  border:1px solid $dark12;
+}
+.panel-body{
+  border:1px solid $dark14;
+  border-top-color:transparent;
+}
+
+.panel-footer{
+  border:1px solid $dark14;
+}
+*/
+
+.panel-heading{
+  border-top-left-radius: $panel-border-radius;
+  border-top-right-radius: $panel-border-radius;
+  font-weight:bold;
+
+  padding-top: 4px;
+  padding-bottom: 3px;
+}
+.panel-body{
+  border-bottom: 1px solid $shadow;
+}
+.panel-footer{
+  padding-top: 14px;
+  padding-bottom: 16px;
+  min-height:59px;
+
+  border-top:1px solid $dark;
+  border-bottom-left-radius: $panel-border-radius;
+  border-bottom-right-radius: $panel-border-radius;
+}
+
+.form-control:focus{
+  border-color: $brand_d4;
+  box-shadow: none;
+}
+
+
+.help-block {
+  color: $windowText; // lighten the text some for contrast
+  font-size: 90%;
+  margin-top:4px;
+  margin-bottom:16px;
+}
+
+h4{
+  font-weight: 500;
+  margin-top:8px;
+  margin-bottom:16px;
+}
+
+
+button, select{
+  &,
+  &:focus,
+  &:hover,
+  &:active,
+  &.active,
+  &.disabled,
+  &[disabled] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+}
+.btn{
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.btn-default{
+
+  border-bottom: 1px solid $button_d2;
+
+  &:focus{
+    background-color: $button;
+    border-color: $brand_d4;
+  }
+
+  &:hover{
+    background-color: $button_l1;
+    border-bottom: 1px solid $button_d1;
+  }
+
+  &:active,
+  &.active {
+    border-top: 1px solid $button_d2;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      opacity: 0.3;
+    }
+  }
+}
+.btn-primary{ /* $color, $background, $border */
+
+  border-bottom: 1px solid $brand_d3;
+
+  &:focus{
+    background-color: $brand_core;
+    border-color: $brand_l4;
+  }
+
+  &:hover{
+    background-color: $brand_l1;
+    border-bottom: 1px solid $brand_d2;
+  }
+
+  &:active,
+  &.active {
+    background-color: $brand_d1;
+    border-top: 1px solid $brand_d3;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      opacity: 0.2;
+    }
+  }
+}
+
+.form-control {
+  fieldset[disabled] &,
+  &[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  &[readonly]
+  {
+    border-color: transparentize($shadow,0.6);
+    cursor: default;
+  }
+}

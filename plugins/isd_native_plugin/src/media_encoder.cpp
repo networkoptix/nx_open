@@ -9,7 +9,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QStringList>
 
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "camera_manager.h"
 #include "plugin.h"
@@ -326,7 +326,7 @@ int MediaEncoder::getSupportedFps() const
         m_supportedFpsList.push_back(fpsS.trimmed().toFloat());
     m_fpsListRead = true;
 
-    qSort( m_supportedFpsList.begin(), m_supportedFpsList.end(), qGreater<float>() );
+    std::sort( m_supportedFpsList.begin(), m_supportedFpsList.end(), std::greater<float>() );
     return nxcip::NX_NO_ERROR;
 }
 

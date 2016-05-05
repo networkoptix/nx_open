@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core</artifactId>
     <packaging>pom</packaging>
@@ -25,24 +25,17 @@
         <product.title>${mediaserver.name}</product.title>
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>app</template>
-        <!--Global libs-->
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc</ffmpeg.libs>
-        <global.libs>-lcommon -lappserver2 -lonvif -lquazip -lnxemail</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis -ldl -lssl</linux.oslibs>
-        <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
 
+        <qt.libs>core core-private network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_streaming -lnx_network</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
+        <linux.oslibs>-ldl</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+
+        <rdep.packages>server-external openssl ffmpeg onvif quazip sigar qtsinglecoreapplication qtservice</rdep.packages>
+        <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
 
     <dependencies>
@@ -54,6 +47,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_sdk/nx_sdk/vms-archive.zip</systemPath>            
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_storage_sdk</artifactId>
@@ -71,6 +65,33 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_email</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_email/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>           
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -121,14 +142,14 @@
                             <stripVersion>true</stripVersion>
                         </configuration>
                     </execution>
-                </executions>
+                </executions>               
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
                 <executions>
-                     <execution>
+                    <execution>
                         <id>gen-api-xml</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -145,10 +166,10 @@
                                 <argument>-template-xml</argument>
                                 <argument>${root.dir}/mediaserver_core/api/api_template.xml</argument>                                
                                 <argument>-output-xml</argument>
-                                <argument>${project.build.directory}/additional-resources/static/api.xml</argument>
+                                <argument>${project.build.directory}/resources/static/api.xml</argument>
                             </arguments>
                         </configuration>
-                    </execution>                 
+                    </execution>                   
                 </executions>
             </plugin>
         </plugins>
@@ -192,6 +213,7 @@
             </activation>
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
+                <rdep.linux.arm.packages>openldap libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>
         <profile>
@@ -208,7 +230,7 @@
                 </property>
             </activation>
             <properties>
-                <qt.libs>core network xml sql</qt.libs>
+                <qt.libs>core core-private network concurrent xml sql</qt.libs>
             </properties>
         </profile>
     </profiles>

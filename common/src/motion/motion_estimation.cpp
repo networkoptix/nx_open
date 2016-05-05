@@ -215,10 +215,10 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    //Q_ASSERT(frame->width % 8 == 0);
+    //NX_ASSERT(frame->width % 8 == 0);
     const int effectiveWidth = frame->width & (~0x07);
 
-    Q_ASSERT(frame->linesize[0] % 16 == 0);
+    NX_ASSERT(frame->linesize[0] % 16 == 0);
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     const simd128i* curLinePtrPrev = (const simd128i*) prevFrame->data[0];
@@ -274,8 +274,8 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
     //saveFrame(frame->data[0], frame->width, frame->height, frame->linesize[0], "c:/src_orig.bmp");
 
-    //Q_ASSERT(frame->width % 8 == 0);
-    Q_ASSERT(frame->linesize[0] % 16 == 0);
+    //NX_ASSERT(frame->width % 8 == 0);
+    NX_ASSERT(frame->linesize[0] % 16 == 0);
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
@@ -322,7 +322,7 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 
 void fillRightEdge8(const CLVideoDecoderOutput* frame)
 {
-    Q_ASSERT(frame->linesize[0] >= frame->width + 8);
+    NX_ASSERT(frame->linesize[0] >= frame->width + 8);
     quint64* dataPtr = (quint64*) (frame->data[0]+frame->width);
     for (int i = 0; i < frame->height; ++i) {
         dataPtr[0] = dataPtr[-1]; // replicate most right 8 pixels
@@ -332,8 +332,8 @@ void fillRightEdge8(const CLVideoDecoderOutput* frame)
 
 void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
 {
-    //Q_ASSERT(frame->width % 8 == 0);
-    Q_ASSERT(frame->linesize[0] % 16 == 0);
+    //NX_ASSERT(frame->width % 8 == 0);
+    NX_ASSERT(frame->linesize[0] % 16 == 0);
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     const simd128i* prevLinePtr = (const simd128i*) prevFrame->data[0];
@@ -386,8 +386,8 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
 
 void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
 {
-    //Q_ASSERT(frame->width % 8 == 0);
-    Q_ASSERT(frame->linesize[0] % 16 == 0);
+    //NX_ASSERT(frame->width % 8 == 0);
+    NX_ASSERT(frame->linesize[0] % 16 == 0);
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
     int lineSize = frame->linesize[0] / 16;
@@ -465,8 +465,8 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     dstCurLine += MD_HEIGHT;\
 }
 
-    Q_ASSERT(frame->linesize[0] % 16 == 0);
-    Q_ASSERT(sqWidth % 8 == 0);
+    NX_ASSERT(frame->linesize[0] % 16 == 0);
+    NX_ASSERT(sqWidth % 8 == 0);
     
     int sqWidthSteps = sqWidth / 8;
 
@@ -541,9 +541,9 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
 }
-    Q_ASSERT(frame->width % 8 == 0);
-    Q_ASSERT(frame->linesize[0] % 16 == 0);
-    Q_ASSERT(sqWidth % 8 == 0);
+    NX_ASSERT(frame->width % 8 == 0);
+    NX_ASSERT(frame->linesize[0] % 16 == 0);
+    NX_ASSERT(sqWidth % 8 == 0);
     sqWidth /= 8;
 
     const simd128i* curLinePtr = (const simd128i*) frame->data[0];
@@ -674,7 +674,7 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
-        Q_ASSERT(iLineNum < m_scaledWidth);
+        NX_ASSERT(iLineNum < m_scaledWidth);
 
         simd128i* dst = (simd128i*) (scaledMask/*&test0[0]*/ + MD_HEIGHT*iLineNum);
         simd128i* src = (simd128i*) (mask + MD_HEIGHT*y);
@@ -700,7 +700,7 @@ void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
-        Q_ASSERT(iLineNum < m_scaledWidth);
+        NX_ASSERT(iLineNum < m_scaledWidth);
 
         quint8* dst = scaledMask/*&test1[0]*/ + MD_HEIGHT*iLineNum;
         quint8* src = mask + MD_HEIGHT*y;
@@ -1030,7 +1030,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
-        m_decoder = new CLFFmpegVideoDecoder(videoData->compressionType, videoData, false);
+        m_decoder = new QnFfmpegVideoDecoder(videoData->compressionType, videoData, false);
         m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
     }
 

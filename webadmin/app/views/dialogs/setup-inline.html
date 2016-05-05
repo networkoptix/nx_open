@@ -1,0 +1,253 @@
+<div class="panel-body text-center" ng-if="stepIs(0)">
+    <div class="master-success"><span class="preloader"></span></div>
+    <div class="vertical-center">
+        <h2>Loading ...</h2>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('initFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <h2>Couldn't initiate your system</h2>
+    <p class="master-description">
+        Authorization failed for some reason.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('start')">
+    <div class="vertical-center">
+        <h2>Get Started with Nx Witness</h2>
+        <p>You need to configure your server before using it.<br>
+        Don't worry. This won't take long.</p>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('systemName')">
+    <h2>Give your System a name</h2>
+    <p class="master-description">
+        System name helps you identify or find your system.
+    </p>
+    <form class="master-controls" name="forms.systemNameForm" novalidate>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
+                   placeholder="System name" required autofocus>
+        </div>
+    </form>
+    <p class="vertical-bottom">
+        <a href="" ng-click="skip()">Merge server with existing system</a>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
+    <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
+    <p class="master-description">
+       Connect your system anywhere, anytime.<br>
+        <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a><br/>
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-primary" ng-click="createAccount()" autofocus>Create new account</button>&nbsp;&nbsp;
+        <button class="btn btn-default" ng-click="next('cloudLogin')">Use existing</button>
+    </p>
+    <p class="vertical-bottom">
+        <a href="" ng-click="skip()">Skip this step for now</a>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
+    <p>Your system will be connected to</p>
+
+    <div class="master-success"><span class="glyphicon glyphicon-cloud"></span></div>
+
+    <h2>{{settings.presetCloudEmail}}</h2>
+
+    <div class="vertical-bottom">
+        <p>
+            <a href="" ng-click="next('cloudLogin')">Connect to another account</a>
+        </p>
+        <p>
+            <a href="" ng-click="skip()">Skip this step for now</a>
+        </p>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
+
+    <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
+    <p class="master-description">
+        Login to your account<br>
+    </p>
+
+    <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
+                   type="email" placeholder="Email" autocomplete="new-password"  required autofocus ng-change="clearCloudError()">
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
+                   type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
+        </div>
+        <div class="form-group" ng-if="settings.cloudError">
+            <p class="help-block">
+                {{settings.cloudError}}
+            </p>
+        </div>
+    </form>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localLogin')">
+    <h2>Set up administrator's password</h2>
+    <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                   type="text" placeholder="Login" required readonly>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.localPassword" name="localPassword" class="form-control"
+                   type="password" autocomplete="new-password" placeholder="Password" required autofocus></div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
+                   type="password" autocomplete="new-password" placeholder="Repeat password" required>
+        </div>
+    </form>
+</div>
+
+<div class="panel-body text-center" ng-hide="!stepIs('merge')">
+    <h2>Connect server to existing system</h2>
+    <form class="master-controls wide" name="forms.remoteSystemForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
+            <ui-select ng-model="settings.remoteSystem" name="remoteSystemName" reset-search-input="false"
+                       ng-change="clearRemoteError()" required autofocus>
+                <ui-select-match placeholder="System address"
+                                 name="remoteSystem">{{$select.selected.systemName}}</ui-select-match>
+                <ui-select-choices
+                        repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search}">
+                    <div ng-bind-html="system.visibleName | highlight: $select.search"></div>
+                </ui-select-choices>
+            </ui-select>
+
+            <p class="help-block text-left">
+                {{settings.remoteSystem.hint}}
+            </p>
+        </div>
+        <div class="form-group">
+            <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
+                   ng-change="clearRemoteError(true)"
+                   placeholder="Login" required readonly>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remotePassword"
+                   name="remotePassword" autocomplete="new-password" class="form-control" type="password"
+                   ng-change="clearRemoteError(true)"
+                   placeholder="Password" required>
+        </div>
+        <div class="form-group has-error"  ng-if="settings.remoteError">
+            <div class="help-block">
+                {{settings.remoteError}}
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
+    <div class="master-success"><span class="preloader"></span></div>
+    <h2>Merging systems ...</h2>
+    <p class="master-description">It may take several minutes</p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <h2>Couldn't merge systems</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Set up separate system</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
+    <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
+    <h2>System is ready to use</h2>
+    <p>Login</p>
+    <h4>{{settings.cloudEmail}}</h4>
+    <p>Sharing and account settings:</p>
+    <h4><a class="external" ng-href="{{portalSystemLink}}" ng-click="openLink($event)">{{portalShortLink}}</a></h4>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localSuccess')">
+    <div class="master-success"><span class="glyphicon glyphicon-ok"></span></div>
+    <h2>System is ready to use</h2>
+    <p>Server address:</p>
+    <h4>{{serverAddress}}</h4>
+    <p>Administrator login:</p>
+    <h4>{{settings.localLogin}}</h4>
+</div>
+
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
+    <h2>Connect your server to the Internet</h2>
+    <p class="master-description">
+        Set up Internet connection on your server to be able <br> to connect to it anywhere using Nx Cloud.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
+    <h2>Connect to the Internet</h2>
+    <p class="master-description">
+        Connect your device to the Internet to connect your system to Nx Cloud.
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <h2>Couldn't connect to cloud</h2>
+    <p class="master-description">
+        {{cloudError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="skip()">Skip this step for now</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localFailure')">
+    <div class="master-success"><span class="glyphicon glyphicon-remove-circle"></span></div>
+    <h2>Couldn't setup your system</h2>
+    <p class="master-description">Something went totally wrong. <br>
+        Error description: {{settings.localError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+    </p>
+</div>
+
+<div class="panel-footer">
+    <button class="btn btn-default" ng-if="activeStep.cancel"
+            ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default" ng-if="activeStep.back"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right" ng-if="activeStep.next"
+            ng-disabled="lockNextButton || cantGoNext()"
+            enter-button
+            ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right" ng-if="activeStep.finish"
+            enter-button
+            ng-click="finish()" ng-disabled="lockNextButton" autofocus>Finish</button>
+</div>

@@ -4,11 +4,10 @@
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 
-#include <common/user_permissions.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/string.h>
 
 class QnUserListModelPrivate : public Connective<QObject> {
@@ -120,12 +119,12 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex &index) const {
 QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user) const {
     QStringList permissionStrings;
 
-    qint64 permissions = model->accessController()->globalPermissions(user);
+    Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
 
-    if (permissions & Qn::GlobalEditProtectedUserPermission)
+    if (permissions.testFlag(Qn::GlobalOwnerPermission))
         permissionStrings.append(tr("Owner"));
 
-    if (permissions & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission))
+    if (permissions & (Qn::GlobalAdminPermission | Qn::GlobalOwnerPermission))
         permissionStrings.append(tr("Administrator"));
 
     if ((permissions & Qn::GlobalViewLivePermission) && permissionStrings.isEmpty())
@@ -166,7 +165,7 @@ Qt::CheckState QnUserListModelPrivate::checkState() const {
 
     if (checkedUsers.size() == userList.size())
         return Qt::Checked;
-    
+
     return Qt::PartiallyChecked;
 }
 
@@ -186,7 +185,6 @@ void QnUserListModelPrivate::setCheckState(Qt::CheckState state, const QnUserRes
 
 QnUserListModel::QnUserListModel(QObject *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
     , d(new QnUserListModelPrivate(this))
 {
 }
@@ -232,22 +230,14 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
             return user->isLdap() ? tr("LDAP user") : tr("Normal user");
         case EnabledColumn:
             return user->isEnabled() ? tr("Enabled") : tr("Disabled");
-        case EditIconColumn:
-            return tr("Edit user");
         default:
             break;
         } // switch (column)
         break;
     case Qt::DecorationRole:
         switch (index.column()) {
-        case EditIconColumn:
-            return qnSkin->icon("edit.png");
         case LdapColumn:
             if (user->isLdap())
-                return qnSkin->icon("done.png");
-            break;
-        case EnabledColumn:
-            if (user->isEnabled())
                 return qnSkin->icon("done.png");
             break;
         default:
@@ -281,7 +271,9 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         break;
     case Qt::CheckStateRole:
         if (index.column() == CheckBoxColumn)
-            return d->checkedUsers.contains(user);
+            return d->checkedUsers.contains(user) ? Qt::Checked : Qt::Unchecked;
+        else if (index.column() == EnabledColumn)
+            return user->isEnabled() ? Qt::Checked : Qt::Unchecked;
         break;
     default:
         break;
@@ -308,7 +300,7 @@ QVariant QnUserListModel::headerData(int section, Qt::Orientation orientation, i
     case LdapColumn:
         return tr("LDAP");
     case EnabledColumn:
-        return tr("Enabled");
+        return QString();
     default:
         return QString();
     }
@@ -339,7 +331,7 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
 
     auto roles = QVector<int>() << Qt::CheckStateRole << Qt::BackgroundRole << Qt::ForegroundRole;
 
-    d->setCheckState(state, user);  
+    d->setCheckState(state, user);
     if (!user) {
         emit dataChanged(index(0, CheckBoxColumn), index(d->userList.size() - 1, ColumnCount - 1), roles);
     }
@@ -348,7 +340,7 @@ void QnUserListModel::setCheckState(Qt::CheckState state, const QnUserResourcePt
         if (row >= 0)
             emit dataChanged(index(row, CheckBoxColumn), index(row, ColumnCount - 1), roles);
     }
-        
+
 }
 
 const QnUserManagementColors QnUserListModel::colors() const {
@@ -363,7 +355,6 @@ void QnUserListModel::setColors(const QnUserManagementColors &colors) {
 
 QnSortedUserListModel::QnSortedUserListModel(QObject *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
 {
 }
 
@@ -372,8 +363,8 @@ bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex 
     QnUserResourcePtr leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     QnUserResourcePtr rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-    Q_ASSERT(leftUser);
-    Q_ASSERT(rightUser);
+    NX_ASSERT(leftUser);
+    NX_ASSERT(rightUser);
 
     if (!rightUser)
         return true;
@@ -382,8 +373,8 @@ bool QnSortedUserListModel::lessThan(const QModelIndex &left, const QModelIndex 
 
     switch (sortColumn()) {
     case QnUserListModel::PermissionsColumn: {
-        qint64 leftPermissions = accessController()->globalPermissions(leftUser);
-        qint64 rightPermissions = accessController()->globalPermissions(rightUser);
+        qint64 leftPermissions = qnResourceAccessManager->globalPermissions(leftUser);
+        qint64 rightPermissions = qnResourceAccessManager->globalPermissions(rightUser);
         if (leftPermissions == rightPermissions)
             break;
         return leftPermissions > rightPermissions; // Use ">" to make the owner higher than others

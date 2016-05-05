@@ -3,7 +3,8 @@
 
 #include <cassert>
 
-#include <algorithm> /* For std::min. */
+#include <algorithm> //< For std::min.
+#include <array>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
@@ -45,7 +46,7 @@ public:
     }
 
     bool readBool(bool *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         peekMarker();
         if(m_peekedMarker == QnUbjson::TrueMarker) {
@@ -67,6 +68,10 @@ public:
 
     bool readInt8(qint8 *target) {
         return readNumberInternal(QnUbjson::Int8Marker, target);
+    }
+
+    bool readUInt16(quint16 *target) {
+        return readNumberInternal(QnUbjson::UInt16Marker, target);
     }
 
     bool readInt16(qint16 *target) {
@@ -108,7 +113,7 @@ public:
     }
 
     bool readUtf8String(QString *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         QByteArray tmp;
         if(!readUtf8String(&tmp))
@@ -119,7 +124,7 @@ public:
     }
 
     bool readBinaryData(QByteArray *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         if(!readArrayStart())
             return false;
@@ -141,7 +146,7 @@ public:
 
     template <class T, std::size_t N>
     bool readBinaryData(std::array<T, N> *target) {
-        assert(target);
+        NX_ASSERT(target);
         
         if(!readArrayStart())
             return false;
@@ -192,6 +197,8 @@ public:
             return m_stream.skipBytes(sizeof(quint8));
         case QnUbjson::Int8Marker:
             return m_stream.skipBytes(sizeof(qint8));
+        case QnUbjson::UInt16Marker:
+            return m_stream.skipBytes(sizeof(quint16));
         case QnUbjson::Int16Marker:
             return m_stream.skipBytes(sizeof(qint16));
         case QnUbjson::Int32Marker:
@@ -254,7 +261,7 @@ public:
 private:
     template<class T>
     bool readNumberInternal(QnUbjson::Marker expectedMarker, T *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         peekMarker();
         if(m_peekedMarker != expectedMarker) 
@@ -268,7 +275,7 @@ private:
     }
 
     bool readUtf8StringInternal(QnUbjson::Marker expectedMarker, QByteArray *target) {
-        assert(target);
+        NX_ASSERT(target);
 
         peekMarker();
         if(m_peekedMarker != expectedMarker)
@@ -345,7 +352,7 @@ private:
     }
 
     QnUbjson::Marker readMarkerInternal() {
-        assert(!m_peeked);
+        NX_ASSERT(!m_peeked);
 
         State &state = m_stateStack.back();
         switch (state.status) {
@@ -420,10 +427,11 @@ private:
 
         switch (m_stream.readMarker()) {
         case QnUbjson::UInt8Marker: return readTypedSizeFromStream<quint8>(target);
-        case QnUbjson::Int8Marker:  return readTypedSizeFromStream<qint8>(target);
+        case QnUbjson::Int8Marker: return readTypedSizeFromStream<qint8>(target);
+        case QnUbjson::UInt16Marker: return readTypedSizeFromStream<quint16>(target);
         case QnUbjson::Int16Marker: return readTypedSizeFromStream<qint16>(target);
         case QnUbjson::Int32Marker: return readTypedSizeFromStream<qint32>(target);
-        default:                    return false;
+        default: return false;
         }
     }
 

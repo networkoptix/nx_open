@@ -30,7 +30,7 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), bool enableOfflineRequests = false, QObject *parent = NULL);
+    QnMediaServerConnection(const QnMediaServerResourcePtr& mserver, const QnUuid& videowallGuid = QnUuid(), bool enableOfflineRequests = false, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
@@ -132,7 +132,7 @@ public:
     int searchCameraAsyncStatus(const QnUuid &processUuid, QObject *target, const char *slot);
     int searchCameraAsyncStop(const QnUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
 
-    int addCameraAsync(const QnManualCameraSearchCameraList& cameras, const QString &username, const QString &password, QObject *target, const char *slot);
+    int addCameraAsync(const QnManualResourceSearchList& cameras, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot);
@@ -231,6 +231,5 @@ private:
     int m_proxyPort;
     bool m_enableOfflineRequests;
 };
-
 
 #endif // __VIDEO_SERVER_CONNECTION_H_

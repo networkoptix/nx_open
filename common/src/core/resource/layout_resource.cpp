@@ -8,7 +8,7 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
-QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool): 
+QnLayoutResource::QnLayoutResource():
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
@@ -18,7 +18,7 @@ QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
     m_locked(false)
 {
     addFlags(Qn::layout);
-    setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
 }
 
 QString QnLayoutResource::getUniqueId() const {
@@ -35,7 +35,7 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const {
 QnLayoutResourcePtr QnLayoutResource::clone() const {
     QnMutexLocker locker( &m_mutex );
 
-    QnLayoutResourcePtr result(new QnLayoutResource(qnResTypePool));
+    QnLayoutResourcePtr result(new QnLayoutResource());
     result->setId(QnUuid::createUuid());
     result->setName(m_name);
     result->setParentId(m_parentId);
@@ -108,7 +108,7 @@ void QnLayoutResource::setUrl(const QString& value)
     if (!oldValue.isEmpty() && oldValue != newValue)
     {
         // Local layout renamed
-        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
+        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
             item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
@@ -376,4 +376,14 @@ void QnLayoutResource::setLocked(bool value) {
         m_locked = value;
     }
     emit lockedChanged(::toSharedPointer(this));
+}
+
+bool QnLayoutResource::isFile() const
+{
+    return flags().testFlag(Qn::url) && !getUrl().isEmpty();
+}
+
+bool QnLayoutResource::isGlobal() const
+{
+    return getParentId().isNull();
 }

@@ -1,15 +1,14 @@
 #ifndef QN_AUDIO_STREAM_DISPLAY
 #define QN_AUDIO_STREAM_DISPLAY
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
-#include "decoders/audio/audio_struct.h"
-#include "openal/qtvsound.h"
-#include "openal/qtvaudiodevice.h"
-#include "core/datapacket/audio_data_packet.h"
+#include <decoders/audio/audio_struct.h>
+#include <openal/qtvsound.h>
+#include <openal/qtvaudiodevice.h>
+#include <nx/streaming/audio_data_packet.h>
 
-
-class CLAbstractAudioDecoder;
+class QnAbstractAudioDecoder;
 class QnCompressedAudioData;
 
 /*!
@@ -66,7 +65,7 @@ private:
     enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
     QnMutex m_guiSync;
-    QMap<CodecID, CLAbstractAudioDecoder*> m_decoder;
+    QMap<CodecID, QnAbstractAudioDecoder*> m_decoder;
 
     int m_bufferMs;
     int m_prebufferMs;

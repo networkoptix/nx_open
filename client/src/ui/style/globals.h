@@ -11,7 +11,7 @@
 
 #include <client/client_meta_types.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 /**
  * Global style settings.

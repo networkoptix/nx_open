@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/synctime.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 
 #include "business/business_strings_helper.h"
@@ -112,7 +112,7 @@ void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& a
             actionData.resourceIds.clear();
             actionData.resourceIds.push_back(res->getId());
         }
-        ec2::fromApiToResource(actionData, actionToSend, qnResPool);
+        ec2::fromApiToResource(actionData, actionToSend);
 
         qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
     }
@@ -133,7 +133,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
     if (!action) {
-        Q_ASSERT_X(0, Q_FUNC_INFO, "No action to execute");
+        NX_ASSERT(0, Q_FUNC_INFO, "No action to execute");
         return; // something wrong. It shouldn't be
     }
 
@@ -216,14 +216,14 @@ static QnBusinessRuleProcessorInstanceDeleter qnBusinessRuleProcessorInstanceDel
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
 {
     // this call is not thread safe! You should init from main thread e.t.c
-    Q_ASSERT_X(m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called first!");
+    NX_ASSERT(m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called first!");
     return m_instance;
 }
 
 void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
 {
     // this call is not thread safe! You should init from main thread e.t.c
-    Q_ASSERT_X(!m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called once!");
+    NX_ASSERT(!m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called once!");
     m_instance = instance;
 }
 

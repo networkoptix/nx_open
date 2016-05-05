@@ -2,7 +2,7 @@
 
 #include "av_client_pull.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
 #include "../resource/av_resource.h"

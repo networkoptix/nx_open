@@ -44,7 +44,7 @@ QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
     connect(ui->valueSpinBox,       QnSpinboxIntValueChanged, this, [this](int value) {
         if (value == 0) {
             int index = ui->periodComboBox->currentIndex();
-            Q_ASSERT_X(index > 0, Q_FUNC_INFO, "Invalid minimum value for the minimal period.");
+            NX_ASSERT(index > 0, Q_FUNC_INFO, "Invalid minimum value for the minimal period.");
             if (index == 0) {
                 ui->valueSpinBox->setValue(1);
             } else {

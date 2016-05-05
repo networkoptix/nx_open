@@ -94,7 +94,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(const QnVideoWallResourcePtr &video
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(m_videowall, this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true);
+    addOverlayWidget(m_statusOverlayWidget, detail::OverlayParams(UserVisible, true));
 
     initInfoOverlay();
 

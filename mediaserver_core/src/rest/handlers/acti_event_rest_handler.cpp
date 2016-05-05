@@ -12,14 +12,14 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <plugins/resource/acti/acti_resource.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(responseMessageBody)
     Q_UNUSED(contentType)
-    Q_ASSERT( path.indexOf("api/camera_event") != -1 );
+    NX_ASSERT( path.indexOf("api/camera_event") != -1 );
 
     QStringList pathParts = path.split('/');
     if( pathParts.size() < 4 )

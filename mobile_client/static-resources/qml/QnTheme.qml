@@ -32,6 +32,7 @@ QtObject {
     property color listSubText
     property color listSeparator
     property color listDisabledText
+    property color listSelectionBorder
 
     property color sessionItemBackground
     property color sessionItemBackgroundActive
@@ -90,6 +91,7 @@ QtObject {
     property color navigationPanelBackground
     property color offlineDimmer
     property color cameraStatus
+    property color versionText
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -115,6 +117,7 @@ QtObject {
         listSubText             = colorTheme.color("list.subText")
         listSeparator           = colorTheme.color("list.separator")
         listDisabledText        = colorTheme.color("list.disabledText")
+        listSelectionBorder     = colorTheme.color("list.selectionBorder")
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
         sessionItemBackgroundIncompatible = colorTheme.color("sessionItem.backgroundIncompatible")
@@ -164,6 +167,7 @@ QtObject {
         navigationPanelBackground = colorTheme.color("other.navigationPanelBackground")
         offlineDimmer           = colorTheme.color("other.offlineDimmer")
         cameraStatus            = colorTheme.color("other.cameraStatus")
+        versionText             = colorTheme.color("other.versionText")
     }
 
     function transparent(color, opacity) {

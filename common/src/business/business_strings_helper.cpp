@@ -4,7 +4,7 @@
 #include <api/app_server_connection.h>
 
 #include "utils/common/id.h"
-#include "utils/network/nettools.h" /* For resolveAddress. */
+#include <nx/network/nettools.h> /* For resolveAddress. */
 
 #include <business/business_aggregation_info.h>
 #include <business/events/reasoned_business_event.h>
@@ -63,7 +63,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
         break;
     }
 
-    Q_ASSERT_X(false, Q_FUNC_INFO, "All enumeration values must be handled here");
+    NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
     return tr("Unknown (%1)").arg(static_cast<int>(value));
 }
 
@@ -423,7 +423,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         for (const QString &id: reasonParamsEncoded.split(L';'))
             if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                 disabledCameras << camera;
-        Q_ASSERT_X(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
+        NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
 
         result = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(

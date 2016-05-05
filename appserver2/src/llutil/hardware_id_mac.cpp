@@ -8,6 +8,8 @@
 
 #include <QtCore/QStringList>
 
+#include <nx/utils/log/assert.h>
+
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 
@@ -27,19 +29,19 @@ inline std::string trim(const std::string& str)
 
 QString getHardwareId(int version, bool guidCompatibility)
 {
-    assert( false );
+    NX_ASSERT( false );
     return QString();
 }
 
 QStringList getMainHardwareIds(int guidCompatibility)
 {
-    assert( false );
+    NX_ASSERT( false );
     return QStringList();
 }
 
 QStringList getCompatibleHardwareIds(int guidCompatibility)
 {
-    assert( false );
+    NX_ASSERT( false );
     return QStringList();
 }
 

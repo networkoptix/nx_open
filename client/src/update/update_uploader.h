@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 
 

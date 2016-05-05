@@ -3,7 +3,10 @@
 
 #include <cmath>
 #include <QtCore/QMetaType>
+
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include <utils/common/model_functions_fwd.h>
 
@@ -26,7 +29,7 @@ struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarping
      */
     int panoFactor;
 
-    QnItemDewarpingParams(): enabled(false), xAngle(0.0), yAngle(0.0), fov(70.0 * M_PI / 180.0), panoFactor(1) {}
+    QnItemDewarpingParams();
 
     friend bool operator==(const QnItemDewarpingParams &l, const QnItemDewarpingParams &r);
 };

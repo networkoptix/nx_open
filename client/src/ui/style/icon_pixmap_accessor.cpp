@@ -1,7 +1,10 @@
 #include "icon_pixmap_accessor.h"
 
 #include <QtGui/QIcon>
-#include <QtGui/5.2.1/QtGui/private/qicon_p.h>
+
+#include <utils/common/qt_private_headers.h>
+#include QT_GUI_PRIVATE_HEADER(qicon_p.h)
+
 
 class QIconThemeEngine {
 public:

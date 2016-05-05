@@ -4,7 +4,7 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QStringList>
 
 #include <openssl/rsa.h>
@@ -20,6 +20,8 @@
 
 #include "api/runtime_info_manager.h"
 #include <nx_ec/data/api_runtime_data.h>
+#include <nx_ec/data/api_license_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -78,7 +80,7 @@ namespace {
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
-#else 
+#else
         // TODO: #Elric #android
         return true;
 #endif
@@ -101,9 +103,9 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 };
 } // anonymous namespace
 
-LicenseTypeInfo::LicenseTypeInfo() : 
-    licenseType(Qn::LC_Count), 
-    allowedForARM(0) 
+LicenseTypeInfo::LicenseTypeInfo() :
+    licenseType(Qn::LC_Count),
+    allowedForARM(0)
 {}
 
 LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Array& className, bool allowedForARM) :
@@ -306,26 +308,26 @@ bool checkForARMBox(const QString& value)
     return !value.isEmpty();
 }
 
-/* 
+/*
    >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
    v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
-   We just allow empty brand for all, because we believe license is correct. 
+   We just allow empty brand for all, because we believe license is correct.
 */
 bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
 {
     if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
-    
+
     QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 
-    if (!m_brand.isEmpty() && m_brand != info.data.brand) 
+    if (!m_brand.isEmpty() && m_brand != info.data.brand)
         return gotError(errCode, InvalidBrand);
 
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
         return gotError(errCode, Expired);
-    
+
     bool isArmBox = checkForARMBox(info.data.box);
     if (isArmBox && !isAllowedForArm())
         return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
@@ -442,7 +444,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     return QString();
 }
 
-Qn::LicenseType QnLicense::type() const 
+Qn::LicenseType QnLicense::type() const
 {
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return Qn::LC_Trial;
@@ -452,7 +454,7 @@ Qn::LicenseType QnLicense::type() const
 
     if (!expiration().isEmpty())
         return Qn::LC_Trial;
-    
+
     for (int i = 0; i < Qn::LC_Count; ++i) {
         if (xclass().toLower().toUtf8() == ::licenseTypeInfo[i].className)
             return ::licenseTypeInfo[i].licenseType;
@@ -563,9 +565,9 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ig
 {
     int result = 0;
 
-    for (const QnLicensePtr& license: m_licenseDict.values()) 
+    for (const QnLicensePtr& license: m_licenseDict.values())
     {
-        if (license->type() == licenseType 
+        if (license->type() == licenseType
             && (ignoreValidity || license->isValid())
             )
             result += license->cameraCount();
@@ -586,7 +588,7 @@ void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
 class QnLicensePoolInstance: public QnLicensePool {};
 Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
 
-QnLicensePool::QnLicensePool(): 
+QnLicensePool::QnLicensePool():
     m_mutex(QnMutex::Recursive)
 {
     if (!qApp)
@@ -677,12 +679,15 @@ void QnLicensePool::addLicenses(const QnLicenseList &licenses)
         emit licensesChanged();
 }
 
-void QnLicensePool::replaceLicenses(const QnLicenseList &licenses)
+void QnLicensePool::replaceLicenses(const ec2::ApiLicenseDataList& licenses)
 {
+    QnLicenseList qnLicences;
+    fromApiToResourceList(licenses, qnLicences);
+
     QnMutexLocker locker( &m_mutex );
 
     m_licenseDict.clear();
-    addLicenses_i(licenses);
+    addLicenses_i(qnLicences);
 
     emit licensesChanged();
 }
@@ -714,8 +719,8 @@ QVector<QString> QnLicensePool::compatibleHardwareIds() const {
 
 QString QnLicensePool::currentHardwareId() const {
     QVector<QString> hwIds = mainHardwareIds();
-    return hwIds.isEmpty() 
-        ? QString() 
+    return hwIds.isEmpty()
+        ? QString()
         : hwIds.last();
 }
 

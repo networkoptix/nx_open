@@ -59,7 +59,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     if (m_currentServer && !m_allServers.contains(m_currentServer))
         m_allServers << m_currentServer;
 
-    qSort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
+    std::sort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
         return naturalStringLess(getResourceName(left), getResourceName(right));
     });
 
@@ -86,10 +86,11 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
         defaultUrl.setUserName(m_userName);
         defaultUrl.setPassword(m_password);
 
-        for (const QHostAddress &addr: server->getNetAddrList()) {
+        for (const auto &addr: server->getNetAddrList()) {
             InterfaceInfo info;
             info.url = defaultUrl;
-            info.url.setHost(addr.toString());
+            info.url.setHost(addr.address.toString());
+            info.url.setPort(addr.port);
             addInterfaceIfNotExists(interfaces, info);
         }
 
@@ -217,7 +218,7 @@ QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {
         return calculateItemPriority(left) < calculateItemPriority(right);
     });
 
-    Q_ASSERT(iter != boost::end(interfaces));
+    NX_ASSERT(iter != boost::end(interfaces));
     if(iter == boost::end(interfaces))
         return QUrl();
 

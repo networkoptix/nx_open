@@ -1,0 +1,107 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+        Example pom for delegating maven goals to msbuild so it builds the "solution"
+
+        A solution can be a group of projects, but here we only have one.
+        It should also be possible to have one maven project per solution project,
+        and have a parent pom to deletegate the build.
+    -->
+
+    <parent>
+        <artifactId>common_libs</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_media</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx media</name>
+
+    <properties>
+        <guid>${nx_media.guid}</guid>
+        <product.title>${company.name} nx_media</product.title>
+
+        <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
+        <global.libs>-lcommon</global.libs>
+
+        <rdep.packages>ffmpeg</rdep.packages>
+        <rdep.android.packages>libjpeg-turbo</rdep.android.packages>
+        <rdep.ios.packages>libjpeg-turbo</rdep.ios.packages>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>            
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>            
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>  
+
+        <profile>
+            <id>mobile-android</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>android</value>
+                </property>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>mobile-ios</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>box</name>
+                    <value>ios</value>
+                </property>
+            </activation>
+            <properties>
+                <ios.defines>DISABLE_FFMPEG</ios.defines>
+            </properties>
+        </profile>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <linux.defines></linux.defines>
+                <rdep.linux.packages>quazip opengl-es-mali proxy-decoder</rdep.linux.packages>
+            </properties>
+        </profile>
+    </profiles> 
+
+</project>

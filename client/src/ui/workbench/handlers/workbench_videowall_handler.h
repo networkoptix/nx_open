@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <api/app_server_connection.h>
 
@@ -65,7 +65,7 @@ private:
     void setControlMode(bool active);
     void updateMode();
 
-    void sendMessage(QnVideoWallControlMessage message, bool cached = false);
+    void sendMessage(const QnVideoWallControlMessage& message, bool cached = false);
     void handleMessage(const QnVideoWallControlMessage &message, const QnUuid &controllerUuid = QnUuid(), qint64 sequence = -1 );
     void storeMessage(const QnVideoWallControlMessage &message, const QnUuid &controllerUuid, qint64 sequence);
     void restoreMessages(const QnUuid &controllerUuid, qint64 sequence);
@@ -124,7 +124,7 @@ private slots:
     void at_videoWall_itemChanged_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
-    void at_eventManager_controlMessageReceived(const QnVideoWallControlMessage &message);
+    void at_eventManager_controlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
 
     void at_display_widgetAdded(QnResourceWidget* widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget* widget);

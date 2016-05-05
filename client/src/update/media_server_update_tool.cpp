@@ -5,7 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QUrlQuery>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -218,6 +218,17 @@ void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
 void QnMediaServerUpdateTool::startOnlineClientUpdate(const QnSoftwareVersion &version) {
     QnUpdateTarget target(QSet<QnUuid>(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     startUpdate(target);
+}
+
+bool QnMediaServerUpdateTool::canCancelUpdate() const
+{
+    if (!m_updateProcess)
+        return true;
+
+    if (m_stage == QnFullUpdateStage::Servers)
+        return false;
+
+    return true;
 }
 
 bool QnMediaServerUpdateTool::cancelUpdate() {

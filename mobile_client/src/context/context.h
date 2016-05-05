@@ -21,6 +21,7 @@ class QnContext: public QObject, public QnInstanceStorage {
     Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
+    Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -58,12 +59,18 @@ public:
     Q_INVOKABLE void enterFullscreen();
     Q_INVOKABLE void exitFullscreen();
 
+    Q_INVOKABLE void copyToClipboard(const QString &text);
+
     Q_INVOKABLE int getStatusBarHeight() const;
     Q_INVOKABLE int getNavigationBarHeight() const;
     Q_INVOKABLE bool getDeviceIsPhone() const;
 
     Q_INVOKABLE void setKeepScreenOn(bool keepScreenOn);
     Q_INVOKABLE void setScreenOrientation(Qt::ScreenOrientation orientation);
+
+    Q_INVOKABLE int getMaxTextureSize() const;
+
+    Q_INVOKABLE bool liteMode() const;
 
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
@@ -72,6 +79,7 @@ signals:
     void colorThemeChanged();
     void applicationInfoChanged();
     void settingsChanged();
+    void liteModeChanged();
 
 private:
     QnConnectionManager *m_connectionManager;

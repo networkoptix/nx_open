@@ -10,13 +10,13 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <streaming/ondemand_media_data_provider.h>
-#include <utils/common/singleton.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/timer_manager.h>
 
 #include "data_source_cache.h"
 #include "streaming_chunk.h"
@@ -35,7 +35,7 @@ class QnTranscoder;
 class StreamingChunkTranscoder
 :
     public QObject,
-    public TimerEventHandler,
+    public nx::utils::TimerEventHandler,
     public Singleton<StreamingChunkTranscoder>,
     public Qn::EnableSafeDirectConnection
 {

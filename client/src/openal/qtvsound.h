@@ -8,15 +8,10 @@
 #ifndef __QTVSOUND_H__
 #define __QTVSOUND_H__
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QVector>
 
-#ifndef Q_OS_WIN
 #include "utils/media/audioformat.h"
-#else
-#include <QtMultimedia/QAudioFormat>
-#define QnAudioFormat QAudioFormat
-#endif
 
 #define OPENAL_NEW_ALGORITHM
 

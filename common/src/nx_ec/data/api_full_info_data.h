@@ -4,7 +4,7 @@
 #include "api_globals.h"
 #include "api_data.h"
 
-namespace ec2 
+namespace ec2
 {
     struct ApiFullInfoData: ApiData {
         ApiResourceTypeDataList resourceTypes;
@@ -13,6 +13,8 @@ namespace ec2
         ApiCameraDataList cameras;
         ApiCameraAttributesDataList cameraUserAttributesList;
         ApiUserDataList users;
+        ApiUserGroupDataList userGroups;
+        ApiAccessRightsDataList accessRights;
         ApiLayoutDataList layouts;
         ApiVideowallDataList videowalls;
         ApiBusinessRuleDataList rules;
@@ -22,9 +24,10 @@ namespace ec2
         ApiResourceParamWithRefDataList allProperties;
         ApiStorageDataList storages;
         ApiResourceStatusDataList resStatusList;
+        ApiWebPageDataList webPages;
     };
 #define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
-                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)
+                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)(userGroups)
 
 } // namespace ec2
 

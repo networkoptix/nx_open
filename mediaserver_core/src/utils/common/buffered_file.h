@@ -4,7 +4,7 @@
 #include <memory>
 #include <list>
 
-#include <QtCore/QWaitCondition>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"
@@ -102,6 +102,7 @@ public:
     virtual qint64 pos() const override;
     virtual void close() override;
     virtual bool seek(qint64 pos) override;
+    virtual bool atEnd() const override;
 
     virtual qint64 writeData (const char * data, qint64 len ) override;
     virtual qint64 readData (char * data, qint64 len ) override;

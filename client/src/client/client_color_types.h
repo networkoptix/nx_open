@@ -6,11 +6,12 @@
 
 #include <utils/common/model_functions_fwd.h>
 
+#include <vector>
+
 struct QnTimeSliderColors {
 public:
     QnTimeSliderColors();
 
-    QColor tickmark;
     QColor positionMarker;
     QColor indicator;
 
@@ -33,16 +34,22 @@ public:
 
     QColor separator;
 
-    QColor dateOverlay;
-    QColor dateOverlayAlternate;
+    std::vector<QColor> dateBarBackgrounds;
+    QColor dateBarText;
 
-    QColor pastLastMinute;
-    QColor futureLastMinute;
+    QColor pastLastMinuteBackground;
+    QColor futureLastMinuteBackground;
+    QColor pastLastMinuteStripe;
+    QColor futureLastMinuteStripe;
+
+    std::vector<QColor> tickmarkLines;
+    std::vector<QColor> tickmarkText;
 };
-#define QnTimeSliderColors_Fields (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)\
-    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
-    (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute)\
-    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)
+#define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
+    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)(separator)\
+    (dateBarBackgrounds)(dateBarText)(pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
+    (tickmarkLines)(tickmarkText)
 
 struct QnTimeScrollBarColors {
     QnTimeScrollBarColors();
@@ -310,6 +317,20 @@ struct QnGraphicsMessageBoxColors {
 };
 #define QnGraphicsMessageBoxColors_Fields (text)(frame)(window)
 
+struct QnResourceItemColors
+{
+    QnResourceItemColors();
+
+    QColor mainText;
+    QColor mainTextSelected;
+    QColor mainTextAccented;
+    QColor extraText;
+    QColor extraTextSelected;
+    QColor extraTextAccented;
+};
+#define QnResourceItemColors_Fields (mainText)(mainTextSelected)(mainTextAccented) \
+                                (extraText)(extraTextSelected)(extraTextAccented)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -323,6 +344,7 @@ struct QnGraphicsMessageBoxColors {
     (QnBookmarkColors) \
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
+    (QnResourceItemColors) \
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

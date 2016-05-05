@@ -10,7 +10,7 @@ QN_FUSION_ADAPT_STRUCT(MultiServerPeriodData, (guid)(periods))
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((MultiServerPeriodData), (json)(ubjson)(xml)(csv_record)(compressed_time)(eq))
 
 namespace {
-    static const qint64 InvalidValue = INT64_MAX;
+    static const qint64 InvalidValue = std::numeric_limits<qint64>::max();
 }
 
 QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod) :
@@ -28,7 +28,7 @@ QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 time
     if (isEmpty())
         return end();
 
-    const_iterator itr = qUpperBound(cbegin(), cend(), timeMs);
+    const_iterator itr = std::upper_bound(cbegin(), cend(), timeMs);
     if (itr != begin())
         --itr;
 
@@ -383,7 +383,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     if (erasePoint < DATETIME_NOW) {
         auto eraseIter = std::lower_bound(periods.begin(), periods.end(), erasePoint);
 
-        Q_ASSERT_X(eraseIter != periods.begin(), Q_FUNC_INFO, "Invalid semantics");
+        NX_ASSERT(eraseIter != periods.begin(), Q_FUNC_INFO, "Invalid semantics");
 
         if (eraseIter != periods.begin() && 
             (eraseIter == periods.end() || eraseIter->startTimeMs > erasePoint)
@@ -402,7 +402,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     }
 
 
-    Q_ASSERT_X(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
     if (periods.isEmpty()) {
         periods = tail;
         return;
@@ -410,7 +410,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
 
     auto last = periods.end() - 1;
     if (!tail.isEmpty() && tail.first().startTimeMs < last->endTimeMs()) {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should not get here, security fallback");
+        NX_ASSERT(false, Q_FUNC_INFO, "Should not get here, security fallback");
         unionTimePeriods(periods, tail);
     } else if (!tail.isEmpty()) {
         auto appending = tail.cbegin();
@@ -437,7 +437,7 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
 
     iterator iter = basePeriods.begin();
     for (const QnTimePeriod& period: appendingPeriods) {
-        iter = qUpperBound(iter, basePeriods.end(), period.startTimeMs);
+        iter = std::upper_bound(iter, basePeriods.end(), period.startTimeMs);
         if (iter != basePeriods.begin())
             --iter;
 
@@ -537,9 +537,9 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const std::vector<QnTimePeri
                     return result;
             } else {
                 QnTimePeriod &last = result.last();
-                Q_ASSERT_X(last.startTimeMs <= startPeriod.startTimeMs, Q_FUNC_INFO, "Algorithm semantics failure, order failed");
+                NX_ASSERT(last.startTimeMs <= startPeriod.startTimeMs, Q_FUNC_INFO, "Algorithm semantics failure, order failed");
                 if (startPeriod.isInfinite()) {
-                    Q_ASSERT_X(!last.isInfinite(), Q_FUNC_INFO, "This should never happen");
+                    NX_ASSERT(!last.isInfinite(), Q_FUNC_INFO, "This should never happen");
                     if (last.isInfinite())
                         last.startTimeMs = qMin(last.startTimeMs, startPeriod.startTimeMs);
                     else if (startPeriod.startTimeMs > last.startTimeMs+last.durationMs) {

@@ -35,19 +35,10 @@ typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
 struct QnCameraConflictList;
 
-#ifdef Q_MOC_RUN
-class QnBusiness
-#else
-namespace QnBusiness
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
 #endif
-{
-#ifdef Q_MOC_RUN
-    Q_GADGET
-    Q_ENUMS(EventReason EventState EventType ActionType UserGroup)
-public:
-#else
-    Q_NAMESPACE
-#endif
+QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType ActionType UserGroup, )
 
     enum EventReason {
         NoReason = 0,

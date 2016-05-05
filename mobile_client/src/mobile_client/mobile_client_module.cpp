@@ -22,8 +22,7 @@
 #include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
 #include "mobile_client_translation_manager.h"
-
-#include <version.h>
+#include <mobile_client/mobile_client_app_info.h>
 
 QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QObject(parent)
@@ -34,9 +33,10 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QnMobileClientMetaTypes::initialize();
 
     /* Set up application parameters so that QSettings know where to look for settings. */
-    QGuiApplication::setOrganizationName(lit(QN_ORGANIZATION_NAME));
-    QGuiApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-    QGuiApplication::setApplicationVersion(lit(QN_APPLICATION_VERSION));
+    QGuiApplication::setOrganizationName(QnAppInfo::organizationName());
+    QGuiApplication::setApplicationName(QnMobileClientAppInfo::applicationName());
+    QGuiApplication::setApplicationDisplayName(QnMobileClientAppInfo::applicationDisplayName());
+    QGuiApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
     // We should load translations before major client's services are started to prevent races
     QnMobileClientTranslationManager *translationManager = new QnMobileClientTranslationManager();
@@ -51,7 +51,6 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
-    common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
     common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());

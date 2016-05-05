@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+SERVICE=connection_mediator
+COMPANY=${deb.customization.company.name}
+
+useradd $SERVICE
+chgrp -R $SERVICE /opt/$COMPANY/$SERVICE
+service $COMPANY-$SERVICE start
+

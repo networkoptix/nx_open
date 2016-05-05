@@ -1,8 +1,6 @@
 #include "gl_hardware_checker.h"
 
-#include <QtWidgets/QMessageBox>
-
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/software_version.h>
 
@@ -35,7 +33,7 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
         messageParts << tr("We have detected that your video card drivers may be not installed or are out of date.");
         messageParts << tr("This may result in client software issues (including unexpected crash).");
         messageParts << tr("Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.");
-        QMessageBox::critical(NULL, title, messageParts.join(L'\n'), QMessageBox::Ok);
+        QnMessageBox::critical(NULL, title, messageParts.join(L'\n'), QDialogButtonBox::Ok);
     }
 
     return contextIsValid;

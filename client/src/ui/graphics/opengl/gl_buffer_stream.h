@@ -17,7 +17,7 @@ public:
     QnGlBufferStream(QByteArray *target): 
         m_target(target) 
     {
-        assert(target);
+        NX_ASSERT(target);
 
         m_target->reserve(1024);
     }

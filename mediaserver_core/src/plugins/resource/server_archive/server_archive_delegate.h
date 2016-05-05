@@ -1,7 +1,7 @@
 #ifndef _SERVER_ARCHIVE_DELEGATE_H__
 #define _SERVER_ARCHIVE_DELEGATE_H__
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtGui/QRegion>
 
 #include "core/resource/resource_fwd.h"
@@ -33,7 +33,7 @@ public:
     virtual AVCodecContext* setAudioChannel(int num);
     virtual void onReverseMode(qint64 displayTime, bool value);
 
-    virtual bool setQuality(MediaQuality quality, bool fastSwitch);
+    virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize &) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;

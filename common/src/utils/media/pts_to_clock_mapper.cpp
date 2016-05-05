@@ -7,9 +7,9 @@
 
 #include <limits>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 //#define DEBUG_OUTPUT
 
@@ -76,12 +76,12 @@ PtsToClockMapper::PtsToClockMapper(
     m_prevPtsValid( false ),
     m_correction( 0 )
 {
-    assert( ptsBits <= sizeof(pts_type)*CHAR_BIT );
+    NX_ASSERT( ptsBits <= sizeof(pts_type)*CHAR_BIT );
 }
 
 PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 {
-    Q_ASSERT( pts <= m_ptsMask );
+    NX_ASSERT( pts <= m_ptsMask );
 
     pts = (pts - m_correction) & m_ptsMask;
 
@@ -147,7 +147,7 @@ PtsToClockMapper::ts_type PtsToClockMapper::getTimestamp( pts_type pts )
 
 void PtsToClockMapper::updateTimeMapping( const pts_type pts, int64_t localTimeOnSourceUsec )
 {
-    Q_ASSERT(pts <= m_ptsMask);
+    NX_ASSERT(pts <= m_ptsMask);
 
     m_baseClockOnSource = localTimeOnSourceUsec;
     m_baseClock = m_baseClockOnSource + m_timeSynchro->localToSourceTimeShift();

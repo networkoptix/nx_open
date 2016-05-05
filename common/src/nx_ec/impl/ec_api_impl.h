@@ -22,7 +22,7 @@
 
 //TODO #ak Defining multiple handler macro because vs2012 does not support variadic templates. Will move to single variadic template after move to vs2013
 
-#define DEFINE_ONE_ARG_HANDLER( REQUEST_NAME, FIRST_ARG_TYPE )                          \
+#define DEFINE_ONE_ARG_HANDLER(REQUEST_NAME, FIRST_ARG_TYPE)                          \
     typedef OneParamHandler<FIRST_ARG_TYPE> REQUEST_NAME##Handler;                      \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;            \
     template<class TargetType, class HandlerType>                                                         \
@@ -32,14 +32,14 @@
         public REQUEST_NAME##Handler                                                    \
     {                                                                                   \
     public:                                                                             \
-        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
-            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
+        Custom##REQUEST_NAME##Handler(TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection) {         \
+            QObject::connect(static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType); \
         }                                                                               \
-        virtual void done( int reqID, const FIRST_ARG_TYPE& val1 ) override { emit##REQUEST_NAME##Done( reqID, val1 ); }; \
+        virtual void done(int reqID, const FIRST_ARG_TYPE& val1) override { on##REQUEST_NAME##Done(reqID, val1); }; \
     };
 
 
-#define DEFINE_TWO_ARG_HANDLER( REQUEST_NAME, FIRST_ARG_TYPE, SECOND_ARG_TYPE )         \
+#define DEFINE_TWO_ARG_HANDLER(REQUEST_NAME, FIRST_ARG_TYPE, SECOND_ARG_TYPE)         \
     typedef TwoParamHandler<FIRST_ARG_TYPE, SECOND_ARG_TYPE> REQUEST_NAME##Handler;     \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;            \
     template<class TargetType, class HandlerType>                                                         \
@@ -49,17 +49,17 @@
         public REQUEST_NAME##Handler                                                    \
     {                                                                                   \
     public:                                                                             \
-        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
-            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
+        Custom##REQUEST_NAME##Handler(TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection) {         \
+            QObject::connect(static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType); \
         } \
-        virtual void done( \
+        virtual void done(\
             int reqID, \
             const FIRST_ARG_TYPE& val1, \
-            const SECOND_ARG_TYPE& val2 ) override { emit##REQUEST_NAME##Done( reqID, val1, val2 ); }; \
+            const SECOND_ARG_TYPE& val2) override { on##REQUEST_NAME##Done(reqID, val1, val2); }; \
     };
 
 
-#define DEFINE_THREE_ARG_HANDLER( REQUEST_NAME, FIRST_ARG_TYPE, SECOND_ARG_TYPE, THIRD_ARG_TYPE )         \
+#define DEFINE_THREE_ARG_HANDLER(REQUEST_NAME, FIRST_ARG_TYPE, SECOND_ARG_TYPE, THIRD_ARG_TYPE)         \
     typedef ThreeParamHandler<FIRST_ARG_TYPE, SECOND_ARG_TYPE, THIRD_ARG_TYPE> REQUEST_NAME##Handler;     \
     typedef std::shared_ptr<REQUEST_NAME##Handler> REQUEST_NAME##HandlerPtr;            \
     template<class TargetType, class HandlerType>                                       \
@@ -69,20 +69,20 @@
         public REQUEST_NAME##Handler                                                    \
     {                                                                                   \
     public:                                                                             \
-        Custom##REQUEST_NAME##Handler( TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection ) {         \
-            QObject::connect( static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType ); \
+        Custom##REQUEST_NAME##Handler(TargetType* target, HandlerType func, Qt::ConnectionType connectionType = Qt::AutoConnection) {         \
+            QObject::connect(static_cast<AppServerSignaller*>(this), &AppServerSignaller::on##REQUEST_NAME##Done, target, func, connectionType); \
         } \
-        virtual void done( \
+        virtual void done(\
             int reqID, \
             const FIRST_ARG_TYPE& val1, \
             const SECOND_ARG_TYPE& val2, \
-            const THIRD_ARG_TYPE& val3 ) override { emit##REQUEST_NAME##Done( reqID, val1, val2, val3 ); }; \
+            const THIRD_ARG_TYPE& val3) override { on##REQUEST_NAME##Done(reqID, val1, val2, val3); }; \
     };
 
 
 namespace ec2
 {
-    const int INVALID_REQ_ID = -1;  
+    const int INVALID_REQ_ID = -1;
 
     // TODO: #Elric #enum
     enum class ErrorCode
@@ -109,7 +109,7 @@ namespace ec2
         incompatiblePeer
     };
 
-    QString toString( ErrorCode errorCode );
+    QString toString(ErrorCode errorCode);
 
     namespace impl
     {
@@ -120,7 +120,7 @@ namespace ec2
             typedef Param1 first_type;
 
             virtual ~OneParamHandler() {}
-            virtual void done( int reqID, const Param1& val1 ) = 0;
+            virtual void done(int reqID, const Param1& val1) = 0;
         };
 
 
@@ -132,7 +132,7 @@ namespace ec2
             typedef Param2 second_type;
 
             virtual ~TwoParamHandler() {}
-            virtual void done( int reqID, const Param1& val1, const Param2& val2 ) = 0;
+            virtual void done(int reqID, const Param1& val1, const Param2& val2) = 0;
         };
 
 
@@ -145,85 +145,46 @@ namespace ec2
             typedef Param3 third_type;
 
             virtual ~ThreeParamHandler() {}
-            virtual void done( int reqID, const Param1& val1, const Param2& val2, const Param3& val3 ) = 0;
+            virtual void done(int reqID, const Param1& val1, const Param2& val2, const Param3& val3) = 0;
         };
 
 
-        class AppServerSignaller
-        :
-            public QObject
+        class AppServerSignaller: public QObject
         {
             Q_OBJECT
 
-        public:
-            void emitSimpleDone( int reqID, const ErrorCode p1 ) { emit onSimpleDone( reqID, p1 ); }
-            void emitGetResourceTypesDone( int reqID, const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2 ); }
-            void emitSetResourceStatusDone( int reqID, const ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2 ); }
-            void emitSaveResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onSaveResourceDone( reqID, p1, p2 ); }
-            //void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
-            void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
-            void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
-            void emitGetKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
-            void emitGetStatusListDone( int reqID, const ErrorCode p1, const ApiResourceStatusDataList& p2 ) { emit onGetStatusListDone( reqID, p1, p2 ); }
-            void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
-            void emitSaveServerDone( int reqID, const ErrorCode p1, const QnMediaServerResourcePtr& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
-            void emitSaveBusinessRuleDone( int reqID, const ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2 ); }
-            void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
-            void emitGetServerUserAttributesDone( int reqID, const ErrorCode p1, const QnMediaServerUserAttributesList& p2 ) { emit onGetServerUserAttributesDone( reqID, p1, p2 ); }
-            void emitGetStoragesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetStoragesDone( reqID, p1, p2 ); }
-            void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
-            void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
-            void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
-            void emitGetCameraUserAttributesDone( int reqID, const ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2 ); }
-            void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const ApiServerFootageDataList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
-            void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
-            void emitGetBusinessRulesDone( int reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
-            void emitGetLicensesDone( int reqID, const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2 ); }
-            void emitGetLayoutsDone( int reqID, const ErrorCode p1, const QnLayoutResourceList& p2 ) { emit onGetLayoutsDone( reqID, p1, p2 ); }
-            void emitGetStoredFileDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( reqID, p1, p2 ); }
-            void emitListDirectoryDone( int reqID, const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2 ); }
-            void emitCurrentTimeDone( int reqID, const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2 ); }
-            void emitDumpDatabaseDone( int reqID, const ErrorCode p1, const ec2::ApiDatabaseDumpData& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
-            void emitGetDiscoveryDataDone( int reqID, const ErrorCode p1, const ApiDiscoveryDataList& p2 ) { emit onGetDiscoveryDataDone( reqID, p1, p2 ); }
-            void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
-            void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
-            void emitAddVideowallDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onAddVideowallDone( reqID, p1, p2 ); }
-            void emitGetVideowallsDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
-        
         signals:
-            void onSimpleDone( int reqID, const ErrorCode );
-            void onGetResourceTypesDone( int reqID, const ErrorCode, const QnResourceTypeList& );
-            void onSetResourceStatusDone( int reqID, const ErrorCode, const QnUuid& );
-            void onSaveResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
-            //void onSetResourceDisabledDone( int reqID, const ErrorCode, const QnUuid& );
-            void onGetResourcesDone( int reqID, const ErrorCode, const QnResourceList& );
-            void onGetResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
-            void onGetKvPairsDone( int reqID, const ErrorCode, const ApiResourceParamWithRefDataList& );
-            void onGetStatusListDone( int reqID, const ErrorCode, const ApiResourceStatusDataList& );
-            void onSaveKvPairsDone( int reqID, const ErrorCode, const ApiResourceParamWithRefDataList& );
-            void onSaveServerDone( int reqID, const ErrorCode, const QnMediaServerResourcePtr&);
-            void onSaveBusinessRuleDone( int reqID, const ErrorCode, const QnBusinessEventRulePtr&);
-            void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
-            void onGetServerUserAttributesDone( int reqID, const ErrorCode, const QnMediaServerUserAttributesList& );
-            void onGetStoragesDone( int reqID, const ErrorCode, const QnResourceList& );
-            void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
-            void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
-            void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
-            void onGetCameraUserAttributesDone( int reqID, const ErrorCode, const QnCameraUserAttributesList& );
-            void onGetCamerasHistoryDone( int reqID, const ErrorCode, const ApiServerFootageDataList& );
-            void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
-            void onGetBusinessRulesDone( int reqID, const ErrorCode, const QnBusinessEventRuleList& );
-            void onGetLicensesDone( int reqID, const ErrorCode, const QnLicenseList& );
-            void onGetLayoutsDone( int reqID, const ErrorCode, const QnLayoutResourceList& );
-            void onGetStoredFileDone( int reqID, const ErrorCode, const QByteArray& );
-            void onListDirectoryDone( int reqID, const ErrorCode, const QStringList& );
-            void onCurrentTimeDone( int reqID, const ErrorCode, const qint64& );
-            void onDumpDatabaseDone( int reqID, const ErrorCode, const ec2::ApiDatabaseDumpData& );
-            void onGetDiscoveryDataDone( int reqID, const ErrorCode, const ApiDiscoveryDataList& );
-            void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
-            void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
-            void onAddVideowallDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
-            void onGetVideowallsDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
+            void onSimpleDone                   (int reqID, const ec2::ErrorCode);
+            void onGetResourceTypesDone         (int reqID, const ec2::ErrorCode, const QnResourceTypeList&);
+            void onSetResourceStatusDone        (int reqID, const ec2::ErrorCode, const QnUuid&);
+            void onSaveResourceDone             (int reqID, const ec2::ErrorCode, const QnResourcePtr&);
+            void onGetResourcesDone             (int reqID, const ec2::ErrorCode, const QnResourceList&);
+            void onGetResourceDone              (int reqID, const ec2::ErrorCode, const QnResourcePtr&);
+            void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
+            void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const ec2::ApiResourceStatusDataList&);
+            void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
+            void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRulePtr&);
+            void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
+            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const QnMediaServerUserAttributesList&);
+            void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
+            void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataList&);
+            void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiCameraAttributesDataList&);
+            void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const ec2::ApiServerFootageDataList&);
+            void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
+            void onGetUserGroupsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiUserGroupDataList&);
+            void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRuleList&);
+            void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
+            void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
+            void onGetStoredFileDone            (int reqID, const ec2::ErrorCode, const QByteArray&);
+            void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
+            void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
+            void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpData&);
+            void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
+            void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
+            void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
+            void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiVideowallDataList&);
+            void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiWebPageDataList&);
+            void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
         };
 
 
@@ -232,102 +193,106 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Common handlers
         //////////////////////////////////////////////////////////
-        DEFINE_ONE_ARG_HANDLER( Simple, ErrorCode )
+        DEFINE_ONE_ARG_HANDLER(Simple,                     ec2::ErrorCode)
 
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractResourceManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( SetResourceStatus, ErrorCode, QnUuid )
-        //DEFINE_TWO_ARG_HANDLER( SetResourceDisabled, ErrorCode, QnUuid )
-        DEFINE_TWO_ARG_HANDLER( GetResourceTypes, ErrorCode, QnResourceTypeList )
-        DEFINE_TWO_ARG_HANDLER( GetResources, ErrorCode, QnResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetResource, ErrorCode, QnResourcePtr )
-        DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, ApiResourceParamWithRefDataList )
-        DEFINE_TWO_ARG_HANDLER( GetStatusList, ErrorCode, ApiResourceStatusDataList )
-        DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, ApiResourceParamWithRefDataList )
+        DEFINE_TWO_ARG_HANDLER(SetResourceStatus,           ec2::ErrorCode, QnUuid)
+        DEFINE_TWO_ARG_HANDLER(GetResourceTypes,            ec2::ErrorCode, QnResourceTypeList)
+        DEFINE_TWO_ARG_HANDLER(GetResources,                ec2::ErrorCode, QnResourceList)
+        DEFINE_TWO_ARG_HANDLER(GetResource,                 ec2::ErrorCode, QnResourcePtr)
+        DEFINE_TWO_ARG_HANDLER(SaveResource,                ec2::ErrorCode, QnResourcePtr)
+        DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
+        DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, ec2::ApiResourceStatusDataList)
+        DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourcePtr)
-        DEFINE_TWO_ARG_HANDLER( SaveResource, ErrorCode, QnResourcePtr)
-        DEFINE_TWO_ARG_HANDLER( GetServers, ErrorCode, QnMediaServerResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetServerUserAttributes, ErrorCode, QnMediaServerUserAttributesList )
-        DEFINE_TWO_ARG_HANDLER( GetStorages, ErrorCode, QnResourceList )
-
+        DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, ec2::ApiMediaServerDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, ec2::ApiMediaServerUserAttributesDataList)
+        DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, ec2::ApiStorageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
-        DEFINE_TWO_ARG_HANDLER( GetCameraUserAttributes, ErrorCode, QnCameraUserAttributesList )
-        DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, ApiServerFootageDataList )
-
-
-        //////////////////////////////////////////////////////////
-        ///////// Handlers for AbstractUserManager
-        //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetUsers, ErrorCode, QnUserResourceList )
-        DEFINE_TWO_ARG_HANDLER( AddUser, ErrorCode, QnUserResourceList )
-
-
-        //////////////////////////////////////////////////////////
-        ///////// Handlers for AbstractBusinessEventManager
-        //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetBusinessRules, ErrorCode, QnBusinessEventRuleList )
-        DEFINE_TWO_ARG_HANDLER( SaveBusinessRule, ErrorCode, QnBusinessEventRulePtr)
-
-        //////////////////////////////////////////////////////////
-        ///////// Handlers for AbstractLicenseManager
-        //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetLicenses, ErrorCode, QnLicenseList )
-
+        DEFINE_TWO_ARG_HANDLER(GetCameras,                  ec2::ErrorCode, ec2::ApiCameraDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCameraUserAttributes,     ec2::ErrorCode, ec2::ApiCameraAttributesDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCamerasHistory,           ec2::ErrorCode, ec2::ApiServerFootageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLayoutManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetLayouts, ErrorCode, QnLayoutResourceList )
-
+        DEFINE_TWO_ARG_HANDLER(GetLayouts,                  ec2::ErrorCode, ec2::ApiLayoutDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractVideowallManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetVideowalls, ErrorCode, QnVideoWallResourceList )
-        DEFINE_TWO_ARG_HANDLER( AddVideowall, ErrorCode, QnVideoWallResourceList )
+        DEFINE_TWO_ARG_HANDLER(GetVideowalls,               ec2::ErrorCode, ec2::ApiVideowallDataList)
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractWebPageManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(GetWebPages,                 ec2::ErrorCode, ec2::ApiWebPageDataList)
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractUserManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, ec2::ApiUserDataList)
+        DEFINE_TWO_ARG_HANDLER(GetUserGroups,              ec2::ErrorCode, ec2::ApiUserGroupDataList)
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractAccessRightsManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(GetAccessRights,             ec2::ErrorCode, ec2::ApiAccessRightsDataList)
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractBusinessEventManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(GetBusinessRules, ec2::ErrorCode, QnBusinessEventRuleList)
+        DEFINE_TWO_ARG_HANDLER(SaveBusinessRule, ec2::ErrorCode, QnBusinessEventRulePtr)
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractLicenseManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(GetLicenses, ec2::ErrorCode, QnLicenseList)
+
+
+
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractStoredFileManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetStoredFile, ErrorCode, QByteArray )
-        DEFINE_TWO_ARG_HANDLER( ListDirectory, ErrorCode, QStringList )
+        DEFINE_TWO_ARG_HANDLER(GetStoredFile, ec2::ErrorCode, QByteArray)
+        DEFINE_TWO_ARG_HANDLER(ListDirectory, ec2::ErrorCode, QStringList)
 
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractDiscoveryManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( GetDiscoveryData, ErrorCode, ApiDiscoveryDataList )
+        DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, ec2::ApiDiscoveryDataList)
 
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnection
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( CurrentTime, ErrorCode, qint64 )
-        DEFINE_TWO_ARG_HANDLER( DumpDatabase, ErrorCode, ApiDatabaseDumpData )
+        DEFINE_TWO_ARG_HANDLER(CurrentTime, ec2::ErrorCode, qint64)
+        DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, ec2::ApiDatabaseDumpData)
 
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnectionFactory
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER( TestConnection, ErrorCode, QnConnectionInfo )
-        DEFINE_TWO_ARG_HANDLER( Connect, ErrorCode, AbstractECConnectionPtr )
+        DEFINE_TWO_ARG_HANDLER(TestConnection, ec2::ErrorCode, QnConnectionInfo)
+        DEFINE_TWO_ARG_HANDLER(Connect, ec2::ErrorCode, AbstractECConnectionPtr)
     }
 
-    Q_ENUMS( ErrorCode );
+    Q_ENUMS(ErrorCode);
 }
 
-Q_DECLARE_METATYPE( ec2::ErrorCode );
-Q_DECLARE_METATYPE( ec2::AbstractECConnectionPtr );
+Q_DECLARE_METATYPE(ec2::ErrorCode);
+Q_DECLARE_METATYPE(ec2::AbstractECConnectionPtr);
 
 #endif  //EC_API_IMPL_H

@@ -11,6 +11,18 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_8">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -21,15 +33,36 @@
        <string>General</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>16</number>
+       </property>
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
        <item>
         <layout class="QFormLayout" name="formLayout_3">
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
          </property>
+         <property name="horizontalSpacing">
+          <number>8</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>8</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="nameLabel">
            <property name="text">
-            <string>Name:</string>
+            <string>Name</string>
            </property>
           </widget>
          </item>
@@ -39,7 +72,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="modelLabel">
            <property name="text">
-            <string>Model:</string>
+            <string>Model</string>
            </property>
           </widget>
          </item>
@@ -53,7 +86,7 @@
          <item row="2" column="0">
           <widget class="QLabel" name="firmwareLabel">
            <property name="text">
-            <string>Firmware:</string>
+            <string>Firmware</string>
            </property>
           </widget>
          </item>
@@ -67,7 +100,7 @@
          <item row="3" column="0">
           <widget class="QLabel" name="vendorLabel">
            <property name="text">
-            <string>Vendor:</string>
+            <string>Vendor</string>
            </property>
           </widget>
          </item>
@@ -81,137 +114,222 @@
         </layout>
        </item>
        <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <property name="topMargin">
+          <number>8</number>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="addressGroupBox">
-         <property name="title">
-          <string>Address</string>
+         <property name="spacing">
+          <number>16</number>
          </property>
-         <layout class="QFormLayout" name="formLayout_5">
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QLineEdit" name="ipAddressEdit">
-              <property name="enabled">
-               <bool>true</bool>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="addressGroupBox">
+           <property name="title">
+            <string>Address</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <layout class="QFormLayout" name="formLayout_5">
+            <property name="horizontalSpacing">
+             <number>8</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>8</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLineEdit" name="ipAddressEdit">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pingButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Ping</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Web Page</string>
               </property>
-              <property name="frame">
-               <bool>true</bool>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="webPageLabel">
+              <property name="text">
+               <string notr="true">&lt;camera url&gt;</string>
               </property>
+              <property name="openExternalLinks">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="ipAddressLabel">
+              <property name="text">
+               <string>IP Address</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="macAddressLabel">
+              <property name="text">
+               <string>MAC Address</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="macAddressEdit">
               <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QPushButton" name="pingButton">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="authenticationGroupBox">
+           <property name="title">
+            <string>Authentication</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <layout class="QFormLayout" name="formLayout_4">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            </property>
+            <property name="horizontalSpacing">
+             <number>8</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>8</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="loginLabel">
               <property name="text">
-               <string>Ping</string>
+               <string>Login</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="loginEdit"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="passwordLabel">
+              <property name="text">
+               <string>Password</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="passwordEdit">
+              <property name="echoMode">
+               <enum>QLineEdit::PasswordEchoOnEdit</enum>
               </property>
              </widget>
             </item>
            </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Web Page:</string>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="audioGroupBox">
+           <property name="title">
+            <string>Audio</string>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>8</number>
             </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="webPageLabel">
-            <property name="text">
-             <string notr="true">&lt;camera url&gt;</string>
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-            <property name="openExternalLinks">
-             <bool>false</bool>
+            <property name="topMargin">
+             <number>8</number>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="ipAddressLabel">
-            <property name="text">
-             <string>IP Address:</string>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="macAddressLabel">
-            <property name="text">
-             <string>MAC Address:</string>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="macAddressEdit">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="authenticationGroupBox">
-         <property name="title">
-          <string>Authentication</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_4">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="loginLabel">
-            <property name="text">
-             <string>Login:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="loginEdit"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="passwordLabel">
-            <property name="text">
-             <string>Password:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="passwordEdit">
-            <property name="echoMode">
-             <enum>QLineEdit::PasswordEchoOnEdit</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QnImageControlWidget" name="imageControlWidget" native="true"/>
+            <item>
+             <widget class="QCheckBox" name="enableAudioCheckBox">
+              <property name="text">
+               <string>Enable Audio</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QnLicensesProposeWidget" name="licensingWidget" native="true"/>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="enableAudioCheckBox">
-         <property name="text">
-          <string>Enable Audio</string>
-         </property>
-        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">

@@ -77,7 +77,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
             //consider using async fsm here (this one should be quite simple)
         //NOTE boost::bind is here temporarily: till QnConcurrent::run supports any number of arguments
         m_searchProcessRuns.insert( processUuid,
-            QnConcurrent::run( 
+            QnConcurrent::run(
                 &manualSearchThreadPoolHolder.pool,
                 boost::bind( &QnManualCameraSearcher::run, searcher, &manualSearchThreadPoolHolder.pool, addr1, addr2, auth, port) ) );
     }
@@ -113,7 +113,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(const QnRequestParams &p
     QnManualCameraSearcher* process(NULL);
     {
         QnMutexLocker lock( &m_searchProcessMutex );
-        if (m_searchProcesses.contains(processUuid)) 
+        if (m_searchProcesses.contains(processUuid))
         {
             process = m_searchProcesses[processUuid];
             process->cancel();
@@ -175,8 +175,8 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
         infos.insert(urlStr, info);
     }
 
-    bool registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);
-    if (registered) 
+    int registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infos);
+    if (registered > 0)
     {
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
         for (const QnManualCameraInfo& info: infos)
@@ -187,12 +187,10 @@ int QnManualCameraAdditionRestHandler::addCamerasAction(const QnRequestParams &p
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-
-    result.setReply(registered);
-    return registered ? CODE_OK : CODE_INTERNAL_ERROR;
+    return registered > 0 ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
-int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+int QnManualCameraAdditionRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QString action = extractAction(path);
     if (action == "search")

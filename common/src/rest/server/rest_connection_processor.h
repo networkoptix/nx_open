@@ -3,7 +3,7 @@
 
 #include <QtCore/QVariantList>
 
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "network/tcp_connection_processor.h"
 #include "request_handler.h"
@@ -36,6 +36,7 @@ public:
     virtual ~QnRestConnectionProcessor();
 
     QnUuid authUserId() const;
+    void setAuthUserId(const QnUuid& authUserId);
 
     //!Rest handler can use following methods to access http request/response directly
     const nx_http::Request& request() const;

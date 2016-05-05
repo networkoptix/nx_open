@@ -1,39 +1,95 @@
 #ifndef __FFMPEG_HELPER_H
 #define __FFMPEG_HELPER_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "core/resource/resource_fwd.h"
 
 extern "C"
 {
-    #include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avio.h>
 }
 
 #include <QtCore/QIODevice>
 
+#include <nx/streaming/media_context.h>
 
-QString codecIDToString(CodecID codecID);
-QString getAudioCodecDescription(AVCodecContext* codecContext);
-
-
+/** Static.
+ * Contains utilities which rely on ffmpeg implementation.
+ */
 class QnFfmpegHelper
 {
-private:
-    enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INTER_MATRIX, Field_OVERRIDE, Field_Channels, Field_SampleRate, Field_Sample_Fmt, Field_BitsPerSample,
-                         Field_CodedWidth, Field_CodedHeight};
-    static void appendCtxField(QByteArray *dst, CodecCtxField field, const char* data, int size);
 public:
-    static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);
-    static AVCodecContext *deserializeCodecContext(const char *data, int dataLen);
+    /**
+     * Copy new value (array of bytes) to a field of an ffmpeg structure (e.g. AVCodecContext),
+     * deallocating if not null, then allocating via av_malloc().
+     * If size is 0, data can be null.
+     */
+    static void copyAvCodecContextField(void **fieldPtr, const void* data, size_t size);
+
+    /**
+     * Either the existing AVCodecContext (for QnAvCodecMediaContext), or the one constructed from fields
+     * (for QnPlainDataMediaContext) is copied to the provided AVCodecContext.
+     * @param av Should be already allocated but not filled yet.
+     */
+    static void mediaContextToAvCodecContext(AVCodecContext* av, const QnConstMediaContextPtr& media);
+
+    /**
+     * @return Either a codec found in ffmpeg registry, or a static instance of a stub AVCodec in case
+     * the proper codec is not available in ffmpeg; never null.
+     */
+    static AVCodec* findAvCodec(CodecID codecId);
+
+    /**
+     * @return Newly allocated AVCodecContext with a proper codec, codec_id and coded_type; never null.
+     */
+    static AVCodecContext* createAvCodecContext(CodecID codecId);
+
+    /**
+     * @return Newly allocated AVCodecContext with data deep-copied via avcodec_copy_context(); never null.
+     * @param context Not null.
+     */
+    static AVCodecContext* createAvCodecContext(const AVCodecContext* context);
+
+    /**
+     * Close and deep-deallocate the context.
+     * @param context If null, do nothing.
+     */
+    static void deleteAvCodecContext(AVCodecContext* context);
 
     static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize = 32768);
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int ioBlockSize = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
-    static void deleteCodecContext(AVCodecContext* ctx);
-};
 
-#endif // ENABLE_DATA_PROVIDERS
+    static QString getErrorStr(int errnum);
+
+private:
+    static void copyMediaContextFieldsToAvCodecContext(
+        AVCodecContext* av, const QnConstMediaContextPtr& media);
+
+    /** Singleton.
+     * Holds a globally shared static instance of a stub AVCodec used for
+     * AVCodecContext when the proper codec is not available in ffmpeg.
+     */
+    class StaticHolder
+    {
+    public:
+        // Instance is not const because ffmpeg requires non-const AVCodec.
+        static StaticHolder instance;
+
+        AVCodec avCodec;
+
+    private:
+        StaticHolder()
+        {
+            memset(&avCodec, 0, sizeof(avCodec));
+            avCodec.id = CODEC_ID_NONE;
+            avCodec.type = AVMEDIA_TYPE_VIDEO;
+        }
+
+        StaticHolder(const StaticHolder&);
+        void operator=(const StaticHolder&);
+    };
+};
 
 #endif // __FFMPEG_HELPER_H

@@ -4,77 +4,23 @@
 #include <algorithm>
 #include <memory>
 
-#include <utils/thread/mutex.h>
-#include <QtXml/QXmlDefaultHandler>
+#include <nx/utils/thread/mutex.h>
 
 #include <api/global_settings.h>
 #include <common/common_globals.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
 
 
 using namespace std;
+using nx::network::UDPSocket;
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int GROUP_PORT = 1900;
 static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512*1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5*60*1000;
 static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24*60*60*1000;
-
-//!Partial parser for SSDP descrition xml (UPnP(TM) Device Architecture 1.1, 2.3)
-class UpnpDeviceDescriptionSaxHandler
-:
-    public QXmlDefaultHandler
-{
-    UpnpDeviceInfo m_deviceInfo;
-    QString m_currentElementName;
-
-public:
-    virtual bool startDocument()
-    {
-        return true;
-    }
-
-    virtual bool startElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& qName, const QXmlAttributes& /*atts*/ )
-    {
-        m_currentElementName = qName;
-        return true;
-    }
-
-    virtual bool characters( const QString& ch )
-    {
-        if( m_currentElementName == QLatin1String("friendlyName") )
-            m_deviceInfo.friendlyName = ch;
-        else if( m_currentElementName == QLatin1String("manufacturer") )
-            m_deviceInfo.manufacturer = ch;
-        else if( m_currentElementName == QLatin1String("modelName") )
-            m_deviceInfo.modelName = ch;
-        else if( m_currentElementName == QLatin1String("serialNumber") )
-            m_deviceInfo.serialNumber = ch;
-        else if( m_currentElementName == QLatin1String("presentationURL") ) {
-            if (ch.endsWith(lit("/")))
-                m_deviceInfo.presentationUrl = ch.left(ch.length()-1);
-            else
-                m_deviceInfo.presentationUrl = ch;
-        }
-
-        return true;
-    }
-
-    virtual bool endElement( const QString& /*namespaceURI*/, const QString& /*localName*/, const QString& /*qName*/ )
-    {
-        m_currentElementName.clear();
-        return true;
-    }
-
-    virtual bool endDocument()
-    {
-        return true;
-    }
-
-    UpnpDeviceInfo deviceInfo() const { return m_deviceInfo; }
-};
 
 
 ////////////////////////////////////////////////////////////
@@ -91,10 +37,12 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false )
 {
-    m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
+    m_timerID = nx::utils::TimerManager::instance()->addTimer(
+        this,
+        std::chrono::milliseconds(m_discoverTryTimeoutMS));
     m_cacheTimer.start();
 
-    assert(UPNPDeviceSearcherInstance == nullptr);
+    NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
     UPNPDeviceSearcherInstance = this;
 }
 
@@ -117,7 +65,7 @@ void UPNPDeviceSearcher::pleaseStop()
     }
     //m_timerID cannot be changed after m_terminated set to true
     if( m_timerID )
-        TimerManager::instance()->joinAndDeleteTimer( m_timerID );
+        nx::utils::TimerManager::instance()->joinAndDeleteTimer( m_timerID );
 
     //since dispatching is stopped, no need to synchronize access to m_socketList
     for( std::map<QString, SocketReadCtx>::const_iterator
@@ -125,12 +73,12 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        it->second.sock->terminateAsyncIO( true );
+        it->second.sock->pleaseStopSync();
     }
     m_socketList.clear();
 
     if(m_receiveSocket)
-        m_receiveSocket->terminateAsyncIO(true);
+        m_receiveSocket->pleaseStopSync();
 
     //cancelling ongoing http requests
     //NOTE m_httpClients cannot be modified by other threads, since UDP socket processing is over and m_terminated == true
@@ -187,7 +135,7 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
         }
         else
         {
-            Q_ASSERT( false );
+            NX_ASSERT( false );
             //TODO: #ak this needs to be implemented if camera discovery ever becomes truly asynchronous
         }
 
@@ -208,7 +156,9 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
     //adding new timer task
     QnMutexLocker lk( &m_mutex );
     if( !m_terminated )
-        m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
+        m_timerID = nx::utils::TimerManager::instance()->addTimer(
+            this,
+            std::chrono::milliseconds(m_discoverTryTimeoutMS) );
 }
 
 void UPNPDeviceSearcher::onSomeBytesRead(
@@ -239,7 +189,7 @@ void UPNPDeviceSearcher::onSomeBytesRead(
                 }
             }
         }
-        udpSock->terminateAsyncIO( true );
+        udpSock->pleaseStopSync();
         return;
     }
 
@@ -320,8 +270,8 @@ void UPNPDeviceSearcher::updateReceiveSocket()
 
     m_receiveBuffer.reserve(READ_BUF_CAPACITY);
 
-    if(m_receiveSocket)
-        m_receiveSocket->cancelAsyncIO(aio::etNone);
+    if (m_receiveSocket)
+        m_receiveSocket->cancelIOSync(nx::network::aio::etNone);
 
     auto udpSock = make_shared<UDPSocket>();
     udpSock->setReuseAddrFlag(true);
@@ -364,20 +314,23 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
 
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
-    if( !sock->setReuseAddrFlag( true ) ||
+    if (!sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress( localAddress ) ) ||
         !sock->setMulticastIF( localAddress ) ||
-        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !sock->readSomeAsync(
+        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ))
+    {
+        sock->post(
+            std::bind(
+                &UPNPDeviceSearcher::onSomeBytesRead, this,
+                sock.get(), SystemError::getLastOSErrorCode(), nullptr, 0));
+    }
+    else
+    {
+        sock->readSomeAsync(
             &p.first->second.buf,
             std::bind(
-                &UPNPDeviceSearcher::onSomeBytesRead,
-                this,
-                sock.get(), _1, &p.first->second.buf, _2 ) ))
-    {
-        QnMutexLocker lk( &m_mutex );
-        m_socketList.erase( p.first );
-        return std::shared_ptr<AbstractDatagramSocket>();
+                &UPNPDeviceSearcher::onSomeBytesRead, this,
+                sock.get(), _1, &p.first->second.buf, _2));
     }
 
     return sock;
@@ -428,17 +381,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection );
-    if( !httpClient->doGet( descriptionUrl ) )
-    {
-        QObject::disconnect(
-            httpClient.get(), &nx_http::AsyncHttpClient::done,
-            this, &UPNPDeviceSearcher::onDeviceDescriptionXmlRequestDone );
-
-        QnMutexLocker lk( &m_mutex );
-        httpClient->terminate();
-        m_httpClients.erase( httpClient );
-        return;
-    }
+    httpClient->doGet( descriptionUrl );
 }
 
 void UPNPDeviceSearcher::processDeviceXml(
@@ -446,7 +389,7 @@ void UPNPDeviceSearcher::processDeviceXml(
     const QByteArray& foundDeviceDescription )
 {
     //parsing description xml
-    UpnpDeviceDescriptionSaxHandler xmlHandler;
+    nx_upnp::DeviceDescriptionHandler xmlHandler;
     QXmlSimpleReader xmlReader;
     xmlReader.setContentHandler( &xmlHandler );
     xmlReader.setErrorHandler( &xmlHandler );

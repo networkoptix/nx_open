@@ -6,8 +6,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-#include "rtp_stream_parser.h"
-#include "decoders/audio/aac.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <decoders/audio/aac.h>
 
 
 class QnAacRtpParser: public QnRtpAudioStreamParser
@@ -17,7 +17,7 @@ public:
     virtual ~QnAacRtpParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 private:
     int m_sizeLength; // 0 if constant size. see RFC3640
@@ -38,7 +38,7 @@ private:
     bool m_auHeaderExists;
 
     AACCodec m_aacHelper;
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
 };
 

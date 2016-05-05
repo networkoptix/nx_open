@@ -20,7 +20,6 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench.h>
 #include <ui/style/globals.h>
@@ -30,13 +29,13 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
 
-    qSort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
+    std::sort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
         return naturalStringLess(l->getName(), r->getName());
     });
 
     QList<QAction *> result;
     foreach(const QnLayoutResourcePtr &layout, layouts) {
-        if(snapshotManager()->isFile(layout))
+        if(layout->isFile())
             if(!QnWorkbenchLayout::instance(layout))
                 continue; /* Not opened. */
 
@@ -80,10 +79,10 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
 
-    qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
+    std::sort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringLess(l.name, r.name);
     });
-    qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
+    std::sort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
         return naturalStringLess(l.name, r.name);
     });
 

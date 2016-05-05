@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="clear_cache_complete_toast">Le cache a été effacé</string>
-    <string name="no_network_connection_toast">Aucune connexion trouvée</string>    
-</resources>

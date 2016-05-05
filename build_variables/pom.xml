@@ -9,12 +9,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build_variables</artifactId>
     <packaging>pom</packaging>
@@ -99,9 +99,9 @@
                         <configuration>
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
-                                <argument>${root.dir}/util/validate_jsons.py</argument>
+                                <argument>${environment.dir}/dev_tools/validate_jsons.py</argument>
                             </arguments>
-                            <workingDirectory>${root.dir}/util</workingDirectory>		
+                            <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>
                     </execution>                      
                     <execution>
@@ -129,6 +129,8 @@
                                 <argument>-Ddonotrebuild=${donotrebuild}</argument>
                                 <argument>-Dnewmobile=${newmobile}</argument>
                                 <argument>-Dcompile.options=${compile.options}</argument>
+                                <argument>-Dbuild.configuration=${build.configuration}</argument>
+                                <argument>-Dqt.debug=${qt.debug}</argument>
                             </arguments>
 			    <skip>buildenv.skip</skip>
                             <workingDirectory>${root.dir}/build_environment</workingDirectory>		

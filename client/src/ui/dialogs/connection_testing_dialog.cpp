@@ -5,10 +5,7 @@
 
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <QtNetwork/QTcpSocket>
-
 #include <QtWidgets/QDataWidgetMapper>
-#include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 
 #include <api/session_manager.h>
@@ -30,9 +27,8 @@
 #include <utils/common/warnings.h>
 #include <utils/connection_diagnostics_helper.h>
 
-#include "compatibility.h"
-
-namespace {
+namespace
+{
     const int timerIntervalMs = 100;
 
     //TODO: #GDM move timeout constant to more common module
@@ -40,7 +36,7 @@ namespace {
 }
 
 
-QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) 
+QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent)
     : QnButtonBoxDialog(parent)
     , ui(new Ui::ConnectionTestingDialog)
     , m_timeoutTimer(new QTimer(this))
@@ -51,7 +47,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent)
     ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(false);
     ui->buttonBox->addButton(m_connectButton, QDialogButtonBox::HelpRole);
 
-    m_connectButton->setVisible(false);    
+    m_connectButton->setVisible(false);
     connect(m_connectButton, &QPushButton::clicked, this, [this] {
         emit connectRequested();
         accept();

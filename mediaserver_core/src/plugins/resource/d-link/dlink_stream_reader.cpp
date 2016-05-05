@@ -4,11 +4,11 @@
 
 #include <QtCore/QTextStream>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 extern int getIntParam(const char* pos);
 
@@ -49,8 +49,8 @@ QString PlDlinkStreamReader::getRTPurl(int profileId) const
     CLHttpStatus status;
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-
-    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, res->getAuth());
+    QAuthenticator auth = res->getAuth();
+    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, auth);
 
     if (status != CL_HTTP_SUCCESS || reply.isEmpty())
         return QString();

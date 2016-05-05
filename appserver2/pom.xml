@@ -1,51 +1,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness New Enterprise Controller</name>    
+    <name>Nx Witness AppServer2 Library</name>    
 
     <properties>
         <guid>${appserver2.guid}</guid>
         <product.title>${appserver2.name}</product.title>  
-        <!--Global libs-->		
-        <template>lib</template>
-        <qt.libs>core network xml sql concurrent</qt.libs>
-        <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lssl -lcrypto</linux.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>                
-        <mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
-        <android.oslibs>-lssl -lcrypto</android.oslibs>
-        <!--Global defines-->
-        <global.defines/>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>      
-        <android.defines/>
-        <ios.defines/>
 
+        <template>lib</template>
         <buildLib>sharedlib</buildLib>
 
+        <qt.libs>core core-private gui network xml sql concurrent</qt.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
+
+        <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>	
 
     <dependencies>
@@ -57,8 +39,25 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-    </dependencies>    
+		
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>           
+    </dependencies>    
 
     <profiles>
         <profile>
@@ -117,8 +116,32 @@
                     <scope>system</scope>
                     <systemPath>${root.dir}/common/pom.xml</systemPath>            
                 </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>nx_streaming</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type> 
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+                </dependency>           
             </dependencies>
         </profile>        
+
+        <profile>
+            <id>bpi</id>
+            <activation>
+                <os>
+                    <family>linux</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.packages>openssl ffmpeg opengl-es-mali</rdep.packages>
+            </properties>
+        </profile>
     </profiles>
 
 </project>

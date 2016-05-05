@@ -4,6 +4,9 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 
+extern "C" {
+#include <libavformat/avformat.h>
+}
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -100,7 +103,7 @@ public:
             const TimePeriod &second = tp1 == first ? tp2 : tp1;
 
             // merge only overlapping periods
-            assert(first.startTimeMs + first.durationMs > second.startTimeMs);
+            NX_ASSERT(first.startTimeMs + first.durationMs > second.startTimeMs);
             TimePeriod ret;
             ret.startTimeMs = first.startTimeMs;
             ret.durationMs =
@@ -234,22 +237,22 @@ public:
                         .arg(m_fileCount)
                         .arg(m_timeLine.m_timeLine.size());
 
-        qint64 prevStartTime;
-        int prevDuration;
-        qDebug() << "Time periods details: ";
+        //qint64 prevStartTime;
+        //int prevDuration;
+        //qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin();
              it != m_timeLine.m_timeLine.cend();
              ++it) {
-            qDebug() << it->startTimeMs << " " << it->durationMs;
-            if (it != m_timeLine.m_timeLine.cbegin()) {
-                qDebug() << "\tGap from previous: "
-                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
-                         << (it->startTimeMs - (prevStartTime + prevDuration))/1000
-                         << "s )";
-            }
-            prevStartTime = it->startTimeMs;
-            prevDuration = it->durationMs;
+            //qDebug() << it->startTimeMs << " " << it->durationMs;
+            //if (it != m_timeLine.m_timeLine.cbegin()) {
+            //    qDebug() << "\tGap from previous: "
+            //             << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
+            //             << (it->startTimeMs - (prevStartTime + prevDuration))/1000
+            //             << "s )";
+            //}
+            //prevStartTime = it->startTimeMs;
+            //prevDuration = it->durationMs;
         }
     }
 
@@ -350,21 +353,16 @@ private:
 
     void loadMedia()
     {
-        for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan :
-                                                     qnBackupStorageMan;
-            manager->getFileCatalog(lit("%1").arg(cameraFolder),
-                                    QnServer::LowQualityCatalog);
-
-            manager->getFileCatalog(lit("%1").arg(cameraFolder),
-                                    QnServer::HiQualityCatalog);
+        ec2::ApiCameraDataList archiveCameras;
+        for (int i = 0; i < m_storageUrls.size(); ++i) 
+        {
+            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::HiQualityCatalog);
             manager->m_rebuildCancelled = false;
 
-            manager->loadFullFileCatalogFromMedia(m_storages[i],
-                                                  QnServer::LowQualityCatalog);
-
-            manager->loadFullFileCatalogFromMedia(m_storages[i],
-                                                  QnServer::HiQualityCatalog);
+            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::LowQualityCatalog, archiveCameras);
+            manager->loadFullFileCatalogFromMedia(m_storages[i], QnServer::HiQualityCatalog, archiveCameras);
         }
     }
 
@@ -459,7 +457,7 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 static void ffmpegInit()
 {
-    av_register_all();
+    avcodec_register_all();
 
     if(av_lockmgr_register(lockmgr) != 0)
     {
@@ -476,7 +474,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
-    commonModule->setModuleGUID("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
     std::unique_ptr<QnStorageManager> normalStorageManager;
     if (!qnNormalStorageMan) {
@@ -528,9 +526,8 @@ TEST(ServerArchiveDelegate_playback_test, Main)
 
     QnServerArchiveDelegate archiveDelegate;
     archiveDelegate.open(cameraResource);
-    archiveDelegate.setQuality(MEDIA_Quality_High, true);
+    archiveDelegate.setQuality(MEDIA_Quality_High, true, QSize());
     archiveDelegate.seek(0, true);
-
     testHelper.getTimeLine().reset();
 
     QnAbstractMediaDataPtr data;
@@ -542,7 +539,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             break;
     }
 
-    archiveDelegate.setQuality(MEDIA_Quality_Low, true);
+    archiveDelegate.setQuality(MEDIA_Quality_Low, true, QSize());
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();
 

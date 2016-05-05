@@ -5,9 +5,15 @@
 #ifndef RESOURCECONTAINER_H
 #define RESOURCECONTAINER_H
 
+#include <array>
 #include <map>
+#include <memory>
+
+#include <boost/optional.hpp>
 
 #include <QtCore/QVariant>
+
+#include <nx/utils/uuid.h>
 
 #include "resourcenameset.h"
 
@@ -23,20 +29,72 @@ namespace stree
         /*!
             \return true, if resource \a resID found, false otherwise
         */
-        virtual bool get( int resID, QVariant* const value ) const = 0;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const = 0;
         //!Helper function to get typed value
         /*!
             If stored value cannot be cast to type \a T, false is returned
         */
-        template<typename T> bool getTypedVal( int resID, T* const value ) const
+        template<typename T> bool get( int resID, T* const value ) const
         {
             QVariant untypedValue;
-            if( !get( resID, &untypedValue ) )
+            if (!get(resID, &untypedValue))
                 return false;
-            if( !untypedValue.canConvert<T>() )
+            if (!untypedValue.canConvert<T>())
                 return false;
             *value = untypedValue.value<T>();
             return true;
+        }
+        bool get( int resID, QnUuid* const value ) const
+        {
+            QVariant untypedValue;
+            if (!get(resID, &untypedValue))
+                return false;
+            if (untypedValue.canConvert<QnUuid>())
+            {
+                *value = untypedValue.value<QnUuid>();
+                return true;
+            }
+            if (untypedValue.canConvert<QString>())
+            {
+                *value = QnUuid::fromStringSafe(untypedValue.value<QString>());
+                return true;
+            }
+            return false;
+        }
+        bool get(int resID, std::string* const value) const
+        {
+            QVariant untypedValue;
+            if (!get(resID, &untypedValue))
+                return false;
+            if (untypedValue.canConvert<QString>())
+            {
+                *value = untypedValue.toString().toStdString();
+                return true;
+            }
+            if (untypedValue.canConvert<QnUuid>())
+            {
+                *value = untypedValue.value<QnUuid>().toStdString();
+                return true;
+            }
+            return false;
+        }
+        template<typename T> boost::optional<T> get( int resID ) const
+        {
+            T val;
+            if( !get( resID, &val ) )
+                return boost::none;
+            return val;
+        }
+        bool get( int resID, QVariant* const value ) const
+        {
+            return getAsVariant( resID, value );
+        }
+        boost::optional<QVariant> get( int resID ) const
+        {
+            QVariant val;
+            if( !get( resID, &val ) )
+                return boost::none;
+            return val;
         }
     };
 
@@ -52,19 +110,37 @@ namespace stree
         virtual void put( int resID, const QVariant& value ) = 0;
     };
 
-    //!Implement this interface to allow work through container
+    class AbstractConstIterator
+    {
+    public:
+        virtual ~AbstractConstIterator() {}
+
+        //!Returns \a false if already at the end
+        virtual bool next() = 0;
+        virtual bool atEnd() const = 0;
+        virtual int resID() const = 0;
+        virtual QVariant value() const = 0;
+        template<typename T> T value() { return value().value<T>(); }
+    };
+
+    //!Implement this interface to allow walk through container data
+    /*!
+        Usage sample:
+        AbstractIteratableContainer* cont = ...;
+        for( auto it = cont->begin(); !it->atEnd(); it->next() )
+        {
+            //accessing data through iterator
+        }
+    */
     class AbstractIteratableContainer
     {
     public:
         virtual ~AbstractIteratableContainer() {}
 
-        //!Sets iternal iterator just before the first element
-        virtual void goToBeginning() = 0;
-        //!Goes to the next element. Returns false if already at the end
-        virtual bool next() = 0;
-        virtual int resID() const = 0;
-        virtual QVariant value() const = 0;
+        //!Returns iterator set to the first element
+        virtual std::unique_ptr<stree::AbstractConstIterator> begin() const = 0;
     };
+
 
     //!Allows to add/get resources. Represents associative container
     class ResourceContainer
@@ -75,27 +151,25 @@ namespace stree
     {
     public:
         ResourceContainer();
+        ResourceContainer(ResourceContainer&&);
+        ResourceContainer(const ResourceContainer&);
+
+        ResourceContainer& operator=(ResourceContainer&&);
+        ResourceContainer& operator=(const ResourceContainer&);
 
         //!Implementation of AbstractResourceReader::get
-        virtual bool get( int resID, QVariant* const value ) const override;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const override;
         //!Implementation of AbstractResourceReader::put
         virtual void put( int resID, const QVariant& value ) override;
 
-        //!Implementation of AbstractIteratableContainer::goToBeginning
-        virtual void goToBeginning() override;
-        //!Implementation of AbstractIteratableContainer::next
-        virtual bool next() override;
-        //!Implementation of AbstractIteratableContainer::resID
-        virtual int resID() const override;
-        //!Implementation of AbstractIteratableContainer::value
-        virtual QVariant value() const override;
+        //!Implementation of AbstractIteratableContainer::begin
+        virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
 
         QString toString( const stree::ResourceNameSet& rns ) const;
+        bool empty() const;
 
     private:
         std::map<int, QVariant> m_mediaStreamPameters;
-        std::map<int, QVariant>::const_iterator m_curIter;
-        bool m_first;
     };
 
     class SingleResourceContainer
@@ -110,7 +184,7 @@ namespace stree
             QVariant value );
 
         //!Implementation of AbstractResourceReader::get
-        virtual bool get( int resID, QVariant* const value ) const;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const;
         //!Implementation of AbstractResourceReader::put
         virtual void put( int resID, const QVariant& value );
 
@@ -125,17 +199,86 @@ namespace stree
         public AbstractResourceReader
     {
     public:
-        MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 );
+        //TODO #ak make initializer a variadic template func
+        MultiSourceResourceReader(
+            const AbstractResourceReader& rc1,
+            const AbstractResourceReader& rc2);
+        MultiSourceResourceReader(
+            const AbstractResourceReader& rc1,
+            const AbstractResourceReader& rc2,
+            const AbstractResourceReader& rc3);
 
         //!Implementation of AbstractResourceReader::get
         /*!
             Reads first reader. If no value found, reads second reader
         */
-        virtual bool get( int resID, QVariant* const value ) const;
+        virtual bool getAsVariant( int resID, QVariant* const value ) const;
 
     private:
-        const AbstractResourceReader& m_rc1;
-        const AbstractResourceReader& m_rc2;
+        const size_t m_elementCount;
+        std::array<const AbstractResourceReader*, 3> m_readers;
+    };
+
+    //TODO #ak using variadic template add method makeMultiSourceResourceReader that accepts any number of aguments
+
+
+    class MultiIteratableResourceReader
+    :
+        public AbstractIteratableContainer
+    {
+    public:
+        MultiIteratableResourceReader(
+            const AbstractIteratableContainer& rc1,
+            const AbstractIteratableContainer& rc2);
+
+        //!Implementation of AbstractIteratableContainer::begin
+        virtual std::unique_ptr<stree::AbstractConstIterator> begin() const override;
+
+    private:
+        const AbstractIteratableContainer& m_rc1;
+        const AbstractIteratableContainer& m_rc2;
+
+        MultiIteratableResourceReader(const MultiIteratableResourceReader&);
+        MultiIteratableResourceReader& operator=(const MultiIteratableResourceReader&);
+    };
+
+    //!Proxies every \a stree::AbstractResourceWriter::put call to the provided container and saves value of desired resource
+    template<class T>
+    class ResourceWriterProxy
+    :
+        public stree::AbstractResourceWriter
+    {
+    public:
+        ResourceWriterProxy(
+            stree::AbstractResourceWriter* target,
+            int resToCatchID)
+        :
+            m_target(target),
+            m_resToCatchID(resToCatchID)
+        {
+        }
+
+        virtual void put(int resID, const QVariant& value) override
+        {
+            if (resID == m_resToCatchID)
+                m_catchedVal = value.value<T>();
+            m_target->put(resID, value);
+        }
+
+        boost::optional<T> get() const
+        {
+            return m_catchedVal;
+        }
+
+        boost::optional<T> take()
+        {
+            return std::move(m_catchedVal);
+        }
+
+    private:
+        AbstractResourceWriter* m_target;
+        int m_resToCatchID;
+        boost::optional<T> m_catchedVal;
     };
 }
 

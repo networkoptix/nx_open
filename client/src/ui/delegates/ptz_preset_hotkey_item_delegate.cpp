@@ -2,9 +2,8 @@
 
 #include <QtCore/QEvent>
 
-#include <ui/widgets/char_combo_box.h>
+#include <ui/widgets/common/char_combo_box.h>
 #include <ui/models/ptz_manage_model.h>
-#include <ui/dialogs/message_box.h>
 
 // -------------------------------------------------------------------------- //
 // QnComboBoxContainerEventFilter
@@ -48,7 +47,7 @@ QWidget *QnPtzPresetHotkeyItemDelegate::createEditor(QWidget *parent, const QSty
     for(int i = 1; i <= 9; i++)
         result->addItem(QString::number(i), i);
     result->addItem(QString::number(0), 0);
-    
+
     /* Open the popup after geometry adjustments. */
     QMetaObject::invokeMethod(result, "showPopup", Qt::QueuedConnection);
 
@@ -93,7 +92,7 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemM
         QnPtzManageModel *ptzModel = qobject_cast<QnPtzManageModel*>(model);
         if (ptzModel) {
             QString existingId = ptzModel->hotkeys().value(hotkey);
-            Q_ASSERT_X(!existingId.isEmpty(), Q_FUNC_INFO, "we should get here only if the selected hotkey is in use");
+            NX_ASSERT(!existingId.isEmpty(), Q_FUNC_INFO, "we should get here only if the selected hotkey is in use");
             if (existingId.isEmpty())
                 return;
 
@@ -102,10 +101,10 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemM
                               ? tr("This hotkey is used by preset \"%1\".").arg(existing.presetModel.preset.name)
                               : tr("This hotkey is used by tour \"%1\".").arg(existing.tourModel.tour.name);
 
-            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QnMessageBox::Cancel);
-            messageBox.addButton(tr("Reassign"), QnMessageBox::AcceptRole);
+            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QDialogButtonBox::Cancel);
+            messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole);
 
-            if (messageBox.exec() == QnMessageBox::Cancel)
+            if (messageBox.exec() == QDialogButtonBox::Cancel)
                 return;
 
             QModelIndex existingIndex = ptzModel->index(ptzModel->rowNumber(existing), QnPtzManageModel::HotkeyColumn);

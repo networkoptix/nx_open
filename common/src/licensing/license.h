@@ -8,7 +8,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QTimer>
@@ -84,10 +84,10 @@ public:
 
     QByteArray rawLicense() const;
 
-    QByteArray toString() const; 
+    QByteArray toString() const;
 
     /**
-     * \returns                         Expiration time of this license, in milliseconds since epoch, 
+     * \returns                         Expiration time of this license, in milliseconds since epoch,
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
@@ -191,7 +191,7 @@ public:
 
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
-    void replaceLicenses(const QnLicenseList &licenses);
+    void replaceLicenses(const ec2::ApiLicenseDataList& licenses);
     void removeLicense(const QnLicensePtr &license);
 
     void reset();

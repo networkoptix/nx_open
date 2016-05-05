@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_MESSAGE_BUS_H_
 #define __BUSINESS_MESSAGE_BUS_H_
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QMap>
 #include <QtCore/QUrl>
 #include <QtCore/QThread>

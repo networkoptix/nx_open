@@ -5,7 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QImage>
 
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 #include <ui/common/geometry.h>
 

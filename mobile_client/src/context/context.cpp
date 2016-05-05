@@ -1,13 +1,20 @@
 #include "context.h"
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/QClipboard>
+
 #include "connection_manager.h"
 #include "ui/color_theme.h"
 #include "utils/mobile_app_info.h"
+#include <utils/common/app_info.h>
 #include "camera/camera_thumbnail_cache.h"
 #include "ui/resolution_util.h"
 #include "login_session_manager.h"
 #include "context_settings.h"
 #include "ui/window_utils.h"
+#include "ui/texture_size_helper.h"
+#include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_app_info.h>
 
 namespace {
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
@@ -60,6 +67,11 @@ void QnContext::exitFullscreen() {
     showSystemUi();
 }
 
+void QnContext::copyToClipboard(const QString &text)
+{
+    qApp->clipboard()->setText(text);
+}
+
 void QnContext::enterFullscreen() {
     hideSystemUi();
 }
@@ -85,3 +97,21 @@ void QnContext::setScreenOrientation(Qt::ScreenOrientation orientation)
     ::setScreenOrientation(orientation);
 }
 
+int QnContext::getMaxTextureSize() const
+{
+    return QnTextureSizeHelper::instance()->maxTextureSize();
+}
+
+bool QnContext::liteMode() const
+{
+    switch (static_cast<LiteModeType>(qnSettings->liteMode()))
+    {
+    case LiteModeType::LiteModeEnabled:
+        return true;
+    case LiteModeType::LiteModeAuto:
+        return QnMobileClientAppInfo::defaultLiteMode();
+    default:
+        break;
+    }
+    return false;
+}

@@ -10,7 +10,7 @@
 
 #include <QCache>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 template<class KeyType, class CachedType>
@@ -160,7 +160,7 @@ public:
 #endif
             m_cache.setMaxCost( m_cache.maxCost()-itemData->cost );
 #ifdef _DEBUG
-            Q_ASSERT_X(
+            NX_ASSERT(
                 cacheSizeBak == m_cache.size(),
                 "ItemCache::takeForUse",
                 QString("cacheSizeBak = %1, m_cache.size() = %2, m_cache.maxCost() = %3").arg(cacheSizeBak).arg(m_cache.size()).arg(m_cache.maxCost()).toLatin1().data() );
@@ -200,7 +200,7 @@ public:
         if( usedItemIter == m_usedItems.end() )
             return false;
 
-        Q_ASSERT( usedItemIter->second->usageCount > 0 );
+        NX_ASSERT( usedItemIter->second->usageCount > 0 );
         --usedItemIter->second->usageCount;
         if( usedItemIter->second->usageCount > 0 )
             return true;

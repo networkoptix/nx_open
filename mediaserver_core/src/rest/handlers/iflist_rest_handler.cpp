@@ -6,7 +6,7 @@
 #include <network/tcp_connection_priv.h>
 #include <common/common_module.h>
 #include <utils/common/app_info.h>
-#include "utils/network/http/linesplitter.h"
+#include <nx/network/http/linesplitter.h>
 #include "network_address_entry.h"
 
 bool readExtraFields(QnNetworkAddressEntryList& entryList)

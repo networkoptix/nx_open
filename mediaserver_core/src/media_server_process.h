@@ -19,7 +19,9 @@
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
-#include <utils/network/http/http_mod_manager.h>
+#include <nx/network/http/http_mod_manager.h>
+#include <nx/network/upnp/upnp_port_mapper.h>
+
 #include "health/system_health.h"
 
 class QnAppserverResourceProcessor;
@@ -56,6 +58,7 @@ public slots:
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
+    void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
@@ -76,7 +79,9 @@ private slots:
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
-    bool initTcpListener();
+    void updateAddressesList();
+    bool initTcpListener(const CloudConnectionManager& cloudConnectionManager);
+    std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
@@ -102,6 +107,8 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
+    QList<QHostAddress> m_localAddresses;
+    std::map<HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;

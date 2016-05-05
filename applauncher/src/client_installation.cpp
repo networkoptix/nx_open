@@ -1,10 +1,12 @@
 #include "client_installation.h"
 
+#include <QtCore/QDataStream>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include "utils/common/log.h"
-#include "version.h"
+#include <nx/utils/log/log.h>
+#include <applauncher_app_info.h>
+
 
 namespace {
     const QString installationDataFile("install.dat");
@@ -91,7 +93,7 @@ QnClientInstallationPtr QnClientInstallation::installationForPath(const QString 
     QnClientInstallationPtr installation(new QnClientInstallation());
     installation->m_rootPath = rootPath;
 
-    QString binary = QN_CLIENT_EXECUTABLE_NAME;
+    QString binary = QnApplauncherAppInfo::clientBinaryName();
     if (rootDir.exists(binary)) {
         installation->m_binaryPath = binary;
     } else {

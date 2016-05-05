@@ -1,15 +1,15 @@
 #include "particle_item.h"
 
-#include <QRadialGradient>
+#include <QtGui/QRadialGradient>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/fuzzy.h>
 
 QnParticleItem::QnParticleItem(QGraphicsItem *parent):
-    base_type(parent) 
+    base_type(parent)
 {
-    setColor(Qt::black);
+    setColor(Qt::blue);
 }
 
 QnParticleItem::~QnParticleItem() {

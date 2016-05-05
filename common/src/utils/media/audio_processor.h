@@ -4,7 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "utils/common/byte_array.h"
-#include "core/datapacket/audio_data_packet.h"
+#include "nx/streaming/audio_data_packet.h"
 
 class QnAudioProcessor
 {
