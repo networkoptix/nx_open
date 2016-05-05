@@ -501,39 +501,35 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
             camerasToAdd.push_back(camera);
     }
 
-    ec2::ApiCameraDataList apiCameraDataList;
     for (const auto &camera : camerasToAdd)
-        apiCameraDataList.push_back(camera.coreData);
-
-    QnAppServerConnectionFactory::getConnection2()
-        ->getCameraManager()
-        ->save(
-            apiCameraDataList,
-            ec2::DummyHandler::instance(),
-            &ec2::DummyHandler::onRequestDone
-        );
-
-    for (const auto &camera : apiCameraDataList)
     {
-        QnResourcePtr existCamRes = qnResPool->getResourceById(camera.id);
-        if (existCamRes && existCamRes->getTypeId() != camera.typeId)
+        bool result = QnAppServerConnectionFactory::getConnection2()
+            ->getCameraManager()
+            ->addCamera(
+                camera.coreData,
+                ec2::DummyHandler::instance(),
+                &ec2::DummyHandler::onRequestDone
+            );
+
+        if (!result)
+            continue;
+
+        QnResourcePtr existCamRes = qnResPool->getResourceById(camera.coreData.id);
+        if (existCamRes && existCamRes->getTypeId() != camera.coreData.typeId)
             qnResPool->removeResource(existCamRes);
-        QnCommonMessageProcessor::instance()->updateResource(camera);
-    }
+        QnCommonMessageProcessor::instance()->updateResource(camera.coreData);
 
-    for (const auto &camera : camerasToAdd)
-    {
-        QnAppServerConnectionFactory::getConnection2()
+        result = QnAppServerConnectionFactory::getConnection2()
             ->getResourceManager()
             ->save(
                 camera.properties,
                 ec2::DummyHandler::instance(),
                 &ec2::DummyHandler::onRequestDone
             );
-    }
 
-    for (const auto &camera : camerasToAdd)
-    {
+        if (!result)
+            continue;
+
         for (const auto &prop : camera.properties)
             propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
         propertyDictionary->saveParams(camera.coreData.id);
