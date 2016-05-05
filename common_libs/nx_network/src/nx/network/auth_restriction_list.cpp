@@ -6,6 +6,7 @@
 #include "auth_restriction_list.h"
 
 #include "utils/match/wildcard.h"
+#include <network/tcp_listener.h>
 
 
 QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
@@ -14,12 +15,7 @@ QnAuthMethodRestrictionList::QnAuthMethodRestrictionList()
 
 unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::Request& request ) const
 {
-    QString path = request.requestLine.url.path();
-    //TODO #ak replace mid and chop with single midRef call
-    while( path.startsWith( lit( "//" ) ) )
-        path = path.mid( 1 );
-    while( path.endsWith( L'/' ) )
-        path.chop( 1 );
+    QString path = QnTcpListener::normalizedPath(request.requestLine.url.path());
     unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall | AuthMethod::urlQueryParam;   //by default
     for( std::pair<QString, unsigned int> allowRule : m_allowed )
     {

@@ -1599,6 +1599,11 @@ bool MediaServerProcess::initTcpListener(
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
+
+    // Server return code 403 (forbidden) instead of 401 if user isn't authorized for requests starting with 'web' path
+    m_universalTcpListener->setPathIgnorePrefix("web/");
+    QnAuthHelper::instance()->restrictionList()->deny(lit("web/*"), AuthMethod::http);
+
     AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");

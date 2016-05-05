@@ -34,10 +34,8 @@ void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHan
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
 {
-    while (path.startsWith(L'/'))
-        path = path.mid(1);
-    if (path.endsWith(L'/'))
-        path = path.left(path.length()-1);
+    path = QnTcpListener::normalizedPath(path);
+
 
     Handlers::const_iterator i = m_handlers.upperBound(path);
     if (i == m_handlers.begin())
@@ -110,14 +108,14 @@ void QnRestConnectionProcessor::run()
             QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
             if (!user)
             {
-                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_ADMIN_UNAUTHORIZED_HTML);
                 return;
             }
 
             bool isAdmin = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
             if (!isAdmin)
             {
-                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_ADMIN_UNAUTHORIZED_HTML);
                 return;
             }
         }

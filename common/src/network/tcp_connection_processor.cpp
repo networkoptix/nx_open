@@ -545,7 +545,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     return result;
 }
 
-void QnTCPConnectionProcessor::sendUnauthorizedResponse(bool isProxy, const QByteArray& messageBody)
+void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -578,7 +578,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(bool isProxy, const QByt
         }
     }
     sendResponse(
-        isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
+        httpResult,
         d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
         contentEncoding );
 }
