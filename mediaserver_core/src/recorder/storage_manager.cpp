@@ -333,6 +333,7 @@ public:
                 }
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
                 scanData.storage->removeFlags(Qn::storage_fastscan);
+                m_owner->resetCameraInfoSavedFlagsForStorage(scanData.storage);
             }
             else
             {
@@ -1880,6 +1881,33 @@ void QnStorageManager::testStoragesDone()
         rebuildCatalogAsync(); // continue to rebuild
 }
 
+void QnStorageManager::resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage)
+{
+    auto storageUrl = storage->getUrl();
+    std::vector<QString> cameraUniqueIds[QnServer::ChunksCatalogCount];
+
+    for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lk(&m_mutexCatalog);
+        for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+            cameraUniqueIds[i].push_back(it.key());
+    }
+    
+    for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        for (const QString &cameraUniqueId : cameraUniqueIds[i])
+        {
+            auto resource = qnResPool->getResourceByUniqueId(cameraUniqueId);
+            if (!resource)
+                continue;
+            auto camResource = resource.dynamicCast<QnSecurityCamResource>();
+            if (!camResource)
+                continue;
+            camResource->resetCameraInfoSavedToDisk(storageUrl);
+        } // for catalogs
+    } // for qualities
+}
+
 void QnStorageManager::writeCameraInfoFiles()
 {
     for (auto &storage : getWritableStorages())
@@ -1887,7 +1915,7 @@ void QnStorageManager::writeCameraInfoFiles()
         auto storageUrl = storage->getUrl();
         auto separator  = getPathSeparator(storageUrl);
 
-        std::array<QString, 2> paths = {
+        std::array<QString, QnServer::ChunksCatalogCount> paths = {
             closeDirPath(storageUrl) +
             DeviceFileCatalog::prefixByCatalog(
                 QnServer::ChunksCatalog::HiQualityCatalog
@@ -1899,13 +1927,18 @@ void QnStorageManager::writeCameraInfoFiles()
             ) + separator
         };
 
-        for (int i = 0; i < 2; ++i)
+        std::vector<QString> cameraUniqueIds[QnServer::ChunksCatalogCount];
+        for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
-            for (auto it = m_devFileCatalog[i].cbegin();
-                 it != m_devFileCatalog[i].cend();
-                 ++it)
+            QnMutexLocker lk(&m_mutexCatalog);
+            for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+                cameraUniqueIds[i].push_back(it.key());
+        }
+        
+        for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+        {
+            for (const QString &cameraUniqueId : cameraUniqueIds[i])
             {
-                const auto cameraUniqueId = it.key();
                 auto resource = qnResPool->getResourceByUniqueId(cameraUniqueId);
                 if (!resource)
                     continue;
@@ -1917,9 +1950,7 @@ void QnStorageManager::writeCameraInfoFiles()
                     continue;
 
                 auto path = paths[i] + cameraUniqueId + separator + lit("info.txt");
-                auto outFile = std::unique_ptr<QIODevice>(
-                    storage->open(path, QIODevice::WriteOnly)
-                );
+                auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
                 if (!outFile)
                     continue;
 

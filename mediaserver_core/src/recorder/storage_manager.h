@@ -167,6 +167,7 @@ public slots:
 private:
     friend class TestStorageThread;
 
+    void resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage);
     void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnVirtualCameraResourceList &cameras,

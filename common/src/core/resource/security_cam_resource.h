@@ -261,6 +261,7 @@ public:
 
     bool isCameraInfoSavedToDisk(const QString &storageUrl) const;
     void setCameraInfoSavedToDisk(const QString &storageUrl);
+    void resetCameraInfoSavedToDisk(const QString &storageUrl);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAudioTransmitterPtr getAudioTransmitter();
