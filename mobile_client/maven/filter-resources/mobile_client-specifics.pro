@@ -5,12 +5,11 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src \
     ${root.dir}/client.core/src
 
-# Ignore missing platform-dependent libs required for libproxydecoder.so
-LIBS += -Wl,--allow-shlib-undefined
-
 unix: !mac {
     LIBS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
     LIBS += "-Wl,-rpath-link,$$OPENSSL_DIR/lib"
+    # Ignore missing platform-dependent libs required for libproxydecoder.so
+    LIBS += "-Wl,--allow-shlib-undefined"
 }
 
 QML_IMPORT_PATH = ${basedir}/static-resources/qml
