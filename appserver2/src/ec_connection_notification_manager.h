@@ -8,7 +8,6 @@
 
 #include "nx_ec/ec_api.h"
 
-#include "transaction/transaction.h"
 #include <transaction/transaction_log.h>
 
 namespace ec2
@@ -49,77 +48,34 @@ namespace ec2
             QnMiscNotificationManager* miscManager,
             QnDiscoveryNotificationManager* discoveryManager);
 
-        void triggerNotification( const QnTransaction<ApiLicenseDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiLicenseData>& tran );
-        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran );
-        void triggerNotification( const QnTransaction<ApiCameraData>& tran );
-        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran );
-        void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran );
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran );
-        void triggerNotification( const QnTransaction<ApiWebPageData>& tran );
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
-        void triggerNotification( const QnTransaction<ApiIdDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran );
-        void triggerNotification( const QnTransaction<ApiStorageData>& tran );
-        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran );
-        void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiServerFootageData>& tran );
-        void triggerNotification( const QnTransaction<ApiUserData>& tran );
-        void triggerNotification( const QnTransaction<ApiUserGroupData>& tran);
-        void triggerNotification( const QnTransaction<ApiAccessRightsData>& tran);
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran );
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran );
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran );
-        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran );
-        void triggerNotification( const QnTransaction<ApiFullInfoData>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiVideowallControlMessageData>& tran );
-        void triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ );
-        void triggerNotification( const QnTransaction<ApiEmailData>& /*tran*/ );
-        void triggerNotification( const QnTransaction<ApiUpdateInstallData>& tran );
-        void triggerNotification( const QnTransaction<ApiUpdateUploadData>& tran );
-        void triggerNotification( const QnTransaction<ApiUpdateUploadResponceData>& tran );
-        void triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran );
-        void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran );
-        void triggerNotification( const QnTransaction<ApiDiscoveryData>& tran );
-        void triggerNotification( const QnTransaction<ApiDiscoveryDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiDiscoverPeerData>& tran );
-        void triggerNotification( const QnTransaction<ApiSystemNameData>& tran );
-        void triggerNotification( const QnTransaction<ApiRuntimeData>& tran );
-        void triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& tran );
-        void triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiDatabaseDumpData> & /*tran*/ );
-        void triggerNotification( const QnTransaction<ApiReverseConnectionData> & tran );
-        void triggerNotification( const QnTransaction<ApiClientInfoData> & /*tran*/ );
-        void triggerNotification( const QnTransaction<ApiClientInfoDataList> & /*tran*/ );
+        template<typename T>
+        void triggerNotification(const QnTransaction<T> &tran)
+        {
+            ec2::detail::NotificationParams notificationParams = {
+                m_ecConnection,
+                m_licenseManager,
+                m_resourceManager,
+                m_mediaServerManager,
+                m_cameraManager,
+                m_userManager,
+                m_businessEventManager,
+                m_layoutManager,
+                m_videowallManager,
+                m_webPageManager,
+                m_storedFileManager,
+                m_updatesManager,
+                m_miscManager,
+                m_discoveryManager
+            };
 
-        void triggerNotification(const QnTransaction<ApiUpdateSequenceData> &/*tran*/) { /* nothing to do */ }
-
-        void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
-        }
-        void triggerNotification(const QnTransaction<ApiPeerAliveData> &/*tran*/)  {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
-        }
-        void triggerNotification(const QnTransaction<ApiSyncRequestData> &/*tran*/)  {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
-        }
-        void triggerNotification(const QnTransaction<QnTranStateResponse> &/*tran*/) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
-        }
-        void triggerNotification(const QnTransaction<ApiTranSyncDoneData> &/*tran*/) {
-            NX_ASSERT(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+            auto tdBase = getTransactionDescriptorByValue(tran.command);
+            auto td = dynamic_cast<detail::TransactionDescriptor<T>*>(tdBase);
+            NX_ASSERT(td, "Downcast to TransactionDescriptor<TransactionParams>* failed");
+            if (td == nullptr)
+                return;
+            td->triggerNotificationFunc(tran, notificationParams);
         }
 
-        void databaseReplaceRequired();
     private:
         AbstractECConnection* m_ecConnection;
         QnLicenseNotificationManager* m_licenseManager;

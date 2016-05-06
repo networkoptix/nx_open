@@ -394,6 +394,11 @@ namespace nx_http
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest,
         AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
+    void downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        nx_http::AsyncHttpClientPtr httpClientCaptured);
+
     typedef std::function<void (SystemError::ErrorCode, int httpStatus)> UploadCompletionHandler;
 
     // Uploads specified data using POST
