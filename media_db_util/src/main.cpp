@@ -38,7 +38,6 @@ void parseArgs(QCoreApplication &app, Config &cfg)
         cfg.fileName = parser.value("file-name");
     else
     {
-        qCritical() << "DB file name is a required option";
         parser.showHelp();
         return;
     }
@@ -107,11 +106,34 @@ void printCamerasData(const QVector<DeviceFileCatalogPtr> &fileCatalogs, const Q
 
 } // namespace aux
 
+void messageHandler(QtMsgType type, const QMessageLogContext &/*context*/, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    switch (type) {
+    case QtDebugMsg:
+        fprintf(stderr, "Debug: %s\n", localMsg.constData());
+        break;
+    case QtInfoMsg:
+        fprintf(stderr, "Info: %s\n", localMsg.constData());
+        break;
+    case QtWarningMsg:
+        fprintf(stderr, "Warning: %s\n", localMsg.constData());
+        break;
+    case QtCriticalMsg:
+        fprintf(stderr, "Critical: %s\n", localMsg.constData());
+        break;
+    case QtFatalMsg:
+        fprintf(stderr, "Fatal: %s\n", localMsg.constData());
+        exit(-1);
+    }
+}
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("Media db util");
     QCoreApplication::setApplicationVersion("1.0");
+    qInstallMessageHandler(&messageHandler);
 
     std::unique_ptr<QnCommonModule> commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
@@ -127,24 +149,15 @@ int main(int argc, char **argv)
     QnFileStorageResourcePtr fileStorage(new QnFileStorageResource);
     fileStorage->setUrl(QFileInfo(cfg.fileName).absolutePath());
     if (!fileStorage->initOrUpdate())
-    {
-        qCritical() << "Failed to initialize file storage";
-        return -1;
-    }
+        qFatal("Failed to initialize file storage");
 
     if (!fileStorage->isFileExists(cfg.fileName))
-    {
-        qCritical() << "DB file doesn't exist";
-        return -1;
-    }
+        qFatal("DB file doesn't exist");
 
     QnStorageDb db(fileStorage, 0);
 
     if (!db.open(cfg.fileName))
-    {
-        qCritical() << "Couldn't open database file.";
-        QCoreApplication::exit(-1);
-    }
+        qFatal("Couldn't open database file.");
 
     auto fileCatalogs = db.loadFullFileCatalog();
 
