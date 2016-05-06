@@ -6,13 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nx/network/http/httpclient.h>
-
 #include <utils/common/string.h>
-#include <utils/serialization/json.h>
-
-#include <data/listening_peer.h>
-#include <http/get_listening_peer_list_handler.h>
 
 #include "functional_tests/mediator_functional_test.h"
 
@@ -21,7 +15,13 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST_F(MediatorFunctionalTest, statistics)
+class Statistics
+:
+    public MediatorFunctionalTest
+{
+};
+
+TEST_F(Statistics, listening_peer_list)
 {
     startAndWaitUntilStarted();
 
@@ -30,22 +30,12 @@ TEST_F(MediatorFunctionalTest, statistics)
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, generateRandomName(16));
-    
-    nx_http::HttpClient httpClient;
-    const auto urlStr = 
-        lm("http://%1%2").arg(httpEndpoint().toString())
-            .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
-    ASSERT_TRUE(httpClient.doGet(QUrl(urlStr)));
-    ASSERT_EQ(
-        nx_http::StatusCode::ok,
-        httpClient.response()->statusLine.statusCode);
-    QByteArray responseBody;
-    while (!httpClient.eof())
-        responseBody += httpClient.fetchMessageBodyBuffer();
 
-    auto listeningPeers =
-        QJson::deserialized<nx::hpm::data::ListeningPeersBySystem>(responseBody);
-    
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+    data::ListeningPeersBySystem listeningPeers;
+    std::tie(statusCode, listeningPeers) = getListeningPeers();
+    ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
+
     ASSERT_EQ(1, listeningPeers.systems.size());
     const auto systemIter = listeningPeers.systems.find(system1.id);
     ASSERT_NE(listeningPeers.systems.end(), systemIter);

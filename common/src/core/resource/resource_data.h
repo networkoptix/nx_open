@@ -34,9 +34,6 @@ public:
         return m_dataByKey.contains(key);
     }
 
-    /*! Get all static values as QStrings. Warning, if value is not a json string it won't preset in the output */
-    QList<QPair<QString, QString>> getAllStringValues() const;
-
 private:
     typedef void (*CopyFunction)(const void *src, void *dst);
 

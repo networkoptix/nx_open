@@ -16,6 +16,7 @@
 #include <nx/utils/std/thread.h>
 
 #include "../cloud_data_provider.h"
+#include "../data/listening_peer.h"
 #include "../mediator_process_public.h"
 
 #include "local_cloud_data_provider.h"
@@ -61,6 +62,9 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count);
 
+    std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
+        getListeningPeers() const;
+
 private:
     QString m_tmpDir;
     int m_port;
@@ -73,7 +77,7 @@ private:
     LocalCloudDataProvider m_cloudDataProvider;
 };
 
-}   //hpm
-}   //nx
+}   // namespace hpm
+}   // namespace nx
 
 #endif  //NX_MEDIATOR_FUNCTIONAL_TEST_H

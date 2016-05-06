@@ -275,7 +275,7 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
 
     m_locallySavedProperties = other->m_locallySavedProperties;
     if (m_id.isNull() && !other->m_id.isNull()) {
-        for (const auto& p: other->getProperties())
+        for (const auto& p: other->getRuntimeProperties())
             m_locallySavedProperties.emplace(p.name, LocalPropertyValue(p.value, true, true));
     }
 }
@@ -331,7 +331,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
     }
 
     //silently ignoring missing properties because of removeProperty method lack
-    for (const ec2::ApiResourceParamData &param: other->getProperties())
+    for (const ec2::ApiResourceParamData &param: other->getRuntimeProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
 
     QnMutexLocker locker( &m_consumersMtx );
@@ -890,9 +890,31 @@ void QnResource::emitPropertyChanged(const QString& key)
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-ec2::ApiResourceParamDataList QnResource::getProperties() const
+ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
 {
     return propertyDictionary->allProperties(getId());
+}
+
+ec2::ApiResourceParamDataList QnResource::getAllProperties() const
+{
+    ec2::ApiResourceParamDataList result;
+    ec2::ApiResourceParamDataList runtimeProperties = propertyDictionary->allProperties(getId());
+    ParamTypeMap staticDefaultProperties;
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
+    if (resType)
+        staticDefaultProperties = resType->paramTypeList();
+
+    for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
+    {
+        auto runtimeIt = std::find_if(runtimeProperties.cbegin(), runtimeProperties.cend(),
+                                      [it] (const ec2::ApiResourceParamData &param) { return it.key() == param.name; });
+        if (runtimeIt == runtimeProperties.cend())
+            result.emplace_back(it.key(), it.value());
+    }
+
+    std::copy(runtimeProperties.cbegin(), runtimeProperties.cend(), std::back_inserter(result));
+    return result;
 }
 
 void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields )

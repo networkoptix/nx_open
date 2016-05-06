@@ -57,7 +57,7 @@ public:
     //!Implementation of \a AbstractServerConnection::getSourceAddress
     virtual SocketAddress getSourceAddress() const override;
     //!Implementation of \a AbstractServerConnection::addOnConnectionCloseHandler
-    virtual void addOnConnectionCloseHandler(std::function<void()> handler) override;
+    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of \a AbstractServerConnection::socket
     virtual AbstractCommunicatingSocket* socket() override;
 

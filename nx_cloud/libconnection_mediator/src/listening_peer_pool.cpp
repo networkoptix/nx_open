@@ -11,7 +11,6 @@
 namespace nx {
 namespace hpm {
 
-
 QString ListeningPeerData::toString() const
 {
     QStringList opts;
