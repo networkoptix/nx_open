@@ -214,7 +214,18 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server: '.tmp',
+            server: {
+                files: [
+                    {
+                        dot: true,
+                        src: [
+                            '.tmp',
+                            '<%= yeoman.app %>/styles/custom',
+                        ]
+                    }
+                ]
+            },
+
 
             publish:{
                 files:[

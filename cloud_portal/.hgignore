@@ -1,4 +1,5 @@
-front_end/node_modules 
+front_end/node_modules
+front_end/app/styles/custom 
 front_end/dist 
 front_end/.tmp 
 front_end/.idea 
