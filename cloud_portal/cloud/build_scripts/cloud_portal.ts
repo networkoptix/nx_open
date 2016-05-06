@@ -4,7 +4,12 @@
     <name>../static/scripts/language.js</name>
     <message>
       <location filename="../static/scripts/language.js"/>
-      <source>use strict</source>
+      <source>Ok</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login to PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -174,7 +179,7 @@
     </message>
     <message>
       <location/>
-      <source>Use only latin letters, numbers and keyboard symbols</source>
+      <source>Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.</source>
       <translation> </translation>
     </message>
     <message>
@@ -200,6 +205,41 @@
     <message>
       <location/>
       <source>You are going to change the owner of your system. You will not be able to return this power back!</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Share</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Share</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Edit users permissions</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Your system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System {systemName} was successfully disconnected from PRODUCT_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System {systemName} was successfully deleted from your account</source>
       <translation> </translation>
     </message>
     <message>
@@ -247,6 +287,11 @@
     </message>
     <message>
       <location/>
+      <source>Change password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Current password</source>
       <translation> </translation>
     </message>
@@ -257,27 +302,12 @@
     </message>
     <message>
       <location/>
-      <source>Your account was successfully saved.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t save your data:</source>
+      <source>readonly</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Save</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Your password was successfully changed.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t change your password:</source>
       <translation> </translation>
     </message>
     <message>
@@ -295,7 +325,22 @@
     <name>../static/views/activate_restore.html</name>
     <message>
       <location filename="../static/views/activate_restore.html"/>
-      <source>Account activation</source>
+      <source>Your account was successfully activated.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Open VMS_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Confirmation link was sent to your email. Check it to continue.</source>
       <translation> </translation>
     </message>
     <message>
@@ -320,6 +365,11 @@
     </message>
     <message>
       <location/>
+      <source>Confirmation link was sent to your email. Check it for creating a new password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Restore password</source>
       <translation> </translation>
     </message>
@@ -330,67 +380,22 @@
     </message>
     <message>
       <location/>
-      <source>Activating account ...</source>
+      <source>Password successfully saved.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Your account was successfully activated.</source>
+      <source>activate&quot; validate-email</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Couldn\'t activate your account:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You are going to confirm your account. Please, enter your account email.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Confirmation link was send to your email. Check it to continue.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t send confirmation email:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Send</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You are going to restore your password. Please, enter your account email.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Confirmation link was send to your email. Check it for creating a new password</source>
+      <source>Send&quot; validate-email</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Restore password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Please, enter new password for your account.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password successfully saved</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t save new password:</source>
       <translation> </translation>
     </message>
     <message>
@@ -405,78 +410,30 @@
     </message>
   </context>
   <context>
-    <name>../static/views/connectDisconnectSystem.html</name>
-    <message>
-      <location filename="../static/views/connectDisconnectSystem.html"/>
-      <source>Connect to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Nx Cloud</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You are going to connect system &quot;&quot; to your cloud account (</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Disconnect from</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You are going to disconnect system &quot;&quot; from cloud.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Registering system in cloud ...</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Registered in cloud portal</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t register your system:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Connect</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Disconnect system from cloud ...</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System was disconnected from cloud portal</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Couldn\'t disconnect your system:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Disconnect&quot;</source>
-      <translation> </translation>
-    </message>
-  </context>
-  <context>
     <name>../static/views/debug.html</name>
     <message>
       <location filename="../static/views/debug.html"/>
-      <source>Debug notifications</source>
+      <source>Debug processes and notifications</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Success</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Run process</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Call notification</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Debug email notifications</source>
       <translation> </translation>
     </message>
     <message>
@@ -497,6 +454,11 @@
     <message>
       <location/>
       <source>Send Notification</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Result:</source>
       <translation> </translation>
     </message>
   </context>
@@ -524,6 +486,11 @@
     </message>
     <message>
       <location/>
+      <source>validate-email</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Login&quot;</source>
       <translation> </translation>
     </message>
@@ -532,6 +499,16 @@
     <name>../static/views/register.html</name>
     <message>
       <location filename="../static/views/register.html"/>
+      <source>Your account was successfully registered.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Please, check your email to confirm it.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>First name</source>
       <translation> </translation>
     </message>
@@ -577,7 +554,7 @@
     </message>
     <message>
       <location/>
-      <source>I agree with</source>
+      <source>By clicking Register, you agree to our</source>
       <translation> </translation>
     </message>
     <message>
@@ -587,17 +564,7 @@
     </message>
     <message>
       <location/>
-      <source>You must comply.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Your account was successfully registered. Please, check your email to confirm it</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Some error has happened:</source>
+      <source>validate-email readonly</source>
       <translation> </translation>
     </message>
     <message>
@@ -615,7 +582,12 @@
     <name>../static/views/share.html</name>
     <message>
       <location filename="../static/views/share.html"/>
-      <source>Account</source>
+      <source>User</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Email</source>
       <translation> </translation>
     </message>
     <message>
@@ -625,7 +597,17 @@
     </message>
     <message>
       <location/>
-      <source>Share&quot;</source>
+      <source>Cancel</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>validate-email readonly</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>buttonText&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -639,16 +621,6 @@
     <name>../static/views/system.html</name>
     <message>
       <location filename="../static/views/system.html"/>
-      <source>Systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>&gt; Remove</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Share</source>
       <translation> </translation>
     </message>
@@ -659,12 +631,22 @@
     </message>
     <message>
       <location/>
-      <source>Open in Nx Witness</source>
+      <source>Open in VMS_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Your system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disconnect from</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -675,6 +657,11 @@
     <message>
       <location/>
       <source>Your permissions:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Remove from my Account</source>
       <translation> </translation>
     </message>
     <message>
@@ -694,7 +681,7 @@
     </message>
     <message>
       <location/>
-      <source>Account</source>
+      <source>Email</source>
       <translation> </translation>
     </message>
     <message>
@@ -704,12 +691,17 @@
     </message>
     <message>
       <location/>
-      <source>gettingSystem</source>
+      <source>&amp;nbsp;&amp;nbsp;Edit</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>System info is unavailable:</source>
+      <source>&amp;nbsp;&amp;nbsp;Delete</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>gettingSystem</source>
       <translation> </translation>
     </message>
     <message>
@@ -719,22 +711,12 @@
     </message>
     <message>
       <location/>
-      <source>Cannot delete the system:</source>
+      <source>Edit permissions</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Users list is unavailable:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>unsharingMessage</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Sharing failed:&quot;</source>
+      <source>Delete&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -747,27 +729,17 @@
     </message>
     <message>
       <location/>
-      <source>Please, connect any systems to your cloud account first.</source>
+      <source>Please, connect any systems to your cloud email first.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Open Nx Witness</source>
+      <source>Open VMS_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Open in Nx Witness</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>false</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Systems list is unavailable:</source>
+      <source>Open in VMS_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -785,22 +757,12 @@
     </message>
     <message>
       <location/>
-      <source>Cancel</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Ok</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Close</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>modal</source>
+      <source>Cancel</source>
       <translation> </translation>
     </message>
     <message>
@@ -818,7 +780,7 @@
     </message>
     <message>
       <location/>
-      <source>Nx Cloud</source>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -838,7 +800,17 @@
     </message>
     <message>
       <location/>
-      <source>&amp;copy; 2016 Networkoptix</source>
+      <source>&amp;copy; 2016 COMPANY_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>COMPANY_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -899,6 +871,11 @@
     </message>
     <message>
       <location/>
+      <source>too common</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>too short</source>
       <translation> </translation>
     </message>
@@ -909,17 +886,9 @@
     </message>
     <message>
       <location/>
-      <source>too common</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Password is required.</source>
       <translation> </translation>
     </message>
-  </context>
-  <context>
-    <name>../static/views/components/process-alert.html</name>
   </context>
   <context>
     <name>../static/views/components/process-button.html</name>

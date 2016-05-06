@@ -14,7 +14,7 @@
     </message>
     <message>
       <location/>
-      <source>Nx Cloud</source>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -54,7 +54,7 @@
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>COMPANY_LINK</source>
       <translation> </translation>
     </message>
     <message>
@@ -64,7 +64,27 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
+      <source>SUPPORT_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D/activate/%7B%7Bmessage.code%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>COMPANY_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -82,7 +102,7 @@
     </message>
     <message>
       <location/>
-      <source>You have received this letter because you or somebody else tried to restore password to account  on NxCloud portal.</source>
+      <source>You have received this letter because you or somebody else tried to restore password to account  on PRODUCT_NAME portal.</source>
       <translation> </translation>
     </message>
     <message>
@@ -112,7 +132,7 @@
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>COMPANY_LINK</source>
       <translation> </translation>
     </message>
     <message>
@@ -122,7 +142,27 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
+      <source>SUPPORT_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D/restore_password/%7B%7Bmessage.code%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>COMPANY_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -140,7 +180,7 @@
     </message>
     <message>
       <location/>
-      <source>Nx Cloud</source>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -165,7 +205,7 @@
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>COMPANY_LINK</source>
       <translation> </translation>
     </message>
     <message>
@@ -175,7 +215,32 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
+      <source>SUPPORT_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>mailto:%7B%7Bmessage.sharer_email%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D/register/%7B%7Buser_email%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>COMPANY_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -208,7 +273,7 @@
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>COMPANY_LINK</source>
       <translation> </translation>
     </message>
     <message>
@@ -218,7 +283,32 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
+      <source>SUPPORT_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>mailto:%7B%7Bmessage.sharer_email%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D/systems/%7B%7Bmessage.system_id%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>COMPANY_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -256,7 +346,7 @@
     </message>
     <message>
       <location/>
-      <source>networkoptix.com</source>
+      <source>COMPANY_LINK</source>
       <translation> </translation>
     </message>
     <message>
@@ -266,7 +356,22 @@
     </message>
     <message>
       <location/>
-      <source>support.networkoptix.com</source>
+      <source>SUPPORT_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>%7B%7Bconfig.portal_url%7D%7D</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>COMPANY_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>
