@@ -189,7 +189,7 @@
                                 </goals>
                                 <configuration>
                                     <properties>
-                                        <provisioning_script>/bin/sh ${project.build.directory}/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
+                                        <provisioning_script>${root.dir}/build_utils/shell/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
                                     </properties>
                                     <source>
                                         def command = project.properties.provisioning_script
