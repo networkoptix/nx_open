@@ -109,7 +109,7 @@ public:
 
     void setLastDiscoveredResources(const QnResourceList& resources);
     QSet<QString> lastDiscoveredIds() const;
-    void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources);
+    void addResourcesImmediatly(QnResourceList& resources);
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:
