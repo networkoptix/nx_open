@@ -13,7 +13,7 @@ Rectangle
     property bool _unauthorized: status == QnCameraListModel.Unauthorized
     property bool _recording: status == QnCameraListModel.Recording
 
-    implicitWidth: 12
+    implicitWidth: 10
     implicitHeight: implicitWidth
     radius: height / 2
 

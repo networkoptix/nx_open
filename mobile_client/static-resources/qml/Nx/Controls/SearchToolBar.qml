@@ -50,12 +50,6 @@ ToolBarBase
         }
     }
 
-    onEnabledChanged:
-    {
-        if (!enabled)
-            clear()
-    }
-
     function clear()
     {
         searchField.text = ""
@@ -68,6 +62,7 @@ ToolBarBase
 
     function open()
     {
+        clear()
         opacity = 1.0
         searchField.forceActiveFocus()
     }

@@ -77,6 +77,9 @@ Page
                 id: camerasList
 
                 anchors.fill: parent
+                anchors.margins: 16
+                displayMarginBeginning: 16
+                displayMarginEnd: 16
 
                 Connections
                 {

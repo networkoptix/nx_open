@@ -70,7 +70,7 @@ Control
         Row
         {
             width: parent.width
-            spacing: 8
+            spacing: 6
 
             StatusIndicator
             {
