@@ -20,7 +20,11 @@ public:
     ~QnWorkbenchConnectHandler();
 
 protected:
-    ec2::ErrorCode connectToServer(const QUrl &appServerUrl, bool silent = false);
+    ec2::ErrorCode connectToServer(const QUrl &appServerUrl
+        , const QString &connectionAlias
+        , bool storePassword
+        , bool autoLogin
+        , bool silent);
 
     bool disconnectFromServer(bool force);
 

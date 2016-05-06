@@ -2225,8 +2225,7 @@ QSize QnNxStyle::sizeFromContents(
 
             QSize sz = base_type::sizeFromContents(type, option, size, widget);
             sz.setHeight(qMax(sz.height(), Metrics::kViewRowHeight));
-            sz.setWidth(sz.width() + Metrics::kStandardPadding * 2);
-            sz.setWidth(sz.width() + Metrics::kStandardPadding * 2);
+            sz.setWidth(sz.width() + (Metrics::kStandardPadding - pixelMetric(PM_FocusFrameHMargin, option, widget) - 1) * 2);
             return sz;
         }
 

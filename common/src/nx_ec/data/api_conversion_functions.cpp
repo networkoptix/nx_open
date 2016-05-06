@@ -316,7 +316,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& d
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), src->getId() );
     fromResourceToApi( *userAttributesLock, static_cast<ApiCameraAttributesData&>(dst) );
 
-    for(const ec2::ApiResourceParamData &srcParam: src->getProperties())
+    for(const ec2::ApiResourceParamData &srcParam: src->getRuntimeProperties())
         dst.addParams.push_back(srcParam);
 }
 

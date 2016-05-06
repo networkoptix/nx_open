@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="clear_cache_complete_toast"> A gyorsítótár törölve</string>
-    <string name="no_network_connection_toast">Nem található hálózati kapcsolat</string>    
-</resources>

@@ -25,6 +25,9 @@ class NX_NETWORK_API MediatorConnector
 public:
     MediatorConnector();
 
+    /** Caller MUST ensure that no one uses stun client */
+    void reinitializeStunClient(
+        stun::AbstractAsyncClient::Settings stunClientSettings);
     /** Shall be called to enable cloud functionality for application */
     void enable( bool waitComplete = false );
 

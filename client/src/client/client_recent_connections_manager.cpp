@@ -2,7 +2,7 @@
 
 #include <core/core_settings.h>
 
-#include <ui/models/last_system_users_model.h>
+#include <ui/models/recent_user_connections_model.h>
 
 QnClientRecentConnectionsManager::QnClientRecentConnectionsManager()
     : base_type()
@@ -14,7 +14,7 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager()
 
     const auto coreSettingsHandler = [this](int id)
     {
-        if (id == QnCoreSettings::LastSystemConnections)
+        if (id == QnCoreSettings::RecentUserConnections)
             updateModelsData();
     };
 
@@ -26,9 +26,9 @@ QnClientRecentConnectionsManager::QnClientRecentConnectionsManager()
 QnClientRecentConnectionsManager::~QnClientRecentConnectionsManager()
 {}
 
-void QnClientRecentConnectionsManager::addModel(QnLastSystemUsersModel* model)
+void QnClientRecentConnectionsManager::addModel(QnRecentUserConnectionsModel* model)
 {
-    connect(model, &QnLastSystemUsersModel::systemNameChanged, this, [this, model]()
+    connect(model, &QnRecentUserConnectionsModel::systemNameChanged, this, [this, model]()
     {
         updateModelBinding(model);
     });
@@ -39,7 +39,7 @@ void QnClientRecentConnectionsManager::addModel(QnLastSystemUsersModel* model)
         updateModelBinding(model);
 }
 
-void QnClientRecentConnectionsManager::removeModel(QnLastSystemUsersModel* model)
+void QnClientRecentConnectionsManager::removeModel(QnRecentUserConnectionsModel* model)
 {
     if (m_unbound.remove(model))
         return;
@@ -56,7 +56,7 @@ void QnClientRecentConnectionsManager::removeModel(QnLastSystemUsersModel* model
     m_bound.erase(it);
 }
 
-void QnClientRecentConnectionsManager::updateModelBinding(QnLastSystemUsersModel* model)
+void QnClientRecentConnectionsManager::updateModelBinding(QnRecentUserConnectionsModel* model)
 {
     const bool isCorrectSystemName = !model->systemName().isEmpty();
     NX_ASSERT(isCorrectSystemName, Q_FUNC_INFO
@@ -95,11 +95,10 @@ void QnClientRecentConnectionsManager::updateModelBinding(QnLastSystemUsersModel
 void QnClientRecentConnectionsManager::updateModelsData()
 {
     m_dataCache.clear();
-    const auto lastConnectionsData = qnCoreSettings->lastSystemConnections();
+    const auto lastConnectionsData = qnCoreSettings->recentUserConnections();
     for (const auto connectionDesc : lastConnectionsData)
     {
-        m_dataCache[connectionDesc.systemName].append(UserPasswordPair(
-            connectionDesc.userName, connectionDesc.password));
+        m_dataCache[connectionDesc.systemName].append(connectionDesc);
     }
     for (const auto boundModel : m_bound)
     {

@@ -45,13 +45,9 @@ int QnMergeSystemsRestHandler::executeGet(
         const QnRestConnectionProcessor *owner)
 {
     Q_UNUSED(path)
-    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
-        NX_LOG(lit("QnMergeSystemsRestHandler. Can't change parameters because server is running in safe mode"), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
-        return nx_http::StatusCode::forbidden;
-    }
-
-    if (ec2::Settings::instance()->dbReadOnly()) {
+    if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt() ||
+        ec2::Settings::instance()->dbReadOnly())
+    {
         NX_LOG(lit("QnMergeSystemsRestHandler. Can't change parameters because server is running in safe mode"), cl_logDEBUG1);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't change parameters because server is running in safe mode"));
         return nx_http::StatusCode::forbidden;
@@ -169,7 +165,21 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (takeRemoteSettings) {
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    bool isDefaultSystemName;
+    if (takeRemoteSettings)
+        isDefaultSystemName = remoteModuleInformation.serverFlags & Qn::SF_AutoSystemName;
+    else
+        isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_AutoSystemName);
+    if (isDefaultSystemName)
+    {
+        NX_LOG(lit("QnMergeSystemsRestHandler. Can not merge to the non configured system"), cl_logDEBUG1);
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("UNCONFIGURED_SYSTEM"));
+        return nx_http::StatusCode::ok;
+    }
+
+    if (takeRemoteSettings)
+    {
         if (!backupDatabase()) {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
                 .arg(takeRemoteSettings), cl_logDEBUG1);
@@ -183,7 +193,8 @@ int QnMergeSystemsRestHandler::executeGet(
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
-    } else {
+    } else
+    {
         if (!admin) {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. No admin")
                 .arg(takeRemoteSettings), cl_logDEBUG1);

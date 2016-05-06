@@ -4,11 +4,9 @@
 
 #include <nx/utils/singleton.h>
 
-class QnLastSystemUsersModel; //TODO: #ynikitenkov rename it
+#include <core/user_recent_connection_data.h>
 
-//TODO: #ynikitenkov move to some common place. Btw, why are we storing passwords anyway?
-typedef QPair<QString, QString> UserPasswordPair;
-typedef QList<UserPasswordPair> UserPasswordPairList;
+class QnRecentUserConnectionsModel;
 
 class QnClientRecentConnectionsManager: public QObject, public Singleton<QnClientRecentConnectionsManager>
 {
@@ -19,17 +17,17 @@ public:
     QnClientRecentConnectionsManager();
     virtual ~QnClientRecentConnectionsManager();
 
-    void addModel(QnLastSystemUsersModel* model);
-    void removeModel(QnLastSystemUsersModel* model);
+    void addModel(QnRecentUserConnectionsModel* model);
+    void removeModel(QnRecentUserConnectionsModel* model);
 
 private:
-    void updateModelBinding(QnLastSystemUsersModel* model);
+    void updateModelBinding(QnRecentUserConnectionsModel* model);
     void updateModelsData();
 
 private:
-    typedef QSet<QnLastSystemUsersModel*> UnboundModelsSet;
-    typedef QHash<QString, QnLastSystemUsersModel*> BoundModelsHash;
-    typedef QHash<QString, UserPasswordPairList> DataCache;
+    typedef QSet<QnRecentUserConnectionsModel*> UnboundModelsSet;
+    typedef QHash<QString, QnRecentUserConnectionsModel*> BoundModelsHash;
+    typedef QHash<QString, QnUserRecentConnectionDataList> DataCache;
 
     UnboundModelsSet m_unbound;
     BoundModelsHash m_bound;

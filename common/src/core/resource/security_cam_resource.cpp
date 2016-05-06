@@ -110,6 +110,11 @@ void QnSecurityCamResource::setCameraInfoSavedToDisk(const QString &storageUrl)
     SAFE(m_cameraInfoSavedToDisk[storageUrl] = true);
 }
 
+void QnSecurityCamResource::resetCameraInfoSavedToDisk(const QString &storageUrl)
+{
+    SAFE(m_cameraInfoSavedToDisk[storageUrl] = false);
+}
+
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
 }

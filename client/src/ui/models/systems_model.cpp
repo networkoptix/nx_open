@@ -242,7 +242,10 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
     case OwnerDescriptionRoleId:
     {
         if (!systemDescription->isCloudSystem())
+        {
+            NX_ASSERT(false, "Non-cloud system can't have cloud owner!");
             return lit("WRONG USER NAME! BUG");
+        }
 
         if ((qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
             && (qnCloudStatusWatcher->cloudLogin() == systemDescription->ownerAccountEmail()))
@@ -252,7 +255,7 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
 
         const auto fullName = systemDescription->ownerFullName();
         return (fullName.isEmpty() ? systemDescription->ownerAccountEmail()
-            : lit("%1%2").arg(fullName, tr("'s system")));
+            : tr("%1's system", "%1 is a user name").arg(fullName));
     }
     case LastPasswordsModelRoleId:
         return QVariant();  // TODO
@@ -290,7 +293,7 @@ void QnSystemsModel::updateOwnerDescription()
         return;
 
     dataChanged(index(0), index(count - 1)
-        , QVector<int>(1, OwnerDescriptionRoleId));
+        , QVector<int>() << OwnerDescriptionRoleId);
 }
 
 void QnSystemsModel::addSystem(const QnSystemDescriptionPtr &systemDescription)

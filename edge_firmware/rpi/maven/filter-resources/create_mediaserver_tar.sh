@@ -21,6 +21,10 @@ set -e
 # }
 
 TOOLCHAIN_ROOT=$environment/packages/${box}/gcc-${gcc.version}
+#bananapi uses bpi toolchain
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
+    TOOLCHAIN_ROOT=$environment/packages/bpi/gcc-${gcc.version}
+fi
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
 
 CUSTOMIZATION=${deb.customization.company.name}
@@ -164,7 +168,7 @@ cp -R ./opt $BUILD_DIR
 
 
 #additional platform specific files
-if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
+if [[ "${box}" == "bpi" ]]; then
     cp -R ./root $BUILD_DIR
     mkdir -p $BUILD_DIR/root/tools/nx
     cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
@@ -177,16 +181,23 @@ fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
     cp -f -P $TOOLCHAIN_ROOT/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
-    cp -f -P $environment/packages/${box}/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+    cp -f -P $environment/packages/bpi/opengl-es-mali/lib/* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
-chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
+if [[ "${box}" == "bpi" ]]; then
+    chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
+fi
 
 #building package
+
 pushd $BUILD_DIR
-  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
-  cp $PACKAGE_NAME ${project.build.directory}
+    if [[ "${box}" == "bpi" ]]; then
+        tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
+    else
+        tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
+    fi
+    cp $PACKAGE_NAME ${project.build.directory}
 popd
 
 if [ ! -z "$STRIP" ]; then

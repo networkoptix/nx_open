@@ -1,1 +1,0 @@
-../../../cpp/maven/filter-resources/version.h

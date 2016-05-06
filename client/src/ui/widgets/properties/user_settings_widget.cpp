@@ -9,7 +9,7 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/models/user_settings_model.h>
+#include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -35,16 +35,20 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 //    setHelpTopic(ui->accessRightsGroupbox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
-    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateLogin);
-    connect(ui->loginEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->passwordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->passwordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->confirmPasswordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::updatePassword);
-    connect(ui->confirmPasswordEdit, &QLineEdit::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::updateEmail);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,                this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->enabledButton,          &QPushButton::clicked,                  this, &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,          this, &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->loginEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updateLogin);
+    connect(ui->loginEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->passwordEdit,           &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updatePassword);
+    connect(ui->passwordEdit,           &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updatePassword);
+    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->emailEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updateEmail);
+    connect(ui->emailEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->enabledButton,          &QPushButton::clicked,          this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   [this]()
+    {
+        ui->permissionsLabel->setText(m_model->permissionsDescription(selectedPermissions(), selectedUserGroup()));
+    });
 
     //setWarningStyle(ui->hintLabel);
 }
@@ -132,7 +136,7 @@ void QnUserSettingsWidget::loadDataToUi()
     if (permissionsIndex < 0)
         permissionsIndex = customPermissionsIndex;
     ui->groupComboBox->setCurrentIndex(permissionsIndex);
-    ui->permissionsLabel->setText(m_model->groupDescription());
+    ui->permissionsLabel->setText(m_model->permissionsDescription());
 
     updateLogin();
     updatePassword();

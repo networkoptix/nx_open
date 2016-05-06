@@ -187,18 +187,23 @@
         "palette": {
             "default": {
                 "midlight":         "dark8.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)",
-                "text":             "light12",
-                "highlightedText":  "light4",
-                "brightText":       "brand_core"
+                "highlight":        "brand_core.setAlpha(102)"
             },
             "inactive": {
                 "midlight":         "dark8.setAlpha(102)",
-                "highlight":        "dark8.setAlpha(102)",
-                "text":             "dark17",
-                "highlightedText":  "light10",
-                "brightText":       "brand_d3"
+                "highlight":        "dark8.setAlpha(102)"
             }
+        }
+    },
+
+    "QnResourceItemDelegate": {
+        "colors": {
+            "mainText":          "light12",
+            "mainTextSelected":  "light4",
+            "mainTextAccented":  "brand_core",
+            "extraText":         "dark17",
+            "extraTextSelected": "light10",
+            "extraTextAccented": "brand_d3"
         }
     },
 
