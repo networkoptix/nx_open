@@ -6,7 +6,7 @@ front_end/.idea
 front_end/.sass-cache
 front_end/bower_components
 app/bower_components
-
+etc/cloud_portal.yaml
 env
 cloud/.idea
 cloud/static

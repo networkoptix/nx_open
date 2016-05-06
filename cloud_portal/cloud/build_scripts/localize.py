@@ -44,6 +44,16 @@ def process_branding(content):
     return content
 
 
+def save_content(filename, content):
+    if filename:
+        # proceed with branding
+        active_content = process_branding(content)
+
+        # save old file
+        with open(filename, "w") as file_descriptor:
+            print "save: " + filename
+            file_descriptor.write(active_content)
+
 def process_files():
     for xml_file in xml_files:
         tree = eTree.parse(xml_file)
@@ -56,19 +66,9 @@ def process_files():
             for message in context.iter('message'):
                 location = message.find('location')
                 if location is not None and location.get('filename'):
-                    if active_filename:
-                        # proceed with branding
-                        active_content = process_branding(active_content)
-
-                        # save old file
-                        with open(active_filename, "w") as file_descriptor:
-                            print("save:", active_filename)
-                            file_descriptor.write(active_content)
-
+                    save_content(active_filename,active_content)
                     active_filename = os.path.join(root_directory, location.get('filename'))
-
                     with open(active_filename, 'r') as file_descriptor:
-                        print("read:", active_filename)
                         active_content = file_descriptor.read()
 
                 source = message.find('source').text
@@ -83,6 +83,8 @@ def process_files():
                     else:
                         print("replacing:", active_filename, source, translation)
                         active_content = active_content.replace(source, translation)
+        save_content(active_filename, active_content)
+
 
 read_branding()
 process_files()
