@@ -129,7 +129,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-                <google.keystore>${customization.dir}/android-main/key.store</google.keystore>
+                <google.keystore>${customization.dir}/mobile_client/key.store</google.keystore>
                 <google.storepass>${android.storepass}</google.storepass>
                 <google.keypass>${android.keypass}</google.keypass>
                 <google.alias>${namespace.additional}</google.alias>
