@@ -1322,7 +1322,8 @@ bool QnDbManager::fixBusinessRules()
             }
         }
     }
-    m_needResyncbRules = true;
+    if (!m_dbJustCreated)
+        m_needResyncbRules = true;
     return true;
 }
 

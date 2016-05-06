@@ -22,9 +22,8 @@ namespace
     {
         for (const auto& res: qnResPool->getResourcesWithFlag(Qn::desktop_camera))
         {
-            if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId || 
-                res->getId() == clientId ||
-                clientId.isNull())
+            if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId ||
+                res->getId() == clientId)
             {
                 return qnCameraPool->getVideoCamera(res);
             }
@@ -53,7 +52,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
     {
-        error = lit("Can't find resource with id '%1'")
+        error = lit("Can't find camera with id '%1'")
             .arg(resourceId.toString());
         return false;
     }
@@ -61,7 +60,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     auto sourceCam = getTransmitSource(clientId);
     if (!sourceCam)
     {
-        error = lit("Can't find client with id '%1'")
+        error = lit("Client PC with id '%1' is not found.")
             .arg(clientId.toString());
         return false;
     }
@@ -69,7 +68,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     QnLiveStreamProviderPtr desktopDataProvider = sourceCam->getLiveReader(QnServer::HiQualityCatalog);
     if(!desktopDataProvider)
     {
-        error = lit("Unable to obtaine live reader for client '%1'")
+        error = lit("Client PC with id '%1' is found but not ready to stream audio yet.")
             .arg(clientId.toString());
         return false;
     }
@@ -77,7 +76,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     QnAudioTransmitterPtr transmitter = resource->getAudioTransmitter();
     if (!transmitter)
     {
-        error = lit("Unable to obtain audio transmitter for resource '%1'")
+        error = lit("Camera '%1' does not support 2-way audio.")
             .arg(resourceId.toString());
         return false;
     }

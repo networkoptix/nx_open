@@ -33,16 +33,26 @@ namespace{
     const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
     const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
 
-    QnOutputAudioFormat toAudioFormat(const QString& codecName)
+    QnAudioFormat toAudioFormat(const QString& codecName)
     {
+        QnAudioFormat result;
         if (codecName == lit("g711"))
-            return QnOutputAudioFormat(CODEC_ID_PCM_MULAW, 8000);
+        {
+            result.setSampleRate(8000);
+            result.setCodec("MULAW");
+        }
         else if (codecName == lit("g726"))
-            return QnOutputAudioFormat(CODEC_ID_ADPCM_G726, 8000);
+        {
+            result.setSampleRate(8000);
+            result.setCodec("G726");
+        }
         else if (codecName == lit("axis-mulaw-128"))
-            return QnOutputAudioFormat(CODEC_ID_PCM_MULAW, 16000);
-        else
-            return QnOutputAudioFormat();
+        {
+            result.setSampleRate(16000);
+            result.setCodec("MULAW");
+        }
+
+        return result;
     }
 }
 
@@ -858,7 +868,7 @@ bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
 
     for (const auto& formatStr: outputFormats.split(','))
     {
-        QnOutputAudioFormat outputFormat = toAudioFormat(formatStr);
+        QnAudioFormat outputFormat = toAudioFormat(formatStr);
         if (m_audioTransmitter->isCompatible(outputFormat))
         {
             m_audioTransmitter->setOutputFormat(outputFormat);
