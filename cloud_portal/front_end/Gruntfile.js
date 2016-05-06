@@ -28,6 +28,7 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
+            config: grunt.file.exists('config.json') && grunt.file.readJSON('config.json'),
             dist: 'dist'
         },
 
@@ -56,7 +57,7 @@ module.exports = function (grunt) {
                 tasks: ['newer:jshint:test', 'karma']
             },
             compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}', 'customizations/<%= yeoman.config.customization %>/front_end/{,*/}*.{scss,sass}'],
                 tasks: ['compass:server', 'autoprefixer']
             },
             gruntfile: {
@@ -377,6 +378,18 @@ module.exports = function (grunt) {
 
         // Copies remaining files to places other tasks can use
         copy: {
+            custom: {
+                expand: true,
+                cwd: '../customizations/<%= yeoman.config.customization %>/front_end',
+                dest: '.tmp/',
+                src: '**'
+            },
+            custom_css: {
+                expand: true,
+                cwd: '../customizations/<%= yeoman.config.customization %>/front_end/styles/',
+                dest: '<%= yeoman.app %>/styles/custom/',
+                src: '**'
+            },
             dist: {
                 files: [
                     {
@@ -494,6 +507,12 @@ module.exports = function (grunt) {
     });
 
 
+    grunt.registerTask('setbranding', function (branding) {
+        var config = {customization: branding};
+        grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
+    });
+
+
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
             return grunt.task.run([
@@ -507,6 +526,8 @@ module.exports = function (grunt) {
         grunt.task.run([
             'clean:server',
             'wiredep',
+            'copy:custom',
+            'copy:custom_css',
             'concurrent:server',
             'autoprefixer',
             'configureProxies:server',
@@ -522,6 +543,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('test', [
         'clean:server',
+        'copy:custom_css',
         'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
@@ -540,10 +562,12 @@ module.exports = function (grunt) {
         'clean:dist',
         'wiredep',
         'useminPrepare',
+        'copy:custom_css',
         'concurrent:dist',
         'autoprefixer',
         'concat',
         'ngmin',
+        'copy:custom',
         'copy:dist',
         'cssmin',
         'uglify',
