@@ -183,7 +183,7 @@ CLOUD_CONNECT = {
     'url': conf['cloud_db']['url'],
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
-    'customization': 'default',
+    'customization': conf['customization'],
     'password_realm': 'VMS'
 }
 

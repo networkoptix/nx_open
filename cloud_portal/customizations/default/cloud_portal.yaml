@@ -10,3 +10,5 @@ cloud_db:
 
 cloud_portal:
     url: 'http://cloud-demo.hdw.mx/static/index.html#'
+
+customization: default

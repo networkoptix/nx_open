@@ -1,17 +1,30 @@
 import os
 import re
 import xml.etree.ElementTree as eTree
+import yaml
+from os.path import join
+
 
 # 1. read ts into xml
 xml_files = ('cloud_portal.ts', 'templates.ts')
-branding_file = '../../customizations/default/branding.ts'
 root_directory = ''
 
 # Read branding info
 
 branding_messages = {}
 
+
+def get_config():
+    conf_dir = os.getenv('CLOUD_PORTAL_CONF_DIR')
+    if not conf_dir:
+        raise RuntimeError('CLOUD_PORTAL_CONF_DIR environment variable is undefined')
+
+    return yaml.safe_load(open(join(conf_dir, 'cloud_portal.yaml')))
+
 def read_branding():
+    conf = get_config()
+    customization = conf['customization']
+    branding_file = '../../customizations/' + customization + '/branding.ts'
     tree = eTree.parse(branding_file)
     root = tree.getroot()
 
