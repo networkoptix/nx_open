@@ -11,6 +11,7 @@
 #include "http/custom_headers.h"
 #include "utils/common/synctime.h"
 #include "network/authutil.h"
+#include <network/tcp_listener.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -64,13 +65,7 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
 
 QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)
 {
-    QString urlPath = query.url().path();
-    
-    if (urlPath.startsWith(QLatin1String("/")))
-        urlPath.remove(0, 1);
-
-    if (urlPath.endsWith(QLatin1String("/")))
-        urlPath.chop(1);
+    QString urlPath = QnTcpListener::normalizedPath(query.url().path());
 
     if ( urlPath == QLatin1String("api/ping") )
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);

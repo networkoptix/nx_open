@@ -247,7 +247,6 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
-static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
@@ -797,14 +796,6 @@ void initLog(const QString& _logLevel)
     NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
 }
 
-void encodeAndStoreAuthKey(const QByteArray& authKey)
-{
-    QByteArray prefix("SK_");
-    QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
-    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
-    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
-}
-
 void initAppServerConnection(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
@@ -846,17 +837,10 @@ void initAppServerConnection(QSettings &settings)
     // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
-    QByteArray authKey = settings.value(AUTH_KEY).toByteArray();
+    QByteArray authKey = nx::ServerSetting::getAuthKey();
     QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
-        // convert from v2.2 format and encode value
-        QByteArray prefix("SK_");
-        if (!authKey.startsWith(prefix))
-            encodeAndStoreAuthKey(authKey);
-        else
-            authKey = decodeAuthKey(authKey);
-
         userName = serverGuid().toString();
         password = authKey;
     }
@@ -916,7 +900,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     if (isStopping())
         return;
 
-    setSysIdTime(value);
+    nx::ServerSetting::setSysIdTime(value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
         saveAdminPswdHash();
@@ -1615,6 +1599,11 @@ bool MediaServerProcess::initTcpListener(
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
+
+    // Server return code 403 (forbidden) instead of 401 if user isn't authorized for requests starting with 'web' path
+    m_universalTcpListener->setPathIgnorePrefix("web/");
+    QnAuthHelper::instance()->restrictionList()->deny(lit("web/*"), AuthMethod::http);
+
     AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
@@ -1884,14 +1873,14 @@ void MediaServerProcess::run()
     if (systemName.value() != systemName.prevValue())
     {
         if (!systemName.prevValue().isEmpty())
-            setSysIdTime(0);
+            nx::ServerSetting::setSysIdTime(0);
         systemName.saveToConfig(); //< update prevValue
     }
 
     if (systemName.value().isEmpty())
     {
         systemName.resetToDefault();
-        setSysIdTime(0);
+        nx::ServerSetting::setSysIdTime(0);
         systemName.saveToConfig();
     }
     if (systemName.isDefault())
@@ -1899,7 +1888,7 @@ void MediaServerProcess::run()
 
     qnCommon->setLocalSystemName(systemName.value());
 
-    qnCommon->setSystemIdentityTime(getSysIdTime(), qnCommon->moduleGUID());
+    qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
     qnCommon->setLocalPeerType(Qn::PT_Server);
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
@@ -1969,7 +1958,7 @@ void MediaServerProcess::run()
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         nx::SystemName systemName(connectInfo.systemName);
         systemName.saveToConfig();
-        setSysIdTime(0);
+        nx::ServerSetting::setSysIdTime(0);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
@@ -2127,7 +2116,7 @@ void MediaServerProcess::run()
             isModified = true;
         }
 
-        QByteArray settingsAuthKey = decodeAuthKey(MSSettings::roSettings()->value(AUTH_KEY).toString().toLatin1());
+        QByteArray settingsAuthKey = nx::ServerSetting::getAuthKey();
         QByteArray authKey = settingsAuthKey;
         if (authKey.isEmpty())
             authKey = server->getAuthKey().toLatin1();
@@ -2140,7 +2129,7 @@ void MediaServerProcess::run()
         }
         // Keep server auth key in registry. Server MUST be able pass authorization after deleting database in database restore process
         if (settingsAuthKey != authKey)
-            encodeAndStoreAuthKey(authKey);
+            nx::ServerSetting::setAuthKey(authKey);
 
         if (isModified)
             m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
