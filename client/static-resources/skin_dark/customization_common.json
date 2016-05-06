@@ -379,13 +379,13 @@
     "QnTwoWayAudioWidget": {
         "palette": {
             "default": {
-            "window": "#00000080",
-            "windowText": "#ffffff"
+            "window": "dark1.setAlpha(128)",
+            "windowText": "light1"
             }
         },
         "colors": {
-            "background": "#212a2f",
-            "visualizer": "#cf2727"
+            "background": "dark7",
+            "visualizer": "red_main"
         }
     },
 
