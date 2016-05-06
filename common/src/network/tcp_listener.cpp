@@ -26,6 +26,9 @@ public:
     int maxConnections;
     bool ddosWarned;
 
+    static QByteArray defaultPage;
+    static QString pathIgnorePrefix;
+
     QnTcpListenerPrivate()
     :
         serverSocket(nullptr),
@@ -37,6 +40,10 @@ public:
     {
     }
 };
+
+QByteArray QnTcpListenerPrivate::defaultPage;
+QString QnTcpListenerPrivate::pathIgnorePrefix;
+
 
 // ------------------------ QnTcpListener ---------------------------
 
@@ -152,7 +159,7 @@ void QnTcpListener::removeDisconnectedConnections()
                 toDeleteList << processor;
                 itr = d->connections.erase(itr);
             }
-            else 
+            else
                 ++itr;
         }
     }
@@ -289,7 +296,7 @@ void QnTcpListener::run()
                 QnTCPConnectionProcessor* processor = createRequestProcessor(QSharedPointer<AbstractStreamSocket>(clientSocket));
                 clientSocket->setRecvTimeout(processor->getSocketTimeout());
                 clientSocket->setSendTimeout(processor->getSocketTimeout());
-                
+
                 QnMutexLocker lock( &d->connectionMtx );
                 d->connections << processor;
                 processor->start();
@@ -330,14 +337,30 @@ int QnTcpListener::getPort() const
     return d->localPort;
 }
 
-static QByteArray m_defaultPage;
-
 void QnTcpListener::setDefaultPage(const QByteArray& path)
 {
-    m_defaultPage = path;
+    QnTcpListenerPrivate::defaultPage = path;
 }
 
 QByteArray QnTcpListener::defaultPage()
 {
-    return m_defaultPage;
+    return QnTcpListenerPrivate::defaultPage;
+}
+
+void QnTcpListener::setPathIgnorePrefix(const QString& path)
+{
+    QnTcpListenerPrivate::pathIgnorePrefix = path;
+}
+
+QString QnTcpListener::normalizedPath(const QString& path)
+{
+    int startIndex = 0;
+    for (; startIndex < path.length() && path[startIndex] == L'/'; ++startIndex);
+
+    int endIndex = path.size(); // [startIndex..endIndex)
+    for (; endIndex > 0 && path[endIndex-1] == L'/'; --endIndex);
+
+    if (path.mid(startIndex).startsWith(QnTcpListenerPrivate::pathIgnorePrefix))
+        startIndex += QnTcpListenerPrivate::pathIgnorePrefix.length();
+    return path.mid(startIndex, endIndex - startIndex);
 }

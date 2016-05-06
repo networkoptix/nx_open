@@ -70,7 +70,8 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
-        qnGlobalSettings->takeCameraOwnershipWithoutLock();
+        qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
+        cameraResource->hasFlags(Qn::desktop_camera);
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
@@ -135,7 +136,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
-void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
+void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
 {
     if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
         return;   //ignoring newly discovered camera

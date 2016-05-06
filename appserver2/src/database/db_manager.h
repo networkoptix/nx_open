@@ -133,7 +133,7 @@ namespace ec2
 
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
-        ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
+        ErrorCode doQuery(const ApiStoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
 
 		// --------- misc -----------------------------
         QnUuid getID() const;
@@ -266,6 +266,13 @@ namespace ec2
 
 
         // ------------ transactions --------------------------------------
+
+        template<typename T>
+        ErrorCode executeTransactionInternal(const QnTransaction<T>&)
+        {
+            NX_ASSERT(0, "This function should be explicitely specialized");
+            return ErrorCode::notImplemented;
+        }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);

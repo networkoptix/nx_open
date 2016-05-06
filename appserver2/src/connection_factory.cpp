@@ -1076,7 +1076,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
         registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
-        registerGetFuncHandler<ApiStoredFilePath, qint64>(p, ApiCommand::dumpDatabaseToFile);
+        registerGetFuncHandler<ApiStoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
         //AbstractECConnectionFactory
         registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( p, ApiCommand::connect,

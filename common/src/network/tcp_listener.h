@@ -49,6 +49,14 @@ public:
     static void setDefaultPage(const QByteArray& path);
     static QByteArray defaultPage();
 
+    /**
+    * All handler will be matched as usual if request path starts with addition prefix
+    */
+    static void setPathIgnorePrefix(const QString& path);
+
+    /** Norlimize url path. cut off web prefix and '/' chars */
+    static QString normalizedPath(const QString& path);
+
 public slots:
     virtual void pleaseStop() override;
 

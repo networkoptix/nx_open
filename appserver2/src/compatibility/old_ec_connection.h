@@ -50,7 +50,7 @@ namespace ec2
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
-        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr) override;
         virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
     private:
         QnConnectionInfo m_connectionInfo;
