@@ -129,7 +129,7 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-                <google.keystore>${customization.dir}/android-main/key.store</google.keystore>
+                <google.keystore>${customization.dir}/mobile_client/key.store</google.keystore>
                 <google.storepass>${android.storepass}</google.storepass>
                 <google.keypass>${android.keypass}</google.keypass>
                 <google.alias>${namespace.additional}</google.alias>
@@ -189,7 +189,7 @@
                                 </goals>
                                 <configuration>
                                     <properties>
-                                        <provisioning_script>/bin/sh ${root.dir}/util/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
+                                        <provisioning_script>${root.dir}/build_utils/shell/get_provisioning_id.sh ${provisioning_profile}</provisioning_script>
                                     </properties>
                                     <source>
                                         def command = project.properties.provisioning_script

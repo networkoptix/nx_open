@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1680</width>
+    <width>1400</width>
     <height>720</height>
    </rect>
   </property>
@@ -499,9 +499,6 @@
              <property name="sortingEnabled">
               <bool>true</bool>
              </property>
-             <attribute name="horizontalHeaderStretchLastSection">
-              <bool>true</bool>
-             </attribute>
              <attribute name="verticalHeaderVisible">
               <bool>false</bool>
              </attribute>
@@ -651,7 +648,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTableView" name="gridDetails">
+            <widget class="QnTableView" name="gridDetails">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -740,6 +737,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QnTableView</class>
+   <extends>QTableView</extends>
+   <header location="global">ui/widgets/common/table_view.h</header>
+  </customwidget>
   <customwidget>
    <class>QnCheckableTableView</class>
    <extends>QTableView</extends>

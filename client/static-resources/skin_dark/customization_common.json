@@ -159,7 +159,17 @@
             "default": {
                 "base":             "transparent",
                 "midlight":         "dark12.setAlpha(102)",
-                "highlight":        "brand_core.setAlpha(102)"
+                "highlight":        "brand_core.setAlpha(102)",
+                "text":             "light10",
+                "highlightedText":  "light4"
+            }
+        }
+    },
+
+    "QScrollBar": {
+        "palette": {
+            "default": {
+                "midlight":         "dark13"
             }
         }
     },
@@ -369,13 +379,13 @@
     "QnTwoWayAudioWidget": {
         "palette": {
             "default": {
-            "window": "#00000080",
-            "windowText": "#ffffff"
+            "window": "dark1.setAlpha(128)",
+            "windowText": "light1"
             }
         },
         "colors": {
-            "background": "#212a2f",
-            "visualizer": "#cf2727"
+            "background": "dark7",
+            "visualizer": "red_main"
         }
     },
 

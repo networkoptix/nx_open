@@ -2057,6 +2057,8 @@ int QnNxStyle::pixelMetric(
     case PM_FocusFrameVMargin:
         return dp(1);
 
+    case PM_HeaderDefaultSectionSizeVertical:
+        return Metrics::kViewRowHeight;
     case PM_HeaderMarkSize:
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:
