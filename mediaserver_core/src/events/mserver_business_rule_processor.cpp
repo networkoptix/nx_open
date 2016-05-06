@@ -47,6 +47,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
+#include <nx_speach_synthesizer/speach_synthesis_data_provider.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -218,6 +219,9 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::ExecutePtzPresetAction:
             result = executePtzAction(action);
             break;
+        case QnBusiness::SayTextAction:
+            result = executeSayTextAction(action);
+            break;
         default:
             break;
         }
@@ -227,6 +231,42 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         qnServerDb->saveActionToDB(action);
 
     return result;
+}
+
+bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
+{
+    const auto params = action->getParams();
+    const auto text = params.sayText;
+    const auto resources = qnResPool
+        ->getResources<QnSecurityCamResource>(params.actionTargets);
+
+    QList<QnAudioTransmitterPtr> transmitters;
+
+    if (resources.empty())
+        return true;
+
+    for (const auto& res: resources)
+    {
+        if (res->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        {
+            auto transmitter = res->getAudioTransmitter();
+            if (transmitter)
+                transmitters << transmitter;
+        }
+    }
+
+    if (transmitters.isEmpty())
+        return true;
+
+    QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
+    for(const auto& transmitter: transmitters)
+    {
+        transmitter->stop();
+        transmitter->subscribe(speachProvider);
+        transmitter->start();
+    }
+    speachProvider->startIfNotRunning();
+    return true;
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)

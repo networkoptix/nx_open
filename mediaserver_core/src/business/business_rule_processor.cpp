@@ -190,11 +190,17 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     case QnBusiness::ShowPopupAction:
     case QnBusiness::PlaySoundOnceAction:
     case QnBusiness::PlaySoundAction:
-    case QnBusiness::SayTextAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
     case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
 
+    case QnBusiness::SayTextAction:
+    {
+        auto params = action->getParams();
+        if(params.playToClient)
+            broadcastBusinessAction(action);
+        break;
+    }
     default:
         break;
     }

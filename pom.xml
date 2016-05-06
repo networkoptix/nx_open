@@ -30,6 +30,7 @@
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <nxemail.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nxemail.guid>
+        <nx_speach_synthesizer.guid>{08927adb-9495-49a3-990d-e56d699203f7}</nx_speach_synthesizer.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
@@ -379,6 +380,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>common_libs/nxemail</module>                
+                <module>common_libs/nx_speach_synthesizer</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
                 <!--<module>mediaproxy</module> -->

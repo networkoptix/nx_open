@@ -109,7 +109,7 @@ extern "C"
 
 #include "utils/common/long_runnable.h"
 
-#include "text_to_wav.h"
+#include <nx_speach_synthesizer/text_to_wav.h>
 #include "common/common_module.h"
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"

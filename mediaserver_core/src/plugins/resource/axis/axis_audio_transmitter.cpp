@@ -41,6 +41,12 @@ QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
 {
 }
 
+void QnAxisAudioTransmitter::prepare()
+{
+    m_transcoder.reset(new QnFfmpegAudioTranscoder(m_outputFormat.codec));
+    m_transcoder->setSampleRate(m_outputFormat.sampleRate);
+}
+
 QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 {
     stop();
@@ -51,7 +57,7 @@ QString QnAxisAudioTransmitter::getAudioMimeType() const
     if (m_outputFormat.codec == CodecID::CODEC_ID_PCM_MULAW)
     {
         if (m_outputFormat.sampleRate == 8000)
-            return lit("audio/g711");
+            return lit("audio/basic");
         else
             return lit("audio/axis-mulaw-%1").arg((m_outputFormat.sampleRate * 8) / 1000);
     }
@@ -101,7 +107,7 @@ QByteArray QnAxisAudioTransmitter::buildTransmitRequest() const
             .arg(sockAddr.toString()))
         .append(lit("Content-Type: %1\r\n")
             .arg(getAudioMimeType()))
-        .append(lit("Content-Length: 999999999\r\n"))
+        .append(lit("Content-Length: 1\r\n"))
         .append(lit("Connection: Keep-Alive\r\n"))
         .append(lit("Cache-Control: no-cache\r\n"))
         .append(lit("Authorization: %1\r\n")
@@ -129,8 +135,6 @@ bool QnAxisAudioTransmitter::establishConnection()
 {
     const auto sockAddr = getSocketAddress();
 
-    qDebug() << "Axis audio transmitter, Connecting to " << sockAddr.toString();
-
     m_socket->reopen();
     auto isConnected = m_socket->connect(sockAddr, kConnectionTimeoutMs);
     if (!isConnected)
@@ -138,14 +142,13 @@ bool QnAxisAudioTransmitter::establishConnection()
 
     auto transmitRequest = buildTransmitRequest();
 
-    qDebug() << "Axis audio transmitter, sending post request" << QString(transmitRequest);
-
     int totalBytesSent = sendData(transmitRequest.constData(), transmitRequest.size());
     m_connectionEstablished = (totalBytesSent == transmitRequest.size());
     
     if (!m_connectionEstablished && !m_needStop)
-        qDebug() << "Axis audio transmitter, error occured during connection establishing: "
-                << SystemError::getLastOSErrorText();
+        qWarning()
+            << "Axis audio transmitter, error occured during connection establishing: "
+            << SystemError::getLastOSErrorText();
 
     return m_connectionEstablished;
 }
@@ -165,11 +168,13 @@ bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
         data.reset();
         if (!transcoded)
             break;
+
         if (sendData(transcoded->data(), transcoded->dataSize()) != transcoded->dataSize())
         {
             if (!m_needStop)
             {
-                qDebug() << "Axis audio transmitter, error occured during audio data transmission:"
+                qWarning()
+                    << "Axis audio transmitter, error occured during audio data transmission:"
                     << SystemError::getLastOSErrorText() << ", "
                     << "Error code: "
                     << SystemError::getLastOSErrorCode();

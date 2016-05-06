@@ -34,6 +34,7 @@ private:
     bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action);
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
+    bool executeSayTextAction(const QnAbstractBusinessActionPtr& action);
 
 private:
     class SendEmailAggregationKey

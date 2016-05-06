@@ -85,9 +85,9 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     // This lock avoid to start and stop same transmitter in the same time
     QnMutexLocker lock(getLock(resourceId));
     if (action == Action::Start)
-        transmitter->subscribe(desktopDataProvider);
+        transmitter->subscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
     else
-        transmitter->unsubscribe(desktopDataProvider);
+        transmitter->unsubscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
 
     return true;
 }

@@ -57,9 +57,13 @@ public:
      */
     virtual bool isInitialized() const = 0;
 
-    void unsubscribe(QnLiveStreamProviderPtr desktopDataProvider);
-    void subscribe(QnLiveStreamProviderPtr desktopDataProvider);
+    virtual void prepare() {}
+
+
+    virtual void unsubscribe(QnAbstractStreamDataProviderPtr desktopDataProvider);
+    virtual void subscribe(QnAbstractStreamDataProviderPtr desktopDataProvider);
+
 private:
     QnMutex m_mutex;
-    QnLiveStreamProviderPtr m_dataProvider;
+    QnAbstractStreamDataProviderPtr m_dataProvider;
 };

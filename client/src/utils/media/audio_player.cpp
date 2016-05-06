@@ -12,7 +12,7 @@
 #include <core/resource/resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
-#include <text_to_wav.h>
+#include <nx_speach_synthesizer/text_to_wav.h>
 
 #include "../../camera/audio_stream_display.h"
 

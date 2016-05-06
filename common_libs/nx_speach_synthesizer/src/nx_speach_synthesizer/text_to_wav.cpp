@@ -95,7 +95,6 @@ namespace
     {
         //int i;
         int n;
-
         if (sample_type == st_short)
         {
             if (bo != EST_NATIVE_BO)
@@ -130,6 +129,7 @@ namespace
                          int sample_rate,
                          const enum EST_sample_type_t sample_type, int bo)   
     {
+
         (void)bo;
         const char *info;
         int data_size, data_int;

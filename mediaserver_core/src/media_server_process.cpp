@@ -224,6 +224,7 @@
 #include "rest/handlers/script_list_rest_handler.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+#include <nx_speach_synthesizer/text_to_wav.h>
 
 #ifdef __arm__
 #include "nx1/info.h"
@@ -2187,6 +2188,8 @@ void MediaServerProcess::run()
 #endif //ENABLE_ONVIF
 #endif
 
+    std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
+    speechSynthesizer->start();
 
     // Roman asked Ivan to comment it for Brian
     // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());

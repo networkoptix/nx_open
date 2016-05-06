@@ -19,6 +19,8 @@ public:
     virtual bool isCompatible(const QnOutputAudioFormat& format) const override;
     virtual void setOutputFormat(const QnOutputAudioFormat& format) override;
     virtual bool isInitialized() const override;
+
+    virtual void prepare() override;
 protected:
     virtual void pleaseStop() override;
 private:

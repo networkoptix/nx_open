@@ -5,7 +5,6 @@
 QnAbstractAudioTransmitter::QnAbstractAudioTransmitter() :
     QnAbstractDataConsumer(1000)
 {
-    qDebug() << "Abstract Audio data Transmitter ctor";
 }
 
 bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data)
@@ -20,32 +19,43 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data
             return processAudioData(media);
     }
 
+    if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+        unsubscribe(dataProviderCopy);
+
     return true;
 }
 
-void QnAbstractAudioTransmitter::unsubscribe(QnLiveStreamProviderPtr dataProvider)
+void QnAbstractAudioTransmitter::unsubscribe(QnAbstractStreamDataProviderPtr dataProvider)
 {
+    QnMutexLocker lock(&m_mutex);
     if (dataProvider && dataProvider == m_dataProvider)
     {
-        dataProvider->getOwner()->notInUse(this);
+        auto owner = dataProvider->getOwner();
+        if (owner)
+            owner->notInUse(this);
         dataProvider->removeDataProcessor(this);
         m_dataProvider.clear();
-        stop();
+        m_needStop = true;
     }
 }
 
-
-void QnAbstractAudioTransmitter::subscribe(QnLiveStreamProviderPtr dataProvider)
+void QnAbstractAudioTransmitter::subscribe(QnAbstractStreamDataProviderPtr dataProvider)
 {
+    QnMutexLocker lock(&m_mutex);
+    prepare();
+    m_needStop = false;
+
     if (m_dataProvider)
     {
-        m_dataProvider->getOwner()->notInUse(this);
+        if (auto owner = m_dataProvider->getOwner())
+            owner->notInUse(this);
         m_dataProvider->removeDataProcessor(this);
     }
 
     m_dataProvider = dataProvider;
     dataProvider->addDataProcessor(this);
     dataProvider->startIfNotRunning();
-    dataProvider->getOwner()->inUse(this);
+    if (auto owner = dataProvider->getOwner())
+        owner->inUse(this);
     start();
 }
