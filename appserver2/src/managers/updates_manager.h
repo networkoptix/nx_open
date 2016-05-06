@@ -3,9 +3,8 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_update_data.h"
-#include "transaction/transaction.h"
 #include "utils/db/db_helper.h"
-#include "transaction/transaction_log.h"
+#include "transaction/transaction.h"
 
 namespace ec2 {
 

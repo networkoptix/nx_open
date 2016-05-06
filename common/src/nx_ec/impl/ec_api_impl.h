@@ -179,6 +179,7 @@ namespace ec2
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
             void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpData&);
+            void onDumpDatabaseToFileDone		(int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpToFileData&);
             void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
@@ -280,7 +281,6 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(CurrentTime, ec2::ErrorCode, qint64)
         DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, ec2::ApiDatabaseDumpData)
-
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnectionFactory
