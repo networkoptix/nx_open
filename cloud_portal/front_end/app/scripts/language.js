@@ -3,7 +3,7 @@
 var L = {
     dialogs:{
         okButton: 'Ok',
-        loginTitle: 'Login to Nx Cloud'
+        loginTitle: 'Login to PRODUCT_NAME'
     },
     systemStatuses:{
         notActivated: 'not activated',
@@ -92,7 +92,7 @@ var L = {
         confirmUnshareTitle: "Delete User?",
         confirmUnshareAction: "Delete",
 
-        successDisconnected: 'System {systemName} was successfully disconnected from Nx Cloud',
+        successDisconnected: 'System {systemName} was successfully disconnected from PRODUCT_NAME',
         successDeleted: 'System {systemName} was successfully deleted from your account',
 
         permissionsRemoved: 'Permissions were removed from {accountEmail}'

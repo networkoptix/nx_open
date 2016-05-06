@@ -39,11 +39,11 @@
                     <tr>
                         <td class="right-border">
                             <b>Website</b><br>
-                            <a href="#">networkoptix.com</a>
+                            <a href="COMPANY_LINK">COMPANY_LINK</a>
                         </td>
                         <td class="left-border">
                             <b>Support</b><br>
-                            <a href="#">support.networkoptix.com</a>
+                            <a href="SUPPORT_LINK">SUPPORT_LINK</a>
                         </td>
                     </tr>
                     </tbody>

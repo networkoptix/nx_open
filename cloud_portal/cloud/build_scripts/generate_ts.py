@@ -17,8 +17,11 @@ def process_js_file(file_name):
     with open(file_name, 'r') as file_descriptor:
         data = file_descriptor.read()
         strings = re.findall("(?<=').+?(?<!\\\\)(?=')", data)
+        strings = [x for x in strings if x not in ignore_strings]
+
         if not strings:
             return None
+
         return {
             'filename': file_name,
             'inline': [],
@@ -50,7 +53,7 @@ def process_inline_text(data):
 
 
 ignore_attributes = ('id', 'name', 'class', 'style',
-                     'src', 'href',
+                     'src',
                      'type', 'role', 'for', 'target',
                      'width', 'rows', 'cols', 'maxlength',
                      'autocomplete',
@@ -59,7 +62,10 @@ ignore_attributes = ('id', 'name', 'class', 'style',
                      'bgcolor', 'content', 'xmlns', 'topmargin', 'leftmargin', 'marginheight', 'marginwidth',
                      'border', 'cellspacing', 'cellpadding', 'border', 'cellspacing' 'cellpadding', 'http\-equiv')
 
-ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'uib\-.*?', 'href')
+ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'uib\-.*?')
+
+ignore_regex = (r'href="#.+?"',)
+ignore_strings = ('use strict',)
 
 
 def process_attributes(data):
@@ -76,6 +82,9 @@ def process_attributes(data):
         data = re.sub('\s+' + attr + '=".+?"', '', data)        # remove attribute if it has value in quotes anyway
         data = re.sub('\s+' + attr + '=[^\s>]+', '', data)      # remove attribute if it has value without quotes anyway
         data = re.sub('\s+' + attr + '(?=[\s/>])', '', data)     # remove attribute without value
+
+    for regex in ignore_regex:
+        data = re.sub(regex, '', data)
 
     data = re.sub(r'<\S+?\s*/?>', '', data)     # remove tags without attributes
     data = re.sub(r'<\S+', '', data)            # remove tags
