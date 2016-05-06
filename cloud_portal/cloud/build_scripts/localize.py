@@ -22,6 +22,7 @@ def get_config():
     return yaml.safe_load(open(join(conf_dir, 'cloud_portal.yaml')))
 
 def read_branding():
+    print "read_branding"
     conf = get_config()
     customization = conf['customization']
     branding_file = '../../customizations/' + customization + '/branding.ts'
@@ -29,7 +30,7 @@ def read_branding():
     root = tree.getroot()
 
     for context in root.iter('context'):
-        name = context.find('name')
+        name = context.find('name').text
         if name != 'global':
             continue
         for message in context.iter('message'):
