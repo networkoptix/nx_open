@@ -12,6 +12,18 @@ Page
 
     leftButtonIcon: "/images/menu.png"
     onLeftButtonClicked: sideNavigation.open()
+    warningText: qsTr("Server offline")
+
+    titleControls:
+    [
+        IconButton
+        {
+            icon: "/images/search.png"
+            enabled: d.enabled
+            opacity: !warningVisible ? 1.0 : 0.2
+            onClicked: searchToolBar.open()
+        }
+    ]
 
     QtObject
     {
@@ -20,19 +32,29 @@ Page
         readonly property bool serverOffline:
                 connectionManager.connectionState === QnConnectionManager.Connecting &&
                 !loadingDummy.visible
-        property bool serverOfflineWarningVisible: false
+        readonly property bool enabled: !warningVisible && !loadingDummy.visible
+
+        onServerOfflineChanged:
+        {
+            if (serverOffline)
+                offlineWarningDelay.restart()
+            else
+                warningVisible = false
+        }
+
     }
 
-    titleControls:
-    [
-        IconButton
+    Timer
+    {
+        id: offlineWarningDelay
+
+        interval: 20 * 1000
+        onTriggered:
         {
-            icon: "/images/search.png"
-            enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
-            opacity: !d.serverOfflineWarningVisible ? 1.0 : 0.2
-            onClicked: searchToolBar.open()
+            searchToolBar.close()
+            warningVisible = true
         }
-    ]
+    }
 
     SearchToolBar
     {
@@ -54,6 +76,7 @@ Page
         }
         displayMarginBeginning: anchors.topMargin
         displayMarginEnd: anchors.bottomMargin
+        enabled: d.enabled
     }
 
     Loader
@@ -62,6 +85,7 @@ Page
         anchors.fill: parent
         active: searchToolBar.text && searchToolBar.opacity == 1.0
         sourceComponent: searchListComponent
+        enabled: d.enabled
     }
 
     Component
@@ -88,6 +112,18 @@ Page
                 }
             }
         }
+    }
+
+    Rectangle
+    {
+        id: offlineDimmer
+
+        anchors.fill: parent
+        color: ColorTheme.transparent(ColorTheme.base5, 0.8)
+
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+        opacity: warningVisible ? 1.0 : 0.0
+        visible: opacity > 0
     }
 
     Rectangle
