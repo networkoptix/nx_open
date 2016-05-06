@@ -20,12 +20,15 @@
         <guid>${media_db_util.guid}</guid>
         <product.title>${company.name} Media DB utility</product.title>
 
-        <qt.libs>core concurrent xml</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils -ludt -lmediaserve_core</global.libs>
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <global.libs>-lmediaserver_core -lcommon -lnx_utils -lnx_network -lnx_streaming -lappserver2 -ludt -lcloud_db_client -lnx_email</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
+        <linux.oslibs>-lldap -ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
-        <rdep.packages>openssl quazip</rdep.packages>
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+        <rdep.packages>openssl ffmpeg onvif quazip sigar</rdep.packages>
+        <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
     </properties>
 
     <dependencies>
