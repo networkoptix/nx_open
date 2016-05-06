@@ -39,7 +39,7 @@ class QnAbstractResourceSearcher;
 
 class QnResourceDiscoveryManager;
 /*!
-    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread, 
+    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread,
     since we cannot move QnResourceDiscoveryManager object to QnResourceDiscoveryManager thread (weird...)
 */
 class QnResourceDiscoveryManagerTimeoutDelegate
@@ -106,13 +106,12 @@ public:
     virtual void doResourceDiscoverIteration();
 
     State state() const;
-    
+
     void setLastDiscoveredResources(const QnResourceList& resources);
     QSet<QString> lastDiscoveredIds() const;
-    virtual bool processDiscoveredResources(QnResourceList& resources);
+    void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources);
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
-
 protected:
     QnMutex m_discoveryMutex;
 
@@ -129,6 +128,7 @@ protected slots:
     void at_resourceDeleted(const QnResourcePtr& resource);
     void at_resourceAdded(const QnResourcePtr& resource);
 protected:
+    virtual bool processDiscoveredResources(QnResourceList& resources);
     bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 private:
     void updateLocalNetworkInterfaces();
