@@ -72,7 +72,10 @@
                     </Directory>                        
 
                     <Directory Id="Platforms" Name="platforms">
-                    </Directory>                    
+                    </Directory>
+                    
+                    <Directory Id="Audio" Name="audio">
+                    </Directory>
 
                     <Directory Id="ClientQml" Name="qml"/>
                     <Directory Id="ClientFontsDir" Name="fonts"/>
@@ -266,6 +269,12 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="AudioPlugins" Directory="Audio">
+            <Component>
+                <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="11" />
+            </Component>
+        </ComponentGroup>
+        
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
                 <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="12" />
@@ -299,6 +308,7 @@
             <ComponentGroupRef Id="ClientQuazip" />
             <ComponentGroupRef Id="ImageFormats" />
             <ComponentGroupRef Id="Platforms" />
+            <ComponentGroupRef Id="AudioPlugins" />
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>        

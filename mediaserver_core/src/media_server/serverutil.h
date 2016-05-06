@@ -8,7 +8,6 @@
 
 // TODO: #Elric this belongs together with server_settings
 
-QByteArray decodeAuthKey(const QByteArray&);
 QnUuid serverGuid();
 void setUseAlternativeGuid(bool value);
 
@@ -36,6 +35,22 @@ namespace nx
     private:
         QString m_value;
         QString m_prevValue;
+    };
+
+    class ServerSetting
+    {
+    public:
+
+        /** Encode and save server auth key to the config/registry */
+        static void setAuthKey(const QByteArray& authKey);
+
+        /** Read and decode server auth key from the config/registry */
+        static QByteArray getAuthKey();
+
+        static qint64 getSysIdTime();
+        static void setSysIdTime(qint64 value);
+    private:
+        static QByteArray decodeAuthKey(const QByteArray& authKey);
     };
 }
 
@@ -68,14 +83,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 
-bool changeAdminPassword(PasswordData data);
+bool changeAdminPassword(PasswordData data, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 
 bool isLocalAppServer(const QString &host);
-
-qint64 getSysIdTime();
-void setSysIdTime(qint64 value);
 
 
 #endif // _SERVER_UTIL_H

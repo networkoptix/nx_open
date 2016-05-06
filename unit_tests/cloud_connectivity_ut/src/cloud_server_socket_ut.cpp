@@ -168,9 +168,10 @@ public:
         init();
     }
 
-private:
+protected:
     hpm::MediatorFunctionalTest m_mediator;
 
+private:
     void init()
     {
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
@@ -178,6 +179,14 @@ private:
         auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
         ASSERT_NE(nullptr, server);
 
+        stun::AbstractAsyncClient::Settings stunClientSettings;
+        stunClientSettings.reconnectPolicy =
+            nx::network::RetryPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                std::chrono::milliseconds(0),
+                nx::network::RetryPolicy::kDefaultDelayMultiplier,
+                std::chrono::minutes(1));
+        SocketGlobals::mediatorConnector().reinitializeStunClient(stunClientSettings);
         SocketGlobals::mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 system.id,
@@ -524,6 +533,35 @@ TEST_F(CloudServerSocketStressTcpTest, MultiThread)
 {
     for (size_t i = 0; i < kThreadCount; ++i)
         startClientThread(kClientCount);
+}
+
+TEST_F(CloudServerSocketTest, reconnect)
+{
+    hpm::api::SystemCredentials currentCredentials =
+        *nx::network::SocketGlobals::mediatorConnector().getSystemCredentials();
+
+    auto system = m_mediator.addRandomSystem();
+    auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
+
+    hpm::api::SystemCredentials otherCredentials;
+    otherCredentials.systemId = system.id;
+    otherCredentials.key = system.authKey;
+    otherCredentials.serverId = server->serverId();
+
+    for (int i = 0; i < 200; ++i)
+    {
+        CloudServerSocket cloudServerSocket(
+            nx::network::SocketGlobals::mediatorConnector().systemConnection());
+        ASSERT_TRUE(cloudServerSocket.registerOnMediatorSync());
+        ASSERT_TRUE(cloudServerSocket.listen(128));
+        cloudServerSocket.moveToListeningState();
+
+        //breaking connection to mediator
+        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(otherCredentials);
+        std::swap(currentCredentials, otherCredentials);
+
+        cloudServerSocket.pleaseStopSync();
+    }
 }
 
 //TEST_F(CloudServerSocketTest, aioCancellation)

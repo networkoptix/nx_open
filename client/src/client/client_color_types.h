@@ -317,6 +317,20 @@ struct QnGraphicsMessageBoxColors {
 };
 #define QnGraphicsMessageBoxColors_Fields (text)(frame)(window)
 
+struct QnResourceItemColors
+{
+    QnResourceItemColors();
+
+    QColor mainText;
+    QColor mainTextSelected;
+    QColor mainTextAccented;
+    QColor extraText;
+    QColor extraTextSelected;
+    QColor extraTextAccented;
+};
+#define QnResourceItemColors_Fields (mainText)(mainTextSelected)(mainTextAccented) \
+                                (extraText)(extraTextSelected)(extraTextAccented)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -330,6 +344,7 @@ struct QnGraphicsMessageBoxColors {
     (QnBookmarkColors) \
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
+    (QnResourceItemColors) \
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

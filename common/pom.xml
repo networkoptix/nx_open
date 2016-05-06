@@ -125,6 +125,7 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
+                <rdep.linux.packages>gcc-4.9.3 quazip</rdep.linux.packages>
             </properties>
         </profile>
 

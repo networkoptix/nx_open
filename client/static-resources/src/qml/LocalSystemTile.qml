@@ -7,8 +7,8 @@ BaseTile
 {
     id: thisComponent;
 
-    property var knownUsersModel;
     property var knownHostsModel;
+    property var recentUserConnectionsModel;
 
     // Properties
     property string selectedUser:
@@ -26,6 +26,8 @@ BaseTile
             return "";
     }
 
+    property bool storePassword: false;
+    property bool autoLogin: false;
     property string selectedHost: (centralArea ? centralArea.host : "");
     property string selectedPassword: (expandedArea ? expandedArea.password : "");
 
@@ -87,7 +89,7 @@ BaseTile
             enabled: thisComponent.allowExpanding;
 
             comboBoxTextRole: "userName";
-            model: thisComponent.knownUsersModel;
+            model: thisComponent.recentUserConnectionsModel;
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
@@ -96,6 +98,8 @@ BaseTile
 
             KeyNavigation.tab: expandedArea.loginTextItem;
             KeyNavigation.backtab: hostChooseItem;
+
+            onCurrentItemIndexChanged: { updatePasswordData(currentItemIndex); }
         }
     }
 
@@ -104,6 +108,7 @@ BaseTile
         property alias login: loginTextField.text;
         property alias password: passwordTextField.text;
         property alias loginTextItem: loginTextField;
+        property alias storePasswordCheckbox: savePasswordCheckBox;
 
         topPadding: 16;
         bottomPadding: 16;
@@ -167,12 +172,23 @@ BaseTile
             {
                 id: savePasswordCheckBox;
                 text: qsTr("Save password");
+
+                onCheckedChanged:
+                {
+                    if (!checked)
+                        autoLoginCheckBoxPrivate.checked = false;
+
+                    thisComponent.storePassword = checked;
+                }
             }
 
             NxCheckBox
             {
+                id: autoLoginCheckBoxPrivate;
                 enabled: savePasswordCheckBox.checked;
                 text: qsTr("Auto-login");
+
+                onCheckedChanged: { thisComponent.autoLogin = checked; }
             }
         }
 
@@ -189,6 +205,27 @@ BaseTile
             KeyNavigation.tab: thisComponent.collapseButton;
         }
     }
+
+    function updatePasswordData(currentItemIndex)
+    {
+        var hasStoredPasswordValue = (recentUserConnectionsModel
+            && recentUserConnectionsModel.getData("hasStoredPassword", currentItemIndex));
+
+        // value can be <undefined>, thus we use explicit conversion here
+        var hasStoredPassword = (hasStoredPasswordValue ? true : false);
+        if (!expandedArea || !expandedArea.storePasswordCheckbox)
+            return;
+
+        expandedArea.storePasswordCheckbox.checked = hasStoredPassword;
+        if (!hasStoredPassword)
+            return;
+
+        var storedPassword = recentUserConnectionsModel.getData(
+            "password", currentItemIndex);
+        expandedArea.password = storedPassword;
+    }
+
+    Component.onCompleted: { updatePasswordData(0); }
 }
 
 

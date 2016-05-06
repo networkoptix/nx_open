@@ -13,6 +13,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
 #include "api/common_message_processor.h"
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
@@ -40,9 +42,9 @@
 #include <thread>
 #include <chrono>
 #include <algorithm>
-#include <vector>
 #include <array>
 #include <sstream>
+#include <map>
 #include "database/server_db.h"
 #include "common/common_globals.h"
 
@@ -59,6 +61,11 @@ static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
 const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
 const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
+
+const QString kArchiveCameraNameKey = lit("cameraName");
+const QString kArchiveCameraModelKey = lit("cameraModel");
+const QString kArchiveCameraGroupIdKey = lit("groupId");
+const QString kArchiveCameraGroupNameKey = lit("groupName");
 
 const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 
@@ -256,7 +263,7 @@ public:
     {
         bool fullscanProcessed = false;
         bool partialScanProcessed = false;
-        ec2::ApiCameraDataList archiveCameras;
+        QnStorageManager::ArchiveCameraDataList archiveCameras;
 
         TasksQueueInfo currentQueueInfo;
 
@@ -326,6 +333,7 @@ public:
                 }
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
                 scanData.storage->removeFlags(Qn::storage_fastscan);
+                m_owner->resetCameraInfoSavedFlagsForStorage(scanData.storage);
             }
             else
             {
@@ -374,35 +382,8 @@ public:
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
 
-                        ec2::ApiCameraDataList camerasToAdd;
-                        for (const auto &camera : archiveCameras)
-                        {
-                            auto cameraLowCatalog = m_owner->getFileCatalog(camera.physicalId, QnServer::LowQualityCatalog);
-                            auto cameraHiCatalog = m_owner->getFileCatalog(camera.physicalId, QnServer::HiQualityCatalog);
-
-                            bool doAdd = (cameraLowCatalog && !cameraLowCatalog->isEmpty()) || (cameraHiCatalog && !cameraHiCatalog->isEmpty());
-                            if (doAdd)
-                                camerasToAdd.push_back(camera);
-                        }
-
-                        QnAppServerConnectionFactory::getConnection2()
-                            ->getCameraManager()
-                            ->save(
-                                camerasToAdd, 
-                                ec2::DummyHandler::instance(), 
-                                &ec2::DummyHandler::onRequestDone
-                            );
-
-                        for (const auto &camera : camerasToAdd) 
-                        {
-                            QnResourcePtr existCamRes = qnResPool->getResourceById(camera.id);
-                            if (existCamRes && existCamRes->getTypeId() != camera.typeId)
-                                qnResPool->removeResource(existCamRes);
-                            QnCommonMessageProcessor::instance()->updateResource(camera);
-                        }
-
+                        m_owner->createArchiveCameras(archiveCameras);
                         archiveCameras.clear();
-                        m_owner->updateCameraHistory();
 
                         if (!m_fullScanCanceled)
                             emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
@@ -507,7 +488,45 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_removeEmtyDirTimer.invalidate();
 }
 
-//std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
+void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archiveCameras)
+{
+    QnStorageManager::ArchiveCameraDataList camerasToAdd;
+    for (const auto &camera : archiveCameras)
+    {
+        auto cameraLowCatalog = getFileCatalog(camera.coreData.physicalId, QnServer::LowQualityCatalog);
+        auto cameraHiCatalog = getFileCatalog(camera.coreData.physicalId, QnServer::HiQualityCatalog);
+
+        bool doAdd = (cameraLowCatalog && !cameraLowCatalog->isEmpty()) || (cameraHiCatalog && !cameraHiCatalog->isEmpty());
+        if (doAdd)
+            camerasToAdd.push_back(camera);
+    }
+
+    for (const auto &camera : camerasToAdd)
+    {
+        bool result = QnAppServerConnectionFactory::getConnection2()
+            ->getCameraManager()
+            ->addCamera(
+                camera.coreData,
+                ec2::DummyHandler::instance(),
+                &ec2::DummyHandler::onRequestDone
+            );
+
+        if (!result)
+            continue;
+
+        QnResourcePtr existCamRes = qnResPool->getResourceById(camera.coreData.id);
+        if (existCamRes && existCamRes->getTypeId() != camera.coreData.typeId)
+            qnResPool->removeResource(existCamRes);
+        QnCommonMessageProcessor::instance()->updateResource(camera.coreData);
+
+        for (const auto &prop : camera.properties)
+            propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
+        propertyDictionary->saveParams(camera.coreData.id);
+    }
+
+    updateCameraHistory();
+}
+
 void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter)
 {
     QnServer::ChunksCatalog catalog = fileCatalog->getCatalog();
@@ -764,50 +783,60 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     m_archiveRebuildInfo = data;
 }
 
-void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ec2::ApiCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const
+void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ArchiveCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const
 {
-    const QString infoPath = closeDirPath(fileInfo.absoluteFilePath()) + lit("info.txt");
-    auto infoFile = std::unique_ptr<QIODevice>(storage->open(infoPath, QIODevice::ReadOnly));
-    if (!infoFile)
-        return;
-    //auto newCamera = QnVirtualCameraResourcePtr(new QnArchiveCamResource);
-    ec2::ApiCameraData newCamera;
-    QString line;
-    while (1) 
-    {
-        line = QString(infoFile->readLine());
-        if (line.isEmpty() || !line.contains("="))
-            break;
-        auto keyValue = line.split(lit("="));
-        assert(keyValue.size() == 2);
+    ArchiveCameraData newCamera;
+    newCamera.coreData.physicalId = fileInfo.fileName();
+    auto cameraGuid = guidFromArbitraryData(newCamera.coreData.physicalId.toUtf8());
+    newCamera.coreData.id = cameraGuid;
+    newCamera.coreData.parentId = qnCommon->moduleGUID();
 
-        if (keyValue[0].contains("cameraName"))
-            newCamera.name = keyValue[1];
-        else if (keyValue[0].contains("cameraModel"))
-            newCamera.model = keyValue[1];
-    }
-    newCamera.physicalId = fileInfo.fileName();
-    auto cameraGuid = guidFromArbitraryData(newCamera.physicalId.toUtf8());
-    newCamera.id = cameraGuid;
-    newCamera.parentId = qnCommon->moduleGUID();
+    auto cameraIt = std::find_if( archiveCameraList.cbegin(), archiveCameraList.cend(),
+                                 [&cameraGuid] (const ArchiveCameraData &cam)
+                                 {
+                                     return cam.coreData.id == cameraGuid;
+                                 });
+    if (cameraIt != archiveCameraList.cend() || qnResPool->getResourceById(cameraGuid))
+        return;
 
     auto camTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
     if (camTypeId.isNull())
         return;
-    newCamera.typeId = camTypeId;
+    newCamera.coreData.typeId = camTypeId;
 
-    auto cameraIt = std::find_if( archiveCameraList.cbegin(), archiveCameraList.cend(),
-                                 [&cameraGuid] (const ec2::ApiCameraData &cam)
-                                 {
-                                     return cam.id == cameraGuid;
-                                 });
-    if (cameraIt != archiveCameraList.cend() || qnResPool->getResourceById(cameraGuid))
+    const QString infoPath = closeDirPath(fileInfo.absoluteFilePath()) + lit("info.txt");
+    auto infoFile = std::unique_ptr<QIODevice>(storage->open(infoPath, QIODevice::ReadOnly));
+    if (!infoFile)
         return;
+
+    QString line;
+    while (1)
+    {
+        if (infoFile->atEnd())
+            break;
+        line = QString(infoFile->readLine()).trimmed();
+        if (line.isEmpty() || !line.contains("="))
+            continue;
+        auto keyValue = line.split(lit("="));
+        NX_ASSERT(keyValue.size() == 2);
+
+        if (keyValue[0].contains(kArchiveCameraNameKey))
+            newCamera.coreData.name = keyValue[1];
+        else if (keyValue[0].contains(kArchiveCameraModelKey))
+            newCamera.coreData.model = keyValue[1];
+        else if (keyValue[0].contains(kArchiveCameraGroupIdKey))
+            newCamera.coreData.groupId= keyValue[1];
+        else if (keyValue[0].contains(kArchiveCameraGroupNameKey))
+            newCamera.coreData.groupName = keyValue[1];
+        else
+            newCamera.properties.emplace_back(cameraGuid, keyValue[0], keyValue[1]);
+    }
+
     archiveCameraList.push_back(newCamera);
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                                    ec2::ApiCameraDataList &archiveCameraList, std::function<void(int current, int total)> progressCallback)
+                                                    ArchiveCameraDataList &archiveCameraList, std::function<void(int current, int total)> progressCallback)
 {
     ArchiveScanPosition scanPos(m_role);
     scanPos.load(); // load from persistent storage
@@ -1837,6 +1866,33 @@ void QnStorageManager::testStoragesDone()
         rebuildCatalogAsync(); // continue to rebuild
 }
 
+void QnStorageManager::resetCameraInfoSavedFlagsForStorage(const QnStorageResourcePtr &storage)
+{
+    auto storageUrl = storage->getUrl();
+    std::vector<QString> cameraUniqueIds[QnServer::ChunksCatalogCount];
+
+    for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lk(&m_mutexCatalog);
+        for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+            cameraUniqueIds[i].push_back(it.key());
+    }
+    
+    for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        for (const QString &cameraUniqueId : cameraUniqueIds[i])
+        {
+            auto resource = qnResPool->getResourceByUniqueId(cameraUniqueId);
+            if (!resource)
+                continue;
+            auto camResource = resource.dynamicCast<QnSecurityCamResource>();
+            if (!camResource)
+                continue;
+            camResource->resetCameraInfoSavedToDisk(storageUrl);
+        } // for catalogs
+    } // for qualities
+}
+
 void QnStorageManager::writeCameraInfoFiles()
 {
     for (auto &storage : getWritableStorages())
@@ -1844,7 +1900,7 @@ void QnStorageManager::writeCameraInfoFiles()
         auto storageUrl = storage->getUrl();
         auto separator  = getPathSeparator(storageUrl);
 
-        std::array<QString, 2> paths = {
+        std::array<QString, QnServer::ChunksCatalogCount> paths = {
             closeDirPath(storageUrl) +
             DeviceFileCatalog::prefixByCatalog(
                 QnServer::ChunksCatalog::HiQualityCatalog
@@ -1856,38 +1912,42 @@ void QnStorageManager::writeCameraInfoFiles()
             ) + separator
         };
 
-        for (int i = 0; i < 2; ++i)
+        std::vector<QString> cameraUniqueIds[QnServer::ChunksCatalogCount];
+        for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
-            for (auto it = m_devFileCatalog[i].cbegin();
-                 it != m_devFileCatalog[i].cend();
-                 ++it)
+            QnMutexLocker lk(&m_mutexCatalog);
+            for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
+                cameraUniqueIds[i].push_back(it.key());
+        }
+        
+        for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
+        {
+            for (const QString &cameraUniqueId : cameraUniqueIds[i])
             {
-                const auto cameraUniqueId = it.key();
-                auto resource = qnResPool->getResourceByUniqueId(
-                    cameraUniqueId
-                );
+                auto resource = qnResPool->getResourceByUniqueId(cameraUniqueId);
                 if (!resource)
+                    continue;
+                auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
+                if (resource->getTypeId() == archiveCamTypeId)
                     continue;
                 auto camResource = resource.dynamicCast<QnSecurityCamResource>();
                 if (!camResource || camResource->isCameraInfoSavedToDisk(storageUrl))
                     continue;
 
                 auto path = paths[i] + cameraUniqueId + separator + lit("info.txt");
-                auto outFile = std::unique_ptr<QIODevice>(
-                    storage->open(path, QIODevice::WriteOnly)
-                );
+                auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly));
                 if (!outFile)
                     continue;
 
-                outFile->write(
-                    static_cast<std::stringstream&>(
-                        std::stringstream()
-                            << "cameraName="  << camResource->getUserDefinedName().toLatin1().constData() << std::endl
-                            << "cameraModel=" << camResource->getModel().toLatin1().constData()           << std::endl
-                            << "groupID="     << camResource->getGroupId().toLatin1().constData()         << std::endl
-                            << "groupName="   << camResource->getGroupName().toLatin1().constData()       << std::endl
-                    ).str().c_str()
-                );
+                QTextStream outStream(outFile.get());
+                outStream << kArchiveCameraNameKey << "=" << camResource->getUserDefinedName() << endl;
+                outStream << kArchiveCameraModelKey << "=" << camResource->getModel() << endl;
+                outStream << kArchiveCameraGroupIdKey << "=" << camResource->getGroupId() << endl;
+                outStream << kArchiveCameraGroupNameKey << "=" << camResource->getGroupName() << endl;
+
+                for (const auto &prop : camResource->getAllProperties())
+                    outStream << prop.name << "=" << prop.value << endl;
+
                 camResource->setCameraInfoSavedToDisk(storageUrl);
             } // for catalogs
         } // for qualities

@@ -35,7 +35,6 @@ public:
         UserActivityColumn,
         EventTypeColumn,
         DescriptionColumn,
-        PlayButtonColumn,
 
         CameraNameColumn,
         CameraIpColumn,
@@ -101,10 +100,10 @@ private:
     static QString getResourceNameById(const QnUuid &id);
     QString htmlData(const Column& column,const QnAuditRecord* data, int row, bool hovered) const;
     QString formatDateTime(int timestampSecs, bool showDate = true, bool showTime = true) const;
+    static QString formatDateTime(const QDateTime& dateTime, bool showDate = true, bool showTime = true);
     static QString formatDuration(int durationSecs);
     QString eventDescriptionText(const QnAuditRecord* data) const;
     QVariant colorForType(Qn::AuditRecordType actionType) const;
-    static QString buttonNameForEvent(Qn::AuditRecordType eventType);
     QString textData(const Column& column,const QnAuditRecord* action) const;
     bool skipDate(const QnAuditRecord *record, int row) const;
     static QString getResourcesString(const std::vector<QnUuid>& resources);

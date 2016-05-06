@@ -49,7 +49,7 @@
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
-        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
+        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="[FREEPORT1]" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
 
@@ -93,7 +93,7 @@
         </Property> -->
         
         <!-- Demo only!!! -->
-        <Property Id="SERVER_PORT" Value="7001" Secure="yes">
+        <Property Id="SERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>        
         <!-- <Property Id="SERVER_PORT" Secure="yes">
@@ -199,8 +199,8 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" After="SetServerPort2"/>
-            <Custom Action="AssignServerPort" After="FindFreePorts">NOT SERVER_PORT</Custom>
+            <Custom Action="FindFreePorts" Before="SetServerPort1"/>
+            <Custom Action="AssignServerPort" After="SetServerPort2">NOT SERVER_PORT</Custom>
             <Custom Action="FindConfiguredStorages" After="AssignServerPort"/> 
         </InstallUISequence>
 

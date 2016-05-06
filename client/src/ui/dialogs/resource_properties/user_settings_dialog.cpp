@@ -9,7 +9,7 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/models/user_settings_model.h>
+#include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/widgets/properties/user_profile_widget.h>
 #include <ui/widgets/properties/user_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>

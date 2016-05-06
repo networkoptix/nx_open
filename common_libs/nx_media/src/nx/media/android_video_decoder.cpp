@@ -164,10 +164,10 @@ class AndroidVideoDecoderPrivate: public QObject
 public:
     AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator)
     :
-        allocator(allocator),
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
+        allocator(allocator),
         program(nullptr)
     {
         registerNativeMethods();
@@ -392,7 +392,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(
     const ResourceAllocatorPtr& allocator, const QSize& resolution)
 :
     AbstractVideoDecoder(),
-    d(new AndroidVideoDecoderPrivate(allocator)),
+    d(new AndroidVideoDecoderPrivate(allocator))
 {
     QN_UNUSED(resolution);
 

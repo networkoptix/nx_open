@@ -8,6 +8,7 @@ MaskedItem
     property var model;
     property string comboBoxTextRole: "display";
     property bool isEditableComboBox: false;
+    property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1);
 
     maskedAreaDelegate: NxComboBox
     {

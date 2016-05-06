@@ -40,7 +40,6 @@ namespace nx_http
         virtual std::shared_ptr<HttpServerConnection> createConnection(
             std::unique_ptr<AbstractStreamSocket> _socket) override
 		{
-
 			return std::make_shared<HttpServerConnection>(
 				this,
 				std::move(_socket),

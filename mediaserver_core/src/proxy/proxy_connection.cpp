@@ -188,6 +188,8 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     QString host = url.host();
     QString urlPath = url.path();
 
+    // todo: this code is deprecated and isn't compatible with WEB client
+    // It never used for WEB client purpose
     if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
     {
         int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix

@@ -168,10 +168,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     /* Should be done after model resetting to avoid state loss. */
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
-    connect(ui->autoLoginCheckBox, &QCheckBox::stateChanged,    this, [this](int state) {
-        qnSettings->setAutoLogin(state == Qt::Checked);
-    });
-
+    
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleChanged,         this, &QnLoginDialog::at_moduleFinder_moduleChanged);
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleAddressFound,    this, &QnLoginDialog::at_moduleFinder_moduleChanged);
     connect(QnModuleFinder::instance(), &QnModuleFinder::moduleLost,            this, &QnLoginDialog::at_moduleFinder_moduleLost);
@@ -220,9 +217,15 @@ void QnLoginDialog::accept() {
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
-            menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
-            updateStoredConnections(url, name);
+        {
+            QnActionParameters params;
+            params.setArgument(Qn::UrlRole, url);
+            params.setArgument(Qn::AutoLoginRole, ui->autoLoginCheckBox->isChecked());
+            params.setArgument(Qn::StorePasswordRole, true);
+            params.setArgument(Qn::ConnectionAliasRole, name);
+            menu()->trigger(QnActions::ConnectAction, params);
             break;
+        }
         case QnConnectionDiagnosticsHelper::Result::RestartRequested:
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break; // to avoid cycle
@@ -381,32 +384,6 @@ void QnLoginDialog::updateUsability() {
         setCursor(Qt::BusyCursor);
         ui->buttonBox->button(QDialogButtonBox::Cancel)->setCursor(Qt::ArrowCursor);
     }
-}
-
-void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
-    QnConnectionDataList connections = qnSettings->customConnections();
-
-    QUrl urlToSave(url);
-    if (!ui->autoLoginCheckBox->isChecked())
-        urlToSave.setPassword(QString());
-
-    QnConnectionData connectionData(name, urlToSave);
-    qnSettings->setLastUsedConnection(connectionData);
-
-    // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
-
-    QnConnectionData selected = connections.getByName(name);
-    if (qnUrlEqual(selected.url, url)) {
-        connections.removeOne(selected.name);
-        connections.prepend(selected);    /* Reorder. */
-    } else {
-        // save "Last used connection"
-        QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        connections.prepend(last);
-    }
-    qnSettings->setCustomConnections(connections);
 }
 
 // -------------------------------------------------------------------------- //

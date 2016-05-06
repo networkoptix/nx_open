@@ -73,6 +73,6 @@ install -m 755 debian/postinst $STAGE/DEBIAN
 cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
 cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
 tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
-(cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
-mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
+(cd $STAGEBASE; zip -y ./connection-mediator-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
+mv $STAGEBASE/connection-mediator-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
 

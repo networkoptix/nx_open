@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="title_activity_resources">Máy ảnh</string>
-    <string name="title_activity_video">hình ảnh</string>
-    <string name="title_activity_archive">Tìm kiếm Video</string>
-	<string name="title_activity_sendlog">Thu thập và gửi log</string>
-</resources>
