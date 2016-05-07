@@ -145,7 +145,7 @@ def format_ts(strings, file_name):
 
 
 js_strings = extract_strings('../static/scripts', 'language.js', mode='js')
-html_strings = extract_strings('../static/views', '.html', dir_exclude='static')
+html_strings = extract_strings('../static/views', '.html')  # , dir_exclude='static'
 format_ts(js_strings + html_strings, "cloud_portal.ts")
 
 template_strings = extract_strings('../notifications/static/templates', '.mustache')

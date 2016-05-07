@@ -527,6 +527,7 @@ module.exports = function (grunt) {
     grunt.registerTask('setbranding', function (branding) {
         var config = {customization: branding};
         grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
+        grunt.task.run(['build']);
     });
 
 

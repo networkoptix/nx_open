@@ -893,4 +893,224 @@
   <context>
     <name>../static/views/components/process-button.html</name>
   </context>
+  <context>
+    <name>../static/views/static/about.html</name>
+    <message>
+      <location filename="../static/views/static/about.html"/>
+      <source>About</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>PRODUCT_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>What is</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/static/eula.html</name>
+    <message>
+      <location filename="../static/views/static/eula.html"/>
+      <source>Terms and conditions</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I pledge allegiance to the flag of the United States of America and to the Republic for which it stands, one nation under God, indivisible, with liberty and justice for all.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I solemnly, sincerely and truly declare and affirm that I will tell the truth, the whole truth and nothing but the truth.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I promise to uphold the Jedi Code. I promise to respect all life and to help those weaker than myself, to use the Force only for good, never to draw my lightsaber in anger, only to defend those who cannot defend themselves, to find new ways to improve myself so that I may be an example to others, and to defend the Galactic Republic.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I swear to fulfill, to the best of my ability and judgment, this covenant:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will respect the hard-won scientific gains of those physicians in whose steps I walk, and gladly share such knowledge as is mine with those who are to follow.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will apply, for the benefit of the sick, all measures which are required, avoiding those twin traps of overtreatment and therapeutic nihilism.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will remember that there is art to medicine as well as science, and that warmth, sympathy, and understanding may outweigh the surgeon's knife or the chemist's drug.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will not be ashamed to say &quot;I know not,&quot; nor will I fail to call in my colleagues when the skills of another are needed for a patient's recovery.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will respect the privacy of my patients, for their problems are not disclosed to me that the world may know. Most especially must I tread with care in matters of life and death. If it is given me to save a life, all thanks. But it may also be within my power to take a life; this awesome responsibility must be faced with great humbleness and awareness of my own frailty. Above all, I must not play at God.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will remember that I do not treat a fever chart, a cancerous growth, but a sick human being, whose illness may affect the person's family and economic stability. My responsibility includes these related problems, if I am to care adequately for the sick.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will prevent disease whenever I can, for prevention is preferable to cure.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I will remember that I remain a member of society, with special obligations to all my fellow human beings, those sound of mind and body as well as the infirm.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>If I do not violate this oath, may I enjoy life and art, respected while I live and remembered with affection thereafter. May I always act so as to preserve the finest traditions of my calling and may I long experience the joy of healing those who seek my help.</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/static/help.html</name>
+    <message>
+      <location filename="../static/views/static/help.html"/>
+      <source>How to use</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>PRODUCT_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>How to connect system to the cloud</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Support</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>If you have more questions,</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>please contact our support team</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>SUPPORT_LINK&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/static/landing.html</name>
+    <message>
+      <location filename="../static/views/static/landing.html"/>
+      <source>PRODUCT_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Future of video surveillance that comes today</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>One account for all your systems</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>No need to keep excess logins and passwords</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Access your video from anywhere</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>No port-forwarding and IP configuration anymore</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Easy sharing and user management</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Share the access and manage all your systems from single place</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Register now</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/static/register-intro.html</name>
+    <message>
+      <location filename="../static/views/static/register-intro.html"/>
+      <source>Welcome to</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>PRODUCT_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>One account for all your systems</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>No need to keep excess logins and passwords</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Access your video from anywhere</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>No port-forwarding and IP configuration anymore</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Easy sharing and user management</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Share the access and manage all your systems from single place</source>
+      <translation> </translation>
+    </message>
+  </context>
 </TS>

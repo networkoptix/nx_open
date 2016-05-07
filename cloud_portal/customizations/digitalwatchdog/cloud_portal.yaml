@@ -1,0 +1,14 @@
+cloud_database:
+    host: '127.0.0.1'
+    port: 3306
+    username: root
+    password: ''
+    database: nx_cloud
+
+cloud_db:
+    url: 'http://cloud-demo.hdw.mx:3346/cdb'
+
+cloud_portal:
+    url: 'http://cloud-demo.hdw.mx/static/dw/index.html#'
+
+customization: digitalwatchdog
