@@ -16,7 +16,7 @@
 
 .btn{
   border-radius:3px;
-  background-color:#2FA2DB;
+  background-color:$brand_core;
   display:inline-block;
   padding:10px;
   text-decoration:none;

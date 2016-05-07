@@ -25,7 +25,7 @@ def read_branding():
     print "read_branding"
     conf = get_config()
     customization = conf['customization']
-    branding_file = '../../customizations/' + customization + '/branding.ts'
+    branding_file = join('..', '..', 'customizations', customization, 'branding.ts')
     tree = eTree.parse(branding_file)
     root = tree.getroot()
 
