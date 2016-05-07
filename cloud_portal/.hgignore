@@ -10,6 +10,8 @@ etc/cloud_portal.yaml
 env
 cloud/.idea
 cloud/static
+cloud/notifications/static/templates/*.mustache
+cloud/notifications/static/templates/email_logo.png
 .DS_Store
 .idea
 

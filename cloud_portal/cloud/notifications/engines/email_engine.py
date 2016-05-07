@@ -30,7 +30,7 @@ def send(email, msg_type, message):
 
     msg.content_subtype = "html"  # Main content is now text/html
 
-    logo_filename = 'notifications/static/templates/logo.png'
+    logo_filename = 'notifications/static/templates/email_logo.png'
     fp = open(logo_filename, 'rb')
     msg_img = MIMEImage(fp.read())
     fp.close()
