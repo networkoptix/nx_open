@@ -5,6 +5,7 @@ angular.module('cloudApp')
         return{
             restrict:'A',
             link:function(scope, element, attrs) {
+                element = $(element);
                 var input = element.find('input,textarea');
                 if(!input.get(0)){ // No input inside - do nothing, just ignore directive
                     return;

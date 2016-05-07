@@ -22,7 +22,6 @@ angular.module('cloudApp')
         }
 
         return {
-            formatError:formatError,
             init:function(caller, settings){
                 /*
                 settings: {
@@ -76,9 +75,12 @@ angular.module('cloudApp')
                             self.finished = true;
                             self.error = true;
                             self.errorData = data;
-                            self.errorMessage = formatError(data.data, errorCodes);
-                            // Error handler here
-                            dialogs.notify(errorPrefix + self.errorMessage, 'danger', holdAlerts);
+                            var formatted = formatError(data.data, errorCodes);
+                            if(formatted !== false){
+                                self.errorMessage = formatted;
+                                // Error handler here
+                                dialogs.notify(errorPrefix + self.errorMessage, 'danger', holdAlerts);
+                            }
                             deferred.reject(data);
                         }
                         return caller().then(function(data){
