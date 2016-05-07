@@ -207,16 +207,18 @@ CORS_ALLOW_CREDENTIALS = True
 
 USE_ASYNC_QUEUE = True
 
-ADMINS = (('Evgeny', 'ebalashov@networkoptix.com'),)
+ADMINS = conf['admins']
 
-DEFAULT_FROM_EMAIL = 'service@networkoptix.com'
-SERVER_EMAIL = 'service@networkoptix.com'
-EMAIL_SUBJECT_PREFIX = '[CLOUD_PORTAL] '
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'service@networkoptix.com'
-EMAIL_HOST_PASSWORD = 'kbnUk06boqBkwU'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = conf['mail_from']
+EMAIL_SUBJECT_PREFIX = conf['mail_prefix']
+EMAIL_HOST = conf['smtp']['host']
+EMAIL_HOST_USER = conf['smtp']['user']
+EMAIL_HOST_PASSWORD = conf['smtp']['password']
+EMAIL_PORT = conf['smtp']['port']
+EMAIL_USE_TLS = conf['smtp']['tls']
+
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 PASSWORD_REQUIREMENTS = {
     'minLength': 6,

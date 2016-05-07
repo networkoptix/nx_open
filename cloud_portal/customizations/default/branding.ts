@@ -15,6 +15,10 @@
       <translation>http://support.networkoptix.com</translation>
     </message>
     <message>
+      <source>SUPPORT_NAME</source>
+      <translation>support.networkoptix.com</translation>
+    </message>
+    <message>
       <source>COMPANY_LINK</source>
       <translation>http://networkoptix.com</translation>
     </message>

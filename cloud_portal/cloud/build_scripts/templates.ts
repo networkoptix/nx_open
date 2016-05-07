@@ -64,7 +64,7 @@
     </message>
     <message>
       <location/>
-      <source>SUPPORT_LINK</source>
+      <source>SUPPORT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -142,7 +142,7 @@
     </message>
     <message>
       <location/>
-      <source>SUPPORT_LINK</source>
+      <source>SUPPORT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -215,7 +215,7 @@
     </message>
     <message>
       <location/>
-      <source>SUPPORT_LINK</source>
+      <source>SUPPORT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -283,7 +283,7 @@
     </message>
     <message>
       <location/>
-      <source>SUPPORT_LINK</source>
+      <source>SUPPORT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -356,7 +356,7 @@
     </message>
     <message>
       <location/>
-      <source>SUPPORT_LINK</source>
+      <source>SUPPORT_NAME</source>
       <translation> </translation>
     </message>
     <message>

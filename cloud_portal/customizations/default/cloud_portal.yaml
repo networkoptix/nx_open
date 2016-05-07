@@ -1,3 +1,5 @@
+customization: default
+
 cloud_database:
     host: '127.0.0.1'
     port: 3306
@@ -11,4 +13,18 @@ cloud_db:
 cloud_portal:
     url: 'http://cloud-demo.hdw.mx/static/index.html#'
 
-customization: default
+mail_from: 'service@networkoptix.com'
+
+mail_prefix: '[CLOUD_PORTAL]'
+
+smtp:
+    host: 'smtp.gmail.com'
+    user: 'service@networkoptix.com'
+    password: 'kbnUk06boqBkwU'
+    port: 587
+    tls: on
+
+admins:
+    -
+        - 'Evgeny'
+        - 'ebalashov@networkoptix.com'

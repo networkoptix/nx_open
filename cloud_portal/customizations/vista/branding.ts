@@ -15,6 +15,10 @@
       <translation>http://vista-cctv.com/technical-support/contact/</translation>
     </message>
     <message>
+      <source>SUPPORT_NAME</source>
+      <translation>vista-cctv.com/technical-support/contact</translation>
+    </message>
+    <message>
       <source>COMPANY_LINK</source>
       <translation>http://vista-cctv.com</translation>
     </message>

@@ -15,6 +15,10 @@
       <translation>http://digital-watchdog.com/contact-tech-support/</translation>
     </message>
     <message>
+      <source>SUPPORT_NAME</source>
+      <translation>digital-watchdog.com/contact-tech-support</translation>
+    </message>
+    <message>
       <source>COMPANY_LINK</source>
       <translation>http://digital-watchdog.com</translation>
     </message>
