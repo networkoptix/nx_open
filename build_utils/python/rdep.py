@@ -317,7 +317,7 @@ def sync_packages(root, url, target, packages, debug, force):
     return success
 
 def upload_package(root, url, target, package):
-    print "Uploading {0}...".format(package)
+    print "Uploading {0} to {1}...".format(package, url)
 
     remote = posixpath.join(url, target, package)
     local = os.path.join(root, target, package)
@@ -513,7 +513,7 @@ def main():
     if args.print_path:
         success = print_path(root, target, packages, args.debug)
     elif args.upload:
-        success = upload_packages(root, url, target, packages, args.debug)
+        success = upload_packages(root, DEFAULT_SYNC_URL, target, packages, args.debug)
     elif args.copy:
         success = copy_packages(root, target, packages, args.copy, args.debug)
     else:
