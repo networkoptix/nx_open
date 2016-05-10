@@ -1,6 +1,6 @@
 'use strict';
 var LoginPage = require('./po.js');
-fdescribe('Login dialog', function () {
+describe('Login dialog', function () {
 
     var p = new LoginPage();
 
@@ -396,7 +396,7 @@ fdescribe('Login dialog', function () {
             var oldWindow = handles[0];
             var newWindow = handles[1];
             browser.switchTo().window(newWindow).then(function () {
-                browser.refresh();
+                // new tab should be refreshed automatically after user logs in at the old tab
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
                 p.helper.logout();
             });
