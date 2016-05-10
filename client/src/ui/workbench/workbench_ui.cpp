@@ -2346,7 +2346,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     pane button "CLND" here and not in createCalendarWidget()
     */
     m_calendarHidingProcessor->addTargetItem(m_sliderItem->calendarButton());
-    m_calendarShowingProcessor->addTargetItem(m_sliderItem->calendarButton());
+    // m_calendarShowingProcessor->addTargetItem(m_sliderItem->calendarButton()); // - show unpinned calendar on hovering its button without pressing
 
     const auto toggleSliderAction = action(QnActions::ToggleSliderAction);
     m_sliderShowButton = newShowHideButton(m_controlsWidget, toggleSliderAction);
