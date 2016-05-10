@@ -226,7 +226,11 @@ class Rdep:
         remote = posixpath.join(url, self.targets[0], package)
         local = os.path.join(self.root, self.targets[0], package)
 
-        PackageConfig(local).update_timestamp()
+        config = PackageConfig(local)
+        config.update_timestamp()
+        uploader_name = self._config.get_name()
+        if uploader_name:
+            config.set_uploader(uploader_name)
 
         command = self._get_rsync_command(
                 _cygwin_path(local) + "/",
@@ -272,15 +276,22 @@ class Rdep:
         return None
 
     def list_packages(self):
+        if not self.targets:
+            print >> sys.stderr, "Please specify target"
+        elif len(self.targets) > 1:
+            print >> sys.stderr, "Please specify only one target to list"
+
+        target = self.targets[0]
+
         url = self._repo_config.get_url()
-        url = posixpath.join(url, self.target) + "/"
+        url = posixpath.join(url, target) + "/"
 
         command = [ self._config.get_rsync(), "--list-only", url ]
         self._verbose_rsync(command)
         try:
             output = subprocess.check_output(command)
         except:
-            print "Could not list packages for {0}".format(self.target)
+            print "Could not list packages for {0}".format(target)
             return False
 
         for line in output.split('\n'):
