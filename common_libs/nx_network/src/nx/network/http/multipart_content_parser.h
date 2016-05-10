@@ -31,8 +31,8 @@ namespace nx_http
         void setBoundary( const StringType& boundary );
         /** Returns headers of last read frame */
         const nx_http::HttpHeaders& prevFrameHeaders() const;
-        /** Returns \a true if previous frame is an epilogue */
-        bool isEpilogue() const;
+        /** Returns \a true if epilogue haws been received */
+        bool eof() const;
 
     private:
         enum ParsingState
@@ -46,7 +46,9 @@ namespace nx_http
             /** reading data with Content-Length known */
             readingSizedBinaryData,
             /** reading data with Content-Length not known: searching for boundary */
-            readingUnsizedBinaryData
+            readingUnsizedBinaryData,
+            /** epilogue has been received */
+            eofReached
         };
 
         enum ChunkParseState
@@ -62,8 +64,9 @@ namespace nx_http
         StringType m_boundary;
         StringType m_startBoundaryLine;
         StringType m_endBoundaryLine;
-        StringType m_boundaryForUnsizedBinaryParsing;
-        StringType m_boundaryForUnsizedBinaryParsingWOTrailingCRLF;
+        StringType m_endBoundaryForUnsizedBinaryParsing;
+        StringType m_startBoundaryForUnsizedBinaryParsing;
+        StringType m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF;
         unsigned int m_contentLength;
         ChunkParseState m_chunkParseState;
         nx::Buffer m_supposedBoundary;
