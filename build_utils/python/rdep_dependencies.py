@@ -111,13 +111,14 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
     repo_ts = get_package_timestamp(target_dir, package)
     install_ts = get_package_timestamp(target_dir, package, install_time=True)
     location = None
+    installed = False
 
     if repo_ts != None:
         if install_ts != None and install_ts == repo_ts:
-            return rdep.targets
+            installed = True
         location = rdep.locate_package(package)
 
-    if not location:
+    if repo_ts == None and not location:
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
         rdep.sync_package(package)
         location = rdep.locate_package(package)
