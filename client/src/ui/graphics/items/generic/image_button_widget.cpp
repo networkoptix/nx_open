@@ -105,7 +105,7 @@ QnImageButtonWidget::QnImageButtonWidget(const QString &statisticsAlias
     m_animator = new VariantAnimator(this);
     m_animator->setTargetObject(this);
     m_animator->setAccessor(new QnImageButtonHoverProgressAccessor());
-    m_animator->setSpeed(1000.0 / qnGlobals->opacityChangePeriod());
+    m_animator->setSpeed(1000.0 / qnGlobals->buttonAnimationPeriod());
     registerAnimation(m_animator);
 
     /* When hovering over a button, a cursor should always change to arrow pointer. */

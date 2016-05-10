@@ -15,8 +15,8 @@
 
 /**
  * Global style settings.
- * 
- * Are expected to be initialized once and not to be changed afterwards. 
+ *
+ * Are expected to be initialized once and not to be changed afterwards.
  * Everything that is changeable is to be implemented at application settings
  * level.
  */
@@ -103,6 +103,9 @@ public:
         /** Background color for a highlighted cell of an invalid business rule in the rules table. */
         BUSINESS_RULE_INVALID_HIGHLIGHT_COLOR,
 
+        /** Period for button hover animation, in milliseconds. */
+        BUTTON_ANIMATION_PERIOD,
+
         VARIABLE_COUNT
     };
 
@@ -122,6 +125,8 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
 
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
+        QN_DECLARE_R_PROPERTY(int,      buttonAnimationPeriod,          BUTTON_ANIMATION_PERIOD,                1)
+
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
 
         QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0) /**< Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */
