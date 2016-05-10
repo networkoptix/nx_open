@@ -850,6 +850,7 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
+                <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
             </properties>
             <modules>
