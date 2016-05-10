@@ -358,7 +358,7 @@ void QnPlISDResourceSearcher::processPacket(
             QAuthenticator auth;
             auth.setUser(creds["user"]);
             auth.setPassword(creds["password"]);
-            QUrl url(discoveryAddr.toString());
+            QUrl url(lit("//") + host.toString());
             if (testCredentials(url, auth))
             {
                 cameraAuth = auth;
@@ -390,9 +390,14 @@ void QnPlISDResourceSearcher::createResource(
         return;
 
     auto isDW = resourceData.value<bool>("isDW");
-    auto vendor = isDW ? kDwFullVendorName : manufacture();
-    auto name = isDW ? devInfo.modelName : lit("ISD-") + devInfo.modelName;
+    auto vendor = isDW ? kDwFullVendorName :
+        vendor == lit("ISD") || vendor == kIsdFullVendorName ?
+            manufacture() :
+            devInfo.manufacturer;
 
+    auto name = (vendor == manufacture() || vendor == kIsdFullVendorName ) ?
+        lit("ISD-") + devInfo.modelName :
+        devInfo.modelName;
 
     QnPlIsdResourcePtr resource( new QnPlIsdResource() );
 
@@ -424,7 +429,7 @@ bool QnPlISDResourceSearcher::testCredentials(const QUrl &url, const QAuthentica
     if (host.isEmpty())
         return false;
 
-    CLHttpStatus status;
+    CLHttpStatus status = CLHttpStatus::CL_HTTP_AUTH_REQUIRED;
     auto data = downloadFile(
         status,
         kIsdModelInfoUrl,
