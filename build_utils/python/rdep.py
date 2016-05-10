@@ -105,7 +105,7 @@ class Rdep:
             additional_args = []):
 
         command = [ self._config.get_rsync() ]
-        command.append("-rlt")
+        command.append("--archive")
         command.append("--delete")
 
         if OS_IS_WINDOWS:
