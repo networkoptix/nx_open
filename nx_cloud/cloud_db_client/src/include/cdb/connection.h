@@ -33,6 +33,10 @@ namespace cdb {
 */
 namespace api {
 
+class ConnectionLostEvent
+{
+};
+
 class SystemAccessListModifiedEvent
 {
 };
@@ -60,11 +64,13 @@ public:
 class SystemEventHandlers
 {
 public:
+    std::function<void(ConnectionLostEvent)> onConnectionLost;
     std::function<void(SystemAccessListModifiedEvent)> onSystemAccessListUpdated;
 };
 
 /**
-    \note Can be safely removed 
+    If existing connection has failed, reconnect attempt will be performed. 
+        If failed to reconnect, \a onConnectionLost event will be reported
 */
 class EventConnection
 {
@@ -72,8 +78,11 @@ public:
     /** If event handler is running in another thread, blocks until handler has returned */
     virtual ~EventConnection() {}
 
-    /**
+    /** Must be called just after object creation to start receiving events
+        @param eventHandlers Handles are invoked in unspecified internal thread. 
+            Single \a EventConnection instance always uses same thread
         @param completionHandler Used to report result. Can be \a nullptr
+        \note This method can be called again only after \a onConnectionLost has been reported
     */
     virtual void start(
         SystemEventHandlers eventHandlers,
