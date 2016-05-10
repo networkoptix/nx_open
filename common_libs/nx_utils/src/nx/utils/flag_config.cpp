@@ -41,6 +41,11 @@ FlagConfig::FlagConfig(const char* moduleName)
     printHeader();
 }
 
+const char* FlagConfig::tempPath()
+{
+    return m_tempPath;
+}
+
 void FlagConfig::printHeader() const
 {
     std::cerr << m_moduleName << " configuration (touch "
