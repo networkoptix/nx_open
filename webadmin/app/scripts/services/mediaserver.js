@@ -433,7 +433,7 @@ angular.module('webadminApp')
 
                 this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.serverFlags.includes(Config.newServerFlag) && !r.data.reply.ecDbReadOnly){
+                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
                         $location.path("/setup");
                         deferred.resolve("setup");
                         return;
