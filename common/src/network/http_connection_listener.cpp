@@ -46,9 +46,7 @@ QnHttpConnectionListener::InstanceFunc QnHttpConnectionListener::findHandler(
     if (isProxy(request))
         return m_proxyInfo.proxyHandler;
 
-    QString normPath = request.requestLine.url.path();
-    while (normPath.startsWith(L'/'))
-        normPath = normPath.mid(1);
+    QString normPath = QnTcpListener::normalizedPath(request.requestLine.url.path());
 
     int bestPathLen = -1;
     int bestIdx = -1;

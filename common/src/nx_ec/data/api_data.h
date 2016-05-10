@@ -26,9 +26,14 @@ struct ApiDataWithVersion: public ApiData {
 
 struct ApiDatabaseDumpData: public ApiData {
     QByteArray data;
-
 };
 #define ApiDatabaseDumpData_Fields (data)
+
+struct ApiDatabaseDumpToFileData : public ApiData {
+    ApiDatabaseDumpToFileData() : size(0) {}
+    qint64 size;
+};
+#define ApiDatabaseDumpToFileData_Fields (size)
 
 struct ApiSyncMarkerRecord: public ApiData
 {
@@ -49,5 +54,6 @@ struct ApiUpdateSequenceData: public ApiData
 } // namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ApiDatabaseDumpData);
+Q_DECLARE_METATYPE(ec2::ApiDatabaseDumpToFileData);
 
 #endif // QN_API_DATA_H

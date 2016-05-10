@@ -293,7 +293,7 @@ void QnNxStyle::drawPrimitive(
             {
                 QColor lineColor = (shape == TabShape::Rectangular)
                                    ? option->palette.shadow().color()
-                                   : mainColor.lighter(1);
+                                   : mainColor.lighter(1).color();
                 lineColor.setAlpha(QnPaletteColor::kMaxAlpha);
 
                 QnScopedPainterPenRollback penRollback(painter, lineColor);

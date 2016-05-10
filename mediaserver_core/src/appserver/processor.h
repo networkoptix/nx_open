@@ -44,7 +44,7 @@ private:
 private:
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
 
-    void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
+    void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const;
 
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
 
