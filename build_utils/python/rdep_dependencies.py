@@ -108,16 +108,16 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
     synched = False
     installed = False
 
-    sync_ts = get_package_timestamp(target_dir, package)
-    repo_ts = None
+    repo_ts = get_package_timestamp(target_dir, package)
+    install_ts = get_package_timestamp(target_dir, package, install_time=True)
+    location = None
 
-    location = rdep.locate_package(package)
-    if location and sync_ts != None:
-        repo_ts = rdep_config.PackageConfig(location).get_timestamp(None)
-        if repo_ts != None:
-            synched = (repo_ts == sync_ts)
+    if repo_ts != None:
+        if install_ts != None and install_ts == repo_ts:
+            return rdep.targets
+        location = rdep.locate_package(package)
 
-    if not synched:
+    if not location:
         print "Fetching package {0} for {1}".format(package, configuration_name(debug))
         rdep.sync_package(package)
         location = rdep.locate_package(package)
@@ -125,19 +125,18 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
             repo_ts = rdep_config.PackageConfig(location).get_timestamp(None)
             set_package_synctime(target_dir, package, repo_ts)
 
-    if not location:
+    if not location or repo_ts == None:
         print "Could not locate {0}".format(package)
         return False
-
-    install_ts = get_package_timestamp(target_dir, package, install_time=True)
-    if install_ts != None and install_ts == repo_ts:
-        installed = True
 
     deps_file = os.path.join(location, package + get_deps_file_suffix())
     if not os.path.isfile(deps_file):
         deps_file = locate_deps_file(location)
     if deps_file and os.path.isfile(deps_file):
         append_deps(deps_file, debug)
+
+    if install_ts != None and install_ts == repo_ts:
+        installed = True
 
     if not installed:
         print "Copying package {0} into {1} for {2}".format(package, target_dir, configuration_name(debug))
@@ -163,18 +162,21 @@ def get_package(rdep, target, package, target_dir, debug = False):
             if not found_target:
                 continue
 
-    if not found_target:
-        return False
+        if not found_target:
+            return False
 
-    if debug:
-        rdep.targets = [ found_target ]
-        if not get_package_for_configuration(rdep, pack + "-debug", target_dir, True):
-            if get_package_for_configuration(rdep, pack, target_dir, True):
-                ts = get_package_timestamp(target_dir, pack)
-                set_package_synctime(target_dir, pack + "-debug", ts, False)
-                set_package_synctime(target_dir, pack + "-debug", ts, True)
-            else:
-                return False
+        if debug:
+            rdep.targets = found_target if type(found_target) is list else [ found_target ]
+            if not get_package_for_configuration(rdep, pack + "-debug", target_dir, True):
+                if get_package_for_configuration(rdep, pack, target_dir, True):
+                    ts = get_package_timestamp(target_dir, pack)
+                    if ts == None:
+                        print "Something went wrong"
+                        return False
+                    set_package_synctime(target_dir, pack + "-debug", ts, False)
+                    set_package_synctime(target_dir, pack + "-debug", ts, True)
+                else:
+                    return False
 
     return True
 
