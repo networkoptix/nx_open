@@ -98,7 +98,7 @@
                 </property>
             </activation>
             <properties>
-                <linux.defines></linux.defines>
+                <linux.defines>ENABLE_PROXY_DECODER</linux.defines>
                 <rdep.linux.packages>quazip opengl-es-mali proxy-decoder</rdep.linux.packages>
             </properties>
         </profile>
