@@ -2,21 +2,19 @@
 
 #include <QtCore/QUrl>
 #include <QtGui/QGuiApplication>
+#include <QtCore/QMetaEnum>
 
 #include <core/resource_management/resource_pool.h>
 #include "api/abstract_connection.h"
 #include "api/app_server_connection.h"
 #include "api/session_manager.h"
-#include "api/model/connection_info.h"
 #include "api/global_settings.h"
 #include "api/runtime_info_manager.h"
-#include "mobile_client/mobile_client_message_processor.h"
-#include "utils/common/app_info.h"
+#include "../mobile_client/mobile_client_message_processor.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "mobile_client/mobile_client_settings.h"
-#include "common/common_module.h"
-#include "watchers/user_watcher.h"
+#include <common/common_module.h>
+#include "../watchers/user_watcher.h"
 
 namespace {
 
