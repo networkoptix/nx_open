@@ -174,6 +174,11 @@ namespace nx_http
         }
         void setAuthType( AuthType value );
         AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
+        /** Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
+            \note May be invoked within \a someMessageBodyAvailable handler only
+            \warning It is a hack. Use it only if you strongly know what you are doing
+        */
+        void forceEndOfMsgBody();
 
         //!Use this method to intanciate AsyncHttpClient class
         /*!
@@ -231,6 +236,7 @@ namespace nx_http
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
+        bool m_forcedEof;
 
         AsyncHttpClient();
 

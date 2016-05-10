@@ -63,7 +63,8 @@ namespace nx_http
         m_authType(authBasicAndDigest),
         m_awaitedMessageNumber( 0 ),
         m_lastSysErrorCode(SystemError::noError),
-        m_requestSequence( 0 )
+        m_requestSequence( 0 ),
+        m_forcedEof( false )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -517,6 +518,11 @@ namespace nx_http
                     lk.relock();
                     if( m_terminated )
                         return;
+                    if (m_forcedEof)
+                    {
+                        m_forcedEof = false;
+                        return;
+                    }
                 }
 
                 if( ((m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
@@ -561,6 +567,11 @@ namespace nx_http
                     lk.relock();
                     if( m_terminated )
                         break;
+                    if (m_forcedEof)
+                    {
+                        m_forcedEof = false;
+                        return;
+                    }
                 }
 
                 if( m_state != sFailed && m_state != sDone )
@@ -948,6 +959,12 @@ namespace nx_http
     AuthInfoCache::AuthorizationCacheItem AsyncHttpClient::authCacheItem() const
     {
         return m_authCacheItem;
+    }
+
+    void AsyncHttpClient::forceEndOfMsgBody()
+    {
+        m_forcedEof = true;
+        m_httpStreamReader.resetState();
     }
 
 
