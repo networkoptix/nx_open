@@ -103,10 +103,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_thumbnailsButton->setPreferredSize(34, 24);
 
     /* Create clock label. */
-    QnClockLabel *clockLabel = new QnClockLabel(this);
-    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
+    QnClockLabel* clockLabel = new QnClockLabel(this);
+    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     clockLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     clockLabel->setPreferredHeight(28.0);
+
+    /* Workaround to avoid size flickering due to our scene scaling: */
+    clockLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     /* Create sliders. */
     m_speedSlider = new QnSpeedSlider(this);
