@@ -99,14 +99,27 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
             if( !d->socket->isConnected() )
                 return false;   //connection has been closed
 
+            nx_http::StatusCode::Value httpResult;
             QByteArray msgBody;
             if (isProxy)
+            {
                 msgBody = STATIC_PROXY_UNAUTHORIZED_HTML;
-            else if (usedMethod & m_unauthorizedPageForMethods)
-                msgBody = unauthorizedPageBody();
+                httpResult = nx_http::StatusCode::proxyAuthenticationRequired;
+            }
+            else if (authResult ==  Qn::Auth_Forbidden)
+            {
+                msgBody = STATIC_FORBIDDEN_HTML;
+                httpResult = nx_http::StatusCode::forbidden;
+            }
             else
-                msgBody = STATIC_UNAUTHORIZED_HTML;
-            sendUnauthorizedResponse(isProxy, msgBody);
+            {
+                if (usedMethod & m_unauthorizedPageForMethods)
+                    msgBody = unauthorizedPageBody();
+                else
+                    msgBody = STATIC_UNAUTHORIZED_HTML;
+                httpResult = nx_http::StatusCode::unauthorized;
+            }
+            sendUnauthorizedResponse(httpResult, msgBody);
 
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {

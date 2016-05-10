@@ -293,7 +293,7 @@ void QnNxStyle::drawPrimitive(
             {
                 QColor lineColor = (shape == TabShape::Rectangular)
                                    ? option->palette.shadow().color()
-                                   : mainColor.lighter(1);
+                                   : mainColor.lighter(1).color();
                 lineColor.setAlpha(QnPaletteColor::kMaxAlpha);
 
                 QnScopedPainterPenRollback penRollback(painter, lineColor);
@@ -2057,6 +2057,8 @@ int QnNxStyle::pixelMetric(
     case PM_FocusFrameVMargin:
         return dp(1);
 
+    case PM_HeaderDefaultSectionSizeVertical:
+        return Metrics::kViewRowHeight;
     case PM_HeaderMarkSize:
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:

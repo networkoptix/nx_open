@@ -87,6 +87,7 @@ namespace ec2 {
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
+    struct ApiDatabaseDumpToFileData;
     struct ApiLicenseOverflowData;
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
@@ -193,6 +194,7 @@ namespace ec2 {
     (ApiPeerData)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
+    (ApiDatabaseDumpToFileData)\
     (ApiLicenseOverflowData)\
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\

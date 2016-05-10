@@ -292,6 +292,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" );
+    qRegisterMetaType<ec2::ApiDatabaseDumpToFileData>( "ApiDatabaseDumpToFileData" );
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" );
     qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" );
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
