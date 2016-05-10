@@ -820,7 +820,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(openedPanels() & SliderPanel, true); /* Leave slider open. */
+            setOpenedPanels(NoPanel, true);
         }
         else
         {
