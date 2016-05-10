@@ -64,7 +64,7 @@ private:
                 m_system.id,
                 m_server->serverId(),
                 m_system.authKey));
-        SocketGlobals::mediatorConnector().mockupAddress(mediator().endpoint());
+        SocketGlobals::mediatorConnector().mockupAddress(mediator().stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
 };
