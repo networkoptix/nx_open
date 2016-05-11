@@ -48,11 +48,25 @@ describe('System suite', function () {
             p.helper.logout();
         });
     });
-    xit("should confirm, if owner deletes system ( You are going to disconnect your system from cloud)", function() {
 
+    it("should confirm, if owner deletes system (You are going to disconnect your system from cloud)", function() {
+        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        p.ownedSystem.click();
+        p.ownerDeleteButton.click();
+        expect(p.disconnectDialog.isDisplayed()).toBe(true);
+        expect(p.disconnectDialog.getText()).toContain('You are going to completely disconnect your system from the cloud. Are you sure?');
+        p.cancelDisconnectButton.click();
+        p.helper.logout();
     });
-    xit("should confirm, if not owner deletes system (You will loose access to this system)", function() {
 
+    it("should confirm, if not owner deletes system (You will loose access to this system)", function() {
+        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
+        p.ownedSystem.click();
+        p.userDeleteButton.click();
+        expect(p.disconnectDialog.isDisplayed()).toBe(true);
+        expect(p.disconnectDialog.getText()).toContain('You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?');
+        p.cancelDisconnectButton.click();
+        p.helper.logout();
     });
 
     it("has Share button, visible for admin and owner", function() {

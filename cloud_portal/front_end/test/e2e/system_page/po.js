@@ -34,6 +34,10 @@ var SystemPage = function () {
     this.roleOptionAdmin = this.roleField.element(by.css('option[label=admin]'));
     this.roleHintBlock = element(by.css('span.help-block'));
     this.submitShareButton = element(by.css('process-button')).element(by.buttonText('Share'));
+    this.ownerDeleteButton = element(by.cssContainingText('button','Disconnect from'));
+    this.userDeleteButton = element(by.cssContainingText('button','Remove from my Account'));
+    this.disconnectDialog = element(by.css('.modal-dialog'));
+    this.cancelDisconnectButton = this.disconnectDialog.element(by.cssContainingText('button', 'Cancel'));
 
     this.selectRoleOption = function(role) {
         return this.roleField.element(by.css(role));
