@@ -37,25 +37,31 @@ void SocketGlobals::init()
 {
     QnMutexLocker lock(&s_mutex);
     if (++s_counter == 1) // first in
+    {
+        s_isInitialized = true; // allow creating Pollable(s) in constructor
         s_instance = new SocketGlobals;
+    }
 }
 
 void SocketGlobals::deinit()
 {
     QnMutexLocker lock(&s_mutex);
     if (--s_counter == 0) // last out
+    {
         delete s_instance;
+        s_isInitialized = false; // allow creating Pollable(s) in destructor
+    }
 }
-
 void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
-        s_counter.load() != 0,
+        s_isInitialized,
         "SocketGlobals::InitGuard must be initialized before using Sockets");
 }
 
 QnMutex SocketGlobals::s_mutex;
-std::atomic<int> SocketGlobals::s_counter(0);
+std::atomic<bool> SocketGlobals::s_isInitialized(false);
+size_t SocketGlobals::s_counter(0);
 SocketGlobals* SocketGlobals::s_instance(nullptr);
 
 } // namespace network

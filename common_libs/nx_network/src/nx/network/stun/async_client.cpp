@@ -284,8 +284,8 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     const auto reconnectHandlers = m_reconnectHandlers;
     lock.unlock();
-    for( const auto& handelr: reconnectHandlers )
-        handelr();
+    for( const auto& handler: reconnectHandlers )
+        handler();
 }
 
 void AsyncClient::processMessage(Message message)
