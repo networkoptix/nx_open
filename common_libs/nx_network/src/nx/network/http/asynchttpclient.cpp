@@ -110,6 +110,45 @@ namespace nx_http
         //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
     }
 
+    void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+    {
+        m_aioThreadBinder.post(
+            [this, completionHandler = std::move(completionHandler)]() mutable
+            {
+                {
+                    QnMutexLocker lk(&m_mutex);
+                    m_terminated = true;
+                }
+                //after we set m_terminated to true with m_mutex locked socket event 
+                    //processing is stopped and m_socket cannot change its value
+                if (m_socket)
+                    m_socket->pleaseStopSync();
+                completionHandler();
+            });
+    }
+
+    nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread()
+    {
+        return m_aioThreadBinder.getAioThread();
+    }
+
+    void AsyncHttpClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        m_aioThreadBinder.bindToAioThread(aioThread);
+        if (m_socket)
+            m_socket->bindToAioThread(aioThread);
+    }
+
+    void AsyncHttpClient::post(nx::utils::MoveOnlyFunc<void()> func)
+    {
+        m_aioThreadBinder.post(std::move(func));
+    }
+
+    void AsyncHttpClient::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+    {
+        m_aioThreadBinder.dispatch(std::move(func));
+    }
+
     AsyncHttpClient::State AsyncHttpClient::state() const
     {
         return m_state;
@@ -658,6 +697,7 @@ namespace nx_http
         m_socket = QSharedPointer<AbstractStreamSocket>(
             SocketFactory::createStreamSocket(m_url.scheme() == lit("https"))
             .release());
+        m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( m_sendTimeoutMs ) ||

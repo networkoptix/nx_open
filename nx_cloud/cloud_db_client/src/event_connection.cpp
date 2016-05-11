@@ -33,6 +33,8 @@ EventConnection::EventConnection(
         std::chrono::minutes(1))),
     m_state(State::init)
 {
+    m_httpClient->bindToAioThread(m_reconnectTimer.getAioThread());
+
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         this, &EventConnection::onHttpResponseReceived,
@@ -51,7 +53,7 @@ EventConnection::~EventConnection()
 {
     //TODO #ak cancel m_cdbEndPointFetcher->get
 
-    m_httpClient->terminate();
+    m_httpClient->pleaseStopSync();
     m_httpClient.reset();
 }
 

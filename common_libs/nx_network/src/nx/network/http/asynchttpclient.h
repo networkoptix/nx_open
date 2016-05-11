@@ -16,7 +16,9 @@
 #include <QtNetwork/QAuthenticator>
 #include <QSharedPointer>
 
-#include <nx/network/abstract_socket.h>
+#include "nx/network/abstract_socket.h"
+#include "nx/network/aio/abstract_pollable.h"
+#include "nx/network/aio/timer.h"
 
 #include "auth_cache.h"
 #include "httpstreamreader.h"
@@ -43,7 +45,8 @@ namespace nx_http
     class NX_NETWORK_API AsyncHttpClient
     :
         public QObject,
-        public std::enable_shared_from_this<AsyncHttpClient>
+        public std::enable_shared_from_this<AsyncHttpClient>,
+        public nx::network::aio::AbstractPollable
     {
         Q_OBJECT
 
@@ -94,6 +97,13 @@ namespace nx_http
             \note No signal is emitted after this call
         */
         virtual void terminate();
+
+        virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+        virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+        virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+        virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
+        virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
         State state() const;
         //!Returns true if no response has been recevied due to transport error
@@ -237,6 +247,8 @@ namespace nx_http
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
         bool m_forcedEof;
+        //TODO #ak remove this member
+        nx::network::aio::Timer m_aioThreadBinder;
 
         AsyncHttpClient();
 
