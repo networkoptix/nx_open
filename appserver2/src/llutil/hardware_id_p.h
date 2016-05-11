@@ -3,6 +3,9 @@
 
 #include "licensing/hardware_info.h"
 
+// HWID_Version -> {MAC -> [HWID]}
+typedef QVector<QMap<QString, QStringList>> HardwareIdListType;
+
 namespace LLUtil {
 class HardwareIdError : public std::exception {
 public:
@@ -15,7 +18,8 @@ private:
     std::string msg;
 };
 
-QString getSaveMacAddress(const QnMacAndDeviceClassList& devices, QSettings *settings);
+QStringList getMacAddressList(const QnMacAndDeviceClassList& devices);
+QString saveMac(const QStringList& macs, QSettings *settings);
 }
 
 #endif // _HARDWARE_ID_PVT_H_

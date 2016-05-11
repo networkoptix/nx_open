@@ -1120,7 +1120,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
 
             // initialize storage immediately in sync mode
-			// todo: remove this call. Need refactor
+            // todo: remove this call. Need refactor
             if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
             {
                 if (qnStorage->getParentId() == qnCommon->moduleGUID())
@@ -1908,9 +1908,7 @@ void MediaServerProcess::run()
     }
 #endif
 
-    int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
+    runtimeData.hardwareIds = LLUtil::getAllHardwareIds().toVector();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
@@ -2703,6 +2701,7 @@ protected:
 
         qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
+        LLUtil::initHardwareId(MSSettings::roSettings());
         updateGuidIfNeeded();
 
         QnUuid guid = serverGuid();
@@ -2730,7 +2729,7 @@ protected:
 
 private:
     QString hardwareIdAsGuid() {
-        auto hwId = LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings());
+        auto hwId = LLUtil::getLatestHardwareId();
         auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
         std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
         return hwIdString;
