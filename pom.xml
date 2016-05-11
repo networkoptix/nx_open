@@ -161,8 +161,8 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>3.0.0</server-external.version>
-        <help.version>${customization}-3.0.0</help.version>
+        <server-external.version>${release.version}</server-external.version>
+        <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -217,13 +217,35 @@
         <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <exec dir="${root.dir}" executable="${init.python.dir}/${python.executable}" failifexecutionfails="true" failonerror="true">
+                                    <arg value="get_branch.py" />
+                                </exec>
+                            </tasks>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
                 <version>1.0-alpha-2</version>
                 <executions>
                     <execution>
                         <id>read</id>
-                        <phase>validate</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
@@ -232,6 +254,7 @@
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
+                                <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
@@ -320,7 +343,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
-                <executions>
+                <executions>               
                     <execution>
                         <id>get-rdep-artifacts</id>
                         <phase>generate-sources</phase>

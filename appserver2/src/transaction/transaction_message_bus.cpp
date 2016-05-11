@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include <QtCore/QTimer>
-#include <QTextStream>
+#include <QtCore/QTextStream>
 
 #include <api/global_settings.h>
 #include "api/app_server_connection.h"
@@ -1277,7 +1277,10 @@ namespace ec2
                 const QUrl& url = itr.key();
                 RemoteUrlConnectInfo& connectInfo = itr.value();
                 bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
-                if (isTimeout && !isPeerUsing(url) && !m_restartPending && !ec2::Settings::instance()->dbReadOnly())
+
+                if (isTimeout && !isPeerUsing(url) && !m_restartPending &&
+                    (ApiPeerData::isClient(m_localPeerType) ||
+                    !ec2::Settings::instance()->dbReadOnly()))
                 {
                     if (!connectInfo.discoveredPeer.isNull())
                     {

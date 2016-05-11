@@ -33,7 +33,7 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
-        <rdep.packages>openssl qtsinglecoreapplication qtservice</rdep.packages>
+        <rdep.packages>openssl any/qtsinglecoreapplication any/qtservice</rdep.packages>
     </properties>
     
     <dependencies>

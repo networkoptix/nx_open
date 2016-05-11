@@ -31,6 +31,19 @@ typedef AbstractSocketImplementationDelegate<
         std::function<AbstractStreamServerSocket*()>
     > SslSocketServerImplementationDelegate;
 
+class NX_NETWORK_API SslEngine
+{
+    static const size_t kBufferSize;
+    static const int kRsaLength;
+    static const std::chrono::seconds kCertExpiration;
+
+public:
+    static String makeCertificateAndKey(
+        const String& name, const String& country, const String& company);
+
+    static bool useCertificateAndPkey(const String& certData);
+};
+
 class NX_NETWORK_API SslSocket
 :
     public SslSocketImplementationDelegate
@@ -42,9 +55,6 @@ public:
         AbstractStreamSocket* wrappedSocket,
         bool isServerSide, bool encriptionEnforced = false);
     virtual ~SslSocket();
-
-    static void initSSLEngine(const QByteArray& certData);
-    static void releaseSSLEngine();
 
     virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;

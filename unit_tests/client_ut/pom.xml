@@ -29,7 +29,7 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
         <path>${env.PATH}</path>
-        <rdep.packages>gtest openssl ffmpeg quazip festival festival-vox</rdep.packages>
+        <rdep.packages>gtest openssl ffmpeg quazip festival any/festival-vox</rdep.packages>
         <rdep.windows.packages>openal</rdep.windows.packages>
     </properties>
     <dependencies>

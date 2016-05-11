@@ -31,6 +31,7 @@ ecs.db-wal
 donotrebuild
 vms.pro
 .idea
+.branch.properties
 
 .DS_Store
 Debug

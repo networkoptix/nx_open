@@ -30,17 +30,6 @@ namespace
     /* Margin at the top and bottom of each detail line in description: */
     const int kDetailLineVerticalMargin = 1;
 
-    /* Fetch camera list from audit record: */
-    QnVirtualCameraResourceList cameraList(const QnAuditRecord* record)
-    {
-        QnVirtualCameraResourceList result;
-        for (const auto& id : record->resources)
-            if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
-                result.push_back(camera);
-
-        return result;
-    };
-
     /* Get description button text from audit record: */
     QString itemButtonText(const QnAuditRecord* record)
     {
@@ -105,7 +94,7 @@ namespace
 QnAuditItemDelegate::QnAuditItemDelegate(QObject* parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_buttonCapturedMouse(false)
+    m_mouseCapture(kNotCaptured)
 {
 }
 
@@ -212,7 +201,7 @@ QSize QnAuditItemDelegate::descriptionSizeHint(const QStyleOptionViewItem& optio
                 QFont smallFont(option.font);
                 smallFont.setPixelSize(option.font.pixelSize() - 1);
                 QFontMetrics smallFontMetrics(smallFont);
-                result.setHeight(result.height() + smallFontMetrics.height() * cameraList(record).size());
+                result.setHeight(result.height() + (smallFontMetrics.height() + kDetailLineVerticalMargin * 2) * QnAuditLogModel::getCameras(record).size());
             }
             break;
         }
@@ -231,10 +220,10 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
         case QEvent::MouseMove:
             {
                 /* First, check if mouse was released outside of our widget and discard any captures: */
-                if (m_buttonCapturedMouse && !static_cast<const QMouseEvent*>(event)->buttons().testFlag(Qt::LeftButton))
+                if (m_mouseCapture != kNotCaptured && !static_cast<const QMouseEvent*>(event)->buttons().testFlag(Qt::LeftButton))
                 {
-                    m_buttonCapturedMouse = false;
-                    m_lastPressedButtonIndex = QModelIndex();
+                    m_lastPressedIndex = QModelIndex();
+                    m_mouseCapture = kNotCaptured;
                 }
 
                 /* Check if mouse is hovering over item button in description column: */
@@ -258,38 +247,68 @@ bool QnAuditItemDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, 
                         scrollArea->viewport()->update(m_lastHoveredButtonRect);
                     }
                 }
+
+                /* If mouse is captured, skip default handling to avoid drag-selecting: */
+                if (m_mouseCapture != kNotCaptured)
+                    return true;
             }
             break;
 
         case QEvent::MouseButtonPress:
             if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton)
             {
-                if (m_lastHoveredButtonIndex == index)
+                if (index.data(Qn::ColumnDataRole).toInt() == QnAuditLogModel::DescriptionColumn)
                 {
-                    m_buttonCapturedMouse = true;
-                    m_lastPressedButtonIndex = index;
-                    scrollArea->viewport()->update(m_lastHoveredButtonRect);
-                }
-                else
-                {
-                    /* Description pressed outside its button: */
-                    if (index.data(Qn::ColumnDataRole).toInt() == QnAuditLogModel::DescriptionColumn )
-                        emit descriptionPressed(index);
+                    if (m_lastHoveredButtonIndex == index)
+                    {
+                        /* Item button was pressed: */
+                        m_mouseCapture = kCapturedByButton;
+                        scrollArea->viewport()->update(m_lastHoveredButtonRect);
+                    }
+                    else
+                    {
+                        /* Do not produce clicks on description items without details: */
+                        const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+                        if (!record || record->resources.empty())
+                            break;
+
+                        /* Description was pressed outside its button: */
+                        m_mouseCapture = kCapturedByDescription;
+                    }
+
+                    m_lastPressedIndex = index;
+
+                    /* Skip default handling to avoid selection change: */
+                    return true;
                 }
             }
             break;
 
         case QEvent::MouseButtonRelease:
-            if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton && m_buttonCapturedMouse)
+            if (static_cast<const QMouseEvent*>(event)->button() == Qt::LeftButton && m_mouseCapture != kNotCaptured)
             {
-                if (m_lastPressedButtonIndex == m_lastHoveredButtonIndex)
+                if (m_lastPressedIndex == index)
                 {
-                    /* Item button was clicked: */
-                    scrollArea->viewport()->update(m_lastHoveredButtonRect);
-                    emit buttonClicked(index);
+                    switch (m_mouseCapture)
+                    {
+                    case kCapturedByDescription:
+                        /* Click on description outside its button: */
+                        emit descriptionClicked(index);
+                        break;
+
+                    case kCapturedByButton:
+                        /* Click on description item button: */
+                        scrollArea->viewport()->update(m_lastHoveredButtonRect);
+                        emit buttonClicked(index);
+                        break;
+                    }
                 }
-                m_lastPressedButtonIndex = QModelIndex();
-                m_buttonCapturedMouse = false;
+
+                m_lastPressedIndex = QModelIndex();
+                m_mouseCapture = kNotCaptured;
+
+                /* Skip default handling to avoid selection change: */
+                return true;
             }
             break;
         }
@@ -415,13 +434,14 @@ void QnAuditItemDelegate::paintDescription(QPainter* painter, const QStyleOption
     case Qn::AR_ExportVideo:
         mainText = lit("%1 - %2").arg(context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(record->rangeStartSec * 1000ll).toString(Qt::SystemLocaleShortDate))
                                  .arg(context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(record->rangeEndSec   * 1000ll).toString(Qt::SystemLocaleShortDate));
-        cameras = cameraList(record);
+        cameras = QnAuditLogModel::getCameras(record);
         break;
 
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        cameras = cameraList(record);
-    /* FALL THROUGH */
+        cameras = QnAuditLogModel::getCameras(record);
+        break;
+
     default:
         mainText = option.index.data(Qt::DisplayRole).toString();
         break;
@@ -430,8 +450,9 @@ void QnAuditItemDelegate::paintDescription(QPainter* painter, const QStyleOption
     QString linkText;
     if (!cameras.empty())
     {
-        mainText += lit(",  ");
         linkText = QnDeviceDependentStrings::getNumericName(cameras);
+        if (!mainText.isEmpty())
+            mainText += lit(",  ");
     }
 
     /* Obtain item rectangle: */
@@ -452,7 +473,11 @@ void QnAuditItemDelegate::paintDescription(QPainter* painter, const QStyleOption
         button.state = option.state & (QStyle::State_Enabled | QStyle::State_Active);
 
         if (option.state.testFlag(QStyle::State_MouseOver) && index == m_lastHoveredButtonIndex)
-            button.state |= (index == m_lastPressedButtonIndex ? QStyle::State_Sunken : QStyle::State_MouseOver);
+        {
+            button.state |= (index == m_lastPressedIndex && m_mouseCapture == kCapturedByButton) ?
+                QStyle::State_Sunken :
+                QStyle::State_MouseOver;
+        }
 
         /* Draw: */
         QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);

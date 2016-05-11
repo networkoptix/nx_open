@@ -33,26 +33,26 @@ namespace hpm {
 
 MediatorFunctionalTest::MediatorFunctionalTest()
 :
-    m_port(0),
+    m_stunPort(0),
     m_httpPort(0)
 {
     //starting clean test
     SocketGlobalsHolder::instance()->reinitialize();
 
-    m_port = (std::rand() % 10000) + 50000;
-    m_httpPort = m_port+1;
+    m_stunPort = (std::rand() % 10000) + 50000;
+    m_httpPort = m_stunPort+1;
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     auto b = std::back_inserter(m_args);
     *b = strdup("/path/to/bin");
     *b = strdup("-e");
-    *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
+    *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_stunPort).toLatin1().constData());
     *b = strdup("-http/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
     *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(endpoint());
+    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
     registerCloudDataProvider(&m_cloudDataProvider);
 }
 
@@ -123,9 +123,9 @@ void MediatorFunctionalTest::addArg(const char* arg)
     *b = strdup(arg);
 }
 
-SocketAddress MediatorFunctionalTest::endpoint() const
+SocketAddress MediatorFunctionalTest::stunEndpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_port);
+    return SocketAddress(HostAddress::localhost, m_stunPort);
 }
 
 SocketAddress MediatorFunctionalTest::httpEndpoint() const
@@ -176,7 +176,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     nx::String name)
 {
     auto server = std::make_unique<MediaServerEmulator>(
-        endpoint(),
+        stunEndpoint(),
         system,
         std::move(name));
     if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
@@ -187,7 +187,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
     const AbstractCloudDataProvider::System& system)
 {
-    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
+    auto server = std::make_unique<MediaServerEmulator>(stunEndpoint(), system);
     if (!server->start())
     {
         std::cerr<<"Failed to start server"<<std::endl;
@@ -207,7 +207,7 @@ std::unique_ptr<MediaServerEmulator>
     MediatorFunctionalTest::addRandomServerNotRegisteredOnMediator(
         const AbstractCloudDataProvider::System& system)
 {
-    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
+    auto server = std::make_unique<MediaServerEmulator>(stunEndpoint(), system);
     if (!server->start())
         return nullptr;
     return server;
@@ -219,8 +219,8 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
         size_t count)
 {
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
+    systemServers.push_back(std::make_unique<MediaServerEmulator>(stunEndpoint(), system));
+    systemServers.push_back(std::make_unique<MediaServerEmulator>(stunEndpoint(), system));
     for (auto& server: systemServers)
         if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
             return std::vector<std::unique_ptr<MediaServerEmulator>>();

@@ -20,7 +20,7 @@ public:
 
 signals:
     void buttonClicked(const QModelIndex& index);
-    void descriptionPressed(const QModelIndex& index);
+    void descriptionClicked(const QModelIndex& index);
 
 private:
     void paintDateTime(QPainter* painter, const QStyleOptionViewItem& option, int dateTimeSecs) const;
@@ -33,10 +33,15 @@ private:
     QSize descriptionSizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
-    QModelIndex m_lastHoveredButtonIndex;   /* Stores model index of item button that was hovered last */
-    QModelIndex m_lastPressedButtonIndex;   /* Stores model index of item button that was pressed      */
-    QRect m_lastHoveredButtonRect;          /* Stores rectangle of item button that was hovered last   */
-    bool m_buttonCapturedMouse;             /* Indicates that left button was pressed on item button   */
+    QModelIndex m_lastHoveredButtonIndex;   /* Stores model index of item button that was hovered last  */
+    QRect m_lastHoveredButtonRect;          /* Stores rectangle of item button that was hovered last    */
+
+    QModelIndex m_lastPressedIndex;         /* Stores model index of description areea that was pressed */
+    enum {
+        kNotCaptured,           /* Mouse is not captured */
+        kCapturedByDescription, /* Mouse is captured after pressing description area outside of its button */
+        kCapturedByButton       /* Mouse is captured after pressing description item button */
+    } m_mouseCapture;
 
     mutable QHash<QString, int> m_sizeHintHash;
     mutable QHash<QString, int> m_boldSizeHintHash;

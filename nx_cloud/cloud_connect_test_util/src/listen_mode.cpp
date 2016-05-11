@@ -9,7 +9,6 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
-#include <utils/common/ssl_gen_cert.h>
 
 namespace nx {
 namespace cctu {
@@ -211,18 +210,16 @@ int runInListenMode(const std::multimap<QString, QString>& args)
 
     if (args.find("ssl") != args.end())
     {
-        const auto sslCert = tmpnam(nullptr);
-        if (const auto ret = generateSslCertificate(sslCert, "cctu", "US", "cctu"))
-            return ret;
+        const auto certificate = network::SslEngine::makeCertificateAndKey(
+            "cloud_connect_test_util", "US", "NX");
 
-        QFile file(QString::fromUtf8(sslCert));
-        if(!file.open(QIODevice::ReadOnly))
+        if (certificate.isEmpty())
         {
             std::cerr << "Could not generate SSL certificate" << std::endl;
             return 4;
         }
 
-        nx::network::SslSocket::initSSLEngine(file.readAll());
+        NX_CRITICAL(network::SslEngine::useCertificateAndPkey(certificate));
         serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
     }
 

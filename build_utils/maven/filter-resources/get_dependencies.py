@@ -1,6 +1,7 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 
 import os
+import posixpath
 import rdep_dependencies
 import platform_detection
 
@@ -25,6 +26,7 @@ DEPENDENCY_VERSIONS = {
     "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
     "server-external": "${server-external.version}",
+    "server-external-${branch}": "${server-external.version}",
     "help": "${help.version}"
 }
 
@@ -35,10 +37,14 @@ def get_package_version(package):
     return version
 
 def get_versioned_package_name(package):
-    version = get_package_version(package)
-    if version:
-        return package + "-" + version
-    return package
+    result = []
+    for pack in package.split('|'):
+        target, pack = posixpath.split(pack)
+        version = get_package_version(pack)
+        if version:
+            pack += "-" + version
+        result.append(posixpath.join(target, pack) if target else pack)
+    return "|".join(result)
 
 def get_packages(target):
     packages = """${rdep.global.packages} ${rdep.packages}"""
