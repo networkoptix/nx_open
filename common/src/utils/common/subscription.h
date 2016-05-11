@@ -102,6 +102,9 @@ public:
 
         m_runningSubscriptionId = kInvalidSubscriptionId;
         m_eventReportingThread = 0;
+
+        lk.unlock();
+        m_cond.wakeAll();
     }
 
 private:

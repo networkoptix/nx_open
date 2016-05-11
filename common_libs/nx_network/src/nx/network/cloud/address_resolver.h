@@ -158,7 +158,7 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
-    struct HostAddressInfo
+    struct NX_NETWORK_API HostAddressInfo
     {
         explicit HostAddressInfo(const HostAddress& hostAddress);
 

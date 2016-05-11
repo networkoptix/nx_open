@@ -16,7 +16,7 @@
     <?define clientName = "${product.name}"?>
     <?define nxtoolName = "${nxtool.company.name} Server Tool"?>
 
-    <?define productExeName = "${product_name}"?>
+    <?define productExeName = "${product.name}"?>
     <?define clientExeName = "${display.product.name}"?>
     <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 

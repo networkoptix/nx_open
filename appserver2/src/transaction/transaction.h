@@ -410,8 +410,8 @@ APPLY(1000, getLicenses, ApiLicenseDataList, \
 APPLY(1001, addLicense, ApiLicenseData, \
                        true, \
                        false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       &createHashForApiLicenseDataHelper, \
+                       LicenseNotificationManagerHelper()) \
 APPLY(1002, addLicenses, ApiLicenseDataList, \
                        true, \
                        false, \
