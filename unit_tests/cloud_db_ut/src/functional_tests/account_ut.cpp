@@ -27,7 +27,13 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, account_activation)
+class Account
+:
+    public CdbFunctionalTest
+{
+};
+
+TEST_F(Account, activation)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -74,7 +80,7 @@ TEST_F(CdbFunctionalTest, account_activation)
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
-TEST_F(CdbFunctionalTest, account_reactivation)
+TEST_F(Account, reactivation)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -130,7 +136,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 }
 
 //reactivation of already activated account must fail
-TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
+TEST_F(Account, reactivation_activated_account)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -162,7 +168,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
     ASSERT_EQ(result, api::ResultCode::forbidden);
 }
 
-TEST_F(CdbFunctionalTest, account_general)
+TEST_F(Account, general)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -252,7 +258,7 @@ TEST_F(CdbFunctionalTest, account_general)
     }
 }
 
-TEST_F(CdbFunctionalTest, account_badRegistration)
+TEST_F(Account, badRegistration)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -308,7 +314,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
     ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.errorClass);
 }
 
-TEST_F(CdbFunctionalTest, account_requestQueryDecode)
+TEST_F(Account, requestQueryDecode)
 {
     //waiting for cloud_db initialization
     ASSERT_TRUE(startAndWaitUntilStarted());
@@ -348,7 +354,7 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     ASSERT_EQ(account1.email, "test@yandex.ru");
 }
 
-TEST_F(CdbFunctionalTest, account_update)
+TEST_F(Account, update)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -388,7 +394,7 @@ TEST_F(CdbFunctionalTest, account_update)
     ASSERT_EQ(newAccount, account1);
 }
 
-TEST_F(CdbFunctionalTest, account_resetPassword_general)
+TEST_F(Account, resetPassword_general)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -447,7 +453,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
     }
 }
 
-TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
+TEST_F(Account, resetPassword_expiration)
 {
     EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
@@ -507,7 +513,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 }
 
 //checks that password reset code is valid for changing password only
-TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
+TEST_F(Account, resetPassword_authorization)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -600,7 +606,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
     ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 }
 
-TEST_F(CdbFunctionalTest, account_reset_password_activates_account)
+TEST_F(Account, reset_password_activates_account)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
