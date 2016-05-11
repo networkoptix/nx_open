@@ -465,7 +465,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
     m_bookmarksHelper(nullptr),
-    m_positionMarkerVisible(true)
+    m_liveSupported(false)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -501,7 +501,12 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum |PreserveWindowSize | UpdateToolTip | SelectionEditable | AdjustWindowToPosition | SnapZoomToSides | UnzoomOnDoubleClick;
+    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum | PreserveWindowSize | UpdateToolTip | SelectionEditable | SnapZoomToSides | UnzoomOnDoubleClick;
+#ifdef TIMELINE_BEHAVIOR_2_5
+    defaultOptions |= AdjustWindowToPosition;
+#else
+    defaultOptions |= StillPosition | HideLivePosition;
+#endif
     setOptions(defaultOptions);
 
     setToolTipFormat(lit("hh:mm:ss"));
@@ -802,7 +807,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
     end = qMax(start, qBound(minimum(), end, maximum()));
 
     /* Check if window size was spoiled and fix it if possible. */
-    if (m_options & PreserveWindowSize)
+    if (m_options.testFlag(PreserveWindowSize))
     {
         qint64 newWindowSize = end - start;
         qint64 range = maximum() - minimum();
@@ -896,13 +901,37 @@ void QnTimeSlider::setSliderPosition(qint64 position, bool keepInWindow)
 
 void QnTimeSlider::setValue(qint64 value, bool keepInWindow)
 {
-    if (!keepInWindow)
-        return setValue(value);
+    if (m_options.testFlag(StillPosition))
+    {
+        qint64 oldValue = this->value();
+        setValue(value);
 
-    bool inWindow = windowContains(this->value());
-    setValue(value);
-    if (inWindow)
-        ensureWindowContains(this->value());
+        if (keepInWindow && windowContains(oldValue))
+        {
+            qint64 delta = this->value() - oldValue;
+            qint64 windowSize = m_windowEnd - m_windowStart;
+            if (delta < 0)
+            {
+                qint64 newWindowStart = qMax(m_windowStart + delta, minimum());
+                setWindow(newWindowStart, newWindowStart + windowSize);
+            }
+            else
+            {
+                qint64 newWindowEnd = qMin(m_windowEnd + delta, maximum());
+                setWindow(newWindowEnd - windowSize, newWindowEnd);
+            }
+        }
+    }
+    else
+    {
+        if (!keepInWindow)
+            return setValue(value);
+
+        bool inWindow = windowContains(this->value());
+        setValue(value);
+        if (inWindow)
+            ensureWindowContains(this->value());
+    }
 }
 
 qint64 QnTimeSlider::selectionStart() const
@@ -1462,18 +1491,18 @@ void QnTimeSlider::updateKineticProcessor()
 void QnTimeSlider::updateToolTipVisibility()
 {
     qint64 pos = sliderPosition();
-    toolTipItem()->setVisible(m_positionMarkerVisible && pos >= m_windowStart && pos <= m_windowEnd);
+    toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd && positionMarkerVisible());
 }
 
 void QnTimeSlider::updateToolTipText()
 {
-    if (!(m_options & UpdateToolTip))
+    if (!(m_options.testFlag(UpdateToolTip)))
         return;
 
     qint64 pos = sliderPosition();
 
     QString toolTip;
-    if (m_options & UseUTC)
+    if (m_options.testFlag(UseUTC))
         toolTip = m_locale.toString(QDateTime::fromMSecsSinceEpoch(pos + m_localOffset), m_toolTipFormat);
     else
         toolTip = m_locale.toString(msecsToTime(pos), m_toolTipFormat);
@@ -1502,7 +1531,7 @@ void QnTimeSlider::updateLineCommentPixmaps()
 
 void QnTimeSlider::updateSteps()
 {
-    m_steps = (m_options & UseUTC) ? timeSteps()->absolute() : timeSteps()->relative();
+    m_steps = m_options.testFlag(UseUTC) ? timeSteps()->absolute() : timeSteps()->relative();
 
     m_nextTickmarkPos.resize(m_steps.size());
     m_tickmarkLines.resize(m_steps.size());
@@ -1529,16 +1558,26 @@ qreal QnTimeSlider::msecsPerPixel() const
 
 bool QnTimeSlider::positionMarkerVisible() const
 {
-    return m_positionMarkerVisible;
+    return !m_options.testFlag(HideLivePosition) || !isLive() || isSliderDown();
 }
 
-void QnTimeSlider::setPositionMarkerVisible(bool value)
+bool QnTimeSlider::isLiveSupported() const
 {
-    if (m_positionMarkerVisible != value)
+    return m_liveSupported;
+}
+
+void QnTimeSlider::setLiveSupported(bool value)
+{
+    if (m_liveSupported != value)
     {
-        m_positionMarkerVisible = value;
+        m_liveSupported = value;
         updateToolTipVisibility();
     }
+}
+
+bool QnTimeSlider::isLive() const
+{
+    return m_liveSupported && value() == maximum();
 }
 
 void QnTimeSlider::updateMSecsPerPixel()
@@ -1998,7 +2037,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     drawSelection(painter);
 
     /* Draw position marker. */
-    if (m_positionMarkerVisible)
+    if (positionMarkerVisible())
         drawMarker(painter, sliderPosition(), m_colors.positionMarker, 2.0);
 
     /* Draw indicators. */
@@ -2530,7 +2569,7 @@ QSizeF QnTimeSlider::sizeHint(Qt::SizeHint which, const QSizeF& constraint) cons
 
 void QnTimeSlider::tick(int deltaMs)
 {
-    if ((m_options & AdjustWindowToPosition) && !m_animating && !isSliderDown())
+    if (m_options.testFlag(AdjustWindowToPosition) && !m_animating && !isSliderDown())
     {
         /* Apply window position corrections if no animation or user interaction is in progress. */
         qint64 position = this->sliderPosition();
@@ -2606,17 +2645,17 @@ void QnTimeSlider::sliderChange(SliderChange change)
             qint64 windowStart = m_windowStart;
             qint64 windowEnd = m_windowEnd;
 
-            if ((m_options & StickToMaximum) && windowEnd == m_oldMaximum)
+            if (m_options.testFlag(StickToMaximum) && windowEnd == m_oldMaximum)
             {
-                if (m_options & PreserveWindowSize)
+                if (m_options.testFlag(PreserveWindowSize))
                     windowStart += maximum() - windowEnd;
 
                 windowEnd = maximum();
             }
 
-            if ((m_options & StickToMinimum) && windowStart == m_oldMinimum)
+            if (m_options.testFlag(StickToMinimum) && windowStart == m_oldMinimum)
             {
-                if (m_options & PreserveWindowSize)
+                if (m_options.testFlag(PreserveWindowSize))
                     windowEnd += minimum() - windowStart;
 
                 windowStart = minimum();
@@ -2668,7 +2707,7 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent* event)
     m_zoomAnchor = valueFromPosition(event->pos());
 
     /* Snap zoom anchor to window sides. */
-    if (m_options & SnapZoomToSides)
+    if (m_options.testFlag(SnapZoomToSides))
     {
         qreal windowRange = m_windowEnd - m_windowStart;
         if ((m_zoomAnchor - m_windowStart) / windowRange < kZoomSideSnapDistance)
@@ -2687,11 +2726,13 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent* event)
 {
     base_type::resizeEvent(event);
 
-    updateMSecsPerPixel();
-    updateLineCommentPixmaps();
-    updateMinimalWindow();
-    updateThumbnailsStepSize(false);
-    updateThumbnailsVisibility();
+    if (event->oldSize().width() != event->newSize().width())
+    {
+        updateMSecsPerPixel();
+        updateMinimalWindow();
+        updateThumbnailsStepSize(false);
+        updateThumbnailsVisibility();
+    }
 }
 
 void QnTimeSlider::kineticMove(const QVariant& degrees)
@@ -2717,11 +2758,7 @@ void QnTimeSlider::keyPressEvent(QKeyEvent* event)
     {
     case Qt::Key_BracketLeft:
     case Qt::Key_BracketRight:
-        if (!(m_options & SelectionEditable))
-        {
-            base_type::keyPressEvent(event);
-        }
-        else
+        if (m_options.testFlag(SelectionEditable))
         {
             if (!isSelectionValid())
             {
@@ -2735,20 +2772,23 @@ void QnTimeSlider::keyPressEvent(QKeyEvent* event)
                 else
                     setSelectionEnd(sliderPosition());
             }
+
+            /* Accept selection events. */
+            event->accept();
+            return;
         }
         break;
-
-    default:
-        base_type::keyPressEvent(event);
-        break;
     }
+
+    /* Ignore all other key events; don't call inherited implementation. */
+    event->ignore();
 }
 
 void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
     base_type::mouseDoubleClickEvent(event);
 
-    if ((m_options & UnzoomOnDoubleClick) && event->button() == Qt::LeftButton)
+    if (m_options.testFlag(UnzoomOnDoubleClick) && event->button() == Qt::LeftButton)
         setWindow(minimum(), maximum(), true);
 }
 
@@ -2832,7 +2872,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
     }
     else if (event->button() == Qt::RightButton)
     {
-        if (m_options & SelectionEditable)
+        if (m_options.testFlag(SelectionEditable))
             m_dragMarker = CreateSelectionMarker;
         else
             m_dragMarker = NoMarker;

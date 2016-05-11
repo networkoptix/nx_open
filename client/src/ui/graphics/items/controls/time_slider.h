@@ -97,6 +97,16 @@ public:
          * Whether double clicking the time slider should start animated unzoom.
          */
         UnzoomOnDoubleClick = 0x100,
+
+        /**
+        * Whether slider should adjust the window to keep current position marker at the same pixel position.
+        */
+        StillPosition = 0x200,
+
+        /**
+        * Whether slider should hide position marker and its tooltip in live mode.
+        */
+        HideLivePosition = 0x400
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -154,6 +164,11 @@ public:
     const QString& toolTipFormat() const;
     void setToolTipFormat(const QString& format);
 
+    bool isLiveSupported() const;
+    void setLiveSupported(bool value);
+
+    bool isLive() const;
+
     Q_SLOT void finishAnimations();
     Q_SLOT void hurryKineticAnimations();
 
@@ -193,7 +208,6 @@ public:
     qreal msecsPerPixel() const;
 
     bool positionMarkerVisible() const;
-    void setPositionMarkerVisible(bool value);
 
 signals:
     void windowMoved();
@@ -450,7 +464,7 @@ private:
     bool m_bookmarksVisible;
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 
-    bool m_positionMarkerVisible;
+    bool m_liveSupported;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

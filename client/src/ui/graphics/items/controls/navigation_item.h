@@ -34,7 +34,7 @@ public:
 private slots:
     void updateSyncButtonChecked();
     void updateSyncButtonEnabled();
-    void updateLiveState();
+    void updateLiveButtonChecked();
     void updateLiveButtonEnabled();
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();
