@@ -357,6 +357,60 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     });
 }
 
+void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userGroup)
+{
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    auto backup = qnResourceAccessManager->userGroups();
+
+    connection->getUserManager()->saveUserGroup(userGroup, this,
+        [this, backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        qnResourceAccessManager->resetUserGroups(backup);
+    });
+}
+
+void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
+{
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    auto backup = qnResourceAccessManager->userGroups();
+
+    connection->getUserManager()->removeUserGroup(groupId, this,
+        [this, backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        qnResourceAccessManager->resetUserGroups(backup);
+    });
+}
+
 /************************************************************************/
 /* VideoWalls block                                                     */
 /************************************************************************/

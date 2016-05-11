@@ -26,6 +26,8 @@ public:
 
     ec2::ApiUserGroupDataList userGroups() const;
     void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
+    void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
+    void removeUserGroup(const QnUuid& groupId);
 
     /** List of resources ids, the given user has access to. */
     QSet<QnUuid> accessibleResources(const QnUuid& userId) const;

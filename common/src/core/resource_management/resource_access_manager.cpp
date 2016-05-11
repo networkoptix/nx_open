@@ -75,6 +75,34 @@ void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& u
     m_userGroups = userGroups;
 }
 
+void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup)
+{
+    QnMutexLocker lk(&m_mutex);
+    auto iter = std::find_if(m_userGroups.begin(), m_userGroups.end(), [userGroup](const ec2::ApiUserGroupData& group)
+    {
+        return group.id == userGroup.id;
+    });
+    if (iter != m_userGroups.end())
+    {
+        iter->name = userGroup.name;
+        iter->permissions = userGroup.permissions;
+    }
+    else
+    {
+        m_userGroups.push_back(userGroup);
+    }
+}
+
+void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_userGroups.erase(
+        std::remove_if(m_userGroups.begin(), m_userGroups.end(), [groupId](const ec2::ApiUserGroupData& group)
+    {
+        return group.id == groupId;
+    }), m_userGroups.end());
+}
+
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
 {
     QnMutexLocker lk(&m_mutex);
