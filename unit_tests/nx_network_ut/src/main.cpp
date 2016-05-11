@@ -9,7 +9,6 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/ssl_gen_cert.h>
 #include <utils/common/command_line_parser.h>
 
 bool readCmdArguments(int argc, char **argv);
@@ -20,22 +19,15 @@ int main(int  argc, char **argv)
     ::testing::InitGoogleMock(&argc, argv);
 
     if (!readCmdArguments(argc, argv))
-        return false;
+        return 1;
 
-    const auto sslCert = tmpnam(nullptr);
-    if (const auto ret = generateSslCertificate(sslCert, argv[0], "US", "test"))
-        return ret;
+    const auto sslCert = nx::network::SslEngine::makeCertificateAndKey(
+        "test", "US", "Network Optix");
 
-    {
-        QFile file(QString::fromUtf8(sslCert));
-        if(!file.open(QIODevice::ReadOnly))
-            return -2;
-
-        nx::network::SslSocket::initSSLEngine(file.readAll());
-    }
+    NX_CRITICAL(!sslCert.isEmpty());
+    nx::network::SslEngine::useCertificateAndPkey(sslCert);
 
     const int result = RUN_ALL_TESTS();
-    QFile::remove(QString::fromUtf8(sslCert));
     return result;
 }
 
