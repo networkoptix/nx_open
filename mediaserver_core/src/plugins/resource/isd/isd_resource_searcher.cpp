@@ -391,11 +391,11 @@ void QnPlISDResourceSearcher::createResource(
 
     auto isDW = resourceData.value<bool>("isDW");
     auto vendor = isDW ? kDwFullVendorName :
-        vendor == lit("ISD") || vendor == kIsdFullVendorName ?
+        (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
             manufacture() :
             devInfo.manufacturer;
 
-    auto name = (vendor == manufacture() || vendor == kIsdFullVendorName ) ?
+    auto name = (vendor == manufacture()) ?
         lit("ISD-") + devInfo.modelName :
         devInfo.modelName;
 
