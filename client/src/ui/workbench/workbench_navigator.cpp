@@ -1153,7 +1153,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             /* Immediate setting of desired new position: */
             m_timeSlider->setValue(timeMSec, keepInWindow);
         else
-            /* Quadratic animation to desired new: */
+            /* Logarithmic animation to desired new position: */
             m_timeSlider->setValue(m_timeSlider->value() + deltaMs / 2, keepInWindow);
 
         if (timeUSec >= 0)
