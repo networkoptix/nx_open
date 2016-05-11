@@ -15,48 +15,44 @@
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
-    m_readOnlyMode(qnCommon->isReadOnly())
+    m_mutex(QnMutex::Recursive)
 {
+    /* This change affects all accessible resources. */
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly)
     {
-        m_readOnlyMode = readOnly;
-        clearCache();
+        Q_UNUSED(readOnly);
+        QnMutexLocker lk(&m_mutex);
+        m_permissionsCache.clear();
     });
 
-    auto removeResourceFromCache = [this](const QnResourcePtr& resource)
-    {
-        if (resource)
-            clearCache(resource->getId());
-    };
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this, removeResourceFromCache](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr& resource)
     {
         if (const QnLayoutResourcePtr &layout = resource.dynamicCast<QnLayoutResource>())
         {
-            connect(layout, &QnResource::parentIdChanged,           this, removeResourceFromCache); /* To make layouts global */
-            connect(layout, &QnLayoutResource::userCanEditChanged,  this, removeResourceFromCache);
-            connect(layout, &QnLayoutResource::lockedChanged,       this, removeResourceFromCache);
+            connect(layout, &QnResource::parentIdChanged,           this, &QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
+            connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(layout, &QnLayoutResource::lockedChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
         {
-            connect(user, &QnUserResource::permissionsChanged,  this, removeResourceFromCache);
-            connect(user, &QnUserResource::userGroupChanged,    this, removeResourceFromCache);
+            connect(user, &QnUserResource::permissionsChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::userGroupChanged,    this, &QnResourceAccessManager::invalidateResourceCache);
         }
-
     });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this, removeResourceFromCache](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
-        removeResourceFromCache(resource);
     });
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceAccessManager::invalidateResourceCache);
 }
 
-void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights)
+void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
 {
+    QnMutexLocker lk(&m_mutex);
     m_accessibleResources.clear();
-    for (const auto& item : accessRights)
+    for (const auto& item : accessibleResourcesList)
     {
         QSet<QnUuid> &accessibleResources = m_accessibleResources[item.userId];
         for (const auto& id : item.resourceIds)
@@ -65,18 +61,29 @@ void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRight
     m_permissionsCache.clear();
 }
 
+ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_userGroups;
+}
+
 void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& userGroups)
 {
+    QnMutexLocker lk(&m_mutex);
+    m_permissionsCache.clear();
+    m_globalPermissionsCache.clear();
     m_userGroups = userGroups;
 }
 
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
 {
+    QnMutexLocker lk(&m_mutex);
     return m_accessibleResources[userId];
 }
 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
 {
+    QnMutexLocker lk(&m_mutex);
     m_accessibleResources[userId] = resources;
 
     for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
@@ -86,11 +93,6 @@ void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const
         else
             ++iter;
     }
-}
-
-ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
-{
-    return m_userGroups;
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr &user) const
@@ -107,20 +109,41 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
 
     QnUuid userId = user->getId();
 
-    auto iter = m_globalPermissionsCache.find(userId);
-    if (iter != m_globalPermissionsCache.cend())
-        return *iter;
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto iter = m_globalPermissionsCache.find(userId);
+        if (iter != m_globalPermissionsCache.cend())
+            return *iter;
+    }
 
     Qn::GlobalPermissions result = user->getRawPermissions();
+    QnUuid groupId = user->userGroup();
 
     if (user->isOwner() || result.testFlag(Qn::GlobalOwnerPermission))
+    {
         result |= Qn::GlobalOwnerPermissionsSet;
-
-    if (result.testFlag(Qn::GlobalAdminPermission))
+    }
+    else if (result.testFlag(Qn::GlobalAdminPermission))
+    {
         result |= Qn::GlobalAdminPermissionsSet;
+    }
+    else if (!groupId.isNull())
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto iter = std::find_if(m_userGroups.cbegin(), m_userGroups.cend(), [groupId](const ec2::ApiUserGroupData& group)
+        {
+            return group.id == groupId;
+        });
+        if (iter != m_userGroups.cend())
+            result |= iter->permissions;
+    }
 
     result = undeprecate(result);
-    m_globalPermissionsCache.insert(userId, result);
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_globalPermissionsCache.insert(userId, result);
+    }
 
     return result;
 }
@@ -139,12 +162,19 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnUserResourcePtr& us
     NX_ASSERT(resource->resourcePool(), Q_FUNC_INFO, "Requesting permissions for non-pool resource");
 
     PermissionKey key(user->getId(), resource->getId());
-    auto iter = m_permissionsCache.find(key);
-    if (iter != m_permissionsCache.cend())
-        return *iter;
+
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto iter = m_permissionsCache.find(key);
+        if (iter != m_permissionsCache.cend())
+            return *iter;
+    }
 
     Qn::Permissions result = calculatePermissions(user, resource);
-    m_permissionsCache.insert(key, result);
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_permissionsCache.insert(key, result);
+    }
     return result;
 }
 
@@ -175,8 +205,15 @@ Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions
     return result;
 }
 
-void QnResourceAccessManager::clearCache(const QnUuid& id)
+void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+
+    QnUuid id = resource->getId();
+
+    QnMutexLocker lk(&m_mutex);
     m_globalPermissionsCache.remove(id);
     for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
     {
@@ -185,12 +222,6 @@ void QnResourceAccessManager::clearCache(const QnUuid& id)
         else
             ++iter;
     }
-}
-
-void QnResourceAccessManager::clearCache()
-{
-    m_globalPermissionsCache.clear();
-    m_permissionsCache.clear();
 }
 
 Qn::Permissions QnResourceAccessManager::calculatePermissions(const QnUserResourcePtr &user, const QnResourcePtr &target) const
@@ -233,7 +264,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (hasGlobalPermission(user, Qn::GlobalPtzControlPermission))
         result |= Qn::WritePtzPermission;
 
-    if (m_readOnlyMode)
+    if (qnCommon->isReadOnly())
         return result;
 
     if (hasGlobalPermission(user, Qn::GlobalEditCamerasPermission))
@@ -251,7 +282,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 
     if (hasGlobalPermission(user, Qn::GlobalEditServersPermissions))
     {
-        if (m_readOnlyMode)
+        if (qnCommon->isReadOnly())
             return Qn::ReadPermission;
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     }
@@ -267,7 +298,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 
     if (hasGlobalPermission(user, Qn::GlobalEditVideoWallPermission))
     {
-        if (m_readOnlyMode)
+        if (qnCommon->isReadOnly())
             return Qn::ReadPermission;
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     }
@@ -282,7 +313,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission;
-    if (m_readOnlyMode)
+    if (qnCommon->isReadOnly())
         return result;
 
     /* Web Page behaves totally like camera. */
@@ -301,7 +332,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
     auto checkReadOnly = [this](Qn::Permissions permissions)
     {
-        if (!m_readOnlyMode)
+        if (!qnCommon->isReadOnly())
             return permissions;
         return permissions &~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };
@@ -364,7 +395,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     Qn::Permissions result = Qn::NoPermissions;
     if (targetUser == user)
     {
-        if (m_readOnlyMode)
+        if (qnCommon->isReadOnly())
             return result | Qn::ReadPermission;
 
         result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
@@ -374,7 +405,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalAdminPermission))
     {
         result |= Qn::ReadPermission;
-        if (m_readOnlyMode)
+        if (qnCommon->isReadOnly())
             return result;
 
         /* Layout-admin can create layouts. */ //TODO: #GDM Should we refactor it in 3.0?
@@ -404,8 +435,11 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr &user
     if (!user || !resource)
         return false;
 
-    if (m_accessibleResources[user->getId()].contains(resource->getId()))
-        return true;
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (m_accessibleResources[user->getId()].contains(resource->getId()))
+            return true;
+    }
 
     auto requiredPermission = [this, resource]()
     {

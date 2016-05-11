@@ -10,6 +10,7 @@
 #include <nx_ec/data/api_user_group_data.h>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
 
@@ -21,15 +22,14 @@ class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnR
 public:
     QnResourceAccessManager(QObject* parent = nullptr);
 
-    void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessRights);
+    void resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList);
 
+    ec2::ApiUserGroupDataList userGroups() const;
     void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
 
     /** List of resources ids, the given user has access to. */
     QSet<QnUuid> accessibleResources(const QnUuid& userId) const;
     void setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources);
-
-    ec2::ApiUserGroupDataList userGroups() const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -66,11 +66,8 @@ private:
     */
     static Qn::GlobalPermissions undeprecate(Qn::GlobalPermissions permissions);
 
-    /** Clear all cache values, bound to the given resource id. */
-    void clearCache(const QnUuid& id);
-
-    /** Fully clear all caches. */
-    void clearCache();
+    /** Clear all cache values, bound to the given resource. */
+    void invalidateResourceCache(const QnResourcePtr& resource);
 
     Qn::Permissions calculatePermissions(const QnUserResourcePtr &user, const QnResourcePtr &target) const;
 
@@ -84,8 +81,7 @@ private:
     bool isAccessibleResource(const QnUserResourcePtr &user, const QnResourcePtr &resource) const;
 
 private:
-    /* Cached value of read-only system state. */
-    bool m_readOnlyMode;
+    mutable QnMutex m_mutex;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
     ec2::ApiUserGroupDataList m_userGroups;
