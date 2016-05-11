@@ -23,6 +23,7 @@ describe('Registration step2', function () {
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            expect(browser.getCurrentUrl()).toContain("/activate/success");
 
             p.helper.login(userEmail, p.helper.userPassword);
             p.helper.logout();
@@ -110,5 +111,15 @@ describe('Registration step2', function () {
             expect(p.accountLastNameInput.getAttribute('value')).toMatch(p.helper.userLastName);
             p.helper.logout();
         });
+    });
+
+    it("If user is registered by link #/register/?from=client - after account activation he sees Open Nx Witness button", function () {
+        // http://cloud-demo.hdw.mx/static/index.html#/register?from=client
+        // http://cloud-demo.hdw.mx/static/index.html#/register?from=mobile
+    });
+
+    it("If registered user didn't come from client - after account activation he sees Login link, which works ", function () {
+        // http://cloud-demo.hdw.mx/static/index.html#/register?from=client
+        // http://cloud-demo.hdw.mx/static/index.html#/register?from=mobile
     });
 });

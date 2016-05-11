@@ -51,6 +51,7 @@ describe('Registration suite', function () {
 
         p.submitButton.click();
         expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerSuccess);
+        expect(browser.getCurrentUrl()).toContain("/register/success");
     });
 
     it("should register user with cyrillic First and Last names and correct credentials", function () {
@@ -207,5 +208,54 @@ describe('Registration suite', function () {
         p.submitButton.click();
 
         p.checkEmailExists();
+    });
+
+    it("should log user out, if he was logged in and goes to registration link", function () {
+        p.helper.login();
+        p.helper.get(p.url);
+        // Check that element that is visible only for authorized user is NOT displayed on page
+        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
+        // Check that register form is opened
+        expect(browser.getCurrentUrl()).toContain('register');
+        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+    });
+
+    it("should display promo-block, if user goes to registration from native app", function () {
+        p.helper.get(p.url + '?from=client');
+        expect(p.helper.htmlBody.$('.promo-block').isDisplayed()).toBe(true);
+        p.helper.get(p.url + '?from=mobile');
+        expect(p.helper.htmlBody.$('.promo-block').isDisplayed()).toBe(true);
+    });
+
+    it("should display promo-block, if user goes to registration not from native app", function () {
+        p.helper.get(p.url);
+        expect(p.helper.htmlBody.$('.promo-block').isPresent()).toBe(false);
+    });
+
+    it("should remove promo-block on registration form successful submitting form", function () {
+        p.helper.get(p.url + '?from=client');
+        expect(p.helper.htmlBody.$('.promo-block').isDisplayed()).toBe(true);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.submitButton.click();
+        expect(p.helper.htmlBody.$('.promo-block').isPresent()).toBe(false);
+
+        p.helper.get(p.url + '?from=mobile');
+        expect(p.helper.htmlBody.$('.promo-block').isDisplayed()).toBe(true);
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.emailInput.sendKeys(p.helper.getRandomEmail());
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.submitButton.click();
+        expect(p.helper.htmlBody.$('.promo-block').isPresent()).toBe(false);
+    });
+
+    it("should not allow to access #/register/success #/activate/success by direct input", function () {
+        p.helper.get('#/register/success');
+        expect(browser.getCurrentUrl()).not.toContain("/register/success");
+        p.helper.get('#/activate/success');
+        expect(browser.getCurrentUrl()).not.toContain("/activate/success");
     });
 });
