@@ -60,7 +60,7 @@ void QnUserGroupSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
     if (group == groups.end())
         return;
     (*group).permissions = value;
-    qnResourceAccessManager->resetUserGroups(groups);
+    qnResourceAccessManager->addOrUpdateUserGroup(*group);
 }
 
 QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources() const
@@ -89,6 +89,19 @@ QString QnUserGroupSettingsModel::groupName() const
     if (group == groups.cend())
         return QString();
     return group->name;
+}
+
+void QnUserGroupSettingsModel::setGroupName(const QString& value)
+{
+    if (m_userGroupId.isNull())
+        return;
+
+    auto groups = qnResourceAccessManager->userGroups();
+    auto group = std::find_if(groups.begin(), groups.end(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId; });
+    if (group == groups.end())
+        return;
+    (*group).name = value;
+    qnResourceAccessManager->addOrUpdateUserGroup(*group);
 }
 
 QString QnUserGroupSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const

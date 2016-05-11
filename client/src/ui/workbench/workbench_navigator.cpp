@@ -130,6 +130,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
+    m_lastAdjustTimelineToPosition(false),
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
@@ -381,6 +382,8 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
 
+    m_timeSlider->setLiveSupported(isLiveSupported());
+
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 4.0);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
@@ -452,7 +455,7 @@ bool QnWorkbenchNavigator::isLiveSupported() const {
 bool QnWorkbenchNavigator::isLive() const {
     return isLiveSupported()
         && m_timeSlider
-        && m_timeSlider->value() == m_timeSlider->maximum();
+        && m_timeSlider->isLive();
 }
 
 bool QnWorkbenchNavigator::setLive(bool live) {
@@ -1056,6 +1059,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
+    bool wasLive = isLive();
 
     qint64 endTimeMSec, startTimeMSec;
 
@@ -1104,7 +1108,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         }
     }
 
-
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
     if(m_calendar)
         m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
@@ -1141,9 +1144,19 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         qint64 timeUSec = usecTimeForWidget(m_currentMediaWidget);
         qint64 timeMSec = usecToMsec(timeUSec);
 
-        m_timeSlider->setValue(timeMSec, keepInWindow);
+        qint64 deltaMs = timeMSec - m_timeSlider->value();
 
-        if(timeUSec >= 0)
+        const qint64 kAnimationThresholdMs = 100;
+        qint64 threshold = qMax(kAnimationThresholdMs, static_cast<qint64>(m_timeSlider->msecsPerPixel()));
+
+        if (qAbs(deltaMs) < threshold || (wasLive && timeMSec == endTimeMSec))
+            /* Immediate setting of desired new position: */
+            m_timeSlider->setValue(timeMSec, keepInWindow);
+        else
+            /* Quadratic animation to desired new: */
+            m_timeSlider->setValue(m_timeSlider->value() + deltaMs / 2, keepInWindow);
+
+        if (timeUSec >= 0)
             updateLive();
 
         bool sync = (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods));
@@ -1337,6 +1350,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider() {
         m_timeScrollBar->setRange(m_timeSlider->minimum(), m_timeSlider->maximum() - windowSize);
         m_timeScrollBar->setValue(m_timeSlider->windowStart());
         m_timeScrollBar->setPageStep(windowSize);
+        m_timeScrollBar->setIndicatorVisible(m_timeSlider->positionMarkerVisible());
         m_timeScrollBar->setIndicatorPosition(m_timeSlider->sliderPosition());
     }
 
@@ -1804,12 +1818,15 @@ void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resourc
     updateCurrentWidgetFlags();
 }
 
-void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
+void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
+{
+    m_lastAdjustTimelineToPosition = (m_timeSlider->options() & QnTimeSlider::AdjustWindowToPosition) != 0;
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
 }
 
-void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased() {
-    m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, true);
+void QnWorkbenchNavigator::at_timeScrollBar_sliderReleased()
+{
+    m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, m_lastAdjustTimelineToPosition);
 }
 
 void QnWorkbenchNavigator::at_calendar_dateClicked(const QDate &date){

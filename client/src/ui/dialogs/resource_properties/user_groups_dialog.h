@@ -12,10 +12,10 @@ class QnUserGroupSettingsModel;
 
 namespace Ui
 {
-    class UserGroupSettingsDialog;
+    class UserGroupsDialog;
 }
 
-class QnUserGroupSettingsDialog: public QnWorkbenchStateDependentTabbedDialog
+class QnUserGroupsDialog: public QnWorkbenchStateDependentTabbedDialog
 {
     Q_OBJECT
 
@@ -33,8 +33,8 @@ public:
         PageCount
     };
 
-    QnUserGroupSettingsDialog(QWidget *parent = NULL);
-    virtual ~QnUserGroupSettingsDialog();
+    QnUserGroupsDialog(QWidget *parent = NULL);
+    virtual ~QnUserGroupsDialog();
 
     QnUuid userGroupId() const;
     void setUserGroupId(const QnUuid& value);
@@ -45,10 +45,11 @@ protected:
     virtual bool hasChanges() const override;
     virtual void applyChanges() override;
 
-private:
-    Q_DISABLE_COPY(QnUserGroupSettingsDialog)
 
-    QScopedPointer<Ui::UserGroupSettingsDialog> ui;
+private:
+    Q_DISABLE_COPY(QnUserGroupsDialog)
+
+    QScopedPointer<Ui::UserGroupsDialog> ui;
 
     /** Common model for all sub-widgets, owned by the dialog. */
     QnUserGroupSettingsModel* m_model;
