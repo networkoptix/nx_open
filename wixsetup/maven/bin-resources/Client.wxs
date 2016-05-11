@@ -10,7 +10,7 @@
                 <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
 
                     <Component Id="AppLauncherExecutable">
-                        <File Id="applauncher.exe" Name="$(var.applauncherName).exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes" DiskId="2">
+                        <File Id="applauncher.exe" Name="$(var.applauncherName).exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes" DiskId="14">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
@@ -82,7 +82,7 @@
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
-                        <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/client.bin.exe" KeyPath="yes" DiskId="2">
+                        <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/client.bin.exe" KeyPath="yes" DiskId="14">
                             <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
                     </Component>                                
@@ -102,11 +102,11 @@
                     </Component>
 
                     <Component Id="ClientSigar">
-                        <File Id="ClientSigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="2"/>
+                        <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
                     </Component>
 
                     <Component Id="ClientVsRedistributable">
-                        <File Id="VcRedistexe" Name="vcredist_$(var.arch).exe" Source="$(var.SourceDir)\vcredist_$(var.arch).exe" DiskId="2" />
+                        <File Id="VcRedist.exe" Name="vcredist_$(var.arch).exe" Source="$(var.SourceDir)\vcredist_$(var.arch).exe" DiskId="15" />
                     </Component>
                 </Directory>                 
             </Directory>
@@ -114,155 +114,155 @@
 
         <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll" DiskId="3" />
+                <File Id="avcodec.dll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll" DiskId="2" />
             </Component>
             <Component>
-                <File Id="ClientAvdeviceDll" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll" DiskId="3"/>
+                <File Id="avdevice.dll" Name="avdevice-54.dll" Source="$(var.SourceDir)/avdevice-54.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll" DiskId="3"/>
+                <File Id="avfilter.dll" Name="avfilter-2.dll" Source="$(var.SourceDir)/avfilter-2.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="$(var.SourceDir)/avformat-54.dll" DiskId="3"/>
+                <File Id="avformat.dll" Name="avformat-54.dll" Source="$(var.SourceDir)/avformat-54.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="$(var.SourceDir)/avutil-51.dll" DiskId="3"/>
+                <File Id="avutil.dll" Name="avutil-51.dll" Source="$(var.SourceDir)/avutil-51.dll" DiskId="2"/>
             </Component>
             <Component>
-                <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="$(var.SourceDir)/swscale-2.dll" DiskId="4"/>
+                <File Id="swscale.dll" Name="swscale-2.dll" Source="$(var.SourceDir)/swscale-2.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="ClientOggDll" Name="libogg-0.dll" Source="$(var.SourceDir)/libogg-0.dll" DiskId="4"/>
+                <File Id="libogg.dll" Name="libogg-0.dll" Source="$(var.SourceDir)/libogg-0.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="$(var.SourceDir)/libvorbis-0.dll" DiskId="4"/>
+                <File Id="libvorbis.dll" Name="libvorbis-0.dll" Source="$(var.SourceDir)/libvorbis-0.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="$(var.SourceDir)/libmp3lame-0.dll" DiskId="4"/>
+                <File Id="libmp3lame.dll" Name="libmp3lame-0.dll" Source="$(var.SourceDir)/libmp3lame-0.dll" DiskId="3"/>
             </Component>
             <Component>
-                <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll" DiskId="4"/>
+                <File Id="libvorbisenc.dll" Name="libvorbisenc-2.dll" Source="$(var.SourceDir)/libvorbisenc-2.dll" DiskId="3"/>
             </Component>
         </ComponentGroup>
         <ComponentGroup Id="ClientLibs" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="ClientUtilsLib" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="3" />
+                <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
             <Component>
-                <File Id="ClientNetworkLib" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="3" />
+                <File Id="nx_network.dll" Name="nx_network.dll" Source="$(var.SourceDir)/nx_network.dll" DiskId="4" />
             </Component>
             <Component>
-                <File Id="ClientUdtLib" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="3" />
+                <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
+            </Component>
+        </ComponentGroup>
+        
+        <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
+            <Component>
+                <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="13"/>
             </Component>
         </ComponentGroup>
         
         <?if $(var.quicksync) = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
-                <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="5"/>
+                <File Id="quicksyncdecoder.dll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll" DiskId="13"/>
             </Component>
             <Component>
-                <File Id="ClientQuickSyncXml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="5"/>                               
+                <File Id="hw_decoding_conf.xml" Name="hw_decoding_conf.xml" Source="$(var.PluginsDir)/hw_decoding_conf.xml" DiskId="13"/>                               
             </Component>
         </ComponentGroup>                            
         <?endif?>
         
         <ComponentGroup Id="ClientQTLibraries" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="ClientQt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="5"/>
+                <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
             </Component>
             <Component>
-                <File Id="ClientQt5Gui.dll" Name="Qt5Gui.dll" Source="$(var.QtDir)\Qt5Gui.dll" DiskId="5"/>
+                <File Id="Qt5Gui.dll" Name="Qt5Gui.dll" Source="$(var.QtDir)\Qt5Gui.dll" DiskId="7"/>
             </Component>
             <Component>
-                <File Id="ClientQt5Multimedia.dll" Name="Qt5Multimedia.dll" Source="$(var.QtDir)\Qt5Multimedia.dll" DiskId="6" />
+                <File Id="Qt5Multimedia.dll" Name="Qt5Multimedia.dll" Source="$(var.QtDir)\Qt5Multimedia.dll" DiskId="8" />
             </Component>
             <Component>
-                <File Id="ClientQt5Network.dll" Name="Qt5Network.dll" Source="$(var.QtDir)\Qt5Network.dll" DiskId="6" />
+                <File Id="Qt5Network.dll" Name="Qt5Network.dll" Source="$(var.QtDir)\Qt5Network.dll" DiskId="8" />
             </Component>
             <Component>
-                <File Id="ClientQt5OpenGL.dll" Name="Qt5OpenGL.dll" Source="$(var.QtDir)\Qt5OpenGL.dll" DiskId="6" />
+                <File Id="Qt5Xml.dll" Name="Qt5Xml.dll" Source="$(var.QtDir)\Qt5Xml.dll" DiskId="8" />
             </Component>
             <Component>
-                <File Id="ClientQt5Xml.dll" Name="Qt5Xml.dll" Source="$(var.QtDir)\Qt5Xml.dll" DiskId="6" />
+                <File Id="Qt5XmlPatterns.dll" Name="Qt5XmlPatterns.dll" Source="$(var.QtDir)\Qt5XmlPatterns.dll" DiskId="8" />
             </Component>
             <Component>
-                <File Id="ClientQt5XmlPatterns.dll" Name="Qt5XmlPatterns.dll" Source="$(var.QtDir)\Qt5XmlPatterns.dll" DiskId="6" />
+                <File Id="Qt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="8"  />                
+            </Component>             
+            <Component>
+                <File Id="Qt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8"  />                
             </Component>
             <Component>            
-                <File Id="ClientQt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="7"  />
+                <File Id="Qt5Widgets.dll" Name="Qt5Widgets.dll" Source="$(var.QtDir)\Qt5Widgets.dll" DiskId="9" />
             </Component>
             <Component>
-                <File Id="ClientQt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="7"  />                
-            </Component>             
-            <Component>
-                <File Id="ClientQt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="7"  />                
+                <File Id="Qt5OpenGL.dll" Name="Qt5OpenGL.dll" Source="$(var.QtDir)\Qt5OpenGL.dll" DiskId="10" />
             </Component>
 			<Component>
-                <File Id="ClientQt5WebChannel.dll" Name="Qt5WebChannel.dll" Source="$(var.QtDir)\Qt5WebChannel.dll" DiskId="7"  />                
+                <File Id="Qt5WebChannel.dll" Name="Qt5WebChannel.dll" Source="$(var.QtDir)\Qt5WebChannel.dll" DiskId="10"  />                
             </Component>            
             <Component>
-                <File Id="ClientQt5PrintSupport.dll" Name="Qt5PrintSupport.dll" Source="$(var.QtDir)\Qt5PrintSupport.dll" DiskId="7"  />                
+                <File Id="Qt5PrintSupport.dll" Name="Qt5PrintSupport.dll" Source="$(var.QtDir)\Qt5PrintSupport.dll" DiskId="10"  />                
             </Component>             
             <Component>
-                <File Id="ClientQt5WebKit.dll" Name="Qt5WebKit.dll" Source="$(var.QtDir)\Qt5WebKit.dll" DiskId="7"  />                
+                <File Id="Qt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="10"  />                
             </Component>             
             <Component>
-                <File Id="ClientQt5WebKitWidgets.dll" Name="Qt5WebKitWidgets.dll" Source="$(var.QtDir)\Qt5WebKitWidgets.dll" DiskId="8"  />                
-            </Component>
-            <Component>
-                <File Id="ClientQt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="8"  />                
-            </Component>             
-            <Component>
-                <File Id="ClientQt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="8"  />                
+                <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="10"  />                
             </Component>       
             <Component>
-                <File Id="ClientQt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="8"  />                
+                <File Id="Qt5Quick.dll" Name="Qt5Quick.dll" Source="$(var.QtDir)\Qt5Quick.dll" DiskId="10"  />                
             </Component>
             <Component>
-                <File Id="ClientQt5QuickWidgets.dll" Name="Qt5QuickWidgets.dll" Source="$(var.QtDir)\Qt5QuickWidgets.dll" DiskId="8"  />                
+                <File Id="Qt5QuickWidgets.dll" Name="Qt5QuickWidgets.dll" Source="$(var.QtDir)\Qt5QuickWidgets.dll" DiskId="10"  />                
             </Component>
             <Component>
-                <File Id="ClientQt5LabsTemplates.dll" Name="Qt5LabsTemplates.dll" Source="$(var.QtDir)\Qt5LabsTemplates.dll" DiskId="8"  />                
+                <File Id="Qt5LabsTemplates.dll" Name="Qt5LabsTemplates.dll" Source="$(var.QtDir)\Qt5LabsTemplates.dll" DiskId="10"  />                
+            </Component>    
+            <Component>
+                <File Id="Qt5WebKit.dll" Name="Qt5WebKit.dll" Source="$(var.QtDir)\Qt5WebKit.dll" DiskId="11"  />                
             </Component>             
             <Component>
-                <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.QtDir)\icudt53.dll" DiskId="8"  />                
+                <File Id="Qt5WebKitWidgets.dll" Name="Qt5WebKitWidgets.dll" Source="$(var.QtDir)\Qt5WebKitWidgets.dll" DiskId="11"  />                
+            </Component>            
+            <Component>
+                <File Id="icudt53.dll" Name="icudt53.dll" Source="$(var.QtDir)\icudt53.dll" DiskId="5"  />                
             </Component>                 
             <Component>
-                <File Id="Clienticuin53.dll" Name="icuin53.dll" Source="$(var.QtDir)\icuin53.dll" DiskId="9"  />                
+                <File Id="icuin53.dll" Name="icuin53.dll" Source="$(var.QtDir)\icuin53.dll" DiskId="5"  />                
             </Component>                 
             <Component>
-                <File Id="Clienticuuc53.dll" Name="icuuc53.dll" Source="$(var.QtDir)\icuuc53.dll" DiskId="9"  />                
+                <File Id="icuuc53.dll" Name="icuuc53.dll" Source="$(var.QtDir)\icuuc53.dll" DiskId="5"  />                
             </Component>                
         </ComponentGroup>
 
         <ComponentGroup Id="ClientQuazip" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="10" />                
+                <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />                
             </Component>
         </ComponentGroup>        
-        
-        <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
-            <Component>
-                <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="10"/>
-            </Component>
-        </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenSSL" Directory="$(var.clientDirId)">
             <Component>
-                <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="11"/>
+                <File Id="ssl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
             </Component>
             <Component>
-                <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll" DiskId="11"/>
+                <File Id="ssl_ssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll" DiskId="6"/>
             </Component>
         </ComponentGroup>    
 
         <ComponentGroup Id="ImageFormats" Directory="ImageFormats">
             <Component>
-                <File Id="qgif.dll" Name="qgif.dll" Source="$(var.QtPluginsDir)\imageformats\qgif.dll" DiskId="11" />
+                <File Id="qgif.dll" Name="qgif.dll" Source="$(var.QtPluginsDir)\imageformats\qgif.dll" DiskId="12" />
             </Component>
             <Component>
-                <File Id="qjpeg.dll" Name="qjpeg.dll" Source="$(var.QtPluginsDir)\imageformats\qjpeg.dll" DiskId="11" />
+                <File Id="qjpeg.dll" Name="qjpeg.dll" Source="$(var.QtPluginsDir)\imageformats\qjpeg.dll" DiskId="12" />
             </Component>
             <Component>
                 <File Id="qtiff.dll" Name="qtiff.dll" Source="$(var.QtPluginsDir)\imageformats\qtiff.dll" DiskId="12" />
@@ -271,13 +271,13 @@
 
         <ComponentGroup Id="AudioPlugins" Directory="Audio">
             <Component>
-                <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="11" />
+                <File Id="qtaudio_windows.dll" Name="qtaudio_windows.dll" Source="$(var.QtPluginsDir)\audio\qtaudio_windows.dll" DiskId="12" />
             </Component>
         </ComponentGroup>
         
         <ComponentGroup Id="Platforms" Directory="Platforms">
             <Component>
-                <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="12" />
+                <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="9" />
             </Component>
         </ComponentGroup>            
 
