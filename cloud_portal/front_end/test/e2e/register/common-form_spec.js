@@ -1,6 +1,6 @@
 'use strict';
 var RegisterPage = require('./po.js');
-fdescribe('Common form behaviour:', function () {
+describe('Common form behaviour:', function () {
     var p = new RegisterPage();
 
     beforeEach(function() {
