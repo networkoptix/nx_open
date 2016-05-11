@@ -24,7 +24,7 @@ public:
     NX_FLAG(0, enableYuvDump); //< Dump frames in both Native and Planar YUV to files.
     NX_FLAG(0, enableLogYuvNative); //< Log struct returned from vdpau with native data ref.
 };
-extern ProxyDecoderFlagConfig conf;
+extern __attribute__ ((visibility ("hidden"))) ProxyDecoderFlagConfig conf;
 
 // Configuration: should be defined before including this header.
 //#define LOG_PREFIX "<ModuleName>: "

@@ -5,7 +5,7 @@
 
 #include "proxy_decoder.h"
 
-ProxyDecoderFlagConfig conf("proxydecoder");
+__attribute__ ((visibility ("hidden"))) ProxyDecoderFlagConfig conf("proxydecoder");
 
 bool outputVdpauCalls()
 {

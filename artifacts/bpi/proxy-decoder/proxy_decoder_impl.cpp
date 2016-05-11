@@ -612,7 +612,7 @@ int Impl::decodeToYuvNative(
 }
 
 int Impl::decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* outPts,
-    void **outFrameHandle)
+    void** outFrameHandle)
 {
     LOG << "decodeForDisplaying() BEGIN";
     assert(outFrameHandle);
