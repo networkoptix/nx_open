@@ -40,5 +40,7 @@ GridView
             var point = mapToItem(camerasGrid.parent, width / 2, height / 2)
             Workflow.openVideoScreen(model.uuid, model.thumbnail, Math.max(0, point.x), Math.max(0, point.y))
         }
+
+        onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)
     }
 }

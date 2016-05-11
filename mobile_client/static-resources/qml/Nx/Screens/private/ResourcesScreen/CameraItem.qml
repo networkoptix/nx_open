@@ -14,6 +14,7 @@ Control
     property int status
 
     signal clicked
+    signal thumbnailRefreshRequested()
 
     padding: 4
     implicitWidth: 200
@@ -162,6 +163,30 @@ Control
             width: thumbnailContainer.width
             height: thumbnailContainer.height
             fillMode: Qt.KeepAspectRatio
+        }
+    }
+
+    Timer
+    {
+        id: refreshTimer
+
+        readonly property int initialLoadDelay: 400
+        readonly property int reloadDelay: 60 * 1000
+
+        interval: initialLoadDelay
+        repeat: true
+        running: connectionManager.connectionState == QnConnectionManager.Connected
+
+        onTriggered:
+        {
+            interval = reloadDelay
+            cameraItem.thumbnailRefreshRequested()
+        }
+
+        onRunningChanged:
+        {
+            if (!running)
+                interval = initialLoadDelay
         }
     }
 }
