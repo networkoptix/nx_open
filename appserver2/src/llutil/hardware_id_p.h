@@ -18,6 +18,9 @@ private:
     std::string msg;
 };
 
+void calcHardwareIds(QMap<QString, QStringList>& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version);
+QMap<QString, QString> calcHardwareIds(const QnHardwareInfo& hi, int version, bool guidCompatibility);
+
 QStringList getMacAddressList(const QnMacAndDeviceClassList& devices);
 QString saveMac(const QStringList& macs, QSettings *settings);
 }

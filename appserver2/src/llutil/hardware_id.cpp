@@ -27,6 +27,26 @@ namespace LLUtil {
 
     void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
+    void calcHardwareIds(QMap<QString, QStringList>& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version) {
+        macHardwareIds.clear();
+
+        QMap<QString, QString> hardwareIdMap;
+
+        std::array<bool, 2> guidCompatibilities = { false, true };
+
+        for (bool guidCompatibility : guidCompatibilities) {
+            hardwareIdMap = calcHardwareIds(hardwareInfo, version, guidCompatibility);
+            for (QString mac : hardwareIdMap.keys()) {
+                macHardwareIds[mac] << hardwareIdMap[mac];
+            }
+        }
+
+        for (const QString& mac : macHardwareIds.keys()) {
+            macHardwareIds[mac].removeDuplicates();
+        }
+    }
+
+
     QStringList getMacAddressList(const QnMacAndDeviceClassList& devices) {
         if (devices.empty())
             return QStringList();

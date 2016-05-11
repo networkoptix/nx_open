@@ -61,7 +61,7 @@ HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
     // Get the data from the WQL sentence
     IWbemClassObject* pclsObj = NULL;
     ULONG uReturnCount = 0;
-    
+
     while (pEnumerator)
     {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturnCount);
@@ -382,7 +382,7 @@ static void fillHardwareInfo(IWbemServices* pSvc, ExecQueryFunction execQuery, Q
     hardwareInfo.memorySerialNumber = execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
 }
 
-static QMap<QString, QString> calcHardwareIds(const QnHardwareInfo& hi, int version, bool guidCompatibility)
+QMap<QString, QString> calcHardwareIds(const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
     QMap<QString, QString> result;
 
@@ -414,25 +414,6 @@ static QMap<QString, QString> calcHardwareIds(const QnHardwareInfo& hi, int vers
     }
 
     return result;
-}
-
-void calcHardwareIds(QMap<QString, QStringList>& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version) {
-    macHardwareIds.clear();
-
-    QMap<QString, QString> hardwareIdMap;
-
-    std::array<bool, 2> guidCompatibilities = { false, true };
-
-    for (bool guidCompatibility : guidCompatibilities) {
-        hardwareIdMap = calcHardwareIds(hardwareInfo, version, guidCompatibility);
-        for (QString mac : hardwareIdMap.keys()) {
-            macHardwareIds[mac] << hardwareIdMap[mac];
-        }
-    }
-
-    for (const QString& mac : macHardwareIds.keys()) {
-        macHardwareIds[mac].removeDuplicates();
-    }
 }
 
 } // namespace {}
