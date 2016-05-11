@@ -22,7 +22,7 @@
         <!--<product.title>${project.name}</product.title>      -->
         <postfix.libs/>
         <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
-        <rdep.global.packages>qt boost</rdep.global.packages>
+        <rdep.global.packages>qt any/boost</rdep.global.packages>
     </properties>
 
     <build>

@@ -374,6 +374,30 @@ void QnMainWindow::updateWidgetsVisibility()
         enum { kSceneIndex, kWelcomePageIndex };
         m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
             ? kWelcomePageIndex : kSceneIndex);
+
+        /* Fix scene activation state (Qt bug workaround) */
+        if (welcomeScreenIsVisible)
+            return;
+
+        if (!display() || !display()->scene())
+            return;
+
+        if (display()->scene()->isActive())
+            return;
+
+        /*
+         * Fixes VMS-2413. The bug is following:
+         * QGraphicsScene contains activation counter.
+         * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
+         * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
+         * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
+         * That's why I hate constructions like:
+         *   if (!--d->activationRefCount) { ... }
+         * --gdm
+         */
+        QEvent e(QEvent::WindowActivate);
+        QObject* sceneObject = display()->scene();
+        sceneObject->event(&e);
     };
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)

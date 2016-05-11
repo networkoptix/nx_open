@@ -23,7 +23,8 @@ public:
 
 QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
     base_type(*new QnTimeScrollBarPrivate, Qt::Horizontal, parent),
-    m_indicatorPosition(0)
+    m_indicatorPosition(0),
+    m_positionMarkerVisible(true)
 {
 }
 
@@ -55,7 +56,7 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* _
 {
     Q_D(QnTimeScrollBar);
     sendPendingMouseMoves(widget);
-    
+
     QStyleOptionSlider opt;
     initStyleOption(&opt);
 
@@ -87,7 +88,7 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* _
     antialiasingRollback.rollback();
 
     /* Draw indicator. */
-    if (m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep())
+    if (m_positionMarkerVisible && m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep())
     {
         /* Calculate handle- and groove-relative indicator positions. */
         qint64 handleValue = qBound(0ll, m_indicatorPosition - sliderPosition(), pageStep());
@@ -162,4 +163,14 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void QnTimeScrollBar::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     base_type::mouseReleaseEvent(event);
+}
+
+bool QnTimeScrollBar::positionMarkerVisible() const
+{
+    return m_positionMarkerVisible;
+}
+
+void QnTimeScrollBar::setPositionMarkerVisible(bool value)
+{
+    m_positionMarkerVisible = value;
 }

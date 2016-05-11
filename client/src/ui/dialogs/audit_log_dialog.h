@@ -5,10 +5,10 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
 
+#include <api/model/audit/audit_record.h>
 #include <core/resource/resource_fwd.h>
+#include <ui/actions/actions.h>
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>
-#include "api/model/audit/audit_record.h"
-#include "ui/actions/actions.h"
 
 class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
@@ -16,7 +16,8 @@ class QnAuditItemDelegate;
 class QnTableView;
 class QnAuditLogModel;
 
-namespace Ui {
+namespace Ui
+{
     class AuditLogDialog;
 }
 
@@ -27,14 +28,15 @@ class QnAuditLogDialog: public QnWorkbenchStateDependentButtonBoxDialog
     typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
-    explicit QnAuditLogDialog(QWidget *parent);
+    explicit QnAuditLogDialog(QWidget* parent);
     virtual ~QnAuditLogDialog();
 
     void disableUpdateData();
     void enableUpdateData();
     void setDateRange(const QDate& from, const QDate& to);
+
 protected:
-    void setVisible(bool value) override;
+    virtual void setVisible(bool value) override;
 
 private slots:
     void updateData();
@@ -44,7 +46,7 @@ private slots:
     void at_exportAction_triggered();
     void at_selectAllAction_triggered();
     void at_itemButtonClicked(const QModelIndex& index);
-    void at_descriptionPressed(const QModelIndex& idx);
+    void at_descriptionClicked(const QModelIndex& idx);
     void at_headerCheckStateChanged(Qt::CheckState state);
     void at_updateDetailModel();
     void at_typeCheckboxChanged();
@@ -53,6 +55,7 @@ private slots:
     void at_selectAllCheckboxChanged();
     void at_updateCheckboxes();
     void at_masterGridSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
 private:
     void requestFinished();
 
@@ -86,9 +89,9 @@ private:
 private:
     QScopedPointer<Ui::AuditLogDialog> ui;
 
-    QnAuditLogMasterModel *m_sessionModel;
-    QnAuditLogModel *m_camerasModel;
-    QnAuditLogDetailModel *m_detailModel;
+    QnAuditLogMasterModel* m_sessionModel;
+    QnAuditLogModel* m_camerasModel;
+    QnAuditLogDetailModel* m_detailModel;
     QSet<int> m_requests;
 
     QnAuditRecordList m_allData;
@@ -98,11 +101,14 @@ private:
     bool m_updateDisabled;
     bool m_dirty;
 
-    QAction *m_selectAllAction;
-    QAction *m_exportAction;
-    QAction *m_clipboardAction;
+    QAction* m_selectAllAction;
+    QAction* m_exportAction;
+    QAction* m_clipboardAction;
     QList<QCheckBox*> m_filterCheckboxes;
 
+    QLabel* m_detailsLabel;
+
     QnAuditItemDelegate* m_itemDelegate;
+    int m_descriptionColumnIndex;
 };
 

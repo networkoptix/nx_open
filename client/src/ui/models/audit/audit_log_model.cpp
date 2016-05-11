@@ -352,7 +352,13 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
     return QString();
 }
 
-QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources) {
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* record)
+{
+    return record ? getCameras(record->resources) : QnVirtualCameraResourceList();
+}
+
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources)
+{
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
         if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
@@ -786,7 +792,6 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     const Column &column = m_columns[index.column()];
-
 
     const QnAuditRecord *record = m_index->at(index.row());
 

@@ -85,6 +85,8 @@ public:
     static void setDetail(QnAuditRecord* record, bool showDetail);
     static QString eventTypeToString(Qn::AuditRecordType recordType);
 
+    static QnVirtualCameraResourceList getCameras(const QnAuditRecord* record);
+
 signals:
     void colorsChanged();
 

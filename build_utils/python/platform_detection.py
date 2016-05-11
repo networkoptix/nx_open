@@ -2,20 +2,41 @@ import platform
 import sys
 
 supported_targets = [
+    "windows",
     "windows-x64",
     "windows-x86",
+    "linux",
+    "linux-arm",
     "linux-x64",
     "linux-x86",
+    "macosx",
     "macosx-x64",
     "rpi",
     "bpi",
     "tx1",
     "isd",
     "isd_s2",
+    "android",
     "android-arm",
+    "android-x86",
     "ios",
     "any"
 ]
+
+additional_targets = {
+    "windows-x64": [ "windows" ],
+    "windows-x86": [ "windows" ],
+    "linux-x64": [ "linux" ],
+    "linux-x86": [ "linux" ],
+    "macosx-x64": [ "macosx" ],
+    "android-arm": [ "android" ],
+    "android-x86": [ "android" ],
+    "rpi": [ "linux-arm", "linux" ],
+    "bpi": [ "linux-arm", "linux" ],
+    "isd": [ "linux-arm", "linux" ],
+    "isd_s2": [ "linux-arm", "linux" ],
+    "tx1": [ "linux-arm", "linux" ]
+}
 
 def detect_platform():
     platform = sys.platform
@@ -37,6 +58,14 @@ def detect_arch():
 
 def detect_target():
     return detect_platform() + "-" + detect_arch()
+
+def get_alternative_targets(target):
+    alternatives = []
+    if target in additional_targets:
+        alternatives = additional_targets[target]
+    if target != "any":
+        alternatives.append("any")
+    return alternatives
 
 def get_platform_for_target(target):
     if target.startswith("windows"):
