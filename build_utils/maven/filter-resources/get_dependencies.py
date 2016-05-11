@@ -26,6 +26,7 @@ DEPENDENCY_VERSIONS = {
     "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
     "server-external": "${server-external.version}",
+    "server-external-${branch}": "${server-external.version}",
     "help": "${help.version}"
 }
 
@@ -36,11 +37,14 @@ def get_package_version(package):
     return version
 
 def get_versioned_package_name(package):
-    target, package = posixpath.split(package)
-    version = get_package_version(package)
-    if version:
-        package += "-" + version
-    return posixpath.join(target, package) if target else package
+    result = []
+    for pack in package.split('|'):
+        target, pack = posixpath.split(pack)
+        version = get_package_version(pack)
+        if version:
+            pack += "-" + version
+        result.append(posixpath.join(target, pack) if target else pack)
+    return "|".join(result)
 
 def get_packages(target):
     packages = """${rdep.global.packages} ${rdep.packages}"""

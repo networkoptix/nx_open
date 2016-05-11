@@ -161,7 +161,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>${release.version}-${branch}</server-external.version>
+        <server-external.version>${release.version}</server-external.version>
         <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
