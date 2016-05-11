@@ -43,7 +43,9 @@ public:
     void reloadSingleFlag(bool* pFlag);
 
     /** Detected temp path including trailing slash or backslash. */
-    const char* tempPath();
+    const char* tempPath() const;
+
+    const char* moduleName() const;
 
 private:
     char m_tempPath[L_tmpnam];

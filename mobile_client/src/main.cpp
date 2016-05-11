@@ -11,13 +11,18 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/utils/flag_config.h>
-class MobileClientFlagConfig: public nx::utils::FlagConfig
+
+namespace mobile_client {
+
+class FlagConfig: public nx::utils::FlagConfig
 {
 public:
     using nx::utils::FlagConfig::FlagConfig;
     NX_FLAG(0, enableEc2TranLog);
 };
-MobileClientFlagConfig conf("mobile_client");
+FlagConfig conf("mobile_client");
+
+} // namespace mobile_client
 
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
@@ -160,10 +165,10 @@ void initLog()
 {
     QnLog::initLog(lit("INFO"));
 
-    if (conf.enableEc2TranLog)
+    if (mobile_client::conf.enableEc2TranLog)
     {
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
-            QLatin1String(conf.tempPath()) + QLatin1String("ec2_tran"),
+            QLatin1String(mobile_client::conf.tempPath()) + QLatin1String("ec2_tran"),
             /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
