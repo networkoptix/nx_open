@@ -41,6 +41,6 @@
         <global.libs>-lcommon -lnx_utils</global.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
 
-        <rdep.packages>qtsingleapplication</rdep.packages>
+        <rdep.packages>any/qtsingleapplication</rdep.packages>
     </properties>
 </project>
