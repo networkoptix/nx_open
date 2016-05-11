@@ -26,6 +26,16 @@ describe('Sharing.', function () {
         p.permDialogClose.click();
     });
 
+    it ("Share button - opens dialog", function() {
+        p.helper.login(p.helper.userEmailOwner);
+        p.ownedSystem.click();
+        p.shareButton.click();
+
+        expect(p.permDialog.isPresent()).toBe(true);
+        expect(p.permEmailFieldEnabled.isDisplayed()).toBe(true);
+        p.permDialogClose.click();
+    });
+
     it ("Sharing link /systems/{system_id}/share - opens dialog", function() {
         p.helper.login(p.helper.userEmailOwner);
 
@@ -157,6 +167,20 @@ describe('Sharing.', function () {
         p.permDialogSubmit.click();
         p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
         expect(p.usrDataRow(p.helper.userEmailViewer).getText()).not.toContain('live viewer');
+    });
+
+    it ("Sharing works", function() {
+        var newUserEmail = p.helper.getRandomEmail();
+        p.helper.createUser(newUserEmail);
+
+        p.helper.login(p.helper.userEmailOwner);
+        p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
+
+        p.roleField.click();
+        p.selectRoleOption(p.helper.roles.liveViewer).click();
+        p.permDialogSubmit.click();
+        p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
+        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).toContain('live viewer');
     });
 
     xit ("Share with registered user - sends him notification", function() {
