@@ -73,6 +73,7 @@ class Rdep:
 
         self.root = root
         self.verbose = False
+        self.targets = None
 
     def _verbose_message(self, message):
         if self.verbose:
@@ -317,10 +318,10 @@ def main():
     parser.add_argument("-u", "--upload",       help="Upload package to the repository.",   action="store_true")
     parser.add_argument("-v", "--verbose",      help="Additional debug output.",            action="store_true")
     parser.add_argument("-l", "--list",         help="List packages for target.",           action="store_true")
+    parser.add_argument("-t", "--target",       help="Target.")
     parser.add_argument("--print-path",         help="Print package dir and exit.",         action="store_true")
     parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.")
-    parser.add_argument("-t", "--targets", nargs='*',  help="Targets to check.")
-    parser.add_argument("-p", "--packages", nargs='*',  help="Packages to sync.")
+    parser.add_argument("packages", nargs='*',  help="Packages to sync.")
 
     args = parser.parse_args()
 
@@ -333,7 +334,8 @@ def main():
 
     rdep = Rdep(root)
     rdep.verbose = args.verbose
-    rdep.targets = args.targets
+    if args.target:
+        rdep.targets = [ args.target ]
 
     packages = args.packages
     if root and (not rdep.targets or not packages):
@@ -346,6 +348,9 @@ def main():
     if not rdep.targets:
         print >> sys.stderr, "Please specify target."
         return False
+
+    if not packages:
+        print >> sys.stderr, "No packages specified"
 
     if args.print_path:
         return rdep.print_path(packages[0])
