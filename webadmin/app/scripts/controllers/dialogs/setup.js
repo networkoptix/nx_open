@@ -3,6 +3,7 @@
 angular.module('webadminApp')
     .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
+        $scope.Config = Config;
 
         if( $location.search().retry) {
             $log.log("This is second try");
@@ -94,7 +95,7 @@ angular.module('webadminApp')
         function checkInternet(reload){
 
             $log.log("check internet connection");
-            if(true || debugMode){ // Temporary skip all internet checks
+            if(debugMode){ // Temporary skip all internet checks
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
                 return;

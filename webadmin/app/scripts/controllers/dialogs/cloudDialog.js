@@ -5,6 +5,7 @@ angular.module('webadminApp')
 
         //1. Detect action: connect or disconnect
         $scope.connect = connect;
+        $scope.Config = Config;
         if(connect) {
             $scope.title = 'Connect system to <span class="product-name">Nx Cloud</span>';
             $scope.actionLabel = 'Connect System';

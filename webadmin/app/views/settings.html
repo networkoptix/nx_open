@@ -7,15 +7,15 @@
         <h2>Cloud Connect</h2>
 
         <div class="col-md-offset-3 col-md-9" ng-if="cloudSystemID">
-            <alert type="info">This system is linked to cloud account {{cloudAccountName}} </alert>
-            <button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnect from Cloud</button>
-            <a class="btn btn-default" ng-href="{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}" target="_blank">Go to Cloud Portal</a>
+            <alert type="info">This system is linked to {{Config.cloud.productName}} account {{cloudAccountName}} </alert>
+            <button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnect from {{Config.cloud.productName}}</button>
+            <a class="btn btn-default" ng-href="{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}" target="_blank">Go to {{Config.cloud.productName}} Portal</a>
         </div>
 
         <div class="col-md-offset-3 col-md-9" ng-if="!cloudSystemID">
-            <alert type="warning">This system is not linked to cloud <a ng-href="{{Config.cloud.portalUrl}}" ng-click="openLink()" target="_blank">Learn more about Nx Cloud</a></alert>
-            <button class="btn btn-default" ng-click="connectToCloud()">Connect to Cloud</button>
-            <a class="btn btn-default" ng-href="{{Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create Cloud Account</a>
+            <alert type="warning">This system is not linked to {{Config.cloud.productName}} <a ng-href="{{Config.cloud.portalUrl}}" ng-click="openLink()" target="_blank">Learn more about {{Config.cloud.productName}}</a></alert>
+            <button class="btn btn-default" ng-click="connectToCloud()">Connect to {{Config.cloud.productName}}</button>
+            <a class="btn btn-default" ng-href="{{Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create {{Config.cloud.productName}} Account</a>
         </div>
     </div>
     <div class="row" ng-hide="settings.ecDbReadOnly">
