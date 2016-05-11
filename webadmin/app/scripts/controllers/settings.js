@@ -157,7 +157,7 @@ angular.module('webadminApp')
             var ips = server.networkAddresses.split(';');
 
             var port = '';
-            if(!ips[i].includes(':')){
+            if(ips[i].indexOf(':') < 0){
                 port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
             }
 

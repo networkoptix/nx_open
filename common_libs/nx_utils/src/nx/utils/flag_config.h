@@ -19,7 +19,7 @@ namespace utils {
  *     class MyModuleFlagConfig: public nx::utils::FlagConfig
  *     {
  *     public:
- *         using FlagConfig::FlagConfig;
+ *         using nx::utils::FlagConfig::FlagConfig;
  *         NX_FLAG(0, myFlag); //< Here 0 stands for 'false' as default value.
  *     };
  *     MyModuleFlagConfig conf("mymodule");
@@ -41,6 +41,9 @@ public:
 
     /** Scan .flag files and set only the specified flag value, without logging. */
     void reloadSingleFlag(bool* pFlag);
+
+    /** Detected temp path including trailing slash or backslash. */
+    const char* tempPath();
 
 private:
     char m_tempPath[L_tmpnam];

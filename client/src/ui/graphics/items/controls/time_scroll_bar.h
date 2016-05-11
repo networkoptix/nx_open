@@ -23,6 +23,9 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+    bool positionMarkerVisible() const;
+    void setPositionMarkerVisible(bool value);
+
 protected:
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -32,6 +35,7 @@ protected:
 private:
     QnTimeScrollBarColors m_colors;
     qint64 m_indicatorPosition;
+    bool m_positionMarkerVisible;
 
 private:
     Q_DECLARE_PRIVATE(QnTimeScrollBar)

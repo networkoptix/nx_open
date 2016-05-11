@@ -1,6 +1,7 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 
 import os
+import posixpath
 import rdep_dependencies
 import platform_detection
 
@@ -35,10 +36,11 @@ def get_package_version(package):
     return version
 
 def get_versioned_package_name(package):
+    target, package = posixpath.split(package)
     version = get_package_version(package)
     if version:
-        return package + "-" + version
-    return package
+        package += "-" + version
+    return posixpath.join(target, package) if target else package
 
 def get_packages(target):
     packages = """${rdep.global.packages} ${rdep.packages}"""

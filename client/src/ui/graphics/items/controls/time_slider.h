@@ -192,6 +192,9 @@ public:
 
     qreal msecsPerPixel() const;
 
+    bool positionMarkerVisible() const;
+    void setPositionMarkerVisible(bool value);
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -446,6 +449,8 @@ private:
     QnBookmarksViewer* m_bookmarksViewer;
     bool m_bookmarksVisible;
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
+
+    bool m_positionMarkerVisible;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

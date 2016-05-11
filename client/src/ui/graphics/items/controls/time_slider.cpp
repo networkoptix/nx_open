@@ -464,7 +464,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastLineBarValue(),
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
-    m_bookmarksHelper(nullptr)
+    m_bookmarksHelper(nullptr),
+    m_positionMarkerVisible(true)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -1461,7 +1462,7 @@ void QnTimeSlider::updateKineticProcessor()
 void QnTimeSlider::updateToolTipVisibility()
 {
     qint64 pos = sliderPosition();
-    toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd);
+    toolTipItem()->setVisible(m_positionMarkerVisible && pos >= m_windowStart && pos <= m_windowEnd);
 }
 
 void QnTimeSlider::updateToolTipText()
@@ -1524,6 +1525,20 @@ void QnTimeSlider::updateTickmarkTextSteps()
 qreal QnTimeSlider::msecsPerPixel() const
 {
     return m_msecsPerPixel;
+}
+
+bool QnTimeSlider::positionMarkerVisible() const
+{
+    return m_positionMarkerVisible;
+}
+
+void QnTimeSlider::setPositionMarkerVisible(bool value)
+{
+    if (m_positionMarkerVisible != value)
+    {
+        m_positionMarkerVisible = value;
+        updateToolTipVisibility();
+    }
 }
 
 void QnTimeSlider::updateMSecsPerPixel()
@@ -1983,7 +1998,8 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
     drawSelection(painter);
 
     /* Draw position marker. */
-    drawMarker(painter, sliderPosition(), m_colors.positionMarker, 2.0);
+    if (m_positionMarkerVisible)
+        drawMarker(painter, sliderPosition(), m_colors.positionMarker, 2.0);
 
     /* Draw indicators. */
     foreach (qint64 position, m_indicators)

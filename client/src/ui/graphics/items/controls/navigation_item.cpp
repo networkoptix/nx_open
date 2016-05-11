@@ -103,10 +103,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_thumbnailsButton->setPreferredSize(34, 24);
 
     /* Create clock label. */
-    QnClockLabel *clockLabel = new QnClockLabel(this);
-    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
+    QnClockLabel* clockLabel = new QnClockLabel(this);
+    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     clockLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     clockLabel->setPreferredHeight(28.0);
+
+    /* Workaround to avoid size flickering due to our scene scaling: */
+    clockLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     /* Create sliders. */
     m_speedSlider = new QnSpeedSlider(this);
@@ -233,7 +236,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateJumpButtonsTooltips()));
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateBookButtonEnabled()));
     connect(navigator(),                    SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
-    connect(navigator(),                    SIGNAL(liveChanged()),                      this,           SLOT(updateLiveButtonChecked()));
+    connect(navigator(),                    SIGNAL(liveChanged()),                      this,           SLOT(updateLiveState()));
     connect(navigator(),                    SIGNAL(liveSupportedChanged()),             this,           SLOT(updateLiveButtonEnabled()));
     connect(navigator(),                    SIGNAL(liveChanged()),                      this,           SLOT(updatePlaybackButtonsEnabled()));
     connect(navigator(),                    SIGNAL(playingSupportedChanged()),          this,           SLOT(updatePlaybackButtonsEnabled()));
@@ -282,7 +285,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     /* Run handlers */
     updateMuteButtonChecked();
     updateSyncButtonChecked();
-    updateLiveButtonChecked();
+    updateLiveState();
     updateLiveButtonEnabled();
     updatePlaybackButtonsEnabled();
 
@@ -480,9 +483,12 @@ void QnNavigationItem::updateMuteButtonChecked()
     m_muteButton->setChecked(m_volumeSlider->isMute());
 }
 
-void QnNavigationItem::updateLiveButtonChecked()
+void QnNavigationItem::updateLiveState()
 {
     m_liveButton->setChecked(navigator()->isLive());
+
+    m_timeSlider->setPositionMarkerVisible(!navigator()->isLive());
+    m_timeScrollBar->setPositionMarkerVisible(!navigator()->isLive());
 
     /* This is needed as button's enabled state will be updated from its action. */ // TODO
     updateLiveButtonEnabled();

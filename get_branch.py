@@ -1,6 +1,6 @@
 import subprocess
 
-proc = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, shell=True)
+proc = subprocess.Popen(["hg", "branch"], stdout=subprocess.PIPE, shell=False)
 (out, err) = proc.communicate()
 print "branch:", out
 

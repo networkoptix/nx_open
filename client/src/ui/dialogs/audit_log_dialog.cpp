@@ -46,15 +46,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
-
-
 namespace
 {
-    const int ProlongedActionRole = Qt::UserRole + 2;
-    const int BTN_ICON_SIZE = 16;
-
-    const int kRowHeightPixels = 24;
-
     enum MasterGridTabIndex
     {
         SessionTab,
@@ -69,7 +62,8 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::AuditLogDialog),
     m_updateDisabled(false),
-    m_dirty(false)
+    m_dirty(false),
+    m_descriptionColumnIndex(-1)
 {
     ui->setupUi(this);
     retranslateUi();
@@ -80,6 +74,22 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
 
     setTabShape(ui->mainTabWidget->tabBar(), style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), style::TabShape::Compact);
+
+    /* Setup details label and its aligning by detailsTabWidget: */
+    QnSingleEventSignalizer* resizeSignalizer = new QnSingleEventSignalizer(this);
+    resizeSignalizer->setEventType(QEvent::Resize);
+    ui->detailsTabWidget->installEventFilter(resizeSignalizer);
+
+    m_detailsLabel = new QLabel(ui->detailsTabWidget);
+    m_detailsLabel->installEventFilter(resizeSignalizer);
+
+    connect(resizeSignalizer, &QnAbstractEventSignalizer::activated, this,
+        [this]()
+        {
+            m_detailsLabel->move(
+                ui->detailsTabWidget->width() - m_detailsLabel->width(),
+                (ui->detailsTabWidget->tabBar()->height() - m_detailsLabel->height()) / 2);
+        });
 
     m_clipboardAction = new QAction(tr("Copy Selection to Clipboard"), this);
     m_exportAction = new QAction(tr("Export Selection to File..."), this);
@@ -95,28 +105,25 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
 
     at_updateCheckboxes();
 
-    connect(m_sessionModel, &QnAuditLogModel::colorsChanged, this, &QnAuditLogDialog::at_updateCheckboxes);
-    connect(ui->selectAllCheckBox, &QCheckBox::stateChanged, this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
+    connect(m_sessionModel, &QnAuditLogModel::colorsChanged,    this, &QnAuditLogDialog::at_updateCheckboxes);
+    connect(ui->selectAllCheckBox, &QCheckBox::stateChanged,    this, &QnAuditLogDialog::at_selectAllCheckboxChanged);
 
     QDate dt = QDateTime::currentDateTime().date();
     ui->dateEditFrom->setDate(dt);
     ui->dateEditTo->setDate(dt);
 
-    QnSingleEventSignalizer *mouseSignalizer = new QnSingleEventSignalizer(this);
-    mouseSignalizer->setEventType(QEvent::MouseButtonRelease);
-
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
     ui->loadingProgressBar->hide();
 
-    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::at_currentTabChanged);
+    connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 
-    connect(m_clipboardAction,  &QAction::triggered,        this, &QnAuditLogDialog::at_clipboardAction_triggered);
-    connect(m_exportAction,     &QAction::triggered,        this, &QnAuditLogDialog::at_exportAction_triggered);
+    connect(m_clipboardAction,  &QAction::triggered,            this, &QnAuditLogDialog::at_clipboardAction_triggered);
+    connect(m_exportAction,     &QAction::triggered,            this, &QnAuditLogDialog::at_exportAction_triggered);
 
-    connect(ui->dateEditFrom,   &QDateEdit::dateChanged,    this, &QnAuditLogDialog::updateData);
-    connect(ui->dateEditTo,     &QDateEdit::dateChanged,    this, &QnAuditLogDialog::updateData);
-    connect(ui->refreshButton,  &QAbstractButton::clicked,  this, &QnAuditLogDialog::updateData);
-    connect(ui->filterLineEdit, &QLineEdit::textChanged,    this, &QnAuditLogDialog::at_filterChanged);
+    connect(ui->dateEditFrom,   &QDateEdit::dateChanged,        this, &QnAuditLogDialog::updateData);
+    connect(ui->dateEditTo,     &QDateEdit::dateChanged,        this, &QnAuditLogDialog::updateData);
+    connect(ui->refreshButton,  &QAbstractButton::clicked,      this, &QnAuditLogDialog::updateData);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged,        this, &QnAuditLogDialog::at_filterChanged);
 
     ui->mainGridLayout->activate();
 
@@ -124,6 +131,24 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget *parent) :
 
     ui->gridMaster->horizontalHeader()->setSortIndicator(1, Qt::DescendingOrder);
     ui->gridCameras->horizontalHeader()->setSortIndicator(1, Qt::AscendingOrder);
+
+    /* Cursor changes when description is hovered: */
+    connect(ui->gridDetails, &QnTableView::hoverEnter, this,
+        [this](const QModelIndex& index)
+        {
+            if (index.column() == m_descriptionColumnIndex)
+            {
+                const QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+                if (record && !record->resources.empty())
+                    ui->gridDetails->setCursor(Qt::PointingHandCursor);
+            }
+        });
+
+    connect(ui->gridDetails, &QnTableView::hoverLeave, this,
+        [this]()
+        {
+            ui->gridDetails->setCursor(Qt::ArrowCursor);
+        });
 }
 
 QnAuditLogDialog::~QnAuditLogDialog()
@@ -186,16 +211,17 @@ void QnAuditLogDialog::setupDetailsGrid()
     m_detailModel = new QnAuditLogDetailModel(this);
     m_detailModel->setColumns(columns);
     ui->gridDetails->setModel(m_detailModel);
-    ui->gridDetails->setSelectionMode(QAbstractItemView::NoSelection);
+    ui->gridDetails->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->gridDetails->setWordWrap(true);
 
     setupGridCommon(ui->gridDetails, false);
+    m_descriptionColumnIndex = columns.indexOf(QnAuditLogModel::DescriptionColumn);
 
     ui->gridDetails->horizontalHeader()->setMinimumSectionSize(48);
-    ui->gridDetails->horizontalHeader()->setSectionResizeMode(columns.indexOf(QnAuditLogModel::DescriptionColumn), QHeaderView::Stretch);
+    ui->gridDetails->horizontalHeader()->setSectionResizeMode(m_descriptionColumnIndex, QHeaderView::Stretch);
 
     connect(m_itemDelegate, &QnAuditItemDelegate::buttonClicked,        this, &QnAuditLogDialog::at_itemButtonClicked);
-    connect(m_itemDelegate, &QnAuditItemDelegate::descriptionPressed,   this, &QnAuditLogDialog::at_descriptionPressed);
+    connect(m_itemDelegate, &QnAuditItemDelegate::descriptionClicked,   this, &QnAuditLogDialog::at_descriptionClicked);
 }
 
 void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
@@ -217,6 +243,8 @@ void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
     }
 
     grid->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    grid->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     grid->verticalHeader()->setMinimumSectionSize(style::Metrics::kViewRowHeight);
     grid->verticalHeader()->setDefaultSectionSize(style::Metrics::kViewRowHeight);
 
@@ -349,9 +377,8 @@ void QnAuditLogDialog::at_typeCheckboxChanged()
         checkState = Qt::Checked;
 
     //TODO: #GDM get rid of this magic and use common setupTristateCheckbox framework
-    ui->selectAllCheckBox->blockSignals(true);
+    QSignalBlocker blocker(ui->selectAllCheckBox);
     ui->selectAllCheckBox->setCheckState(checkState);
-    ui->selectAllCheckBox->blockSignals(false);
 
     at_filterChanged();
 };
@@ -369,9 +396,8 @@ void QnAuditLogDialog::at_selectAllCheckboxChanged()
     {
         if (!checkbox->isEnabled())
             continue;
-        checkbox->blockSignals(true);
+        QSignalBlocker blocker(checkbox);
         checkbox->setChecked(state == Qt::Checked);
-        checkbox->blockSignals(false);
     }
     at_filterChanged();
 };
@@ -383,7 +409,7 @@ void QnAuditLogDialog::at_currentTabChanged()
 
     for(QCheckBox* checkBox: m_filterCheckboxes)
     {
-        Qn::AuditRecordTypes eventTypes =static_cast<Qn::AuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
+        Qn::AuditRecordTypes eventTypes = static_cast<Qn::AuditRecordTypes>(checkBox->property(checkBoxFilterProperty).toInt());
         bool allowed = allEnabled || (camerasTypes & eventTypes);
 
         if (checkBox->isEnabled() == allowed)
@@ -443,33 +469,42 @@ void QnAuditLogDialog::at_filterChanged()
 
 void QnAuditLogDialog::at_updateDetailModel()
 {
+    QString labelText;
+    ui->gridDetails->setUpdatesEnabled(false);
+
     if (ui->mainTabWidget->currentIndex() == SessionTab)
     {
         QnAuditRecordRefList checkedRows = m_sessionModel->checkedRows();
         auto data = filterChildDataBySessions(checkedRows);
         m_detailModel->setData(data);
         m_detailModel->calcColorInterleaving();
+        if (m_sessionModel->rowCount() != 0)
+            labelText = tr("Details for %1 session(s) of %2").arg(checkedRows.size()).arg(m_sessionModel->rowCount());
     }
     else
     {
         QnAuditRecordRefList checkedRows = m_camerasModel->checkedRows();
         auto data = filterChildDataByCameras(checkedRows);
         m_detailModel->setData(data);
+        if (m_camerasModel->rowCount() != 0)
+            labelText = tr("Details for %1 camera(s) of %2").arg(checkedRows.size()).arg(m_camerasModel->rowCount());
     }
 
-    /// TODO: #ynikitenkov introduce expanded-state management in model
+    m_detailsLabel->setText(labelText);
+    m_detailsLabel->resize(m_detailsLabel->sizeHint());
 
-    /// Collapses all expanded descriptions (cameras, for examples)
+    QStyleOptionViewItem option;
+    option.initFrom(ui->gridDetails);
+
     for (int row = 0; row != m_detailModel->rowCount(); ++row)
     {
-        const QModelIndex index = m_detailModel->QnAuditLogModel::index(row, 0);
-        const QVariant data = index.data(Qn::AuditRecordDataRole);
-        if (!data.canConvert<QnAuditRecord *>())
-            continue;
-
-        QnAuditRecord * const record = data.value<QnAuditRecord *>();
-        m_detailModel->setDetail(record, false);
+        QModelIndex index = m_detailModel->index(row, m_descriptionColumnIndex);
+        int height = ui->gridDetails->itemDelegate()->sizeHint(option, index).height();
+        ui->gridDetails->setRowHeight(row, height);
     }
+
+    ui->gridDetails->setUpdatesEnabled(true);
+    ui->gridDetails->update();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()
@@ -507,21 +542,22 @@ void QnAuditLogDialog::at_masterGridSelectionChanged(const QItemSelection& selec
         setGridGeneralCheckState(tableView);
 }
 
-void QnAuditLogDialog::at_descriptionPressed(const QModelIndex& index)
+void QnAuditLogDialog::at_descriptionClicked(const QModelIndex& index)
 {
-    if (index.data(Qn::ColumnDataRole) != QnAuditLogModel::DescriptionColumn)
+    if (index.column() != m_descriptionColumnIndex)
         return;
 
-    QVariant data = index.data(Qn::AuditRecordDataRole);
-    if (!data.canConvert<QnAuditRecord*>())
+    QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+    if (!record || record->resources.empty())
         return;
 
-    QnAuditRecord* record = data.value<QnAuditRecord*>();
     bool showDetail = QnAuditLogModel::hasDetail(record);
     showDetail = !showDetail;
     QnAuditLogModel::setDetail(record, showDetail);
 
-    int height = ui->gridDetails->itemDelegate()->sizeHint(QStyleOptionViewItem(), index).height();
+    QStyleOptionViewItem option;
+    option.initFrom(ui->gridDetails);
+    int height = ui->gridDetails->itemDelegate()->sizeHint(option, index).height();
     ui->gridDetails->setRowHeight(index.row(), height);
 }
 
@@ -650,13 +686,12 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
 
 void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
 {
-    NX_ASSERT(index.data(Qn::ColumnDataRole) == QnAuditLogModel::DescriptionColumn);
+    NX_ASSERT(index.column() == m_descriptionColumnIndex);
 
-    QVariant data = index.data(Qn::AuditRecordDataRole);
-    if (!data.canConvert<QnAuditRecord*>())
+    QnAuditRecord* record = index.data(Qn::AuditRecordDataRole).value<QnAuditRecord*>();
+    if (!record)
         return;
 
-    QnAuditRecord* record = data.value<QnAuditRecord*>();
     if (record->isPlaybackType())
         processPlaybackAction(record);
     else if (record->eventType == Qn::AR_UserUpdate)

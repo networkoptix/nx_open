@@ -172,9 +172,9 @@ QnRoutingManagementColors::QnRoutingManagementColors() {
 }
 
 QnAuditLogColors::QnAuditLogColors() {
-    httpLink = QColor(0xFF, 0xFF, 0xFF); // HTTP NavajoWhite
+    httpLink = QColor(0x2f, 0xa2, 0xdb);
 
-    unsucessLoginAction = QColor(0x99, 0x99, 0x99);
+    unsucessLoginAction = QColor(0xcf, 0x27, 0x27);
 
     loginAction = QColor(0x65, 0x99, 0x1c);
     updUsers = QColor(0x99, 0x49, 0x98); // QColor(0x02, 0x9e, 0xb0);
