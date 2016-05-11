@@ -24,6 +24,7 @@ public:
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
 
     QString groupName() const;
+    void setGroupName(const QString& value);
 
     /** Return human-readable permissions description for the target user */
     QString permissionsDescription() const;

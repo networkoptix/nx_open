@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
-
+#include <ui/dialogs/resource_properties/user_groups_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource_properties/user_settings_model.h>
@@ -63,6 +63,15 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
             return;
         setUser(QnUserResourcePtr());
         tryClose(true);
+    });
+
+    //TODO: #GDM #access change to QnAction
+    QPushButton* editGroupsButton = new QPushButton(tr("Edit User Groups..."), this);
+    ui->buttonBox->addButton(editGroupsButton, QDialogButtonBox::HelpRole);
+    connect(editGroupsButton, &QPushButton::clicked, this, [this]
+    {
+        QScopedPointer<QnUserGroupsDialog> groupsDialog(new QnUserGroupsDialog(this));
+        groupsDialog->exec();
     });
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
