@@ -6,6 +6,8 @@ import yaml
 import os
 from os.path import join
 import re
+import inlinestyler
+assert inlinestyler.VERSION == (0, 2, 1), "Setup correct version of inlinestyler! Try 'pip install inlinestyler==0.2.1' and change requirements.txt accordingly"
 
 cssutils.log.setLevel(logging.ERROR)
 
