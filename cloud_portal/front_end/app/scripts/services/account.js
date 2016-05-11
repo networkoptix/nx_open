@@ -62,8 +62,8 @@ angular.module('cloudApp')
                 this.setPassword(password);
                 var promise = cloudApi.login(email, password, remember);
                 promise.then(function(result){
-                    if(result.data.resultCode === L.errorCodes.ok){
-                        $rootScope.session.loginState = true;
+                    if(result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
+                        $rootScope.session.loginState = result.data.email;
                     }
                 });
                 return promise;
