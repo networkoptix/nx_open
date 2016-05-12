@@ -94,14 +94,13 @@ namespace LLUtil {
             NX_ASSERT(g_hardwareId.size() == LATEST_HWID_VERSION);
 
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
-            NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
-
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             g_storedMac = saveMac(macs, settings);
             g_hardwareInfo.mac = g_storedMac;
 
             g_hardwareIdInitialized = true;
 
+            NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
             NX_LOG(QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")), cl_logINFO);
         }
         catch (const LLUtil::HardwareIdError& err) {
