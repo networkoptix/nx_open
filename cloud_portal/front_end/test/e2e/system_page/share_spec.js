@@ -169,18 +169,25 @@ describe('Sharing.', function () {
         expect(p.usrDataRow(p.helper.userEmailViewer).getText()).not.toContain('live viewer');
     });
 
-    it ("Sharing works", function() {
+    fit ("Sharing works", function() {
         var newUserEmail = p.helper.getRandomEmail();
-        p.helper.createUser(newUserEmail);
+        p.helper.createUser('Mark', 'Hamill', newUserEmail);
 
         p.helper.login(p.helper.userEmailOwner);
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
 
+        p.emailField.sendKeys(newUserEmail);
         p.roleField.click();
-        p.selectRoleOption(p.helper.roles.liveViewer).click();
-        p.permDialogSubmit.click();
+        p.selectRoleOption(p.helper.roles.viewer).click();
+        p.submitShareButton.click();
         p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
-        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).toContain('live viewer');
+        p.modalDialog.isPresent().then(function(isPresent) {
+            if(isPresent) {
+                p.modalDialogClose.click();
+                expect('Share dialog').toBe('absent');
+            }
+        });
+        expect(p.usrDataRow(newUserEmail).getText()).toContain('viewer');
     });
 
     xit ("Share with registered user - sends him notification", function() {

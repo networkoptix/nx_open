@@ -20,7 +20,7 @@ describe('System suite', function () {
                     expect(browser.getCurrentUrl()).toContain('#/systems/');
                     expect(p.systemNameElem.getText()).toContain(systemsAttr[i].sysName);
                     expect(p.systemOwnElem.getText()).toContain(systemsAttr[i].sysOwner);
-                    expect(p.openInNxButton.isDisplayed()).toBe(true);
+                    expect(p.openInClientButton.isDisplayed()).toBe(true);
 
                     p.helper.navigateBack();
                 }
@@ -41,7 +41,7 @@ describe('System suite', function () {
         offlineSystems.count().then(function(count) {
             for (var i= 0; i < count; i++) {
                 offlineSystems.get(i).click();
-                expect(p.openInNxButton.isEnabled()).toBe(false);
+                expect(p.openInClientButton.isEnabled()).toBe(false);
 
                 p.helper.navigateBack();
             }
@@ -127,7 +127,7 @@ describe('System suite', function () {
     });
 
     it("should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)", function() {
-        p.helper.login(p.userEmailNoPerm, p.helper.userPassword);
+        p.helper.login(p.helper.userEmailNoPerm, p.helper.userPassword);
 
         //p.helper.getSysPage(p.systemLink);
         browser.get(p.url + p.systemLink);
@@ -144,7 +144,7 @@ describe('System suite', function () {
         expect(p.systemNameElem.getText()).not.toContain(p.systemName);
         expect(p.loginButton.isPresent()).toBe(true);
         // Fill data into login page
-        p.helper.loginFromCurrPage(p.userEmailNoPerm, p.helper.userPassword);
+        p.helper.loginFromCurrPage(p.helper.userEmailNoPerm, p.helper.userPassword);
         p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
         expect(p.systemNameElem.isPresent()).toBe(false);
 

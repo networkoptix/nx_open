@@ -27,7 +27,7 @@ var SystemPage = function () {
 
     this.systemNameElem = element(by.css('h1'));
     this.systemOwnElem = element.all(by.css('.panel')).get(0).all(by.css('h2,h3'));
-    this.openInNxButton = element(by.buttonText('Open in Nx Witness'));
+    this.openInClientButton = element(by.partialButtonText('Open in '));
     this.shareButton = element(by.partialButtonText('Share'));
     this.emailField = element(by.model('share.accountEmail'));
     this.roleField = element(by.model('share.accessRole'));
@@ -49,6 +49,7 @@ var SystemPage = function () {
     this.modalDialog = element(by.css('.modal-dialog'));
     this.deleteUserButton = this.modalDialog.element(by.buttonText('Delete'));
     this.cancelDelUserButton = this.modalDialog.element(by.buttonText('Cancel'));
+    this.modalDialogClose = this.modalDialog.element(by.css('.close'));
 
     this.usrDataRow = function(email) {
         return this.helper.getParentOf(element(by.cssContainingText('td', email)));
