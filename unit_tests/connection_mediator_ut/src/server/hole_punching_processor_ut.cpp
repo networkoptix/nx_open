@@ -56,7 +56,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
     ASSERT_EQ(api::ResultCode::ok, server1->listen());
 
     //requesting connect to the server 
-    nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+    nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
     std::promise<api::ResultCode> connectResultPromise;
 
@@ -156,7 +156,7 @@ TEST_F(HolePunchingProcessor, server_failure)
         ASSERT_EQ(api::ResultCode::ok, server1->listen());
 
         //requesting connect to the server 
-        nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
         boost::optional<api::ResultCode> connectResult;
 
@@ -219,7 +219,7 @@ TEST_F(HolePunchingProcessor, destruction)
 
     for (int i = 0; i < 100; ++i)
     {
-        nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
         api::ConnectRequest connectRequest;
         connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();

@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <context/context_aware.h>
+#include "context_aware.h"
 
 class QnConnectionManagerPrivate;
 class QnConnectionManager : public QObject, public QnContextAware {

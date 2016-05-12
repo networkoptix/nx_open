@@ -11,6 +11,9 @@
 #include <media_server/serverutil.h>
 #include <utils/common/sync_call.h>
 #include <utils/common/model_functions.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
 
 
 int QnSaveCloudSystemCredentialsHandler::executePost(
@@ -78,9 +81,21 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         NX_LOGX(lit("Attempt to bind to cloud already-bound system"), cl_logDEBUG1);
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            lit("System already bound to cloud (id %1)").arg(cloudSystemId));
+            tr("System already bound to cloud (id %1)").arg(cloudSystemId));
         return nx_http::StatusCode::ok;
     }
+
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    if (!hasPublicIP)
+    {
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            tr("Server is not connected to the Internet."));
+        NX_LOGX(result.errorString, cl_logWARNING);
+        return nx_http::StatusCode::internalServerError;
+    }
+
 
     qnGlobalSettings->setCloudSystemID(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
@@ -90,7 +105,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         NX_LOGX(lit("Error saving cloud credentials to the local DB"), cl_logWARNING);
         result.setError(
              QnJsonRestResult::CantProcessRequest,
-             lit("Failed to save cloud credentials to local DB"));
+             tr("Failed to save cloud credentials to local DB"));
          return nx_http::StatusCode::internalServerError;
     }
 
@@ -136,7 +151,7 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         {
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
-                lit("Could not connect to cloud: %1").
+                tr("Could not connect to cloud: %1").
                 arg(QString::fromStdString(cloudConnectionFactory->toString(cdbResultCode))));
             return nx_http::StatusCode::ok;
         }

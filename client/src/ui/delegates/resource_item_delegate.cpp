@@ -260,18 +260,12 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
     QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
 
-    /* Determine currently raised/zoomed item: */
-    QnWorkbenchItem* raisedItem = nullptr;
-    if (workbench())
-    {
-        raisedItem = workbench()->item(Qn::RaisedRole);
-        if (!raisedItem)
-            raisedItem = workbench()->item(Qn::ZoomedRole);
-    }
+    /* Determine central workbench item: */
+    QnWorkbenchItem* centralItem = workbench() ? workbench()->item(Qn::CentralRole) : nullptr;
 
-    if (raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId())))
+    if (centralItem && (centralItem->uuid() == uuid || (resource && uuid.isNull() && centralItem->resourceUid() == resource->getUniqueId())))
     {
-        /* Raised/zoomed item: */
+        /* Central item: */
         return ItemState::Accented;
     }
     else if (!resource.isNull() && !currentLayoutResource.isNull())

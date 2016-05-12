@@ -161,7 +161,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>${release.version}-${branch}</server-external.version>
+        <server-external.version>${release.version}</server-external.version>
         <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
@@ -479,7 +479,7 @@
         </profile>
         <profile>
             <id>windows</id>
-	    
+
             <activation>
                 <os>
                     <family>Windows</family>
@@ -534,7 +534,7 @@
             <properties>
                 <machine.type>X86</machine.type>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -839,6 +839,7 @@
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
+                <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
             </properties>
             <modules>
@@ -872,6 +873,7 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
+                <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
             </properties>
             <modules>
@@ -1130,11 +1132,11 @@
                 <property>
                     <name>test</name>
                     <value>true</value>
-                </property>                
+                </property>
             </activation>
             <modules>
                 <module>unit_tests</module>
             </modules>
-        </profile>        
+        </profile>
     </profiles>
 </project>
