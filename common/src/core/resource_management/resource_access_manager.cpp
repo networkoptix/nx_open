@@ -15,7 +15,7 @@
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
-    m_mutex(QnMutex::Recursive)
+    m_mutex(QnMutex::NonRecursive)
 {
     /* This change affects all accessible resources. */
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly)
