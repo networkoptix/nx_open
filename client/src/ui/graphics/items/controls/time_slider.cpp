@@ -505,7 +505,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 #ifdef TIMELINE_BEHAVIOR_2_5
     defaultOptions |= AdjustWindowToPosition;
 #else
-    defaultOptions |= StillPosition | HideLivePosition;
+    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection;
 #endif
     setOptions(defaultOptions);
 
@@ -2866,11 +2866,17 @@ void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent* event)
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton)
+    Qt::MouseButton selectingButton(Qt::LeftButton);
+    Qt::MouseButton positioningButton(Qt::RightButton);
+
+    if (!m_options.testFlag(LeftButtonSelection))
+        qSwap(selectingButton, positioningButton);
+
+    if (event->button() == positioningButton)
     {
         m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
     }
-    else if (event->button() == Qt::RightButton)
+    else if (event->button() == selectingButton)
     {
         if (m_options.testFlag(SelectionEditable))
             m_dragMarker = CreateSelectionMarker;

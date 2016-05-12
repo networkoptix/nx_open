@@ -106,7 +106,12 @@ public:
         /**
         * Whether slider should hide position marker and its tooltip in live mode.
         */
-        HideLivePosition = 0x400
+        HideLivePosition = 0x400,
+
+        /**
+        * Whether drag-selection should be performed by left mouse button (otherwise right).
+        */
+        LeftButtonSelection = 0x800
     };
     Q_DECLARE_FLAGS(Options, Option);
 
