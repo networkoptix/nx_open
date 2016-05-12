@@ -17,7 +17,7 @@ namespace ec2
 
 static QnTransactionLog* globalInstance = nullptr;
 
-QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
+QnTransactionLog::QnTransactionLog(detail::QnDbManager* db): m_dbManager(db)
 {
     NX_ASSERT(!globalInstance);
     globalInstance = this;
@@ -176,7 +176,7 @@ QnUuid QnTransactionLog::makeHash(const QByteArray &extraData, const ApiDiscover
 
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
-    QnDbManager::QnDbTransactionLocker locker(dbManager->getTransaction());
+    detail::QnDbManager::QnDbTransactionLocker locker(dbManager(Qn::kSuperUserAccess).getTransaction());
     for(const ApiSyncMarkerRecord& record: data.markers)
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence), cl_logDEBUG1);

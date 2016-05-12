@@ -1,6 +1,7 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include <memory>
 #include <QtSql/QSqlError>
 
 #include "nx_ec/ec_api.h"
@@ -13,45 +14,51 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
+#include "core/resource_management/resource_access_manager.h"
 
 
 namespace ec2
 {
-    class LicenseManagerImpl;
 
-    enum ApiObjectType
-    {
-        ApiObject_NotDefined,
-        ApiObject_Server,
-        ApiObject_Camera,
-        ApiObject_User,
-        ApiObject_Layout,
-        ApiObject_Videowall,
-        ApiObject_BusinessRule,
-        ApiObject_Storage,
-        ApiObject_WebPage,
-    };
-    struct ApiObjectInfo
-    {
-        ApiObjectInfo() {}
-        ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
+class LicenseManagerImpl;
 
-        ApiObjectType type;
-        QnUuid id;
-    };
-    class ApiObjectInfoList: public std::vector<ApiObjectInfo>
-    {
-    public:
-        std::vector<ApiIdData> toIdList() const
-        {
-            std::vector<ApiIdData> result;
-            result.reserve(size());
-            for (size_t i = 0; i < size(); ++i)
-                result.push_back(ApiIdData(at(i).id));
-            return result;
-        }
-    };
+enum ApiObjectType
+{
+    ApiObject_NotDefined,
+    ApiObject_Server,
+    ApiObject_Camera,
+    ApiObject_User,
+    ApiObject_Layout,
+    ApiObject_Videowall,
+    ApiObject_BusinessRule,
+    ApiObject_Storage,
+    ApiObject_WebPage,
+};
+struct ApiObjectInfo
+{
+    ApiObjectInfo() {}
+    ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
 
+    ApiObjectType type;
+    QnUuid id;
+};
+class ApiObjectInfoList: public std::vector<ApiObjectInfo>
+{
+public:
+    std::vector<ApiIdData> toIdList() const
+    {
+        std::vector<ApiIdData> result;
+        result.reserve(size());
+        for (size_t i = 0; i < size(); ++i)
+            result.push_back(ApiIdData(at(i).id));
+        return result;
+    }
+};
+
+class QnDbManagerAccess;
+
+namespace detail
+{
     class QnDbManager
     :
         public QObject,
@@ -60,6 +67,7 @@ namespace ec2
     {
         Q_OBJECT
 
+        friend class ec2::QnDbManagerAccess;
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -179,7 +187,7 @@ namespace ec2
         };
 
 
-        friend class QnTransactionLog;
+        friend class ec2::QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QnReadWriteLock& getMutex() { return m_mutex; }
 
@@ -572,6 +580,7 @@ namespace ec2
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool isTranAllowed(const QnAbstractTransaction& tran) const;
+        void setUserAccessData(const Qn::UserAccessData &userAccessData);
 
     private:
         QnUuid m_storageTypeId;
@@ -604,9 +613,55 @@ namespace ec2
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
         bool m_dbReadOnly;
+        Qn::UserAccessData m_userAccessData;
     };
+} // namespace detail
+
+class QnDbManagerAccess
+{
+public:
+    QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
+    ~QnDbManagerAccess();
+    ApiObjectType getObjectType(const QnUuid& objectId);
+
+    template <class T1, class T2>
+    ErrorCode doQuery(T1&& t1, T2&& t2)
+    {
+        return detail::QnDbManager::instance()->doQuery(std::forward<T1>(t1), std::forward<T2>(t2));
+    }
+
+    QnDbHelper::QnDbTransaction* getTransaction();
+    ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
+    ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
+    ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
+
+    template <class Transaction, class SerializedTransaction>
+    ErrorCode executeTransactionNoLock(Transaction &&tran, SerializedTransaction &&serializedTran)
+    {
+        return detail::QnDbManager::instance()->executeTransactionNoLock(
+                    std::forward<Transaction>(tran),
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <class Transaction, class SerializedTransaction>
+    ErrorCode executeTransaction(Transaction &&tran, SerializedTransaction &&serializedTran)
+    {
+        return detail::QnDbManager::instance()->executeTransaction(
+                    std::forward<Transaction>(tran),
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    bool saveMiscParam( const QByteArray& name, const QByteArray& value );
+    bool readMiscParam( const QByteArray& name, QByteArray* value );
+    ErrorCode readSettings(ApiResourceParamDataList& settings);
+
+private:
+    Qn::UserAccessData m_userAccessData;
+    static QnMutex m_userAccessMutex;
 };
 
-#define dbManager QnDbManager::instance()
+} // namespace ec2
+
+#define dbManager(userAccessData) QnDbManagerAccess(userAccessData)
 
 #endif // __DB_MANAGER_H_

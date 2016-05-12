@@ -50,6 +50,9 @@ static const QString RES_TYPE_STORAGE = "storage";
 namespace ec2
 {
 
+namespace detail
+{
+
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
@@ -74,15 +77,6 @@ static bool removeDirRecursive(const QString & dirName)
     return result;
 }
 
-template <class T>
-void assertSorted(std::vector<T> &data) {
-#ifdef _DEBUG
-    assertSorted(data, &T::id);
-#else
-    Q_UNUSED(data);
-#endif // DEBUG
-}
-
 template <class T, class Field>
 void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
 #ifdef _DEBUG
@@ -98,6 +92,15 @@ void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
 #else
     Q_UNUSED(data);
     Q_UNUSED(idField);
+#endif // DEBUG
+}
+
+template <class T>
+void assertSorted(std::vector<T> &data) {
+#ifdef _DEBUG
+    assertSorted(data, &T::id);
+#else
+    Q_UNUSED(data);
 #endif // DEBUG
 }
 
@@ -4506,4 +4509,64 @@ QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
     return &m_tran;
 }
 
+void QnDbManager::setUserAccessData(const Qn::UserAccessData &userAccessData)
+{
+    m_userAccessData = userAccessData;
 }
+
+} // namespace detail
+
+QnMutex QnDbManagerAccess::m_userAccessMutex;
+
+QnDbManagerAccess::QnDbManagerAccess(const Qn::UserAccessData &userAccessData)
+    : m_userAccessData(userAccessData)
+{
+    m_userAccessMutex.lock();
+    detail::QnDbManager::instance()->setUserAccessData(userAccessData);
+}
+
+QnDbManagerAccess::~QnDbManagerAccess()
+{
+    m_userAccessMutex.unlock();
+}
+
+ApiObjectType QnDbManagerAccess::getObjectType(const QnUuid& objectId)
+{
+    return detail::QnDbManager::instance()->getObjectType(objectId);
+}
+
+QnDbHelper::QnDbTransaction* QnDbManagerAccess::getTransaction()
+{
+    return detail::QnDbManager::instance()->getTransaction();
+}
+
+ApiObjectType QnDbManagerAccess::getObjectTypeNoLock(const QnUuid& objectId)
+{
+    return detail::QnDbManager::instance()->getObjectTypeNoLock(objectId);
+}
+
+ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo& parentObject)
+{
+    return detail::QnDbManager::instance()->getNestedObjectsNoLock(parentObject);
+}
+
+ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
+{
+    return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
+}
+
+bool QnDbManagerAccess::saveMiscParam( const QByteArray& name, const QByteArray& value )
+{
+    return detail::QnDbManager::instance()->saveMiscParam(name, value);
+}
+
+bool QnDbManagerAccess::readMiscParam( const QByteArray& name, QByteArray* value )
+{
+    return detail::QnDbManager::instance()->readMiscParam(name, value);
+}
+
+ErrorCode QnDbManagerAccess::readSettings(ApiResourceParamDataList& settings)
+{
+    return detail::QnDbManager::instance()->readSettings(settings);
+}
+} // namespace ec2

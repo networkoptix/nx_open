@@ -53,7 +53,7 @@ namespace ec2
         ClientQueryProcessor m_remoteQueryProcessor;
         QnMutex m_mutex;
         Settings m_settingsInstance;
-        std::unique_ptr<QnDbManager> m_dbManager;
+        std::unique_ptr<detail::QnDbManager> m_dbManager;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
         std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
         Ec2DirectConnectionPtr m_directConnection;

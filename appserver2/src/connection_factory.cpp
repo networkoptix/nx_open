@@ -44,7 +44,7 @@ namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
-        m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
+        m_dbManager( peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
         m_transactionMessageBus( new ec2::QnTransactionMessageBus(peerType) ),
         m_terminated( false ),
@@ -1361,7 +1361,7 @@ namespace ec2
 			clientInfo.parentId = qnCommon->moduleGUID();
 
 			ApiClientInfoDataList infos;
-			auto result = dbManager->doQuery(clientInfo.id, infos);
+            auto result = dbManager(Qn::kSuperUserAccess).doQuery(clientInfo.id, infos);
 			if (result != ErrorCode::ok)
 				return result;
 
@@ -1382,8 +1382,8 @@ namespace ec2
 					else {
 						NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
 							.arg(toString(result)), cl_logERROR);
-					}
-				});
+                    }
+                });
         }
 
         return ErrorCode::ok;
@@ -1422,9 +1422,9 @@ namespace ec2
 
     ErrorCode Ec2DirectConnectionFactory::getSettings( std::nullptr_t, ApiResourceParamDataList* const outData )
     {
-        if( !QnDbManager::instance() )
+        if( !detail::QnDbManager::instance() )
             return ErrorCode::ioError;
-        return QnDbManager::instance()->readSettings( *outData );
+        return dbManager(Qn::kSuperUserAccess).readSettings( *outData );
     }
 
     template<class InputDataType>

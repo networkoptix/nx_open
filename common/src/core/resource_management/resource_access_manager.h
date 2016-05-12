@@ -13,6 +13,21 @@
 
 #include <utils/common/connective.h>
 
+namespace Qn
+{
+struct UserAccessData
+{
+    QnUuid userId;
+
+    UserAccessData() {}
+    UserAccessData(const QnUuid &userId) : userId(userId) {}
+
+    bool isNull() const { return userId.isNull(); }
+};
+
+const UserAccessData kSuperUserAccess;
+}
+
 class QnResourceAccessManager : public Connective<QObject>, public Singleton<QnResourceAccessManager>
 {
     Q_OBJECT

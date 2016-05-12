@@ -103,7 +103,7 @@ namespace ec2
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager->getObjectType(tran.params.id))
+                switch(dbManager(Qn::kSuperUserAccess).getObjectType(tran.params.id))
                 {
                 case ApiObject_Server:
                     updatedTran.command = ApiCommand::removeMediaServer;
@@ -243,7 +243,7 @@ namespace ec2
         {
             QnConcurrent::run( Ec2ThreadPool::instance(), [input, handler]() {
                 OutputData output;
-                const ErrorCode errorCode = dbManager->doQuery( input, output );
+                const ErrorCode errorCode = dbManager(Qn::kSuperUserAccess).doQuery( input, output );
                 handler( errorCode, output );
             } );
         }
@@ -258,7 +258,7 @@ namespace ec2
         {
             QnConcurrent::run( Ec2ThreadPool::instance(), [input1, input2, handler]() {
                 OutputData output;
-                const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
+                const ErrorCode errorCode = dbManager(Qn::kSuperUserAccess).doQuery( input1, input2, output );
                 handler( errorCode, output );
             } );
         }
@@ -282,12 +282,12 @@ namespace ec2
             QnMutexLocker lock( &m_updateDataMutex );
 
             //starting transaction
-            std::unique_ptr<QnDbManager::QnDbTransactionLocker> dbTran;
+            std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
             std::list<std::function<void()>> transactionsToSend;
 
             if( ApiCommand::isPersistent(tran.command) )
             {
-                dbTran.reset(new QnDbManager::QnDbTransactionLocker(dbManager->getTransaction()));
+                dbTran.reset(new detail::QnDbManager::QnDbTransactionLocker(dbManager(Qn::kSuperUserAccess).getTransaction()));
                 errorCode = syncFunction( tran, &transactionsToSend );
                 if( errorCode != ErrorCode::ok )
                     return;
@@ -333,7 +333,7 @@ namespace ec2
                 ApiCommand::removeResource,
                 tran.isLocal,
                 tran.deliveryInfo,
-                dbManager->getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
+                dbManager(Qn::kSuperUserAccess).getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
                 transactionsToSend );
             if( errorCode != ErrorCode::ok )
                 return errorCode;
@@ -350,7 +350,7 @@ namespace ec2
                 ApiCommand::removeBusinessRule,
                 tran.isLocal,
                 tran.deliveryInfo,
-                dbManager->getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
+                dbManager(Qn::kSuperUserAccess).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
                 transactionsToSend );
             if( errorCode != ErrorCode::ok )
                 return errorCode;
@@ -373,7 +373,7 @@ namespace ec2
 
             transactionLog->fillPersistentInfo(tran);
             QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-            ErrorCode errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
+            ErrorCode errorCode = dbManager(Qn::kSuperUserAccess).executeTransactionNoLock( tran, serializedTran );
             NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
             if (errorCode != ErrorCode::ok)
                 return errorCode;
@@ -396,7 +396,7 @@ namespace ec2
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager->getObjectTypeNoLock(tran.params.id))
+                switch(dbManager(Qn::kSuperUserAccess).getObjectTypeNoLock(tran.params.id))
                 {
                 case ApiObject_Server:
                     updatedTran.command = ApiCommand::removeMediaServer;

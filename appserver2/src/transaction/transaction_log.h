@@ -11,7 +11,7 @@ namespace ec2
 {
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 
-    class QnDbManager;
+    namespace detail { class QnDbManager; }
 
 
     class QnTransactionLog
@@ -24,7 +24,7 @@ namespace ec2
             Reason_Timestamp
         };
 
-        QnTransactionLog(QnDbManager* db);
+        QnTransactionLog(detail::QnDbManager* db);
         virtual ~QnTransactionLog();
 
         static QnTransactionLog* instance();
@@ -97,7 +97,7 @@ namespace ec2
         void setTransactionLogTime(qint64 value);
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
     private:
-        friend class QnDbManager;
+        friend class detail::QnDbManager;
 
         template <class T>
         ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
@@ -123,7 +123,7 @@ namespace ec2
             QMap<QnUuid, UpdateHistoryData> updateHistory;
         };
     private:
-        QnDbManager* m_dbManager;
+        detail::QnDbManager* m_dbManager;
         QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
 

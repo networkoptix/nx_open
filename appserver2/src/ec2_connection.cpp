@@ -20,11 +20,11 @@ namespace ec2
         const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor ),
-        m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
+        m_transactionLog( new QnTransactionLog(detail::QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo ),
         m_isInitialized( false )
     {
-        m_isInitialized = QnDbManager::instance()->init(dbUrl);
+        m_isInitialized = detail::QnDbManager::instance()->init(dbUrl);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
 
