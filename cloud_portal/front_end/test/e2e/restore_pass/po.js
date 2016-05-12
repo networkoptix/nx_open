@@ -33,6 +33,8 @@ RestorePasswordPage = function () {
     this.submitButton = element(by.buttonText('Restore password'));
     this.savePasswordButton = element(by.buttonText('Save password'));
 
+    this.messageLoginLink = element(by.css('h1')).element(by.linkText('Login'));
+
     this.passCheck = {
         input: this.passwordInput,
         submit: this.savePasswordButton
