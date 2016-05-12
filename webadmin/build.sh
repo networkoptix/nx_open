@@ -29,3 +29,4 @@ if [ $? -gt 0 ]; then
    echo "+++++++++++++++++++++++++ GRUNT errorlevel:" $? "+++++++++++++++++++++++++"
    exit $?
 fi
+if [ ! -f ./external.dat ]; then rm ./target/rdep.sh && exit 1; fi

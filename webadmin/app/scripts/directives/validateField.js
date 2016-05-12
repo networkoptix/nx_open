@@ -19,7 +19,7 @@ angular.module('webadminApp')
 
                 input.on('focus',function(){
                     setTimeout(function(){
-                        scope[formName][fieldName].$setUntouched();
+                        resolveForm(scope,formName)[fieldName].$setUntouched();
                         scope.$apply();
                     },0);
                 });

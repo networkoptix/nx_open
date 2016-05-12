@@ -60,9 +60,7 @@ def detect_target():
     return detect_platform() + "-" + detect_arch()
 
 def get_alternative_targets(target):
-    alternatives = []
-    if target in additional_targets:
-        alternatives = additional_targets[target]
+    alternatives = additional_targets.get(target, [])
     if target != "any":
         alternatives.append("any")
     return alternatives

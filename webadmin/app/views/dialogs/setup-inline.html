@@ -18,7 +18,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('start')">
     <div class="vertical-center">
-        <h2>Get Started with Nx Witness</h2>
+        <h2>Get Started with {{Config.productName}}</h2>
         <p>You need to configure your server before using it.<br>
         Don't worry. This won't take long.</p>
     </div>
@@ -41,7 +41,7 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
-    <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
+    <h2>Connect your System to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
     <p class="master-description">
        Connect your system anywhere, anytime.<br>
         <a class="external" ng-href="{{portalUrl}}" target="_blank" ng-click="openLink($event)">Learn more</a><br/>
@@ -75,7 +75,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
 
-    <h2>Connect your System to <span class="product-name add-version">Nx Cloud</span></h2>
+    <h2>Connect your System to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
     <p class="master-description">
         Login to your account<br>
     </p>
@@ -117,16 +117,17 @@
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
     <form class="master-controls wide" name="forms.remoteSystemForm" novalidate disable-autocomplete>
-        <div class="form-group" validate-field>
-            <ui-select ng-model="settings.remoteSystem" name="remoteSystemName" reset-search-input="false"
-                       ng-change="clearRemoteError()" required autofocus>
-                <ui-select-match placeholder="System address"
-                                 name="remoteSystem">{{$select.selected.systemName}}</ui-select-match>
-                <ui-select-choices
-                        repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search}">
-                    <div ng-bind-html="system.visibleName | highlight: $select.search"></div>
-                </ui-select-choices>
-            </ui-select>
+        <div class="form-group text-left" validate-field>
+
+            <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
+                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {visibleName: $viewValue} | limitTo:8"
+                   typeahead-input-formatter="getSystemName($model)"
+                   typeahead-focus-on-select="false"
+                   typeahead-min-length="0"
+                   typeahead-show-hint="true"
+                   typeahead-focus-first="false"
+                   typeahead-focus
+                   class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
@@ -195,7 +196,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>Connect your server to the Internet</h2>
     <p class="master-description">
-        Set up Internet connection on your server to be able <br> to connect to it anywhere using Nx Cloud.
+        Set up Internet connection on your server to be able <br> to connect to it anywhere using {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
@@ -207,7 +208,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
     <h2>Connect to the Internet</h2>
     <p class="master-description">
-        Connect your device to the Internet to connect your system to Nx Cloud.
+        Connect your device to the Internet to connect your system to {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>

@@ -53,7 +53,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         size_t bytesWritten = 0;
         ASSERT_EQ(nx_api::SerializerState::done, messageSerializer.serialize(&sendBuffer, &bytesWritten));
         ASSERT_EQ(bytesWritten, sendBuffer.size());
-        ASSERT_TRUE(udpSocket->sendTo(sendBuffer, endpoint()));
+        ASSERT_TRUE(udpSocket->sendTo(sendBuffer, stunEndpoint()));
 
         //reading response
         nx::Buffer recvBuffer;
