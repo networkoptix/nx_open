@@ -559,6 +559,11 @@ public:
         UserSettingsAction,
 
         /**
+         * Opens user groups dialog.
+         */
+        UserGroupsAction,
+
+        /**
          * Opens camera settings dialog.
          */
         CameraSettingsAction,
