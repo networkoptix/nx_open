@@ -9,6 +9,7 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/string.h>
+#include <utils/serialization/lexical.h>
 
 namespace nx {
 namespace cctu {
@@ -28,16 +29,6 @@ void printListenOptions(std::ostream* const outStream)
     "  --local-address={ip:port}    Local address to listen\n"
     "  --udt                        Use udt instead of tcp. Only if listening local address\n"
     "  --ssl                        Uses SSL on top of server socket type\n";
-}
-
-static const void limitStringList(QStringList* list)
-{
-    if (list->size() <= kMaxAddressesToPrint)
-        return;
-
-    const auto size = list->size();
-    list->erase(list->begin() + kMaxAddressesToPrint, list->end());
-    *list << lm("... (%1 total)").arg(size);
 }
 
 class CloudServerSocketGenerator
@@ -106,6 +97,55 @@ public:
             context.socket->pleaseStopSync();
     }
 
+    bool registerOnMediatorSync()
+    {
+        QStringList sucessfulListening;
+        QStringList failedListening;
+        nx::utils::promise<void> registerPromise;
+        {
+            nx::BarrierHandler barrier(
+                [&registerPromise](){ registerPromise.set_value(); });
+
+            for (auto& context: socketContexts)
+            {
+                context.socket->registerOnMediator(
+                    [&, handler = barrier.fork()](hpm::api::ResultCode code)
+                    {
+                        if (code == hpm::api::ResultCode::ok)
+                        {
+                            sucessfulListening << context.listeningAddress;
+                        }
+                        else
+                        {
+                            failedListening << lm("%1(%2)")
+                                .arg(context.listeningAddress)
+                                .arg(QnLexical::serialized(code));
+                        }
+
+                        handler();
+                    });
+            }
+        }
+
+        registerPromise.get_future().wait();
+
+        if (!failedListening.isEmpty())
+        {
+            limitStringList(&failedListening);
+            std::cerr << "warning. Addresses failed to listen: " <<
+                failedListening.join(lit(", ")).toStdString() << std::endl;
+        }
+
+        if (!sucessfulListening.isEmpty())
+        {
+            limitStringList(&sucessfulListening);
+            std::cout << "listening on mediator. Addresses: " <<
+                sucessfulListening.join(lit(", ")).toStdString() << std::endl;
+        }
+
+        return !sucessfulListening.isEmpty();
+    }
+
     std::vector<SocketContext> socketContexts;
 };
 
@@ -154,36 +194,7 @@ int runInListenMode(const std::multimap<QString, QString>& args)
         serverSocket = cloudServerSocketGenerator.make(
             cloudCredentials[0].toUtf8(), cloudCredentials[1].toUtf8(), serverIds);
 
-        QStringList sucessfulListening;
-        QStringList failedListening;
-        for (auto& context: cloudServerSocketGenerator.socketContexts)
-        {
-            if (context.socket->registerOnMediatorSync())
-            {
-                sucessfulListening << context.listeningAddress;
-            }
-            else
-            {
-                const auto error = SystemError::getLastOSErrorText();
-                failedListening << lm("%1(%2)")
-                    .arg(context.listeningAddress).arg(error);
-            }
-        }
-
-        if (!failedListening.isEmpty())
-        {
-            limitStringList(&failedListening);
-            std::cerr << "warning. Addresses failed to listen: " <<
-                failedListening.join(lit(", ")).toStdString() << std::endl;
-        }
-
-        if (!sucessfulListening.isEmpty())
-        {
-            limitStringList(&sucessfulListening);
-            std::cout << "listening on mediator. Addresses: " <<
-                sucessfulListening.join(lit(", ")).toStdString() << std::endl;
-        }
-        else
+        if (!cloudServerSocketGenerator.registerOnMediatorSync())
         {
             std::cerr << "error. All sockets failed to listen on mediator. "
                 << std::endl;
@@ -306,6 +317,16 @@ int printStatsAndWaitForCompletion(
     }
 
     return 0;
+}
+
+void limitStringList(QStringList* list)
+{
+    if (list->size() <= kMaxAddressesToPrint)
+        return;
+
+    const auto size = list->size();
+    list->erase(list->begin() + kMaxAddressesToPrint, list->end());
+    *list << lm("... (%1 total)").arg(size);
 }
 
 } // namespace cctu
