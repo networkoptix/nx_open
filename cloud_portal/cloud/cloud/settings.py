@@ -221,7 +221,7 @@ EMAIL_USE_TLS = conf['smtp']['tls']
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 PASSWORD_REQUIREMENTS = {
-    'minLength': 6,
+    'minLength': 8,
     'requiredRegex': re.compile("^[\x21-\x7E][\x20-\x7E]+[\x21-\x7E]$"),
     'commonList': 'static/scripts/commonPasswordsList.json'
 }
