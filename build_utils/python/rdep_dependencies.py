@@ -8,6 +8,7 @@ import filelock
 import ConfigParser
 import glob
 import time
+import distutils.spawn
 from rdep import Rdep
 import rdep_config
 import platform_detection
@@ -199,6 +200,15 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
         config.set_url(SYNC_URL)
     if not config.get_push_url(None):
         config.set_push_url(PUSH_URL)
+
+    global_config = rdep_config.RdepConfig()
+    if not global_config.get_rsync():
+        if not distutils.spawn.find_executable("rsync"):
+            rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
+            if not os.path.isfile(rsync):
+                print "Cannot find rsync executable. Please specify it in .rderc"
+                exit(1)
+            global_config.set_rsync(rsync)
 
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir)
