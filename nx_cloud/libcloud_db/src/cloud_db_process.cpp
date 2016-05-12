@@ -151,13 +151,14 @@ int CloudDBProcess::executeApplication()
             &dbManager,
             emailManager.get());
 
+        EventManager eventManager(settings);
+
         SystemManager systemManager(
             settings,
             &timerManager,
             accountManager,
+            eventManager,
             &dbManager);
-
-        EventManager eventManager(settings);
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
