@@ -69,12 +69,7 @@
     </message>
     <message>
       <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D/activate/%7B%7Bmessage.code%7D%7D</source>
+      <source>/activate/{{message.code}}</source>
       <translation> </translation>
     </message>
     <message>
@@ -147,12 +142,7 @@
     </message>
     <message>
       <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D/restore_password/%7B%7Bmessage.code%7D%7D</source>
+      <source>/restore_password/{{message.code}}</source>
       <translation> </translation>
     </message>
     <message>
@@ -220,17 +210,7 @@
     </message>
     <message>
       <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>mailto:%7B%7Bmessage.sharer_email%7D%7D</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D/register/%7B%7Buser_email%7D%7D</source>
+      <source>mailto:{{message.sharer_email}}&quot;  /register/{{user_email}}</source>
       <translation> </translation>
     </message>
     <message>
@@ -288,17 +268,7 @@
     </message>
     <message>
       <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>mailto:%7B%7Bmessage.sharer_email%7D%7D</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D/systems/%7B%7Bmessage.system_id%7D%7D</source>
+      <source>mailto:{{message.sharer_email}}&quot; /systems/{{message.system_id}}</source>
       <translation> </translation>
     </message>
     <message>
@@ -357,11 +327,6 @@
     <message>
       <location/>
       <source>SUPPORT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>%7B%7Bconfig.portal_url%7D%7D</source>
       <translation> </translation>
     </message>
     <message>

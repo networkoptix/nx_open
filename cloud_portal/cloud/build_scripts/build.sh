@@ -1,4 +1,10 @@
 echo "Set customization (pass customization name as a single parameter for this script)"
+
+if  [ -z $CLOUD_PORTAL_CONF_DIR ]; then
+    echo "Set CLOUD_PORTAL_CONF_DIR"
+    export CLOUD_PORTAL_CONF_DIR=$HOME/networkoptix/develop/cloud_portal/etc
+fi
+
 CUSTOMIZATION=default
 
 if  [ -n "$1" ]; then
