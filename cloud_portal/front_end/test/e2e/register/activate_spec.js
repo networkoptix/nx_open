@@ -146,4 +146,20 @@ describe('User activation', function () {
             expect(p.openInClientButton.isDisplayed()).toBe(true);
         });
     });
+
+    it("link works and does not log out user, if he was logged in", function () {
+        var userEmail = p.helper.getRandomEmail();
+
+        p.helper.register(null, null, userEmail);
+        p.helper.login(p.helper.userEmail);
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            expect(p.helper.forms.logout.dropdownToggle.isPresent()).toBe(true);
+            expect(p.helper.forms.logout.dropdownToggle.getText()).toContain(p.helper.userEmail);
+        });
+    });
+
+    xit("If no user was logged in, confirmation link logs new user in (not implemented)", function () {
+    });
 });
