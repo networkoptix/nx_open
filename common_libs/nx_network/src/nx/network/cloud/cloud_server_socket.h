@@ -70,7 +70,10 @@ public:
     virtual void cancelIOSync() override;
 
     /** Invokes listen on mediator */
-    bool registerOnMediatorSync();
+    void registerOnMediator(
+        nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
+
+    hpm::api::ResultCode registerOnMediatorSync();
 
     /** test only */
     void moveToListeningState();
@@ -100,7 +103,7 @@ protected:
     const std::vector<AcceptorMaker> m_acceptorMakers;
     int m_acceptQueueLen;
 
-    State m_state;
+    std::atomic<State> m_state;
     QnMutex m_mutex;
     bool m_terminated;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
