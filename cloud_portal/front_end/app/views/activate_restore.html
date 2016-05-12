@@ -83,7 +83,8 @@
         <h1>Set new password</h1>
 
         <h2 class="process-success" ng-if="change.success || changeSuccess ">
-            Password successfully saved.
+            Password successfully saved.<br>
+            <a href="#/login">Login</a>
         </h2>
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
 
