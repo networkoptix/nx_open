@@ -2231,6 +2231,19 @@ QSize QnNxStyle::sizeFromContents(
             return sz;
         }
 
+    case CT_ProgressBar:
+        if (const QStyleOptionProgressBar* progressBar = qstyleoption_cast<const QStyleOptionProgressBar*>(option))
+        {
+            bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
+            if (!hasText)
+            {
+                QStyleOptionProgressBar subOption(*progressBar);
+                subOption.rect.setSize(size);
+                return subElementRect(SE_ProgressBarGroove, &subOption, widget).size();
+            }
+        }
+        break;
+
     default:
         break;
     }

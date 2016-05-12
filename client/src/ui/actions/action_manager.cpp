@@ -1439,6 +1439,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("User Settings...")).
         condition(hasFlags(Qn::user));
 
+    factory(QnActions::UserGroupsAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Users Groups...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
+
     factory(QnActions::CameraIssuesAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

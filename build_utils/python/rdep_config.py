@@ -1,6 +1,7 @@
 import os
 import ConfigParser
 import time
+import distutils.spawn
 
 class ConfigHelper:
     FILE_NAME = None
@@ -55,7 +56,13 @@ class RdepConfig(ConfigHelper):
         self.set_value("General", "ssh", ssh)
 
     def get_rsync(self):
-        return self.get_value("General", "rsync", "rsync")
+        default_value = "rsync"
+        if not distutils.spawn.find_executable("rsync"):
+            default_value = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
+    
+        return self.get_value("General", "rsync", default_value)
+        
+        
     def set_rsync(self, rsync):
         self.set_value("General", "rsync", rsync)
 

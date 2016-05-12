@@ -1,20 +1,21 @@
-#include "user_group_settings_dialog.h"
-#include "ui_user_group_settings_dialog.h"
+#include "user_groups_dialog.h"
+#include "ui_user_groups_dialog.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_access_manager.h>
 
 #include <ui/models/resource_properties/user_grous_settings_model.h>
+#include <ui/style/resource_icon_cache.h>
 #include <ui/widgets/properties/user_group_settings_widget.h>
 #include <ui/widgets/properties/accessible_resources_widget.h>
 #include <ui/widgets/properties/permissions_widget.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-QnUserGroupSettingsDialog::QnUserGroupSettingsDialog(QWidget *parent):
+QnUserGroupsDialog::QnUserGroupsDialog(QWidget *parent):
     base_type(parent),
-    ui(new Ui::UserGroupSettingsDialog()),
+    ui(new Ui::UserGroupsDialog()),
     m_model(new QnUserGroupSettingsModel(this)),
     m_settingsPage(new QnUserGroupSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
@@ -39,18 +40,54 @@ QnUserGroupSettingsDialog::QnUserGroupSettingsDialog(QWidget *parent):
 
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
+
+    QStandardItemModel* groupsModel = new QStandardItemModel(this);
+    for (const auto& group : qnResourceAccessManager->userGroups())
+    {
+        QString name = group.name;
+        if (name.isEmpty())
+            name = tr("<Unnamed Group>");
+
+        QStandardItem* item = new QStandardItem(qnResIconCache->icon(QnResourceIconCache::Users), name);
+        item->setData(qVariantFromValue(group.id), Qt::UserRole + 1);
+        qDebug() << "added group id" << group.id.toString();
+        groupsModel->appendRow(item);
+    }
+    ui->groupsTreeView->setModel(groupsModel);
+
+    connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex& current, const QModelIndex& previous)
+    {
+        if (!current.isValid())
+            return;
+        QnUuid groupId = current.data(Qt::UserRole + 1).value<QnUuid>();
+        qDebug() << "selected group id" << groupId.toString();
+    });
+
+    connect(ui->newGroupButton, &QPushButton::clicked, this, [this, groupsModel]
+    {
+        ec2::ApiUserGroupData group;
+        group.id = QnUuid::createUuid();
+        group.name = group.id.toSimpleString();
+        group.permissions = Qn::GlobalViewLivePermission;
+        qnResourcesChangesManager->saveUserGroup(group);
+
+        QStandardItem* item = new QStandardItem(qnResIconCache->icon(QnResourceIconCache::Users), group.name);
+        item->setData(qVariantFromValue(group.id), Qt::UserRole + 1);
+        qDebug() << "added group id" << group.id.toString();
+        groupsModel->appendRow(item);
+    });
 }
 
-QnUserGroupSettingsDialog::~QnUserGroupSettingsDialog()
+QnUserGroupsDialog::~QnUserGroupsDialog()
 {}
 
 
-QnUuid QnUserGroupSettingsDialog::userGroupId() const
+QnUuid QnUserGroupsDialog::userGroupId() const
 {
     return m_model->userGroupId();
 }
 
-void QnUserGroupSettingsDialog::setUserGroupId(const QnUuid& value)
+void QnUserGroupsDialog::setUserGroupId(const QnUuid& value)
 {
     if (m_model->userGroupId() == value)
         return;
@@ -62,7 +99,7 @@ void QnUserGroupSettingsDialog::setUserGroupId(const QnUuid& value)
     loadDataToUi();
 }
 
-void QnUserGroupSettingsDialog::retranslateUi()
+void QnUserGroupsDialog::retranslateUi()
 {
     base_type::retranslateUi();
    /* if (!m_user)
@@ -84,7 +121,7 @@ void QnUserGroupSettingsDialog::retranslateUi()
     }*/
 }
 
-bool QnUserGroupSettingsDialog::hasChanges() const
+bool QnUserGroupsDialog::hasChanges() const
 {
     return base_type::hasChanges();
 
@@ -109,7 +146,7 @@ bool QnUserGroupSettingsDialog::hasChanges() const
 
 }
 
-void QnUserGroupSettingsDialog::applyChanges()
+void QnUserGroupsDialog::applyChanges()
 {
 
 /*    qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr &user)
@@ -124,3 +161,4 @@ void QnUserGroupSettingsDialog::applyChanges()
 */
     updateButtonBox();
 }
+

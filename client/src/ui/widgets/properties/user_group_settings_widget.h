@@ -31,4 +31,5 @@ public:
 private:
     QScopedPointer<Ui::UserGroupSettingsWidget> ui;
     QnUserGroupSettingsModel* m_model;
+    QStandardItemModel* m_usersModel;
 };

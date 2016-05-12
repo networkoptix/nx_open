@@ -113,6 +113,8 @@ private slots:
     void on_resourceRemoved(const QnUuid& resourceId );
 
     void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
+    void on_userGroupChanged(const ec2::ApiUserGroupData& userGroup);
+    void on_userGroupRemoved(const QnUuid& groupId);
 
     void on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraID);

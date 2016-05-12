@@ -10,6 +10,7 @@
 #include <ui/dialogs/resource_properties/camera_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
+#include <ui/dialogs/resource_properties/user_groups_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 
 #include <ui/workbench/workbench_access_controller.h>
@@ -25,6 +26,7 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     connect(action(QnActions::ServerSettingsAction), &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
     connect(action(QnActions::NewUserAction),        &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered);
     connect(action(QnActions::UserSettingsAction),   &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered);
+    connect(action(QnActions::UserGroupsAction),     &QAction::triggered,    this,   &QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered);
 }
 
 QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
@@ -98,5 +100,11 @@ void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
     m_userSettingsDialog->setUser(user);
 
     //dialog->setFocusedElement(params.argument<QString>(Qn::FocusElementRole));
+}
+
+void QnWorkbenchResourcesSettingsHandler::at_userGroupsAction_triggered()
+{
+    QScopedPointer<QnUserGroupsDialog> groupsDialog(new QnUserGroupsDialog(mainWindow()));
+    groupsDialog->exec();
 }
 
