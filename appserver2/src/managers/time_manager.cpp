@@ -1324,6 +1324,7 @@ namespace ec2
                         QByteArray::number(m_localTimePriorityKey.toUInt64())));
 
                 localTimeTran.isLocal = true;
+                transactionLog->fillPersistentInfo(localTimeTran);
                 dbManager(Qn::kSuperUserAccess).executeTransaction(localTimeTran, QByteArray());
             }));
     }
