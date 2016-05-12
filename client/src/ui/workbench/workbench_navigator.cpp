@@ -766,7 +766,7 @@ void QnWorkbenchNavigator::jumpBackward() {
 
     qint64 pos = reader->startTime();
     if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
-        bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
+        bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
@@ -804,7 +804,7 @@ void QnWorkbenchNavigator::jumpForward() {
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
     } else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
-        bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
+        bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
@@ -999,13 +999,13 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
             flags |= WidgetSupportsLive | WidgetSupportsPeriods;
 
-        if(m_currentWidget->resource()->flags() & Qn::periods)
+        if(m_currentWidget->resource()->flags().testFlag(Qn::periods))
             flags |= WidgetSupportsPeriods;
 
-        if(m_currentWidget->resource()->flags() & Qn::utc)
+        if(m_currentWidget->resource()->flags().testFlag(Qn::utc))
             flags |= WidgetUsesUTC;
 
-        if(m_currentWidget->resource()->flags() & Qn::sync)
+        if(m_currentWidget->resource()->flags().testFlag(Qn::sync))
             flags |= WidgetSupportsSync;
 
         if(workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
@@ -1199,7 +1199,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods() {
 void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
     QnTimePeriodList periods;
 
-    if (type == Qn::MotionContent && m_currentMediaWidget && !(m_currentMediaWidget->options() & QnResourceWidget::DisplayMotion)) {
+    if (type == Qn::MotionContent && m_currentMediaWidget && !m_currentMediaWidget->options().testFlag(QnResourceWidget::DisplayMotion)) {
         /* Use empty periods. */
     } else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
         periods = loader->periods(type);
@@ -1242,7 +1242,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent timePeriodT
     /* We don't want duplicate loaders. */
     QSet<QnCachingCameraDataLoader *> loaders;
     foreach(const QnMediaResourceWidget *widget, m_syncedWidgets) {
-        if(timePeriodType == Qn::MotionContent && !(widget->options() & QnResourceWidget::DisplayMotion)) {
+        if(timePeriodType == Qn::MotionContent && !widget->options().testFlag(QnResourceWidget::DisplayMotion)) {
             /* Ignore it. */
         } else if(QnCachingCameraDataLoader *loader = loaderByWidget(widget)) {
             loaders.insert(loader);
@@ -1573,7 +1573,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         return;
 
     /* Add slider-local actions to the menu. */
-    bool selectionEditable = m_timeSlider->options() & QnTimeSlider::SelectionEditable;
+    bool selectionEditable = m_timeSlider->options().testFlag(QnTimeSlider::SelectionEditable);
     manager->redirectAction(menu.data(), QnActions::StartTimeSelectionAction,  selectionEditable ? m_startSelectionAction : NULL);
     manager->redirectAction(menu.data(), QnActions::EndTimeSelectionAction,    selectionEditable ? m_endSelectionAction : NULL);
     manager->redirectAction(menu.data(), QnActions::ClearTimeSelectionAction,  selectionEditable ? m_clearSelectionAction : NULL);
@@ -1745,7 +1745,7 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->resource()->flags() & Qn::sync)
+    if(widget->resource()->flags().testFlag(Qn::sync))
     {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         {
@@ -1766,7 +1766,7 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     disconnect(widget, NULL, this, NULL);
     disconnect(widget->resource(), NULL, this, NULL);
 
-    if(widget->resource()->flags() & Qn::sync)
+    if(widget->resource()->flags().testFlag(Qn::sync))
     {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
         {
@@ -1794,7 +1794,7 @@ void QnWorkbenchNavigator::at_widget_optionsChanged() {
 
 void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
     int oldSize = m_motionIgnoreWidgets.size();
-    if(widget->options() & QnResourceWidget::DisplayMotion) {
+    if(widget->options().testFlag(QnResourceWidget::DisplayMotion)) {
         m_motionIgnoreWidgets.insert(widget);
         if (widget == m_currentMediaWidget)
             at_widget_motionSelectionChanged(m_currentMediaWidget);
@@ -1820,7 +1820,7 @@ void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resourc
 
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed()
 {
-    m_lastAdjustTimelineToPosition = (m_timeSlider->options() & QnTimeSlider::AdjustWindowToPosition) != 0;
+    m_lastAdjustTimelineToPosition = m_timeSlider->options().testFlag(QnTimeSlider::AdjustWindowToPosition);
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
 }
 

@@ -1496,7 +1496,7 @@ void QnTimeSlider::updateToolTipVisibility()
 
 void QnTimeSlider::updateToolTipText()
 {
-    if (!(m_options.testFlag(UpdateToolTip)))
+    if (!m_options.testFlag(UpdateToolTip))
         return;
 
     qint64 pos = sliderPosition();
@@ -1568,11 +1568,11 @@ bool QnTimeSlider::isLiveSupported() const
 
 void QnTimeSlider::setLiveSupported(bool value)
 {
-    if (m_liveSupported != value)
-    {
-        m_liveSupported = value;
-        updateToolTipVisibility();
-    }
+    if (m_liveSupported == value)
+        return;
+
+    m_liveSupported = value;
+    updateToolTipVisibility();
 }
 
 bool QnTimeSlider::isLive() const
