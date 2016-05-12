@@ -24,6 +24,9 @@ var RegisterPage = function () {
 
     this.submitButton = element(by.css('[form=registerForm]')).element(by.buttonText('Register'));
 
+    this.openInClientButton = element(by.cssContainingText('button', 'Open '));
+    this.messageLoginLink = element(by.css('h1')).element(by.linkText('Login'));
+
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));
     };

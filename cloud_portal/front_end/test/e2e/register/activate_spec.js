@@ -1,6 +1,6 @@
 'use strict';
 var RegisterPage = require('./po.js');
-describe('Registration step2', function () {
+describe('User activation', function () {
     var p = new RegisterPage();
 
     beforeEach(function() {
@@ -24,9 +24,7 @@ describe('Registration step2', function () {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             expect(browser.getCurrentUrl()).toContain("/activate/success");
-
-            p.helper.login(userEmail, p.helper.userPassword);
-            p.helper.logout();
+            expect(p.messageLoginLink.isDisplayed()).toBe(true);
         });
     });
 
@@ -113,13 +111,37 @@ describe('Registration step2', function () {
         });
     });
 
-    it("If user is registered by link #/register/?from=client - after account activation he sees Open Nx Witness button", function () {
-        // http://cloud-demo.hdw.mx/static/index.html#/register?from=client
-        // http://cloud-demo.hdw.mx/static/index.html#/register?from=mobile
+    it("should display Open Nx Witness button after activation, if user is registered by link #/register/?from=client", function () {
+        var userEmail = p.helper.getRandomEmail();
+
+        p.helper.get(p.url + '?from=client');
+
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.emailInput.sendKeys(userEmail);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.submitButton.click();
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            expect(p.openInClientButton.isDisplayed()).toBe(true);
+        });
     });
 
-    it("If registered user didn't come from client - after account activation he sees Login link, which works ", function () {
-        // http://cloud-demo.hdw.mx/static/index.html#/register?from=client
-        // http://cloud-demo.hdw.mx/static/index.html#/register?from=mobile
+    it("should display Open Nx Witness button after activation, if user is registered by link #/register/?from=mobile", function () {
+        var userEmail = p.helper.getRandomEmail();
+
+        p.helper.get(p.url + '?from=mobile');
+
+        p.firstNameInput.sendKeys(p.helper.userFirstName);
+        p.lastNameInput.sendKeys(p.helper.userLastName);
+        p.emailInput.sendKeys(userEmail);
+        p.passwordInput.sendKeys(p.helper.userPassword);
+        p.submitButton.click();
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            expect(p.openInClientButton.isDisplayed()).toBe(true);
+        });
     });
 });
