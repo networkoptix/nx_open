@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <iostream>
-#include <array>
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
@@ -382,9 +381,9 @@ static void fillHardwareInfo(IWbemServices* pSvc, ExecQueryFunction execQuery, Q
     hardwareInfo.memorySerialNumber = execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
 }
 
-QMap<QString, QString> calcHardwareIds(const QnHardwareInfo& hi, int version, bool guidCompatibility)
+void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
-    QMap<QString, QString> result;
+    hardwareIdMap.clear();
 
     QString hardwareId;
 
@@ -405,15 +404,13 @@ QMap<QString, QString> calcHardwareIds(const QnHardwareInfo& hi, int version, bo
 
             if (!mac.isEmpty())
             {
-                result[mac] = hardwareId + mac;
+                hardwareIdMap[mac] = hardwareId + mac;
             }
         }
     } else
     {
-        result[""] = hardwareId;
+        hardwareIdMap[""] = hardwareId;
     }
-
-    return result;
 }
 
 } // namespace {}

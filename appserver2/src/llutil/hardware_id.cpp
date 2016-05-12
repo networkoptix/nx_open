@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QDateTime>
+#include <array>
 
 #include <utils/serialization/json.h>
 
@@ -35,7 +36,7 @@ namespace LLUtil {
         std::array<bool, 2> guidCompatibilities = { false, true };
 
         for (bool guidCompatibility : guidCompatibilities) {
-            hardwareIdMap = calcHardwareIds(hardwareInfo, version, guidCompatibility);
+            calcHardwareIdMap(hardwareIdMap, hardwareInfo, version, guidCompatibility);
             for (QString mac : hardwareIdMap.keys()) {
                 macHardwareIds[mac] << hardwareIdMap[mac];
             }
@@ -100,6 +101,8 @@ namespace LLUtil {
             g_hardwareInfo.mac = g_storedMac;
 
             g_hardwareIdInitialized = true;
+
+            NX_LOG(QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")), cl_logINFO);
         }
         catch (const LLUtil::HardwareIdError& err) {
             qWarning() << QLatin1String("getHardwareId()") << err.what();
