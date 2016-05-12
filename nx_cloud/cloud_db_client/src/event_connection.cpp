@@ -10,6 +10,7 @@
 #include <utils/math/math.h>
 #include <utils/media/custom_output_stream.h>
 
+#include "cdb_request_path.h"
 #include "data/types.h"
 
 
@@ -70,8 +71,6 @@ void EventConnection::start(
         std::bind(&EventConnection::cdbEndpointResolved, this, _1, _2));
 }
 
-static const QString kEventHandlerPath("/cdb/events");
-
 void EventConnection::cdbEndpointResolved(
     nx_http::StatusCode::Value resCode,
     SocketAddress endpoint)
@@ -87,7 +86,7 @@ void EventConnection::cdbEndpointResolved(
     url.setScheme("http");
     url.setHost(endpoint.address.toString());
     url.setPort(endpoint.port);
-    url.setPath(url.path() + kEventHandlerPath);
+    url.setPath(url.path() + kSubscribeToSystemEventsPath);
     url.setUserName(QString::fromStdString(m_login));
     url.setPassword(QString::fromStdString(m_password));
     m_httpClient->doGet(url);

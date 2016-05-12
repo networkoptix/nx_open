@@ -75,6 +75,9 @@ class Settings
 public:
     Settings();
 
+    Settings(const Settings&) = delete;
+    Settings& operator=(const Settings&) = delete;
+
     bool showHelp() const;
 
     //!list of local endpoints to bind to. By default, 0.0.0.0:3346

@@ -44,14 +44,15 @@
 #include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/share_system_handler.h"
 #include "managers/account_manager.h"
-#include "managers/temporary_account_password_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
+#include "managers/event_manager.h"
 #include "managers/system_manager.h"
+#include "managers/temporary_account_password_manager.h"
 #include "stree/stree_manager.h"
 
-#include <utils/common/app_info.h>
 #include <libcloud_db_app_info.h>
+#include <utils/common/app_info.h>
 
 
 static int registerQtResources()
@@ -137,6 +138,8 @@ int CloudDBProcess::executeApplication()
             EMailManagerFactory::create(settings));
         StreeManager streeManager(settings.auth());
 
+        nx_http::MessageDispatcher httpMessageDispatcher;
+
         //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
@@ -153,6 +156,8 @@ int CloudDBProcess::executeApplication()
             &timerManager,
             accountManager,
             &dbManager);
+
+        EventManager eventManager(settings);
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
@@ -179,7 +184,6 @@ int CloudDBProcess::executeApplication()
             accountManager,
             systemManager);
 
-        nx_http::MessageDispatcher httpMessageDispatcher;
         //registering HTTP handlers
         registerApiHandlers(
             &httpMessageDispatcher,
@@ -187,6 +191,9 @@ int CloudDBProcess::executeApplication()
             &accountManager,
             &systemManager,
             &authProvider);
+        eventManager.registerHttpHandlers(
+            authorizationManager,
+            &httpMessageDispatcher);
 
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
