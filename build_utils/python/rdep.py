@@ -331,6 +331,9 @@ def main():
     root = args.root
     if not root:
         root = _find_root(os.getcwd(), RepositoryConfig.FILE_NAME)
+    if not root:
+        print >> sys.stderr, "Repository root not found. Please specify it with --root or by setting working directory."
+        return False
 
     rdep = Rdep(root)
     rdep.verbose = args.verbose
@@ -351,6 +354,7 @@ def main():
 
     if not packages:
         print >> sys.stderr, "No packages specified"
+        return False
 
     if args.print_path:
         return rdep.print_path(packages[0])
