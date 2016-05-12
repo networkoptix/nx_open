@@ -629,11 +629,14 @@ public:
     ApiObjectType getObjectType(const QnUuid& objectId);
 
     template <class T1, class T2>
-    ErrorCode doQuery(T1&& t1, T2&& t2)
+    ErrorCode doQuery(const T1 &t1, T2 &t2)
     {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(std::forward<T1>(t1), std::forward<T2>(t2));
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
         if (!hasPermission(t2, m_userAccessData.userId, Qn::Permission::ReadPermission))
+        {
             errorCode = ErrorCode::forbidden;
+            t2 = T2();
+        }
         return errorCode;
     }
 
