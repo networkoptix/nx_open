@@ -209,6 +209,16 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
                 print "Cannot find rsync executable. Please specify it in .rderc"
                 exit(1)
             global_config.set_rsync(rsync)
+    if not global_config.get_name():
+        homedir = os.path.join(os.path.expanduser("~"))
+        hg_config_file = os.path.join(homedir, ".hgrc")
+        if not os.path.isfile(hg_config_file):
+            hg_config_file = os.path.join(homedir, "Mercurial.ini")
+        if os.path.isfile(hg_config_file):
+            hg_config = rdep_config.ConfigHelper(hg_config_file)
+            username = hg_config.get_value("ui", "username", "").strip()
+            if username:
+                global_config.set_name(username)
 
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir)
