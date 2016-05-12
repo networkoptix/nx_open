@@ -580,7 +580,6 @@ namespace detail
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool isTranAllowed(const QnAbstractTransaction& tran) const;
-        void setUserAccessData(const Qn::UserAccessData &userAccessData);
 
     private:
         QnUuid m_storageTypeId;
@@ -613,7 +612,6 @@ namespace detail
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
         bool m_dbReadOnly;
-        Qn::UserAccessData m_userAccessData;
     };
 } // namespace detail
 
@@ -657,7 +655,6 @@ public:
 
 private:
     Qn::UserAccessData m_userAccessData;
-    static QnMutex m_userAccessMutex;
 };
 
 } // namespace ec2

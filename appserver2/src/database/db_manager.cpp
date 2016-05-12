@@ -4508,27 +4508,11 @@ QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 {
     return &m_tran;
 }
-
-void QnDbManager::setUserAccessData(const Qn::UserAccessData &userAccessData)
-{
-    m_userAccessData = userAccessData;
-}
-
 } // namespace detail
-
-QnMutex QnDbManagerAccess::m_userAccessMutex;
 
 QnDbManagerAccess::QnDbManagerAccess(const Qn::UserAccessData &userAccessData)
     : m_userAccessData(userAccessData)
-{
-    m_userAccessMutex.lock();
-    detail::QnDbManager::instance()->setUserAccessData(userAccessData);
-}
-
-QnDbManagerAccess::~QnDbManagerAccess()
-{
-    m_userAccessMutex.unlock();
-}
+{}
 
 ApiObjectType QnDbManagerAccess::getObjectType(const QnUuid& objectId)
 {
