@@ -1,6 +1,6 @@
 import requests
 from requests.auth import HTTPDigestAuth
-from hashlib import md5
+from hashlib import md5, sha256
 from cloud import settings
 from api.helpers.exceptions import validate_response
 
@@ -89,10 +89,12 @@ class Account(object):
 
         password_string = ':'.join((email, realm, password))
         password_ha1 = md5(password_string).hexdigest()
+        password_ha1_sha256 = sha256(password_string).hexdigest()
 
         params = {
             'email': email,
             'passwordHa1': password_ha1,
+            'passwordHa1Sha256': password_ha1_sha256,
             'fullName': ' '.join((first_name, last_name)),
             'customization': customization
         }
@@ -108,9 +110,11 @@ class Account(object):
 
         password_string = ':'.join((email, realm, new_password))
         password_ha1 = md5(password_string).hexdigest()
+        password_ha1_sha256 = sha256(password_string).hexdigest()
 
         params = {
-            'passwordHa1': password_ha1
+            'passwordHa1': password_ha1,
+            'passwordHa1Sha256': password_ha1_sha256
         }
         request = settings.CLOUD_CONNECT['url'] + '/account/update'
 
