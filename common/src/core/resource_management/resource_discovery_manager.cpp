@@ -703,3 +703,9 @@ void QnResourceDiscoveryManager::updateSearchersUsage() {
     for(QnAbstractResourceSearcher *searcher: searchers)
         updateSearcherUsage(searcher, usePartialEnable);
 }
+
+void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources)
+{
+    processDiscoveredResources(resources);
+    m_resourceProcessor->processResources(resources);
+}

@@ -162,7 +162,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
             storage->setSpaceLimit(QnFileStorageResource::calcSpaceLimit(partition.type));
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
-            data.isWritable = storage->isWritable();
+            data.isWritable = storage->initOrUpdate() && storage->isWritable();
         }
 
         result.push_back(data);
