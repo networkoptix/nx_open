@@ -199,8 +199,9 @@ void QnUserSettingsDialog::applyChanges()
 
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     //TODO: #GDM #access SafeMode what to rollback if we were creating new user
-    qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr &user)
+    qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr& user)
     {
+        Q_UNUSED(user);
         for (const auto& page : allPages())
         {
             if (page.enabled && page.visible)

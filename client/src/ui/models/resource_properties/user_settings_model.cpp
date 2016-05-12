@@ -162,7 +162,7 @@ QString QnUserSettingsModel::permissionsDescription(Qn::GlobalPermissions permis
     return QString();
 }
 
-QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const
+QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid& id, Qn::GlobalPermissions permissions) const
 {
     const bool hasAccessToSystem = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 

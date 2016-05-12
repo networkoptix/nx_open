@@ -45,7 +45,7 @@ public:
     QString permissionsDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const;
 
 private:
-    QString getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const;
+    QString getCustomPermissionsDescription(const QnUuid& id, Qn::GlobalPermissions permissions) const;
 
 private:
     Mode m_mode;
