@@ -169,7 +169,7 @@ describe('Sharing.', function () {
         expect(p.usrDataRow(p.helper.userEmailViewer).getText()).not.toContain('live viewer');
     });
 
-    fit ("Sharing works", function() {
+    it ("Sharing works", function() {
         var newUserEmail = p.helper.getRandomEmail();
         p.helper.createUser('Mark', 'Hamill', newUserEmail);
 
