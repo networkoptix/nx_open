@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
 #include <utils/common/ldap.h>
 
 #include <ui/style/warning_style.h>
@@ -68,20 +69,30 @@ void QnLdapSettingsDialogPrivate::testSettings() {
         return;
     }
 
+    // TODO: #dklychkov #3.0 testLdapSettings rest request (on server side) should check all servers.
     QnMediaServerConnectionPtr serverConnection;
     const auto onlineServers = qnResPool->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr server: onlineServers)
     {
-        if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             continue;
 
         serverConnection = server->apiConnection();
         break;
     }
 
-    if (!serverConnection) {
-        stopTesting(tr("None of your servers are connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
-        return;
+    if (!serverConnection)
+    {
+        QnMediaServerResourcePtr server = qnCommon->currentServer();
+
+        NX_ASSERT(server);
+        if (!server)
+        {
+            stopTesting(tr("Could not perform a test."));
+            return;
+        }
+
+        serverConnection = server->apiConnection();
     }
 
     Q_Q(QnLdapSettingsDialog);
