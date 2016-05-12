@@ -117,6 +117,10 @@ TEST_F( StunClientServerTest, Connectivity )
 
     startServer();
     promise.get_future().wait(); // automatic reconnect is expected
+
+    // there might be a small delay before server creates connection from
+    // accepted socket
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_EQ( server->connections.size(), 1 );
 }
 

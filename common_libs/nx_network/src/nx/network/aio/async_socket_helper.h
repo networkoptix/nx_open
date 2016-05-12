@@ -279,10 +279,7 @@ public:
             return;
 
         NX_ASSERT( buf.size() > 0 );
-
-        //NX_ASSERT does not stop all threads immediately, so performing segmentation fault
-        if( m_asyncSendIssued.exchange(true) )
-            *((int*)nullptr) = 12;
+        NX_CRITICAL( !m_asyncSendIssued.exchange(true) );
 
         m_sendBuffer = &buf;
         m_sendHandler = std::move( handler );

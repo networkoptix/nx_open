@@ -252,6 +252,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectTimeout)
 
 TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
 {
+    manualAcceptorStop = true;
     std::random_device device;
     std::mt19937 generator(device());
     std::uniform_int_distribution<int64_t> distribution(0, kUdpRetryTimeout.count() * 2);

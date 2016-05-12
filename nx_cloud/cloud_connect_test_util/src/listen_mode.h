@@ -18,5 +18,7 @@ int printStatsAndWaitForCompletion(
     nx::network::test::ConnectionPool* const connectionPool,
     nx::utils::MoveOnlyFunc<bool()> interruptCondition);
 
+void limitStringList(QStringList* list);
+
 } // namespace cctu
 } // namespace nx

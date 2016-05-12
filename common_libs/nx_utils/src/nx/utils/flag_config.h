@@ -27,7 +27,7 @@ namespace utils {
  * </code></pre>
  * In the code, use conf.myFlag to test the value.
  */
-class FlagConfig // abstract
+class NX_UTILS_API FlagConfig // abstract
 {
 public:
     /** @param moduleName Is a prefix for .flag files. */
@@ -43,7 +43,9 @@ public:
     void reloadSingleFlag(bool* pFlag);
 
     /** Detected temp path including trailing slash or backslash. */
-    const char* tempPath();
+    const char* tempPath() const;
+
+    const char* moduleName() const;
 
 private:
     char m_tempPath[L_tmpnam];

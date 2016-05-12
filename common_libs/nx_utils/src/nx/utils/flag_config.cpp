@@ -41,9 +41,14 @@ FlagConfig::FlagConfig(const char* moduleName)
     printHeader();
 }
 
-const char* FlagConfig::tempPath()
+const char* FlagConfig::tempPath() const
 {
     return m_tempPath;
+}
+
+const char* FlagConfig::moduleName() const
+{
+    return m_moduleName;
 }
 
 void FlagConfig::printHeader() const

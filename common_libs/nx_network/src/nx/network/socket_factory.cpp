@@ -88,12 +88,15 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
         natTraversalRequired,
         s_enforcedStreamSocketType);
 
-#ifdef ENABLE_SSL
-    if( result && ( sslRequired || s_isSslEnforced ) )
-        result.reset( new SslSocket( result.release(), false ) );
-#endif
+    if (!result)
+        return std::unique_ptr<AbstractStreamSocket>();
+
+    #ifdef ENABLE_SSL
+        if (sslRequired || s_isSslEnforced)
+            result.reset(new SslSocket(result.release(), false));
+    #endif // ENABLE_SSL
     
-    return std::move( result );
+    return std::move(result);
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -107,10 +110,16 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         natTraversalRequired,
         s_enforcedStreamSocketType);
 
-#ifdef ENABLE_SSL
-    if( result && ( sslRequired || s_isSslEnforced ) )
-        result.reset( new SslServerSocket( result.release(), true ) );
-#endif // ENABLE_SSL
+    if (!result)
+        return std::unique_ptr<AbstractStreamServerSocket>();
+
+    #ifdef ENABLE_SSL
+        if (s_isSslEnforced)
+            result.reset(new SslServerSocket(result.release(), false));
+        else
+        if (sslRequired)
+            result.reset(new SslServerSocket(result.release(), true));
+    #endif // ENABLE_SSL
 
     return std::move( result );
 }

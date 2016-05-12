@@ -175,7 +175,6 @@
 #include <utils/common/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/util.h>
@@ -1716,31 +1715,46 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
-    QString sslCertPath = MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString();
+    const auto sslCertPath = MSSettings::roSettings()->value(
+        nx_ms_conf::SSL_CERTIFICATE_PATH,
+        getDataDirectory() + lit( "/ssl/cert.pem")).toString();
+
+    nx::String sslCertData;
     QFile f(sslCertPath);
-    if (!f.open(QIODevice::ReadOnly)) {
-        qWarning() << "Could not find SSL certificate at "<<f.fileName()<<". Generating a new one";
+    if (f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
+    {
+        f.close();
+        qWarning() << "Could not find valid SSL certificate at "
+            << f.fileName() << ". Generating a new one";
 
         QDir parentDir = QFileInfo(f).absoluteDir();
-        if (!parentDir.exists()) {
-            if (!QDir().mkpath(parentDir.absolutePath())) {
-                qWarning() << "Could not create directory " << parentDir.absolutePath();
+        if (!parentDir.exists() && !QDir().mkpath(parentDir.absolutePath()))
+        {
+            qWarning() << "Could not create directory "
+                << parentDir.absolutePath();
+        }
+
+        sslCertData = nx::network::SslEngine::makeCertificateAndKey(
+            qApp->applicationName().toLatin1(), "US",
+            QnAppInfo::organizationName().toLatin1());
+
+        if (sslCertData.isEmpty())
+        {
+             qWarning() << "Could not generate SSL certificate ";
+        }
+        else
+        {
+            if (!f.open(QIODevice::WriteOnly) ||
+                f.write(sslCertData) != sslCertData.size())
+            {
+                qWarning() << "Could not write SSL certificate to file";
             }
-        }
 
-        //TODO: #ivigasin sslCertPath can contain non-latin1 symbols
-        if (generateSslCertificate(sslCertPath.toLatin1(), qApp->applicationName().toLatin1(), "US", QnAppInfo::organizationName().toLatin1())) {
-            qWarning() << "Could not generate SSL certificate ";
+            f.close();
         }
+    }
 
-        if( !f.open( QIODevice::ReadOnly ) )
-            qWarning() << "Could not load SSL certificate "<<f.fileName();
-    }
-    if( f.isOpen() )
-    {
-        const QByteArray& certData = f.readAll();
-        nx::network::SslSocket::initSSLEngine( certData );
-    }
+    nx::network::SslEngine::useCertificateAndPkey(sslCertData);
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
@@ -2490,7 +2504,6 @@ void MediaServerProcess::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
 
@@ -2514,9 +2527,7 @@ void MediaServerProcess::run()
     //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
-    nx::network::SslSocket::releaseSSLEngine();
     authHelper.reset();
-
     fileDeletor.reset();
     normalStorageManager.reset();
     backupStorageManager.reset();
@@ -2525,7 +2536,6 @@ void MediaServerProcess::run()
         m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
 }
-
 
 void MediaServerProcess::at_appStarted()
 {
