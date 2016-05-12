@@ -248,7 +248,7 @@ namespace nx_api
 
         void addNewTaskToQueue( std::shared_ptr<SendTask> newTask )
         {
-            this->socket()->dispatch(
+            this->dispatch(
                 [this, newTask]()
                 {
                     m_sendQueue.push_back( std::move( *newTask ) );

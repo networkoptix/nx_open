@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/abstract_pollable.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/move_only_func.h>
 #include <utils/common/stoppable.h>
@@ -53,7 +54,7 @@ namespace nx_api
         class CustomConnectionType
     > class BaseServerConnection
     :
-        public QnStoppableAsync
+            public nx::network::aio::AbstractPollable
     {
     public:
         typedef BaseServerConnection<CustomConnectionType> SelfType;
@@ -85,6 +86,26 @@ namespace nx_api
                     stopWhileInAioThread();
                     handler();
                 });
+        }
+
+        virtual nx::network::aio::AbstractAioThread* getAioThread() override
+        {
+            return m_streamSocket->getAioThread();
+        }
+
+        virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+        {
+            m_streamSocket->bindToAioThread(aioThread);
+        }
+
+        virtual void post(nx::utils::MoveOnlyFunc<void()> func) override
+        {
+            m_streamSocket->post(std::move(func));
+        }
+
+        virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override
+        {
+            m_streamSocket->dispatch(std::move(func));
         }
 
         //!Start receiving data from connection
