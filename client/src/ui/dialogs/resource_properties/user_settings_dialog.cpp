@@ -28,7 +28,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::CamerasFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::ServersFilter, this))
+    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::ServersFilter, this)),
+    m_editGroupsButton(new QPushButton(tr("Edit User Groups..."), this))
 {
     ui->setupUi(this);
 
@@ -39,8 +40,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
-    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
-    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
+    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
+    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -65,9 +66,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
         tryClose(true);
     });
 
-    QPushButton* editGroupsButton = new QPushButton(tr("Edit User Groups..."), this);
-    ui->buttonBox->addButton(editGroupsButton, QDialogButtonBox::HelpRole);
-    connect(editGroupsButton, &QPushButton::clicked, action(QnActions::UserGroupsAction), &QAction::trigger);
+    ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
+    connect(m_editGroupsButton, &QPushButton::clicked, action(QnActions::UserGroupsAction), &QAction::trigger);
+    m_editGroupsButton->setVisible(false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -79,7 +80,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 
-    updatePagesVisibility();
+    updateControlsVisibility();
 }
 
 QnUserSettingsDialog::~QnUserSettingsDialog()
@@ -113,7 +114,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
-    updatePagesVisibility();
+    updateControlsVisibility();
     loadDataToUi();
 }
 
@@ -211,7 +212,7 @@ void QnUserSettingsDialog::applyChanges()
     updateButtonBox();
 }
 
-void QnUserSettingsDialog::updatePagesVisibility()
+void QnUserSettingsDialog::updateControlsVisibility()
 {
     auto mode = m_model->mode();
 
@@ -237,6 +238,8 @@ void QnUserSettingsDialog::updatePagesVisibility()
         && m_permissionsPage->selectedPermissions().testFlag(Qn::GlobalEditServersPermissions);
 
     setPageVisible(ServersPage,     serverPagesVisible);
+
+    m_editGroupsButton->setVisible(settingsPageVisible);
 
     /* Buttons state takes into account pages visibility, so we must recalculate it. */
     updateButtonBox();

@@ -26,6 +26,8 @@ public:
 
     ec2::ApiUserGroupDataList userGroups() const;
     void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
+
+    ec2::ApiUserGroupData userGroup(const QnUuid& groupId) const;
     void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
     void removeUserGroup(const QnUuid& groupId);
 

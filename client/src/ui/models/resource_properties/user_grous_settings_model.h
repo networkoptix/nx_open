@@ -1,21 +1,34 @@
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <nx_ec/data/api_user_group_data.h>
 
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserGroupSettingsModel : public QnAbstractPermissionsModel, public QnWorkbenchContextAware
+/** Model for editing list of user groups */
+class QnUserGroupSettingsModel : public QAbstractListModel, public QnAbstractPermissionsModel
 {
     Q_OBJECT
 
-    typedef QnAbstractPermissionsModel base_type;
+    typedef QAbstractListModel base_type;
 public:
     QnUserGroupSettingsModel(QObject* parent = nullptr);
     virtual ~QnUserGroupSettingsModel();
 
-    QnUuid userGroupId() const;
-    void setUserGroupId(const QnUuid& value);
+    ec2::ApiUserGroupDataList groups() const;
+    void setGroups(const ec2::ApiUserGroupDataList& value);
+
+    void addGroup(const ec2::ApiUserGroupData& group);
+    void removeGroup(const QnUuid& id);
+
+    /** Select group as current. */
+    void selectGroup(const QnUuid& value);
+    QnUuid selectedGroup() const;
+
+    /* Following  methods are working with the currently selected group. */
+
+    QString groupName() const;
+    void setGroupName(const QString& value);
 
     virtual Qn::GlobalPermissions rawPermissions() const override;
     virtual void setRawPermissions(Qn::GlobalPermissions value) override;
@@ -23,18 +36,20 @@ public:
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;
 
-    QString groupName() const;
-    void setGroupName(const QString& value);
+    /** Get accessible resources for the given group - just for convenience. */
+    QSet<QnUuid> accessibleResources(const QnUuid& groupId) const;
 
-    /** Return human-readable permissions description for the target user */
-    QString permissionsDescription() const;
+    /* Methods of QAbstractItemModel */
 
-    /** Return human-readable permissions description for the selected permissions set. */
-    QString permissionsDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const;
-
-private:
-    QString getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const;
+    virtual int rowCount(const QModelIndex& index) const override;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
 
 private:
-    QnUuid m_userGroupId;
+    ec2::ApiUserGroupDataList::iterator currentGroup();
+    ec2::ApiUserGroupDataList::const_iterator currentGroup() const;
+
+private:
+    QnUuid m_currentGroupId;
+    ec2::ApiUserGroupDataList m_groups;
+    QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
 };

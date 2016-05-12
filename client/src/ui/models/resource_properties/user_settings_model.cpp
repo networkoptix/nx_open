@@ -171,10 +171,18 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Q
     auto allResources = qnResPool->getResources();
     auto accessibleResources = qnResourceAccessManager->accessibleResources(id);
 
-    std::map<Filter, QString> nameByFilter{
+    std::map<Filter, QString> nameByFilter
+    {
         {CamerasFilter, tr("Cameras")},
         {LayoutsFilter, tr("Global Layouts")},
         {ServersFilter, tr("Servers")},
+    };
+
+    std::map<Filter, QString> allNameByFilter
+    {
+        {CamerasFilter, tr("All Cameras")},
+        {LayoutsFilter, tr("All Global Layouts")},
+        {ServersFilter, tr("All Servers")},
     };
 
     for (auto filter : allFilters())
@@ -182,7 +190,7 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Q
         auto flag = accessPermission(filter);
         if (permissions.testFlag(flag))
         {
-            QString row = lit("<td colspan=2><b>%1</b></td>").arg(accessPermissionText(filter));
+            QString row = lit("<td colspan=2><b>%1</b></td>").arg(allNameByFilter[filter]);
             tableRows << kHtmlTableRowTemplate.arg(row);
         }
         else

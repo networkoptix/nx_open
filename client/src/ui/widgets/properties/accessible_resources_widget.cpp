@@ -90,7 +90,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     default:
         break;
     }
-    ui->allResourcesCheckBox->setText(QnAbstractPermissionsModel::accessPermissionText(m_filter));
 
     m_resourcesModel->setCheckable(true);
     m_resourcesModel->setResources(QnAbstractPermissionsModel::filteredResources(m_filter, qnResPool->getResources()));

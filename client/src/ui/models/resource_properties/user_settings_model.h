@@ -5,11 +5,11 @@
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserSettingsModel : public QnAbstractPermissionsModel, public QnWorkbenchContextAware
+class QnUserSettingsModel : public QObject, public QnAbstractPermissionsModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QnAbstractPermissionsModel base_type;
+    typedef QObject base_type;
 public:
     /** User editing mode */
     enum Mode

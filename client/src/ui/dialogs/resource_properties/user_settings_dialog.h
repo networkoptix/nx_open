@@ -49,7 +49,7 @@ protected:
     virtual void applyChanges() override;
 
 private:
-    void updatePagesVisibility();
+    void updateControlsVisibility();
 
 private:
     Q_DISABLE_COPY(QnUserSettingsDialog)
@@ -67,6 +67,7 @@ private:
     QnAccessibleResourcesWidget* m_camerasPage;
     QnAccessibleResourcesWidget* m_layoutsPage;
     QnAccessibleResourcesWidget* m_serversPage;
+    QPushButton* m_editGroupsButton;
 
 };
 
