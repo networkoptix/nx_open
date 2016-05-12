@@ -62,8 +62,8 @@ class RdepConfig(ConfigHelper):
     def set_ssh(self, ssh):
         self.set_value("General", "ssh", ssh)
 
-    def get_rsync(self):
-        return self.get_value("General", "rsync", "rsync")
+    def get_rsync(self, default_value):
+        return self.get_value("General", "rsync", default_value)
     def set_rsync(self, rsync):
         self.set_value("General", "rsync", rsync)
 

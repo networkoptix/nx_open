@@ -106,7 +106,7 @@ class Rdep:
             show_progress = True,
             additional_args = []):
 
-        command = [ self._config.get_rsync() ]
+        command = [ self._config.get_rsync("rsync") ]
         command.append("--archive")
         command.append("--delete")
 
