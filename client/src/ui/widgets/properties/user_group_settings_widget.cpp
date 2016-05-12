@@ -28,6 +28,7 @@ QnUserGroupSettingsWidget::QnUserGroupSettingsWidget(QnUserGroupSettingsModel* m
     connect(ui->deleteGroupButton, &QPushButton::clicked, this, [this]()
     {
         m_model->removeGroup(m_model->selectedGroup());
+        emit hasChangesChanged();
     });
 }
 

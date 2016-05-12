@@ -32,13 +32,16 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
     endResetModel();
 }
 
-void QnUserGroupSettingsModel::addGroup(const ec2::ApiUserGroupData& group)
+int QnUserGroupSettingsModel::addGroup(const ec2::ApiUserGroupData& group)
 {
     NX_ASSERT(!group.id.isNull());
+    int row = static_cast<int>(m_groups.size());
 
-    beginInsertRows(QModelIndex(), m_groups.size(), m_groups.size());
+    beginInsertRows(QModelIndex(), row, row);
     m_groups.push_back(group);
     endInsertRows();
+
+    return row;
 }
 
 void QnUserGroupSettingsModel::removeGroup(const QnUuid& id)
@@ -112,7 +115,7 @@ QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const QnUuid& groupId
 
 int QnUserGroupSettingsModel::rowCount(const QModelIndex& index) const
 {
-    return m_groups.size();
+    return static_cast<int>(m_groups.size());
 }
 
 QVariant QnUserGroupSettingsModel::data(const QModelIndex &index, int role) const

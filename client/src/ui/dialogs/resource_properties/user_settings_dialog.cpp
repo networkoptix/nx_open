@@ -18,7 +18,7 @@
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
+QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
     m_model(new QnUserSettingsModel(this)),
@@ -40,8 +40,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
-    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
-    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
+    connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -67,7 +67,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     });
 
     ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
-    connect(m_editGroupsButton, &QPushButton::clicked, action(QnActions::UserGroupsAction), &QAction::trigger);
+    connect(m_editGroupsButton, &QPushButton::clicked, this, [this]
+    {
+        menu()->trigger(QnActions::UserGroupsAction);
+        //TODO: #GDM #access re-read user groups list
+    });
     m_editGroupsButton->setVisible(false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);

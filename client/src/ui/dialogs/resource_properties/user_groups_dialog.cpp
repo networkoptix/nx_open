@@ -12,6 +12,8 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <utils/common/string.h>
+
 QnUserGroupsDialog::QnUserGroupsDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::UserGroupsDialog()),
@@ -61,14 +63,18 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget *parent):
 
     connect(ui->newGroupButton, &QPushButton::clicked, this, [this]
     {
+        QStringList usedNames;
+        for (const auto& group: m_model->groups())
+            usedNames << group.name;
+
         ec2::ApiUserGroupData group;
         group.id = QnUuid::createUuid();
-        group.name = group.id.toSimpleString();
+        group.name = generateUniqueString(usedNames, tr("New Group"), tr("New Group %1"));
         group.permissions = Qn::GlobalViewLivePermission;
-//         qnResourcesChangesManager->saveUserGroup(group);
 
-        m_model->addGroup(group);
-        m_model->selectGroup(group.id);
+        int row = m_model->addGroup(group);
+        ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row), QItemSelectionModel::ClearAndSelect);
+        updateButtonBox();
     });
 }
 

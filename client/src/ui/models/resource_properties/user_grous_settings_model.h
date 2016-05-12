@@ -18,7 +18,8 @@ public:
     ec2::ApiUserGroupDataList groups() const;
     void setGroups(const ec2::ApiUserGroupDataList& value);
 
-    void addGroup(const ec2::ApiUserGroupData& group);
+    /** Add new group. Returns index of added group in the model. */
+    int addGroup(const ec2::ApiUserGroupData& group);
     void removeGroup(const QnUuid& id);
 
     /** Select group as current. */
