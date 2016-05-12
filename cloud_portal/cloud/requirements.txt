@@ -20,4 +20,4 @@ PyYAML==3.11
 requests==2.9.1
 cssutils==1.0.1
 htmlmin==0.1.10
-inlinestyler==0.2.3
+inlinestyler==0.2.1
