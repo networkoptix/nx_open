@@ -117,16 +117,17 @@
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
     <form class="master-controls wide" name="forms.remoteSystemForm" novalidate disable-autocomplete>
-        <div class="form-group" validate-field>
-            <ui-select ng-model="settings.remoteSystem" name="remoteSystemName" reset-search-input="false"
-                       ng-change="clearRemoteError()" required autofocus>
-                <ui-select-match placeholder="System address"
-                                 name="remoteSystem">{{$select.selected.systemName}}</ui-select-match>
-                <ui-select-choices
-                        repeat="system as system in getSystems($select.search) | filter: { visibleName: $select.search}">
-                    <div ng-bind-html="system.visibleName | highlight: $select.search"></div>
-                </ui-select-choices>
-            </ui-select>
+        <div class="form-group text-left" validate-field>
+
+            <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
+                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {visibleName: $viewValue} | limitTo:8"
+                   typeahead-input-formatter="getSystemName($model)"
+                   typeahead-focus-on-select="false"
+                   typeahead-min-length="0"
+                   typeahead-show-hint="true"
+                   typeahead-focus-first="false"
+                   typeahead-focus
+                   class="form-control">
 
             <p class="help-block text-left">
                 {{settings.remoteSystem.hint}}
