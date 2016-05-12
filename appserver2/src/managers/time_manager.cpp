@@ -28,6 +28,7 @@
 #include <transaction/transaction_message_bus.h>
 
 #include <nx_ec/data/api_runtime_data.h>
+#include <nx_ec/data/api_misc_data.h>
 
 #include <utils/common/joinable.h>
 #include <nx/utils/log/log.h>
@@ -84,13 +85,25 @@ namespace ec2
         qint64 syncTimeToLocalDelta,
         const TimePriorityKey& syncTimeKey)
     {
+        QnTransaction<ApiMiscData> deltaTran(ApiCommand::NotDefined,
+            ApiMiscData(TIME_DELTA_PARAM_NAME,
+                QByteArray::number(syncTimeToLocalDelta)));
+
+        QnTransaction<ApiMiscData> priorityTran(ApiCommand::NotDefined,
+            ApiMiscData(USED_TIME_PRIORITY_KEY_PARAM_NAME,
+                QByteArray::number(syncTimeKey.toUInt64())));
+
+        deltaTran.isLocal = true;
+        priorityTran.isLocal = true;
+
+        transactionLog->fillPersistentInfo(deltaTran);
+        transactionLog->fillPersistentInfo(priorityTran);
+
         return
-            dbManager(Qn::kSuperUserAccess).saveMiscParam(
-                TIME_DELTA_PARAM_NAME,
-                QByteArray::number(syncTimeToLocalDelta)) &&
-            dbManager(Qn::kSuperUserAccess).saveMiscParam(
-                USED_TIME_PRIORITY_KEY_PARAM_NAME,
-                QByteArray::number(syncTimeKey.toUInt64()));
+            dbManager(Qn::kSuperUserAccess)
+                .executeTransaction(deltaTran, QByteArray()) == ErrorCode::ok &&
+            dbManager(Qn::kSuperUserAccess)
+                .executeTransaction(priorityTran, QByteArray()) == ErrorCode::ok;
     }
 
     /*!
@@ -100,20 +113,21 @@ namespace ec2
         qint64* const syncTimeToLocalDelta,
         TimePriorityKey* const syncTimeKey)
     {
-        QByteArray syncTimeToLocalDeltaStr;
-        if (!dbManager(Qn::kSuperUserAccess).readMiscParam(
+        ApiMiscData syncTimeToLocalDeltaData;
+
+        if (dbManager(Qn::kSuperUserAccess).doQuery(
                 TIME_DELTA_PARAM_NAME,
-                &syncTimeToLocalDeltaStr))
+                syncTimeToLocalDeltaData) != ErrorCode::ok)
             return false;
 
-        QByteArray syncTimeKeyStr;
-        if (!dbManager(Qn::kSuperUserAccess).readMiscParam(
+        ApiMiscData syncTimeKeyData;
+        if (dbManager(Qn::kSuperUserAccess).doQuery(
                 USED_TIME_PRIORITY_KEY_PARAM_NAME,
-                &syncTimeKeyStr))
+                syncTimeKeyData) != ErrorCode::ok)
             return false;
 
-        *syncTimeToLocalDelta = syncTimeToLocalDeltaStr.toLongLong();
-        syncTimeKey->fromUInt64(syncTimeKeyStr.toULongLong());
+        *syncTimeToLocalDelta = syncTimeToLocalDeltaData.value.toLongLong();
+        syncTimeKey->fromUInt64(syncTimeKeyData.value.toULongLong());
         return true;
     }
 
@@ -1115,11 +1129,11 @@ namespace ec2
 
     void TimeSynchronizationManager::onDbManagerInitialized()
     {
-        QByteArray timePriorityStr;
+        ApiMiscData timePriorityData;
         const bool timePriorityStrLoadResult =
-            dbManager(Qn::kSuperUserAccess).readMiscParam(
+            dbManager(Qn::kSuperUserAccess).doQuery(
                 LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                &timePriorityStr);
+                timePriorityData) == ErrorCode::ok;
 
         qint64 restoredTimeDelta = 0;
         TimePriorityKey restoredPriorityKey;
@@ -1133,7 +1147,7 @@ namespace ec2
         //restoring local time priority from DB
         if (timePriorityStrLoadResult)
         {
-            const quint64 restoredPriorityKeyVal = timePriorityStr.toULongLong();
+            const quint64 restoredPriorityKeyVal = timePriorityData.value.toULongLong();
             TimePriorityKey restoredPriorityKey;
             restoredPriorityKey.fromUInt64( restoredPriorityKeyVal );
             //considering time, restored from DB, to be unreliable
@@ -1303,10 +1317,14 @@ namespace ec2
     void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
     {
         if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
-            Ec2ThreadPool::instance()->start(make_custom_runnable([this] {
-                dbManager(Qn::kSuperUserAccess).saveMiscParam(
-                            LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                            QByteArray::number(m_localTimePriorityKey.toUInt64()));
+            Ec2ThreadPool::instance()->start(make_custom_runnable([this]
+            {
+                QnTransaction<ApiMiscData> localTimeTran(ApiCommand::NotDefined,
+                    ec2::ApiMiscData(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+                        QByteArray::number(m_localTimePriorityKey.toUInt64())));
+
+                localTimeTran.isLocal = true;
+                dbManager(Qn::kSuperUserAccess).executeTransaction(localTimeTran, QByteArray());
             }));
     }
 }

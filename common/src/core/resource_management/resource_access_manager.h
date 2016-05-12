@@ -25,6 +25,16 @@ struct UserAccessData
     bool isNull() const { return userId.isNull(); }
 };
 
+inline bool operator == (const UserAccessData &lhs, const UserAccessData &rhs)
+{
+    return lhs.userId == rhs.userId;
+}
+
+inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
+{
+    return ! operator == (lhs, rhs);
+}
+
 const UserAccessData kSuperUserAccess;
 }
 

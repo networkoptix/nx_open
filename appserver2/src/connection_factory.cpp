@@ -1424,7 +1424,7 @@ namespace ec2
     {
         if( !detail::QnDbManager::instance() )
             return ErrorCode::ioError;
-        return dbManager(Qn::kSuperUserAccess).readSettings( *outData );
+        return dbManager(Qn::kSuperUserAccess).doQuery(nullptr, *outData );
     }
 
     template<class InputDataType>

@@ -42,13 +42,8 @@ namespace ec2
         }
     };
 
-    class ServerQueryProcessorAccess;
-
-//    namespace detail
-//    {
     class ServerQueryProcessor
     {
-        friend class ec2::ServerQueryProcessorAccess;
     public:
         virtual ~ServerQueryProcessor() {}
 
@@ -269,8 +264,6 @@ namespace ec2
         }
 
     private:
-        void setUserAccessData(const Qn::UserAccessData &userAccessData) { m_userAccessData = userAccessData; }
-
         /*!
             \param syncFunction ErrorCode( QnTransaction<QueryDataType>& , std::list<std::function<void()>>* )
         */
@@ -477,24 +470,7 @@ namespace ec2
 
         private:
             static QnMutex m_updateDataMutex;
-            Qn::UserAccessData m_userAccessData;
     };
-//    } // namespace detail
-
-//class ServerQueryProcessorAccess
-//{
-//public:
-//    ServerQueryProcessorAccess(detail::ServerQueryProcessor &processor, const Qn::UserAccessData &userAccessData)
-//    {
-//        m_serverQueryProcessorAccessMutex.lock();
-//        processor.setUserAccessData(userAccessData);
-//    }
-
-//    ~ServerQueryProcessorAccess()
-//    {
-//        m_serverQueryProcessorAccessMutex.unlock();
-//    }
-//};
-} // namespace ec2
+}
 
 #endif  //ABSTRACT_QUERY_PROCESSOR_H

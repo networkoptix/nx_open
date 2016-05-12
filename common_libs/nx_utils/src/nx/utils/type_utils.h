@@ -77,6 +77,9 @@ static_unique_ptr_cast(
         static_cast<ResultType*>(sourcePtr.release()));
 }
 
+template<typename T, typename Type = void>
+using SfinaeCheck = Type;
+
 
 }   //namespace utils
 }   //namespace nx

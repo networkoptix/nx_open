@@ -8,13 +8,16 @@
 #include "transaction/transaction.h"
 #include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
+#include "nx_ec/data/api_misc_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
+#include "nx/utils/type_utils.h"
 #include "core/resource_management/resource_access_manager.h"
+#include "core/resource/user_resource.h"
 
 
 namespace ec2
@@ -158,11 +161,9 @@ namespace detail
         ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
         ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
 
         //!Reads settings (properties of user 'admin')
-        ErrorCode readSettings(ApiResourceParamDataList& settings);
 
         virtual QnDbTransaction* getTransaction() override;
 
@@ -192,6 +193,7 @@ namespace detail
         QnReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ data retrieval --------------------------------------
+        ErrorCode doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -202,6 +204,7 @@ namespace detail
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
 
+        ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         //getResourceTypes
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
@@ -311,6 +314,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -466,6 +470,9 @@ namespace detail
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
+        ErrorCode saveMiscParam(const ApiMiscData &params);
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
+
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
@@ -619,7 +626,6 @@ class QnDbManagerAccess
 {
 public:
     QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
-    ~QnDbManagerAccess();
     ApiObjectType getObjectType(const QnUuid& objectId);
 
     template <class T1, class T2>
@@ -633,11 +639,14 @@ public:
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-    template <class Transaction, class SerializedTransaction>
-    ErrorCode executeTransactionNoLock(Transaction &&tran, SerializedTransaction &&serializedTran)
+    template <class ParamType, class SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<ParamType> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!hasWritePermission(tran.params, m_userAccessData.userId))
+            return ErrorCode::forbidden;
+
         return detail::QnDbManager::instance()->executeTransactionNoLock(
-                    std::forward<Transaction>(tran),
+                    tran,
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
@@ -649,9 +658,28 @@ public:
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
-    bool saveMiscParam( const QByteArray& name, const QByteArray& value );
-    bool readMiscParam( const QByteArray& name, QByteArray* value );
-    ErrorCode readSettings(ApiResourceParamDataList& settings);
+private:
+    template<typename ParamType>
+    bool hasWritePermission(const ParamType &param, const QnUuid &userId)
+    {
+        if (m_userAccessData == Qn::kSuperUserAccess)
+            return true;
+        return hasWritePermissionImpl(param, userId, 0);
+    }
+
+    template<typename ParamType>
+    auto hasWritePermissionImpl(const ParamType &param, const QnUuid &userId, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
+    {
+        return qnResourceAccessManager->hasPermission(qnResPool->getResourceById(userId).dynamicCast<QnUserResource>(),
+                                                      qnResPool->getResourceById(param.id),
+                                                      Qn::Permission::SavePermission);
+    }
+
+    template<typename ParamType>
+    auto hasWritePermissionImpl(const ParamType &/*param*/, const QnUuid &/*userId*/, char) -> bool
+    {
+        return true;
+    }
 
 private:
     Qn::UserAccessData m_userAccessData;

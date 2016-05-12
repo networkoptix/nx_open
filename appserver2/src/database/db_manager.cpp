@@ -2985,24 +2985,19 @@ ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
     return result;
 }
 
-bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value )
+ErrorCode QnDbManager::saveMiscParam(const ApiMiscData &params)
 {
-    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
-
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
-    insQuery.addBindValue( name );
-    insQuery.addBindValue( value );
+    insQuery.addBindValue( params.name );
+    insQuery.addBindValue( params.value );
     if( !insQuery.exec() )
-        return false;
-    locker.commit();
-    return true;
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
 
 bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 {
-    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
-
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT data from misc_data where key = ?");
@@ -3128,6 +3123,19 @@ void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
     QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
     for(const QFileInfo& fi: dir2.entryInfoList(QDir::Files))
         loadResourceTypeXML(fi.absoluteFilePath(), data);
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
+{
+    if (!readMiscParam(name, &miscData.value))
+        return ErrorCode::dbError;
+    miscData.name = name;
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(std::nullptr_t /*dummy*/, ApiResourceParamDataList& data)
+{
+    return readSettings(data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
@@ -4098,6 +4106,11 @@ ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
     }
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMiscData>& tran)
+{
+    return saveMiscParam(tran.params);
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
 {
     if (tran.command == ApiCommand::addLicense)
@@ -4537,20 +4550,5 @@ ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo&
 ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
 {
     return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
-}
-
-bool QnDbManagerAccess::saveMiscParam( const QByteArray& name, const QByteArray& value )
-{
-    return detail::QnDbManager::instance()->saveMiscParam(name, value);
-}
-
-bool QnDbManagerAccess::readMiscParam( const QByteArray& name, QByteArray* value )
-{
-    return detail::QnDbManager::instance()->readMiscParam(name, value);
-}
-
-ErrorCode QnDbManagerAccess::readSettings(ApiResourceParamDataList& settings)
-{
-    return detail::QnDbManager::instance()->readSettings(settings);
 }
 } // namespace ec2
