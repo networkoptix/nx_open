@@ -631,9 +631,10 @@ public:
     template <class T1, class T2>
     ErrorCode doQuery(T1&& t1, T2&& t2)
     {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(std::forward<T1>(t1), std::forward<T2>(t2));
         if (!hasPermission(t2, m_userAccessData.userId, Qn::Permission::ReadPermission))
-            return ErrorCode::forbidden;
-        return detail::QnDbManager::instance()->doQuery(std::forward<T1>(t1), std::forward<T2>(t2));
+            errorCode = ErrorCode::forbidden;
+        return errorCode;
     }
 
     QnDbHelper::QnDbTransaction* getTransaction();
