@@ -25,6 +25,8 @@ describe('User activation', function () {
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             expect(browser.getCurrentUrl()).toContain("/activate/success");
             expect(p.messageLoginLink.isDisplayed()).toBe(true);
+            p.messageLoginLink.click();
+            expect(p.helper.forms.login.dialog.isDisplayed()).toBe(true);
         });
     });
 
