@@ -245,10 +245,10 @@ protected:
     virtual void kineticMove(const QVariant& degrees) override;
     virtual void finishKinetic() override;
 
-    virtual void startDragProcess(DragInfo*) override;
+    virtual void startDragProcess(DragInfo* info) override;
     virtual void startDrag(DragInfo* info) override;
     virtual void dragMove(DragInfo* info) override;
-    virtual void finishDrag(DragInfo*) override;
+    virtual void finishDragProcess(DragInfo* info) override;
 
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint) const override;
 
