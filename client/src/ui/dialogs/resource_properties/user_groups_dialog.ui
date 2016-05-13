@@ -14,9 +14,6 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="0" column="1">
-    <widget class="QTabWidget" name="tabWidget"/>
-   </item>
    <item row="1" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
@@ -65,6 +62,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -120,6 +123,41 @@
        </spacer>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QStackedWidget" name="groupInfoStackedWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="noGroupsPage">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Here must be some text about user groups</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="groupInfoPage">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

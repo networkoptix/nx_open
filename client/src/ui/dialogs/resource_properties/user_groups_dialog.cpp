@@ -47,7 +47,14 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
 
     connect(ui->groupsTreeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [this](const QModelIndex& current, const QModelIndex& previous)
     {
-        if (!current.isValid())
+        bool valid = current.isValid();
+
+        ui->groupInfoStackedWidget->setCurrentWidget(valid
+            ? ui->groupInfoPage
+            : ui->noGroupsPage
+        );
+
+        if (!valid)
             return;
 
         QnUuid groupId = current.data(Qn::UuidRole).value<QnUuid>();
