@@ -19,7 +19,7 @@ namespace media {
 class ProxyVideoDecoderFlagConfig: public nx::utils::FlagConfig
 {
 public:
-    using FlagConfig::FlagConfig;
+    using nx::utils::FlagConfig::FlagConfig;
 
     NX_FLAG(1, largeOnly); //< isCompatible() will allow only width > 640.
 
