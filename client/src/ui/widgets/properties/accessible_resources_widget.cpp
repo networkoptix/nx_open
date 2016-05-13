@@ -64,7 +64,7 @@ namespace
 
 }
 
-QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnAbstractPermissionsModel::Filter filter, QWidget* parent /*= 0*/):
+QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::AccessibleResourcesWidget()),
     m_permissionsModel(permissionsModel),
@@ -76,14 +76,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     switch (m_filter)
     {
-    case QnAbstractPermissionsModel::CamerasFilter:
+    case QnResourceAccessFilter::CamerasFilter:
         ui->allResourcesCheckBox->setText(tr("All Cameras"));
         break;
-    case QnAbstractPermissionsModel::LayoutsFilter:
+    case QnResourceAccessFilter::LayoutsFilter:
         ui->allResourcesCheckBox->setText(tr("All Global Layouts"));
         ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts."));
         break;
-    case QnAbstractPermissionsModel::ServersFilter:
+    case QnResourceAccessFilter::ServersFilter:
         ui->allResourcesCheckBox->setText(tr("All Servers"));
         ui->descriptionLabel->setText(tr("Giving access to some server you give access to view server statistics."));
         break;
@@ -92,7 +92,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     }
 
     m_resourcesModel->setCheckable(true);
-    m_resourcesModel->setResources(QnAbstractPermissionsModel::filteredResources(m_filter, qnResPool->getResources()));
+    m_resourcesModel->setResources(QnResourceAccessFilter::filteredResources(m_filter, qnResPool->getResources()));
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {
         if (roles.contains(Qt::CheckStateRole)
@@ -165,22 +165,22 @@ QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
 
 bool QnAccessibleResourcesWidget::hasChanges() const
 {
-    if (m_permissionsModel->rawPermissions().testFlag(QnAbstractPermissionsModel::accessPermission(m_filter)) != ui->allResourcesCheckBox->isChecked())
+    if (m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)) != ui->allResourcesCheckBox->isChecked())
         return true;
 
-    return m_resourcesModel->checkedResources() != QnAbstractPermissionsModel::filteredResources(m_filter, m_permissionsModel->accessibleResources());
+    return m_resourcesModel->checkedResources() != QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources());
 }
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    ui->allResourcesCheckBox->setChecked(m_permissionsModel->rawPermissions().testFlag(QnAbstractPermissionsModel::accessPermission(m_filter)));
-    m_resourcesModel->setCheckedResources(QnAbstractPermissionsModel::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
+    ui->allResourcesCheckBox->setChecked(m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)));
+    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
 }
 
 void QnAccessibleResourcesWidget::applyChanges()
 {
     auto accessibleResources = m_permissionsModel->accessibleResources();
-    auto oldFiltered = QnAbstractPermissionsModel::filteredResources(m_filter, accessibleResources);
+    auto oldFiltered = QnResourceAccessFilter::filteredResources(m_filter, accessibleResources);
     auto newFiltered = m_resourcesModel->checkedResources();
     accessibleResources.subtract(oldFiltered);
     accessibleResources.unite(newFiltered);
@@ -188,9 +188,9 @@ void QnAccessibleResourcesWidget::applyChanges()
 
     Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
     if (ui->allResourcesCheckBox->isChecked())
-        permissions |= QnAbstractPermissionsModel::accessPermission(m_filter);
+        permissions |= QnResourceAccessFilter::accessPermission(m_filter);
     else
-        permissions &= ~QnAbstractPermissionsModel::accessPermission(m_filter);
+        permissions &= ~QnResourceAccessFilter::accessPermission(m_filter);
     m_permissionsModel->setRawPermissions(permissions);
 }
 

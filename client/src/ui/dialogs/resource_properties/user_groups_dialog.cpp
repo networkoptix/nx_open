@@ -20,13 +20,13 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     m_model(new QnUserGroupSettingsModel(this)),
     m_settingsPage(new QnUserGroupSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::CamerasFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::ServersFilter, this))
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
+    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::ServersFilter, this))
 {
     ui->setupUi(this);
 
-    addPage(SettingsPage, m_settingsPage, tr("Group Information"));
+    addPage(SettingsPage, m_settingsPage, tr("Group Info"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));

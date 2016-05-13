@@ -2,6 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resource_access_filter.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -11,8 +12,6 @@ namespace
 {
     const QString kHtmlTableTemplate(lit("<table>%1</table>"));
     const QString kHtmlTableRowTemplate(lit("<tr>%1</tr>"));
-
-
 }
 
 QnUserSettingsModel::QnUserSettingsModel(QObject* parent /*= nullptr*/) :
@@ -171,23 +170,23 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid& id, Q
     auto allResources = qnResPool->getResources();
     auto accessibleResources = qnResourceAccessManager->accessibleResources(id);
 
-    std::map<Filter, QString> nameByFilter
+    std::map<QnResourceAccessFilter::Filter, QString> nameByFilter
     {
-        {CamerasFilter, tr("Cameras")},
-        {LayoutsFilter, tr("Global Layouts")},
-        {ServersFilter, tr("Servers")},
+        {QnResourceAccessFilter::CamerasFilter, tr("Cameras")},
+        {QnResourceAccessFilter::LayoutsFilter, tr("Global Layouts")},
+        {QnResourceAccessFilter::ServersFilter, tr("Servers")},
     };
 
-    std::map<Filter, QString> allNameByFilter
+    std::map<QnResourceAccessFilter::Filter, QString> allNameByFilter
     {
-        {CamerasFilter, tr("All Cameras")},
-        {LayoutsFilter, tr("All Global Layouts")},
-        {ServersFilter, tr("All Servers")},
+        {QnResourceAccessFilter::CamerasFilter, tr("All Cameras")},
+        {QnResourceAccessFilter::LayoutsFilter, tr("All Global Layouts")},
+        {QnResourceAccessFilter::ServersFilter, tr("All Servers")},
     };
 
-    for (auto filter : allFilters())
+    for (auto filter : QnResourceAccessFilter::allFilters())
     {
-        auto flag = accessPermission(filter);
+        auto flag = QnResourceAccessFilter::accessPermission(filter);
         if (permissions.testFlag(flag))
         {
             QString row = lit("<td colspan=2><b>%1</b></td>").arg(allNameByFilter[filter]);
@@ -195,8 +194,8 @@ QString QnUserSettingsModel::getCustomPermissionsDescription(const QnUuid& id, Q
         }
         else
         {
-            auto allFiltered = filteredResources(filter, allResources);
-            auto accessibleFiltered = filteredResources(filter, accessibleResources);
+            auto allFiltered = QnResourceAccessFilter::filteredResources(filter, allResources);
+            auto accessibleFiltered = QnResourceAccessFilter::filteredResources(filter, accessibleResources);
 
             QString row = hasAccessToSystem
                 ? lit("<td><b>%1</b> / %2</td><td>%3</td>").arg(accessibleFiltered.size()).arg(allFiltered.size()).arg(nameByFilter[filter])

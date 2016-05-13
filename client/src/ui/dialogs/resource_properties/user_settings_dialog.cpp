@@ -27,9 +27,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_profilePage(new QnUserProfileWidget(m_model, this)),
     m_settingsPage(new QnUserSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::CamerasFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::ServersFilter, this)),
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
+    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::ServersFilter, this)),
     m_editGroupsButton(new QPushButton(tr("Edit User Groups..."), this))
 {
     ui->setupUi(this);
