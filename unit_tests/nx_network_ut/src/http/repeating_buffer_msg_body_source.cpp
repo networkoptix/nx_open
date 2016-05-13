@@ -21,7 +21,7 @@ void RepeatingBufferMsgBodySource::pleaseStop(
     m_timer.pleaseStop(std::move(handler));
 }
 
-nx::network::aio::AbstractAioThread* RepeatingBufferMsgBodySource::getAioThread()
+nx::network::aio::AbstractAioThread* RepeatingBufferMsgBodySource::getAioThread() const
 {
     return m_timer.getAioThread();
 }

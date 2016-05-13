@@ -27,7 +27,7 @@ namespace nx_http {
 
         virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
-        virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+        virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
         virtual void bindToAioThread(
             nx::network::aio::AbstractAioThread* aioThread) override;
         virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;

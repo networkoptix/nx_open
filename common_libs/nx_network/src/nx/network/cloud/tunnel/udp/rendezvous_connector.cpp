@@ -41,7 +41,7 @@ void RendezvousConnector::pleaseStop(
         });
 }
 
-aio::AbstractAioThread* RendezvousConnector::getAioThread()
+aio::AbstractAioThread* RendezvousConnector::getAioThread() const
 {
     return m_aioThreadBinder.getAioThread();
 }

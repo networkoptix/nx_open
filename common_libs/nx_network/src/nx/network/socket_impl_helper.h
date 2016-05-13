@@ -76,7 +76,7 @@ public:
     //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
     //!Implementation of AbstractSocket::getAioThread
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const override { return m_abstractSocketProvider()->getAioThread(); }
     //!Implementation of AbstractSocket::bindToAioThread
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
 

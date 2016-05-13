@@ -88,7 +88,7 @@ namespace nx_api
                 });
         }
 
-        virtual nx::network::aio::AbstractAioThread* getAioThread() override
+        virtual nx::network::aio::AbstractAioThread* getAioThread() const override
         {
             return m_streamSocket->getAioThread();
         }

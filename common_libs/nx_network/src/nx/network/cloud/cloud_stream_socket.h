@@ -78,7 +78,7 @@ public:
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
-    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
 private:

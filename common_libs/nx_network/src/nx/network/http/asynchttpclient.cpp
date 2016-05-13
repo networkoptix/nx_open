@@ -127,7 +127,7 @@ namespace nx_http
             });
     }
 
-    nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread()
+    nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const
     {
         return m_aioThreadBinder.getAioThread();
     }

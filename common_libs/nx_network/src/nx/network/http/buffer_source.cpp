@@ -21,7 +21,7 @@ namespace nx_http
         m_aioBinder.pleaseStop(std::move(completionHandler));
     }
 
-    nx::network::aio::AbstractAioThread* BufferSource::getAioThread()
+    nx::network::aio::AbstractAioThread* BufferSource::getAioThread() const
     {
         return m_aioBinder.getAioThread();
     }

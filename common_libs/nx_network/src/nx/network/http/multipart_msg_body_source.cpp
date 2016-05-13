@@ -34,7 +34,7 @@ namespace nx_http {
             });
     }
 
-    nx::network::aio::AbstractAioThread* MultipartMessageBodySource::getAioThread()
+    nx::network::aio::AbstractAioThread* MultipartMessageBodySource::getAioThread() const
     {
         return m_aioThreadBinder.getAioThread();
     }
