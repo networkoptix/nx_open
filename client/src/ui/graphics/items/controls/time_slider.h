@@ -106,7 +106,12 @@ public:
         /**
         * Whether slider should hide position marker and its tooltip in live mode.
         */
-        HideLivePosition = 0x400
+        HideLivePosition = 0x400,
+
+        /**
+        * Whether drag-selection should be performed by left mouse button (otherwise right).
+        */
+        LeftButtonSelection = 0x800
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -240,10 +245,10 @@ protected:
     virtual void kineticMove(const QVariant& degrees) override;
     virtual void finishKinetic() override;
 
-    virtual void startDragProcess(DragInfo*) override;
+    virtual void startDragProcess(DragInfo* info) override;
     virtual void startDrag(DragInfo* info) override;
     virtual void dragMove(DragInfo* info) override;
-    virtual void finishDrag(DragInfo*) override;
+    virtual void finishDragProcess(DragInfo* info) override;
 
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint) const override;
 

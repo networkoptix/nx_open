@@ -58,7 +58,8 @@ private:
     ~SocketGlobals();
 
     static QnMutex s_mutex;
-    static std::atomic<int> s_counter;
+    static std::atomic<bool> s_isInitialized;
+    static size_t s_counter;
     static SocketGlobals* s_instance;
 
 private:

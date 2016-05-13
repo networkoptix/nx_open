@@ -8,6 +8,7 @@ import filelock
 import ConfigParser
 import glob
 import time
+import distutils.spawn
 from rdep import Rdep
 import rdep_config
 import platform_detection
@@ -108,23 +109,32 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
     synched = False
     installed = False
 
-    repo_ts = get_package_timestamp(target_dir, package)
-    install_ts = get_package_timestamp(target_dir, package, install_time=True)
+    full_name = package + "-debug" if debug else package
+
+    repo_ts = get_package_timestamp(target_dir, full_name)
+    install_ts = get_package_timestamp(target_dir, full_name, install_time = True)
     location = None
     installed = False
 
     if repo_ts != None:
         if install_ts != None and install_ts == repo_ts:
             installed = True
-        location = rdep.locate_package(package)
+        location = rdep.locate_package(full_name)
+        if installed and not location and debug:
+            location = rdep.locate_package(package)
 
-    if repo_ts == None and not location:
-        print "Fetching package {0} for {1}".format(package, configuration_name(debug))
-        rdep.sync_package(package)
-        location = rdep.locate_package(package)
+    if repo_ts == None or not location:
+        print "Fetching package {0}".format(full_name)
+        if rdep.sync_package(full_name):
+            location = rdep.locate_package(full_name)
+        elif rdep.sync_package(package):
+            location = rdep.locate_package(package)
+        else:
+            return False
+
         if location:
             repo_ts = rdep_config.PackageConfig(location).get_timestamp(None)
-            set_package_synctime(target_dir, package, repo_ts)
+            set_package_synctime(target_dir, full_name, repo_ts)
 
     if not location or repo_ts == None:
         print "Could not locate {0}".format(package)
@@ -140,9 +150,9 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
         installed = True
 
     if not installed:
-        print "Copying package {0} into {1} for {2}".format(package, target_dir, configuration_name(debug))
+        print "Copying package {0} into {1}".format(full_name, target_dir)
         copy_package(location, target_dir, debug)
-        set_package_synctime(target_dir, package, repo_ts, install_time=True)
+        set_package_synctime(target_dir, full_name, repo_ts, install_time = True)
 
     # Get real target from location
     target, _ = os.path.split(location)
@@ -160,24 +170,16 @@ def get_package(rdep, target, package, target_dir, debug = False):
             rdep.targets = [ explicit_target ] if explicit_target else [ target ] + platform_detection.get_alternative_targets(target)
 
             found_target = get_package_for_configuration(rdep, pack, target_dir, False)
-            if not found_target:
-                continue
+            if found_target:
+                break
 
         if not found_target:
             return False
 
         if debug:
             rdep.targets = found_target if type(found_target) is list else [ found_target ]
-            if not get_package_for_configuration(rdep, pack + "-debug", target_dir, True):
-                if get_package_for_configuration(rdep, pack, target_dir, True):
-                    ts = get_package_timestamp(target_dir, pack)
-                    if ts == None:
-                        print "Something went wrong"
-                        return False
-                    set_package_synctime(target_dir, pack + "-debug", ts, False)
-                    set_package_synctime(target_dir, pack + "-debug", ts, True)
-                else:
-                    return False
+            if not get_package_for_configuration(rdep, pack, target_dir, True):
+                return False
 
     return True
 
@@ -198,6 +200,25 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
         config.set_url(SYNC_URL)
     if not config.get_push_url(None):
         config.set_push_url(PUSH_URL)
+
+    global_config = rdep_config.RdepConfig()
+    if not global_config.get_rsync():
+        if not distutils.spawn.find_executable("rsync"):
+            rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
+            if not os.path.isfile(rsync):
+                print "Cannot find rsync executable. Please specify it in .rderc"
+                exit(1)
+            global_config.set_rsync(rsync)
+    if not global_config.get_name():
+        homedir = os.path.join(os.path.expanduser("~"))
+        hg_config_file = os.path.join(homedir, ".hgrc")
+        if not os.path.isfile(hg_config_file):
+            hg_config_file = os.path.join(homedir, "Mercurial.ini")
+        if os.path.isfile(hg_config_file):
+            hg_config = rdep_config.ConfigHelper(hg_config_file)
+            username = hg_config.get_value("ui", "username", "").strip()
+            if username:
+                global_config.set_name(username)
 
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir)

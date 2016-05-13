@@ -42,7 +42,7 @@ public:
 
     void addArg(const char* arg);
 
-    SocketAddress endpoint() const;
+    SocketAddress stunEndpoint() const;
     SocketAddress httpEndpoint() const;
 
     std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
@@ -67,7 +67,7 @@ public:
 
 private:
     QString m_tmpDir;
-    int m_port;
+    int m_stunPort;
     int m_httpPort;
     std::vector<char*> m_args;
     std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;

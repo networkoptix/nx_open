@@ -36,15 +36,9 @@ public:
     QnUserGroupsDialog(QWidget *parent = NULL);
     virtual ~QnUserGroupsDialog();
 
-    QnUuid userGroupId() const;
-    void setUserGroupId(const QnUuid& value);
-
 protected:
-    virtual void retranslateUi() override;
-
     virtual bool hasChanges() const override;
     virtual void applyChanges() override;
-
 
 private:
     Q_DISABLE_COPY(QnUserGroupsDialog)

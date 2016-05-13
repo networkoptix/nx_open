@@ -24,7 +24,7 @@
 #undef min
 #endif
 
-// #define DEBUG_SSL
+//#define DEBUG_SSL
 
 static std::size_t kSslAsyncRecvBufferSize = 1024 * 100;
 static const unsigned char kSslSessionId[] = "Network Optix SSL socket";
@@ -681,7 +681,7 @@ void SslAsyncBioHelper::doRead()
     } else {
         // We have to issue our operations right just here since we have no
         // left data inside of the buffer and our user needs to read all the
-        // data out in the buffer here. 
+        // data out in the buffer here.
         m_underlySocket->readSomeAsync(
             &m_recvBuffer,
             std::bind(
@@ -1005,50 +1005,25 @@ private:
 class SslStaticData
 {
 public:
-    EVP_PKEY* pkey;
-    SSL_CTX* serverContext;
-    SSL_CTX* clientContext;
+    std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> pkey;
+    std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> serverContext;
+    std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> clientContext;
 
     SslStaticData()
     :
-        pkey(nullptr),
-        serverContext(nullptr),
-        clientContext(nullptr)
+        pkey(nullptr, &EVP_PKEY_free),
+        serverContext(nullptr, &SSL_CTX_free),
+        clientContext(nullptr, &SSL_CTX_free)
     {
         SSL_library_init();
         OpenSSL_add_all_algorithms();
         SSL_load_error_strings();
-        serverContext = SSL_CTX_new(SSLv23_server_method());
-        clientContext = SSL_CTX_new(SSLv23_client_method());
 
-        SSL_CTX_set_options(serverContext, SSL_OP_SINGLE_DH_USE);
-        SSL_CTX_set_session_id_context(serverContext, kSslSessionId, 4);
-    }
+        serverContext.reset(SSL_CTX_new(SSLv23_server_method()));
+        clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
 
-    ~SslStaticData()
-    {
-        release();
-    }
-
-    void release()
-    {
-        if (serverContext)
-        {
-            SSL_CTX_free(serverContext);
-            serverContext = nullptr;
-        }
-
-        if (clientContext)
-        {
-            SSL_CTX_free(clientContext);
-            clientContext = nullptr;
-        }
-
-        if (pkey)
-        {
-            EVP_PKEY_free(pkey);
-            pkey = nullptr;
-        }
+        SSL_CTX_set_options(serverContext.get(), SSL_OP_SINGLE_DH_USE);
+        SSL_CTX_set_session_id_context(serverContext.get(), kSslSessionId, 4);
     }
     
     static SslStaticData* instance();
@@ -1061,35 +1036,130 @@ SslStaticData* SslStaticData::instance()
     return SslStaticData_instance();
 }
 
-void SslSocket::initSSLEngine(const QByteArray& certData)
+template<typename T, typename Deleter>
+std::unique_ptr<T, Deleter> uniquePtrWrap(T* ptr, Deleter deleter)
 {
-    BIO *bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    X509 *x = PEM_read_bio_X509_AUX(
-        bufio,
-        NULL,
-        SslStaticData::instance()->serverContext->default_passwd_callback,
-        SslStaticData::instance()->serverContext->default_passwd_callback_userdata);
-
-    SSL_CTX_use_certificate(SslStaticData::instance()->serverContext, x);
-    SSL_CTX_use_certificate(SslStaticData::instance()->clientContext, x);
-    X509_free(x);
-    BIO_free(bufio);
-
-    bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    SslStaticData::instance()->pkey = PEM_read_bio_PrivateKey(
-        bufio,
-        NULL,
-        SslStaticData::instance()->serverContext->default_passwd_callback,
-        SslStaticData::instance()->serverContext->default_passwd_callback_userdata);
-
-    SSL_CTX_use_PrivateKey(SslStaticData::instance()->serverContext, SslStaticData::instance()->pkey);
-    BIO_free(bufio);
-    // Initialize OpenSSL global lock, so server side will initialize it right here
+    return std::unique_ptr<T, Deleter>(ptr, std::move(deleter));
 }
 
-void SslSocket::releaseSSLEngine()
+const size_t SslEngine::kBufferSize = 1024 * 10;
+const int SslEngine::kRsaLength = 2048;
+const std::chrono::seconds SslEngine::kCertExpiration =
+    std::chrono::hours(5 * 365); // 5 years
+
+String SslEngine::makeCertificateAndKey(
+    const String& common, const String& country, const String& company)
 {
-    SslStaticData::instance()->release();
+    const auto data = SslStaticData::instance();
+    const int serialNumber = qrand();
+
+    auto number = uniquePtrWrap(BN_new(), &BN_free);
+    if (!number || !BN_set_word(number.get(), RSA_F4))
+    {
+        NX_LOG("SSL cant generate big number", cl_logWARNING);
+        return String();
+    }
+
+    auto rsa = uniquePtrWrap(RSA_new(), &RSA_free);
+    if (!rsa || !RSA_generate_key_ex(rsa.get(), kRsaLength, number.get(), NULL))
+    {
+        NX_LOG("SSL cant generate RSA", cl_logWARNING);
+        return String();
+    }
+
+    auto pkey = uniquePtrWrap(EVP_PKEY_new(), &EVP_PKEY_free);
+    if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
+    {
+        NX_LOG("SSL cant generate PKEY", cl_logWARNING);
+        return String();
+    }
+
+    auto x509 = uniquePtrWrap(X509_new(), &X509_free);
+    if (!x509
+        || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
+        || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
+        || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
+        || !X509_set_pubkey(x509.get(), pkey.get()))
+    {
+        NX_LOG("SSL cant generate X509 cert", cl_logWARNING);
+        return String();
+    }
+
+    const auto name = X509_get_subject_name(x509.get());
+    const auto nameSet = [&name](const char* field, const String& value)
+    {
+        auto vptr = (unsigned char *)value.data();
+        return X509_NAME_add_entry_by_txt(
+            name, field,  MBSTRING_ASC, vptr, -1, -1, 0);
+    };
+
+    if (!name
+        || !nameSet("C", country) || !nameSet("O", company) || !nameSet("CN", common)
+        || !X509_set_issuer_name(x509.get(), name)
+        || !X509_sign(x509.get(), pkey.get(), EVP_sha1()))
+    {
+        NX_LOG("SSL cant sign X509 cert", cl_logWARNING);
+        return String();
+    }
+
+    char writeBuffer[kBufferSize] = { 0 };
+    const auto bio = uniquePtrWrap(BIO_new(BIO_s_mem()), BIO_free);
+    if (!bio
+        || !PEM_write_bio_PrivateKey(bio.get(), pkey.get(), 0, 0, 0, 0, 0)
+        || !PEM_write_bio_X509(bio.get(), x509.get())
+        || !BIO_read(bio.get(), writeBuffer, kBufferSize))
+    {
+        NX_LOG("SSL cant generate cert string", cl_logWARNING);
+        return String();
+    }
+
+    return QByteArray(writeBuffer);
+}
+
+bool SslEngine::useCertificateAndPkey(const String& certData)
+{
+    const auto data = SslStaticData::instance();
+    {
+        auto bio = uniquePtrWrap(
+            BIO_new_mem_buf((void*) certData.data(), certData.size()),
+            &BIO_free);
+
+        auto x509 = uniquePtrWrap(
+            PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+
+        if (!x509)
+        {
+            NX_LOG("SSL cannot read X509", cl_logDEBUG1);
+            return false;
+        }
+
+        if (SSL_CTX_use_certificate(data->serverContext.get(), x509.get()) != 1)
+        {
+            NX_LOG("SSL cannot use X509", cl_logWARNING);
+            return false;
+        }
+    }
+
+    {
+        auto bio = uniquePtrWrap(
+            BIO_new_mem_buf((void*) certData.data(), certData.size()),
+            &BIO_free);
+
+        data->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
+        if (!data->pkey)
+        {
+            NX_LOG("SSL cannot read PKEY", cl_logDEBUG1);
+            return false;
+        }
+
+        if (SSL_CTX_use_PrivateKey(data->serverContext.get(), data->pkey.get()) != 1)
+        {
+            NX_LOG("SSL cannot use PKEY", cl_logWARNING);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 class SslSocketPrivate
@@ -1183,8 +1253,8 @@ void SslSocket::init()
     BIO_set_nbio(wbio, 1);
 
     auto context = d->isServerSide
-        ? SslStaticData::instance()->serverContext
-        : SslStaticData::instance()->clientContext;
+        ? SslStaticData::instance()->serverContext.get()
+        : SslStaticData::instance()->clientContext.get();
 
     NX_ASSERT(context);
     d->ssl.reset(SSL_new(context)); // get new SSL state with context

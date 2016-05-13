@@ -15,7 +15,7 @@
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
-    m_mutex(QnMutex::Recursive)
+    m_mutex(QnMutex::NonRecursive)
 {
     /* This change affects all accessible resources. */
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly)
@@ -73,6 +73,19 @@ void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& u
     m_permissionsCache.clear();
     m_globalPermissionsCache.clear();
     m_userGroups = userGroups;
+}
+
+ec2::ApiUserGroupData QnResourceAccessManager::userGroup(const QnUuid& groupId) const
+{
+    QnMutexLocker lk(&m_mutex);
+    auto iter = std::find_if(m_userGroups.cbegin(), m_userGroups.cend(), [groupId](const ec2::ApiUserGroupData& group)
+    {
+        return group.id == groupId;
+    });
+
+    if (iter == m_userGroups.cend())
+        return ec2::ApiUserGroupData();
+    return *iter;
 }
 
 void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup)

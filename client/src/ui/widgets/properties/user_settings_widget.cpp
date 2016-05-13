@@ -325,7 +325,6 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
             addCustomGroup(group);
     }
 
-    addBuiltInGroup(tr("New Group..."), Qn::NoGlobalPermissions);
     addBuiltInGroup(tr("Custom..."), Qn::NoGlobalPermissions);
 }
 

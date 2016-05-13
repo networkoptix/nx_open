@@ -1,7 +1,12 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage,$localStorage) {
+    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $timeout, $q,
+              $sessionStorage, $localStorage, currentUser) {
+
+        if(currentUser === null ){
+            return; // Do nothing, user wasn't authorised
+        }
 
         var channels = {
             Auto: 'lo',

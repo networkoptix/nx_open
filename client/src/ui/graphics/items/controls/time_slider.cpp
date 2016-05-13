@@ -505,7 +505,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 #ifdef TIMELINE_BEHAVIOR_2_5
     defaultOptions |= AdjustWindowToPosition;
 #else
-    defaultOptions |= StillPosition | HideLivePosition;
+    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection;
 #endif
     setOptions(defaultOptions);
 
@@ -1496,7 +1496,7 @@ void QnTimeSlider::updateToolTipVisibility()
 
 void QnTimeSlider::updateToolTipText()
 {
-    if (!(m_options.testFlag(UpdateToolTip)))
+    if (!m_options.testFlag(UpdateToolTip))
         return;
 
     qint64 pos = sliderPosition();
@@ -1568,11 +1568,11 @@ bool QnTimeSlider::isLiveSupported() const
 
 void QnTimeSlider::setLiveSupported(bool value)
 {
-    if (m_liveSupported != value)
-    {
-        m_liveSupported = value;
-        updateToolTipVisibility();
-    }
+    if (m_liveSupported == value)
+        return;
+
+    m_liveSupported = value;
+    updateToolTipVisibility();
 }
 
 bool QnTimeSlider::isLive() const
@@ -2866,19 +2866,21 @@ void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent* event)
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton)
+    switch (event->button())
     {
+    case Qt::LeftButton:
         m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
-    }
-    else if (event->button() == Qt::RightButton)
-    {
-        if (m_options.testFlag(SelectionEditable))
+        if (m_options.testFlag(SelectionEditable) && m_options.testFlag(LeftButtonSelection) && m_dragMarker == NoMarker)
             m_dragMarker = CreateSelectionMarker;
-        else
-            m_dragMarker = NoMarker;
+        break;
+
+    case Qt::RightButton:
+        m_dragMarker = (m_options.testFlag(SelectionEditable) && !m_options.testFlag(LeftButtonSelection)) ?
+            CreateSelectionMarker :
+            NoMarker;
+        break;
     }
 
-    bool processed = false;
     if (thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && event->button() == Qt::LeftButton && thumbnailsRect().contains(event->pos()))
     {
         qint64 time = qRound(valueFromPosition(event->pos(), false), thumbnailsLoader()->timeStep());
@@ -2887,11 +2889,10 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
         {
             emit thumbnailClicked();
             setSliderPosition(pos->thumbnail.actualTime(), true);
-            processed = true;
         }
     }
 
-    dragProcessor()->mousePressEvent(this, event, m_dragMarker == NoMarker && !processed);
+    dragProcessor()->mousePressEvent(this, event, false);
 
     event->accept();
 }
@@ -2935,14 +2936,19 @@ void QnTimeSlider::changeEvent(QEvent* event)
     }
 }
 
-void QnTimeSlider::startDragProcess(DragInfo*)
+void QnTimeSlider::startDragProcess(DragInfo* info)
 {
+    m_dragDelta = QPointF();
     m_dragIsClick = true;
+    setSliderDown(true);
+
+    if (m_dragMarker == NoMarker || m_dragMarker == CreateSelectionMarker)
+        setSliderPosition(valueFromPosition(info->mousePressItemPos()));
 }
 
 void QnTimeSlider::startDrag(DragInfo* info)
 {
-    setSliderDown(true);
+    m_dragIsClick = false;
 
     if (m_dragMarker == CreateSelectionMarker)
     {
@@ -2955,30 +2961,23 @@ void QnTimeSlider::startDrag(DragInfo* info)
     if (m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
     {
         m_selecting = true;
+        m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
         emit selectionPressed();
     }
-
-    m_dragIsClick = false;
-
-    if (m_dragMarker == NoMarker)
-        m_dragDelta = QPointF();
-    else
-        m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
 }
 
 void QnTimeSlider::dragMove(DragInfo* info)
 {
     QPointF mousePos = info->mouseItemPos() + m_dragDelta;
-
-    if (m_dragMarker == NoMarker || m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
-        setSliderPosition(valueFromPosition(mousePos));
+    setSliderPosition(valueFromPosition(mousePos));
 
     if (m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
     {
         qint64 selectionStart = m_selectionStart;
         qint64 selectionEnd = m_selectionEnd;
         Marker otherMarker = NoMarker;
-        switch(m_dragMarker)
+
+        switch (m_dragMarker)
         {
         case SelectionStartMarker:
             selectionStart = sliderPosition();
@@ -3004,8 +3003,10 @@ void QnTimeSlider::dragMove(DragInfo* info)
     }
 }
 
-void QnTimeSlider::finishDrag(DragInfo*)
+void QnTimeSlider::finishDragProcess(DragInfo* info)
 {
+    Q_UNUSED(info);
+
     if (m_selecting)
     {
         emit selectionReleased();

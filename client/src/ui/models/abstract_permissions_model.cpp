@@ -7,8 +7,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 
-QnAbstractPermissionsModel::QnAbstractPermissionsModel(QObject* parent) :
-    QObject(parent)
+QnAbstractPermissionsModel::QnAbstractPermissionsModel()
 {
 
 }
@@ -74,24 +73,4 @@ Qn::GlobalPermission QnAbstractPermissionsModel::accessPermission(Filter filter)
     }
     NX_ASSERT(false);
     return Qn::NoGlobalPermissions;
-}
-
-QString QnAbstractPermissionsModel::accessPermissionText(Filter filter)
-{
-    switch (filter)
-    {
-    case QnAbstractPermissionsModel::CamerasFilter:
-        return tr("All Cameras");
-        break;
-    case QnAbstractPermissionsModel::LayoutsFilter:
-        return tr("All Global Layouts");
-        break;
-    case QnAbstractPermissionsModel::ServersFilter:
-        return tr("All Servers");
-        break;
-    default:
-        break;
-    }
-    NX_ASSERT(false);
-    return QString();
 }

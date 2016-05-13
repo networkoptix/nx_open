@@ -125,14 +125,14 @@
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="clmisc.cab" EmbedCab="yes" />
-        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="yes" />
-        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="yes" />
-        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="yes" />
-        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="yes" />
-        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="yes" />
-        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="yes" />
-        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="yes" />
-        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="yes" />   
+        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="no" />
+        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="no" />
+        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="no" />
+        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="no" />
+        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="no" />
+        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="no" />
+        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="no" />
+        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="no" />   
         <Media Id="10" Cabinet="clqt1.cab" EmbedCab="yes" />
         <Media Id="11" Cabinet="clqt2.cab" EmbedCab="yes" />
         <Media Id="12" Cabinet="clqtpl.cab" EmbedCab="yes" />

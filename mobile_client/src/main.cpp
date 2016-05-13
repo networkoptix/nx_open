@@ -1,25 +1,38 @@
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
-#include <QtQml/QQmlEngine>
-#include <QtQml/QtQml>
-#include <QtQml/QQmlFileSelector>
-#include <QtQuick/QQuickWindow>
-
 #include <time.h>
 
-#include "api/app_server_connection.h"
-#include "api/runtime_info_manager.h"
-#include "nx_ec/ec2_lib.h"
-#include "common/common_module.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/mobile_client_camera_factory.h"
-#include "utils/common/app_info.h"
-#include "nx/utils/log/log.h"
-#include "utils/settings_migration.h"
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
+#include <QtGui/QFont>
+#include <QtGui/QOpenGLContext>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QtQml>
+#include <QtQuick/QQuickWindow>
 
-#include <context/context.h>
-#include <mobile_client/mobile_client_module.h>
-#include <mobile_client/mobile_client_settings.h>
+#include <nx/utils/log/log.h>
+
+#include <nx/utils/flag_config.h>
+
+namespace mobile_client {
+
+class FlagConfig: public nx::utils::FlagConfig
+{
+public:
+    using nx::utils::FlagConfig::FlagConfig;
+    NX_FLAG(0, enableEc2TranLog);
+};
+FlagConfig conf("mobile_client");
+
+} // namespace mobile_client
+
+#include <api/app_server_connection.h>
+#include <api/runtime_info_manager.h>
+#include <nx_ec/ec2_lib.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <utils/settings_migration.h>
+
+#include "context/context.h"
+#include "mobile_client/mobile_client_module.h"
 
 #include "ui/color_theme.h"
 #include "ui/resolution_util.h"
@@ -28,11 +41,9 @@
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
-#include <ui/helpers/font_loader.h>
+#include "ui/helpers/font_loader.h"
 
 #include <nx/media/decoder_registrar.h>
-#include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLFunctions>
 #include "resource_allocator.h"
 
 int runUi(QGuiApplication *application) {
@@ -150,8 +161,18 @@ int runApplication(QGuiApplication *application) {
     return result;
 }
 
-void initLog() {
+void initLog()
+{
     QnLog::initLog(lit("INFO"));
+
+    if (mobile_client::conf.enableEc2TranLog)
+    {
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            QLatin1String(mobile_client::conf.tempPath()) + QLatin1String("ec2_tran"),
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
+            cl_logDEBUG2);
+    }
 }
 
 int main(int argc, char *argv[])

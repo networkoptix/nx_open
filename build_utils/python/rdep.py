@@ -68,11 +68,13 @@ class Rdep:
         return True
 
     def __init__(self, root):
-        self._config = RdepConfig(os.path.join(os.path.expanduser("~"), ".rdeprc"))
-        self._repo_config = RepositoryConfig(os.path.join(root, ".rdep"))
+        self._config = RdepConfig()
+        self._repo_config = RepositoryConfig(root)
 
         self.root = root
         self.verbose = False
+        self.targets = None
+        self.force = False
 
     def _verbose_message(self, message):
         if self.verbose:
@@ -104,7 +106,7 @@ class Rdep:
             show_progress = True,
             additional_args = []):
 
-        command = [ self._config.get_rsync() ]
+        command = [ self._config.get_rsync("rsync") ]
         command.append("--archive")
         command.append("--delete")
 
@@ -128,7 +130,7 @@ class Rdep:
 
         return command
 
-    def _try_sync(self, target, package, force):
+    def _try_sync(self, target, package):
         url = self._repo_config.get_url()
         src = posixpath.join(url, target, package)
         dst = os.path.join(self.root, target, package)
@@ -153,7 +155,7 @@ class Rdep:
             return self.SYNC_NOT_FOUND
 
         time = PackageConfig(dst).get_timestamp()
-        if newtime == time and not force:
+        if newtime == time and not self.force:
             os.remove(config_file)
             return self.SYNC_SUCCESS
 
@@ -178,13 +180,13 @@ class Rdep:
 
         return self.SYNC_SUCCESS
 
-    def sync_package(self, package, force = False):
+    def sync_package(self, package):
         print "Synching {0}...".format(package)
 
         to_remove = []
 
         for target in self.targets:
-            ret = self._try_sync(target, package, force)
+            ret = self._try_sync(target, package)
             if ret == self.SYNC_NOT_FOUND:
                 path = os.path.join(self.root, target, package)
                 if os.path.isdir(path):
@@ -206,9 +208,9 @@ class Rdep:
         print "Package {0} downloaded for target {1}".format(package, target)
         return True
 
-    def sync_packages(self, packages, force):
+    def sync_packages(self, packages):
         for package in packages:
-            if not self.sync_package(package, force):
+            if not self.sync_package(package):
                 return False
         return True
 
@@ -220,17 +222,43 @@ class Rdep:
                 print >> sys.stderr, "Please specify target for upload."
             return False
 
+        target = self.targets[0]
+
+        uploader_name = self._config.get_name()
+        if not uploader_name:
+            print >> sys.stderr, "Please specify your name in {0}".format(self._config.get_file_name())
+            print >> sys.stderr, "Add \"name = Nx User <nxuser@networkoptix.com>\" to the section [General]."
+            return False
+
         print "Uploading {0}...".format(package)
 
-        url = self._repo_config.get_push_url(self._repo_config.get_url())
-        remote = posixpath.join(url, self.targets[0], package)
-        local = os.path.join(self.root, self.targets[0], package)
+        url = self._repo_config.get_url()
+        remote = posixpath.join(url, target, package)
+        local = os.path.join(self.root, target, package)
+
+        config_file = tempfile.mktemp()
+        command = self._get_rsync_command(
+                posixpath.join(remote, PackageConfig.FILE_NAME),
+                _cygwin_path(config_file),
+                show_progress = False)
+        self._verbose_rsync(command)
+        with open(os.devnull, "w") as fnull:
+            if subprocess.call(command, stderr = fnull) == 0:
+                newtime = PackageConfig(config_file).get_timestamp()
+                os.remove(config_file)
+                time = PackageConfig(local).get_timestamp()
+                if newtime and time != newtime:
+                    print >> sys.stderr, "Somebody has already updated this package."
+                    if not self.force:
+                        print >> sys.stderr, "Please make sure you are updating the latest version of the package."
+                        return False
+
+        url = self._repo_config.get_push_url(url)
+        remote = posixpath.join(url, target, package)
 
         config = PackageConfig(local)
         config.update_timestamp()
-        uploader_name = self._config.get_name()
-        if uploader_name:
-            config.set_uploader(uploader_name)
+        config.set_uploader(uploader_name)
 
         command = self._get_rsync_command(
                 _cygwin_path(local) + "/",
@@ -317,10 +345,10 @@ def main():
     parser.add_argument("-u", "--upload",       help="Upload package to the repository.",   action="store_true")
     parser.add_argument("-v", "--verbose",      help="Additional debug output.",            action="store_true")
     parser.add_argument("-l", "--list",         help="List packages for target.",           action="store_true")
+    parser.add_argument("-t", "--target",       help="Target.")
     parser.add_argument("--print-path",         help="Print package dir and exit.",         action="store_true")
     parser.add_argument("--init", metavar="URL", help="Init repository in the current dir with the specified URL.")
-    parser.add_argument("-t", "--targets", nargs='*',  help="Targets to check.")
-    parser.add_argument("-p", "--packages", nargs='*',  help="Packages to sync.")
+    parser.add_argument("packages", nargs='*',  help="Packages to sync.")
 
     args = parser.parse_args()
 
@@ -330,10 +358,15 @@ def main():
     root = args.root
     if not root:
         root = _find_root(os.getcwd(), RepositoryConfig.FILE_NAME)
+    if not root:
+        print >> sys.stderr, "Repository root not found. Please specify it with --root or by setting working directory."
+        return False
 
     rdep = Rdep(root)
     rdep.verbose = args.verbose
-    rdep.targets = args.targets
+    rdep.force = args.force
+    if args.target:
+        rdep.targets = [ args.target ]
 
     packages = args.packages
     if root and (not rdep.targets or not packages):
@@ -347,6 +380,10 @@ def main():
         print >> sys.stderr, "Please specify target."
         return False
 
+    if not packages:
+        print >> sys.stderr, "No packages specified"
+        return False
+
     if args.print_path:
         return rdep.print_path(packages[0])
     elif args.upload:
@@ -354,7 +391,7 @@ def main():
     elif args.list:
         return rdep.list_packages()
     else:
-        return rdep.sync_packages(packages, args.force)
+        return rdep.sync_packages(packages)
 
 if __name__ == "__main__":
     if not main():
