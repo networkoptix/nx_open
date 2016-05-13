@@ -467,7 +467,7 @@ TEST_F(Account, resetPassword_expiration)
 
     const std::chrono::seconds expirationPeriod(5);
 
-    addArg("-accountManager/passwordResetCodeExpirationTimeoutSec");
+    addArg("-accountManager/passwordResetCodeExpirationTimeout");
     addArg(QByteArray::number((unsigned int)expirationPeriod.count()).constData());
 
     ASSERT_TRUE(startAndWaitUntilStarted());

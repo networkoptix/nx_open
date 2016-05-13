@@ -377,9 +377,11 @@ TimerManager::TaskContext::TaskContext(
 
 
 std::chrono::milliseconds parseTimerDuration(
-    const QString& duration,
+    const QString& durationNotTrimmed,
     std::chrono::milliseconds defaultValue)
 {
+    QString duration = durationNotTrimmed.trimmed();
+
     std::chrono::milliseconds res;
     bool ok(true);
     const auto toUInt = [&](int suffixLen)
