@@ -7,8 +7,8 @@
 #include <QFile>
 #include <QtCore/QMutex>
 #include <nx/network/socket.h>
-#include "nx/streaming/media_data_packet.h"
-#include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 
 class QnTestCamera

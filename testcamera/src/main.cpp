@@ -44,6 +44,24 @@ QStringList checkFileNames(const QString& fileNames)
     return files;
 }
 
+void showUsage(char* exeName)
+{
+    qDebug() << "usage:";
+    qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
+    qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
+    qDebug() << "count=N";
+    qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
+    qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
+    qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
+    qDebug() << "";
+    qDebug() << "example:";
+    QString str = QFileInfo(exeName).baseName() + QString(" files=\"c:/test.264\";count=20");
+    qDebug() << str;
+    qDebug() << "\n[options]: ";
+    qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+}
+
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
@@ -67,19 +85,7 @@ int main(int argc, char *argv[])
 
     if (argc == 1)
     {
-        qDebug() << "usage:";
-        qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
-        qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
-        qDebug() << "count=N";
-        qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
-        qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-        qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
-        qDebug() << "";
-        qDebug() << "example:";
-        QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20");
-        qDebug() << str;
-        qDebug() << "\n[options]: ";
-        qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+        showUsage(argv[0]);
         return 1;
     }
 
