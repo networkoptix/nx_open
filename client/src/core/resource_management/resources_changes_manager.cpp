@@ -369,7 +369,7 @@ void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userG
     qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
 
     connection->getUserManager()->saveUserGroup(userGroup, this,
-        [this, backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+        [backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -400,7 +400,7 @@ void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
     qnResourceAccessManager->removeUserGroup(groupId);
 
     connection->getUserManager()->removeUserGroup(groupId, this,
-        [this, backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+        [backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 

@@ -88,7 +88,7 @@ private:
     mutable QnMutex m_mutex;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
-    ec2::ApiUserGroupDataList m_userGroups;
+    QHash<QnUuid, ec2::ApiUserGroupData> m_userGroups;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 
