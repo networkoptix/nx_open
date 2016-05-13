@@ -118,7 +118,7 @@ int QnUserGroupSettingsModel::rowCount(const QModelIndex& index) const
     return static_cast<int>(m_groups.size());
 }
 
-QVariant QnUserGroupSettingsModel::data(const QModelIndex &index, int role) const
+QVariant QnUserGroupSettingsModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid() || index.row() >= m_groups.size())
         return QVariant();

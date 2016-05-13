@@ -33,7 +33,7 @@ public:
         PageCount
     };
 
-    QnUserGroupsDialog(QWidget *parent = NULL);
+    QnUserGroupsDialog(QWidget* parent = NULL);
     virtual ~QnUserGroupsDialog();
 
 protected:

@@ -14,7 +14,7 @@
 
 #include <utils/common/string.h>
 
-QnUserGroupsDialog::QnUserGroupsDialog(QWidget *parent):
+QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::UserGroupsDialog()),
     m_model(new QnUserGroupSettingsModel(this)),
