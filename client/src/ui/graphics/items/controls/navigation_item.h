@@ -81,6 +81,7 @@ private:
     QnTimeScrollBar* m_timeScrollBar;
     QnSpeedSlider* m_speedSlider;
     QnVolumeSlider* m_volumeSlider;
+    QnFramedWidget* m_separators;
 };
 
 #endif // QN_NAVIGATION_ITEM_H
