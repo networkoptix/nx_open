@@ -160,6 +160,31 @@ describe('User activation', function () {
         });
     });
 
+    it('email can be sent again', function () {
+        var userEmail = p.helper.getRandomEmail();
+
+        p.helper.register(null, null, userEmail);
+        // Read email but not visit the activation link
+        p.getActivationLink(userEmail).then( function(url) { console.log(url) });
+        // Login
+        p.helper.forms.login.openLink.click();
+        p.helper.loginFromCurrPage(userEmail);
+        // Follow the link in alert
+        //browser.pause();
+        browser.ignoreSynchronization = true;
+        element(by.linkText('Send confirmation link again')).click();
+        browser.ignoreSynchronization = false;
+        // Request one more email
+        expect(browser.getCurrentUrl()).toContain('activate');
+        expect(element(by.css('h1')).getText()).toContain('Confirm your account');
+        element(by.buttonText('Send')).click();
+        // Check email again and follow the -white rabbit- link
+        p.getActivationLink(userEmail).then( function(url) {
+            p.helper.get(url);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+        });
+    });
+
     xit("If no user was logged in, confirmation link logs new user in (not implemented)", function () {
     });
 });
