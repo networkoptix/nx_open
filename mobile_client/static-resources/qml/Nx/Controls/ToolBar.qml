@@ -18,6 +18,7 @@ ToolBarBase
         x: 8
         visible: icon != ""
         onClicked: leftButtonClicked()
+        alwaysCompleteHighlightAnimation: false
     }
 
     PageTitleLabel
@@ -25,7 +26,7 @@ ToolBarBase
         id: label
         anchors.verticalCenter: parent.verticalCenter
         x: leftButton.visible ? 72 : 16
-        width: titleControls.x - x - 8
+        width: controlsRow.x - x - 8
     }
 
     Row

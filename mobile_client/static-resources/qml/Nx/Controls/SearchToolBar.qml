@@ -28,6 +28,7 @@ ToolBarBase
         {
             icon: "/images/arrow_back.png"
             onClicked: close()
+            alwaysCompleteHighlightAnimation: false
         }
 
         QnTextField

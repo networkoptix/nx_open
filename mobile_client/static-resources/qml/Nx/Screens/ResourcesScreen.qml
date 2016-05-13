@@ -22,6 +22,7 @@ Page
             enabled: d.enabled
             opacity: !warningVisible ? 1.0 : 0.2
             onClicked: searchToolBar.open()
+            alwaysCompleteHighlightAnimation: false
         }
     ]
 

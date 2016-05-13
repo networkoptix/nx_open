@@ -11,6 +11,7 @@ Item
     property bool centered: false
     property bool rounded: false
     property alias radius: highlightRectangle.radius
+    property bool alwaysCompleteHighlightAnimation: false
 
     property Ripple _currentRipple: null
 
@@ -39,7 +40,10 @@ Item
                 fadeOutAnimation.duration = 500
             }
 
-            fadeInAnimation.stop()
+            if (alwaysCompleteHighlightAnimation)
+                fadeInAnimation.complete()
+            else
+                fadeInAnimation.stop()
             fadeOutAnimation.start()
         }
 
