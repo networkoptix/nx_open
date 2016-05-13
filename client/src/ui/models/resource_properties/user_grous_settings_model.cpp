@@ -4,6 +4,8 @@
 
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/common/string.h>
+
 QnUserGroupSettingsModel::QnUserGroupSettingsModel(QObject* parent /*= nullptr*/) :
     base_type(parent),
     m_currentGroupId(),
@@ -26,6 +28,11 @@ void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
 {
     beginResetModel();
     m_groups = value;
+    std::sort(m_groups.begin(), m_groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
+    {
+        /* Case Sensitive sort. */
+        return naturalStringCompare(l.name, r.name) < 0;
+    });
     m_accessibleResources.clear();
     for (const auto& group : m_groups)
         m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group.id);

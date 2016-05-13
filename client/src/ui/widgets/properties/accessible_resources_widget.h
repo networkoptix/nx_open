@@ -34,5 +34,6 @@ private:
     const QnResourceAccessFilter::Filter m_filter;
 
     QScopedPointer<QnResourceListModel> m_resourcesModel;
+    QScopedPointer<QnResourceListModel> m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */
     QScopedPointer<QSortFilterProxyModel> m_viewModel;
 };

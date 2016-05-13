@@ -4,8 +4,12 @@
 #include <client/client_globals.h>
 
 #include <core/resource_management/resource_pool.h>
-
+#include <core/resource/resource_type.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+
 
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource_list_model.h>
@@ -62,6 +66,8 @@ namespace
 
     };
 
+    const int kDefaultIconSize = 18;
+    const QString kDummyResourceId(lit("dummy_resource"));
 }
 
 QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent /*= 0*/):
@@ -70,29 +76,67 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     m_permissionsModel(permissionsModel),
     m_filter(filter),
     m_resourcesModel(new QnResourceListModel()),
+    m_controlsModel(new QnResourceListModel()),
     m_viewModel(new QnResourcesListSortModel())
 {
     ui->setupUi(this);
 
     switch (m_filter)
     {
-    case QnResourceAccessFilter::CamerasFilter:
-        ui->allResourcesCheckBox->setText(tr("All Cameras"));
-        break;
     case QnResourceAccessFilter::LayoutsFilter:
-        ui->allResourcesCheckBox->setText(tr("All Global Layouts"));
         ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts."));
         break;
     case QnResourceAccessFilter::ServersFilter:
-        ui->allResourcesCheckBox->setText(tr("All Servers"));
         ui->descriptionLabel->setText(tr("Giving access to some server you give access to view server statistics."));
         break;
     default:
         break;
     }
 
+    auto createDummyResource = [](QnResourceAccessFilter::Filter filter) -> QnResourcePtr
+    {
+        switch (filter)
+        {
+        case QnResourceAccessFilter::CamerasFilter:
+        {
+            QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+            dummy->setName(tr("All Cameras"));
+            return dummy;
+        }
+        case QnResourceAccessFilter::LayoutsFilter:
+        {
+            QnLayoutResourcePtr dummy(new QnLayoutResource());
+            dummy->setName(tr("All Global Layouts"));
+            return dummy;
+        }
+        case QnResourceAccessFilter::ServersFilter:
+        {
+            QnMediaServerResourcePtr dummy(new QnMediaServerResource());
+            dummy->setName(tr("All Servers"));
+            return dummy;
+        }
+        default:
+            NX_ASSERT(false);
+            break;
+        }
+        return QnResourcePtr();
+    };
+
+    auto dummy = createDummyResource(m_filter);
+    if (dummy)
+    {
+        /* Create separate dummy resource for each filter, but once per application run. */
+        dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
+        m_controlsModel->setResources(QnResourceList() << dummy);
+    }
+
+    m_controlsModel->setCheckable(true);
+    m_controlsModel->setStatusIgnored(true);
+
     m_resourcesModel->setCheckable(true);
+    m_resourcesModel->setStatusIgnored(true);
     m_resourcesModel->setResources(QnResourceAccessFilter::filteredResources(m_filter, qnResPool->getResources()));
+
     connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
     {
         if (roles.contains(Qt::CheckStateRole)
@@ -108,16 +152,19 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     m_viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     m_viewModel->sort(Qn::NameColumn);
 
+    ui->resourcesTreeView->setModel(m_viewModel.data());
+    ui->controlsTreeView->setModel(m_controlsModel.data());
 
     auto itemDelegate = new QnResourceItemDelegate(this);
-    ui->resourcesTreeView->setItemDelegate(itemDelegate);
-
-    ui->resourcesTreeView->setModel(m_viewModel.data());
-    ui->resourcesTreeView->setMouseTracking(true);
-
-    ui->resourcesTreeView->header()->setStretchLastSection(false);
-    ui->resourcesTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->resourcesTreeView->header()->setSectionResizeMode(QnResourceListModel::NameColumn, QHeaderView::Stretch);
+    auto setupTreeView = [itemDelegate](QnTreeView* treeView)
+    {
+        treeView->setItemDelegate(itemDelegate);
+        treeView->header()->setStretchLastSection(false);
+        treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        treeView->header()->setSectionResizeMode(QnResourceListModel::NameColumn, QHeaderView::Stretch);
+    };
+    setupTreeView(ui->resourcesTreeView);
+    setupTreeView(ui->controlsTreeView);
 
     auto updateThumbnail = [this](const QModelIndex& index)
     {
@@ -140,10 +187,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
         }
     };
 
+    ui->resourcesTreeView->setMouseTracking(true);
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, updateThumbnail);
-    connect(ui->allResourcesCheckBox, &QCheckBox::clicked, this, [this]
+
+    connect(m_controlsModel.data(), &QnResourceListModel::dataChanged, this, [this](const QModelIndex& index)
     {
-        ui->resourcesTreeView->setEnabled(!ui->allResourcesCheckBox->isChecked());
+        QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
+        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+        ui->resourcesTreeView->setEnabled(!checked);
         emit hasChangesChanged();
     });
 
@@ -165,7 +216,9 @@ QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
 
 bool QnAccessibleResourcesWidget::hasChanges() const
 {
-    if (m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)) != ui->allResourcesCheckBox->isChecked())
+    bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
+
+    if (m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)) != checkedAll)
         return true;
 
     return m_resourcesModel->checkedResources() != QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources());
@@ -173,7 +226,11 @@ bool QnAccessibleResourcesWidget::hasChanges() const
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    ui->allResourcesCheckBox->setChecked(m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)));
+    QSet<QnUuid> checkedControls; //= m_controlsModel->resources()
+    if (m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)))
+        for (const auto& resource : m_controlsModel->resources())
+            checkedControls << resource->getId();
+    m_controlsModel->setCheckedResources(checkedControls);
     m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
 }
 
@@ -186,8 +243,9 @@ void QnAccessibleResourcesWidget::applyChanges()
     accessibleResources.unite(newFiltered);
     m_permissionsModel->setAccessibleResources(accessibleResources);
 
+    bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
     Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
-    if (ui->allResourcesCheckBox->isChecked())
+    if (checkedAll)
         permissions |= QnResourceAccessFilter::accessPermission(m_filter);
     else
         permissions &= ~QnResourceAccessFilter::accessPermission(m_filter);
