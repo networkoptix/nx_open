@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "plugins/resource/test_camera/testcamera_const.h"
+#include <plugins/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
 
 int MEDIA_PORT = 4985;

@@ -11,6 +11,9 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/nalUnits.h"
 
+namespace {
+    static const unsigned int kSendTimeoutMs = 1000;
+}
 
 QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileName)
 {
@@ -103,12 +106,15 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
 int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int size) {
     int sent = 0, sentTotal = 0;
     while (sentTotal < size) {
-        sent = socket->send(static_cast<const quint8*>(data)+ sentTotal, size - sentTotal);
+        sent = socket->send(static_cast<const quint8*>(data) + sentTotal, size - sentTotal);
         if (sent < 1) {
-            qWarning() << "TCP socket write error for camera " << m_mac << "send" << sent << "of" << size;
+            qWarning() << "TCP socket write error for camera" << m_mac << " has sent" << sent << "of" << size;
+            SystemError::ErrorCode ercode = 0;
+            if (socket->getLastError(&ercode)) {
+                qWarning() << "Socket error code " << ercode;
+            }
             break;
         }
-
         sentTotal += sent;
     }
 
@@ -186,6 +192,9 @@ void QnTestCamera::startStreaming(AbstractStreamSocket* socket, bool isSecondary
     QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;
     if (fileList.isEmpty())
         return;
+
+    socket->setSendTimeout(kSendTimeoutMs);
+
     while (1)
     {
         QString fileName = fileList[fileIndex];
