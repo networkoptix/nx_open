@@ -729,6 +729,8 @@ void QnTimeSlider::setLineComment(int line, const QString& comment)
     m_lineData[line].comment = comment;
 
     updateLineCommentPixmap(line);
+
+    emit lineCommentChanged(line, m_lineData[line].comment);
 }
 
 QString QnTimeSlider::lineComment(int line)
@@ -752,7 +754,14 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
     if (!checkLinePeriod(line, type))
         return;
 
+    bool hadArchive = archiveAvailable();
+
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
+
+    bool hasArchive = archiveAvailable();
+
+    if (hasArchive != hadArchive)
+        emit archiveAvailabilityChanged(hasArchive);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const
@@ -1551,11 +1560,6 @@ void QnTimeSlider::updateTickmarkTextSteps()
     }
 }
 
-qreal QnTimeSlider::msecsPerPixel() const
-{
-    return m_msecsPerPixel;
-}
-
 bool QnTimeSlider::positionMarkerVisible() const
 {
     return !m_options.testFlag(HideLivePosition) || !isLive() || isSliderDown();
@@ -1578,6 +1582,20 @@ void QnTimeSlider::setLiveSupported(bool value)
 bool QnTimeSlider::isLive() const
 {
     return m_liveSupported && value() == maximum();
+}
+
+bool QnTimeSlider::archiveAvailable() const
+{
+    for (int line = 0; line < m_lineCount; ++line)
+        if (!m_lineData[line].timeStorage.periods(Qn::RecordingContent).empty())
+            return true;
+
+    return false;
+}
+
+qreal QnTimeSlider::msecsPerPixel() const
+{
+    return m_msecsPerPixel;
 }
 
 void QnTimeSlider::updateMSecsPerPixel()

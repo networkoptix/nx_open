@@ -242,7 +242,14 @@
     "QnNavigationItem": {
         "palette": { "default": { 
             "window": "dark6",
-            "midlight": "dark8"
+            "midlight": "dark8",
+            "shadow": "dark1.setAlpha(38)"
+        }}
+    },
+
+    "QnTimelinePlaceholder": {
+        "palette": { "default": { 
+            "windowText": "dark11"
         }}
     },
 

@@ -222,6 +222,8 @@ public:
 
     bool positionMarkerVisible() const;
 
+    bool archiveAvailable() const;
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -232,6 +234,8 @@ signals:
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
     void msecsPerPixelChanged();
+    void lineCommentChanged(int line, const QString& comment);
+    void archiveAvailabilityChanged(bool hasArchive);
 
 protected:
     virtual void sliderChange(SliderChange change) override;

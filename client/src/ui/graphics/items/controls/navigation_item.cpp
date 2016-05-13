@@ -35,9 +35,11 @@
 #include <core/resource/resource.h>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include "time_slider.h"
 #include "time_scroll_bar.h"
+#include "timeline_placeholder.h"
 #include "clock_label.h"
 
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
@@ -125,8 +127,19 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
 
+    GraphicsLabel* timelinePlaceholder = new QnTimelinePlaceholder(this, m_timeSlider);
+    timelinePlaceholder->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
     m_timeScrollBar = new QnTimeScrollBar(this);
     m_timeScrollBar->setPreferredHeight(16);
+
+    connect(m_timeSlider, &QnTimeSlider::archiveAvailabilityChanged, this,
+        [this, timelinePlaceholder](bool hasArchive)
+        {
+            m_timeSlider->setVisible(hasArchive);
+            m_timeScrollBar->setVisible(hasArchive);
+            timelinePlaceholder->setVisible(!hasArchive);
+        });
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
@@ -184,6 +197,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     sliderLayout->setSpacing(0);
     sliderLayout->addItem(m_timeSlider);
     sliderLayout->addItem(m_timeScrollBar);
+    sliderLayout->addItem(timelinePlaceholder);
+
+    m_timeSlider->hide();
+    m_timeScrollBar->hide();
 
     QGraphicsLinearLayout* mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(0, 0, 0, 0);
