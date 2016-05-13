@@ -962,8 +962,8 @@ void MediaServerProcess::stopObjects()
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
 {
+    // migration from old version. move setting from registry to the DB
     static const QString DV_PROPERTY = QLatin1String("disabledVendors");
-
     QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     if (!disabledVendors.isNull())
     {
@@ -1897,8 +1897,6 @@ void MediaServerProcess::run()
         nx::ServerSetting::setSysIdTime(0);
         systemName.saveToConfig();
     }
-    if (systemName.isDefault())
-        serverFlags |= Qn::SF_AutoSystemName;
 
     qnCommon->setLocalSystemName(systemName.value());
 
@@ -1988,6 +1986,7 @@ void MediaServerProcess::run()
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
+
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
@@ -2286,9 +2285,10 @@ void MediaServerProcess::run()
 
     loadResourcesFromECS(messageProcessor.data());
 
-    if (isNewServerInstance)
+    if (isNewServerInstance || systemName.isDefault())
     {
         /* In case of error it will be instantly cleaned by the watcher. */
+        qnGlobalSettings->resetCloudParams();
         qnGlobalSettings->setNewSystem(true);
     }
 

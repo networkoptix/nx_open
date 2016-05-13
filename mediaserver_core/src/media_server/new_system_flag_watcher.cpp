@@ -16,6 +16,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/utils/log/log.h>
+#include "serverutil.h"
 
 namespace
 {
@@ -57,6 +58,11 @@ void QnNewSystemServerFlagWatcher::update()
 
     auto newSystemMustBeCleaned = [this]
     {
+        nx::SystemName systemName;
+        systemName.loadFromConfig();
+        if (systemName.isDefault())
+            return false;
+
         if (!qnGlobalSettings->cloudSystemID().isEmpty())
             return true;
 

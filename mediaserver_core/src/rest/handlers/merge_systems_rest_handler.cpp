@@ -168,9 +168,9 @@ int QnMergeSystemsRestHandler::executeGet(
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool isDefaultSystemName;
     if (takeRemoteSettings)
-        isDefaultSystemName = remoteModuleInformation.serverFlags & Qn::SF_AutoSystemName;
+        isDefaultSystemName = remoteModuleInformation.serverFlags & Qn::SF_NewSystem;
     else
-        isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_AutoSystemName);
+        isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_NewSystem);
     if (isDefaultSystemName)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Can not merge to the non configured system"), cl_logDEBUG1);
