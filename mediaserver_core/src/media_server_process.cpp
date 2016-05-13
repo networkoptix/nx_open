@@ -1210,7 +1210,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     {
         //loading videowalls
         ec2::ApiVideowallDataList videowalls;
-        while(( rez = ec2Connection->getVideowallManager()->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
+        while(( rez = ec2Connection->getVideowallManager(Qn::kSuperUserAccess)->getVideowallsSync(&videowalls))  != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);

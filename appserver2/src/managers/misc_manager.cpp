@@ -80,7 +80,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
 }
 
 
-template class QnMiscManager<ServerQueryProcessor>;
+template class QnMiscManager<ServerQueryProcessorAccess>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;
 
 } // namespace ec2

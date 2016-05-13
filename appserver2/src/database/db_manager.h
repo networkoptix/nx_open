@@ -16,6 +16,7 @@
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
 #include "nx/utils/type_utils.h"
+#include "core/resource_management/user_access_data.h"
 #include "core/resource_management/resource_access_manager.h"
 #include "core/resource/user_resource.h"
 
@@ -628,7 +629,7 @@ public:
     QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    template <class T1, class T2>
+    template <typename T1, typename T2>
     ErrorCode doQuery(const T1 &t1, T2 &t2)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
@@ -659,7 +660,7 @@ public:
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-    template <class Param, class SerializedTransaction>
+    template <typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
         if (!hasPermission(tran.params, Qn::Permission::SavePermission))

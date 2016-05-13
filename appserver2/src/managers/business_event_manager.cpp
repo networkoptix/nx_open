@@ -124,7 +124,7 @@ QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiComma
     return tran;
 }
 
-template class QnBusinessEventManager<ServerQueryProcessor>;
+template class QnBusinessEventManager<ServerQueryProcessorAccess>;
 template class QnBusinessEventManager<FixedUrlClientQueryProcessor>;
 
 }

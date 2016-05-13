@@ -14,12 +14,11 @@
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection(
-        ServerQueryProcessor* queryProcessor,
+    Ec2DirectConnection::Ec2DirectConnection(ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
         const QUrl& dbUrl)
     :
-        BaseEc2Connection<ServerQueryProcessor>( queryProcessor ),
+        BaseEc2Connection<ServerQueryProcessorAccess>( queryProcessor ),
         m_transactionLog( new QnTransactionLog(detail::QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo ),
         m_isInitialized( false )

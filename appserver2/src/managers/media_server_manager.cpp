@@ -162,7 +162,7 @@ namespace ec2
         return reqID;
     }
 
-    template class QnMediaServerManager<ServerQueryProcessor>;
+    template class QnMediaServerManager<ServerQueryProcessorAccess>;
     template class QnMediaServerManager<FixedUrlClientQueryProcessor>;
 
 }

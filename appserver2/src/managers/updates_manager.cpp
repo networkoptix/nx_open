@@ -109,7 +109,7 @@ namespace ec2 {
         return transaction;
     }
 
-    template class QnUpdatesManager<ServerQueryProcessor>;
+    template class QnUpdatesManager<ServerQueryProcessorAccess>;
     template class QnUpdatesManager<FixedUrlClientQueryProcessor>;
 
 } // namespace ec2

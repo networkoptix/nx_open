@@ -60,17 +60,17 @@ namespace ec2
         return AbstractUserManagerPtr();
     }
 
-    AbstractLayoutManagerPtr OldEcConnection::getLayoutManager()
+    AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &)
     {
         return AbstractLayoutManagerPtr();
     }
 
-    AbstractVideowallManagerPtr OldEcConnection::getVideowallManager()
+    AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
     {
         return AbstractVideowallManagerPtr();
     }
 
-    AbstractWebPageManagerPtr OldEcConnection::getWebPageManager()
+    AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserAccessData &)
     {
         return AbstractWebPageManagerPtr();
     }

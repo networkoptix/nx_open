@@ -181,6 +181,6 @@ namespace ec2
         return reqID;
     }
 
-    template class QnUserManager<ServerQueryProcessor>;
+    template class QnUserManager<ServerQueryProcessorAccess>;
     template class QnUserManager<FixedUrlClientQueryProcessor>;
 }

@@ -219,7 +219,7 @@ QnTransaction<ApiDiscoveredServerDataList> QnDiscoveryManager<QueryProcessorType
     return transaction;
 }
 
-template class QnDiscoveryManager<ServerQueryProcessor>;
+template class QnDiscoveryManager<ServerQueryProcessorAccess>;
 template class QnDiscoveryManager<FixedUrlClientQueryProcessor>;
 
 } // namespace ec2

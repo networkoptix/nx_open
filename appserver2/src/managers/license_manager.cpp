@@ -106,6 +106,6 @@ namespace ec2
         return tran;
     }
 
-    template class QnLicenseManager<ServerQueryProcessor>;
+    template class QnLicenseManager<ServerQueryProcessorAccess>;
     template class QnLicenseManager<FixedUrlClientQueryProcessor>;
 }

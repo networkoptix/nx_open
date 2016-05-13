@@ -49,7 +49,7 @@ namespace ec2
         virtual void setConfParams( std::map<QString, QVariant> confParams ) override;
 
     private:
-        ServerQueryProcessor m_serverQueryProcessor;
+        ServerQueryProcessorAccess m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
         QnMutex m_mutex;
         Settings m_settingsInstance;

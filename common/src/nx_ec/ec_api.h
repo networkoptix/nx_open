@@ -17,6 +17,7 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
+#include <core/resource_management/user_access_data.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
@@ -603,14 +604,14 @@ namespace ec2
         virtual AbstractLicenseManagerPtr getLicenseManager() = 0;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() = 0;
         virtual AbstractUserManagerPtr getUserManager() = 0;
-        virtual AbstractLayoutManagerPtr getLayoutManager() = 0;
-        virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
+        virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
-        virtual AbstractWebPageManagerPtr getWebPageManager() = 0;
+        virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
 

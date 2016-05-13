@@ -7,15 +7,25 @@
 
 namespace ec2
 {
+
+class AbstractWebPageManagerBase : public QObject
+{
+    Q_OBJECT
+public:
+signals:
+    void addedOrUpdated(const ec2::ApiWebPageData &webpage);
+    void removed(const QnUuid &id);
+};
+
     /*!
     \note All methods are asynchronous if other not specified
     */
-    class AbstractWebPageManager: public QObject
+    class AbstractWebPageManager
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractWebPageManager() {}
+
+        virtual AbstractWebPageManagerBase *getBase() const = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const ec2::ApiWebPageDataList&)
@@ -55,10 +65,6 @@ namespace ec2
             return remove(id, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
-
-    signals:
-        void addedOrUpdated(const ec2::ApiWebPageData &webpage);
-        void removed(const QnUuid &id);
 
     protected:
         virtual int getWebPages(impl::GetWebPagesHandlerPtr handler) = 0;

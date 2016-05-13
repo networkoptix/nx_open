@@ -18,6 +18,7 @@
 
 #include <api/app_server_connection.h>
 
+#include <core/resource_management/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_properties.h>
@@ -107,18 +108,18 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(userManager, &ec2::AbstractUserManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged);
 
-    auto layoutManager = connection->getLayoutManager();
-    connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
-    connect(layoutManager, &ec2::AbstractLayoutManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
+    auto layoutManager = connection->getLayoutManager(Qn::kSuperUserAccess)->getBase();
+    connect(layoutManager, &ec2::AbstractLayoutManagerBase::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
+    connect(layoutManager, &ec2::AbstractLayoutManagerBase::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    auto videowallManager = connection->getVideowallManager();
-    connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, on_resourceUpdated(ec2::ApiVideowallData));
-    connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
+    auto videowallManager = connection->getVideowallManager(Qn::kSuperUserAccess)->getBase();
+    connect(videowallManager, &ec2::AbstractVideowallManagerBase::addedOrUpdated,       this, on_resourceUpdated(ec2::ApiVideowallData));
+    connect(videowallManager, &ec2::AbstractVideowallManagerBase::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(videowallManager, &ec2::AbstractVideowallManagerBase::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
-    auto webPageManager = connection->getWebPageManager();
-    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, on_resourceUpdated(ec2::ApiWebPageData));
-    connect(webPageManager, &ec2::AbstractWebPageManager::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved );
+    auto webPageManager = connection->getWebPageManager(Qn::kSuperUserAccess)->getBase();
+    connect(webPageManager, &ec2::AbstractWebPageManagerBase::addedOrUpdated,           this, on_resourceUpdated(ec2::ApiWebPageData));
+    connect(webPageManager, &ec2::AbstractWebPageManagerBase::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto licenseManager = connection->getLicenseManager();
     connect(licenseManager, &ec2::AbstractLicenseManager::licenseChanged,           this, &QnCommonMessageProcessor::on_licenseChanged );
@@ -158,7 +159,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getLicenseManager()->disconnect(this);
     connection->getBusinessEventManager()->disconnect(this);
     connection->getUserManager()->disconnect(this);
-    connection->getLayoutManager()->disconnect(this);
+    connection->getLayoutManager(Qn::kSuperUserAccess)->getBase()->disconnect(this);
     connection->getStoredFileManager()->disconnect(this);
     connection->getDiscoveryManager()->disconnect(this);
     connection->getTimeManager()->disconnect(this);

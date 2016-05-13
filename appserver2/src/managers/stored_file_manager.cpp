@@ -82,6 +82,6 @@ namespace ec2
     }
 
 
-    template class QnStoredFileManager<ServerQueryProcessor>;
+    template class QnStoredFileManager<ServerQueryProcessorAccess>;
     template class QnStoredFileManager<FixedUrlClientQueryProcessor>;
 }

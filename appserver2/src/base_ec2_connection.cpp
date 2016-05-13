@@ -29,9 +29,9 @@ namespace ec2
         m_cameraManager( new QnCameraManager<QueryProcessorType>(m_queryProcessor) ),
         m_userManager( new QnUserManager<QueryProcessorType>(m_queryProcessor) ),
         m_businessEventManager( new QnBusinessEventManager<QueryProcessorType>(m_queryProcessor) ),
-        m_layoutManager( new QnLayoutManager<QueryProcessorType>(m_queryProcessor) ),
-        m_videowallManager( new QnVideowallManager<QueryProcessorType>(m_queryProcessor) ),
-        m_webPageManager ( new QnWebPageManager<QueryProcessorType>(m_queryProcessor) ),
+        m_layoutManagerBase(std::make_shared<QnLayoutNotificationManager>()),
+        m_videowallManagerBase(std::make_shared<QnVideowallNotificationManager>()),
+        m_webPageManagerBase(std::make_shared<QnWebPageNotificationManager>()),
         m_storedFileManager( new QnStoredFileManager<QueryProcessorType>(m_queryProcessor) ),
         m_updatesManager( new QnUpdatesManager<QueryProcessorType>(m_queryProcessor) ),
         m_miscManager( new QnMiscManager<QueryProcessorType>(m_queryProcessor) ),
@@ -47,9 +47,9 @@ namespace ec2
                 m_cameraManager.get(),
                 m_userManager.get(),
                 m_businessEventManager.get(),
-                m_layoutManager.get(),
-                m_videowallManager.get(),
-                m_webPageManager.get(),
+                m_layoutManagerBase.get(),
+                m_videowallManagerBase.get(),
+                m_webPageManagerBase.get(),
                 m_storedFileManager.get(),
                 m_updatesManager.get(),
                 m_miscManager.get(),
@@ -113,21 +113,21 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager()
+    AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_layoutManager;
+        return std::make_shared<QnLayoutManager<QueryProcessorType>>(m_layoutManagerBase, m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
-    AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallManager()
+    AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_videowallManager;
+        return std::make_shared<QnVideowallManager<QueryProcessorType>>(m_videowallManagerBase, m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
-    AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager()
+    AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_webPageManager;
+        return std::make_shared<QnWebPageManager<QueryProcessorType>>(m_webPageManagerBase, m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
@@ -171,7 +171,7 @@ namespace ec2
                 outData = data;
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(Qn::kSuperUserAccess).template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> (
             ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -187,7 +187,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiDatabaseDumpToFileData&/*dumpFileSize*/ ) {
             handler->done( reqID, errorCode );
         };
-        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(Qn::kSuperUserAccess).template processQueryAsync<ApiStoredFilePath, ApiDatabaseDumpToFileData, decltype(queryDoneHandler)> (
             ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
 
         return reqID;
@@ -203,7 +203,7 @@ namespace ec2
         tran.params = data;
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+        m_queryProcessor->getAccess(Qn::kSuperUserAccess).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
 
         return reqID;
     }
@@ -258,5 +258,5 @@ namespace ec2
 
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;
-    template class BaseEc2Connection<ServerQueryProcessor>;
+    template class BaseEc2Connection<ServerQueryProcessorAccess>;
 }

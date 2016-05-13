@@ -1373,7 +1373,7 @@ namespace ec2
 			}
 
             QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
-            m_serverQueryProcessor.processUpdateAsync(transaction,
+            m_serverQueryProcessor.getAccess(Qn::kSuperUserAccess).processUpdateAsync(transaction,
                 [&](ErrorCode result) {
 					if (result == ErrorCode::ok) {
 						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),

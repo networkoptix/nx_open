@@ -28,9 +28,9 @@ namespace ec2
         virtual AbstractLicenseManagerPtr getLicenseManager() override;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
         virtual AbstractUserManagerPtr getUserManager() override;
-        virtual AbstractLayoutManagerPtr getLayoutManager() override;
-        virtual AbstractVideowallManagerPtr getVideowallManager() override;
-        virtual AbstractWebPageManagerPtr getWebPageManager() override;
+        virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
+        virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &) override;
+        virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &) override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
         virtual AbstractMiscManagerPtr getMiscManager() override;

@@ -52,9 +52,9 @@ namespace ec2
         virtual AbstractLicenseManagerPtr getLicenseManager() override;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
         virtual AbstractUserManagerPtr getUserManager() override;
-        virtual AbstractLayoutManagerPtr getLayoutManager() override;
-        virtual AbstractVideowallManagerPtr getVideowallManager() override;
-        virtual AbstractWebPageManagerPtr getWebPageManager() override;
+        virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
         virtual AbstractMiscManagerPtr getMiscManager() override;
@@ -88,9 +88,9 @@ namespace ec2
         std::shared_ptr<QnCameraManager<QueryProcessorType>> m_cameraManager;
         std::shared_ptr<QnUserManager<QueryProcessorType>> m_userManager;
         std::shared_ptr<QnBusinessEventManager<QueryProcessorType>> m_businessEventManager;
-        std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
-        std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
-        std::shared_ptr<QnWebPageManager<QueryProcessorType>> m_webPageManager;
+        QnLayoutNotificationManagerPtr m_layoutManagerBase;
+        QnVideowallNotificationManagerPtr m_videowallManagerBase;
+        QnWebPageNotificationManagerPtr m_webPageManagerBase;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
         std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;

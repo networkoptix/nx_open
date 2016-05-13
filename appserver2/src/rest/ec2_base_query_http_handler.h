@@ -141,7 +141,7 @@ namespace ec2
     public:
         QueryHttpHandler2(
             ApiCommand::Value cmdCode,
-            ServerQueryProcessor* const queryProcessor )
+            ServerQueryProcessorAccess* const queryProcessor )
         :
             base_type( cmdCode ),
             m_cmdCode( cmdCode ),
@@ -163,7 +163,7 @@ namespace ec2
 
     private:
         ApiCommand::Value m_cmdCode;
-        ServerQueryProcessor* const m_queryProcessor;
+        ServerQueryProcessorAccess* const m_queryProcessor;
     };
 
 
