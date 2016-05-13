@@ -236,6 +236,7 @@ namespace nx_http
     void HttpServerConnection::fullMessageHasBeenSent()
     {
         //if connection is NOT persistent then closing it
+        m_currentMsgBody.reset();
         if (!m_isPersistent)
             closeConnection(SystemError::noError);
     }

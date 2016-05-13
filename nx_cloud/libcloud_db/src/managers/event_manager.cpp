@@ -5,9 +5,12 @@
 
 #include "event_manager.h"
 
+#include <chrono>
+
 #include <nx/network/http/multipart_msg_body_source.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/cpp14.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>
 
@@ -35,7 +38,7 @@ public:
             authorizationManager,
             std::bind(
                 &EventManager::subscribeToEvents, eventManager,
-                std::placeholders::_1, std::placeholders::_2))
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
     {
     }
 };
@@ -71,6 +74,7 @@ void EventManager::registerHttpHandlers(
 }
 
 void EventManager::subscribeToEvents(
+    const nx_http::HttpServerConnection& httpConnection,
     const AuthorizationInfo& authzInfo,
     nx::utils::MoveOnlyFunc<
         void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
@@ -90,17 +94,21 @@ void EventManager::subscribeToEvents(
 
     NX_LOGX(lm("System %1 subscribing to events").arg(*systemID), cl_logDEBUG2);
 
-    ServerConnectionContext context;
+    auto context = std::make_unique<ServerConnectionContext>();
     auto msgBody = 
         std::make_unique<nx_http::MultipartMessageBodySource>(
             "nx_cloud_event_boundary");
-    context.msgBody = msgBody.get();
+    context->msgBody = msgBody.get();
 
     {
         QnMutexLocker lk(&m_mutex);
         auto it = m_activeMediaServerConnections.emplace(*systemID, std::move(context));
-        context.msgBody->setOnBeforeDestructionHandler(
+        it->second->msgBody->setOnBeforeDestructionHandler(
             std::bind(&EventManager::beforeMsgBodySourceDestruction, this, it));
+        it->second->timer.bindToAioThread(httpConnection.getAioThread());
+        it->second->timer.start(
+            m_settings.eventManager().mediaServerConnectionIdlePeriod,
+            std::bind(&EventManager::onMediaServerIdlePeriodExpired, this, it));
     }
 
     completionHandler(
@@ -120,6 +128,16 @@ void EventManager::beforeMsgBodySourceDestruction(
 {
     QnMutexLocker lk(&m_mutex);
     m_activeMediaServerConnections.erase(serverConnectionIter);
+}
+
+void EventManager::onMediaServerIdlePeriodExpired(
+    EventManager::MediaServerConnectionContainer::iterator serverConnectionIter)
+{
+    //closing event stream to force mediaserver send us a new request
+
+    //NOTE we do not need synchronization here since all events 
+        //related to a single connection are always invoked within same aio thread
+    serverConnectionIter->second->msgBody->serializer()->writeEpilogue();
 }
 
 }   //namespace cdb

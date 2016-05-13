@@ -340,6 +340,7 @@ class AbstractFreeMsgBodyHttpHandler
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
+        const nx_http::HttpServerConnection& connection,
         const AuthorizationInfo& authzInfo,
         InputData inputData,
         nx::utils::MoveOnlyFunc<
@@ -376,6 +377,7 @@ public:
             return;
 
         m_requestFunc(
+            connection,
             AuthorizationInfo(std::move(authInfo)),
             std::move(inputData),
             [this](
@@ -407,6 +409,7 @@ class AbstractFreeMsgBodyHttpHandler<void>
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
+        const nx_http::HttpServerConnection& connection,
         const AuthorizationInfo& authzInfo,
         nx::utils::MoveOnlyFunc<
             void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
@@ -442,6 +445,7 @@ public:
             return;
 
         m_requestFunc(
+            connection,
             AuthorizationInfo(std::move(authInfo)),
             [this](
                 api::ResultCode resultCode,
@@ -458,7 +462,7 @@ public:
                 else
                     this->requestCompleted(
                         resultCodeToFusionRequestResult(resultCode));
-        });
+            });
     }
 
 private:

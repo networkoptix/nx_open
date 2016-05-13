@@ -9,6 +9,7 @@
 #include <memory>
 
 #include <cdb/result_code.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
@@ -20,6 +21,7 @@
 
 namespace nx_http
 {
+    class HttpServerConnection;
     class MessageDispatcher;
     class MultipartMessageBodySource;
 }
@@ -44,6 +46,7 @@ public:
         nx_http::MessageDispatcher* const httpMessageDispatcher);
 
     void subscribeToEvents(
+        const nx_http::HttpServerConnection& connection,
         const AuthorizationInfo& authzInfo,
         nx::utils::MoveOnlyFunc<
             void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
@@ -56,6 +59,7 @@ private:
     {
     public:
         nx_http::MultipartMessageBodySource* msgBody;
+        nx::network::aio::Timer timer;
 
         ServerConnectionContext()
         :
@@ -64,7 +68,7 @@ private:
         }
     };
 
-    typedef std::multimap<std::string, ServerConnectionContext> 
+    typedef std::multimap<std::string, std::unique_ptr<ServerConnectionContext>> 
         MediaServerConnectionContainer;
 
     const conf::Settings& m_settings;
@@ -75,6 +79,8 @@ private:
 
     void beforeMsgBodySourceDestruction(
         MediaServerConnectionContainer::iterator serverConnectionIter);
+    void onMediaServerIdlePeriodExpired(
+        EventManager::MediaServerConnectionContainer::iterator serverConnectionIter);
 };
 
 }   //namespace cdb

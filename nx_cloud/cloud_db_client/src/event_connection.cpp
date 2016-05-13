@@ -174,8 +174,12 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
         return connectionAttemptHasFailed(api::ResultCode::invalidFormat);
     }
 
+    auto oldState = m_state;
     m_state = State::connected;
     m_reconnectTimer.reset();
+    if (oldState == State::reconnecting)
+        return;
+    NX_ASSERT(oldState == State::connecting && m_connectCompletionHandler);
     auto handler = std::move(m_connectCompletionHandler);
     return handler(api::ResultCode::ok);
 }
