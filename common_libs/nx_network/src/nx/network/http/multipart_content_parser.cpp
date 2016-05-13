@@ -33,12 +33,19 @@ namespace nx_http
                 {
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
-                    const bool lineFound = m_lineSplitter.parseByLines(
+                    bool lineFound = m_lineSplitter.parseByLines(
                         data.mid( offset ),
                         &lineBuffer,
                         &bytesRead );
                     offset += bytesRead;
-                    if( !lineFound )
+                    if (!lineFound && 
+                        m_lineSplitter.partialLineBuffer() == m_endBoundaryLine)
+                    {
+                        m_lineSplitter.reset();
+                        lineBuffer = m_endBoundaryLine;
+                        lineFound = true;
+                    }
+                    if (!lineFound)
                         continue;
 
                     if (!processLine(lineBuffer))

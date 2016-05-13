@@ -121,6 +121,11 @@ namespace nx_http
         m_prevLineEnding = 0;
     }
 
+    QnByteArrayConstRef LineSplitter::partialLineBuffer() const
+    {
+        return m_currentLine;
+    }
+
     QnByteArrayConstRef LineSplitter::flush()
     {
         return m_currentLine;

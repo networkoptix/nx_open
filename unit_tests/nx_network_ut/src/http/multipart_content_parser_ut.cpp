@@ -333,7 +333,7 @@ TEST(HttpMultipartContentParser, epilogueOnly)
                 decodedFramesProcessor));
 
         parser.processData(testData);
-        parser.flush();
+        //parser.flush();
 
         ASSERT_TRUE(parser.eof());
         ASSERT_EQ(1, frames.size());
