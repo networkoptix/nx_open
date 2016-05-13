@@ -11,7 +11,7 @@
 
 namespace nx_http {
 
-TEST(MultipartBodySerializer, general)
+TEST(HttpMultipartBodySerializer, general)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -54,6 +54,21 @@ TEST(MultipartBodySerializer, general)
 
         ASSERT_EQ(testData, bufferOutputStream->buffer());
     }
+}
+
+TEST(HttpMultipartBodySerializer, onlyEpilogue)
+{
+    auto bufferOutputStream = std::make_shared<BufferOutputStream>();
+    MultipartBodySerializer serializer(
+        "boundary",
+        bufferOutputStream);
+
+    nx::Buffer testData;
+    testData += "\r\n--boundary--"; //terminating multipart body
+
+    serializer.writeEpilogue();
+
+    ASSERT_EQ(testData, bufferOutputStream->buffer());
 }
 
 }   //namespace nx_http

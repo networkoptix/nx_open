@@ -14,18 +14,18 @@
 
 namespace nx_http {
 
-class MultipartMessageBodySourceTest
+class HttpMultipartMessageBodySourceTest
 :
     public ::testing::Test
 {
 public:
-    MultipartMessageBodySourceTest()
+    HttpMultipartMessageBodySourceTest()
     :
         m_eofReported(false)
     {
     }
 
-    ~MultipartMessageBodySourceTest()
+    ~HttpMultipartMessageBodySourceTest()
     {
         if (m_msgBodySource)
             m_msgBodySource->pleaseStopSync();
@@ -47,7 +47,7 @@ protected:
 
         m_msgBodySource = std::make_unique<MultipartMessageBodySource>("boundary");
         m_msgBodySource->readAsync(
-            std::bind(&MultipartMessageBodySourceTest::onSomeBodyBytesRead, this, _1, _2));
+            std::bind(&HttpMultipartMessageBodySourceTest::onSomeBodyBytesRead, this, _1, _2));
     }
 
     void onSomeBodyBytesRead(SystemError::ErrorCode errorCode, BufferType buffer)
@@ -64,11 +64,11 @@ protected:
 
         m_msgBody += std::move(buffer);
         m_msgBodySource->readAsync(
-            std::bind(&MultipartMessageBodySourceTest::onSomeBodyBytesRead, this, _1, _2));
+            std::bind(&HttpMultipartMessageBodySourceTest::onSomeBodyBytesRead, this, _1, _2));
     }
 };
 
-TEST_F(MultipartMessageBodySourceTest, general)
+TEST_F(HttpMultipartMessageBodySourceTest, general)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -106,12 +106,28 @@ TEST_F(MultipartMessageBodySourceTest, general)
         if (closeMultipartBody)
             m_msgBodySource->serializer()->writeEpilogue();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
         ASSERT_EQ(testData, m_msgBody);
         if (closeMultipartBody)
             ASSERT_TRUE(m_eofReported);
     }
+}
+
+
+TEST_F(HttpMultipartMessageBodySourceTest, onlyEpilogue)
+{
+    initializeMsgBodySource();
+
+    nx::Buffer testData;
+    testData += "\r\n--boundary--"; //terminating multipart body
+
+    m_msgBodySource->serializer()->writeEpilogue();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    ASSERT_EQ(testData, m_msgBody);
+    ASSERT_TRUE(m_eofReported);
 }
 
 }   //namespace nx_http

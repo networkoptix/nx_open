@@ -151,7 +151,7 @@ TEST( HttpMultipartContentParser, onlySizedData )
             "\r\n"
             +frame4;
         if (closeContent)
-            testData += "\r\n--fbdr--\r\n"; //terminating multipart body
+            testData += "\r\n--fbdr--"; //terminating multipart body
 
         for( int dataStep = 1; dataStep < testData.size(); ++dataStep )
         {
@@ -314,51 +314,11 @@ TEST( HttpMultipartContentParser, unSizedData )
     }
 }
 
-#if 0
-TEST(HttpMultipartContentParser, epilogue)
+TEST(HttpMultipartContentParser, epilogueOnly)
 {
-    //const nx::Buffer frame1 = 
-    //    "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
-    //    "xxxxxxxxxxxxxxxxxxxxxxxxxxx\r\nxxxxxx2";
-    const nx::Buffer frame1 =
-        "1xxxxxxxxxxxxxxx\rxxxxxxxx\nxxxxxxxxxx"
-        "xxxxxxxxxxxxxxxxx\r\nxxxxxxxxxxxxxxxx2";
-    const nx::Buffer frame2 =
-        "3xxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxx"
-        "xxxxxxxxxxxxxxx\r\r\rx\rxxxxxxxxxxxxxxxxxx"
-        "xxxxxxxxxxxxxxxxxxxxx\n\n\n\nxxx\r\n\r\nxxxxxxxxx4";
-    const nx::Buffer frame3 = "";
-    const nx::Buffer frame4 =
-        "5xxxxxxxxxx\r\n\r\n\r\n\r\n\r\r\r\r\r\n\n\n\nyyyyyyyyyyyyyy6";
+    nx::Buffer testData = "\r\n--fbdr--"; //terminating multipart body
 
-    const nx::Buffer testData =
-        "\r\n--fbdr"
-        "\r\n"
-        "Content-Length: " + nx::Buffer::number(frame1.size()) + "\r\n"
-        "Content-Type: image/jpeg\r\n"
-        "\r\n"
-        + frame1 +
-        "\r\n--fbdr"
-        "\r\n"
-        "Content-Length: " + nx::Buffer::number(frame2.size()) + "\r\n"
-        "Content-Type: image/jpeg\r\n"
-        "\r\n"
-        + frame2 +
-        "\r\n--fbdr"
-        "\r\n"
-        "Content-Length: " + nx::Buffer::number(frame3.size()) + "\r\n"
-        "Content-Type: image/jpeg\r\n"
-        "\r\n"
-        + frame3 +
-        "\r\n--fbdr"
-        "\r\n"
-        "Content-Length: " + nx::Buffer::number(frame4.size()) + "\r\n"
-        "Content-Type: image/jpeg\r\n"
-        "\r\n"
-        + frame4 +
-        "\r\n--fbdr--"; //terminating multipart body
-
-    for (int dataStep = testData.size()-1; dataStep < testData.size(); ++dataStep)
+    for (int dataStep = 1; dataStep < testData.size(); ++dataStep)
     {
         nx_http::MultipartContentParser parser;
         parser.setContentType("multipart/x-mixed-replace;boundary=fbdr");
@@ -372,22 +332,11 @@ TEST(HttpMultipartContentParser, epilogue)
             std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
                 decodedFramesProcessor));
 
-        for (int pos = 0; pos < testData.size(); pos += dataStep)
-            parser.processData(QnByteArrayConstRef(
-                testData,
-                pos,
-                pos + dataStep <= testData.size() ? dataStep : QnByteArrayConstRef::npos));
+        parser.processData(testData);
         parser.flush();
 
         ASSERT_TRUE(parser.eof());
-        ASSERT_EQ(frames.size(), 5);
-        ASSERT_EQ(frame1, frames[0]);
-        ASSERT_EQ(frame2, frames[1]);
-        ASSERT_EQ(frame3, frames[2]);
-        ASSERT_EQ(frame4, frames[3]);
-        ASSERT_TRUE(frames[4].isEmpty());
+        ASSERT_EQ(1, frames.size());
+        ASSERT_TRUE(frames[0].isEmpty());
     }
-
-    //TODO #ak test with Content-Length specified
 }
-#endif

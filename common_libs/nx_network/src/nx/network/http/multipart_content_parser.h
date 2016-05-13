@@ -72,6 +72,7 @@ namespace nx_http
         nx::Buffer m_supposedBoundary;
         nx_http::HttpHeaders m_currentFrameHeaders;
 
+        bool processLine(const ConstBufferRefType& lineBuffer);
         bool readUnsizedBinaryData(
             QnByteArrayConstRef data,
             size_t* const offset );
