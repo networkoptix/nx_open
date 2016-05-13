@@ -594,7 +594,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
         DisableNICSAtPaths(pSvc, paths);
     }
 
-    QMap<QString, QStringList> macHardwareIds;
+    HardwareIdListForVersion macHardwareIds;
 
     // Only for HWID1
     QnHardwareInfo v1HardwareInfo;

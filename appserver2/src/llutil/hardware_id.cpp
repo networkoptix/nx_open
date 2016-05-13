@@ -28,22 +28,25 @@ namespace LLUtil {
 
     void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
-    void calcHardwareIds(QMap<QString, QStringList>& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version) {
+    void calcHardwareIds(HardwareIdListForVersion& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version) {
         macHardwareIds.clear();
-
-        QMap<QString, QString> hardwareIdMap;
 
         std::array<bool, 2> guidCompatibilities = { false, true };
 
-        for (bool guidCompatibility : guidCompatibilities) {
-            calcHardwareIdMap(hardwareIdMap, hardwareInfo, version, guidCompatibility);
-            for (QString mac : hardwareIdMap.keys()) {
-                macHardwareIds[mac] << hardwareIdMap[mac];
+        QStringList macs = version >= 4 ? getMacAddressList(hardwareInfo.nics) : QStringList("");
+        for (QString mac : macs) {
+            QStringList hardwareIds;
+            for (bool guidCompatibility : guidCompatibilities) {
+                QMap<QString, QString> hardwareIdMap;
+                calcHardwareIdMap(hardwareIdMap, hardwareInfo, version, guidCompatibility);
+                hardwareIds << hardwareIdMap[mac];
             }
+
+            macHardwareIds << QPair<QString, QStringList>(mac, hardwareIds);
         }
 
-        for (const QString& mac : macHardwareIds.keys()) {
-            macHardwareIds[mac].removeDuplicates();
+        for (auto& item : macHardwareIds) {
+            item.second.removeDuplicates();
         }
     }
 
@@ -108,6 +111,9 @@ namespace LLUtil {
         }
     }
 
+    /* Hardware IDs come in order:
+        If it depends on a MAC, then saved mac first.
+        First come ones with guid_compatibility=0 */
     QStringList getHardwareIds(int version) {
         if (version == 0) {
             QString hardwareId = QSettings().value("ecsGuid").toString();
@@ -124,11 +130,16 @@ namespace LLUtil {
         int index = version - 1;
 
         QStringList result;
-        for (QStringList hwids : g_hardwareId[index].values()) {
-            for (QString& hwid : hwids) {
+        for (const auto& pair : g_hardwareId[index]) {
+            for (const QString& hwid : pair.second) {
                 QCryptographicHash md5Hash(QCryptographicHash::Md5);
                 md5Hash.addData(hwid.toUtf8());
-                result << QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
+
+                QString hwid = QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
+                if (pair.first == g_storedMac)
+                    result.insert(0, hwid);
+                else
+                    result << hwid;
             }
         }
 
@@ -150,16 +161,18 @@ namespace LLUtil {
     QString getLatestHardwareId() {
         NX_ASSERT(g_hardwareIdInitialized);
 
-        const QMap<QString, QStringList>& macHwIds = g_hardwareId[LATEST_HWID_VERSION - 1];
-        if (!macHwIds.contains(g_storedMac))
-            return QString();
+        const auto& macHwIds = g_hardwareId[LATEST_HWID_VERSION - 1];
+        for (const auto& macHwid : macHwIds) {
+            if (macHwid.first == g_storedMac) {
+                if (!macHwid.second.isEmpty()) {
+                    QCryptographicHash md5Hash(QCryptographicHash::Md5);
+                    md5Hash.addData(macHwid.second.front().toUtf8());
+                    return QString(lit("0%1%2")).arg(LATEST_HWID_VERSION).arg(QString(md5Hash.result().toHex()));
+                }
+            }
+        }
 
-        if (macHwIds[g_storedMac].isEmpty())
-            return QString();
-
-        QCryptographicHash md5Hash(QCryptographicHash::Md5);
-        md5Hash.addData(macHwIds[g_storedMac].front().toUtf8());
-        return QString(lit("0%1%2")).arg(LATEST_HWID_VERSION).arg(QString(md5Hash.result().toHex()));
+        return QString();
     }
 
     const QnHardwareInfo& getHardwareInfo() {

@@ -60,11 +60,11 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
 
         QString name;
         if (version == 0)
-            name = QLatin1String("oldhwid");
+            name = QLatin1String("oldhwid[]");
         else if (version == 1)
-            name = QLatin1String("hwid");
+            name = QLatin1String("hwid[]");
         else
-            name = QString(QLatin1String("hwid%1")).arg(version);
+            name = QString(QLatin1String("hwid%1[]")).arg(version);
 
         params.addQueryItem(name, hwid);
     }
