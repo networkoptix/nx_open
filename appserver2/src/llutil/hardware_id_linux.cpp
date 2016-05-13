@@ -229,13 +229,22 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QSettings *settings, QnHar
     // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
-    QStringList hardwareIds = QStringList() << QString::fromLatin1(hardwareId.constData(), hardwareId.size());
-    QMap<QString, QStringList> macHardwareIds;
-    macHardwareIds[""] = hardwareIds;
+    QStringList hardwareIdList = QStringList() << QString::fromLatin1(hardwareId.constData(), hardwareId.size());
+
+    HardwareIdListForVersion macHardwareIds;
+    macHardwareIds << QPair<QString, QStringList>("",  hardwareIdList);
 
     for (int i = 0; i < LATEST_HWID_VERSION; i++) {
         hardwareIds << macHardwareIds;
     }
+}
+
+void fillHardwareIds(HardwareIdListType& /*hardwareIds*/, QnHardwareInfo& /*hardwareInfo*/)
+{
+}
+
+void calcHardwareIdMap(QMap<QString, QString>& /* hardwareIdMap */, const QnHardwareInfo& /*hi*/, int /*version*/, bool /*guidCompatibility*/)
+{
 }
 
 #endif
