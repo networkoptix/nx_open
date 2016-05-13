@@ -1,5 +1,4 @@
 import QtQuick 2.0
-
 import com.networkoptix.qml 1.0
 
 QnPlayer

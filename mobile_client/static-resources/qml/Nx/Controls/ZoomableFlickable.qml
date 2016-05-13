@@ -1,4 +1,4 @@
-import QtQuick 2.4
+import QtQuick 2.6
 
 Item
 {
@@ -30,7 +30,8 @@ Item
         flick.animateToSize(width, height, animate, forceSize)
     }
 
-    QnFlickable {
+    Flickable
+    {
         id: flick
 
         anchors.fill: parent
@@ -46,7 +47,8 @@ Item
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
 
-        Item {
+        Item
+        {
             id: contentItem
             width: flick.contentWidth
             height: flick.contentHeight

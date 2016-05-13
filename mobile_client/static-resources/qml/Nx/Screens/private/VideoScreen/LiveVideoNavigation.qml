@@ -1,10 +1,9 @@
-import QtQuick 2.4
+import QtQuick 2.6
+import Nx 1.0
+import Nx.Controls 1.0
 
-import com.networkoptix.qml 1.0
-
-import "../controls"
-
-Item {
+Item
+{
     id: videoNavigation
 
     property var mediaPlayer
@@ -12,49 +11,58 @@ Item {
     implicitWidth: parent.width
     implicitHeight: content.height
 
-    Image {
+    Image
+    {
         width: parent.width
         height: sourceSize.height
         anchors.bottom: parent.bottom
-        sourceSize.height: dp(56 * 2)
+        sourceSize.height: 56 * 2
         source: "qrc:///images/timeline_gradient.png"
     }
 
-    Column {
+    Column
+    {
         id: content
 
         width: parent.width
 
-        QnCircleProgressIndicator {
-            width: dp(32)
-            height: dp(32)
+        CircleBusyIndicator
+        {
+            width: 32
+            height: 32
             anchors.horizontalCenter: parent.horizontalCenter
-            lineWidth: dp(2)
-            color: QnTheme.windowText
+            lineWidth: 2
+            color: ColorTheme.windowText
 
-            opacity: mediaPlayer && mediaPlayer.loading ? 1.0 : 0.0
+            running: mediaPlayer && mediaPlayer.loading
+            opacity: running ? 1.0 : 0.0
 
-            Behavior on opacity {
-                SequentialAnimation {
+            Behavior on opacity
+            {
+                SequentialAnimation
+                {
                     PauseAnimation { duration: 250 }
                     NumberAnimation { duration: 250 }
                 }
             }
         }
 
-        Text {
+        Text
+        {
             id: liveLabel
             anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: sp(32)
+            font.pixelSize: 32
             font.weight: Font.Normal
-            color: QnTheme.windowText
+            color: ColorTheme.windowText
             text: qsTr("LIVE")
-            height: dp(64)
+            height: 64
             verticalAlignment: Text.AlignVCenter
             opacity: mediaPlayer && mediaPlayer.loading ? 0.2 : 1.0
 
-            Behavior on opacity {
-                SequentialAnimation {
+            Behavior on opacity
+            {
+                SequentialAnimation
+                {
                     PauseAnimation { duration: 250 }
                     NumberAnimation { duration: 250 }
                 }

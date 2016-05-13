@@ -1,20 +1,21 @@
-import QtQuick 2.4
+import QtQuick 2.6
+import Qt.labs.controls 1.0
 
-import com.networkoptix.qml 1.0
-
-Item {
-    id: indicator
-
-    implicitWidth: dp(48)
-    implicitHeight: dp(48)
-
-    anchors.alignWhenCentered: false
+BusyIndicator
+{
+    id: control
 
     property color color: "white"
     property int progress: -1
-    property real lineWidth: dp(3)
+    property real lineWidth: 3
 
-    onProgressChanged: {
+    implicitWidth: 48
+    implicitHeight: 48
+
+    anchors.alignWhenCentered: false
+
+    onProgressChanged:
+    {
         if (progress < 0)
             return
 
@@ -23,7 +24,8 @@ Item {
         canvas.arcEnd = Math.PI * 2 * Math.min(100, progress) / 100
     }
 
-    onVisibleChanged: {
+    onVisibleChanged:
+    {
         if (progress >= 0)
             return
 
@@ -32,19 +34,16 @@ Item {
         arcAnimation.restart()
     }
 
-    Canvas {
+    contentItem: Canvas
+    {
         id: canvas
 
-        anchors.centerIn: parent
-        anchors.alignWhenCentered: false
-        width: parent.width / iconScale()
-        height: parent.height / iconScale()
-        scale: iconScale()
+        anchors.fill: parent
 
         renderStrategy: Canvas.Cooperative
 
-        property real lineWidth: indicator.lineWidth / iconScale()
-        property real radius: Math.min(width, height) / 2 - canvas.lineWidth
+        property real lineWidth: control.lineWidth
+        property real radius: Math.min(width, height) / 2 - lineWidth
 
         property real arcStart: 0
         property real arcEnd: 0
@@ -57,7 +56,8 @@ Item {
         onArcStartChanged: requestPaint()
         onArcEndChanged: requestPaint()
 
-        onPaint: {
+        onPaint:
+        {
             var ctx = canvas.getContext('2d')
             ctx.reset()
 
@@ -69,33 +69,39 @@ Item {
             ctx.stroke()
         }
 
-        Behavior on arcStart {
+        Behavior on arcStart
+        {
             enabled: progress >= 0
             NumberAnimation { duration: 200 }
         }
-        Behavior on arcEnd {
+        Behavior on arcEnd
+        {
             enabled: progress >= 0
             NumberAnimation { duration: 200 }
         }
 
-        NumberAnimation on rotation {
+        NumberAnimation on rotation
+        {
             id: rotationAnimation
 
             duration: canvas.animationDuration * 3
             from: -90
             to: 270
-            running: indicator.visible && progress < 0
+            running: control.visible && progress < 0
             loops: Animation.Infinite
         }
 
-        SequentialAnimation {
+        SequentialAnimation
+        {
             id: arcAnimation
 
-            running: indicator.visible && progress < 0
+            running: control.visible && progress < 0
             loops: Animation.Infinite
 
-            ParallelAnimation {
-                NumberAnimation {
+            ParallelAnimation
+            {
+                NumberAnimation
+                {
                     target: canvas
                     properties: "arcEnd"
                     from: canvas.shortArc
@@ -105,8 +111,10 @@ Item {
                 }
             }
 
-            ParallelAnimation {
-                NumberAnimation {
+            ParallelAnimation
+            {
+                NumberAnimation
+                {
                     target: canvas
                     properties: "arcStart"
                     from: 0
@@ -114,7 +122,8 @@ Item {
                     easing.type: Easing.InOutQuad
                     duration: canvas.animationDuration
                 }
-                NumberAnimation {
+                NumberAnimation
+                {
                     target: canvas
                     properties: "arcEnd"
                     from: canvas.longArc

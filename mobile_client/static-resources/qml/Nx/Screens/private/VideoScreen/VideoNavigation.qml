@@ -1,12 +1,13 @@
-import QtQuick 2.4
+import QtQuick 2.6
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
-
+import Qt.labs.controls 1.0
+import Nx 1.0
+import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
-import "../controls"
-
-Item {
+Item
+{
     id: videoNavigation
 
     property string resourceId
@@ -17,20 +18,27 @@ Item {
     readonly property real timelinePosition: timeline.position
     readonly property bool timelineAtLive: timeline.stickToEnd
 
-    property alias paused: playbackController.paused
+    property alias paused: playbackController.checked
 
-    width: parent ? parent.width : 0
-    height: navigator.height + navigationPanel.height
+    implicitWidth: parent ? parent.width : 0
+    implicitHeight: navigator.height + navigationPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
 
-    QtObject {
+    QtObject
+    {
         id: d
 
-        function updateNavigatorPosition() {
-            if (Screen.primaryOrientation == Qt.PortraitOrientation) {
+        readonly property bool hasArchive: timeline.startBound > 0
+
+        function updateNavigatorPosition()
+        {
+            if (Screen.primaryOrientation == Qt.PortraitOrientation)
+            {
                 navigator.y = 0
                 navigatorMouseArea.drag.target = undefined
-            } else {
+            }
+            else
+            {
                 navigatorMouseArea.drag.target = navigator
             }
         }
@@ -39,25 +47,31 @@ Item {
         readonly property var locale: Qt.locale()
     }
 
-    QnCameraChunkProvider {
+    QnCameraChunkProvider
+    {
         id: chunkProvider
         resourceId: player.resourceId
     }
 
-    Timer {
+    Timer
+    {
         interval: 30000
         triggeredOnStart: true
         running: true
+        repeat: true
         onTriggered: chunkProvider.update()
     }
 
-    Item {
+    Item
+    {
         id: navigator
+
         width: parent.width
         height: timeline.height + playbackController.height
         Behavior on y { SmoothedAnimation { duration: 200; reversingMode: SmoothedAnimation.Sync } }
 
-        MouseArea {
+        MouseArea
+        {
             id: navigatorMouseArea
 
             anchors.fill: navigator
@@ -65,11 +79,12 @@ Item {
             drag.minimumY: 0
             drag.maximumY: navigationPanel.height
             drag.filterChildren: true
-            drag.threshold: dp(10)
+            drag.threshold: 10
 
             property real prevY
 
-            onPressed: {
+            onPressed:
+            {
                 /* We propagate composed events for areas free of the UI controls (timeline, play/pause button). */
                 propagateComposedEvents =
                         (mouse.y < height - timeline.height) &&
@@ -78,21 +93,28 @@ Item {
                 if (drag.target)
                     prevY = drag.target.y
             }
-            onMouseYChanged: {
+            onMouseYChanged:
+            {
                 if (drag.target)
                     prevY = drag.target.y
             }
-            onReleased: {
+            onReleased:
+            {
                 if (!drag.target)
                     return
 
                 var dir = drag.target.y - prevY
 
-                if (dir > dp(1)) {
+                if (dir > 1)
+                {
                     drag.target.y = drag.maximumY
-                } else if (dir < -dp(1)) {
+                }
+                else if (dir < -1)
+                {
                     drag.target.y = drag.minimumY
-                } else {
+                }
+                else
+                {
                     var mid = (drag.minimumY + drag.maximumY) / 2
                     if (drag.target.y < mid)
                         drag.target.y = drag.minimumY
@@ -101,50 +123,56 @@ Item {
                 }
             }
 
-            Image {
+            Image
+            {
                 width: timeline.width
                 height: sourceSize.height
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: timeline.chunkBarHeight
-                sourceSize.height: dp(150) - timeline.chunkBarHeight
-                source: "qrc:///images/timeline_gradient.png"
+                sourceSize.height: 150 - timeline.chunkBarHeight
+                source: "/images/timeline_gradient.png"
             }
 
-            QnTimeline {
+            Timeline
+            {
                 id: timeline
 
                 enabled: startBound > 0
 
                 anchors.bottom: parent.bottom
                 width: parent.width
-                height: dp(104)
+                height: 104
 
-                stickToEnd: mediaPlayer.liveMode && !playbackController.paused
+                stickToEnd: mediaPlayer.liveMode && !playbackController.checked
 
-                chunkBarHeight: dp(32)
-                textY: height - chunkBarHeight - dp(16) - dp(24)
+                chunkBarHeight: 32
+                textY: height - chunkBarHeight - 16 - 24
 
                 chunkProvider: chunkProvider
                 startBound: chunkProvider.bottomBound
 
-                onMoveFinished: {
+                onMoveFinished:
+                {
                     mediaPlayer.seek(position)
-                    if (!playbackController.paused)
+                    if (!playbackController.checked)
                         mediaPlayer.play()
                 }
 
                 onPositionTapped: mediaPlayer.seek(position)
 
-                onPositionChanged: {
+                onPositionChanged:
+                {
                     if (!dragging)
                         return
 
                     mediaPlayer.seek(position)
                 }
 
-                Connections {
+                Connections
+                {
                     target: mediaPlayer
-                    onPositionChanged: {
+                    onPositionChanged:
+                    {
                         if (timeline.moving)
                             return
 
@@ -153,7 +181,8 @@ Item {
 
                         timeline.position = mediaPlayer.position
                     }
-                    onPlayingChanged: {
+                    onPlayingChanged:
+                    {
                         if (timeline.moving)
                             return
 
@@ -163,24 +192,27 @@ Item {
                 }
             }
 
-            Item {
+            Item
+            {
                 id: timelineMask
 
                 anchors.fill: timeline
                 visible: false
 
-                Rectangle {
+                Rectangle
+                {
                     id: blurRectangle
 
-                    readonly property real blurWidth: dp(36)
-                    readonly property real margin: dp(18)
+                    readonly property real blurWidth: 36
+                    readonly property real margin: 18
 
                     width: timeline.height - timeline.chunkBarHeight
                     height: timeline.width
                     rotation: 90
                     anchors.centerIn: parent
                     anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-                    gradient: Gradient {
+                    gradient: Gradient
+                    {
                         GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
                         GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
                         GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
@@ -191,7 +223,8 @@ Item {
                     }
                 }
 
-                Rectangle {
+                Rectangle
+                {
                     width: timeline.width
                     height: timeline.chunkBarHeight
                     anchors.bottom: parent.bottom
@@ -199,7 +232,8 @@ Item {
                 }
             }
 
-            OpacityMask {
+            OpacityMask
+            {
                 anchors.fill: timeline
                 source: timeline.timelineView
                 maskSource: timelineMask
@@ -207,52 +241,36 @@ Item {
                 Component.onCompleted: timeline.timelineView.visible = false
             }
 
-            Text {
+            Text
+            {
                 anchors.horizontalCenter: timeline.horizontalCenter
                 text: qsTr("No Archive")
                 font.capitalization: Font.AllUppercase
-                font.pixelSize: sp(12)
+                font.pixelSize: 12
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
-                color: QnTheme.windowText
+                color: ColorTheme.windowText
                 visible: timeline.startBound <= 0
                 opacity: 0.5
             }
 
-            Rectangle {
+            Pane
+            {
                 id: navigationPanel
+
                 width: parent.width
-                height: dp(64)
+                height: 64
                 anchors.top: timeline.bottom
-                color: QnTheme.navigationPanelBackground
-                clip: true
+                background: Rectangle { color: ColorTheme.base3 }
+                padding: 4
 
-                MouseArea {
-                    /* Block mouse events */
-                    anchors.fill: parent
-                }
-
-                QnButton {
-                    anchors.right: parent.right
+                IconButton
+                {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("LIVE")
-                    flat: true
-                    iconic: true
-                    onClicked: {
-                        playbackController.paused = false
-                        mediaPlayer.playLive()
-                    }
-                    opacity: timeline.stickToEnd ? 0.0 : 1.0
-                    Behavior on opacity { NumberAnimation { duration: 200 } }
-                }
-
-                QnIconButton {
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: "image://icon/calendar.png"
-                    enabled: timeline.startBound > 0
-                    opacity: enabled ? 1.0 : 0.15
-                    onClicked: {
+                    icon: "/images/calendar.png"
+                    enabled: d.hasArchive
+                    onClicked:
+                    {
                         calendarLoader.active = true
                         var calendarPanel = calendarLoader.item
                         calendarPanel.date = timeline.positionDate
@@ -260,34 +278,52 @@ Item {
                     }
                 }
 
-                QnIconButton {
-                    id: zoomOutButton
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.horizontalCenterOffset: -width / 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: "image://icon/minus.png"
-                    enabled: timeline.startBound > 0
-                    opacity: enabled ? 1.0 : 0.15
-                    onClicked: timeline.zoomOut()
+                Row
+                {
+                    anchors.centerIn: parent
+
+                    IconButton
+                    {
+                        id: zoomOutButton
+
+                        icon: "/images/minus.png"
+                        enabled: d.hasArchive
+                        onClicked: timeline.zoomOut()
+                    }
+
+                    IconButton
+                    {
+                        id: zoomInButton
+
+                        icon: "/images/plus.png"
+                        enabled: d.hasArchive
+                        onClicked: timeline.zoomIn()
+                    }
                 }
 
-                QnIconButton {
-                    id: zoomInButton
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.horizontalCenterOffset: width / 2
+                Button
+                {
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    icon: "image://icon/plus.png"
-                    enabled: timeline.startBound > 0
-                    opacity: enabled ? 1.0 : 0.15
-                    onClicked: timeline.zoomIn()
+                    text: qsTr("LIVE")
+                    flat: true
+                    onClicked:
+                    {
+                        playbackController.checked = false
+                        mediaPlayer.playLive()
+                    }
+                    opacity: timeline.stickToEnd ? 0.0 : 1.0
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
 
-                Timer {
+                Timer
+                {
                     interval: 100
                     repeat: true
                     running: zoomInButton.pressed || zoomOutButton.pressed
                     triggeredOnStart: true
-                    onTriggered: {
+                    onTriggered:
+                    {
                         if (zoomInButton.pressed)
                             timeline.zoomIn()
                         else
@@ -296,33 +332,36 @@ Item {
                 }
             }
 
-            Item {
+            Item
+            {
                 id: dateTimeLabel
 
-                height: dp(56)
+                height: 56
                 width: parent.width
                 anchors.bottom: timeline.bottom
-                anchors.bottomMargin: timeline.chunkBarHeight + dp(16)
+                anchors.bottomMargin: timeline.chunkBarHeight + 16
 
-                Text {
+                Text
+                {
                     id: dateLabel
 
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    height: dp(24)
-                    font.pixelSize: sp(14)
+                    height: 24
+                    font.pixelSize: 14
                     font.weight: Font.Normal
                     verticalAlignment: Text.AlignVCenter
 
                     // TODO: Remove qsTr from this string!
                     text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
-                    color: QnTheme.windowText
+                    color: ColorTheme.windowText
 
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
 
-                Item {
+                Item
+                {
                     id: timeLiveLabel
 
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -333,48 +372,61 @@ Item {
                     width: timeLabel.visible ? timeLabel.width : liveLabel.width
                     height: timeLabel.height
 
-                    QnTimeLabel {
+                    TimeLabel
+                    {
                         id: timeLabel
                         dateTime: timeline.positionDate
                         visible: !timeline.stickToEnd
                     }
 
-                    Text {
+                    Text
+                    {
                         id: liveLabel
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pixelSize: sp(32)
+                        font.pixelSize: 32
                         font.weight: Font.Normal
-                        color: QnTheme.windowText
+                        color: ColorTheme.windowText
                         text: qsTr("LIVE")
                         visible: timeline.stickToEnd
                     }
                 }
             }
 
-            QnPlaybackController {
+            PlaybackController
+            {
                 id: playbackController
 
                 anchors.verticalCenter: timeline.bottom
-                anchors.verticalCenterOffset: -dp(150)
+                anchors.verticalCenterOffset: -150
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 loading: !paused && (mediaPlayer.loading || timeline.dragging)
-
-                gripTickVisible: timeline.startBound > 0
             }
 
-            Rectangle {
-                color: QnTheme.playPause
+            Rectangle
+            {
+                color: ColorTheme.windowText
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: playbackController.bottom
+                width: 2
+                height: 8
+                visible: timeline.startBound > 0
+            }
+
+            Rectangle
+            {
+                color: ColorTheme.windowText
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                width: dp(2)
-                height: timeline.chunkBarHeight + dp(8)
+                width: 2
+                height: timeline.chunkBarHeight + 8
                 visible: timeline.startBound > 0
             }
         }
     }
 
-    Rectangle {
+    Rectangle
+    {
         // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
         width: parent.width
         anchors.top: parent.bottom
@@ -382,20 +434,21 @@ Item {
         height: navigationPanel.height
     }
 
-    Loader {
+    Loader
+    {
         id: calendarLoader
 
         active: false
 
-        sourceComponent: QnCalendarPanel
-        {
-        chunkProvider: chunkProvider
-            onDatePicked:
-            {
-                hide()
-                mediaPlayer.seek(date.getTime())
-            }
-        }
+//        sourceComponent: CalendarPanel
+//        {
+//            chunkProvider: chunkProvider
+//            onDatePicked:
+//            {
+//                hide()
+//                mediaPlayer.seek(date.getTime())
+//            }
+//        }
     }
 
     Component.onCompleted: d.updateNavigatorPosition()

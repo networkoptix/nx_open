@@ -1,8 +1,9 @@
 import QtQuick 2.0
-
+import Nx 1.0
 import com.networkoptix.qml 1.0
 
-Item {
+Item
+{
     id: root
 
     property alias windowStart: timeline.windowStart
@@ -23,43 +24,50 @@ Item {
     signal moveFinished()
     signal positionTapped(real position)
 
-    function zoomIn() {
+    function zoomIn()
+    {
         timeline.zoomIn()
     }
 
-    function zoomOut() {
+    function zoomOut()
+    {
         timeline.zoomOut()
     }
 
-    function correctPosition(position) {
+    function correctPosition(position)
+    {
         timelineView.correctPosition(position)
     }
 
-    function clearCorrection() {
+    function clearCorrection()
+    {
         timelineView.clearCorrection()
     }
 
-    QnTimelineView {
+    QnTimelineView
+    {
         id: timeline
         anchors.fill: parent
 
         property bool moving: false
         property bool dragging: false
 
-        textColor: QnTheme.timelineText
-        chunkColor: QnTheme.timelineChunk
+        textColor: ColorTheme.transparent(ColorTheme.contrast2, 0.7)
+        chunkColor: ColorTheme.green_main
 
         timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
 
-        font.pixelSize: sp(16)
+        font.pixelSize: 16
 
-        onMoveFinished: {
+        onMoveFinished:
+        {
             moving = false
             root.moveFinished()
         }
     }
 
-    PinchArea {
+    PinchArea
+    {
         id: pinchArea
 
         anchors.fill: parent
@@ -67,31 +75,38 @@ Item {
         pinch.maximumRotation: 0
         pinch.dragAxis: Qt.XAxis
 
-        onPinchStarted: {
+        onPinchStarted:
+        {
             timeline.startZoom(pinch.scale)
             timeline.dragging = false
         }
-        onPinchUpdated: {
+        onPinchUpdated:
+        {
             timeline.updateZoom(pinch.scale)
         }
-        onPinchFinished: {
+        onPinchFinished:
+        {
             timeline.finishZoom(pinch.scale)
         }
 
-        MouseArea {
+        MouseArea
+        {
             id: mouseArea
 
             property int pressX: -1
 
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
-            drag.threshold: dp(10)
+            drag.threshold: 10
 
-            onPressed: {
+            onPressed:
+            {
                 pressX = mouseX
             }
-            onMouseXChanged: {
-                if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold) {
+            onMouseXChanged:
+            {
+                if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold)
+                {
                     preventStealing = true
                     timeline.moving = true
                     timeline.dragging = true
@@ -100,19 +115,24 @@ Item {
                 }
                 timeline.updateDrag(mouse.x)
             }
-            onReleased: {
+            onReleased:
+            {
                 preventStealing = false
                 pressX = -1
 
-                if (timeline.moving) {
+                if (timeline.moving)
+                {
                     timeline.dragging = false
                     root.dragFinished()
                     timeline.finishDrag(mouse.x)
-                } else {
+                }
+                else
+                {
                     positionTapped(timeline.positionAtX(mouse.x))
                 }
             }
-            onWheel: {
+            onWheel:
+            {
                 if (wheel.angleDelta.y > 0)
                     timeline.zoomIn()
                 else if (wheel.angleDelta.y < 0)

@@ -7,8 +7,11 @@ StackView 1.0 StackView.qml
 ToolBar 1.0 ToolBar.qml
 SearchToolBar 1.0 SearchToolBar.qml
 PageTitleLabel 1.0 PageTitleLabel.qml
+PageBase 1.0 PageBase.qml
 Page 1.0 Page.qml
 MaterialEffect 1.0 MaterialEffect.qml
 ThreeDotBusyIndicator 1.0 ThreeDotBusyIndicator.qml
 CirclesBusyIndicator 1.0 CirclesBusyIndicator.qml
+CircleBusyIndicator 1.0 CircleBusyIndicator.qml
 WarningPanel 1.0 WarningPanel.qml
+ZoomableFlickable 1.0 ZoomableFlickable.qml

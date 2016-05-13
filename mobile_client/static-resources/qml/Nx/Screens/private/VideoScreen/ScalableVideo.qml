@@ -1,9 +1,9 @@
-import QtQuick 2.4
+import QtQuick 2.6
 import QtMultimedia 5.0
+import Nx.Controls 1.0
 
-import "../controls"
-
-QnZoomableFlickable {
+ZoomableFlickable
+{
     id: zf
 
     property var source
@@ -13,8 +13,12 @@ QnZoomableFlickable {
 
     property real maxZoomFactor: 4
 
-    readonly property real sourceContentWidth: screenshot.visible || !content.video ? screenshot.sourceSize.width : content.video.sourceRect.width
-    readonly property real sourceContentHeight: screenshot.visible || !content.video ? screenshot.sourceSize.height : content.video.sourceRect.height
+    readonly property real sourceContentWidth:
+                screenshot.visible || !content.video ? screenshot.sourceSize.width
+                                                     : content.video.sourceRect.width
+    readonly property real sourceContentHeight:
+                screenshot.visible || !content.video ? screenshot.sourceSize.height
+                                                     : content.video.sourceRect.height
 
     minContentWidth: width
     minContentHeight: height
@@ -28,13 +32,15 @@ QnZoomableFlickable {
 
     clip: true
 
-    onSourceChanged: {
+    onSourceChanged:
+    {
         videoLoader.sourceComponent = undefined
         if (source)
             videoLoader.sourceComponent = videoComponent
     }
 
-    Item {
+    Item
+    {
         id: content
 
         property var video: videoLoader.item
@@ -45,20 +51,23 @@ QnZoomableFlickable {
         width: contentWidth
         height: contentHeight
 
-        Loader {
+        Loader
+        {
             id: videoLoader
             anchors.centerIn: parent
             width: content.rotated90 ? parent.height : parent.width
             height: content.rotated90 ? parent.width : parent.height
             rotation: zf.videoRotation
 
-            onStatusChanged: {
+            onStatusChanged:
+            {
                 if (status == Loader.Ready)
                     item.source = zf.source
             }
         }
 
-        Component {
+        Component
+        {
             id: videoComponent
 
             VideoOutput {
@@ -67,7 +76,8 @@ QnZoomableFlickable {
             }
         }
 
-        Image {
+        Image
+        {
             id: screenshot
 
             anchors.centerIn: parent
@@ -88,7 +98,8 @@ QnZoomableFlickable {
             }
         }
 
-        function resetSize() {
+        function resetSize()
+        {
             var hasVideo = content.video && content.video.sourceRect.width > 0 && content.video.sourceRect.height > 0
             var hasScreenshot = screenshot.sourceSize.width > 0 && screenshot.sourceSize.height > 0
             var emptySize = width <= 0 || height <= 0
@@ -102,7 +113,8 @@ QnZoomableFlickable {
                 updateWithScreenshotSize()
         }
 
-        function updateSize(w, h, saveZoom) {
+        function updateSize(w, h, saveZoom)
+        {
             if (w <= 0 || h <= 0)
                 return
 
@@ -125,7 +137,8 @@ QnZoomableFlickable {
             resizeContent(w, h, animate, true)
         }
 
-        function updateWithVideoSize(saveZoom) {
+        function updateWithVideoSize(saveZoom)
+        {
             var w = content.video.sourceRect.width
             var h = content.video.sourceRect.height
 
@@ -135,7 +148,8 @@ QnZoomableFlickable {
             content.updateSize(w, h, saveZoom)
         }
 
-        function updateWithScreenshotSize(saveZoom) {
+        function updateWithScreenshotSize(saveZoom)
+        {
             var w = screenshot.sourceSize.width
             var h = screenshot.sourceSize.height
 
@@ -149,7 +163,8 @@ QnZoomableFlickable {
     onWidthChanged: fitToBounds()
     onHeightChanged: fitToBounds()
 
-    function fitToBounds() {
+    function fitToBounds()
+    {
         var hasVideo = content.video && content.video.sourceRect.width > 0 && content.video.sourceRect.height > 0
         var hasScreenshot = screenshot.sourceSize.width > 0 && screenshot.sourceSize.height > 0
         var emptySize = width <= 0 || height <= 0
@@ -157,11 +172,15 @@ QnZoomableFlickable {
         if ((!hasVideo && !hasScreenshot) || emptySize)
             return
 
-        if (contentWidth <= 0 || contentHeight <= 0) {
-            if (hasVideo) {
+        if (contentWidth <= 0 || contentHeight <= 0)
+        {
+            if (hasVideo)
+            {
                 content.updateWithVideoSize()
                 return
-            } else if (hasScreenshot) {
+            }
+            else if (hasScreenshot)
+            {
                 content.updateWithScreenshotSize()
                 return
             }
