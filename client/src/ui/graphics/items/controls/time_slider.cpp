@@ -143,7 +143,7 @@ namespace {
     /** Width of sensitive areas at the left and right of the window.
       * When a marker is dragged to these areas it causes window scroll.
       * Has effect only with DragScrollsWindow option. */
-    const qreal kWindowScrollPixelThreshold = 1.0f;
+    const qreal kWindowScrollPixelThreshold = 1.0;
 
 
     QTime msecsToTime(qint64 msecs)
