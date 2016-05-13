@@ -7,15 +7,6 @@ describe('Confirmation email', function () {
         p.helper.get(p.helper.urls.restore_password);
     });
 
-    it("can be sent again", function () {
-        expect('functionality').toBe('returned');
-        p.getRestorePassLink(p.helper.userEmail).then(function(url) {
-            p.helper.get(url);
-            p.setNewPassword(p.helper.userPassword);
-            p.verifySecondAttemptFails(url, p.helper.userPassword);
-        });
-    });
-
     it("link works and does not log out user, if he was logged in", function () {
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {
             p.helper.login(p.helper.userEmail2);
