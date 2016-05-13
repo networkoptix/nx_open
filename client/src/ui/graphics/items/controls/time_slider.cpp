@@ -2866,18 +2866,25 @@ void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent* event)
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+    bool immediateDrag = true;
     switch (event->button())
     {
     case Qt::LeftButton:
         m_dragMarker = markerFromPosition(event->pos(), kHoverEffectDistance);
         if (m_options.testFlag(SelectionEditable) && m_options.testFlag(LeftButtonSelection) && m_dragMarker == NoMarker)
             m_dragMarker = CreateSelectionMarker;
+        immediateDrag = m_dragMarker == NoMarker;
         break;
 
     case Qt::RightButton:
+        immediateDrag = false;
         m_dragMarker = (m_options.testFlag(SelectionEditable) && !m_options.testFlag(LeftButtonSelection)) ?
             CreateSelectionMarker :
             NoMarker;
+        break;
+
+    default:
+        m_dragMarker = NoMarker;
         break;
     }
 
@@ -2889,10 +2896,11 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
         {
             emit thumbnailClicked();
             setSliderPosition(pos->thumbnail.actualTime(), true);
+            immediateDrag = false;
         }
     }
 
-    dragProcessor()->mousePressEvent(this, event, false);
+    dragProcessor()->mousePressEvent(this, event, immediateDrag);
 
     event->accept();
 }
@@ -2942,27 +2950,32 @@ void QnTimeSlider::startDragProcess(DragInfo* info)
     m_dragIsClick = true;
     setSliderDown(true);
 
-    if (m_dragMarker == NoMarker || m_dragMarker == CreateSelectionMarker)
+    if (m_dragMarker == CreateSelectionMarker)
         setSliderPosition(valueFromPosition(info->mousePressItemPos()));
 }
 
 void QnTimeSlider::startDrag(DragInfo* info)
 {
+    qint64 pos = valueFromPosition(info->mousePressItemPos());
     m_dragIsClick = false;
 
-    if (m_dragMarker == CreateSelectionMarker)
+    switch (m_dragMarker)
     {
-        qint64 pos = valueFromPosition(info->mousePressItemPos());
+    case NoMarker:
+        setSliderPosition(pos);
+        break;
+
+    case CreateSelectionMarker:
         setSelectionValid(true);
         setSelection(pos, pos);
         m_dragMarker = SelectionStartMarker;
-    }
-
-    if (m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
-    {
+        /* FALL THROUGH */
+    case SelectionStartMarker:
+    case SelectionEndMarker:
         m_selecting = true;
         m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
         emit selectionPressed();
+        break;
     }
 }
 
