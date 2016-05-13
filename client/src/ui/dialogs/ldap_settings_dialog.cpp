@@ -85,7 +85,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     {
         QnMediaServerResourcePtr server = qnCommon->currentServer();
 
-        NX_ASSERT(server);
+        Q_ASSERT(server);
         if (!server)
         {
             stopTesting(tr("Could not perform a test."));
