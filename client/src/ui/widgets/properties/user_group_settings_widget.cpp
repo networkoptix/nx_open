@@ -64,4 +64,5 @@ void QnUserGroupSettingsWidget::loadDataToUi()
 void QnUserGroupSettingsWidget::applyChanges()
 {
     m_model->setGroupName(ui->nameLineEdit->text());
+    emit hasChangesChanged();
 }

@@ -71,7 +71,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     connect(m_editGroupsButton, &QPushButton::clicked, this, [this]
     {
         menu()->trigger(QnActions::UserGroupsAction);
-        //TODO: #GDM #access re-read user groups list
+        m_settingsPage->updateAccessRightsPresets();
     });
     m_editGroupsButton->setVisible(false);
 
@@ -119,8 +119,8 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
-    updateControlsVisibility();
     loadDataToUi();
+    updateControlsVisibility();
 }
 
 QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()

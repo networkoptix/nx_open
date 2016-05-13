@@ -66,7 +66,8 @@ namespace
 
     };
 
-    const int kDefaultIconSize = 18;
+    const int kRowSpacing = 4;
+
     const QString kDummyResourceId(lit("dummy_resource"));
 }
 
@@ -156,6 +157,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->controlsTreeView->setModel(m_controlsModel.data());
 
     auto itemDelegate = new QnResourceItemDelegate(this);
+    itemDelegate->setSpacing(kRowSpacing);
+
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {
         treeView->setItemDelegate(itemDelegate);
@@ -188,11 +191,13 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     };
 
     ui->resourcesTreeView->setMouseTracking(true);
+    ui->resourcesTreeView->setEnabled(false);
+
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, updateThumbnail);
 
     connect(m_controlsModel.data(), &QnResourceListModel::dataChanged, this, [this](const QModelIndex& index)
     {
-        QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
+        QModelIndex checkedIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         ui->resourcesTreeView->setEnabled(!checked);
         emit hasChangesChanged();
@@ -200,7 +205,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this](const QModelIndex& index)
     {
-        QModelIndex checkedIdx = index.sibling(index.row(), Qn::CheckColumn);
+        QModelIndex checkedIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         int inverted = checked ? Qt::Unchecked : Qt::Checked;
         m_viewModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
