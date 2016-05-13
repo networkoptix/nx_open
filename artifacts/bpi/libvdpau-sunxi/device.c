@@ -28,6 +28,8 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
                                     VdpDevice *device,
                                     VdpGetProcAddress **get_proc_address)
 {
+	VDPAU_DBG("libvdpau_sunxi: vdp_imp_device_create_x11()");
+
 	if (!device || !get_proc_address)
 		return VDP_STATUS_INVALID_POINTER;
 
@@ -63,7 +65,9 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 	char *env_vdpau_osd = getenv("VDPAU_OSD");
 	char *env_vdpau_g2d = getenv("VDPAU_DISABLE_G2D");
 	if (env_vdpau_osd && strncmp(env_vdpau_osd, "1", 1) == 0)
-		dev->osd_enabled = 1;
+	{
+  		dev->osd_enabled = 1;
+	}
 	else
 	{
 		VDPAU_DBG("OSD disabled!");

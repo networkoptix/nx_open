@@ -7,6 +7,7 @@ public:
     using nx::utils::FlagConfig::FlagConfig;
 
     NX_FLAG(0, enableStub);
+    NX_FLAG(0, enableFps);
 
     // vdpau_helper
     NX_FLAG(0, outputVdpauCalls); //< Log each VDPAU call (errors are logged anyway).
@@ -27,12 +28,13 @@ public:
 extern __attribute__ ((visibility ("hidden"))) ProxyDecoderFlagConfig conf;
 
 // Configuration: should be defined before including this header.
-//#define LOG_PREFIX "<ModuleName>: "
+//#define OUTPUT_PREFIX "<ModuleName>: "
 
 #include <cassert>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
 
 extern "C" {
 #include <libavcodec/vdpau.h>
@@ -42,6 +44,15 @@ extern "C" {
 #define LL std::cerr << "####### line " << __LINE__ << " [" << __FILE__ << "]\n";
 
 namespace {
+
+template<typename... Args>
+std::string stringFormat(const std::string& format, Args... args)
+{
+    size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'.
+    std::unique_ptr<char[]> buf(new char[size]);
+    snprintf(buf.get(), size, format.c_str(), args...);
+    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside.
+}
 
 struct EndWithEndl
 {
@@ -53,7 +64,7 @@ struct EndWithEndl
 
 } // namespace
 
-#define LOG if (!conf.enableOutput) {} else EndWithEndl() /*operator,*/, std::cerr << LOG_PREFIX
+#define OUTPUT if (!conf.enableOutput) {} else EndWithEndl() /*operator,*/, std::cerr << OUTPUT_PREFIX
 
 #define PRINT EndWithEndl() /*operator,*/, std::cerr
 
@@ -61,6 +72,8 @@ long getTimeMs();
 void logTimeMs(long oldTime, const char* tag);
 #define TIME_BEGIN(TAG) long TIME_##TAG = conf.enableTime ? getTimeMs() : 0
 #define TIME_END(TAG) if(conf.enableTime) logTimeMs(TIME_##TAG, #TAG)
+
+void debugShowFps(const char* prefix);
 
 /**
  * Draw a colored checkerboard in RGB.

@@ -200,6 +200,17 @@ static void logStrOrHex(
         fprintf(stderr, "%s0x%08X%s", prefix, value, suffix);
 }
 
+uint32_t calcYuvNativeQuickHash(const YuvNative* yuvNative)
+{
+    static const int dwordsCount = 256; //< Limit of data being scanned.
+
+    uint32_t hash = 0;
+    for (int i = 0; i < dwordsCount; ++i)
+        hash ^= ((const uint32_t*) yuvNative->virt)[i * 256];
+
+    return hash;
+}
+
 void logYuvNative(const YuvNative* y)
 {
     fprintf(stderr, "YuvNative { ");

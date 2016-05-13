@@ -77,6 +77,8 @@ typedef struct
  */
 void getVideoSurfaceYuvNative(VdpVideoSurface surface, YuvNative* yuvNative);
 
+uint32_t calcYuvNativeQuickHash(const YuvNative* yuvNative);
+
 void logYuvNative(const YuvNative* yuvNative);
 
 const char* vdpChromaTypeToStr(VdpChromaType v);

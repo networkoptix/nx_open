@@ -7,8 +7,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES
     proxy_decoder.h
-    conf.h
-    conf.cpp
+    flag_config.h
+    flag_config.cpp
     vdpau_helper.h
     vdpau_helper.cpp
     proxy_decoder_utils.h

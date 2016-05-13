@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include <fstream>
+#include <deque>
+#include <numeric>
 
 #include "proxy_decoder.h"
 
@@ -32,6 +34,29 @@ void logTimeMs(long oldTimeMs, const char* tag)
 {
     long timeMs = getTimeMs();
     std::cerr << "TIME ms: " << (timeMs - oldTimeMs) << " [" << tag << "]\n";
+}
+
+void debugShowFps(const char* prefix)
+{
+    static const int kFpsCount = 30;
+    static std::deque<long> deltaList;
+    static long prevT = 0;
+
+    const long t = getTimeMs();
+    if (prevT != 0)
+    {
+        const long delta = t - prevT;
+        deltaList.push_back(delta);
+        if (deltaList.size() > kFpsCount)
+            deltaList.pop_front();
+        assert(!deltaList.empty());
+        double deltaAvg = std::accumulate(deltaList.begin(), deltaList.end(), 0.0)
+            / deltaList.size();
+
+        fprintf(stderr, "%sFPS avg %4.1f, %4d ms, avg %4.0f ms\n",
+            prefix, 1000.0 / deltaAvg, delta, deltaAvg);
+    }
+    prevT = t;
 }
 
 void debugDrawCheckerboardArgb(
@@ -93,22 +118,24 @@ void debugDrawCheckerboardYNative(uint8_t* yNative, int frameWidth, int frameHei
     // All coords are in blocks (32x32 pixels).
     static int x0 = 0;
     static int line0 = 0;
+    static const int kBoardWidth = 8;
+    static const int kBoardHeight = 8;
 
     const int w = (frameWidth + 31) / 32;
     const int h = (frameHeight + 31) / 32;
 
-    for (int x = 0; x < 8; ++x)
+    for (int x = 0; x < kBoardWidth; ++x)
     {
-        for (int y = 0; y < 8; ++y)
+        for (int y = 0; y < kBoardHeight; ++y)
         {
             uint8_t color = ((x & 1) == (y & 1)) ? 0 : 254;
             memset(yNative + 32 * 32 * ((line0 + y) * w + (x0 + x)), color, 32 * 32);
         }
     }
 
-    if (++x0 >= (w - /* use only whole blocks */ 1) - 8)
+    if (++x0 >= (w - /* use only whole blocks */ 1) - kBoardWidth)
         x0 = 0;
-    if (++line0 >= (h - /* use only whole blocks */ 1) - 8)
+    if (++line0 >= (h - /* use only whole blocks */ 1) - kBoardHeight)
         line0 = 0;
 }
 

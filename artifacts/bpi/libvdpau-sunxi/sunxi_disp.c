@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 /*
  * Copyright (c) 2013-2015 Jens Kuske <jenskuske@gmail.com>
  *
@@ -22,10 +24,23 @@
 #include <stdint.h> //< For kernel-headers
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <errno.h>
+#include <string.h>
 
 #include "kernel-headers/sunxi_disp_ioctl.h"
 #include "vdpau_private.h"
 #include "sunxi_disp.h"
+
+// Configuration.
+static const struct
+{
+	bool enableColorKey;
+	bool enableIoctlOutput;
+} conf =
+{
+	.enableColorKey = 0,
+	.enableIoctlOutput = 0,
+};
 
 struct sunxi_disp_private
 {
@@ -44,47 +59,69 @@ static void sunxi_disp_close_video_layer(struct sunxi_disp *sunxi_disp);
 static int sunxi_disp_set_osd_layer(struct sunxi_disp *sunxi_disp, int x, int y, int width, int height, output_surface_ctx_t *surface);
 static void sunxi_disp_close_osd_layer(struct sunxi_disp *sunxi_disp);
 
+static int disp_ioctl(int fd, int cmd, const uint32_t args[],
+	const char* cmdStr, const char* argsStr)
+{
+    if (conf.enableIoctlOutput)
+		fprintf(stderr, "ioctl(/dev/disp, %s, %s) -> ", cmdStr, argsStr);
+
+	int result = ioctl(fd, cmd, args);
+
+	if (conf.enableIoctlOutput)
+	{
+		if (result < 0)
+			fprintf(stderr, "ERROR %d: %s\n", result, strerror(errno));
+		else
+			fprintf(stderr, "%d\n", result);
+	}
+	else
+	{
+		if (result < 0)
+		{
+			fprintf(stderr, "ERROR: ioctl(/dev/disp, %s, %s) -> %d: %s\n",
+				cmdStr, argsStr, result, strerror(errno));
+		}
+	}
+
+	return result;
+}
+
+#define ARGS(A1, A2, A3, A4) {(uint32_t) (A1), (uint32_t) (A2), (uint32_t) (A3), (uint32_t) (A4)}
+#define DISP(CMD, ARGS) disp_ioctl(disp->fd, (CMD), (const uint32_t[]) ARGS, #CMD, #ARGS)
+
 struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 {
 	struct sunxi_disp_private *disp = calloc(1, sizeof(*disp));
 
 	disp->fd = open("/dev/disp", O_RDWR);
-	if (disp->fd == -1)
+	if (disp->fd < 0)
 	{
 		VDPAU_DBG("[disp1] ERROR: Cannot open /dev/disp");
 		goto err_open;
 	}
 
-	int tmp = SUNXI_DISP_VERSION;
-	if (ioctl(disp->fd, DISP_CMD_VERSION, &tmp) < 0)
-	{
-		VDPAU_DBG("[disp1] ERROR: Invalid /dev/disp driver version");
+	int version = DISP(DISP_CMD_VERSION, {SUNXI_DISP_VERSION});
+	if (version < 0)
 		goto err_version;
-	}
+	VDPAU_DBG("[disp1] /dev/disp reported version %d", version);
 
-	uint32_t args[4] = { 0, DISP_LAYER_WORK_MODE_SCALER, 0, 0 };
-	disp->video_layer = ioctl(disp->fd, DISP_CMD_LAYER_REQUEST, args);
+	disp->video_layer = DISP(DISP_CMD_LAYER_REQUEST, ARGS(0, DISP_LAYER_WORK_MODE_SCALER, 0, 0));
 	if (disp->video_layer == 0)
-	{
-		VDPAU_DBG("[disp1] ERROR: Unable to request Video layer");
+		VDPAU_DBG("[disp1] ERROR: Video Layer request returned 0");
+    if (disp->video_layer <= 0)
 		goto err_video_layer;
-	}
-
-	args[1] = (uint32_t) disp->video_layer;
-	ioctl(disp->fd, osd_enabled ? DISP_CMD_LAYER_TOP : DISP_CMD_LAYER_BOTTOM, args);
 
 	if (osd_enabled)
 	{
-		args[1] = DISP_LAYER_WORK_MODE_NORMAL;
-		disp->osd_layer = ioctl(disp->fd, DISP_CMD_LAYER_REQUEST, args);
-		if (disp->osd_layer == 0)
-		{
-			VDPAU_DBG("[disp1] ERROR: Unable to request OSD layer");
-			goto err_osd_layer;
-		}
+		DISP(DISP_CMD_LAYER_TOP, ARGS(0, disp->video_layer, 0, 0));
 
-		args[1] = disp->osd_layer;
-		ioctl(disp->fd, DISP_CMD_LAYER_TOP, args);
+		disp->osd_layer = DISP(DISP_CMD_LAYER_REQUEST, ARGS(0, DISP_LAYER_WORK_MODE_NORMAL, 0, 0));
+		if (disp->osd_layer == 0)
+			VDPAU_DBG("[disp1] ERROR: OSD Layer request returned 0");
+		if (disp->osd_layer <= 0)
+			goto err_osd_layer;
+
+		DISP(DISP_CMD_LAYER_TOP, ARGS(0, disp->osd_layer, 0, 0));
 
 		disp->osd_info.pipe = 1;
 		disp->osd_info.mode = DISP_LAYER_WORK_MODE_NORMAL;
@@ -95,19 +132,23 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 	}
 	else
 	{
-		disp->video_info.pipe = 1;
-		disp->video_info.ck_enable = 1;
+		DISP(DISP_CMD_LAYER_TOP, ARGS(0, disp->video_layer, 0, 0));
 
-		__disp_colorkey_t ck;
-		ck.ck_max.red = ck.ck_min.red = 0;
-		ck.ck_max.green = ck.ck_min.green = 1;
-		ck.ck_max.blue = ck.ck_min.blue = 2;
-		ck.red_match_rule = 2;
-		ck.green_match_rule = 2;
-		ck.blue_match_rule = 2;
+		if (conf.enableColorKey)
+		{
+			disp->video_info.pipe = 1;
+			disp->video_info.ck_enable = 1;
 
-		args[1] = (unsigned long)(&ck);
-		ioctl(disp->fd, DISP_CMD_SET_COLORKEY, args);
+			__disp_colorkey_t ck;
+			ck.ck_max.red = ck.ck_min.red = 0;
+			ck.ck_max.green = ck.ck_min.green = 1;
+			ck.ck_max.blue = ck.ck_min.blue = 2;
+			ck.red_match_rule = 2;
+			ck.green_match_rule = 2;
+			ck.blue_match_rule = 2;
+
+			DISP(DISP_CMD_SET_COLORKEY, ARGS(0, &ck, 0, 0));
+		}
 	}
 
 	disp->video_info.mode = DISP_LAYER_WORK_MODE_SCALER;
@@ -123,8 +164,7 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 	return (struct sunxi_disp *)disp;
 
 err_osd_layer:
-	args[1] = disp->osd_layer;
-	ioctl(disp->fd, DISP_CMD_LAYER_RELEASE, args);
+	DISP(DISP_CMD_LAYER_RELEASE, ARGS(0, disp->osd_layer, 0, 0));
 err_video_layer:
 err_version:
 	close(disp->fd);
@@ -137,15 +177,13 @@ static void sunxi_disp_close(struct sunxi_disp *sunxi_disp)
 {
 	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
 
-	uint32_t args[4] = { 0, disp->video_layer, 0, 0 };
-	ioctl(disp->fd, DISP_CMD_LAYER_CLOSE, args);
-	ioctl(disp->fd, DISP_CMD_LAYER_RELEASE, args);
+	DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->video_layer, 0, 0));
+	DISP(DISP_CMD_LAYER_RELEASE, ARGS(0, disp->video_layer, 0, 0));
 
 	if (disp->osd_layer)
 	{
-		args[1] = disp->osd_layer;
-		ioctl(disp->fd, DISP_CMD_LAYER_CLOSE, args);
-		ioctl(disp->fd, DISP_CMD_LAYER_RELEASE, args);
+		DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->osd_layer, 0, 0));
+		DISP(DISP_CMD_LAYER_RELEASE, ARGS(0, disp->osd_layer, 0, 0));
 	}
 
 	close(disp->fd);
@@ -210,10 +248,8 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 		disp->video_info.scn_win.height -= scn_clip;
 	}
 
-	uint32_t args[4] = { 0, disp->video_layer, (unsigned long)(&disp->video_info), 0 };
-	ioctl(disp->fd, DISP_CMD_LAYER_SET_PARA, args);
-
-	ioctl(disp->fd, DISP_CMD_LAYER_OPEN, args);
+	DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->video_layer, &disp->video_info, 0));
+	DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->video_layer, 0, 0));
 
 	// Note: might be more reliable (but slower and problematic when there
 	// are driver issues and the GET functions return wrong values) to query the
@@ -222,17 +258,13 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 	// set doing this unconditionally is costly.
 	if (surface->csc_change)
 	{
-		ioctl(disp->fd, DISP_CMD_LAYER_ENHANCE_OFF, args);
-		args[2] = 0xff * surface->brightness + 0x20;
-		ioctl(disp->fd, DISP_CMD_LAYER_SET_BRIGHT, args);
-		args[2] = 0x20 * surface->contrast;
-		ioctl(disp->fd, DISP_CMD_LAYER_SET_CONTRAST, args);
-		args[2] = 0x20 * surface->saturation;
-		ioctl(disp->fd, DISP_CMD_LAYER_SET_SATURATION, args);
+        DISP(DISP_CMD_LAYER_ENHANCE_OFF, ARGS(0, disp->video_layer, 0, 0));
+		DISP(DISP_CMD_LAYER_SET_BRIGHT, ARGS(0, disp->video_layer, 0xff * surface->brightness + 0x20, 0));
+		DISP(DISP_CMD_LAYER_SET_CONTRAST, ARGS(0, disp->video_layer, 0x20 * surface->contrast, 0));
+		DISP(DISP_CMD_LAYER_SET_SATURATION, ARGS(0, disp->video_layer, 0x20 * surface->saturation, 0));
 		// hue scale is randomly chosen, no idea how it maps exactly
-		args[2] = (32 / 3.14) * surface->hue + 0x20;
-		ioctl(disp->fd, DISP_CMD_LAYER_SET_HUE, args);
-		ioctl(disp->fd, DISP_CMD_LAYER_ENHANCE_ON, args);
+		DISP(DISP_CMD_LAYER_SET_HUE, ARGS(0, disp->video_layer, (32 / 3.14) * surface->hue + 0x20, 0));
+		DISP(DISP_CMD_LAYER_ENHANCE_ON, ARGS(0, disp->video_layer, 0, 0));
 		surface->csc_change = 0;
 	}
 
@@ -243,8 +275,7 @@ static void sunxi_disp_close_video_layer(struct sunxi_disp *sunxi_disp)
 {
 	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
 
-	uint32_t args[4] = { 0, disp->video_layer, 0, 0 };
-	ioctl(disp->fd, DISP_CMD_LAYER_CLOSE, args);
+	DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->video_layer, 0, 0));
 }
 
 static int sunxi_disp_set_osd_layer(struct sunxi_disp *sunxi_disp, int x, int y, int width, int height, output_surface_ctx_t *surface)
@@ -274,10 +305,8 @@ static int sunxi_disp_set_osd_layer(struct sunxi_disp *sunxi_disp, int x, int y,
 	disp->osd_info.scn_win.width = min_nz(width, surface->rgba.dirty.x1) - surface->rgba.dirty.x0;
 	disp->osd_info.scn_win.height = min_nz(height, surface->rgba.dirty.y1) - surface->rgba.dirty.y0;
 
-	uint32_t args[4] = { 0, disp->osd_layer, (unsigned long)(&disp->osd_info), 0 };
-	ioctl(disp->fd, DISP_CMD_LAYER_SET_PARA, args);
-
-	ioctl(disp->fd, DISP_CMD_LAYER_OPEN, args);
+	DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->osd_layer, &disp->osd_info, 0));
+	DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->osd_layer, 0, 0));
 
 	return 0;
 }
@@ -286,6 +315,5 @@ static void sunxi_disp_close_osd_layer(struct sunxi_disp *sunxi_disp)
 {
 	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
 
-	uint32_t args[4] = { 0, disp->osd_layer, 0, 0 };
-	ioctl(disp->fd, DISP_CMD_LAYER_CLOSE, args);
+	DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->osd_layer, 0, 0));
 }

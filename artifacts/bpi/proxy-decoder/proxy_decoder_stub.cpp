@@ -5,10 +5,165 @@
 #include <cassert>
 #include <cstring>
 
-#define LOG_PREFIX "ProxyDecoder[STUB]: "
+#include "vdpau_helper.h"
+
+#define OUTPUT_PREFIX "ProxyDecoder[STUB]: "
 #include "proxy_decoder_utils.h"
 
 namespace {
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Used to implement decodeToDisplayQueue() / displayDecoded() as Y-checkerboard.
+ */
+class VdpauStub
+{
+public:
+    VdpauStub(int frameWidth, int frameHeight);
+    ~VdpauStub();
+    void display();
+
+private:
+    int m_frameWidth;
+    int m_frameHeight;
+
+    VdpDevice m_vdpDevice = VDP_INVALID_HANDLE;
+    VdpDecoder m_vdpDecoder = VDP_INVALID_HANDLE;
+    VdpVideoMixer m_vdpMixer = VDP_INVALID_HANDLE;
+    VdpPresentationQueueTarget m_vdpTarget = VDP_INVALID_HANDLE;
+    VdpPresentationQueue m_vdpQueue = VDP_INVALID_HANDLE;
+
+    static const int kSurfaceCount = 20;
+    int m_videoSurfaceIndex = 0;
+    std::vector<VdpVideoSurface> m_vdpVideoSurfaces;
+};
+
+VdpauStub::VdpauStub(int frameWidth, int frameHeight)
+:
+    m_frameWidth(frameWidth),
+    m_frameHeight(frameHeight)
+{
+    PRINT << OUTPUT_PREFIX << "Initializing VDPAU...";
+
+    m_vdpDevice = createVdpDevice();
+
+    VDP(vdp_decoder_create(m_vdpDevice,
+        VDP_DECODER_PROFILE_H264_HIGH,
+        m_frameWidth,
+        m_frameHeight,
+        /*max_references*/ 16,
+        &m_vdpDecoder));
+    vdpCheckHandle(m_vdpDecoder, "Decoder");
+
+    VDP(vdp_video_mixer_create(m_vdpDevice,
+        /*feature_count*/ 0,
+        /*features*/ nullptr,
+        /*parameter_count*/ 0,
+        /*parameters*/ nullptr,
+        /*parameter_values*/ nullptr,
+        &m_vdpMixer));
+    vdpCheckHandle(m_vdpMixer, "Mixer");
+
+    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, /*drawable*/ 0, &m_vdpTarget));
+    vdpCheckHandle(m_vdpTarget, "Presentation Queue Target");
+
+    VDP(vdp_presentation_queue_create(m_vdpDevice, m_vdpTarget, &m_vdpQueue));
+    vdpCheckHandle(m_vdpQueue, "Presentation Queue");
+
+    while (m_vdpVideoSurfaces.size() < kSurfaceCount)
+    {
+        VdpVideoSurface surface = VDP_INVALID_HANDLE;
+        VDP(vdp_video_surface_create(m_vdpDevice,
+            VDP_CHROMA_TYPE_420, m_frameWidth, m_frameHeight, &surface));
+        vdpCheckHandle(surface, "Video Surface");
+
+        m_vdpVideoSurfaces.push_back(surface);
+
+        static YuvNative yuvNative;
+        getVideoSurfaceYuvNative(surface, &yuvNative);
+        memset(yuvNative.virt, 0, yuvNative.size);
+    }
+
+    PRINT << OUTPUT_PREFIX << "VDPAU Initialized OK";
+}
+
+VdpauStub::~VdpauStub()
+{
+    OUTPUT << "Deinitializing VDPAU BEGIN";
+
+    for (auto& surface: m_vdpVideoSurfaces)
+    {
+        if (surface != VDP_INVALID_HANDLE)
+            VDP(vdp_video_surface_destroy(surface));
+        surface = VDP_INVALID_HANDLE;
+    }
+
+    if (m_vdpQueue != VDP_INVALID_HANDLE)
+        VDP(vdp_presentation_queue_destroy(m_vdpQueue));
+
+    if (m_vdpTarget != VDP_INVALID_HANDLE)
+        VDP(vdp_presentation_queue_target_destroy(m_vdpTarget));
+
+    if (m_vdpMixer != VDP_INVALID_HANDLE)
+        VDP(vdp_video_mixer_destroy(m_vdpMixer));
+
+    if (m_vdpDecoder != VDP_INVALID_HANDLE)
+        VDP(vdp_decoder_destroy(m_vdpDecoder));
+
+    if (m_vdpDevice != VDP_INVALID_HANDLE)
+        VDP(vdp_device_destroy(m_vdpDevice));
+
+    OUTPUT << "Deinitializing VDPAU END";
+}
+
+void VdpauStub::display()
+{
+    VdpVideoSurface videoSurface = m_vdpVideoSurfaces[m_videoSurfaceIndex];
+
+    OUTPUT << stringFormat("VdpauStub::display() BEGIN, surface #%2d of %d {%2d}",
+        m_videoSurfaceIndex, kSurfaceCount, videoSurface);
+
+    m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % kSurfaceCount;
+
+    static YuvNative yuvNative;
+    getVideoSurfaceYuvNative(videoSurface, &yuvNative);
+    memset(yuvNative.virt, 0, yuvNative.luma_size);
+    debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
+
+    VdpOutputSurface outputSurface;
+    VDP(vdp_output_surface_create(m_vdpDevice,
+        VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
+    vdpCheckHandle(outputSurface, "Output Surface");
+
+    // In vdpau_sunxi, this links Video Surface to Output Surface; does not process pixel data.
+    VDP(vdp_video_mixer_render(m_vdpMixer,
+        /*background_surface*/ VDP_INVALID_HANDLE, //< Not implemented.
+        /*background_source_rect*/ nullptr, //< Not implemented.
+        VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME, //< Other values not implemented.
+        /*video_surfaces_past_count*/ 0, //< Not implemented.
+        /*video_surfaces_past*/ nullptr, //< Not implemented.
+        /*video_surface_current*/ videoSurface,
+        /*video_surfaces_future_count*/ 0, //< Not implemented.
+        /*video_surfaces_future*/ nullptr, //< Not implemented.
+        /*video_source_rect*/ nullptr, //< Can be specified.
+        outputSurface,
+        /*destination_rect*/ nullptr, //< Not implemented.
+        /*destination_video_rect*/ nullptr, //< Can be specified.
+        /*layer_count*/ 0, //< Other values not implemented.
+        /*layers*/ nullptr //< Not implemented.
+    ));
+
+    VDP(vdp_presentation_queue_display(m_vdpQueue, outputSurface,
+        /*clip_width*/ m_frameWidth, /*clip_height*/ m_frameHeight,
+        /*earliest_presentation_time, not implemented*/ 0));
+
+    VDP(vdp_output_surface_destroy(outputSurface));
+
+    OUTPUT << "VdpauStub::display() END";
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class Stub
 :
@@ -41,6 +196,8 @@ private:
     int m_nativeYuvBufferSize = 0;
 
     int m_frameNumber;
+
+    std::unique_ptr<VdpauStub> m_vdpauStub;
 };
 
 Stub::Stub(int frameWidth, int frameHeight)
@@ -52,7 +209,7 @@ Stub::Stub(int frameWidth, int frameHeight)
     assert(frameWidth > 0);
     assert(frameHeight > 0);
 
-    LOG << "Stub(frameWidth: " << frameWidth << ", frameHeight: " << frameHeight << ")";
+    OUTPUT << "Stub(frameWidth: " << frameWidth << ", frameHeight: " << frameHeight << ")";
 
     // Native buffer is NV12 (12 bits per pixel), arranged in 32x32 px macroblocks.
     m_nativeYuvBufferSize =
@@ -65,9 +222,9 @@ Stub::Stub(int frameWidth, int frameHeight)
 
 Stub::~Stub()
 {
-    LOG << "~Stub() BEGIN";
+    OUTPUT << "~Stub() BEGIN";
     free(m_nativeYuvBuffer);
-    LOG << "~Stub() END";
+    OUTPUT << "~Stub() END";
 }
 
 int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPts,
@@ -81,7 +238,7 @@ int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPts,
     if (prevArgbLineSize != argbLineSize)
     {
         prevArgbLineSize = argbLineSize;
-        LOG << "decodeToRgb(argbLineSize: " << argbLineSize << ")";
+        OUTPUT << "decodeToRgb(argbLineSize: " << argbLineSize << ")";
     }
 
     static int frameNumber = 0;
@@ -110,7 +267,7 @@ int Stub::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
     {
         prevYLineSize = yLineSize;
         prevUVLineSize = uVLineSize;
-        LOG << "decodeToYuvPlanar(yLineSize: " << yLineSize
+        OUTPUT << "decodeToYuvPlanar(yLineSize: " << yLineSize
             << ", uVLineSize: " << uVLineSize << ")";
     }
 
@@ -149,10 +306,10 @@ int Stub::decodeToDisplayQueue(
     const CompressedFrame* compressedFrame, int64_t* outPts,
     void **outFrameHandle)
 {
-    // Do nothing visible.
+    OUTPUT << "decodeToDisplayQueue()";
 
     assert(outFrameHandle);
-    (*outFrameHandle) = nullptr;
+    *outFrameHandle = (void*) (1);
 
     if (outPts && compressedFrame)
         *outPts = compressedFrame->pts;
@@ -161,7 +318,15 @@ int Stub::decodeToDisplayQueue(
 
 void Stub::displayDecoded(void* handle)
 {
-    assert(!handle);
+    assert(handle == (void*) (1));
+
+    if (!m_vdpauStub)
+        m_vdpauStub.reset(new VdpauStub(m_frameWidth, m_frameHeight));
+
+    if (conf.enableFps)
+        debugShowFps(OUTPUT_PREFIX);
+
+    m_vdpauStub->display();
 }
 
 } // namespace
