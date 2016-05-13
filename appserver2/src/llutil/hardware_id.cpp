@@ -135,11 +135,11 @@ namespace LLUtil {
                 QCryptographicHash md5Hash(QCryptographicHash::Md5);
                 md5Hash.addData(hwid.toUtf8());
 
-                QString hwid = QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
+                QString hwidHash = QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
                 if (pair.first == g_storedMac)
-                    result.insert(0, hwid);
+                    result.insert(0, hwidHash);
                 else
-                    result << hwid;
+                    result << hwidHash;
             }
         }
 

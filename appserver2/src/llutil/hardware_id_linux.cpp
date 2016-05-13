@@ -183,7 +183,7 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareIn
 
     findMacAddresses(hardwareInfo.nics);
 
-    QMap<QString, QStringList> macHardwareIds;
+    HardwareIdListForVersion macHardwareIds;
 
     for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
         calcHardwareIds(macHardwareIds, hardwareInfo, i);
