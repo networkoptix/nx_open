@@ -6,7 +6,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
         <fileSet>
-            <directory>${libdir}/${arch}/bin/${build.configuration}</directory>
+            <directory>${libdir}/${arch}/bin/release</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
                 <include>audio/**</include>
