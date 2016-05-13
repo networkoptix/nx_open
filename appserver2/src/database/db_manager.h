@@ -632,11 +632,25 @@ public:
     ErrorCode doQuery(const T1 &t1, T2 &t2)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
-        if (!hasPermission(t2, m_userAccessData.userId, Qn::Permission::ReadPermission))
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+        if (!hasPermission(t2, Qn::Permission::ReadPermission))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();
         }
+        return errorCode;
+    }
+
+    template<typename T1, template<typename> class Container, typename Param>
+    ErrorCode doQuery(const T1 &inParam, Container<Param> &outParamContainer)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParamContainer);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+        filterByPermission(outParamContainer, Qn::Permission::ReadPermission);
+        if (outParamContainer.size() == 0)
+            return ErrorCode::forbidden;
         return errorCode;
     }
 
@@ -645,10 +659,10 @@ public:
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-    template <class ParamType, class SerializedTransaction>
-    ErrorCode executeTransactionNoLock(const QnTransaction<ParamType> &tran, SerializedTransaction &&serializedTran)
+    template <class Param, class SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
-        if (!hasPermission(tran.params, m_userAccessData.userId, Qn::Permission::SavePermission))
+        if (!hasPermission(tran.params, Qn::Permission::SavePermission))
             return ErrorCode::forbidden;
 
         return detail::QnDbManager::instance()->executeTransactionNoLock(
@@ -656,6 +670,18 @@ public:
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
+    template <template<typename> class Container, typename Param, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
+    {
+        QnTransaction<Container<Param>> tranCopy = tran;
+        filterByPermission(tranCopy.params, Qn::Permission::SavePermission);
+        if (tranCopy.params.size() == 0)
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransactionNoLock(
+                    tran,
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
     template <class Transaction, class SerializedTransaction>
     ErrorCode executeTransaction(Transaction &&tran, SerializedTransaction &&serializedTran)
     {
@@ -666,23 +692,32 @@ public:
 
 private:
     template<typename ParamType>
-    bool hasPermission(const ParamType &param, const QnUuid &userId, Qn::Permission permission)
+    bool hasPermission(const ParamType &param, Qn::Permission permission)
     {
         if (m_userAccessData == Qn::kSuperUserAccess)
             return true;
-        return hasPermissionImpl(param, userId, permission, 0);
+        return hasPermissionImpl(param, permission, 0);
+    }
+
+    template<template<typename> class Container, typename Param>
+    void filterByPermission(Container<Param> &paramContainer, Qn::Permission permission)
+    {
+        paramContainer.erase(std::remove_if(paramContainer.begin(), paramContainer.end(),
+                                            [permission] (const Param &param) {
+                                                return !hasPermission(param, permission);
+                                            }));
     }
 
     template<typename ParamType>
-    auto hasPermissionImpl(const ParamType &param, const QnUuid &userId, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
+    auto hasPermissionImpl(const ParamType &param, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
     {
-        return qnResourceAccessManager->hasPermission(qnResPool->getResourceById(userId).dynamicCast<QnUserResource>(),
+        return qnResourceAccessManager->hasPermission(qnResPool->getResourceById(m_userAccessData.userId).dynamicCast<QnUserResource>(),
                                                       qnResPool->getResourceById(param.id),
                                                       permission);
     }
 
     template<typename ParamType>
-    auto hasPermissionImpl(const ParamType &/*param*/, const QnUuid &/*userId*/, Qn::Permission /*permission*/, char) -> bool
+    auto hasPermissionImpl(const ParamType &/*param*/, Qn::Permission /*permission*/, char) -> bool
     {
         return true;
     }
