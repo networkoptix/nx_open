@@ -679,9 +679,10 @@ public:
             return ErrorCode::forbidden;
 
         return detail::QnDbManager::instance()->executeTransactionNoLock(
-                    tran,
+                    tranCopy,
                     std::forward<SerializedTransaction>(serializedTran));
     }
+
     template <class Transaction, class SerializedTransaction>
     ErrorCode executeTransaction(Transaction &&tran, SerializedTransaction &&serializedTran)
     {
@@ -691,8 +692,8 @@ public:
     }
 
 private:
-    template<typename ParamType>
-    bool hasPermission(const ParamType &param, Qn::Permission permission)
+    template<typename Param>
+    bool hasPermission(const Param &param, Qn::Permission permission)
     {
         if (m_userAccessData == Qn::kSuperUserAccess)
             return true;
@@ -708,16 +709,16 @@ private:
                                             }));
     }
 
-    template<typename ParamType>
-    auto hasPermissionImpl(const ParamType &param, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
+    template<typename Param>
+    auto hasPermissionImpl(const Param&param, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
     {
         return qnResourceAccessManager->hasPermission(qnResPool->getResourceById(m_userAccessData.userId).dynamicCast<QnUserResource>(),
                                                       qnResPool->getResourceById(param.id),
                                                       permission);
     }
 
-    template<typename ParamType>
-    auto hasPermissionImpl(const ParamType &/*param*/, Qn::Permission /*permission*/, char) -> bool
+    template<typename Param>
+    auto hasPermissionImpl(const Param&/*param*/, Qn::Permission /*permission*/, char) -> bool
     {
         return true;
     }
