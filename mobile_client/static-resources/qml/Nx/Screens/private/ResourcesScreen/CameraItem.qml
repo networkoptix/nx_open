@@ -118,7 +118,7 @@ Control
 
         Column
         {
-            width: parent.width
+            width: parent ? parent.width : 0
             leftPadding: 8
             rightPadding: 8
 

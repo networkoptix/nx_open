@@ -103,7 +103,7 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
     stackView.push(
             Qt.resolvedUrl("/qml/Nx/Screens/VideoScreen.qml"),
             {
-                "resourcdId": resourceId,
+                "resourceId": resourceId,
                 "initialScreenshot": screenshotUrl
             }
     )

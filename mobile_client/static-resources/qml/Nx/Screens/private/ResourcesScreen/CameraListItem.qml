@@ -63,8 +63,8 @@ Control
                 anchors.centerIn: parent
                 source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
                 visible: d.offline
-                sourceSize.width: dp(40)
-                sourceSize.height: dp(40)
+                sourceSize.width: 40
+                sourceSize.height: 40
             }
 
             Image
