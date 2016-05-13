@@ -116,7 +116,7 @@
         <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
-        <newmobile></newmobile>
+        <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
@@ -125,7 +125,7 @@
         <angle>false</angle>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1></compile.option1>
+        <compile.option1/>
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
@@ -137,8 +137,8 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-         <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
-        <qt.debug></qt.debug>
+        <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
+        <qt.debug/>
         <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -173,7 +173,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines></global.defines>
+        <global.defines/>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
@@ -947,7 +947,7 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
             </properties>
         </profile>
         <profile>
@@ -967,7 +967,7 @@
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
             </properties>
         </profile>
         <profile>
@@ -1136,7 +1136,8 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
-            </modules>
+                <module>unit_tests_run</module>
+            </modules>                
         </profile>
     </profiles>
 </project>
