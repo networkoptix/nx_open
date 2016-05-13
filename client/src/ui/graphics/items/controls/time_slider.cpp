@@ -47,24 +47,6 @@
 
 namespace {
 
-    QTime msecsToTime(qint64 msecs)
-    {
-        return QTime(0, 0, 0, 0).addMSecs(msecs);
-    }
-
-    inline qreal adjust(qreal value, qreal target, qreal delta)
-    {
-        return (value < target) ?
-            ((target - value < delta) ? target : (value + delta)) :
-            ((value - target < delta) ? target : (value - delta));
-    }
-
-    qreal speed(qreal current, qreal target, qreal timeMs)
-    {
-        return qAbs(target - current) / timeMs;
-    }
-
-
     /* Note that most numbers below are given relative to time slider size. */
 
     /* Tickmark bar. */
@@ -158,6 +140,28 @@ namespace {
     const int kBookmarkTextPadding = 6;
     const int kMinBookmarkTextCharsVisible = 6;
 
+    /** Width of sensitive areas at the left and right of the window.
+      * When a marker is dragged to these areas it causes window scroll.
+      * Has effect only with DragScrollsWindow option. */
+    const qreal kWindowScrollPixelThreshold = 1.0f;
+
+
+    QTime msecsToTime(qint64 msecs)
+    {
+        return QTime(0, 0, 0, 0).addMSecs(msecs);
+    }
+
+    inline qreal adjust(qreal value, qreal target, qreal delta)
+    {
+        return (value < target) ?
+            ((target - value < delta) ? target : (value + delta)) :
+            ((value - target < delta) ? target : (value - delta));
+    }
+
+    qreal speed(qreal current, qreal target, qreal timeMs)
+    {
+        return qAbs(target - current) / timeMs;
+    }
 
     bool checkLine(int line)
     {
@@ -505,7 +509,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 #ifdef TIMELINE_BEHAVIOR_2_5
     defaultOptions |= AdjustWindowToPosition;
 #else
-    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection;
+    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow;
 #endif
     setOptions(defaultOptions);
 
@@ -869,6 +873,21 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
     }
 }
 
+void QnTimeSlider::shiftWindow(qint64 delta, bool animate)
+{
+    qint64 windowSize = m_windowEnd - m_windowStart;
+    if (delta < 0)
+    {
+        qint64 newWindowStart = qMax(m_windowStart + delta, minimum());
+        setWindow(newWindowStart, newWindowStart + windowSize, animate);
+    }
+    else
+    {
+        qint64 newWindowEnd = qMin(m_windowEnd + delta, maximum());
+        setWindow(newWindowEnd - windowSize, newWindowEnd, animate);
+    }
+}
+
 bool QnTimeSlider::windowContains(qint64 position)
 {
     return m_windowStart <= position && position <= m_windowEnd;
@@ -876,16 +895,10 @@ bool QnTimeSlider::windowContains(qint64 position)
 
 void QnTimeSlider::ensureWindowContains(qint64 position)
 {
-    qint64 d = 0;
-
     if (position < m_windowStart)
-        d = position - m_windowStart;
+        shiftWindow(position - m_windowStart);
     else if (m_windowEnd < position)
-        d = position - m_windowEnd;
-    else
-        return;
-
-    setWindow(m_windowStart + d, m_windowEnd + d);
+        shiftWindow(position - m_windowEnd);
 }
 
 void QnTimeSlider::setSliderPosition(qint64 position, bool keepInWindow)
@@ -907,20 +920,7 @@ void QnTimeSlider::setValue(qint64 value, bool keepInWindow)
         setValue(value);
 
         if (keepInWindow && windowContains(oldValue))
-        {
-            qint64 delta = this->value() - oldValue;
-            qint64 windowSize = m_windowEnd - m_windowStart;
-            if (delta < 0)
-            {
-                qint64 newWindowStart = qMax(m_windowStart + delta, minimum());
-                setWindow(newWindowStart, newWindowStart + windowSize);
-            }
-            else
-            {
-                qint64 newWindowEnd = qMin(m_windowEnd + delta, maximum());
-                setWindow(newWindowEnd - windowSize, newWindowEnd);
-            }
-        }
+            shiftWindow(this->value() - oldValue);
     }
     else
     {
@@ -2045,6 +2045,31 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
         drawMarker(painter, position, m_colors.indicator);
 }
 
+bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
+{
+    /* Handle tooltip drag here by our dragProcessor instead of base class: */
+    if (target == toolTipItem())
+    {
+        switch (event->type())
+        {
+        case QEvent::GraphicsSceneMousePress:
+            m_dragDelta = toolTipItem()->tailPos() - static_cast<QGraphicsSceneMouseEvent*>(event)->pos();
+            dragProcessor()->mousePressEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event), true);
+            return true;
+
+        case QEvent::GraphicsSceneMouseRelease:
+            dragProcessor()->mouseReleaseEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event));
+            return true;
+
+        case QEvent::GraphicsSceneMouseMove:
+            dragProcessor()->mouseMoveEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event));
+            return true;
+        }
+    }
+
+    return base_type::eventFilter(target, event);
+}
+
 void QnTimeSlider::drawSeparator(QPainter* painter, const QRectF& rect)
 {
     if (qFuzzyCompare(rect.top(), this->rect().top()))
@@ -2900,6 +2925,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
         }
     }
 
+    m_dragDelta = QPointF();
     dragProcessor()->mousePressEvent(this, event, immediateDrag);
 
     event->accept();
@@ -2914,6 +2940,9 @@ void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     dragProcessor()->mouseReleaseEvent(this, event);
+
+    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker)
+        setSelectionValid(false);
 
     m_dragMarker = NoMarker;
 
@@ -2939,24 +2968,25 @@ void QnTimeSlider::changeEvent(QEvent* event)
     case QEvent::PaletteChange:
         updatePixmapCache(); // - to update when standard palette is customized (not at the same moment as setColors)
         break;
-    default:
-        break;
     }
 }
 
 void QnTimeSlider::startDragProcess(DragInfo* info)
 {
-    m_dragDelta = QPointF();
     m_dragIsClick = true;
     setSliderDown(true);
 
+    /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself. */
     if (m_dragMarker == CreateSelectionMarker)
-        setSliderPosition(valueFromPosition(info->mousePressItemPos()));
+        setSliderPosition(valueFromPosition(mapFromScene(info->mousePressScenePos())));
 }
 
 void QnTimeSlider::startDrag(DragInfo* info)
 {
-    qint64 pos = valueFromPosition(info->mousePressItemPos());
+    /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself. */
+    QPointF mousePos = mapFromScene(info->mousePressScenePos());
+    qint64 pos = valueFromPosition(mousePos + m_dragDelta);
+
     m_dragIsClick = false;
 
     switch (m_dragMarker)
@@ -2973,7 +3003,7 @@ void QnTimeSlider::startDrag(DragInfo* info)
     case SelectionStartMarker:
     case SelectionEndMarker:
         m_selecting = true;
-        m_dragDelta = positionFromMarker(m_dragMarker) - info->mousePressItemPos();
+        m_dragDelta = positionFromMarker(m_dragMarker) - mousePos;
         emit selectionPressed();
         break;
     }
@@ -2981,8 +3011,33 @@ void QnTimeSlider::startDrag(DragInfo* info)
 
 void QnTimeSlider::dragMove(DragInfo* info)
 {
-    QPointF mousePos = info->mouseItemPos() + m_dragDelta;
-    setSliderPosition(valueFromPosition(mousePos));
+    /* We have to use mapping because these events can be caused by the tooltip as well as by the slider itself.
+     * We have to use scene coordinates because of possible redrag events when real tooltip coordinates differ from those stored in the DragInfo object. */
+    QPointF mousePos = mapFromScene(info->mouseScenePos());
+
+    if (m_options.testFlag(DragScrollsWindow))
+    {
+        qreal left  = mousePos.x() - kWindowScrollPixelThreshold;
+        qreal right = mousePos.x() + kWindowScrollPixelThreshold;
+
+        if (m_dragDelta.x() < 0)
+            left += m_dragDelta.x();
+        else
+            right += m_dragDelta.x();
+
+        if (left < 0)
+        {
+            ensureWindowContains(valueFromPosition(QPointF(left, 0), false));
+            executeDelayed([this]() { dragProcessor()->redrag(); });
+        }
+        else if (right > rect().right())
+        {
+            ensureWindowContains(valueFromPosition(QPointF(right, 0), false));
+            executeDelayed([this]() { dragProcessor()->redrag(); });
+        }
+    }
+
+    setSliderPosition(valueFromPosition(mousePos + m_dragDelta));
 
     if (m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
     {
@@ -3027,4 +3082,5 @@ void QnTimeSlider::finishDragProcess(DragInfo* info)
     }
 
     setSliderDown(false);
+    m_dragDelta = QPointF();
 }
