@@ -110,6 +110,9 @@ VdpStatus vdp_video_surface_create(VdpDevice device,
 	vs->height = height;
 	vs->chroma_type = chroma_type;
 
+    // Added to allow nx_video_surface_get_native_data().
+    vs->source_format = INTERNAL_YCBCR_FORMAT;
+
 	vs->luma_size = ALIGN(width, 32) * ALIGN(height, 32);
 	switch (chroma_type)
 	{
