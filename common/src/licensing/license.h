@@ -197,8 +197,7 @@ public:
     void reset();
     bool isEmpty() const;
 
-    QVector<QString> mainHardwareIds() const;
-    QVector<QString> compatibleHardwareIds() const;
+    QVector<QString> hardwareIds() const;
     QString currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
