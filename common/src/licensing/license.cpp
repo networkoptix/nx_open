@@ -714,10 +714,24 @@ QVector<QString> QnLicensePool::hardwareIds() const {
 }
 
 QString QnLicensePool::currentHardwareId() const {
+    QString hardwareId;
+
+    // hardwareIds is a ordered list
+    // first come hwid1s, than hwid2s, etc..
+    // We need to find first hardware id of last version
     QVector<QString> hwIds = hardwareIds();
-    return hwIds.isEmpty()
-        ? QString()
-        : hwIds.last();
+    QString lastPrefix;
+    for (QString hwid : hwIds) {
+        NX_ASSERT(hwid.length() >= 2);
+
+        QString prefix = hwid.mid(0, 2);
+        if (prefix != lastPrefix) {
+            lastPrefix = prefix;
+            hardwareId = hwid;
+        }
+    }
+
+    return hardwareId;
 }
 
 int QnLicensePool::camerasPerAnalogEncoder() {
