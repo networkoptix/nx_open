@@ -683,11 +683,27 @@ public:
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
-    template <class Transaction, class SerializedTransaction>
-    ErrorCode executeTransaction(Transaction &&tran, SerializedTransaction &&serializedTran)
+    template <class Param, class SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
     {
+        if (!hasPermission(tran.params, Qn::Permission::SavePermission))
+            return ErrorCode::forbidden;
+
         return detail::QnDbManager::instance()->executeTransaction(
-                    std::forward<Transaction>(tran),
+                    tran,
+                    std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <template<typename> class Container, typename Param, typename SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
+    {
+        QnTransaction<Container<Param>> tranCopy = tran;
+        filterByPermission(tranCopy.params, Qn::Permission::SavePermission);
+        if (tranCopy.params.size() == 0)
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransaction(
+                    tranCopy,
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
