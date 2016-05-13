@@ -63,7 +63,7 @@ QnFileCache* QnFileCache::instance()
 
 QnTestCamera::QnTestCamera(quint32 num): m_num(num)
 {
-    bool ok;
+    //bool ok;
     m_mac = "92-61";
     m_num = htonl(m_num);
     QByteArray last = QByteArray((const char*) &m_num, 4).toHex();
@@ -133,9 +133,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
         QnCompressedVideoDataPtr video = data[i];
         if (i == 0)
         {
-            //m_context = QnMediaContextPtr( new QnMediaContext(video->context));
-            QByteArray byteArray;
-            QnFfmpegHelper::serializeCodecContext(video->context->ctx(), &byteArray);
+            QByteArray byteArray = video->context->serialize();
 
             quint32 packetLen = htonl(byteArray.size());
             quint16 codec = video->compressionType;

@@ -6,7 +6,7 @@
 #include "test_camera.h"
 #include <nx/network/socket.h>
 #include "utils/common/long_runnable.h"
-#include <nx/network/tcp_listener.h>
+#include <network/tcp_listener.h>
 
 class QnCameraDiscoveryListener;
 

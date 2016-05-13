@@ -12,7 +12,6 @@
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/storage_plugin_factory.h"
-#include "plugins/storage/file_storage/file_storage_resource.h"
 
 #include <utils/common/app_info.h>
 
@@ -30,7 +29,19 @@ void ffmpegInit()
 {
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
+}
+
+QStringList checkFileNames(const QString& fileNames)
+{
+    QStringList files;
+    for (auto& file: fileNames.split(',')) {
+        if (!QFile::exists(file))
+            qWarning() << "File" << file << "not found";
+        else
+            files.append(file);
+    }
+    return files;
 }
 
 int main(int argc, char *argv[])
@@ -50,7 +61,7 @@ int main(int argc, char *argv[])
 
     new QnLongRunnablePool();
 
-    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
+    //QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     qDebug() << qApp->applicationName() << "version" << qApp->applicationVersion();
 
@@ -145,23 +156,15 @@ int main(int argc, char *argv[])
             continue;
         }
 
-
-        primaryFiles = primaryFileNames.split(',');
-        for (int k = 0; k < primaryFiles.size(); ++k)
-        if (!QFile::exists(primaryFiles[k])) {
-            qWarning() << "File" << primaryFiles[k] << "not found";
+        primaryFiles = checkFileNames(primaryFileNames);
+        if (primaryFiles.isEmpty()) {
+            qWarning() << "No one of the specified files exists!";
             continue;
         }
 
         if (!secondaryFileNames.isEmpty())
-            secondaryFiles = secondaryFileNames.split(',');
-        for (int k = 0; k < secondaryFiles.size(); ++k)
-            if (!QFile::exists(secondaryFiles[k])) {
-                qWarning() << "File" << secondaryFiles[k] << "not found";
-                continue;
-            }
-
-        if(secondaryFiles.isEmpty())
+            secondaryFiles = checkFileNames(secondaryFileNames);
+        if (secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
         QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, offlineFreq);

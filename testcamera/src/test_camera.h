@@ -38,7 +38,7 @@ private:
     QStringList m_secondaryFiles;
     int m_prefixLen;
     int m_offlineFreq;
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     bool m_isEnabled;
     QTime m_offlineTimer;
     QTime m_checkTimer;
