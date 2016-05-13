@@ -61,7 +61,7 @@ Control
             Image
             {
                 anchors.centerIn: parent
-                source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
+                source: d.unauthorized ? "/images/camera_locked.png" : "/images/camera_offline.png"
                 visible: d.offline
                 sourceSize.width: 40
                 sourceSize.height: 40
@@ -95,11 +95,11 @@ Control
             id: label
             leftPadding: 6
             width: parent.width - statusIndicator.width - 2 * anchors.margins
-            height: dp(48)
+            height: 48
             verticalAlignment: Text.AlignVCenter
             maximumLineCount: 2
             wrapMode: Text.WordWrap
-            font.pixelSize: sp(16)
+            font.pixelSize: 16
             font.weight: d.offline ? Font.DemiBold : Font.Normal
             elide: Text.ElideRight
             color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
