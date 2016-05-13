@@ -1500,7 +1500,7 @@ void QnTimeSlider::updateKineticProcessor()
 void QnTimeSlider::updateToolTipVisibility()
 {
     qint64 pos = sliderPosition();
-    toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd && positionMarkerVisible());
+    toolTipItem()->setVisible(pos >= m_windowStart && pos <= m_windowEnd && positionMarkerVisible() && isVisible());
 }
 
 void QnTimeSlider::updateToolTipText()
