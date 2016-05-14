@@ -22,7 +22,7 @@ if [ $run_tests == "true" ]; then
     echo "Tests Finished with code " $ERRORLEVEL
     if [[ $ERRORLEVEL -ne 0 ]]; then echo $ERRORLEVEL && exit $ERRORLEVEL; fi
     mkdir -p $nx_vms_dir/.test
-    echo $current_changeset >> $nx_vms_dir/.test/$branch
+    echo $current_changeset > $nx_vms_dir/.test/$branch
 else
     echo "This changeset has been already tested." $ERRORLEVEL
     exit 0
