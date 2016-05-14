@@ -4,6 +4,7 @@ current_changeset=$(hg id -i)
 nx_vms_dir=$(pwd)
 latest_success_changeset=
 run_tests=true
+
 if [ -f $nx_vms_dir/.test/$branch ]; then 
     latest_success_changeset=$(cat $nx_vms_dir/.test/$branch)
     if [ $current_changeset == $latest_success_changeset ]; then run_tests=false; fi
