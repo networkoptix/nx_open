@@ -9,27 +9,50 @@
             <directory>${libdir}/${arch}/bin/release</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
+                <include>audio/**</include>
+                <include>fonts/**</include>
                 <include>imageformats/*.dll</include>
                 <include>platforms/*.dll</include>
-                <include>styles/**</include>
-                <include>help/**</include>
-                <include>vox/**</include>
+                <include>qml/**</include>
                 <include>av*.dll</include>
-                <include>icu*.dll</include>
+                <include>${product.name}*.exe</include>                
                 <include>lib*.dll</include>
-                <include>openal32.dll</include>
-                <include>qjson.dll</include>
-                <include>Qt5*.dll</include>
+                <include>nx*.dll</include>
+                <include>OpenAL32.dll</include>
                 <include>quazip.dll</include>
                 <include>sigar.dll</include>
                 <include>ssleay32.dll</include>
                 <include>swscale-2.dll</include>
-                <include>wrap_oal.dll</include>
-                <include>zlibwapi.dll</include>
-                <include>${product.name}*.exe</include>
+                <include>udt.dll</include>
                 <include>vcredist*.exe</include>
             </includes>		
-        </fileSet>			
+        </fileSet>	
+        <fileSet>
+            <directory>${qt.dir}/bin</directory>
+            <outputDirectory>..</outputDirectory>
+            <includes>
+                <include>icu*.dll</include>
+                <include>Qt5Concurrent.dll</include>
+                <include>Qt5Core.dll</include>
+                <include>Qt5Gui.dll</include>
+                <include>Qt5LabsTemplates.dll</include>
+                <include>Qt5Multimedia.dll</include>
+                <include>Qt5MultimediaWidgets.dll</include>
+                <include>Qt5Network.dll</include>
+                <include>Qt5OpenGL.dll</include>
+                <include>Qt5PrintSupport.dll</include>
+                <include>Qt5Qml.dll</include>
+                <include>Qt5Quick.dll</include>
+                <include>Qt5QuickWidgets.dll</include>
+                <include>Qt5Sql.dll</include>
+                <include>Qt5WebChannel.dll</include>
+                <include>Qt5WebKit.dll</include>
+                <include>Qt5WebKitWidgets.dll</include>
+                <include>Qt5Widgets.dll</include>
+                <include>Qt5Xml.dll</include>
+                <include>Qt5XmlPatterns.dll</include>
+            </includes>		
+        </fileSet>				
 		<fileSet>
 			<directory>${project.build.directory}/client</directory>
 			<outputDirectory>..</outputDirectory>
