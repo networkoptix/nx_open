@@ -3,7 +3,6 @@
 
 #include <QtCore/QObject>
 
-#include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
