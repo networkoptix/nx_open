@@ -264,6 +264,8 @@ private:
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
 
+    bool m_lastAdjustTimelineToPosition;
+
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
     QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;

@@ -25,11 +25,14 @@
 #include <common/common_module.h>
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_workbench(),
+    m_recordingIcon(qnSkin->icon("tree/recording.png")),
+    m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
+    m_buggyIcon(qnSkin->icon("tree/buggy.png")),
+    m_colors(),
+    m_spacing(0)
 {
-    m_recordingIcon = qnSkin->icon("tree/recording.png");
-    m_scheduledIcon = qnSkin->icon("tree/scheduled.png");
-    m_buggyIcon = qnSkin->icon("tree/buggy.png");
 }
 
 QnWorkbench* QnResourceItemDelegate::workbench() const
@@ -50,6 +53,16 @@ const QnResourceItemColors& QnResourceItemDelegate::colors() const
 void QnResourceItemDelegate::setColors(const QnResourceItemColors& colors)
 {
     m_colors = colors;
+}
+
+int QnResourceItemDelegate::spacing() const
+{
+    return m_spacing;
+}
+
+void QnResourceItemDelegate::setSpacing(int value)
+{
+    m_spacing = value;
 }
 
 void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
@@ -165,7 +178,8 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     QRect extraIconRect = iconRect.adjusted(-4, 0, -4, 0);
     extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
 
-    bool recording = false, scheduled = false;
+    bool recording = false;
+    bool scheduled = false;
     if (resource)
     {
         if (resource->getStatus() == Qn::Recording && resource.dynamicCast<QnVirtualCameraResource>())
@@ -199,7 +213,7 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     QRect checkRect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &option, option.widget);
 
     /* Return minimal required size: */
-    return (textRect | iconRect | checkRect).size();
+    return (textRect | iconRect | checkRect).size() + QSize(0, m_spacing);
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const

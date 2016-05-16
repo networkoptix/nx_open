@@ -32,6 +32,7 @@ public:
     QnUuid selectedUserGroup() const;
     Qn::GlobalPermissions selectedPermissions() const;
 
+    void updateAccessRightsPresets();
 private:
     void updateLogin();
     void updatePassword();
@@ -39,7 +40,6 @@ private:
 
 private:
     void updateControlsAccess();
-    void updateAccessRightsPresets();
 
 
     bool validMode() const;

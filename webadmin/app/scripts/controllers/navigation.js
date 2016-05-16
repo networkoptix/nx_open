@@ -10,7 +10,10 @@ angular.module('webadminApp')
             $scope.settings = r.data.reply;
             $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
 
-            mediaserver.getUser().then(function(user){
+            mediaserver.resolveNewSystemAndUser().then(function(user){
+                if(user === null){
+                    return;
+                }
                 $scope.user = {
                     isAdmin: user.isAdmin,
                     name: user.name

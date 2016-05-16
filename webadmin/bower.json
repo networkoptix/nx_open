@@ -19,7 +19,7 @@
     "screenfull": "~2.0.0",
     "ngstorage": "~0.3.7",
     "chartjs": "~1.0.2",
-    "ui-select": "angular-ui-select#^0.14.9"
+    "typeahead-focus": "*"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",

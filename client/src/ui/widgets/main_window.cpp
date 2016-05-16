@@ -229,7 +229,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchExportHandler>();
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
+#ifdef _DEBUG
     context->instance<QnWorkbenchDebugHandler>();
+#endif
     context->instance<QnWorkbenchVideoWallHandler>();
     context->instance<QnWorkbenchWebPageHandler>();
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();

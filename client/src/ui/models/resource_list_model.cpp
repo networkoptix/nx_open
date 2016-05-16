@@ -13,7 +13,10 @@
 QnResourceListModel::QnResourceListModel(QObject *parent) :
     base_type(parent),
     m_readOnly(false),
-    m_checkable(false)
+    m_checkable(false),
+    m_statusIgnored(false),
+    m_resources(),
+    m_checkedResources()
 {}
 
 QnResourceListModel::~QnResourceListModel()
@@ -42,6 +45,21 @@ void QnResourceListModel::setCheckable(bool value)
         return;
     beginResetModel();
     m_checkable = value;
+    endResetModel();
+}
+
+bool QnResourceListModel::isStatusIgnored() const
+{
+    return m_statusIgnored;
+}
+
+void QnResourceListModel::setStatusIgnored(bool value)
+{
+    if (m_statusIgnored == value)
+        return;
+
+    beginResetModel();
+    m_statusIgnored = value;
     endResetModel();
 }
 
@@ -190,7 +208,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
 
     case Qt::DecorationRole:
         if (index.column() == NameColumn)
-            return qnResIconCache->icon(resource);
+            return resourceIcon(resource);
         break;
 
     case Qt::CheckStateRole:
@@ -259,5 +277,16 @@ void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resou
 
     QModelIndex index = this->index(row, 0);
     emit dataChanged(index, index);
+}
+
+QIcon QnResourceListModel::resourceIcon(const QnResourcePtr& resource) const
+{
+    if (!m_statusIgnored)
+        return qnResIconCache->icon(resource);
+
+    QnResourceIconCache::Key key = qnResIconCache->key(resource);
+    key &= ~QnResourceIconCache::StatusMask;
+    key |= QnResourceIconCache::Online;
+    return qnResIconCache->icon(key);
 }
 
