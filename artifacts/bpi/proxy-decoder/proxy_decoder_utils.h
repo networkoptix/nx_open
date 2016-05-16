@@ -79,18 +79,25 @@ void debugShowFps(const char* prefix);
  * Draw a colored checkerboard in RGB.
  */
 void debugDrawCheckerboardArgb(
-    uint8_t* argbBuffer, int lineSizeBytes, int frameWidth, int frameHeight);
+    uint8_t* argbBuffer, int lineSizeBytes, int frameW, int frameH);
 
 /**
  * Draw a moving checkerboard in Y channel.
  */
 void debugDrawCheckerboardY(
-    uint8_t* yBuffer, int lineLen, int frameWidth, int frameHeight);
+    uint8_t* yBuffer, int lineLen, int frameW, int frameH);
 
 /**
  * Draw a moving checkerboard in Y channel in Native (32x32-macroblock) format.
  */
-void debugDrawCheckerboardYNative(uint8_t* yNative, int frameWidth, int frameHeight);
+void debugDrawCheckerboardYNative(uint8_t* yNative, int frameW, int frameH);
+
+/**
+ * Print the line using a large font with 1 macroblock (32x32 px) as 1 pixel.
+ * Currently only numbers and spaces are supported.
+ */
+void debugPrintNative(uint8_t* yNative, int frameW, int frameH,
+    int x0, int y0, const char* text);
 
 /**
  * @return Human-readable item index or a "not found" message.

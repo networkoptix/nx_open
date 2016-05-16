@@ -44,7 +44,7 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
     m_frameWidth(frameWidth),
     m_frameHeight(frameHeight)
 {
-    PRINT << OUTPUT_PREFIX << "Initializing VDPAU...";
+    PRINT << OUTPUT_PREFIX << "Initializing VDPAU; using " << kSurfaceCount << " surfaces";
 
     m_vdpDevice = createVdpDevice();
 
@@ -52,7 +52,7 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
         VDP_DECODER_PROFILE_H264_HIGH,
         m_frameWidth,
         m_frameHeight,
-        /*max_references*/ 16,
+        /*max_references*/ 16, //< Used only for checking to be <= 16.
         &m_vdpDecoder));
     vdpCheckHandle(m_vdpDecoder, "Decoder");
 
@@ -119,17 +119,22 @@ VdpauStub::~VdpauStub()
 
 void VdpauStub::display()
 {
-    VdpVideoSurface videoSurface = m_vdpVideoSurfaces[m_videoSurfaceIndex];
-
-    OUTPUT << stringFormat("VdpauStub::display() BEGIN, surface #%2d of %d {%2d}",
-        m_videoSurfaceIndex, kSurfaceCount, videoSurface);
-
+    const int videoSurfaceIndex = m_videoSurfaceIndex;
     m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % kSurfaceCount;
+
+    VdpVideoSurface videoSurface = m_vdpVideoSurfaces[videoSurfaceIndex];
+
+    OUTPUT << stringFormat("VdpauStub::display() BEGIN, surface #%2d of %d {index %2d}",
+        videoSurface, kSurfaceCount, videoSurfaceIndex);
 
     static YuvNative yuvNative;
     getVideoSurfaceYuvNative(videoSurface, &yuvNative);
     memset(yuvNative.virt, 0, yuvNative.luma_size);
-    debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
+    //debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
+    // Print videoSurfaceIndex in its individual position.
+    debugPrintNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight,
+        /*x*/ 12 * (videoSurfaceIndex % 4), /*y*/ 6 * (videoSurfaceIndex / 4),
+        stringFormat("%02d", videoSurface).c_str());
 
     VdpOutputSurface outputSurface;
     VDP(vdp_output_surface_create(m_vdpDevice,
