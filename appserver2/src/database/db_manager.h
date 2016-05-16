@@ -674,9 +674,11 @@ public:
     template <template<typename> class Container, typename Param, typename SerializedTransaction>
     ErrorCode executeTransactionNoLock(const QnTransaction<Container<Param>> &tran, SerializedTransaction &&serializedTran)
     {
-        QnTransaction<Container<Param>> tranCopy = tran;
-        filterByPermission(tranCopy.params, Qn::Permission::SavePermission);
-        if (tranCopy.params.size() == 0)
+        bool userHasNotPermissionForAllResources = std::any_of(tran.params.cbegin(), tran.params.cend(),
+                                                               [](const Param &param) {
+                                                                   return !hasPermission(param, Qn::Permission::SavePermission);
+                                                               });
+        if (userHasNotPermissionForAllResources)
             return ErrorCode::forbidden;
 
         return detail::QnDbManager::instance()->executeTransactionNoLock(
