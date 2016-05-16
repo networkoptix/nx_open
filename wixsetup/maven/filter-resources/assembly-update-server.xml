@@ -6,7 +6,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}/bin</directory>
+			<directory>${project.build.directory}/bin/msi</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
 				<include>*-server-*.msi</include>
