@@ -77,7 +77,7 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual bool getRecvTimeout(unsigned int* millis) const override;
     virtual bool getSendTimeout(unsigned int* millis) const override;
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::bind

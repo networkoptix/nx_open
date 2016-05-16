@@ -154,7 +154,7 @@ AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
     return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
-aio::AbstractAioThread* MultipleServerSocket::getAioThread()
+aio::AbstractAioThread* MultipleServerSocket::getAioThread() const
 {
     return m_timerSocket.getAioThread();
 }

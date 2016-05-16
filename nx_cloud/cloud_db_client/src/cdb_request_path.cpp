@@ -26,6 +26,8 @@ const char* kSystemGetAccessRoleListPath = "/cdb/system/get_access_role_list";
 const char* kAuthGetNoncePath = "/cdb/auth/get_nonce";
 const char* kAuthGetAuthenticationPath = "/cdb/auth/get_authentication";
 
+const char* kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
+
 const char* kPingPath = "/cdb/ping";
 
 }   //cdb

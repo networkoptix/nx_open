@@ -47,7 +47,7 @@ public:
     */
     void cancelSync();
 
-    AbstractAioThread* getAioThread();
+    AbstractAioThread* getAioThread() const;
     void bindToAioThread(AbstractAioThread* aioThread);
 
 private:

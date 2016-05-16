@@ -48,7 +48,10 @@ namespace nx_http
             std::unique_ptr<AbstractCommunicatingSocket> sock,
             nx_http::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher );
-        ~HttpServerConnection();
+        virtual ~HttpServerConnection();
+
+        virtual void pleaseStop(
+            nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
         void processMessage( nx_http::Message&& request );
 
@@ -67,7 +70,7 @@ namespace nx_http
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
         void responseSent();
         void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
-        void someMessageBodySent();
+        void readMoreMessageBodyData();
         void fullMessageHasBeenSent();
         void checkForConnectionPersistency( const Message& request );
 

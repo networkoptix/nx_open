@@ -182,7 +182,7 @@ public:
     /*!
         \note if socket is not bound to any thread yet, binds it automatically
     */
-    virtual nx::network::aio::AbstractAioThread* getAioThread() = 0;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const = 0;
 
     //!Binds current socket to specified AIOThread
     /*!

@@ -202,7 +202,7 @@ void CloudServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
     m_mediatorRegistrationRetryTimer.dispatch(std::move(handler));
 }
 
-aio::AbstractAioThread* CloudServerSocket::getAioThread()
+aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 {
     return m_mediatorRegistrationRetryTimer.getAioThread();
 }

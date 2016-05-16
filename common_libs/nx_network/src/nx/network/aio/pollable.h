@@ -60,7 +60,7 @@ public:
 
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
 
-    nx::network::aio::AbstractAioThread* getAioThread();
+    nx::network::aio::AbstractAioThread* getAioThread() const;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
 
 protected:

@@ -12,6 +12,7 @@ namespace nx {
 namespace cdb {
 namespace api {
 
+//TODO #ak too many different conversion functions here
 
 nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
 {
@@ -44,6 +45,8 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
             return nx_http::StatusCode::badRequest;
         case ResultCode::serviceUnavailable:
             return nx_http::StatusCode::serviceUnavailable;
+        case ResultCode::invalidFormat:
+            return nx_http::StatusCode::badRequest;
         case ResultCode::unknownError:
             return nx_http::StatusCode::internalServerError;
     }
@@ -109,6 +112,7 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
 
         case ResultCode::notImplemented:
         case ResultCode::unknownError:
+        case ResultCode::invalidFormat:
         default:
             requestResultCode = nx_http::FusionRequestErrorClass::internalError;
             break;
@@ -147,6 +151,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::invalidNonce, "invalidNonce")
     (ResultCode::serviceUnavailable, "serviceUnavailable")
     (ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
+    (ResultCode::invalidFormat, "invalidFormat")
     (ResultCode::unknownError, "unknownError")
 );
 

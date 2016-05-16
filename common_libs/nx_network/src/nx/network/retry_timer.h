@@ -77,7 +77,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
     virtual void pleaseStopSync() override;
 
-    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;

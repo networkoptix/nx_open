@@ -72,7 +72,7 @@ public:
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
 
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     //!Implementation of AbstractSocket::post
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;

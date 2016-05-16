@@ -167,7 +167,7 @@ public:
         m_aioThreadBinder.pleaseStop(std::move(completionHandler));
     }
 
-    virtual aio::AbstractAioThread* getAioThread() override
+    virtual aio::AbstractAioThread* getAioThread() const override
     {
         return m_aioThreadBinder.getAioThread();
     }

@@ -28,6 +28,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
     static QnUuid getDesktopResourceUuid();
+    bool isConnectedTo(const QnMediaServerResourcePtr &server) const;
 protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(Qn::ConnectionRole role) override;
 private:
