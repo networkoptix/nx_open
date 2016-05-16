@@ -35,7 +35,7 @@ namespace ec2
         return AbstractResourceManagerPtr();
     }
 
-    AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager()
+    AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserAccessData &)
     {
         return AbstractMediaServerManagerPtr();
     }
@@ -55,7 +55,7 @@ namespace ec2
         return AbstractBusinessEventManagerPtr();
     }
 
-    AbstractUserManagerPtr OldEcConnection::getUserManager()
+    AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
     {
         return AbstractUserManagerPtr();
     }
@@ -80,17 +80,17 @@ namespace ec2
         return AbstractStoredFileManagerPtr();
     }
 
-    AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager()
+    AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager(const Qn::UserAccessData &)
     {
         return AbstractUpdatesManagerPtr();
     }
 
-    AbstractMiscManagerPtr OldEcConnection::getMiscManager()
+    AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
     {
         return AbstractMiscManagerPtr();
     }
 
-    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager()
+    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserAccessData &)
     {
         return AbstractDiscoveryManagerPtr();
     }

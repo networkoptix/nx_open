@@ -75,5 +75,5 @@ namespace ec2
 
 
     template class QnTimeManager<FixedUrlClientQueryProcessor>;
-    template class QnTimeManager<ServerQueryProcessor>;
+    template class QnTimeManager<ServerQueryProcessorAccess>;
 }

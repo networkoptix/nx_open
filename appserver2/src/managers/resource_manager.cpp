@@ -172,6 +172,6 @@ namespace ec2
         return tran;
     }
 
-    template class QnResourceManager<ServerQueryProcessor>;
+    template class QnResourceManager<ServerQueryProcessorAccess>;
     template class QnResourceManager<FixedUrlClientQueryProcessor>;
 }

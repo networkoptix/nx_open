@@ -28,7 +28,7 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnVideowallManager<QueryProcessorType>::QnVideowallManager(QnVideowallNotificationManagerRawPtr &base,
+    QnVideowallManager<QueryProcessorType>::QnVideowallManager(QnVideowallNotificationManagerRawPtr base,
                                                                QueryProcessorType* const queryProcessor,
                                                                const Qn::UserAccessData &userAccessData)
     :

@@ -168,7 +168,7 @@ namespace ec2
         return reqID;
     }
 
-    template class QnCameraManager<ServerQueryProcessor>;
+    template class QnCameraManager<ServerQueryProcessorAccess>;
     template class QnCameraManager<FixedUrlClientQueryProcessor>;
 
 }

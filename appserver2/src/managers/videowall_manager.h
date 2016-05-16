@@ -23,7 +23,7 @@ namespace ec2
     class QnVideowallManager: public AbstractVideowallManager
     {
     public:
-        QnVideowallManager(QnVideowallNotificationManagerRawPtr &base,
+        QnVideowallManager(QnVideowallNotificationManagerRawPtr base,
                            QueryProcessorType* const queryProcessor,
                            const Qn::UserAccessData &userAccessData = Qn::kSuperUserAccess);
 

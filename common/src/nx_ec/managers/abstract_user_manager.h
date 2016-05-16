@@ -9,15 +9,28 @@
 
 namespace ec2
 {
+
+class AbstractUserManagerBase : public QObject
+{
+    Q_OBJECT
+public:
+signals:
+    void addedOrUpdated(const ec2::ApiUserData& user);
+    void groupAddedOrUpdated(const ec2::ApiUserGroupData& group);
+    void removed(const QnUuid& id);
+    void groupRemoved(const QnUuid& id);
+    void accessRightsChanged(const ec2::ApiAccessRightsData& access);
+};
+
     /*!
     \note All methods are asynchronous if other not specified
     */
-    class AbstractUserManager: public QObject
+    class AbstractUserManager
     {
-        Q_OBJECT
-
     public:
         virtual ~AbstractUserManager() {}
+
+        virtual AbstractUserManagerBase *getBase() const = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
@@ -144,13 +157,6 @@ namespace ec2
                 return this->setAccessRights(data, handler);
             });
         }
-
-    signals:
-        void addedOrUpdated(const ec2::ApiUserData& user);
-        void groupAddedOrUpdated(const ec2::ApiUserGroupData& group);
-        void removed(const QnUuid& id);
-        void groupRemoved(const QnUuid& id);
-        void accessRightsChanged(const ec2::ApiAccessRightsData& access);
 
     private:
         virtual int getUsers(impl::GetUsersHandlerPtr handler) = 0;

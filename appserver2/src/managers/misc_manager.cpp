@@ -14,8 +14,12 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSyste
 }
 
 template<class QueryProcessorType>
-QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor) :
-    m_queryProcessor(queryProcessor)
+QnMiscManager<QueryProcessorType>::QnMiscManager(QnMiscNotificationManagerRawPtr base,
+                                                 QueryProcessorType * const queryProcessor,
+                                                 const Qn::UserAccessData &userAccessData) :
+    m_base(base),
+    m_queryProcessor(queryProcessor),
+    m_userAccessData(userAccessData)
 {
 }
 
@@ -33,7 +37,7 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(
     auto transaction = prepareTransaction(systemName, sysIdTime, tranLogTime);
 
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
@@ -69,7 +73,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     transaction.isLocal = true;
 
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction,
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(transaction,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);

@@ -25,17 +25,17 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_licenseManager( new QnLicenseManager<QueryProcessorType>(m_queryProcessor) ),
         m_resourceManager( new QnResourceManager<QueryProcessorType>(m_queryProcessor) ),
-        m_mediaServerManager( new QnMediaServerManager<QueryProcessorType>(m_queryProcessor) ),
+        m_mediaServerManagerBase(std::make_shared<QnMediaServerNotificationManager>()),
         m_cameraManager( new QnCameraManager<QueryProcessorType>(m_queryProcessor) ),
-        m_userManager( new QnUserManager<QueryProcessorType>(m_queryProcessor) ),
+        m_userManagerBase(std::make_shared<QnUserNotificationManager>()),
         m_businessEventManager( new QnBusinessEventManager<QueryProcessorType>(m_queryProcessor) ),
         m_layoutManagerBase(std::make_shared<QnLayoutNotificationManager>()),
         m_videowallManagerBase(std::make_shared<QnVideowallNotificationManager>()),
         m_webPageManagerBase(std::make_shared<QnWebPageNotificationManager>()),
         m_storedFileManager( new QnStoredFileManager<QueryProcessorType>(m_queryProcessor) ),
-        m_updatesManager( new QnUpdatesManager<QueryProcessorType>(m_queryProcessor) ),
-        m_miscManager( new QnMiscManager<QueryProcessorType>(m_queryProcessor) ),
-        m_discoveryManager( new QnDiscoveryManager<QueryProcessorType>(m_queryProcessor) ),
+        m_updatesManagerBase(std::make_shared<QnUpdatesNotificationManager>()),
+        m_miscManagerBase(std::make_shared<QnMiscNotificationManager>()),
+        m_discoveryManagerBase(std::make_shared<QnDiscoveryNotificationManager>()),
         m_timeManager( new QnTimeManager<QueryProcessorType>(m_queryProcessor) )
     {
         m_notificationManager.reset(
@@ -43,17 +43,17 @@ namespace ec2
                 this,
                 m_licenseManager.get(),
                 m_resourceManager.get(),
-                m_mediaServerManager.get(),
+                m_mediaServerManagerBase.get(),
                 m_cameraManager.get(),
-                m_userManager.get(),
+                m_userManagerBase.get(),
                 m_businessEventManager.get(),
                 m_layoutManagerBase.get(),
                 m_videowallManagerBase.get(),
                 m_webPageManagerBase.get(),
                 m_storedFileManager.get(),
-                m_updatesManager.get(),
-                m_miscManager.get(),
-                m_discoveryManager.get() ) );
+                m_updatesManagerBase.get(),
+                m_miscManagerBase.get(),
+                m_discoveryManagerBase.get() ) );
 
         m_auditManager.reset(new ECConnectionAuditManager(this));
     }
@@ -83,9 +83,9 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaServerManager()
+    AbstractMediaServerManagerPtr BaseEc2Connection<QueryProcessorType>::getMediaServerManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_mediaServerManager;
+        return std::make_shared<QnMediaServerManager<QueryProcessorType>>(m_mediaServerManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
@@ -107,27 +107,27 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager()
+    AbstractUserManagerPtr BaseEc2Connection<QueryProcessorType>::getUserManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_userManager;
+        return std::make_shared<QnUserManager<QueryProcessorType>>(m_userManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
     AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager(const Qn::UserAccessData &userAccessData)
     {
-        return std::make_shared<QnLayoutManager<QueryProcessorType>>(m_layoutManagerBase, m_queryProcessor, userAccessData);
+        return std::make_shared<QnLayoutManager<QueryProcessorType>>(m_layoutManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
     AbstractVideowallManagerPtr BaseEc2Connection<QueryProcessorType>::getVideowallManager(const Qn::UserAccessData &userAccessData)
     {
-        return std::make_shared<QnVideowallManager<QueryProcessorType>>(m_videowallManagerBase, m_queryProcessor, userAccessData);
+        return std::make_shared<QnVideowallManager<QueryProcessorType>>(m_videowallManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
     AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager(const Qn::UserAccessData &userAccessData)
     {
-        return std::make_shared<QnWebPageManager<QueryProcessorType>>(m_webPageManagerBase, m_queryProcessor, userAccessData);
+        return std::make_shared<QnWebPageManager<QueryProcessorType>>(m_webPageManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
@@ -137,21 +137,21 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManager()
+    AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_updatesManager;
+        return std::make_shared<QnUpdatesManager<QueryProcessorType>>(m_updatesManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
-    AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager()
+    AbstractMiscManagerPtr BaseEc2Connection<QueryProcessorType>::getMiscManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_miscManager;
+        return std::make_shared<QnMiscManager<QueryProcessorType>>(m_miscManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>
-    AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryManager()
+    AbstractDiscoveryManagerPtr BaseEc2Connection<QueryProcessorType>::getDiscoveryManager(const Qn::UserAccessData &userAccessData)
     {
-        return m_discoveryManager;
+        return std::make_shared<QnDiscoveryManager<QueryProcessorType>>(m_discoveryManagerBase.get(), m_queryProcessor, userAccessData);
     }
 
     template<class QueryProcessorType>

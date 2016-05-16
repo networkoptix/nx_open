@@ -23,18 +23,18 @@ namespace ec2
         virtual QString authInfo() const override;
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
-        virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
         virtual AbstractCameraManagerPtr getCameraManager() override;
         virtual AbstractLicenseManagerPtr getLicenseManager() override;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
-        virtual AbstractUserManagerPtr getUserManager() override;
+        virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &) override;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &) override;
         virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &) override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
-        virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
-        virtual AbstractMiscManagerPtr getMiscManager() override;
-        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
+        virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
         virtual AbstractTimeManagerPtr getTimeManager() override;
 
         virtual void addRemotePeer(const QUrl& url) override;

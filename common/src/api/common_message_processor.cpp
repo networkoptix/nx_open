@@ -88,13 +88,13 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(resourceManager, &ec2::AbstractResourceManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged );
     connect(resourceManager, &ec2::AbstractResourceManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    auto mediaServerManager = connection->getMediaServerManager();
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData));
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageChanged,   this, on_resourceUpdated(ec2::ApiStorageData));
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
-    connect(mediaServerManager, &ec2::AbstractMediaServerManager::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
+    auto mediaServerManager = connection->getMediaServerManager(Qn::kSuperUserAccess)->getBase();
+    connect(mediaServerManager, &ec2::AbstractMediaServerManagerBase::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData));
+    connect(mediaServerManager, &ec2::AbstractMediaServerManagerBase::storageChanged,   this, on_resourceUpdated(ec2::ApiStorageData));
+    connect(mediaServerManager, &ec2::AbstractMediaServerManagerBase::removed,          this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(mediaServerManager, &ec2::AbstractMediaServerManagerBase::storageRemoved,   this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(mediaServerManager, &ec2::AbstractMediaServerManagerBase::userAttributesChanged, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesChanged );
+    connect(mediaServerManager, &ec2::AbstractMediaServerManagerBase::userAttributesRemoved, this, &QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved );
 
     auto cameraManager = connection->getCameraManager();
     connect(cameraManager, &ec2::AbstractCameraManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiCameraData));
@@ -103,10 +103,10 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::removed,                    this, &QnCommonMessageProcessor::on_resourceRemoved );
 
-    auto userManager = connection->getUserManager();
-    connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
-    connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect(userManager, &ec2::AbstractUserManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged);
+    auto userManager = connection->getUserManager(Qn::kSuperUserAccess)->getBase();
+    connect(userManager, &ec2::AbstractUserManagerBase::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
+    connect(userManager, &ec2::AbstractUserManagerBase::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect(userManager, &ec2::AbstractUserManagerBase::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged);
 
     auto layoutManager = connection->getLayoutManager(Qn::kSuperUserAccess)->getBase();
     connect(layoutManager, &ec2::AbstractLayoutManagerBase::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
@@ -143,9 +143,9 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(timeManager, &ec2::AbstractTimeManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
     connect(timeManager, &ec2::AbstractTimeManager::peerTimeChanged,                this, &QnCommonMessageProcessor::peerTimeChanged);
 
-    auto discoveryManager = connection->getDiscoveryManager();
-    connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData );
-    connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
+    auto discoveryManager = connection->getDiscoveryManager(Qn::kSuperUserAccess)->getBase();
+    connect(discoveryManager, &ec2::AbstractDiscoveryManagerBase::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData );
+    connect(discoveryManager, &ec2::AbstractDiscoveryManagerBase::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
 
 #undef on_resourceUpdated
 }
@@ -154,16 +154,16 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
 {
     connection->disconnect(this);
     connection->getResourceManager()->disconnect(this);
-    connection->getMediaServerManager()->disconnect(this);
+    connection->getMediaServerManager(Qn::kSuperUserAccess)->getBase()->disconnect(this);
     connection->getCameraManager()->disconnect(this);
     connection->getLicenseManager()->disconnect(this);
     connection->getBusinessEventManager()->disconnect(this);
-    connection->getUserManager()->disconnect(this);
+    connection->getUserManager(Qn::kSuperUserAccess)->getBase()->disconnect(this);
     connection->getLayoutManager(Qn::kSuperUserAccess)->getBase()->disconnect(this);
     connection->getStoredFileManager()->disconnect(this);
-    connection->getDiscoveryManager()->disconnect(this);
+    connection->getDiscoveryManager(Qn::kSuperUserAccess)->getBase()->disconnect(this);
     connection->getTimeManager()->disconnect(this);
-    connection->getMiscManager()->disconnect(this);
+    connection->getMiscManager(Qn::kSuperUserAccess)->getBase()->disconnect(this);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoData& fullData)

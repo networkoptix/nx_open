@@ -8,12 +8,25 @@
 namespace ec2
 {
 
-    class AbstractMediaServerManager: public QObject
-    {
-        Q_OBJECT
+class AbstractMediaServerManagerBase : public QObject
+{
+    Q_OBJECT
+public:
+signals:
+    void addedOrUpdated(const ec2::ApiMediaServerData& server);
+    void storageChanged(const ec2::ApiStorageData& storage);
+    void removed(const QnUuid& id);
+    void storageRemoved(const QnUuid& id);
+    void userAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attributes);
+    void userAttributesRemoved(const QnUuid& id);
+};
 
+    class AbstractMediaServerManager
+    {
     public:
         virtual ~AbstractMediaServerManager() {}
+
+        virtual AbstractMediaServerManagerBase *getBase() const = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers)
@@ -168,14 +181,6 @@ namespace ec2
                 return this->getStorages(mediaServerId, handler);
             }, storages);
         }
-
-    signals:
-        void addedOrUpdated(const ec2::ApiMediaServerData& server);
-        void storageChanged(const ec2::ApiStorageData& storage);
-        void removed(const QnUuid& id);
-        void storageRemoved(const QnUuid& id);
-        void userAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attributes);
-        void userAttributesRemoved(const QnUuid& id);
 
     protected:
         virtual int getServers(impl::GetServersHandlerPtr handler) = 0;

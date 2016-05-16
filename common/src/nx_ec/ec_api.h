@@ -386,8 +386,17 @@ namespace ec2
     };
 
 
-    class AbstractUpdatesManager : public QObject {
+    class AbstractUpdatesManagerBase : public QObject
+    {
         Q_OBJECT
+    public:
+    signals:
+        void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+        void updateUploadProgress(const QString &updateId, const QnUuid &peerId, int chunks);
+        void updateInstallationRequested(const QString &updateId);
+    };
+
+    class AbstractUpdatesManager {
     public:
         enum ReplyCode {
             NoError = -1,
@@ -396,6 +405,8 @@ namespace ec2
         };
 
         virtual ~AbstractUpdatesManager() {}
+
+        virtual AbstractUpdatesManagerBase *getBase() const = 0;
 
         template<class TargetType, class HandlerType> int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, TargetType *target, HandlerType handler) {
             return sendUpdatePackageChunk(updateId, data, offset, peers, std::static_pointer_cast<impl::SimpleHandler>(
@@ -412,11 +423,6 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-    signals:
-        void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
-        void updateUploadProgress(const QString &updateId, const QnUuid &peerId, int chunks);
-        void updateInstallationRequested(const QString &updateId);
-
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
@@ -424,9 +430,21 @@ namespace ec2
     };
 
 
-    class AbstractDiscoveryManager : public QObject {
+    class AbstractDiscoveryManagerBase : public QObject
+    {
         Q_OBJECT
     public:
+    signals:
+        void peerDiscoveryRequested(const QUrl &url);
+        void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
+        void discoveredServerChanged(const ApiDiscoveredServerData &discoveredServer);
+        void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList &discoveredServers);
+    };
+
+    class AbstractDiscoveryManager {
+    public:
+        virtual AbstractDiscoveryManagerBase *getBase() const = 0;
+
         template<class TargetType, class HandlerType> int discoverPeer(const QUrl &url, TargetType *target, HandlerType handler) {
             return discoverPeer(url, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -461,12 +479,6 @@ namespace ec2
             return sendDiscoveredServersList(discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
-
-    signals:
-        void peerDiscoveryRequested(const QUrl &url);
-        void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
-        void discoveredServerChanged(const ApiDiscoveredServerData &discoveredServer);
-        void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList &discoveredServers);
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
@@ -533,9 +545,18 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractTimeManager> AbstractTimeManagerPtr;
 
-    class AbstractMiscManager : public QObject {
+    class AbstractMiscManagerBase : public QObject
+    {
         Q_OBJECT
     public:
+    signals:
+        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
+    };
+
+    class AbstractMiscManager {
+    public:
+        virtual AbstractMiscManagerBase *getBase() const = 0;
+
         template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, TargetType *target, HandlerType handler) {
             return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -559,9 +580,6 @@ namespace ec2
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, value, time, std::placeholders::_1));
         }
 
-
-    signals:
-        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
@@ -599,17 +617,17 @@ namespace ec2
         virtual void setTransactionLogTime(qint64 value) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
-        virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractCameraManagerPtr getCameraManager() = 0;
         virtual AbstractLicenseManagerPtr getLicenseManager() = 0;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() = 0;
-        virtual AbstractUserManagerPtr getUserManager() = 0;
+        virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
-        virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
-        virtual AbstractMiscManagerPtr getMiscManager() = 0;
-        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
         virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) = 0;
 

@@ -153,9 +153,9 @@ namespace ec2
         void processQueryAsync(
             const InputData& inputData,
             HandlerType handler,
-            const QnRestConnectionProcessor* /*connection*/)
+            const QnRestConnectionProcessor* owner)
         {
-            m_queryProcessor->template processQueryAsync<InputData, OutputData, HandlerType>(
+            m_queryProcessor->getAccess(Qn::UserAccessData(owner->authUserId())).template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,
                 handler );

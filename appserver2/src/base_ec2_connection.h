@@ -47,18 +47,18 @@ namespace ec2
         virtual ~BaseEc2Connection();
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
-        virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractCameraManagerPtr getCameraManager() override;
         virtual AbstractLicenseManagerPtr getLicenseManager() override;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
-        virtual AbstractUserManagerPtr getUserManager() override;
+        virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
-        virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
-        virtual AbstractMiscManagerPtr getMiscManager() override;
-        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractTimeManagerPtr getTimeManager() override;
 
         virtual void startReceivingNotifications() override;
@@ -84,17 +84,17 @@ namespace ec2
         QueryProcessorType* m_queryProcessor;
         std::shared_ptr<QnLicenseManager<QueryProcessorType>> m_licenseManager;
         std::shared_ptr<QnResourceManager<QueryProcessorType>> m_resourceManager;
-        std::shared_ptr<QnMediaServerManager<QueryProcessorType>> m_mediaServerManager;
+        QnMediaServerNotificationManagerPtr m_mediaServerManagerBase;
         std::shared_ptr<QnCameraManager<QueryProcessorType>> m_cameraManager;
-        std::shared_ptr<QnUserManager<QueryProcessorType>> m_userManager;
+        QnUserNotificationManagerPtr m_userManagerBase;
         std::shared_ptr<QnBusinessEventManager<QueryProcessorType>> m_businessEventManager;
         QnLayoutNotificationManagerPtr m_layoutManagerBase;
         QnVideowallNotificationManagerPtr m_videowallManagerBase;
         QnWebPageNotificationManagerPtr m_webPageManagerBase;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
-        std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
-        std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
-        std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
+        QnUpdatesNotificationManagerPtr m_updatesManagerBase;
+        QnMiscNotificationManagerPtr m_miscManagerBase;
+        QnDiscoveryNotificationManagerPtr m_discoveryManagerBase;
         std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
         std::unique_ptr<ECConnectionAuditManager> m_auditManager;
