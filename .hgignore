@@ -38,6 +38,7 @@ Debug
 Release
 
 .directory
+.test
 
 */x86/*
 */x64/*
