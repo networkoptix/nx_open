@@ -137,6 +137,9 @@ VdpStatus vdp_video_surface_create(VdpDevice device,
 		return ret;
 	}
 
+	VDPAU_DBG("Created video surface #%02d, phys 0x%08X, virt 0x%08X", *surface,
+		vs->yuv->data->phys, (uint32_t) vs->yuv->data->virt);
+
 	return VDP_STATUS_OK;
 }
 
@@ -195,14 +198,6 @@ VdpStatus vdp_video_surface_get_parameters(VdpVideoSurface surface,
 static VdpStatus nx_video_surface_get_native_data(const video_surface_ctx_t *vs,
     										  void *const *destination_data)
 {
-	// HACK: Direct access to libcedrus private structure defined in libcedrus/cedrus_mem.h
-	struct cedrus_mem
-	{
-		void *virt;
-		uint32_t phys;
-		size_t size;
-	};
-
 	const struct cedrus_mem *const mem = (const struct cedrus_mem *) vs->yuv->data;
 
 	*((void **) (destination_data[0])) = cedrus_mem_get_pointer(vs->yuv->data);

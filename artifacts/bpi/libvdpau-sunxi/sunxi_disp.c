@@ -36,10 +36,12 @@ static const struct
 {
 	bool enableColorKey;
 	bool enableIoctlOutput;
+	bool enableSetFb;
 } conf =
 {
 	.enableColorKey = 0,
 	.enableIoctlOutput = 0,
+	.enableSetFb = 1,
 };
 
 struct sunxi_disp_private
@@ -110,6 +112,7 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 		VDPAU_DBG("[disp1] ERROR: Video Layer request returned 0");
     if (disp->video_layer <= 0)
 		goto err_video_layer;
+	VDPAU_DBG("[disp1] Video Layer %d opened", disp->video_layer);
 
 	if (osd_enabled)
 	{
@@ -248,8 +251,27 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 		disp->video_info.scn_win.height -= scn_clip;
 	}
 
-	DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->video_layer, &disp->video_info, 0));
-	DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->video_layer, 0, 0));
+	if (conf.enableSetFb)
+	{
+		// TODO: Rewrite via storing and comparing prev video_info.
+		static bool first_time = true;
+		if (first_time)
+		{
+			first_time = false;
+			DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->video_layer, &disp->video_info, 0));
+			DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->video_layer, 0, 0));
+			VDPAU_DBG("First time: DISP_CMD_LAYER_SET_PARA, DISP_CMD_LAYER_OPEN");
+		}
+		else
+		{
+			DISP(DISP_CMD_LAYER_SET_FB, ARGS(0, disp->video_layer, &disp->video_info.fb, 0));
+		}
+	}
+	else
+	{
+        DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->video_layer, &disp->video_info, 0));
+        DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->video_layer, 0, 0));
+	}
 
 	// Note: might be more reliable (but slower and problematic when there
 	// are driver issues and the GET functions return wrong values) to query the

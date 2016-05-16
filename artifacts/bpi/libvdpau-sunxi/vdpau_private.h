@@ -34,6 +34,14 @@
 
 #define INTERNAL_YCBCR_FORMAT (VdpYCbCrFormat)0xffff
 
+// HACK: Direct access to libcedrus private structure defined in libcedrus/cedrus_mem.h
+struct cedrus_mem
+{
+	void *virt;
+	uint32_t phys;
+	size_t size;
+};
+
 typedef struct
 {
 	cedrus_t *cedrus;
