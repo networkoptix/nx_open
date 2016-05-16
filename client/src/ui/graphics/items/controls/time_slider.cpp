@@ -755,14 +755,7 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
     if (!checkLinePeriod(line, type))
         return;
 
-    bool hadArchive = archiveAvailable();
-
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
-
-    bool hasArchive = archiveAvailable();
-
-    if (hasArchive != hadArchive)
-        emit archiveAvailabilityChanged(hasArchive);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const
@@ -1587,17 +1580,6 @@ void QnTimeSlider::setLiveSupported(bool value)
 bool QnTimeSlider::isLive() const
 {
     return m_liveSupported && value() == maximum();
-}
-
-bool QnTimeSlider::archiveAvailable() const
-{
-    for (int line = 0; line < m_lineCount; ++line)
-    {
-        if (!m_lineData[line].timeStorage.periods(Qn::RecordingContent).empty())
-            return true;
-    }
-
-    return false;
 }
 
 qreal QnTimeSlider::msecsPerPixel() const
