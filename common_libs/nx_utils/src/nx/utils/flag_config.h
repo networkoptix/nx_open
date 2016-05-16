@@ -27,7 +27,7 @@ namespace utils {
  * </code></pre>
  * In the code, use conf.myFlag to test the value.
  */
-class FlagConfig // abstract
+class NX_UTILS_API FlagConfig // abstract
 {
 public:
     /** @param moduleName Is a prefix for .flag files. */
