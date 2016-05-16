@@ -41,6 +41,8 @@ _ump_osu_errcode_t _ump_uku_release( _ump_uk_release_s *args );
 
 _ump_osu_errcode_t _ump_uku_size_get( _ump_uk_size_get_s *args );
 
+_ump_osu_errcode_t _ump_uku_phys_addr_get( _ump_uk_phys_addr_get_s *args );
+
 _ump_osu_errcode_t _ump_uku_get_api_version( _ump_uk_api_version_s *args );
 
 #if UNIFIED_MEMORY_PROVIDER_VERSION > 2

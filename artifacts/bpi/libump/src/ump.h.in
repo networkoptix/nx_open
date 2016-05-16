@@ -204,6 +204,10 @@ UMP_API_EXPORT void ump_write(ump_handle dst, unsigned long offset, const void *
 UMP_API_EXPORT void * ump_mapped_pointer_get(ump_handle mem);
 
 
+/* Fix */
+UMP_API_EXPORT void * ump_phys_address_get(ump_handle mem);
+
+
 /**
  * Releases a previously mapped pointer to the specified UMP memory.
  *

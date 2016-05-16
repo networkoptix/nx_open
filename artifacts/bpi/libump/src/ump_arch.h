@@ -45,6 +45,9 @@ ump_secure_id ump_arch_allocate(unsigned long * size, ump_alloc_constraints cons
 /** Query size of specified UMP memory, in bytes. */
 unsigned long ump_arch_size_get(ump_secure_id secure_id);
 
+/** Query physical address of specified UMP memory. */
+void* ump_arch_phys_address(ump_secure_id secure_id);
+
 /** Release a reference from specified UMP memory. */
 void ump_arch_reference_release(ump_secure_id secure_id);
 

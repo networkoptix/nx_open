@@ -51,6 +51,7 @@ typedef struct ump_mem
 	                                    for the memory that this handle reveals. */
 	unsigned long cookie;          /**< cookie for use in arch_unmap calls */
 	ump_cache_enabled is_cached;
+	void *phys_address;
 } ump_mem;
 
 #ifdef __cplusplus

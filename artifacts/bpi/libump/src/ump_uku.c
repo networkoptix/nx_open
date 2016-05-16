@@ -118,6 +118,10 @@ _ump_osu_errcode_t _ump_uku_size_get(_ump_uk_size_get_s *args)
 	return ump_driver_ioctl(args->ctx, UMP_IOC_SIZE_GET, args);
 }
 
+_ump_osu_errcode_t _ump_uku_phys_addr_get( _ump_uk_phys_addr_get_s *args )
+{
+	return ump_driver_ioctl(args->ctx, UMP_IOC_PHYS_ADDR_GET, args);
+}
 
 void _ump_uku_msynch(_ump_uk_msync_s *args)
 {

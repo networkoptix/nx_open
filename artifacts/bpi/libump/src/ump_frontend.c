@@ -75,7 +75,8 @@ UMP_API_EXPORT ump_handle ump_handle_create_from_secure_id(ump_secure_id secure_
 				mem->size = size;
 				mem->cookie = cookie;
 				mem->is_cached = 1; /* Is set to actually check in the ump_cpu_msync_now() function */
-
+				mem->phys_address = ump_arch_phys_address(secure_id);
+				
 				_ump_osu_lock_auto_init(&mem->ref_lock, 0, 0, 0);
 				UMP_DEBUG_ASSERT(NULL != mem->ref_lock, ("Failed to initialize lock\n"));
 				mem->ref_count = 1;
@@ -138,6 +139,17 @@ UMP_API_EXPORT void ump_write(ump_handle dsth, unsigned long offset, const void 
 }
 
 
+UMP_API_EXPORT void* ump_phys_address_get(ump_handle memh)
+{
+	ump_mem * mem = (ump_mem*)memh;
+
+	UMP_DEBUG_ASSERT(UMP_INVALID_MEMORY_HANDLE != memh, ("Handle is invalid"));
+	UMP_DEBUG_ASSERT(UMP_INVALID_SECURE_ID != mem->secure_id, ("Secure ID is inavlid"));
+	UMP_DEBUG_ASSERT(0 < mem->ref_count, ("Reference count too low"));
+	UMP_DEBUG_ASSERT(0 < mem->size, ("Memory size of passed handle too low"));
+
+	return mem->phys_address;
+}
 
 UMP_API_EXPORT void* ump_mapped_pointer_get(ump_handle memh)
 {

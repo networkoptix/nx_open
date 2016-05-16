@@ -54,6 +54,7 @@ extern "C"
 #define UMP_IOC_UNLOCK        _IOW(UMP_IOCTL_NR,  _UMP_IOC_UNLOCK, _ump_uk_unlock_s)
 #endif /* UNIFIED_MEMORY_PROVIDER_VERSION */
 
+#define UMP_IOC_PHYS_ADDR_GET _IOWR(UMP_IOCTL_NR,  _UMP_IOC_PHYS_ADDR_GET, _ump_uk_phys_addr_get_s)
 #ifdef __cplusplus
 }
 #endif
