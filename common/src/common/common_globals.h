@@ -351,7 +351,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_HasPublicIP      = 0x004,
         SF_IfListCtrl       = 0x008,
         SF_timeCtrl         = 0x010,
-        SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+        //SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
         SF_ArmServer        = 0x040,
         SF_Has_HDD          = 0x080,
         SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
@@ -536,7 +536,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
         ConnectionAliasRole,                        /**< Role for alias of connection. Used in QnActions::ConnectAction, QnLoginDialog. */
-        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials 
+        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                         (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
