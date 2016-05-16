@@ -1592,8 +1592,10 @@ bool QnTimeSlider::isLive() const
 bool QnTimeSlider::archiveAvailable() const
 {
     for (int line = 0; line < m_lineCount; ++line)
+    {
         if (!m_lineData[line].timeStorage.periods(Qn::RecordingContent).empty())
             return true;
+    }
 
     return false;
 }
