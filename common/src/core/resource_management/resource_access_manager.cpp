@@ -15,7 +15,7 @@
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
-    m_mutex(QnMutex::Recursive)
+    m_mutex(QnMutex::NonRecursive)
 {
     /* This change affects all accessible resources. */
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly)
@@ -64,7 +64,11 @@ void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRight
 ec2::ApiUserGroupDataList QnResourceAccessManager::userGroups() const
 {
     QnMutexLocker lk(&m_mutex);
-    return m_userGroups;
+    ec2::ApiUserGroupDataList result;
+    result.reserve(m_userGroups.size());
+    for (const auto& group: m_userGroups)
+        result.push_back(group);
+    return result;
 }
 
 void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& userGroups)
@@ -72,35 +76,27 @@ void QnResourceAccessManager::resetUserGroups(const ec2::ApiUserGroupDataList& u
     QnMutexLocker lk(&m_mutex);
     m_permissionsCache.clear();
     m_globalPermissionsCache.clear();
-    m_userGroups = userGroups;
+    m_userGroups.clear();
+    for (const auto& group : userGroups)
+        m_userGroups.insert(group.id, group);
+}
+
+ec2::ApiUserGroupData QnResourceAccessManager::userGroup(const QnUuid& groupId) const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_userGroups.value(groupId);
 }
 
 void QnResourceAccessManager::addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup)
 {
     QnMutexLocker lk(&m_mutex);
-    auto iter = std::find_if(m_userGroups.begin(), m_userGroups.end(), [userGroup](const ec2::ApiUserGroupData& group)
-    {
-        return group.id == userGroup.id;
-    });
-    if (iter != m_userGroups.end())
-    {
-        iter->name = userGroup.name;
-        iter->permissions = userGroup.permissions;
-    }
-    else
-    {
-        m_userGroups.push_back(userGroup);
-    }
+    m_userGroups[userGroup.id] = userGroup;
 }
 
 void QnResourceAccessManager::removeUserGroup(const QnUuid& groupId)
 {
     QnMutexLocker lk(&m_mutex);
-    m_userGroups.erase(
-        std::remove_if(m_userGroups.begin(), m_userGroups.end(), [groupId](const ec2::ApiUserGroupData& group)
-    {
-        return group.id == groupId;
-    }), m_userGroups.end());
+    m_userGroups.remove(groupId);
 }
 
 QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) const
@@ -157,13 +153,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     }
     else if (!groupId.isNull())
     {
-        QnMutexLocker lk(&m_mutex);
-        auto iter = std::find_if(m_userGroups.cbegin(), m_userGroups.cend(), [groupId](const ec2::ApiUserGroupData& group)
-        {
-            return group.id == groupId;
-        });
-        if (iter != m_userGroups.cend())
-            result |= iter->permissions;
+        result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
     }
 
     result = undeprecate(result);

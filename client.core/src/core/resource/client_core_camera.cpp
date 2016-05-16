@@ -19,9 +19,13 @@ QString QnClientCoreCamera::getName() const {
     return getUserDefinedName();
 }
 
-void QnClientCoreCamera::setName(const QString& name) {
+void QnClientCoreCamera::setName(const QString& name)
+{
     if (getId().isNull())
+    {
+        base_type::setName(name);
         return;
+    }
 
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(QnCameraUserAttributePool::instance(), getId());
@@ -49,7 +53,7 @@ Qn::ResourceStatus QnClientCoreCamera::getStatus() const {
     Qn::ResourceStatus serverStatus = qnStatusDictionary->value(getParentId());
     if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
         return Qn::Offline;
-    
+
     return QnResource::getStatus();
 }
 

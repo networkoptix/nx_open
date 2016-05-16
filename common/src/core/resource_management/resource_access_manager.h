@@ -26,6 +26,8 @@ public:
 
     ec2::ApiUserGroupDataList userGroups() const;
     void resetUserGroups(const ec2::ApiUserGroupDataList& userGroups);
+
+    ec2::ApiUserGroupData userGroup(const QnUuid& groupId) const;
     void addOrUpdateUserGroup(const ec2::ApiUserGroupData& userGroup);
     void removeUserGroup(const QnUuid& groupId);
 
@@ -86,7 +88,7 @@ private:
     mutable QnMutex m_mutex;
 
     QHash<QnUuid, QSet<QnUuid> > m_accessibleResources;
-    ec2::ApiUserGroupDataList m_userGroups;
+    QHash<QnUuid, ec2::ApiUserGroupData> m_userGroups;
 
     mutable QHash<QnUuid, Qn::GlobalPermissions> m_globalPermissionsCache;
 

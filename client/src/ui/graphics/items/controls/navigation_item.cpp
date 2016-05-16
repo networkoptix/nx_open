@@ -35,9 +35,11 @@
 #include <core/resource/resource.h>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include "time_slider.h"
 #include "time_scroll_bar.h"
+#include "timeline_placeholder.h"
 #include "clock_label.h"
 
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
@@ -125,8 +127,28 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
 
+    GraphicsLabel* timelinePlaceholder = new QnTimelinePlaceholder(this, m_timeSlider);
+    timelinePlaceholder->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
     m_timeScrollBar = new QnTimeScrollBar(this);
     m_timeScrollBar->setPreferredHeight(16);
+
+    m_separators = new QnFramedWidget(this);
+    m_separators->setWindowBrush(Qt::NoBrush);
+    m_separators->setFrameShape(Qn::RectangularFrame);
+    m_separators->setFrameBorders(Qt::LeftEdge | Qt::RightEdge);
+    m_separators->setFrameColor(palette().color(QPalette::Midlight));
+    m_separators->setFrameWidth(1.0);
+
+    connect(m_timeSlider, &QnTimeSlider::archiveAvailabilityChanged, this,
+        [this, timelinePlaceholder](bool hasArchive)
+        {
+            m_timeSlider->setVisible(hasArchive);
+            m_timeScrollBar->setVisible(hasArchive);
+            timelinePlaceholder->setVisible(!hasArchive);
+            m_separators->setFrameColor(palette().color(hasArchive ? QPalette::Shadow : QPalette::Midlight));
+            m_separators->setFrameWidth(hasArchive ? 2.0 : 1.0);
+        });
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
@@ -184,6 +206,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     sliderLayout->setSpacing(0);
     sliderLayout->addItem(m_timeSlider);
     sliderLayout->addItem(m_timeScrollBar);
+    sliderLayout->addItem(timelinePlaceholder);
+
+    m_timeSlider->hide();
+    m_timeScrollBar->hide();
 
     QGraphicsLinearLayout* mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -249,6 +275,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updatePlayButtonChecked, Qt::QueuedConnection);
+
+    connect(this, &QGraphicsWidget::geometryChanged, [this, sliderLayout]() { m_separators->setGeometry(sliderLayout->geometry()); });
 
     /* Register actions. */
     addAction(action(QnActions::PreviousFrameAction));
@@ -523,7 +551,10 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event)
         return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
 
     if (event->type() == QEvent::PaletteChange)
+    {
         setFrameColor(palette().color(QPalette::Midlight));
+        m_separators->setFrameColor(palette().color(m_timeSlider->archiveAvailable() ? QPalette::Shadow : QPalette::Midlight));
+    }
 
     return base_type::eventFilter(watched, event);
 }

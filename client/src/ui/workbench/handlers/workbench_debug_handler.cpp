@@ -47,10 +47,12 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+#ifdef _DEBUG
     connect(action(QnActions::DebugControlPanelAction),                &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered);
     connect(action(QnActions::DebugIncrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
     connect(action(QnActions::DebugDecrementCounterAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
     connect(action(QnActions::DebugShowResourcePoolAction),            &QAction::triggered,    this,   &QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered);
+#endif
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered() {
