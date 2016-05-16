@@ -90,7 +90,7 @@ void MultipartBodySerializer::startBodyPartInternal(
         "Content-Type: " + contentType + "\r\n";
     serializeHeaders(headers, &serializedData);
     if (contentLength && (headers.find("Content-Length") == headers.end()))
-        serializedData+= "Content-Length: "+BufferType::number(*contentLength)+"\r\n";
+        serializedData+= "Content-Length: "+BufferType::number((quint64)*contentLength)+"\r\n";
     serializedData += "\r\n";
     serializedData += data;
 

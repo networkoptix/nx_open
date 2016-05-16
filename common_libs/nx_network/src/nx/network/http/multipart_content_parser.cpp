@@ -292,7 +292,7 @@ namespace nx_http
                     const size_t bytesNeeded = m_startBoundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
                     const int slashRPos = data.indexOf( '\r' );
                     if( (slashRPos != -1) &&
-                        (slashRPos < bytesNeeded) &&
+                        (static_cast<size_t>(slashRPos) < bytesNeeded) &&
                         !((m_supposedBoundary + data.mid(0, slashRPos)).startsWith(m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF)) )
                     {
                         //boundary not found, resetting boundary check
