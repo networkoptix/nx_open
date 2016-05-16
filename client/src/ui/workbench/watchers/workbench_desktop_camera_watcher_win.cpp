@@ -74,8 +74,9 @@ void QnWorkbenchDesktopCameraWatcher::forcedUpdate() {
     m_desktop->addConnection(m_server);
 }
 
-void QnWorkbenchDesktopCameraWatcher::setServer(const QnMediaServerResourcePtr &server) {
-    if (m_server == server)
+void QnWorkbenchDesktopCameraWatcher::setServer(const QnMediaServerResourcePtr &server)
+{
+    if (m_server == server && m_desktop && m_desktop->isConnectedTo(server))
         return;
 
     if (m_desktop && m_server)
