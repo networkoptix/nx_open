@@ -33,76 +33,23 @@ namespace nx_http
                 {
                     ConstBufferRefType lineBuffer;
                     size_t bytesRead = 0;
-                    const bool lineFound = m_lineSplitter.parseByLines(
+                    bool lineFound = m_lineSplitter.parseByLines(
                         data.mid( offset ),
                         &lineBuffer,
                         &bytesRead );
                     offset += bytesRead;
-                    if( !lineFound )
+                    if (!lineFound && 
+                        m_lineSplitter.partialLineBuffer() == m_endBoundaryLine)
+                    {
+                        m_lineSplitter.reset();
+                        lineBuffer = m_endBoundaryLine;
+                        lineFound = true;
+                    }
+                    if (!lineFound)
                         continue;
 
-                    switch( m_state )
-                    {
-                        case waitingBoundary:
-                            if( lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine )
-                            {
-                                m_state = readingHeaders;
-                                m_currentFrameHeaders.clear();
-                            }
-                            continue;
-
-                        case readingTextData:
-                            if( lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine )
-                            {
-                                if( !m_nextFilter->processData( m_currentFrame ) )
-                                    return false;
-                                m_currentFrame.clear();
-
-                                m_state = readingHeaders;
-                                m_currentFrameHeaders.clear();
-                                continue;
-                            }
-                            m_currentFrame += lineBuffer;
-                            break;
-
-                        case readingHeaders:
-                        {
-                            if( lineBuffer.isEmpty() )
-                            {
-                                //m_state = m_contentLength == (unsigned int)-1 ? readingTextData : readingBinaryData;
-                                const auto contentLengthIter = m_currentFrameHeaders.find( "Content-Length" );
-                                if( contentLengthIter != m_currentFrameHeaders.end() )
-                                {
-                                    //Content-Length known
-                                    m_contentLength = contentLengthIter->second.toUInt();
-                                    m_state = depleteLineFeedBeforeBinaryData;
-                                    m_nextState = readingSizedBinaryData;
-                                }
-                                else
-                                {
-                                    const nx_http::StringType& contentType = nx_http::getHeaderValue( m_currentFrameHeaders, "Content-Type" );
-                                    if( contentType == "application/text" || contentType == "text/plain" )
-                                    {
-                                        m_state = readingTextData;
-                                    }
-                                    else
-                                    {
-                                        m_state = depleteLineFeedBeforeBinaryData;
-                                        m_nextState = readingUnsizedBinaryData;
-                                    }
-                                }
-                                continue;
-                            }
-                            QnByteArrayConstRef headerName;
-                            QnByteArrayConstRef headerValue;
-                            nx_http::parseHeader( &headerName, &headerValue, lineBuffer );  //ignoring result
-                            m_currentFrameHeaders.emplace( headerName, headerValue );
-                            break;
-                        }
-
-                        default:
-                            break;
-                    }
+                    if (!processLine(lineBuffer))
+                        return false;
                     break;
                 }
 
@@ -146,11 +93,34 @@ namespace nx_http
             }
         }
 
+        if( m_state == eofReached )
+            return m_nextFilter->processData(nx_http::BufferType());    //reporting eof with empty part
+
         return true;
     }
 
     size_t MultipartContentParser::flush()
     {
+        switch (m_state)
+        {
+            case waitingBoundary:
+            case readingHeaders:
+            case readingTextData:
+            {
+                ConstBufferRefType lineBuffer = m_lineSplitter.flush();
+                if (!lineBuffer.isEmpty())
+                {
+                    processLine(lineBuffer);
+                    if (m_state == eofReached)
+                        return m_nextFilter->processData(nx_http::BufferType());    //reporting eof with empty part
+                }
+                break;
+            }
+
+            default:
+                break;
+        }
+
         if( m_currentFrame.isEmpty() )
             return 0;
 
@@ -204,14 +174,84 @@ namespace nx_http
         while( !m_boundary.isEmpty() && m_boundary[m_boundary.size() - 1] == '"' )
             m_boundary.remove( m_boundary.size() - 1, 1 );
         m_startBoundaryLine = "--" + m_boundary/*+"\r\n"*/; //--boundary\r\n
-        m_boundaryForUnsizedBinaryParsing = "\r\n" + m_startBoundaryLine + "\r\n";
-        m_boundaryForUnsizedBinaryParsingWOTrailingCRLF = "\r\n"+m_startBoundaryLine;
+        m_startBoundaryForUnsizedBinaryParsing = "\r\n" + m_startBoundaryLine + "\r\n";
+        m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF = "\r\n"+m_startBoundaryLine;
         m_endBoundaryLine = "--"+m_boundary+"--" /*"\r\n"*/;
+        m_endBoundaryForUnsizedBinaryParsing = m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF + "--";
     }
 
     const nx_http::HttpHeaders& MultipartContentParser::prevFrameHeaders() const
     {
         return m_currentFrameHeaders;
+    }
+
+    bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
+    {
+        switch (m_state)
+        {
+            case waitingBoundary:
+                if (lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine)
+                {
+                    m_state = lineBuffer == m_startBoundaryLine ? readingHeaders : eofReached;
+                    m_currentFrameHeaders.clear();
+                }
+                break;
+
+            case readingTextData:
+                if (lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine)
+                {
+                    if (!m_nextFilter->processData(m_currentFrame))
+                        return false;
+                    m_currentFrame.clear();
+
+                    m_state = lineBuffer == m_startBoundaryLine ? readingHeaders : eofReached;
+                    m_currentFrameHeaders.clear();
+                    break;
+                }
+                m_currentFrame += lineBuffer;
+                break;
+
+            case readingHeaders:
+            {
+                if (lineBuffer.isEmpty())
+                {
+                    //m_state = m_contentLength == (unsigned int)-1 ? readingTextData : readingBinaryData;
+                    const auto contentLengthIter = m_currentFrameHeaders.find("Content-Length");
+                    if (contentLengthIter != m_currentFrameHeaders.end())
+                    {
+                        //Content-Length known
+                        m_contentLength = contentLengthIter->second.toUInt();
+                        m_state = depleteLineFeedBeforeBinaryData;
+                        m_nextState = readingSizedBinaryData;
+                    }
+                    else
+                    {
+                        const nx_http::StringType& contentType = nx_http::getHeaderValue(m_currentFrameHeaders, "Content-Type");
+                        if (contentType == "application/text" || contentType == "text/plain")
+                        {
+                            m_state = readingTextData;
+                        }
+                        else
+                        {
+                            m_state = depleteLineFeedBeforeBinaryData;
+                            m_nextState = readingUnsizedBinaryData;
+                        }
+                    }
+                    break;
+                }
+                QnByteArrayConstRef headerName;
+                QnByteArrayConstRef headerValue;
+                nx_http::parseHeader(&headerName, &headerValue, lineBuffer);  //ignoring result
+                m_currentFrameHeaders.emplace(headerName, headerValue);
+                break;
+            }
+
+            default:
+                NX_ASSERT(false);
+                return false;
+        }
+
+        return true;
     }
 
     bool MultipartContentParser::readUnsizedBinaryData(
@@ -249,11 +289,11 @@ namespace nx_http
                     //if we are here, then m_supposedBoundary does not contain full boundary yet
 
                     //saving supposed boundary in local buffer
-                    const size_t bytesNeeded = m_boundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
+                    const size_t bytesNeeded = m_startBoundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
                     const int slashRPos = data.indexOf( '\r' );
                     if( (slashRPos != -1) &&
-                        (slashRPos < bytesNeeded) &&    //checking within potential boundary
-                        ((m_supposedBoundary + data.mid( 0, slashRPos )) != m_boundaryForUnsizedBinaryParsingWOTrailingCRLF) )
+                        (slashRPos < bytesNeeded) &&
+                        !((m_supposedBoundary + data.mid(0, slashRPos)).startsWith(m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF)) )
                     {
                         //boundary not found, resetting boundary check
                         m_currentFrame += m_supposedBoundary;
@@ -271,15 +311,15 @@ namespace nx_http
                 }
 
                 QnByteArrayConstRef supposedBoundary;
-                if( m_supposedBoundary.size() == m_boundaryForUnsizedBinaryParsing.size() )  //supposed boundary is in m_supposedBoundary buffer
+                if( m_supposedBoundary.size() == m_startBoundaryForUnsizedBinaryParsing.size() )  //supposed boundary is in m_supposedBoundary buffer
                 {
-                    supposedBoundary = QnByteArrayConstRef( m_supposedBoundary );
+                    supposedBoundary = QnByteArrayConstRef(m_supposedBoundary);
                 }
-                else if( m_supposedBoundary.isEmpty() && (data.size() >= (size_t)m_boundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
+                else if( m_supposedBoundary.isEmpty() && (data.size() >= (size_t)m_startBoundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
                 {
-                    supposedBoundary = data.mid( 0, m_boundaryForUnsizedBinaryParsing.size() );
-                    *offset += m_boundaryForUnsizedBinaryParsing.size();
-                    data.pop_front( m_boundaryForUnsizedBinaryParsing.size() );
+                    supposedBoundary = data.mid( 0, m_startBoundaryForUnsizedBinaryParsing.size() );
+                    *offset += m_startBoundaryForUnsizedBinaryParsing.size();
+                    data.pop_front( m_startBoundaryForUnsizedBinaryParsing.size() );
                 }
                 else
                 {
@@ -290,14 +330,15 @@ namespace nx_http
                 }
 
                 //checking if boundary has been met
-                if( supposedBoundary == m_boundaryForUnsizedBinaryParsing )
+                if( (supposedBoundary == m_startBoundaryForUnsizedBinaryParsing) ||
+                    (supposedBoundary == m_endBoundaryForUnsizedBinaryParsing) )
                 {
                     //found frame delimiter
                     if( !m_nextFilter->processData( m_currentFrame ) )
                         return false;
                     m_currentFrame.clear();
 
-                    m_state = readingHeaders;
+                    m_state = supposedBoundary == m_endBoundaryForUnsizedBinaryParsing ? eofReached : readingHeaders;
                     m_currentFrameHeaders.clear();
                 }
                 else
@@ -313,5 +354,10 @@ namespace nx_http
         }
 
         return true;
+    }
+
+    bool MultipartContentParser::eof() const
+    {
+        return m_state == eofReached;
     }
 }

@@ -13,14 +13,13 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/singleton.h>
 #include <utils/common/safe_direct_connection.h>
+#include <utils/common/subscription.h>
 
 
 class CloudConnectionManager
 :
     public QObject,
-    public Singleton<CloudConnectionManager>,
     public Qn::EnableSafeDirectConnection,
     public nx::hpm::api::AbstractCloudSystemCredentialsProvider
 {
@@ -39,6 +38,13 @@ public:
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
+    //event subscription
+    void subscribeToSystemAccessListUpdatedEvent(
+        nx::utils::MoveOnlyFunc<void(nx::cdb::api::SystemAccessListModifiedEvent)> handler,
+        nx::utils::SubscriptionId* const subscriptionId);
+    void unsubscribeFromSystemAccessListUpdatedEvent(
+        nx::utils::SubscriptionId subscriptionId);
+
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
 
@@ -49,8 +55,15 @@ private:
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
+    std::unique_ptr<nx::cdb::api::EventConnection> m_eventConnection;
+    nx::utils::Subscription<nx::cdb::api::SystemAccessListModifiedEvent>
+        m_systemAccessListUpdatedEventSubscription;
 
     bool boundToCloud(QnMutexLockerBase* const lk) const;
+    void monitorForCloudEvents();
+    void stopMonitoringCloudEvents();
+    void onSystemAccessListUpdated(nx::cdb::api::SystemAccessListModifiedEvent);
+    void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);
 
 private slots:
     void cloudSettingsChanged();

@@ -289,11 +289,11 @@ TEST_F(CdbFunctionalTest, notification_of_system_removal)
     constexpr const std::chrono::seconds kDropExpiredSystemsPeriodSec =
         std::chrono::seconds(1);
 
-    addArg("-systemManager/reportRemovedSystemPeriodSec");
+    addArg("-systemManager/reportRemovedSystemPeriod");
     addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
     addArg("-systemManager/controlSystemStatusByDb");
     addArg("true");
-    addArg("-systemManager/dropExpiredSystemsPeriodSec");
+    addArg("-systemManager/dropExpiredSystemsPeriod");
     addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
 
     ASSERT_TRUE(startAndWaitUntilStarted());

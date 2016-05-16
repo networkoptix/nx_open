@@ -9,6 +9,7 @@
 #include <nx/network/cloud/random_online_endpoint_selector.h>
 
 #include "cdb_connection.h"
+#include "event_connection.h"
 
 namespace nx {
 namespace cdb {
@@ -41,6 +42,16 @@ std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
     const std::string& password)
 {
     return std::make_unique<Connection>(
+        &m_endPointFetcher,
+        login,
+        password);
+}
+
+std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection(
+    const std::string& login,
+    const std::string& password)
+{
+    return std::make_unique<EventConnection>(
         &m_endPointFetcher,
         login,
         password);

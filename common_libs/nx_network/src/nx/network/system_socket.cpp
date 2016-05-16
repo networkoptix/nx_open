@@ -110,7 +110,7 @@ bool Socket<InterfaceToImplement>::getSendTimeout(unsigned int* millis) const
 }
 
 template<typename InterfaceToImplement>
-aio::AbstractAioThread* Socket<InterfaceToImplement>::getAioThread()
+aio::AbstractAioThread* Socket<InterfaceToImplement>::getAioThread() const
 {
     return Pollable::getAioThread();
 }

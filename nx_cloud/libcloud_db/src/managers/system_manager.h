@@ -42,6 +42,7 @@ namespace conf
     class Settings;
 }
 class AccountManager;
+class EventManager;
 
 /*!
     Provides methods for manipulating system data on persisent storage.
@@ -61,6 +62,7 @@ public:
         const conf::Settings& settings,
         nx::utils::TimerManager* const timerManager,
         const AccountManager& accountManager,
+        const EventManager& eventManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
     virtual ~SystemManager();
 
@@ -172,6 +174,7 @@ private:
     const conf::Settings& m_settings;
     nx::utils::TimerManager* const m_timerManager;
     const AccountManager& m_accountManager;
+    const EventManager& m_eventManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     //!map<id, system>
     SystemsDict m_systems;

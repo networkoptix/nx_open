@@ -56,7 +56,7 @@ public:
     //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
-    aio::AbstractAioThread* getAioThread() override;
+    aio::AbstractAioThread* getAioThread() const override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
