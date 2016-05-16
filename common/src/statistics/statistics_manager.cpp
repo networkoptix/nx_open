@@ -153,7 +153,9 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
 
 bool QnStatisticsManager::isStatisticsSendingAllowed() const
 {
-    return qnGlobalSettings->isInitialized() && qnGlobalSettings->isStatisticsAllowed();
+    return qnGlobalSettings->isInitialized() &&
+           qnGlobalSettings->isStatisticsAllowed() &&
+           !qnGlobalSettings->isNewSystem();
 }
 
 void QnStatisticsManager::unregisterModule(const QString &alias)
