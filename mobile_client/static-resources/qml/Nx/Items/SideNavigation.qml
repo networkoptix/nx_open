@@ -59,16 +59,25 @@ Drawer
             {
                 icon: "/images/plus.png"
                 text: qsTr("New connection")
-                active: !currentSessionId
+                visible: !currentSessionId
                 onClicked:
                 {
                     sideNavigation.close()
-
-                    if (active)
-                        return
-
-                    connectionManager.disconnectFromServer(false)
                     Workflow.openNewSessionScreen()
+                }
+            }
+
+            SideNavigationButton
+            {
+                icon: "/images/close.png"
+                text: qsTr("Disconnect from server")
+                visible: currentSessionId
+                onClicked:
+                {
+                    sideNavigation.close()
+                    connectionManager.disconnectFromServer(false)
+                    currentSessionId = ""
+                    Workflow.openSessionsScreen()
                 }
             }
 
