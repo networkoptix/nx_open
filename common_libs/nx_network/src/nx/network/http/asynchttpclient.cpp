@@ -1004,7 +1004,7 @@ namespace nx_http
     void AsyncHttpClient::forceEndOfMsgBody()
     {
         m_forcedEof = true;
-        m_httpStreamReader.resetState();
+        m_httpStreamReader.forceEndOfMsgBody();
     }
 
 

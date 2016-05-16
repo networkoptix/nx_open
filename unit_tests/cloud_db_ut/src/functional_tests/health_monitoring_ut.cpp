@@ -90,7 +90,7 @@ TEST_F(HealthMonitoring, general)
 TEST_F(HealthMonitoring, reconnect)
 {
     addArg("-eventManager/mediaServerConnectionIdlePeriod");
-    addArg("5s");
+    addArg("3s");
 
     ASSERT_TRUE(startAndWaitUntilStarted());
 
@@ -118,7 +118,7 @@ TEST_F(HealthMonitoring, reconnect)
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, result);
 
-    std::this_thread::sleep_for(std::chrono::minutes(1));
+    std::this_thread::sleep_for(std::chrono::seconds(8 + (rand() % 3)));
 
     //checking that cdb considers system as online
     api::SystemDataEx systemData;

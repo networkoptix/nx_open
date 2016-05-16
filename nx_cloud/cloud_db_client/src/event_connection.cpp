@@ -81,11 +81,17 @@ void EventConnection::cdbEndpointResolved(
         return;
     }
 
+    m_cdbEndpoint = std::move(endpoint);
+    initiateConnection();
+}
+
+void EventConnection::initiateConnection()
+{
     //connecting with Http client to cloud_db
     QUrl url;
     url.setScheme("http");
-    url.setHost(endpoint.address.toString());
-    url.setPort(endpoint.port);
+    url.setHost(m_cdbEndpoint.address.toString());
+    url.setPort(m_cdbEndpoint.port);
     url.setPath(url.path() + kSubscribeToSystemEventsPath);
     url.setUserName(QString::fromStdString(m_login));
     url.setPassword(QString::fromStdString(m_password));
@@ -111,9 +117,7 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
             const bool nextTryScheduled = m_reconnectTimer.scheduleNextTry(
                 [this]
                 {
-                    using namespace std::placeholders;
-                    m_cdbEndPointFetcher->get(
-                        std::bind(&EventConnection::cdbEndpointResolved, this, _1, _2));
+                    initiateConnection();
                 });
             if (!nextTryScheduled)
             {

@@ -217,6 +217,12 @@ namespace nx_http
             m_contentDecoder->flush();
     }
 
+    void HttpStreamReader::forceEndOfMsgBody()
+    {
+        NX_ASSERT(m_state == readingMessageBody);
+        m_state = messageDone;
+    }
+
     /*!
         By default \a true.
         \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
