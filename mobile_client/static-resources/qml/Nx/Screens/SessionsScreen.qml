@@ -9,7 +9,7 @@ Page
     id: sessionsScreen
     objectName: "sessionsScreen"
 
-    leftButtonIcon: "/images/menu.png"
+    leftButtonIcon: lp("/images/menu.png")
     padding: 16
 
     onLeftButtonClicked: sideNavigation.open()

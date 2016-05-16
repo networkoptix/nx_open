@@ -31,7 +31,7 @@ Item
 
             IconButton
             {
-                icon: "/images/arrow_left.png"
+                icon: lp("/images/arrow_left.png")
                 onClicked: calendar.previousMonthClicked()
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
@@ -63,7 +63,7 @@ Item
 
             IconButton
             {
-                icon: "/images/arrow_right.png"
+                icon: lp("/images/arrow_right.png")
                 onClicked: calendar.nextMonthClicked()
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
@@ -101,7 +101,7 @@ Item
             {
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Close")
-                icon: "/images/close.png"
+                icon: lp("/images/close.png")
                 flat: true
                 onClicked: calendar.closeClicked()
             }

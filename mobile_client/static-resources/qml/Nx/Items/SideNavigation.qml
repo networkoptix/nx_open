@@ -57,7 +57,7 @@ Drawer
 
             SideNavigationButton
             {
-                icon: "/images/plus.png"
+                icon: lp("/images/plus.png")
                 text: qsTr("New connection")
                 visible: !currentSessionId
                 onClicked:
@@ -69,7 +69,7 @@ Drawer
 
             SideNavigationButton
             {
-                icon: "/images/close.png"
+                icon: lp("/images/close.png")
                 text: qsTr("Disconnect from server")
                 visible: currentSessionId
                 onClicked:
@@ -83,7 +83,7 @@ Drawer
 
             SideNavigationButton
             {
-                icon: "/images/settings.png"
+                icon: lp("/images/settings.png")
                 text: qsTr("Settings")
                 visible: !liteMode
                 onClicked: Workflow.openSettingsScreen()

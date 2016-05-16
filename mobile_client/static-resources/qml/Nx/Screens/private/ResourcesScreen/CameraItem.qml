@@ -125,7 +125,7 @@ Control
             Image
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized ? "/images/camera_locked.png" : "/images/camera_offline.png"
+                source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
             }
 
             Text

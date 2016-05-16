@@ -17,7 +17,7 @@ Item
         height: sourceSize.height
         anchors.bottom: parent.bottom
         sourceSize.height: 56 * 2
-        source: "/images/timeline_gradient.png"
+        source: lp("/images/timeline_gradient.png")
     }
 
     Column

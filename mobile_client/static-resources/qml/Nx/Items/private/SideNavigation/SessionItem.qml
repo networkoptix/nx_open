@@ -43,7 +43,7 @@ SideNavigationItem
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.right
                 anchors.leftMargin: 8
-                icon: "/images/edit.png"
+                icon: lp("/images/edit.png")
 
                 onClicked:
                 {

@@ -131,3 +131,18 @@ void QnContext::setCurrentSessionId(const QString &id)
     m_currentSessionId = id;
     emit currentSessionIdChanged();
 }
+
+QString QnContext::lp(const QString& path) const
+{
+    if (path.isEmpty())
+        return path;
+
+    return m_localPrefix + path;
+}
+
+void QnContext::setLocalPrefix(const QString& prefix)
+{
+    m_localPrefix = prefix;
+    if (!m_localPrefix.endsWith(lit("/")))
+        m_localPrefix.append(lit("/"));
+}

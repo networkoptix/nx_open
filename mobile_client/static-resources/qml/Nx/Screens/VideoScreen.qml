@@ -151,13 +151,13 @@ PageBase
         id: toolBar
 
         title: resourceHelper.resourceName
-        leftButtonIcon: "/images/arrow_back.png"
+        leftButtonIcon: lp("/images/arrow_back.png")
         onLeftButtonClicked: Workflow.popCurrentScreen()
         background: Image
         {
             anchors.fill: parent
             anchors.topMargin: -toolBar.statusBarHeight
-            source: "/images/toolbar_gradient.png"
+            source: lp("/images/toolbar_gradient.png")
         }
 
         opacity: liteMode ? 0.0 : 1.0
@@ -240,13 +240,13 @@ PageBase
                 source:
                 {
                     if (d.serverOffline)
-                        return "/images/server_offline_1.png"
+                        return lp("/images/server_offline_1.png")
                     else if (d.cameraUnauthorized)
-                        return "/images/camera_locked_1.png"
+                        return lp("/images/camera_locked_1.png")
                     else if (d.cameraOffline)
-                        return "/images/camera_offline_1.png"
+                        return lp("/images/camera_offline_1.png")
                     else if (d.failed)
-                        return "/images/camera_warning_1.png"
+                        return lp("/images/camera_warning_1.png")
                     else
                         return ""
                 }

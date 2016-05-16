@@ -26,7 +26,7 @@ ToolBarBase
 
         IconButton
         {
-            icon: "/images/arrow_back.png"
+            icon: lp("/images/arrow_back.png")
             onClicked: close()
             alwaysCompleteHighlightAnimation: false
         }
@@ -46,7 +46,7 @@ ToolBarBase
 
         IconButton
         {
-            icon: "/images/clear.png"
+            icon: lp("/images/clear.png")
             onClicked: clear()
         }
     }

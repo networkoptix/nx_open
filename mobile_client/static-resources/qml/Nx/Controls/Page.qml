@@ -21,7 +21,7 @@ PageBase
         ToolBar
         {
             id: toolBar
-            leftButtonIcon: "/images/arrow_back.png"
+            leftButtonIcon: lp("/images/arrow_back.png")
             onLeftButtonClicked: page.leftButtonClicked()
         }
 

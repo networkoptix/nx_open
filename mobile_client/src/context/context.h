@@ -83,6 +83,9 @@ public:
     QString currentSessionId() const;
     void setCurrentSessionId(const QString& id);
 
+    Q_INVOKABLE QString lp(const QString& path) const;
+    void setLocalPrefix(const QString& prefix);
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
@@ -102,6 +105,7 @@ private:
     QnContextSettings *m_settings;
     QnSavedSessionsModel* m_savedSessionsModel;
 
+    QString m_localPrefix;
     QScopedPointer<QnResolutionUtil> m_resolutionUtil;
 
     QString m_currentSessionId;

@@ -10,7 +10,7 @@ Page
     id: resourcesScreen
     objectName: "resourcesScreen"
 
-    leftButtonIcon: "/images/menu.png"
+    leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
     warningText: qsTr("Server offline")
 
@@ -18,7 +18,7 @@ Page
     [
         IconButton
         {
-            icon: "/images/search.png"
+            icon: lp("/images/search.png")
             enabled: d.enabled
             opacity: !warningVisible ? 1.0 : 0.2
             onClicked: searchToolBar.open()

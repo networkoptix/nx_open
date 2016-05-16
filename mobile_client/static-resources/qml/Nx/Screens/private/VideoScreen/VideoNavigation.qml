@@ -130,7 +130,7 @@ Item
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: timeline.chunkBarHeight
                 sourceSize.height: 150 - timeline.chunkBarHeight
-                source: "/images/timeline_gradient.png"
+                source: lp("/images/timeline_gradient.png")
             }
 
             Timeline
@@ -267,7 +267,7 @@ Item
                 IconButton
                 {
                     anchors.verticalCenter: parent.verticalCenter
-                    icon: "/images/calendar.png"
+                    icon: lp("/images/calendar.png")
                     enabled: d.hasArchive
                     onClicked:
                     {
@@ -284,7 +284,7 @@ Item
                     {
                         id: zoomOutButton
 
-                        icon: "/images/minus.png"
+                        icon: lp("/images/minus.png")
                         enabled: d.hasArchive
                         onClicked: timeline.zoomOut()
                     }
@@ -293,7 +293,7 @@ Item
                     {
                         id: zoomInButton
 
-                        icon: "/images/plus.png"
+                        icon: lp("/images/plus.png")
                         enabled: d.hasArchive
                         onClicked: timeline.zoomIn()
                     }
