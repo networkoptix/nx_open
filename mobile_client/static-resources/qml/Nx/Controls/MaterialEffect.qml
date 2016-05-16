@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0
 
 Item
 {
@@ -10,10 +11,21 @@ Item
     property var mouseArea: null
     property bool centered: false
     property bool rounded: false
-    property alias radius: highlightRectangle.radius
+    property real radius: rounded ? width / 2 : 0
     property bool alwaysCompleteHighlightAnimation: false
 
     property Ripple _currentRipple: null
+
+    layer.enabled: radius > 0
+    layer.effect: OpacityMask
+    {
+        maskSource: Rectangle
+        {
+            width: materialEffect.width
+            height: materialEffect.height
+            radius: materialEffect.radius
+        }
+    }
 
     Connections
     {
@@ -87,7 +99,6 @@ Item
         anchors.fill: parent
         color: "#30ffffff"
         opacity: 0
-        radius: rounded ? width / 2 : 0
 
         SequentialAnimation
         {

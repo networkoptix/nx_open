@@ -271,10 +271,8 @@ Item
                     enabled: d.hasArchive
                     onClicked:
                     {
-                        calendarLoader.active = true
-                        var calendarPanel = calendarLoader.item
                         calendarPanel.date = timeline.positionDate
-                        calendarPanel.show()
+                        calendarPanel.open()
                     }
                 }
 
@@ -430,25 +428,20 @@ Item
         // This rectangle guarantees the same color under android navigation buttons as under the navigation panel
         width: parent.width
         anchors.top: parent.bottom
-        color: navigationPanel.color
+        color: ColorTheme.base3
         height: navigationPanel.height
     }
 
-    Loader
+    CalendarPanel
     {
-        id: calendarLoader
+        id: calendarPanel
 
-        active: false
-
-//        sourceComponent: CalendarPanel
-//        {
-//            chunkProvider: chunkProvider
-//            onDatePicked:
-//            {
-//                hide()
-//                mediaPlayer.seek(date.getTime())
-//            }
-//        }
+        chunkProvider: chunkProvider
+        onDatePicked:
+        {
+            close()
+            mediaPlayer.seek(date.getTime())
+        }
     }
 
     Component.onCompleted: d.updateNavigatorPosition()

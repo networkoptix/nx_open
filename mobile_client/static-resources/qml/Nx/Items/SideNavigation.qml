@@ -14,9 +14,10 @@ Drawer
 
     Rectangle
     {
-        width: Math.min(mainWindow.width - 56, mainWindow.height - 56, 56 * 6)
-        height: mainWindow.height
+        width: Math.min(ApplicationWindow.window.width - 56, ApplicationWindow.window.height - 56, 56 * 6)
+        height: ApplicationWindow.window.height
         color: ColorTheme.base8
+        clip: true
 
         ListView
         {

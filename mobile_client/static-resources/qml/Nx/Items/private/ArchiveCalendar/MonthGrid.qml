@@ -1,40 +1,37 @@
-import QtQuick 2.4
-
+import QtQuick 2.6
+import Nx 1.0
 import com.networkoptix.qml 1.0
 
-Item {
-    id: calendarMonth
+Item
+{
+    id: monthGrid
 
-    height: calendarGrid.height
+    property alias locale: calendarModel.locale
     property alias year: calendarModel.year
     property alias month: calendarModel.month
     property date currentDate
-    property alias mondayIsFirstDay: calendarModel.mondayIsFirstDay
     property alias chunkProvider: calendarModel.chunkProvider
-
-    property alias dayHeight: calendarGrid.cellHeight
 
     property date _today: new Date()
 
     signal datePicked(date date)
 
-    Grid {
-        id: calendarGrid
+    Grid
+    {
+        id: grid
 
-        property real cellWidth: width / columns
-        property real cellHeight: cellWidth
-
-        width: parent.width
-        height: parent.width / columns * 6
+        anchors.fill: parent
 
         columns: 7
+        property real cellWidth: width / columns
+        property real cellHeight: height / 6
 
-        Repeater {
-            model: QnCalendarModel {
-                id: calendarModel
-            }
+        Repeater
+        {
+            model: QnCalendarModel { id: calendarModel }
 
-            Item {
+            Item
+            {
                 id: calendarDay
 
                 property bool current: currentDate.getMonth() + 1 == month &&
@@ -42,39 +39,45 @@ Item {
                                        currentDate.getMonth() === model.date.getMonth() &&
                                        currentDate.getDate() === model.date.getDate()
 
-                width: calendarGrid.cellWidth
-                height: calendarGrid.cellHeight
+                width: grid.cellWidth
+                height: grid.cellHeight
 
-                Rectangle {
+                Rectangle
+                {
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: dp(3)
-                    width: parent.width + dp(3)
-                    height: dp(3)
-                    radius: dp(1.5)
-                    color: QnTheme.calendarArchiveIndicator
+                    anchors.bottomMargin: 3
+                    width: parent.width + 3
+                    height: 3
+                    radius: height / 2
+                    color: ColorTheme.green_main
                     visible: model.hasArchive
                 }
 
-                Rectangle {
+                Rectangle
+                {
                     anchors.centerIn: parent
-                    width: dp(40)
-                    height: dp(40)
+                    width: 40
+                    height: 40
                     radius: width / 2
                     visible: calendarDay.current
-                    color: QnTheme.calendarSelectedBackground
+                    color: ColorTheme.windowText
                 }
 
-                Text {
+                Text
+                {
                     anchors.centerIn: parent
                     text: model.display
-                    color: calendarDay.current ? QnTheme.calendarSelectedText
-                                               : model.date > _today ? QnTheme.calendarDisabledText : QnTheme.calendarText
-                    font.pixelSize: sp(16)
+                    color: calendarDay.current ? ColorTheme.base3
+                                               : model.date > _today ? ColorTheme.base15
+                                                                     : ColorTheme.windowText
+                    font.pixelSize: 16
                 }
 
-                MouseArea {
+                MouseArea
+                {
                     anchors.fill: parent
-                    onClicked: {
+                    onClicked:
+                    {
                         if (model.date.getMonth() + 1 !== calendarModel.month ||
                             model.date > _today)
                         {
@@ -82,7 +85,7 @@ Item {
                         }
 
                         currentDate = model.date
-                        calendarMonth.datePicked(model.date)
+                        monthGrid.datePicked(model.date)
                     }
                 }
             }

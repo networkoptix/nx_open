@@ -18,6 +18,7 @@ ApplicationWindow
     overlay.background: Rectangle
     {
         color: ColorTheme.transparent(ColorTheme.base5, 0.4)
+        Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
     SideNavigation { id: sideNavigation }

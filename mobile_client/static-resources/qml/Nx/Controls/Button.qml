@@ -11,6 +11,7 @@ Button
     property color color: ColorTheme.base9
     property color textColor: ColorTheme.windowText
     property bool flat: false
+    property string icon: ""
 
     property real mouseX: mouseTracker.mouseX
     property real mouseY: mouseTracker.mouseY
@@ -27,16 +28,28 @@ Button
     font.pixelSize: 16
     font.weight: Font.DemiBold
 
-    label: Text
+    label: Row
     {
         anchors.centerIn: parent
-        text: control.text
-        font: control.font
         leftPadding: 8
         rightPadding: 8
-        color: control.textColor
-        elide: Text.ElideRight
-        opacity: control.enabled ? 1.0 : 0.3
+        spacing: 8
+
+        Image
+        {
+            source: control.icon
+            visible: status == Image.Ready
+        }
+
+        Text
+        {
+            anchors.verticalCenter: parent.verticalCenter
+            text: control.text
+            font: control.font
+            color: control.textColor
+            elide: Text.ElideRight
+            opacity: control.enabled ? 1.0 : 0.3
+        }
     }
 
     background: Rectangle
@@ -58,7 +71,7 @@ Button
         {
             anchors.fill: parent
             clip: true
-            radius: parent.radius
+            radius: 2 //parent.radius
             mouseArea: control
             rippleSize: 160
         }
