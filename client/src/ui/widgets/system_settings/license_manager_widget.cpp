@@ -30,6 +30,7 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
 #include "api/runtime_info_manager.h"
+#include "llutil/hardware_id.h"
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
@@ -201,8 +202,7 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url)
 {
-    const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
+    const QVector<QString> hardwareIds = qnLicensePool->hardwareIds();
 
     if (QnRuntimeInfoManager::instance()->remoteInfo().isNull()) {
         emit showMessageLater(tr("License Activation"),
@@ -227,29 +227,22 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         n++;
     }
 
-    int hw = 0;
-    foreach (const QString& hwid, mainHardwareIds) {
+    foreach (const QString& hwid, hardwareIds) {
+        int version = LLUtil::hardwareIdVersion(hwid);
+
         QString name;
-        if (hw == 0)
-            name = QLatin1String("oldhwid");
-        else if (hw == 1)
-            name = QLatin1String("hwid");
+        if (version == 0)
+            name = QLatin1String("oldhwid[]");
+        else if (version == 1)
+            name = QLatin1String("hwid[]");
         else
-            name = QString(QLatin1String("hwid%1")).arg(hw);
+            name = QString(QLatin1String("hwid%1[]")).arg(version);
 
         params.addQueryItem(name, hwid);
-
-        hw++;
     }
+
     if (infoMode)
         params.addQueryItem(lit("mode"), lit("info"));
-
-    hw = 1;
-    foreach (const QString& hwid, compatibleHardwareIds) {
-        QString name = QString(QLatin1String("chwid%1")).arg(hw);
-        params.addQueryItem(name, hwid);
-        hw++;
-    }
 
     ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->remoteInfo().data;
 

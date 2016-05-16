@@ -16,7 +16,7 @@ class QnChangeUserPasswordDialog: public QnButtonBoxDialog, public QnWorkbenchCo
     typedef QnButtonBoxDialog base_type;
 
 public:
-    QnChangeUserPasswordDialog(QWidget *parent = NULL);
+    QnChangeUserPasswordDialog(QWidget* parent = NULL);
     virtual ~QnChangeUserPasswordDialog();
 
     QString newPassword() const;

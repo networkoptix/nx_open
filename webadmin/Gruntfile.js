@@ -231,12 +231,12 @@ module.exports = function (grunt) {
 
 
                 //Parallels - Burbank
-                {context: '/web/',      host: '10.1.5.104', port: 7001},
-                {context: '/api/',      host: '10.1.5.104', port: 7001},
-                {context: '/ec2/',      host: '10.1.5.104', port: 7001},
-                {context: '/hls/',      host: '10.1.5.104', port: 7001},
-                {context: '/media/',    host: '10.1.5.104', port: 7001},
-                {context: '/proxy/',    host: '10.1.5.104', port: 7001}/**/
+                {context: '/web/',      host: '10.1.5.139', port: 7001},
+                {context: '/api/',      host: '10.1.5.139', port: 7001},
+                {context: '/ec2/',      host: '10.1.5.139', port: 7001},
+                {context: '/hls/',      host: '10.1.5.139', port: 7001},
+                {context: '/media/',    host: '10.1.5.139', port: 7001},
+                {context: '/proxy/',    host: '10.1.5.139', port: 7001}/**/
 
             ],
             livereload: {

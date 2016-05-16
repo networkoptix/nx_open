@@ -37,8 +37,7 @@ namespace ec2
                    videoWallControlSession == other.videoWallControlSession &&
                    serverTimePriority == other.serverTimePriority &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
-                   mainHardwareIds == other.mainHardwareIds &&
-                   compatibleHardwareIds == other.compatibleHardwareIds &&
+                   hardwareIds == other.hardwareIds &&
                    updateStarted == other.updateStarted &&
                    nx1mac == other.nx1mac &&
                    nx1serial == other.nx1serial &&
@@ -62,8 +61,7 @@ namespace ec2
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;
 
-        QVector<QString> mainHardwareIds;
-        QVector<QString> compatibleHardwareIds;
+        QVector<QString> hardwareIds;
 
         QString nx1mac;
         QString nx1serial;
@@ -76,7 +74,7 @@ namespace ec2
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
-                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)(nx1mac)(nx1serial)\
+                                                        (hardwareIds)(updateStarted)(nx1mac)(nx1serial)\
                                                         (userId)
 
 

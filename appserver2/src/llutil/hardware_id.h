@@ -16,9 +16,11 @@ namespace LLUtil {
 const int LATEST_HWID_VERSION = 5;
 
 const QnHardwareInfo &getHardwareInfo();
-QString getHardwareId(int version, bool guidCompatibility, QSettings *settings);
-QStringList getMainHardwareIds(int guidCompatibility, QSettings *settings);
-QStringList getCompatibleHardwareIds(int guidCompatibility, QSettings *settings);
+
+void initHardwareId(QSettings *settings);
+QString getLatestHardwareId();
+QStringList getAllHardwareIds();
+int hardwareIdVersion(const QString& hardwareId);
 
 }
 

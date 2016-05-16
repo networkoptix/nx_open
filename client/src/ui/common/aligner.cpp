@@ -4,12 +4,12 @@
 
 namespace
 {
-    class DefaultWidgetAccessor: public AbstractAccessor
+    class WidgetSizeAccessor: public AbstractAccessor
     {
     public:
-        DefaultWidgetAccessor() {}
+        WidgetSizeAccessor() {}
 
-        virtual QVariant get(const QObject *object) const override
+        virtual QVariant get(const QObject* object) const override
         {
             const QWidget* w = qobject_cast<const QWidget*>(object);
             if (!w)
@@ -17,7 +17,7 @@ namespace
             return w->sizeHint().width();
         }
 
-        virtual void set(QObject *object, const QVariant &value) const override
+        virtual void set(QObject* object, const QVariant& value) const override
         {
             QWidget* w = qobject_cast<QWidget*>(object);
             if (!w)
@@ -33,7 +33,7 @@ namespace
 
 QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     base_type(parent),
-    m_defaultAccessor(new DefaultWidgetAccessor())
+    m_defaultAccessor(new WidgetSizeAccessor())
 {
 
 }
@@ -67,14 +67,12 @@ void QnAligner::align()
     if (m_widgets.isEmpty())
         return;
 
-    auto widest = std::max_element(m_widgets.cbegin(), m_widgets.cend(), [this](QWidget* left, QWidget* right)
-    {
-        return accessor(left)->get(left).toInt() < accessor(right)->get(right).toInt();
-    });
-    int width = accessor(*widest)->get(*widest).toInt();
+    int maxWidth = 0;
+    for (auto w : m_widgets)
+        maxWidth = std::max(accessor(w)->get(w).toInt(), maxWidth);
 
     for (QWidget* w : m_widgets)
-        accessor(w)->set(w, width);
+        accessor(w)->set(w, maxWidth);
 }
 
 AbstractAccessor* QnAligner::accessor(QWidget *widget) const

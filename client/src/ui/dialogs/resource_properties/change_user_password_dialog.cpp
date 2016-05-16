@@ -7,7 +7,7 @@
 #include <ui/workbench/workbench_context.h>
 
 
-QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget *parent):
+QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent, true),
     ui(new Ui::ChangeUserPasswordDialog())
@@ -45,7 +45,7 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget *parent):
             return QnInputField::ValidateResult(true, QString());
 
         if (text.isEmpty())
-            return QnInputField::ValidateResult(false, tr("To modify your password, please enter existing one."));
+            return QnInputField::ValidateResult(false, tr("To modify your password, please enter the existing one."));
 
         if (!context()->user()->checkPassword(text))
             return QnInputField::ValidateResult(false, tr("Invalid current password."));

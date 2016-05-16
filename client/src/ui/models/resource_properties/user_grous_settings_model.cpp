@@ -1,24 +1,15 @@
 #include "user_grous_settings_model.h"
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
-#include <core/resource/user_resource.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
+#include <ui/style/resource_icon_cache.h>
 
-namespace
-{
-    const QString kHtmlTableTemplate(lit("<table>%1</table>"));
-    const QString kHtmlTableRowTemplate(lit("<tr>%1</tr>"));
-
-
-}
+#include <utils/common/string.h>
 
 QnUserGroupSettingsModel::QnUserGroupSettingsModel(QObject* parent /*= nullptr*/) :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_userGroupId()
+    m_currentGroupId(),
+    m_groups()
 {
 
 }
@@ -28,103 +19,162 @@ QnUserGroupSettingsModel::~QnUserGroupSettingsModel()
 
 }
 
-QnUuid QnUserGroupSettingsModel::userGroupId() const
+ec2::ApiUserGroupDataList QnUserGroupSettingsModel::groups() const
 {
-    return m_userGroupId;
+    return m_groups;
 }
 
-void QnUserGroupSettingsModel::setUserGroupId(const QnUuid& value)
+void QnUserGroupSettingsModel::setGroups(const ec2::ApiUserGroupDataList& value)
 {
-    m_userGroupId = value;
+    beginResetModel();
+    m_groups = value;
+    std::sort(m_groups.begin(), m_groups.end(), [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
+    {
+        /* Case Sensitive sort. */
+        return naturalStringCompare(l.name, r.name) < 0;
+    });
+    m_accessibleResources.clear();
+    for (const auto& group : m_groups)
+        m_accessibleResources[group.id] = qnResourceAccessManager->accessibleResources(group.id);
+    endResetModel();
 }
 
-Qn::GlobalPermissions QnUserGroupSettingsModel::rawPermissions() const
+int QnUserGroupSettingsModel::addGroup(const ec2::ApiUserGroupData& group)
 {
-    if (m_userGroupId.isNull())
-        return Qn::NoGlobalPermissions;
+    NX_ASSERT(!group.id.isNull());
+    int row = static_cast<int>(m_groups.size());
 
-    auto groups = qnResourceAccessManager->userGroups();
-    auto group = std::find_if(groups.cbegin(), groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId; });
-    if (group == groups.cend())
-        return Qn::NoGlobalPermissions;
-    return group->permissions;
+    beginInsertRows(QModelIndex(), row, row);
+    m_groups.push_back(group);
+    endInsertRows();
+
+    return row;
 }
 
-void QnUserGroupSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
+void QnUserGroupSettingsModel::removeGroup(const QnUuid& id)
 {
-    if (m_userGroupId.isNull())
-        return;
+    auto iter = std::find_if(m_groups.begin(), m_groups.end(), [id](const ec2::ApiUserGroupData& elem) { return elem.id == id; });
+    int row = std::distance(m_groups.begin(), iter);
 
-    auto groups = qnResourceAccessManager->userGroups();
-    auto group = std::find_if(groups.begin(), groups.end(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId; });
-    if (group == groups.end())
-        return;
-    (*group).permissions = value;
-    qnResourceAccessManager->resetUserGroups(groups);
+    beginRemoveRows(QModelIndex(), row, row);
+    m_groups.erase(iter);
+    endRemoveRows();
+
+    if (id == m_currentGroupId)
+        m_currentGroupId = QnUuid();
 }
 
-QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources() const
+void QnUserGroupSettingsModel::selectGroup(const QnUuid& value)
 {
-    if (m_userGroupId.isNull())
-        return QSet<QnUuid>();
-
-    return qnResourceAccessManager->accessibleResources(m_userGroupId);
+    m_currentGroupId = value;
 }
 
-void QnUserGroupSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
+QnUuid QnUserGroupSettingsModel::selectedGroup() const
 {
-    if (m_userGroupId.isNull())
-        return;
-
-    qnResourceAccessManager->setAccessibleResources(m_userGroupId, value);
+    return m_currentGroupId;
 }
 
 QString QnUserGroupSettingsModel::groupName() const
 {
-    if (m_userGroupId.isNull())
+    auto iter = currentGroup();
+    if (iter == m_groups.cend())
         return QString();
-
-    auto groups = qnResourceAccessManager->userGroups();
-    auto group = std::find_if(groups.cbegin(), groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_userGroupId;  });
-    if (group == groups.cend())
-        return QString();
-    return group->name;
+    return iter->name;
 }
 
-QString QnUserGroupSettingsModel::getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const
+void QnUserGroupSettingsModel::setGroupName(const QString& value)
 {
-    const bool hasAccessToSystem = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    auto iter = currentGroup();
+    if (iter == m_groups.end())
+        return;
 
-    QStringList tableRows;
-
-    auto allResources = qnResPool->getResources();
-    auto accessibleResources = qnResourceAccessManager->accessibleResources(id);
-
-    std::map<Filter, QString> nameByFilter{
-        {CamerasFilter, tr("Cameras")},
-        {LayoutsFilter, tr("Global Layouts")},
-        {ServersFilter, tr("Servers")},
-    };
-
-    for (auto filter : allFilters())
-    {
-        auto flag = accessPermission(filter);
-        if (permissions.testFlag(flag))
-        {
-            QString row = lit("<td colspan=2><b>%1</b></td>").arg(accessPermissionText(filter));
-            tableRows << kHtmlTableRowTemplate.arg(row);
-        }
-        else
-        {
-            auto allFiltered = filteredResources(filter, allResources);
-            auto accessibleFiltered = filteredResources(filter, accessibleResources);
-
-            QString row = hasAccessToSystem
-                ? lit("<td><b>%1</b> / %2</td><td>%3</td>").arg(accessibleFiltered.size()).arg(allFiltered.size()).arg(nameByFilter[filter])
-                : lit("<td><b>%1</b></td><td>%2</td>").arg(accessibleFiltered.size()).arg(nameByFilter[filter]);
-            tableRows << kHtmlTableRowTemplate.arg(row);
-        }
-    }
-
-    return kHtmlTableTemplate.arg(tableRows.join(QString()));
+    int row = std::distance(m_groups.begin(), iter);
+    QModelIndex idx = index(row);
+    iter->name = value;
+    emit dataChanged(idx, idx);
 }
+
+Qn::GlobalPermissions QnUserGroupSettingsModel::rawPermissions() const
+{
+    auto iter = currentGroup();
+    if (iter == m_groups.cend())
+        return Qn::NoGlobalPermissions;
+    return iter->permissions;
+}
+
+void QnUserGroupSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
+{
+    auto iter = currentGroup();
+    if (iter == m_groups.end())
+        return;
+    iter->permissions = value;
+}
+
+QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources() const
+{
+    return m_accessibleResources.value(m_currentGroupId);
+}
+
+QSet<QnUuid> QnUserGroupSettingsModel::accessibleResources(const QnUuid& groupId) const
+{
+    return m_accessibleResources.value(groupId);
+}
+
+int QnUserGroupSettingsModel::rowCount(const QModelIndex& index) const
+{
+    return static_cast<int>(m_groups.size());
+}
+
+QVariant QnUserGroupSettingsModel::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid() || index.row() >= m_groups.size())
+        return QVariant();
+
+    auto group = m_groups[index.row()];
+
+    switch (role)
+    {
+    case Qt::DisplayRole:
+    case Qt::AccessibleTextRole:
+    case Qt::ToolTipRole:
+    case Qt::StatusTipRole:
+    case Qt::WhatsThisRole:
+    case Qt::AccessibleDescriptionRole:
+        return group.name;
+
+    case Qt::DecorationRole:
+        return qnResIconCache->icon(QnResourceIconCache::Users);
+
+    case Qn::UuidRole:
+        return qVariantFromValue(group.id);
+
+    default:
+        break;
+    }
+    return QVariant();
+}
+
+void QnUserGroupSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
+{
+    if (m_currentGroupId.isNull())
+        return;
+
+    m_accessibleResources[m_currentGroupId] = value;
+}
+
+ec2::ApiUserGroupDataList::iterator QnUserGroupSettingsModel::currentGroup()
+{
+    if (m_currentGroupId.isNull())
+        return m_groups.end();
+
+    return std::find_if(m_groups.begin(), m_groups.end(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_currentGroupId; });
+}
+
+ec2::ApiUserGroupDataList::const_iterator QnUserGroupSettingsModel::currentGroup() const
+{
+    if (m_currentGroupId.isNull())
+        return m_groups.cend();
+
+    return std::find_if(m_groups.cbegin(), m_groups.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_currentGroupId; });
+}
+
