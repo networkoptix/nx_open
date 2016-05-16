@@ -248,6 +248,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     {
         qnGlobalSettings->resetCloudParams();
         qnGlobalSettings->setNewSystem(true);
+        qnGlobalSettings->synchronizeNowSync();
     }
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
 
