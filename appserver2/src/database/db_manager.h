@@ -682,7 +682,7 @@ public:
             return ErrorCode::forbidden;
 
         return detail::QnDbManager::instance()->executeTransactionNoLock(
-                    tranCopy,
+                    tran,
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
@@ -708,7 +708,7 @@ public:
             return ErrorCode::forbidden;
 
         return detail::QnDbManager::instance()->executeTransaction(
-                    tranCopy,
+                    tran,
                     std::forward<SerializedTransaction>(serializedTran));
     }
 
