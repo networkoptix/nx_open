@@ -141,7 +141,7 @@ Control
                 maximumLineCount: 2
                 font.pixelSize: 14
                 font.weight: Font.Normal
-                color: QnTheme.cameraText
+                color: ColorTheme.windowText
             }
         }
     }

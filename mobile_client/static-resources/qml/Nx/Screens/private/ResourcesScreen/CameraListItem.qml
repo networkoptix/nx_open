@@ -102,7 +102,7 @@ Control
             font.pixelSize: 16
             font.weight: d.offline ? Font.DemiBold : Font.Normal
             elide: Text.ElideRight
-            color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
+            color: d.offline ? ColorTheme.base11 : ColorTheme.windowText
         }
     }
 

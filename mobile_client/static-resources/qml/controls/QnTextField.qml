@@ -1,4 +1,5 @@
 import QtQuick 2.2
+import Nx 1.0
 import com.networkoptix.qml 1.0
 
 FocusScope {
@@ -18,10 +19,10 @@ FocusScope {
 
     property int textPadding: 0
 
-    property color inactiveColor: showError ? QnTheme.inputBorderError : QnTheme.inputBorder
-    property color activeColor: showError ? QnTheme.inputBorderActiveError : QnTheme.inputBorderActive
-    property color textColor: showError ? QnTheme.inputTextError : QnTheme.inputText
-    property color placeholderColor: showError ? QnTheme.inputPlaceholderError : QnTheme.inputPlaceholder
+    property color inactiveColor: showError ? ColorTheme.orange_d1 : ColorTheme.base10
+    property color activeColor: showError ? ColorTheme.orange_main : ColorTheme.brand_main
+    property color textColor: showError ? ColorTheme.orange_d1 : ColorTheme.windowText
+    property color placeholderColor: ColorTheme.base10
     property color cursorColor: activeColor
     property alias selectionAllowed: textInput.selectionAllowed
 

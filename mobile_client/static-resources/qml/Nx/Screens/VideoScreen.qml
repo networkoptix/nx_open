@@ -255,7 +255,7 @@ PageBase
             Text
             {
                 height: 96
-                color: QnTheme.cameraStatus
+                color: ColorTheme.base13
 
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
