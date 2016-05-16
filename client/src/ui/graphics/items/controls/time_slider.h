@@ -482,6 +482,7 @@ private:
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 
     bool m_liveSupported;
+    bool m_keyboardSelectionInitiated;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);
