@@ -730,7 +730,6 @@ namespace ec2
          *     %value false
          *     %value true
  * %param permissions Combination (via "|") of the following flags:
-         *     %value GlobalOwnerPermission Root, can edit admins.
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
          *     %value GlobalEditLayoutsPermission Can create and edit layouts.
          *     %value GlobalEditServersPermissions Can edit server settings.
@@ -738,8 +737,8 @@ namespace ec2
          *     %value GlobalViewArchivePermission Can view archives of available cameras.
          *     %value GlobalExportPermission Can export archives of available cameras.
          *     %value GlobalEditCamerasPermission Can edit camera settings.
-         *     %value GlobalPtzControlPermission Can change camera's PTZ state.
-         *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+         *     %value GlobalUserInputPermission Can change camera's PTZ state.
+         *     %value GlobalControlVideoWallPermission Can control videowalls.
          *     %value GlobalAccessAllCamerasPermission Has access to all cameras
          *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
          *     %value GlobalAccessAllServersPermission Has access to all servers
@@ -793,8 +792,8 @@ namespace ec2
         *     %value GlobalViewArchivePermission Can view archives of available cameras.
         *     %value GlobalExportPermission Can export archives of available cameras.
         *     %value GlobalEditCamerasPermission Can edit camera settings.
-        *     %value GlobalPtzControlPermission Can change camera's PTZ state.
-        *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+        *     %value GlobalUserInputPermission Can change camera's PTZ state.
+        *     %value GlobalControlVideoWallPermission Can control videowalls.
         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
         *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
         *     %value GlobalAccessAllServersPermission Has access to all servers
