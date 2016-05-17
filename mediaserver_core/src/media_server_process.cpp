@@ -1810,8 +1810,6 @@ void MediaServerProcess::run()
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
 
-    //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-
     std::unique_ptr<QnStorageManager> normalStorageManager(
         new QnStorageManager(
             QnServer::StoragePool::Normal

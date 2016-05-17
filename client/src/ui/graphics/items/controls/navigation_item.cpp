@@ -140,9 +140,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_separators->setFrameColor(palette().color(QPalette::Midlight));
     m_separators->setFrameWidth(1.0);
 
-    connect(m_timeSlider, &QnTimeSlider::archiveAvailabilityChanged, this,
-        [this, timelinePlaceholder](bool hasArchive)
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
+        [this, timelinePlaceholder]()
         {
+            bool hasArchive = navigator()->hasArchive();
             m_timeSlider->setVisible(hasArchive);
             m_timeScrollBar->setVisible(hasArchive);
             timelinePlaceholder->setVisible(!hasArchive);
@@ -553,7 +554,7 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::PaletteChange)
     {
         setFrameColor(palette().color(QPalette::Midlight));
-        m_separators->setFrameColor(palette().color(m_timeSlider->archiveAvailable() ? QPalette::Shadow : QPalette::Midlight));
+        m_separators->setFrameColor(palette().color(navigator()->hasArchive() ? QPalette::Shadow : QPalette::Midlight));
     }
 
     return base_type::eventFilter(watched, event);

@@ -222,8 +222,6 @@ public:
 
     bool positionMarkerVisible() const;
 
-    bool archiveAvailable() const;
-
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -235,7 +233,6 @@ signals:
     void thumbnailClicked();
     void msecsPerPixelChanged();
     void lineCommentChanged(int line, const QString& comment);
-    void archiveAvailabilityChanged(bool hasArchive);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -482,6 +479,7 @@ private:
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 
     bool m_liveSupported;
+    bool m_keyboardSelectionInitiated;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

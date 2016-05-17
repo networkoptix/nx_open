@@ -469,7 +469,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
     m_bookmarksHelper(nullptr),
-    m_liveSupported(false)
+    m_liveSupported(false),
+    m_keyboardSelectionInitiated(false)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -754,14 +755,7 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
     if (!checkLinePeriod(line, type))
         return;
 
-    bool hadArchive = archiveAvailable();
-
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
-
-    bool hasArchive = archiveAvailable();
-
-    if (hasArchive != hadArchive)
-        emit archiveAvailabilityChanged(hasArchive);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const
@@ -970,6 +964,7 @@ void QnTimeSlider::setSelection(qint64 start, qint64 end)
 
     if (m_selectionStart != start || m_selectionEnd != end)
     {
+        m_keyboardSelectionInitiated = false;
         m_selectionStart = start;
         m_selectionEnd = end;
 
@@ -985,6 +980,9 @@ bool QnTimeSlider::isSelectionValid() const
 void QnTimeSlider::setSelectionValid(bool valid)
 {
     m_selectionValid = valid;
+
+    if (!m_selectionValid)
+        m_keyboardSelectionInitiated = false;
 }
 
 const QString& QnTimeSlider::toolTipFormat() const
@@ -1582,15 +1580,6 @@ void QnTimeSlider::setLiveSupported(bool value)
 bool QnTimeSlider::isLive() const
 {
     return m_liveSupported && value() == maximum();
-}
-
-bool QnTimeSlider::archiveAvailable() const
-{
-    for (int line = 0; line < m_lineCount; ++line)
-        if (!m_lineData[line].timeStorage.periods(Qn::RecordingContent).empty())
-            return true;
-
-    return false;
 }
 
 qreal QnTimeSlider::msecsPerPixel() const
@@ -2816,6 +2805,8 @@ void QnTimeSlider::keyPressEvent(QKeyEvent* event)
                     setSelectionEnd(sliderPosition());
             }
 
+            m_keyboardSelectionInitiated = m_selectionStart == m_selectionEnd;
+
             /* Accept selection events. */
             event->accept();
             return;
@@ -2959,7 +2950,7 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker)
+    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker && !m_keyboardSelectionInitiated)
         setSelectionValid(false);
 
     m_dragMarker = NoMarker;
