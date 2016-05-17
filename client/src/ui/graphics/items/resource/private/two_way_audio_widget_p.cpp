@@ -246,6 +246,10 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     });
 }
 
+QnTwoWayAudioWidgetPrivate::~QnTwoWayAudioWidgetPrivate()
+{
+}
+
 void QnTwoWayAudioWidgetPrivate::updateCamera(const QnVirtualCameraResourcePtr& camera)
 {
     NX_ASSERT(!m_camera);

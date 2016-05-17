@@ -29,6 +29,7 @@ public:
 
 public:
     QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
+    virtual ~QnTwoWayAudioWidgetPrivate();
 
     void updateCamera(const QnVirtualCameraResourcePtr& camera);
 
