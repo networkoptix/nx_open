@@ -27,6 +27,9 @@ namespace
 
     const QLatin1String kChangeUser("changeUser");
 
+
+    const QString kModuleName = lit("vms_gateway");
+
     //log settings
     const QLatin1String kLogLevel( "log/logLevel" );
 #ifdef _DEBUG

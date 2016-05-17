@@ -480,6 +480,8 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
             </modules>
         </profile>
         <profile>
