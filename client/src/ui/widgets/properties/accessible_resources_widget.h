@@ -29,11 +29,16 @@ public:
     virtual void applyChanges() override;
 
 private:
+    void initControlsModel();
+    void initResourcesModel();
+
+    void updateThumbnail(const QModelIndex& index = QModelIndex());
+
+private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
     QnAbstractPermissionsModel* const m_permissionsModel;
     const QnResourceAccessFilter::Filter m_filter;
 
     QScopedPointer<QnResourceListModel> m_resourcesModel;
     QScopedPointer<QnResourceListModel> m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */
-    QScopedPointer<QSortFilterProxyModel> m_viewModel;
 };
