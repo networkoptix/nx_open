@@ -17,14 +17,14 @@
         <tr>
             <td class="side-spacer"></td>
             <td class="header">
-                {{#system}}
+                {{#systemName}}
                 <div class="system-info">
                     <table>
                         <tbody>
                         <tr>
                             <td><img class="icon" src="cid:home"></td>
-                            <td><div class="name">{{system.name}}</div>
-                                <div class="hint">{{system.signature}}</div></td>
+                            <td><div class="name">{{systemName}}</div>
+                                {{#systemSignature}}<div class="hint">{{systemSignature}}</div>{{/systemSignature}}</td>
                         </tr>
                         {{#cloud}}
                         <tr class="cloud-info">
@@ -36,7 +36,7 @@
                         </tbody>
                     </table>
                 </div>
-                {{/system}}
+                {{/systemName}}
                 {{^system}}
                     <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
                 {{/system}}
@@ -64,18 +64,18 @@
                             </td>
                             <td class="left-border right-border">
                                 <b>Website</b><br>
-                                <a href="COMPANY_LINK">COMPANY_LINK</a>
+                                <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
                         {{/system}}
                         {{^system}}
                             <td class="right-border">
                                 <b>Website</b><br>
-                                <a href="COMPANY_LINK">COMPANY_LINK</a>
+                                <a href="{{companyUrl}}">{{companyUrl}}</a>
                             </td>
                         {{/system}}
                         <td class="left-border">
                             <b>Support</b><br>
-                            <a href="SUPPORT_LINK">SUPPORT_NAME</a>
+                            <a href="{{supportLink}}">{{supportLinkText}}</a>
                         </td>
                     </tr>
                     </tbody>

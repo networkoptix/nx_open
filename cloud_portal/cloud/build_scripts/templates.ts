@@ -39,32 +39,12 @@
     </message>
     <message>
       <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>SUPPORT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/activate/{{message.code}}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>SUPPORT_LINK&quot;</source>
+      <source>/activate/{{message.code}}&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -112,32 +92,12 @@
     </message>
     <message>
       <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>SUPPORT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/restore_password/{{message.code}}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>SUPPORT_LINK&quot;</source>
+      <source>/restore_password/{{message.code}}&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -180,32 +140,12 @@
     </message>
     <message>
       <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>SUPPORT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>mailto:{{message.sharer_email}}&quot;  /register/{{user_email}}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>SUPPORT_LINK&quot;</source>
+      <source>mailto:{{message.sharer_email}}&quot;  /register/{{user_email}}&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -238,32 +178,12 @@
     </message>
     <message>
       <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>SUPPORT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>mailto:{{message.sharer_email}}&quot; /systems/{{message.system_id}}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>SUPPORT_LINK&quot;</source>
+      <source>mailto:{{message.sharer_email}}&quot; /systems/{{message.system_id}}&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -301,27 +221,7 @@
     </message>
     <message>
       <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Support</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>SUPPORT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>COMPANY_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>SUPPORT_LINK&quot;</source>
       <translation> </translation>
     </message>
   </context>

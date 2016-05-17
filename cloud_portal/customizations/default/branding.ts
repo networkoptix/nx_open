@@ -11,15 +11,15 @@
       <translation>Nx Witness</translation>
     </message>
     <message>
-      <source>SUPPORT_LINK</source>
+      <source>{{supportLink}}</source>
       <translation>http://support.networkoptix.com</translation>
     </message>
     <message>
-      <source>SUPPORT_NAME</source>
-      <translation>support.networkoptix.com</translation>
+      <source>{{supportLinkText}}</source>
+      <translation>http://support.networkoptix.com</translation>
     </message>
     <message>
-      <source>COMPANY_LINK</source>
+      <source>{{companyUrl}}</source>
       <translation>http://networkoptix.com</translation>
     </message>
     <message>

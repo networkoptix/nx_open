@@ -803,16 +803,6 @@
       <source>&amp;copy; 2016 COMPANY_NAME</source>
       <translation> </translation>
     </message>
-    <message>
-      <location/>
-      <source>SUPPORT_LINK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>COMPANY_LINK&quot;</source>
-      <translation> </translation>
-    </message>
   </context>
   <context>
     <name>../static/views/components/header.html</name>

@@ -11,15 +11,15 @@
       <translation>Qulu</translation>
     </message>
     <message>
-      <source>SUPPORT_LINK</source>
+      <source>{{supportLink}}</source>
       <translation>http://vista-cctv.com/technical-support/contact/</translation>
     </message>
     <message>
-      <source>SUPPORT_NAME</source>
+      <source>{{supportLinkText}}</source>
       <translation>vista-cctv.com/technical-support/contact</translation>
     </message>
     <message>
-      <source>COMPANY_LINK</source>
+      <source>{{companyUrl}}</source>
       <translation>http://vista-cctv.com</translation>
     </message>
     <message>

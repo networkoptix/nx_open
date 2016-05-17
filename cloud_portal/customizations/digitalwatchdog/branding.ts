@@ -11,15 +11,15 @@
       <translation>DW Spectrum</translation>
     </message>
     <message>
-      <source>SUPPORT_LINK</source>
+      <source>{{supportLink}}</source>
       <translation>http://digital-watchdog.com/contact-tech-support/</translation>
     </message>
     <message>
-      <source>SUPPORT_NAME</source>
+      <source>{{supportLinkText}}</source>
       <translation>digital-watchdog.com/contact-tech-support</translation>
     </message>
     <message>
-      <source>COMPANY_LINK</source>
+      <source>{{companyUrl}}</source>
       <translation>http://digital-watchdog.com</translation>
     </message>
     <message>

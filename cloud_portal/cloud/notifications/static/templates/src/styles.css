@@ -1,3 +1,4 @@
+/* Warning! Keep this file and other templates consistent between cloud_portal/cloud/notifications and nx_vms */
 h1{
     font-size:20px;
     font-weight:normal;
@@ -43,11 +44,16 @@ p{
 .container,table{
   color:#263137;
 }
+
 .content{
-  width:800px;
-  padding: 15px 20px;
-  border: 1px solid #E1E7EA;
-  border-radius: 2px;
+    width:800px;
+    padding: 15px 0;
+    border: 1px solid #E1E7EA;
+    border-radius: 2px;
+}
+
+.content>*{
+    padding: 0 20px;
 }
 
 .btn{
@@ -60,6 +66,7 @@ p{
   color: white;
   font-weight: bold;
   font-size:13px;
+  margin-left:20px;
 }
 
 .disclaimer{
