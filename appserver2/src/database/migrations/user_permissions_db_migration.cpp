@@ -49,7 +49,7 @@ namespace ec2
         {
             QSqlQuery query(database);
             query.setForwardOnly(true);
-            QString sqlText = QString("UPDATE vms_userprofile set rights = :permissions where id = :id");
+            QString sqlText = QString("UPDATE vms_userprofile set rights = :permissions where user_id = :id");
             if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
                 return false;
             query.bindValue(":id", data.id);
@@ -101,7 +101,7 @@ namespace ec2
 
             QSqlQuery query(database);
             query.setForwardOnly(true);
-            QString sqlText = "SELECT id, rights from vms_userprofile";
+            QString sqlText = "SELECT user_id, rights from vms_userprofile";
             if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
                 return false;
             if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
@@ -113,7 +113,7 @@ namespace ec2
                 int oldPermissions = query.value("rights").toInt();
 
                 UserPermissionsRemapData data;
-                data.id = query.value("id").toInt();
+                data.id = query.value("user_id").toInt();
                 data.permissions = migratedPermissions(oldPermissions);
                 migrationQueue.push_back(data);
             }
