@@ -202,18 +202,17 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
-    /* Init style option: */
-    QStyleOptionViewItem option(styleOption);
-    initStyleOption(&option, index);
+    return base_type::sizeHint(styleOption, index) + QSize(0, m_spacing);
+}
 
-    /* Obtain sub-elements layout: */
-    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
-    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
-    QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
-    QRect checkRect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &option, option.widget);
+void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+{
+    base_type::initStyleOption(option, index);
 
-    /* Return minimal required size: */
-    return (textRect | iconRect | checkRect).size() + QSize(0, m_spacing);
+    static const QSize kMaxDeviceIndependentIconSize(1024, 1024);
+
+    if (!option->icon.isNull())
+        option->decorationSize = option->icon.actualSize(kMaxDeviceIndependentIconSize);
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const

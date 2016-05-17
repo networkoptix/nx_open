@@ -24,9 +24,12 @@ public:
 
     int spacing() const;
     void setSpacing(int value);
+
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const override;
+
+    virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
 
     virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     virtual void destroyEditor(QWidget* editor, const QModelIndex& index) const override;
