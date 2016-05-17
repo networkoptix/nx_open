@@ -207,12 +207,23 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
 
 void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
+    /* Save default decoration size: */
+    QSize defaultDecorationSize = option->decorationSize;
+
+    /* If icon size is explicitly specified in itemview, decorationSize already holds that value.
+     * If icon size is not specified in itemview, set decorationSize to something big.
+     * It will be treated as maximal allowed size: */
+    auto view = qobject_cast<const QAbstractItemView*>(option->widget);
+    if (!view || !view->iconSize().isValid())
+        option->decorationSize = QSize(1024, 1024);
+
+    /* Call inherited implementation.
+     * When it configures item icon, it sets decorationSize to actual icon size: */
     base_type::initStyleOption(option, index);
 
-    static const QSize kMaxDeviceIndependentIconSize(1024, 1024);
-
-    if (!option->icon.isNull())
-        option->decorationSize = option->icon.actualSize(kMaxDeviceIndependentIconSize);
+    /* But if the item has no icon, restore decoration size to saved default: */
+    if (option->icon.isNull())
+        option->decorationSize = defaultDecorationSize;
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
