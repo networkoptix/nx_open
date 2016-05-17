@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
-import Nx.Dialogs 1.0
 import com.networkoptix.qml 1.0
 
 import "private/ResourcesScreen"
@@ -18,12 +17,6 @@ Page
 
     titleControls:
     [
-        IconButton
-        {
-            icon: lp("/images/plus.png")
-            onClicked: Workflow.openOldClientDownloadSuggestion()
-        },
-
         IconButton
         {
             icon: lp("/images/search.png")

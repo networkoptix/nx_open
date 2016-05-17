@@ -97,12 +97,6 @@ Page
 
     function showWarning(status, info)
     {
-        if (status === QnConnectionManager.InvalidVersion)
-        {
-            // TODO
-            return
-        }
-
         warningText = LoginUtils.connectionErrorText(status, info)
         warningVisible = true
 
@@ -110,6 +104,9 @@ Page
             credentialsEditor.displayUserCredentialsError = true
         else
             credentialsEditor.displayAddressError = true
+
+        if (status === QnConnectionManager.InvalidVersion)
+            Workflow.openOldClientDownloadSuggestion()
     }
 
     function hideWarning()
