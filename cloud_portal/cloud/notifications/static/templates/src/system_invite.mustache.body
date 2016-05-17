@@ -1,4 +1,4 @@
-<h2>Welcome to <span>PRODUCT_NAME</span></h2>
+<h1>Welcome to PRODUCT_NAME</h1>
 
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> is inviting you to join <a href="{{config.portal_url}}">PRODUCT_NAME</a>
 and shared his system system {{message.system_name}} with you.</p>

@@ -9,22 +9,12 @@
     </message>
     <message>
       <location/>
-      <source>Welcome to</source>
+      <source>Welcome to PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>PRODUCT_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Thank you for registering in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>. Please, click the button below to confirm you e-mail address.</source>
+      <source>Thank you for registering in PRODUCT_NAME. Please, click the button below to confirm you e-mail address.</source>
       <translation> </translation>
     </message>
     <message>
@@ -34,12 +24,7 @@
     </message>
     <message>
       <location/>
-      <source>If you haven't registered in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>, just ignore this letter.</source>
+      <source>If you haven't registered in PRODUCT_NAME, just ignore this letter.</source>
       <translation> </translation>
     </message>
     <message>
@@ -165,17 +150,17 @@
     </message>
     <message>
       <location/>
-      <source>Welcome to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>PRODUCT_NAME</source>
+      <source>Welcome to PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>is inviting you to join</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>

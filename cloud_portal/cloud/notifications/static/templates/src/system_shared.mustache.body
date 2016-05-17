@@ -1,4 +1,4 @@
-<h2>System was shared with you</h2>
+<h1>System was shared with you</h1>
 
 <p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> shared system {{message.system_name}} with you.</p>
 

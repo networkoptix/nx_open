@@ -1,4 +1,4 @@
-<h2>New message</h2>
+<h1>New message</h1>
 
 <p><b>Type:</b>{{message.type}} <br>
 <b>Data:</b> <pre>{{{message.data}}}</pre></p>

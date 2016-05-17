@@ -174,7 +174,7 @@
     </message>
     <message>
       <location/>
-      <source>Password must contain at least 6 characters</source>
+      <source>Password must contain at least 8 characters</source>
       <translation> </translation>
     </message>
     <message>
