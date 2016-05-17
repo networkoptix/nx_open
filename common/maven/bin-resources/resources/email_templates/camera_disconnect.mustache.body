@@ -1,5 +1,20 @@
-<td>
+
+
+<h1>{{event}}</h1>
+<table class="description">
+<tbody>
     {{#aggregated}}
-        {{timestamp}}
+        <tr>
+            <td width="50%">
+                <h6 class="no-margin">{{source}}</h6>
+            </td>
+            <td>
+                {{#aggregated}}
+                    {{timestamp}}
+                {{/aggregated}}
+            </td>
+        </tr>
     {{/aggregated}}
-</td>
+</tbody>
+</table>
+

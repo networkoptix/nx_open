@@ -1,17 +1,19 @@
-<div class="content">
-    <div class="callout">
-        <h4>MediaServer failure information:</h4>
-        <table class="details">
+<h1>{{event}}: {{source}}</h1>
+
+
+<table class="description">
+    <thead>
+        <tr>
+            <th>Reason</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#aggregated}}
             <tr>
-                <th>Reason</th>
-                <th>Time</th>
+                <td>{{reason}}</td>
+                <td><i>{{timestamp}}</i></td>
             </tr>
-            {{#aggregated}}
-                <tr>
-                    <td>{{reason}}</td>
-                    <td><i>{{timestamp}}</i></td>
-                </tr>
-            {{/aggregated}}
-        </table>
-    </div>
-</div>
+        {{/aggregated}}
+    </tbody>
+</table>

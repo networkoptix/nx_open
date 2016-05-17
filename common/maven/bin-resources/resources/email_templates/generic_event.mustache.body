@@ -1,48 +1,53 @@
-I<div class="content">
-    <div class="callout">
+<h1>{{event}}: {{source}}</h1>
 
-        <h4>Event: {{caption}}</h3>
-        {{#description}}
-            <p> {{description}}</p>
-        {{/description}}
+<div class="description">
+    {{#caption}}
+        <h2>Event: {{caption}}</h2>
+    {{/caption}}
+    {{#description}}
+        <p> {{description}}</p>
+    {{/description}}
+</div>
 
-        <h4>Date(s) when the event is occured:</h4>
-        {{#aggregated}}
-        <table class="details">
-            <tr>
-                <td><i>{{timestamp}}</i></td>
-            </tr>
-        </table>
-        {{/aggregated}}
-    
-        {{#hasCameras}}
-            <h4>Related cameras:</h4>
-            <table>
-                {{#cameras}}
+<div class="date">
+    <h3>Date(s) when the event is occured:</h3>
+    {{#aggregated}}
+    <table class="details">
+        <tr>
+            <td><i>{{timestamp}}</i></td>
+        </tr>
+    </table>
+    {{/aggregated}}
+</div>
+
+<div class="cameras">
+    {{#hasCameras}}
+        <h4>Related cameras:</h4>
+        <table>
+            {{#cameras}}
+                <tr>
+                    <td>{{name}}</td>
+                    <td>
+                        {{#urlint}}
+                            <p><a href="{{urlint}}">Play archive from the local network</a></p>
+                        {{/urlint}}
+                    </td>
+                    <td>
+                        {{#urlext}}
+                            <p><a href="{{urlext}}">Play archive from the web</a></p>
+                        {{/urlext}}
+                    </td>
+                </tr>
+
+                {{#screenshot}}
                     <tr>
-                        <td>{{name}}</td>
-                        <td>
-                            {{#urlint}}
-                                <p><a href="{{urlint}}">Play archive from the local network</a></p>
-                            {{/urlint}}
-                        </td>
-                        <td>
-                            {{#urlext}}
-                                <p><a href="{{urlext}}">Play archive from the web</a></p>
-                            {{/urlext}}
+                        <td colspan="3">
+                            <img alt="Screenshot" src="{{screenshot}}"/>
                         </td>
                     </tr>
-
-                    {{#screenshot}}
-                        <tr>
-                            <td colspan="3">
-                                <img alt="Screenshot" src="{{screenshot}}"/>
-                            </td>
-                        </tr>
-                    {{/screenshot}}
-                {{/cameras}}
-            </table>
-        {{/hasCameras}} 
-    </div>
+                {{/screenshot}}
+            {{/cameras}}
+        </table>
+    {{/hasCameras}}
 </div>
 

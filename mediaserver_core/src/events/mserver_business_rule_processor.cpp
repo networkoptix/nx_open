@@ -50,12 +50,13 @@
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
     const QString tpEventLogoFilename(lit("eventLogoFilename"));
-    const QString tpProductLogo(lit("productLogo.png"));
+    const QString tpProductLogo(lit("logo"));
     const QString tpCompanyName(lit("companyName"));
     const QString tpCompanyUrl(lit("companyUrl"));
     const QString tpSupportLink(lit("supportLink"));
     const QString tpSupportLinkText(lit("supportLinkText"));
     const QString tpSystemName(lit("systemName"));
+    const QString tpSystemSignature(lit("systemSignature"));
     const QString tpImageMimeType(lit("image/png"));
     const QString tpScreenshotFilename(lit("screenshot"));
     const QString tpScreenshot(lit("screenshot.jpeg"));
@@ -398,21 +399,22 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 {
     QnEmailAttachmentList attachments;
     QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, true);
-    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
+    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); // TODO: We do not need event logo anymore - remove it from code and from resources, pls
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
+//    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
+//    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportLink] = QnEmailAddress::isValid(emailSettings.supportEmail)
         ? lit("mailto:%1").arg(emailSettings.supportEmail)
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = emailSettings.signature;
+    contextMap[tpSystemName] = emailSettings.signature; // TODO: We need system name here!
+    contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;

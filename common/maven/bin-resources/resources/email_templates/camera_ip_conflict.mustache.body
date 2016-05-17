@@ -1,19 +1,19 @@
-{{#aggregated}}
-<div class="content">
-    <div class="callout">
-        <p>Conflict detected at {{timestamp}} for IP address {{cameraConflictAddress}}:</p>
-        <table class="details">
+<h1>{{event}}: {{source}}</h1>
+<p>Conflict detected at {{timestamp}} for IP address {{cameraConflictAddress}}:</p>
+
+<table class="description">
+    <thead>
+        <tr>
+           <th>Number</th>
+           <th>Physical ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#cameraConflicts}}
             <tr>
-                <th>Number</th>
-                <th>Physical ID</th>
+                <td>{{number}}</td>
+                <td>{{mac}}</td>
             </tr>
-            {{#cameraConflicts}}
-                <tr>
-                    <td>{{number}}</td>
-                    <td>{{mac}}</td>
-                </tr>
-            {{/cameraConflicts}}
-        </table>
-    </div>
-</div>
-{{/aggregated}}
+        {{/cameraConflicts}}
+    </tbody>
+</table>

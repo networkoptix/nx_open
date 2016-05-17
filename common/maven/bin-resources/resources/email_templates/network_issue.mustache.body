@@ -1,4 +1,17 @@
+
+<h1>{{event}}</h1>
+<table class="description">
+<tbody>
 {{#aggregated}}
-	<td class="error">Reason: {{reason}}</td>
-	<td><i>{{timestamp}}</i></td>
+		<tr>
+			<td width="50%">
+				<h6 class="no-margin">{{source}}</h6>
+			</td>
+			{{#aggregated}}
+				<td class="error">Reason: {{reason}}</td>
+				<td><i>{{timestamp}}</i></td>
+			{{/aggregated}}
+		</tr>
 {{/aggregated}}
+</tbody>
+</table>
