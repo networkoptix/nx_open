@@ -58,7 +58,7 @@ namespace ec2
         ErrorCode res;
         #define dbManager_queryOrReturn(ApiType, name) \
             ApiType name; \
-            if ((res = dbManager(Qn::kSuperUserAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
+            if ((res = dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
                 return res;
 
         dbManager_queryOrReturn(ApiMediaServerDataExList, mediaservers);
@@ -69,7 +69,7 @@ namespace ec2
             if (cam.typeId != m_desktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
 
-        if ((res = dbManager(Qn::kSuperUserAccess).doQuery(nullptr, outData->clients)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, outData->clients)) != ErrorCode::ok)
             return res;
 
         dbManager_queryOrReturn(ApiLicenseDataList, licenses);
@@ -84,7 +84,7 @@ namespace ec2
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
 
-        if ((res = dbManager(Qn::kSuperUserAccess).doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
+        if ((res = dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
             return res;
 
         dbManager_queryOrReturn(ApiUserDataList, users);

@@ -49,7 +49,7 @@ class ServerQueryProcessor
 {
 public:
     virtual ~ServerQueryProcessor() {}
-    ServerQueryProcessor(const Qn::UserAccessData &userAccessData = Qn::kSuperUserAccess)
+    ServerQueryProcessor(const Qn::UserAccessData &userAccessData)
         : m_userAccessData(userAccessData)
     {}
 

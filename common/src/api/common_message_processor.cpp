@@ -435,7 +435,7 @@ void QnCommonMessageProcessor::resetTime()
     if (!m_connection)
         return;
 
-    auto timeManager = m_connection->getTimeManager(Qn::kSuperUserAccess);
+    auto timeManager = m_connection->getTimeManager(Qn::kDefaultUserAccess);
     timeManager->getCurrentTime(this, [this](int handle, ec2::ErrorCode errCode, qint64 syncTime)
     {
         Q_UNUSED(handle);
@@ -444,7 +444,7 @@ void QnCommonMessageProcessor::resetTime()
 
         emit syncTimeChanged(syncTime);
 
-        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager(Qn::kSuperUserAccess)->getPeerTimeInfoList();
+        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager(Qn::kDefaultUserAccess)->getPeerTimeInfoList();
         for (const ec2::QnPeerTimeInfo &info : peers)
         {
             if (!QnRuntimeInfoManager::instance()->hasItem(info.peerId))

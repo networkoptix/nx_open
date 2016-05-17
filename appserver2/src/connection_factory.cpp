@@ -1361,7 +1361,7 @@ namespace ec2
 			clientInfo.parentId = qnCommon->moduleGUID();
 
 			ApiClientInfoDataList infos;
-            auto result = dbManager(Qn::kSuperUserAccess).doQuery(clientInfo.id, infos);
+            auto result = dbManager(Qn::kDefaultUserAccess).doQuery(clientInfo.id, infos);
 			if (result != ErrorCode::ok)
 				return result;
 
@@ -1373,7 +1373,7 @@ namespace ec2
 			}
 
             QnTransaction<ApiClientInfoData> transaction(ApiCommand::saveClientInfo, clientInfo);
-            m_serverQueryProcessor.getAccess(Qn::kSuperUserAccess).processUpdateAsync(transaction,
+            m_serverQueryProcessor.getAccess(Qn::kDefaultUserAccess).processUpdateAsync(transaction,
                 [&](ErrorCode result) {
 					if (result == ErrorCode::ok) {
 						NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
@@ -1424,7 +1424,7 @@ namespace ec2
     {
         if( !detail::QnDbManager::instance() )
             return ErrorCode::ioError;
-        return dbManager(Qn::kSuperUserAccess).doQuery(nullptr, *outData );
+        return dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, *outData );
     }
 
     template<class InputDataType>

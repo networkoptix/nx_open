@@ -25,7 +25,11 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
     return ! operator == (lhs, rhs);
 }
 
-const UserAccessData kSuperUserAccess;
+/**
+* Default kDefaultUserAccess for server side is superuser.
+* For client side kDefaultUserAccess is not taken into account.
+*/
+const UserAccessData kDefaultUserAccess;
 }
 
 #endif // __USER_ACCESS_DATA_H__

@@ -100,9 +100,9 @@ namespace ec2
         transactionLog->fillPersistentInfo(priorityTran);
 
         return
-            dbManager(Qn::kSuperUserAccess)
+            dbManager(Qn::kDefaultUserAccess)
                 .executeTransaction(deltaTran, QByteArray()) == ErrorCode::ok &&
-            dbManager(Qn::kSuperUserAccess)
+            dbManager(Qn::kDefaultUserAccess)
                 .executeTransaction(priorityTran, QByteArray()) == ErrorCode::ok;
     }
 
@@ -115,13 +115,13 @@ namespace ec2
     {
         ApiMiscData syncTimeToLocalDeltaData;
 
-        if (dbManager(Qn::kSuperUserAccess).doQuery(
+        if (dbManager(Qn::kDefaultUserAccess).doQuery(
                 TIME_DELTA_PARAM_NAME,
                 syncTimeToLocalDeltaData) != ErrorCode::ok)
             return false;
 
         ApiMiscData syncTimeKeyData;
-        if (dbManager(Qn::kSuperUserAccess).doQuery(
+        if (dbManager(Qn::kDefaultUserAccess).doQuery(
                 USED_TIME_PRIORITY_KEY_PARAM_NAME,
                 syncTimeKeyData) != ErrorCode::ok)
             return false;
@@ -1131,7 +1131,7 @@ namespace ec2
     {
         ApiMiscData timePriorityData;
         const bool timePriorityStrLoadResult =
-            dbManager(Qn::kSuperUserAccess).doQuery(
+            dbManager(Qn::kDefaultUserAccess).doQuery(
                 LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                 timePriorityData) == ErrorCode::ok;
 
@@ -1325,7 +1325,7 @@ namespace ec2
 
                 localTimeTran.isLocal = true;
                 transactionLog->fillPersistentInfo(localTimeTran);
-                dbManager(Qn::kSuperUserAccess).executeTransaction(localTimeTran, QByteArray());
+                dbManager(Qn::kDefaultUserAccess).executeTransaction(localTimeTran, QByteArray());
             }));
     }
 }

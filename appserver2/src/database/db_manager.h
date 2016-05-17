@@ -716,7 +716,7 @@ private:
     template<typename Param>
     bool hasPermission(const Param &param, Qn::Permission permission)
     {
-        if (m_userAccessData == Qn::kSuperUserAccess)
+        if (m_userAccessData == Qn::kDefaultUserAccess)
             return true;
         return hasPermissionImpl(param, permission, 0);
     }

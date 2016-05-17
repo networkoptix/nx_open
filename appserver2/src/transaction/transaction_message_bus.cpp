@@ -758,7 +758,7 @@ namespace ec2
             if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
             {
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                ErrorCode errorCode = dbManager(Qn::kSuperUserAccess).executeTransaction(tran, serializedTran);
+                ErrorCode errorCode = dbManager(Qn::kDefaultUserAccess).executeTransaction(tran, serializedTran);
                 switch(errorCode) {
                 case ErrorCode::ok:
                     break;
@@ -950,7 +950,7 @@ namespace ec2
             QnTransaction<ApiFullInfoData> tran;
             tran.command = ApiCommand::getFullInfo;
             tran.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kSuperUserAccess).doQuery(nullptr, tran.params) != ErrorCode::ok) {
+            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tran.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -976,13 +976,13 @@ namespace ec2
             QnTransaction<ApiMediaServerDataExList> tranServers;
             tranServers.command = ApiCommand::getMediaServersEx;
             tranServers.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kSuperUserAccess).doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
+            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
 
             ec2::ApiCameraDataExList cameras;
-            if (dbManager(Qn::kSuperUserAccess).doQuery(nullptr, cameras) != ErrorCode::ok) {
+            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, cameras) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1005,7 +1005,7 @@ namespace ec2
             QnTransaction<ApiUserDataList> tranUsers;
             tranUsers.command = ApiCommand::getUsers;
             tranUsers.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kSuperUserAccess).doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
+            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1013,7 +1013,7 @@ namespace ec2
             QnTransaction<ApiLayoutDataList> tranLayouts;
             tranLayouts.command = ApiCommand::getLayouts;
             tranLayouts.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kSuperUserAccess).doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1021,7 +1021,7 @@ namespace ec2
             QnTransaction<ApiServerFootageDataList> tranCameraHistory;
             tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
             tranCameraHistory.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kSuperUserAccess).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
+            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }

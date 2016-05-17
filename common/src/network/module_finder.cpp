@@ -587,7 +587,7 @@ void QnModuleFinder::sendModuleInformation(
     NX_LOG(lit("QnModuleFinder: Send info for %1: %2 -> %3.")
            .arg(moduleInformation.id.toString()).arg(address.toString()).arg(status), cl_logDEBUG2);
 
-    QnAppServerConnectionFactory::getConnection2()->getDiscoveryManager(Qn::kSuperUserAccess)->sendDiscoveredServer(
+    QnAppServerConnectionFactory::getConnection2()->getDiscoveryManager(Qn::kDefaultUserAccess)->sendDiscoveredServer(
                 std::move(serverData),
                 ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
