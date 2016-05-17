@@ -12,10 +12,10 @@
 #include <boost/optional.hpp>
 #endif
 
+#include <utils/media/abstract_byte_stream_filter.h>
+
 #include "httptypes.h"
 #include "linesplitter.h"
-
-#include "utils/media/abstract_byte_stream_filter.h"
 
 
 namespace nx_http
@@ -32,7 +32,6 @@ namespace nx_http
     class NX_NETWORK_API HttpStreamReader
     {
     public:
-        // TODO: #Elric #enum
         enum ReadState
         {
             waitingMessageStart,
@@ -74,6 +73,8 @@ namespace nx_http
         void resetState();
         //!Flush all internal buffers (if any), so that all data is available through public API
         void flush();
+        //!Force HttpStreamReader think that end of message body has been met
+        void forceEndOfMsgBody();
         /*!
             By default \a true.
             \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer

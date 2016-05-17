@@ -27,6 +27,8 @@ extern const char* kSystemGetAccessRoleListPath;
 extern const char* kAuthGetNoncePath;
 extern const char* kAuthGetAuthenticationPath;
 
+extern const char* kSubscribeToSystemEventsPath;
+
 extern const char* kPingPath;
 
 }   //cdb

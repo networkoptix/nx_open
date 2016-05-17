@@ -354,7 +354,7 @@ void CloudStreamSocket::registerTimer(
     m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));
 }
 
-aio::AbstractAioThread* CloudStreamSocket::getAioThread()
+aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
 {
     return m_aioThreadBinder->getAioThread();
 }

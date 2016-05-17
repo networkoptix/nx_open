@@ -6,8 +6,8 @@
 #include "cloud_connection_manager.h"
 
 #include <api/global_settings.h>
-
 #include <common/common_module.h>
+#include <utils/serialization/lexical.h>
 
 #include <nx/network/socket_global.h>
 
@@ -32,12 +32,20 @@ CloudConnectionManager::CloudConnectionManager()
         }
     }
 
-    Qn::directConnect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &CloudConnectionManager::cloudSettingsChanged);
+    Qn::directConnect(
+        qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &CloudConnectionManager::cloudSettingsChanged);
 }
 
 CloudConnectionManager::~CloudConnectionManager()
 {
-   directDisconnectAll();
+    directDisconnectAll();
+
+    QnMutexLocker lk(&m_mutex);
+    auto eventConnection = std::move(m_eventConnection);
+    lk.unlock();
+
+    eventConnection.reset();
 }
 
 boost::optional<nx::hpm::api::SystemCredentials>
@@ -95,9 +103,75 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
+void CloudConnectionManager::subscribeToSystemAccessListUpdatedEvent(
+    nx::utils::MoveOnlyFunc<void(nx::cdb::api::SystemAccessListModifiedEvent)> handler,
+    nx::utils::SubscriptionId* const subscriptionId)
+{
+    m_systemAccessListUpdatedEventSubscription.subscribe(
+        std::move(handler),
+        subscriptionId);
+}
+
+void CloudConnectionManager::unsubscribeFromSystemAccessListUpdatedEvent(
+    nx::utils::SubscriptionId subscriptionId)
+{
+    m_systemAccessListUpdatedEventSubscription.removeSubscription(subscriptionId);
+}
+
 bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 {
     return !m_cloudSystemID.isEmpty() && !m_cloudAuthKey.isEmpty();
+}
+
+void CloudConnectionManager::monitorForCloudEvents()
+{
+    QnMutexLocker lk(&m_mutex);
+
+    m_eventConnection =
+        m_cdbConnectionFactory->createEventConnection(
+            m_cloudSystemID.toStdString(),
+            m_cloudAuthKey.toStdString());
+
+    using namespace std::placeholders;
+    nx::cdb::api::SystemEventHandlers systemEventHandlers;
+    systemEventHandlers.onSystemAccessListUpdated =
+        std::bind(&CloudConnectionManager::onSystemAccessListUpdated, this, _1);
+    m_eventConnection->start(
+        std::move(systemEventHandlers),
+        std::bind(&CloudConnectionManager::onEventConnectionEstablished, this, _1));
+}
+
+void CloudConnectionManager::onEventConnectionEstablished(
+    nx::cdb::api::ResultCode resultCode)
+{
+    if (resultCode == nx::cdb::api::ResultCode::ok)
+    {
+        NX_LOGX(lm("Successfully opened event connection to the cloud"), cl_logDEBUG2);
+    }
+    else
+    {
+        //TODO #ak retry on failure
+        NX_LOGX(lm("Error opening event connection to the cloud: %1")
+            .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+    }
+}
+
+void CloudConnectionManager::stopMonitoringCloudEvents()
+{
+    QnMutexLocker lk(&m_mutex);
+
+    //closing event connection
+    NX_ASSERT(m_eventConnection);
+    auto eventConnection = std::move(m_eventConnection);
+    lk.unlock();
+
+    eventConnection.reset();
+}
+
+void CloudConnectionManager::onSystemAccessListUpdated(
+    nx::cdb::api::SystemAccessListModifiedEvent event)
+{
+    m_systemAccessListUpdatedEventSubscription.notify(std::move(event));
 }
 
 void CloudConnectionManager::cloudSettingsChanged()
@@ -134,11 +208,14 @@ void CloudConnectionManager::cloudSettingsChanged()
 
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(std::move(credentials));
+
+        monitorForCloudEvents();
     }
     else
     {
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
+        stopMonitoringCloudEvents();
     }
 
     emit cloudBindingStatusChanged(boundToCloud);

@@ -46,7 +46,7 @@ public:
     bool getSendTimeout(unsigned int* millis) const override;
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
-    aio::AbstractAioThread* getAioThread() override;
+    aio::AbstractAioThread* getAioThread() const override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::*

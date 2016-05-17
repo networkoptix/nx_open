@@ -26,6 +26,8 @@
 #include "abstract_nonce_provider.h"
 
 
+class CloudConnectionManager;
+
 /*!
     If server connected to cloud generates nonce suitable for authentication with cloud account credentials.
     Otherwise, standard nonce generation/validation logic is used
@@ -40,7 +42,9 @@ public:
     /*!
         \param defaultGenerator Used if no connection to cloud
     */
-    CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultGenerator);
+    CdbNonceFetcher(
+        CloudConnectionManager* const cloudConnectionManager,
+        std::unique_ptr<AbstractNonceProvider> defaultGenerator);
     ~CdbNonceFetcher();
 
     virtual QByteArray generateNonce() override;
@@ -65,6 +69,7 @@ private:
     };
 
     mutable QnMutex m_mutex;
+    CloudConnectionManager* const m_cloudConnectionManager;
     std::unique_ptr<AbstractNonceProvider> m_defaultGenerator;
     bool m_boundToCloud;
     //map<cdb_nonce, valid_time>

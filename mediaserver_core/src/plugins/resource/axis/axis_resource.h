@@ -11,7 +11,6 @@
 #include "nx/streaming/media_data_packet.h"
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/multipartcontentparser.h>
 #include "api/model/api_ioport_data.h"
 #include <nx/network/http/multipart_content_parser.h>
 
@@ -127,7 +126,6 @@ private:
     
 
     nx_http::AsyncHttpClientPtr m_inputPortHttpMonitor;
-    nx_http::MultipartContentParserHelper m_multipartContentParser;
     nx_http::BufferType m_currentMonitorData;
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
     QnAudioTransmitterPtr m_audioTransmitter;

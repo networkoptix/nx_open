@@ -27,7 +27,7 @@ void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
 
 DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
 {
-    if (!qnGlobalSettings->isInitialized() || qnGlobalSettings->isNewSystem())
+    if (qnGlobalSettings->isInitialized() && qnGlobalSettings->isNewSystem())
         return DiscoveryMode::disabled;
     return m_discoveryMode;
 }

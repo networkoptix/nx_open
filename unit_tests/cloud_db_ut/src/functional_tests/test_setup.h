@@ -139,6 +139,11 @@ public:
         const std::vector<api::SystemSharingEx>& sharings,
         const std::string& accountEmail,
         const std::string& systemID) const;
+    api::ResultCode fetchSystemData(
+        const std::string& accountEmail,
+        const std::string& accountPassword,
+        const std::string& systemId,
+        api::SystemDataEx* const systemData);
 
 private:
     QString m_tmpDir;

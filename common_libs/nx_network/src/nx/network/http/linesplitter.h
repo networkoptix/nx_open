@@ -43,6 +43,8 @@ namespace nx_http
         bool currentLineEndingClosed() const;
         //!Resets parser state
         void reset();
+        QnByteArrayConstRef partialLineBuffer() const;
+        QnByteArrayConstRef flush();
 
     private:
         //lined text parsing

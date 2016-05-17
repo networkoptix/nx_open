@@ -61,7 +61,7 @@ void TunnelConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-aio::AbstractAioThread* TunnelConnector::getAioThread()
+aio::AbstractAioThread* TunnelConnector::getAioThread() const
 {
     return m_timer.getAioThread();
 }

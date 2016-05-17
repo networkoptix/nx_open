@@ -10,10 +10,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <http/custom_headers.h>
-#include <utils/common/app_info.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/sync_call.h>
 #include <nx/network/http/auth_tools.h>
+#include <utils/common/app_info.h>
+#include <utils/common/sync_call.h>
 
 #include "cdb_nonce_fetcher.h"
 #include "cloud/cloud_connection_manager.h"
@@ -22,20 +22,32 @@
 static const std::chrono::minutes UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD(1);
 
 CloudUserAuthenticator::CloudUserAuthenticator(
+    CloudConnectionManager* const cloudConnectionManager,
     std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
     const CdbNonceFetcher& cdbNonceFetcher)
 :
+    m_cloudConnectionManager(cloudConnectionManager),
     m_defaultAuthenticator(std::move(defaultAuthenticator)),
-    m_cdbNonceFetcher(cdbNonceFetcher)
+    m_cdbNonceFetcher(cdbNonceFetcher),
+    m_systemAccessListUpdatedSubscriptionId(nx::utils::kInvalidSubscriptionId)
 {
+    using namespace std::placeholders;
+
     m_monotonicClock.restart();
     Qn::directConnect(
-        CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
+        m_cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this, &CloudUserAuthenticator::cloudBindingStatusChanged);
+
+    m_cloudConnectionManager->subscribeToSystemAccessListUpdatedEvent(
+        std::bind(&CloudUserAuthenticator::onSystemAccessListUpdated, this, _1),
+        &m_systemAccessListUpdatedSubscriptionId);
 }
 
 CloudUserAuthenticator::~CloudUserAuthenticator()
 {
+    m_cloudConnectionManager->unsubscribeFromSystemAccessListUpdatedEvent(
+        m_systemAccessListUpdatedSubscriptionId);
+
     directDisconnectAll();
 }
 
@@ -244,7 +256,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 
     nx::cdb::api::ResultCode resultCode;
     nx::cdb::api::AuthResponse authResponse;
-    const auto connection = CloudConnectionManager::instance()->getCloudConnection();
+    const auto connection = m_cloudConnectionManager->getCloudConnection();
     if (connection)
     {
         std::tie(resultCode, authResponse) =
@@ -255,7 +267,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
                     std::move(authRequest),
                     std::placeholders::_1));
         if (resultCode != nx::cdb::api::ResultCode::ok)
-            CloudConnectionManager::instance()->processCloudErrorCode(resultCode);
+            m_cloudConnectionManager->processCloudErrorCode(resultCode);
     }
     else
     {
@@ -282,7 +294,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     {
         NX_LOG(lm("CloudUserAuthenticator. Failed to authenticate username %1, cloudNonce %2 in cloud: %3").
             arg(userid).arg(cloudNonce).
-            arg(CloudConnectionManager::instance()->connectionFactory().toString(resultCode)),
+            arg(m_cloudConnectionManager->connectionFactory().toString(resultCode)),
             cl_logDEBUG2);
 
         if (resultCode != nx::cdb::api::ResultCode::networkError &&
@@ -354,6 +366,13 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorizeWithC
     {
         return std::make_tuple(Qn::Auth_WrongPassword, std::move(localUser));
     }
+}
+
+void CloudUserAuthenticator::onSystemAccessListUpdated(
+    nx::cdb::api::SystemAccessListModifiedEvent event)
+{
+    NX_LOGX(lm("Received SystemAccessListModified event"), cl_logDEBUG1);
+    //TODO #ak
 }
 
 void CloudUserAuthenticator::cloudBindingStatusChanged(bool /*boundToCloud*/)

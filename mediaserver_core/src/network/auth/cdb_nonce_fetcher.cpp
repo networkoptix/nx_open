@@ -20,8 +20,11 @@ namespace {
     constexpr const std::chrono::seconds kGetNonceRetryTimeout = std::chrono::seconds(5);
 }
 
-CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultGenerator)
+CdbNonceFetcher::CdbNonceFetcher(
+    CloudConnectionManager* const cloudConnectionManager,
+    std::unique_ptr<AbstractNonceProvider> defaultGenerator)
 :
+    m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(std::move(defaultGenerator)),
     m_boundToCloud(false),
     m_randomEngine(m_rd()),
@@ -32,10 +35,10 @@ CdbNonceFetcher::CdbNonceFetcher(std::unique_ptr<AbstractNonceProvider> defaultG
     QnMutexLocker lk(&m_mutex);
 
     Qn::directConnect(
-        CloudConnectionManager::instance(), &CloudConnectionManager::cloudBindingStatusChanged,
+        m_cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this, &CdbNonceFetcher::cloudBindingStatusChanged);
 
-    m_boundToCloud = CloudConnectionManager::instance()->boundToCloud();
+    m_boundToCloud = m_cloudConnectionManager->boundToCloud();
 
     if (m_boundToCloud)
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
@@ -152,7 +155,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     if (!m_boundToCloud)
         return;
 
-    m_connection = CloudConnectionManager::instance()->getCloudConnection();
+    m_connection = m_cloudConnectionManager->getCloudConnection();
     if (!m_connection)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
@@ -180,7 +183,7 @@ void CdbNonceFetcher::gotNonce(
     {
         NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
-        CloudConnectionManager::instance()->processCloudErrorCode(resCode);
+        m_cloudConnectionManager->processCloudErrorCode(resCode);
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
             kGetNonceRetryTimeout);
