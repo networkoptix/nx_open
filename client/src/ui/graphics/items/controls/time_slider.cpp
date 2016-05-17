@@ -127,6 +127,9 @@ namespace {
     const int kLineLabelFontHeight = 14;
     const int kLineLabelFontWeight = QFont::DemiBold;
 
+    /** Padding at the left of line labels. */
+    const int kLineLabelPaddingPixels = 6;
+
     const qreal kDegreesFor2x = 180.0;
 
     const qreal kZoomSideSnapDistance = 0.075;
@@ -2025,7 +2028,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
         QPixmap pixmap = m_lineData[line].commentPixmap;
 
         QRectF pixmapRect = pixmap.rect();
-        QRectF fullRect(lineBarRect.left(), lineTop, pixmapRect.width(), lineHeight);
+        QRectF fullRect(lineBarRect.left() + kLineLabelPaddingPixels, lineTop, pixmapRect.width(), lineHeight);
         QRectF centeredRect = QnGeometry::aligned(pixmapRect.size(), fullRect);
 
         painter->drawPixmap(centeredRect, pixmap, pixmapRect);
