@@ -14,6 +14,7 @@
 #include <openssl/ssl.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 
 #ifdef max
@@ -26,8 +27,8 @@
 
 //#define DEBUG_SSL
 
-static std::size_t kSslAsyncRecvBufferSize = 1024 * 100;
-static const unsigned char kSslSessionId[] = "Network Optix SSL socket";
+static const std::size_t kSslAsyncRecvBufferSize(1024 * 100);
+static const nx::String kSslSessionId("Network Optix SSL socket");
 
 namespace {
 
@@ -1023,7 +1024,10 @@ public:
         clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
 
         SSL_CTX_set_options(serverContext.get(), SSL_OP_SINGLE_DH_USE);
-        SSL_CTX_set_session_id_context(serverContext.get(), kSslSessionId, 4);
+        SSL_CTX_set_session_id_context(
+            serverContext.get(),
+            reinterpret_cast<const unsigned char*>(kSslSessionId.data()),
+            kSslSessionId.size());
     }
     
     static SslStaticData* instance();
@@ -1036,16 +1040,10 @@ SslStaticData* SslStaticData::instance()
     return SslStaticData_instance();
 }
 
-template<typename T, typename Deleter>
-std::unique_ptr<T, Deleter> uniquePtrWrap(T* ptr, Deleter deleter)
-{
-    return std::unique_ptr<T, Deleter>(ptr, std::move(deleter));
-}
-
 const size_t SslEngine::kBufferSize = 1024 * 10;
 const int SslEngine::kRsaLength = 2048;
 const std::chrono::seconds SslEngine::kCertExpiration =
-    std::chrono::hours(5 * 365); // 5 years
+    std::chrono::hours(5 * 365 * 24); // 5 years
 
 String SslEngine::makeCertificateAndKey(
     const String& common, const String& country, const String& company)
@@ -1053,28 +1051,28 @@ String SslEngine::makeCertificateAndKey(
     const auto data = SslStaticData::instance();
     const int serialNumber = qrand();
 
-    auto number = uniquePtrWrap(BN_new(), &BN_free);
+    auto number = utils::uniquePtr(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
     {
         NX_LOG("SSL cant generate big number", cl_logWARNING);
         return String();
     }
 
-    auto rsa = uniquePtrWrap(RSA_new(), &RSA_free);
+    auto rsa = utils::uniquePtr(RSA_new(), &RSA_free);
     if (!rsa || !RSA_generate_key_ex(rsa.get(), kRsaLength, number.get(), NULL))
     {
         NX_LOG("SSL cant generate RSA", cl_logWARNING);
         return String();
     }
 
-    auto pkey = uniquePtrWrap(EVP_PKEY_new(), &EVP_PKEY_free);
+    auto pkey = utils::uniquePtr(EVP_PKEY_new(), &EVP_PKEY_free);
     if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
     {
         NX_LOG("SSL cant generate PKEY", cl_logWARNING);
         return String();
     }
 
-    auto x509 = uniquePtrWrap(X509_new(), &X509_free);
+    auto x509 = utils::uniquePtr(X509_new(), &X509_free);
     if (!x509
         || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
         || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
@@ -1090,7 +1088,7 @@ String SslEngine::makeCertificateAndKey(
     {
         auto vptr = (unsigned char *)value.data();
         return X509_NAME_add_entry_by_txt(
-            name, field,  MBSTRING_ASC, vptr, -1, -1, 0);
+            name, field,  MBSTRING_UTF8, vptr, -1, -1, 0);
     };
 
     if (!name
@@ -1103,7 +1101,7 @@ String SslEngine::makeCertificateAndKey(
     }
 
     char writeBuffer[kBufferSize] = { 0 };
-    const auto bio = uniquePtrWrap(BIO_new(BIO_s_mem()), BIO_free);
+    const auto bio = utils::uniquePtr(BIO_new(BIO_s_mem()), BIO_free);
     if (!bio
         || !PEM_write_bio_PrivateKey(bio.get(), pkey.get(), 0, 0, 0, 0, 0)
         || !PEM_write_bio_X509(bio.get(), x509.get())
@@ -1113,18 +1111,18 @@ String SslEngine::makeCertificateAndKey(
         return String();
     }
 
-    return QByteArray(writeBuffer);
+    return String(writeBuffer);
 }
 
 bool SslEngine::useCertificateAndPkey(const String& certData)
 {
     const auto data = SslStaticData::instance();
     {
-        auto bio = uniquePtrWrap(
+        auto bio = utils::uniquePtr(
             BIO_new_mem_buf((void*) certData.data(), certData.size()),
             &BIO_free);
 
-        auto x509 = uniquePtrWrap(
+        auto x509 = utils::uniquePtr(
             PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
 
         if (!x509)
@@ -1133,7 +1131,7 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
             return false;
         }
 
-        if (SSL_CTX_use_certificate(data->serverContext.get(), x509.get()) != 1)
+        if (!SSL_CTX_use_certificate(data->serverContext.get(), x509.get()))
         {
             NX_LOG("SSL cannot use X509", cl_logWARNING);
             return false;
@@ -1141,7 +1139,7 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
     }
 
     {
-        auto bio = uniquePtrWrap(
+        auto bio = utils::uniquePtr(
             BIO_new_mem_buf((void*) certData.data(), certData.size()),
             &BIO_free);
 
@@ -1152,7 +1150,7 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
             return false;
         }
 
-        if (SSL_CTX_use_PrivateKey(data->serverContext.get(), data->pkey.get()) != 1)
+        if (!SSL_CTX_use_PrivateKey(data->serverContext.get(), data->pkey.get()))
         {
             NX_LOG("SSL cannot use PKEY", cl_logWARNING);
             return false;
@@ -1258,8 +1256,13 @@ void SslSocket::init()
 
     NX_ASSERT(context);
     d->ssl.reset(SSL_new(context)); // get new SSL state with context
+
     SSL_set_verify(d->ssl.get(), SSL_VERIFY_NONE, NULL);
-    SSL_set_session_id_context(d->ssl.get(), kSslSessionId, 4);
+    SSL_set_session_id_context(
+        d->ssl.get(),
+        reinterpret_cast<const unsigned char*>(kSslSessionId.data()),
+        kSslSessionId.size());
+
     SSL_set_bio(d->ssl.get(), rbio, wbio);  //d->ssl will free bio when freed
 }
 

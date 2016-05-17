@@ -1721,7 +1721,7 @@ void MediaServerProcess::run()
 
     nx::String sslCertData;
     QFile f(sslCertPath);
-    if (f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
+    if (!f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
     {
         f.close();
         qWarning() << "Could not find valid SSL certificate at "
@@ -1735,8 +1735,8 @@ void MediaServerProcess::run()
         }
 
         sslCertData = nx::network::SslEngine::makeCertificateAndKey(
-            qApp->applicationName().toLatin1(), "US",
-            QnAppInfo::organizationName().toLatin1());
+            QnAppInfo::productName().toUtf8(), "US",
+            QnAppInfo::organizationName().toUtf8());
 
         if (sslCertData.isEmpty())
         {
