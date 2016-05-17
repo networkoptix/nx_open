@@ -1073,11 +1073,11 @@ VariantAnimator* QnWorkbenchNavigator::createPositionAnimator()
         m_animatedPosition = value.value<qint64>();
     };
 
-    QScopedPointer<VariantAnimator> animator(new VariantAnimator(this));
+    VariantAnimator* animator = new VariantAnimator(this);
     animator->setTimer(InstrumentManager::animationTimer(display()->scene()));
     animator->setAccessor(newAccessor(positionGetter, positionSetter));
     animator->setTargetObject(this);
-    return animator.take();
+    return animator;
 }
 
 void QnWorkbenchNavigator::initializePositionAnimations()
