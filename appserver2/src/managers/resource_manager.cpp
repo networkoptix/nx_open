@@ -14,10 +14,10 @@
 namespace ec2
 {
     template<class T>
-    QnResourceManager<T>::QnResourceManager( T* const queryProcessor)
+    QnResourceManager<T>::QnResourceManager( T* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
-        QnResourceNotificationManager(),
-        m_queryProcessor( queryProcessor )
+        m_queryProcessor( queryProcessor ),
+        m_userAccessData(userAccessData)
     {
     }
 
@@ -32,7 +32,7 @@ namespace ec2
 				fromApiToResourceList(resTypeList, outResTypeList);
             handler->done( reqID, errorCode, outResTypeList );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiResourceTypeDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiResourceTypeDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceTypes, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -45,7 +45,7 @@ namespace ec2
         //performing request
         auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
         return reqID;
     }
 
@@ -58,7 +58,7 @@ namespace ec2
         auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
         tran.isLocal = true;
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
         return reqID;
     }
 
@@ -73,7 +73,7 @@ namespace ec2
                 outData = params;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceParamWithRefDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiResourceParamWithRefDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceParams, resourceId, queryDoneHandler );
         return reqID;
     }
@@ -89,7 +89,7 @@ namespace ec2
                 outData = params;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceStatusDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiResourceStatusDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getStatusList, resourceId, queryDoneHandler );
         return reqID;
     }
@@ -103,7 +103,7 @@ namespace ec2
         ApiResourceParamWithRefDataList outData;
         outData = kvPairs;
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
 
         return reqID;
     }
@@ -117,7 +117,7 @@ namespace ec2
         ApiResourceParamWithRefDataList outData;
         outData = kvPairs;
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
 
         return reqID;
     }
@@ -128,7 +128,7 @@ namespace ec2
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeResource, id );
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
 
@@ -140,7 +140,7 @@ namespace ec2
         for(const QnUuid& id: idList)
             tran.params.push_back(id);
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
 

@@ -7,7 +7,7 @@
 
 namespace ec2
 {
-    class QnVideowallNotificationManager: public AbstractVideowallManagerBase
+    class QnVideowallNotificationManager: public AbstractVideowallNotificationManager
     {
     public:
         QnVideowallNotificationManager();
@@ -17,17 +17,12 @@ namespace ec2
     };
 
     typedef std::shared_ptr<QnVideowallNotificationManager> QnVideowallNotificationManagerPtr;
-    typedef QnVideowallNotificationManager *QnVideowallNotificationManagerRawPtr;
 
     template<class QueryProcessorType>
     class QnVideowallManager: public AbstractVideowallManager
     {
     public:
-        QnVideowallManager(QnVideowallNotificationManagerRawPtr base,
-                           QueryProcessorType* const queryProcessor,
-                           const Qn::UserAccessData &userAccessData = Qn::kSuperUserAccess);
-
-        QnVideowallNotificationManagerRawPtr getBase() const override { return m_base; }
+        QnVideowallManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
@@ -37,7 +32,6 @@ namespace ec2
         virtual int sendControlMessage(const ec2::ApiVideowallControlMessageData& message, impl::SimpleHandlerPtr handler) override;
 
     private:
-        QnVideowallNotificationManagerRawPtr m_base;
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
     };

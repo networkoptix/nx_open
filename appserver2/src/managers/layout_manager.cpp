@@ -27,11 +27,9 @@ namespace ec2
 
 
     template<typename QueryProcessorType>
-    QnLayoutManager<QueryProcessorType>::QnLayoutManager(QnLayoutNotificationManagerRawPtr base,
-                                                         QueryProcessorType* const queryProcessor,
+    QnLayoutManager<QueryProcessorType>::QnLayoutManager(QueryProcessorType* const queryProcessor,
                                                          const Qn::UserAccessData &userAccessData)
-        : m_base(base),
-          m_queryProcessor(queryProcessor),
+        : m_queryProcessor(queryProcessor),
           m_userAccessData(userAccessData)
     {}
 

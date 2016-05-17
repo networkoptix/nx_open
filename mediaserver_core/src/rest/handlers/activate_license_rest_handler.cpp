@@ -17,6 +17,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include <utils/serialization/json_functions.h>
 #include <utils/common/app_info.h>
+#include "rest/server/rest_connection_processor.h"
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -87,7 +88,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     return result;
 }
 
-int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     ec2::ApiDetailedLicenseData reply;
 
@@ -136,7 +137,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     QnLicenseList licenses;
     licenses << license;
-    const ec2::ErrorCode errorCode = connect->getLicenseManager()->addLicensesSync(licenses);
+    const ec2::ErrorCode errorCode = connect->getLicenseManager(Qn::UserAccessData(owner->authUserId()))->addLicensesSync(licenses);
     if( errorCode != ec2::ErrorCode::ok) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
         return CODE_OK;

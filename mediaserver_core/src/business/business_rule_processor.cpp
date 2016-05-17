@@ -443,7 +443,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec
 
 bool QnBusinessRuleProcessor::broadcastBusinessAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->broadcastBusinessAction(
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSuperUserAccess)->broadcastBusinessAction(
         action, this, &QnBusinessRuleProcessor::at_broadcastBusinessActionFinished );
     return true;
 }

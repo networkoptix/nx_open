@@ -7,7 +7,7 @@
 
 namespace ec2
 {
-    class AbstractVideowallManagerBase : public QObject
+    class AbstractVideowallNotificationManager : public QObject
     {
         Q_OBJECT
     public:
@@ -17,6 +17,8 @@ namespace ec2
         void controlMessage(const ec2::ApiVideowallControlMessageData& message);
     };
 
+    typedef std::shared_ptr<AbstractVideowallNotificationManager> AbstractVideowallNotificationManagerPtr;
+
     /*!
     \note All methods are asynchronous if other not specified
     */
@@ -24,8 +26,6 @@ namespace ec2
     {
     public:
         virtual ~AbstractVideowallManager() {}
-
-        virtual AbstractVideowallManagerBase *getBase() const  = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const ec2::ApiVideowallDataList&)

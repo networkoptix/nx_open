@@ -38,7 +38,7 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnUuid& dstPeer)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    int handle = ec2Connection->getBusinessEventManager()->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
+    int handle = ec2Connection->getBusinessEventManager(Qn::kSuperUserAccess)->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
 
     QnMutexLocker lock(&m_mutex);
     m_sendingActions.insert(handle, bAction);

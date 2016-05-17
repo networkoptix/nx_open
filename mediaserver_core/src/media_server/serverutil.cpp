@@ -97,7 +97,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data, QString* errString)
+bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -140,7 +140,7 @@ bool changeAdminPassword(PasswordData data, QString* errString)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
         if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
@@ -159,7 +159,7 @@ bool changeAdminPassword(PasswordData data, QString* errString)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager(Qn::UserAccessData(userId))->saveSync(apiUser, data.password);
         if (errCode != ec2::ErrorCode::ok)
         {
             if (errString)
@@ -228,7 +228,7 @@ bool backupDatabase() {
     return true;
 }
 
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime)
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, const QnUuid &userId)
 {
     if (qnCommon->localSystemName() == systemName.value())
         return true;
@@ -255,7 +255,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(userId)->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
 }

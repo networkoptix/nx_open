@@ -97,9 +97,9 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::connectToConnection(connection);
 
-    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+    connect(connection->getUpdatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateChunkReceived,
         this, &QnServerMessageProcessor::at_updateChunkReceived);
-    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+    connect(connection->getUpdatesNotificationManager().get(), &ec2::AbstractUpdatesNotificationManager::updateInstallationRequested,
         this, &QnServerMessageProcessor::at_updateInstallationRequested);
 
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
@@ -107,14 +107,14 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
-    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+    connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
         this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(nx::SystemName(systemName), sysIdTime, tranLogTime); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::disconnectFromConnection(connection);
-    connection->getUpdatesManager()->disconnect(this);
-    connection->getMiscManager()->disconnect(this);
+    connection->getUpdatesNotificationManager()->disconnect(this);
+    connection->getMiscNotificationManager()->disconnect(this);
 }
 
 void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {

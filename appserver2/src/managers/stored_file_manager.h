@@ -9,9 +9,7 @@
 
 namespace ec2
 {
-    class QnStoredFileNotificationManager
-    :
-        public AbstractStoredFileManager
+    class QnStoredFileNotificationManager : public AbstractStoredFileNotificationManager
     {
     public:
         QnStoredFileNotificationManager() {}
@@ -33,14 +31,13 @@ namespace ec2
         }
     };
 
+    typedef std::shared_ptr<QnStoredFileNotificationManager> QnStoredFileNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnStoredFileManager
-    :
-        public QnStoredFileNotificationManager
+    class QnStoredFileManager : public AbstractStoredFileManager
     {
     public:
-        QnStoredFileManager( QueryProcessorType* const queryProcessor);
+        QnStoredFileManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) override;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) override;
@@ -49,6 +46,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
 
         QnTransaction<ApiStoredFileData> prepareTransaction( const QString& filename, const QByteArray& data );
         QnTransaction<ApiStoredFilePath> prepareTransaction( const QString& filename );

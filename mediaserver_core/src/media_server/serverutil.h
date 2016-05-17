@@ -59,7 +59,7 @@ namespace nx
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime);
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, const QnUuid &userId);
 
 struct PasswordData
 {
@@ -83,7 +83,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 
-bool changeAdminPassword(PasswordData data, QString* errString = nullptr);
+bool changeAdminPassword(PasswordData data, const QnUuid &userId, QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 

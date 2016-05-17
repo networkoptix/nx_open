@@ -49,10 +49,10 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor )
+    QnCameraManager<QueryProcessorType>::QnCameraManager(QueryProcessorType* const queryProcessor , const Qn::UserAccessData &userAccessData)
     :
-        QnCameraNotificationManager(),
-        m_queryProcessor( queryProcessor )
+      m_queryProcessor( queryProcessor ),
+      m_userAccessData(userAccessData)
     {
     }
 
@@ -65,7 +65,7 @@ namespace ec2
         {
             handler->done(reqID, errorCode, cameras);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiCameraDataList, decltype(queryDoneHandler)>
             (ApiCommand::getCameras, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -75,7 +75,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiCameraData> tran(ApiCommand::saveCamera, camera);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -96,7 +96,7 @@ namespace ec2
 
         const int reqID = generateRequestID();
         QnTransaction<ApiCameraDataList> tran(ApiCommand::saveCameras, cameras);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -108,7 +108,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdData> tran(ApiCommand::removeCamera, id);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -121,7 +121,7 @@ namespace ec2
         ApiServerFootageData data(serverGuid, cameras);
         const int reqID = generateRequestID();
         QnTransaction<ApiServerFootageData> tran(ApiCommand::addCameraHistoryItem, data);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -137,7 +137,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiServerFootageDataList& cameraHistory) {
             handler->done( reqID, errorCode, cameraHistory);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiServerFootageDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiServerFootageDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryItems, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -148,7 +148,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiCameraAttributesDataList> tran(ApiCommand::saveCameraUserAttributesList, cameraAttributes);
-        m_queryProcessor->processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(tran, [handler, reqID](ec2::ErrorCode errorCode)
         {
             handler->done(reqID, errorCode);
         });
@@ -163,7 +163,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraAttributesDataList& cameraUserAttributesList ) {
             handler->done( reqID, errorCode, cameraUserAttributesList);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getCameraUserAttributes, nullptr, queryDoneHandler );
         return reqID;
     }

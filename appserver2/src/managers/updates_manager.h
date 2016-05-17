@@ -8,9 +8,7 @@
 
 namespace ec2 {
 
-    class QnUpdatesNotificationManager
-    :
-        public AbstractUpdatesManagerBase
+    class QnUpdatesNotificationManager : public AbstractUpdatesNotificationManager
     {
     public:
         QnUpdatesNotificationManager();
@@ -33,9 +31,8 @@ namespace ec2 {
         public AbstractUpdatesManager
     {
     public:
-        QnUpdatesManager(QnUpdatesNotificationManagerRawPtr base, QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
+        QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
         virtual ~QnUpdatesManager();
-        virtual QnUpdatesNotificationManagerRawPtr getBase() const override { return m_base; }
 
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
@@ -43,7 +40,6 @@ namespace ec2 {
         virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
 
     private:
-        QnUpdatesNotificationManagerRawPtr m_base;
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
 

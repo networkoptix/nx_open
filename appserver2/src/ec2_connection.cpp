@@ -30,7 +30,7 @@ namespace ec2
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
             m_staticticsReporter.reset(new Ec2StaticticsReporter(
-                getResourceManager(), getMediaServerManager(Qn::kSuperUserAccess)));
+                getResourceManager(Qn::kSuperUserAccess), getMediaServerManager(Qn::kSuperUserAccess)));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()

@@ -14,10 +14,8 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSyste
 }
 
 template<class QueryProcessorType>
-QnMiscManager<QueryProcessorType>::QnMiscManager(QnMiscNotificationManagerRawPtr base,
-                                                 QueryProcessorType * const queryProcessor,
+QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor,
                                                  const Qn::UserAccessData &userAccessData) :
-    m_base(base),
     m_queryProcessor(queryProcessor),
     m_userAccessData(userAccessData)
 {

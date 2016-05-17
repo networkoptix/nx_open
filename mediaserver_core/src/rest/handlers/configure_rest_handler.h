@@ -9,7 +9,7 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
     virtual void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
 private:
-    int changePort(int port);
+    int changePort(const QnUuid & userId, int port);
     void resetConnections();
 };
 

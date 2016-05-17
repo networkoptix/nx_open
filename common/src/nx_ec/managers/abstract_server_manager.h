@@ -8,7 +8,7 @@
 namespace ec2
 {
 
-class AbstractMediaServerManagerBase : public QObject
+class AbstractMediaServerNotificationManager : public QObject
 {
     Q_OBJECT
 public:
@@ -21,12 +21,12 @@ signals:
     void userAttributesRemoved(const QnUuid& id);
 };
 
+typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaServerNotificationManagerPtr;
+
     class AbstractMediaServerManager
     {
     public:
         virtual ~AbstractMediaServerManager() {}
-
-        virtual AbstractMediaServerManagerBase *getBase() const = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const QnMediaServerResourceList& servers)

@@ -8,6 +8,7 @@
 #include <media_server/serverutil.h>
 
 #include <utils/common/model_functions.h>
+#include "rest/server/rest_connection_processor.h"
 
 namespace
 {
@@ -36,10 +37,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, true));
 
-int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupLocalSystemData(params)), result);
+    return execute(std::move(SetupLocalSystemData(params)), owner->authUserId(), result);
 }
 
 int QnSetupLocalSystemRestHandler::executePost(
@@ -47,14 +48,14 @@ int QnSetupLocalSystemRestHandler::executePost(
     const QnRequestParams&,
     const QByteArray &body,
     QnJsonRestResult &result,
-    const QnRestConnectionProcessor*)
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
     SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
-    return execute(std::move(data), result);
+    return execute(std::move(data), owner->authUserId(), result);
 }
 
-int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRestResult &result)
+int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUuid &userId, QnJsonRestResult &result)
 {
     if (data.oldPassword.isEmpty())
         data.oldPassword = kDefaultAdminPassword;
@@ -95,12 +96,12 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     }
 
     QString errString;
-    if (!changeAdminPassword(data, &errString)) {
+    if (!changeAdminPassword(data, userId, &errString)) {
         result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeSystemName(data.systemName, 0, 0))
+    if (!changeSystemName(data.systemName, 0, 0, userId))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::internalServerError;

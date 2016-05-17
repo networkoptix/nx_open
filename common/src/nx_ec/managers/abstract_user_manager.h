@@ -10,7 +10,7 @@
 namespace ec2
 {
 
-class AbstractUserManagerBase : public QObject
+class AbstractUserNotificationManager : public QObject
 {
     Q_OBJECT
 public:
@@ -22,6 +22,8 @@ signals:
     void accessRightsChanged(const ec2::ApiAccessRightsData& access);
 };
 
+typedef std::shared_ptr<AbstractUserNotificationManager> AbstractUserNotificationManagerPtr;
+
     /*!
     \note All methods are asynchronous if other not specified
     */
@@ -29,8 +31,6 @@ signals:
     {
     public:
         virtual ~AbstractUserManager() {}
-
-        virtual AbstractUserManagerBase *getBase() const = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const QnUserResourceList&)

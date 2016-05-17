@@ -37,9 +37,10 @@ namespace ec2
     //// class QnLicenseManager
     ////////////////////////////////////////////////////////////
     template<class T>
-    QnLicenseManager<T>::QnLicenseManager( T* const queryProcessor )
+    QnLicenseManager<T>::QnLicenseManager(T* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
-        m_queryProcessor( queryProcessor )
+      m_queryProcessor( queryProcessor ),
+      m_userAccessData(userAccessData)
     {
     }
 
@@ -54,7 +55,7 @@ namespace ec2
                 fromApiToResourceList(licenses, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLicenseDataList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiLicenseDataList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
         return reqID;
     }
     
@@ -69,7 +70,7 @@ namespace ec2
         auto tran = prepareTransaction( ApiCommand::addLicenses, licenses );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }
@@ -85,7 +86,7 @@ namespace ec2
         auto tran = prepareTransaction( ApiCommand::removeLicense, license );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
         return reqID;
     }

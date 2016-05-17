@@ -16,12 +16,13 @@
 #include <nx_ec/data/api_user_data.h>
 
 #include <nx/utils/uuid.h>
+#include "rest/server/rest_connection_processor.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
-int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, params, body);
 
@@ -34,7 +35,7 @@ int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnReques
         return nx_http::StatusCode::ok;
     }
 
-    ec2::AbstractUserManagerPtr userManager = ec2Connection()->getUserManager();
+    ec2::AbstractUserManagerPtr userManager = ec2Connection()->getUserManager(Qn::UserAccessData(owner->authUserId()));
 
     ec2::ApiUserDataList dbUsers;
     userManager->getUsersSync(&dbUsers);

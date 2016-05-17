@@ -6,7 +6,7 @@
 
 namespace ec2
 {
-    class QnWebPageNotificationManager: public AbstractWebPageManagerBase
+    class QnWebPageNotificationManager: public AbstractWebPageNotificationManager
     {
     public:
         QnWebPageNotificationManager();
@@ -16,17 +16,12 @@ namespace ec2
     };
 
     typedef std::shared_ptr<QnWebPageNotificationManager> QnWebPageNotificationManagerPtr;
-    typedef QnWebPageNotificationManager *QnWebPageNotificationManagerRawPtr;
 
     template<class QueryProcessorType>
     class QnWebPageManager: public AbstractWebPageManager
     {
     public:
-        QnWebPageManager(QnWebPageNotificationManagerRawPtr base,
-                         QueryProcessorType* const queryProcessor,
-                         const Qn::UserAccessData &userAccessData);
-
-        QnWebPageNotificationManagerRawPtr getBase() const override { return m_base; }
+        QnWebPageManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
     protected:
         virtual int getWebPages( impl::GetWebPagesHandlerPtr handler ) override;
@@ -34,7 +29,6 @@ namespace ec2
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
     private:
-        QnWebPageNotificationManagerRawPtr m_base;
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
     };

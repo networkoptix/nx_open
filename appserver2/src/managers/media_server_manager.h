@@ -6,7 +6,7 @@
 
 namespace ec2
 {
-    class QnMediaServerNotificationManager: public AbstractMediaServerManagerBase
+    class QnMediaServerNotificationManager: public AbstractMediaServerNotificationManager
     {
     public:
         QnMediaServerNotificationManager();
@@ -27,14 +27,12 @@ namespace ec2
     };
 
     typedef std::shared_ptr<QnMediaServerNotificationManager> QnMediaServerNotificationManagerPtr;
-    typedef QnMediaServerNotificationManager *QnMediaServerNotificationManagerRawPtr;
 
     template<class QueryProcessorType>
     class QnMediaServerManager: public AbstractMediaServerManager
     {
     public:
-        QnMediaServerManager(QnMediaServerNotificationManagerRawPtr base, QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
-        QnMediaServerNotificationManagerRawPtr getBase() const override { return m_base; }
+        QnMediaServerManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         //!Implementation of QnMediaServerManager::getServers
         virtual int getServers(impl::GetServersHandlerPtr handler) override;
@@ -54,7 +52,6 @@ namespace ec2
         virtual int getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler ) override;
 
     private:
-        QnMediaServerNotificationManagerRawPtr m_base;
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
     };

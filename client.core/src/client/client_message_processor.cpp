@@ -87,13 +87,13 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
 
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::connectToConnection(connection);
-    connect(connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+    connect(connection->getMiscNotificationManager(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
             this, &QnClientMessageProcessor::at_systemNameChangeRequested);
 }
 
 void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
     base_type::disconnectFromConnection(connection);
-    connection->getMiscManager()->disconnect(this);
+    connection->getMiscNotificationManager()->disconnect(this);
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {

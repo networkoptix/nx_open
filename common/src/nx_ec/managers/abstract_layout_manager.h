@@ -8,7 +8,7 @@
 namespace ec2
 {
 
-class AbstractLayoutManagerBase : public QObject
+class AbstractLayoutNotificationManager : public QObject
 {
     Q_OBJECT
 public:
@@ -18,6 +18,8 @@ signals:
     void removed(const QnUuid& id);
 };
 
+typedef std::shared_ptr<AbstractLayoutNotificationManager> AbstractLayoutNotificationManagerPtr;
+
     /*!
     \note All methods are asynchronous if other not specified
     */
@@ -25,8 +27,6 @@ signals:
     {
     public:
         virtual ~AbstractLayoutManager() {}
-
-        virtual AbstractLayoutManagerBase *getBase() const  = 0;
 
         /*!
         \param handler Functor with params: (ErrorCode, const ApiLayoutDataList&)

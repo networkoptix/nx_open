@@ -30,7 +30,7 @@ namespace ec2
         return m_connectionInfo.ecUrl.password();
     }
 
-    AbstractResourceManagerPtr OldEcConnection::getResourceManager()
+    AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
     {
         return AbstractResourceManagerPtr();
     }
@@ -40,17 +40,17 @@ namespace ec2
         return AbstractMediaServerManagerPtr();
     }
 
-    AbstractCameraManagerPtr OldEcConnection::getCameraManager()
+    AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserAccessData &)
     {
         return AbstractCameraManagerPtr();
     }
 
-    AbstractLicenseManagerPtr OldEcConnection::getLicenseManager()
+    AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserAccessData &)
     {
         return AbstractLicenseManagerPtr();
     }
 
-    AbstractBusinessEventManagerPtr OldEcConnection::getBusinessEventManager()
+    AbstractBusinessEventManagerPtr OldEcConnection::getBusinessEventManager(const Qn::UserAccessData &)
     {
         return AbstractBusinessEventManagerPtr();
     }
@@ -75,7 +75,7 @@ namespace ec2
         return AbstractWebPageManagerPtr();
     }
 
-    AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager()
+    AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserAccessData &)
     {
         return AbstractStoredFileManagerPtr();
     }
@@ -95,9 +95,79 @@ namespace ec2
         return AbstractDiscoveryManagerPtr();
     }
 
-    AbstractTimeManagerPtr OldEcConnection::getTimeManager()
+    AbstractTimeManagerPtr OldEcConnection::getTimeManager(const Qn::UserAccessData &)
     {
         return AbstractTimeManagerPtr();
+    }
+
+    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+    {
+        return AbstractLicenseNotificationManagerPtr();
+    }
+
+    AbstractTimeNotificationManagerPtr OldEcConnection::getTimeNotificationManager()
+    {
+        return AbstractTimeNotificationManagerPtr();
+    }
+
+    AbstractResourceNotificationManagerPtr OldEcConnection::getResourceNotificationManager()
+    {
+        return AbstractResourceNotificationManagerPtr();
+    }
+
+    AbstractMediaServerNotificationManagerPtr OldEcConnection::getMediaServerNotificationManager()
+    {
+        return AbstractMediaServerNotificationManagerPtr();
+    }
+
+    AbstractCameraNotificationManagerPtr OldEcConnection::getCameraNotificationManager()
+    {
+        return AbstractCameraNotificationManagerPtr();
+    }
+
+    AbstractBusinessEventNotificationManagerPtr OldEcConnection::getBusinessEventNotificationManager()
+    {
+        return AbstractBusinessEventNotificationManagerPtr();
+    }
+
+    AbstractUserNotificationManagerPtr OldEcConnection::getUserNotificationManager()
+    {
+        return AbstractUserNotificationManagerPtr();
+    }
+
+    AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
+    {
+        return AbstractLayoutNotificationManagerPtr();
+    }
+
+    AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
+    {
+        return AbstractWebPageNotificationManagerPtr();
+    }
+
+    AbstractDiscoveryNotificationManagerPtr OldEcConnection::getDiscoveryNotificationManager()
+    {
+        return AbstractDiscoveryNotificationManagerPtr();
+    }
+
+    AbstractMiscNotificationManagerPtr OldEcConnection::getMiscNotificationManager()
+    {
+        return AbstractMiscNotificationManagerPtr();
+    }
+
+    AbstractUpdatesNotificationManagerPtr OldEcConnection::getUpdatesNotificationManager()
+    {
+        return AbstractUpdatesNotificationManagerPtr();
+    }
+
+    AbstractStoredFileNotificationManagerPtr OldEcConnection::getStoredFileNotificationManager()
+    {
+        return AbstractStoredFileNotificationManagerPtr();
+    }
+
+    AbstractVideowallNotificationManagerPtr OldEcConnection::getVideowallNotificationManager()
+    {
+        return AbstractVideowallNotificationManagerPtr();
     }
 
     int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)

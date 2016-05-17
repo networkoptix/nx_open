@@ -51,8 +51,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
 
 template<class QueryProcessorType>
-QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(QnDiscoveryNotificationManagerRawPtr *base, QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
-    m_base(base),
+QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
     m_queryProcessor(queryProcessor),
     m_userAccessData(userAccessData)
 {

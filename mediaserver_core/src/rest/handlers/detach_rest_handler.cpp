@@ -9,26 +9,27 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include "rest/server/rest_connection_processor.h"
 
 namespace {
     static const QString kDefaultAdminPassword = "admin";
 }
 
-int QnDetachFromSystemRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnDetachFromSystemRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
-    return execute(std::move(PasswordData(params)), result);
+    return execute(std::move(PasswordData(params)), owner->authUserId(), result);
 }
 
-int QnDetachFromSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnDetachFromSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
     Q_UNUSED(params);
 
     PasswordData passwordData = QJson::deserialized<PasswordData>(body);
-    return execute(std::move(passwordData), result);
+    return execute(std::move(passwordData), owner->authUserId(), result);
 }
 
-int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRestResult &result)
+int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUuid &userId, QnJsonRestResult &result)
 {
     if (!passwordData.hasPassword())
         passwordData.password = kDefaultAdminPassword;
@@ -47,7 +48,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
     }
 
     QString errString;
-    if (!changeAdminPassword(passwordData, &errString)) {
+    if (!changeAdminPassword(passwordData, userId, &errString)) {
         result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
@@ -65,7 +66,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
 
     nx::SystemName systemName;
     systemName.resetToDefault();
-    if (!changeSystemName(systemName, 0, 0))
+    if (!changeSystemName(systemName, 0, 0, userId))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error.  Can't change system name."));
         return nx_http::StatusCode::internalServerError;

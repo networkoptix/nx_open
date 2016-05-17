@@ -21,11 +21,8 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QnWebPageNotificationManagerRawPtr base,
-                                                           QueryProcessorType* const queryProcessor,
-                                                           const Qn::UserAccessData &userAccessData)
-        : m_base(base),
-          m_queryProcessor(queryProcessor),
+    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
+        : m_queryProcessor(queryProcessor),
           m_userAccessData(userAccessData)
     {}
 

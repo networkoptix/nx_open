@@ -43,8 +43,7 @@ namespace ec2 {
 
 
     template<class QueryProcessorType>
-    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QnUpdatesNotificationManagerRawPtr base, QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
-        m_base(base),
+    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
         m_queryProcessor(queryProcessor),
         m_userAccessData(userAccessData)
     {

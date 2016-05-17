@@ -58,9 +58,8 @@ namespace ec2
 
 
     template<class QueryProcessorType>
-    QnMediaServerManager<QueryProcessorType>::QnMediaServerManager(QnMediaServerNotificationManagerRawPtr base, QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
+    QnMediaServerManager<QueryProcessorType>::QnMediaServerManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
-      m_base(base),
       m_queryProcessor( queryProcessor ),
       m_userAccessData(userAccessData)
     {}
