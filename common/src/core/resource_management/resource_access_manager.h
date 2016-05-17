@@ -85,12 +85,6 @@ public:
     bool canCreateResource(const QnUuid& userId, const ec2::ApiVideowallData& data) const;
     bool canCreateResource(const QnUuid& userId, const ec2::ApiWebPageData& data) const;
 private:
-    /**
-    * \param permissions               Permission flags containing some deprecated values.
-    * \returns                         Permission flags with deprecated values replaced with new ones.
-    */
-    static Qn::GlobalPermissions undeprecate(Qn::GlobalPermissions permissions);
-
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
 
@@ -108,7 +102,7 @@ private:
 
     bool canCreateStorageInternal(const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
     bool canCreateLayoutInternal(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
-    bool canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions) const;
+    bool canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
     bool canCreateVideoWallInternal(const QnUserResourcePtr& user) const;
     bool canCreateWebPageInternal(const QnUserResourcePtr& user) const;
 

@@ -121,28 +121,27 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr &user)
 
     Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(user);
 
-    if (permissions.testFlag(Qn::GlobalOwnerPermission))
-        permissionStrings.append(tr("Owner"));
+    if (user->isOwner())
+        return tr("Owner");
 
-    if (permissions & (Qn::GlobalAdminPermission | Qn::GlobalOwnerPermission))
-        permissionStrings.append(tr("Administrator"));
+    if (permissions.testFlag(Qn::GlobalAdminPermission))
+        return tr("Administrator");
 
-    if ((permissions & Qn::GlobalViewLivePermission) && permissionStrings.isEmpty())
-        permissionStrings.append(tr("View live video"));
+    permissionStrings.append(tr("View live video"));
 
     if (permissions & Qn::GlobalEditCamerasPermission)
         permissionStrings.append(QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("Adjust device settings"),
             tr("Adjust camera settings")
         ));
-    if (permissions & Qn::GlobalPtzControlPermission)
+    if (permissions & Qn::GlobalUserInputPermission)
         permissionStrings.append(tr("Use PTZ controls"));
     if (permissions & Qn::GlobalViewArchivePermission)
         permissionStrings.append(tr("View video archives"));
     if (permissions & Qn::GlobalExportPermission)
         permissionStrings.append(tr("Export video"));
-    if (permissions & Qn::GlobalEditVideoWallPermission)
-        permissionStrings.append(tr("Edit Video Walls"));
+    if (permissions & Qn::GlobalControlVideoWallPermission)
+        permissionStrings.append(tr("Control Video Walls"));
 
     return permissionStrings.join(lit(", "));
 }

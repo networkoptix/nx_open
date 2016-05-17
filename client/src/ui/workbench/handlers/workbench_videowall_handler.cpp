@@ -1573,7 +1573,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         layout->setId(m_uuidPool->getFreeId());
         if(context()->user())
             layout->setParentId(context()->user()->getId());
-        if (accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission))
+        if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
             layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
 
         QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;
