@@ -401,7 +401,6 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
-                <module>testcamera</module>
             </modules>
         </profile>
         <profile>
@@ -451,7 +450,6 @@
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
-                <!-- <module>testcamera</module> -->
             </modules>
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>
@@ -558,6 +556,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
+                <module>testcamera</module>
                 <module>wixsetup</module>
             </modules>
         </profile>
