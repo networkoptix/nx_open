@@ -4,7 +4,7 @@
 <table class="description">
     <thead>
     <tr>
-        <th>Number</th>
+        <th>#</th>
         <th>Server IP</th>
         <th>Camera Physical ID</th>
     </tr>
@@ -21,6 +21,7 @@
 </table>
 
 <div class="date">
-    <p>Conflict detected at: {{timestamp}}</p>
+    Conflict has been detected {{count}} times, last:<br>
+    <b>{{timestamp}}</b>
 </div>
 {{/aggregated}}

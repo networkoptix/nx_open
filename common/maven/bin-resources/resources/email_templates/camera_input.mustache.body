@@ -3,6 +3,7 @@
 <table class="description">
     <thead>
         <tr>
+            <th>#</th>
             <th>Input Port</th>
             <th>Time</th>
         </tr>
@@ -10,9 +11,10 @@
     <tbody>
     {{#aggregated}}
         <tr>
+            <td>{{number}}</td>
             <td>{{inputPort}}</td>
-            <td><i>{{timestamp}}</i></td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
         </tr>
     {{/aggregated}}
-</tbody>
+    </tbody>
 </table>

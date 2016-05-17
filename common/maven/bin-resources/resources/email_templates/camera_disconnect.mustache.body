@@ -1,16 +1,17 @@
-
-
 <h1>{{event}}</h1>
 <table class="description">
 <tbody>
     {{#aggregated}}
         <tr>
-            <td width="50%">
-                <h6 class="no-margin">{{source}}</h6>
+			<td>
+				<img src="{{sourceIcon}}">
+			</td>
+            <td >
+                <b>{{sourceName}}</b> ({{sourceIp}})
             </td>
             <td>
                 {{#aggregated}}
-                    {{timestamp}}
+                    {{timestampDate}} <b>{{timestampTime}}</b>
                 {{/aggregated}}
             </td>
         </tr>

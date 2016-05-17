@@ -11,7 +11,7 @@
     {{#aggregated}}
         <tr>
             <td class="error">{{reason}}</td>
-            <td><i>{{timestamp}}</i></td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</td>
         </tr>
     {{/aggregated}}
 </tbody>

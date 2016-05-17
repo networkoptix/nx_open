@@ -7,20 +7,16 @@
 {{/screenshot}}
 
 <div class="date">
-    <h4>Date(s) when the motion is detected:</h4>
-        {{#aggregated}}
-        <table class="details">
-            <tr>
-                <td><i>{{timestamp}}</i></td>
-            </tr>
-        </table>
-        {{/aggregated}}
+    <p>
+        Motion has been detected {{count}} times, last:
+        <b>{{timestamp}}</b>
+    </p>
 
-		{{#urlint}}
-			<p><a href="{{urlint}}">Play archive from the local network</a></p>
-		{{/urlint}}
+    {{#urlint}}
+        <p><a href="{{urlint}}">Play archive from the local network</a></p>
+    {{/urlint}}
 
-		{{#urlext}}
-			<p><a href="{{urlext}}">Play archive from the web</a></p>
-		{{/urlext}}
+    {{#urlext}}
+        <p><a href="{{urlext}}">Play archive from the web</a></p>
+    {{/urlext}}
 </div>

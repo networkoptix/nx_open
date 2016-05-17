@@ -14,7 +14,7 @@
     {{#aggregated}}
     <table class="details">
         <tr>
-            <td><i>{{timestamp}}</i></td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</td>
         </tr>
     </table>
     {{/aggregated}}

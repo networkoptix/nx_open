@@ -1,18 +1,25 @@
 <h1>{{event}}: {{source}}</h1>
-<p>Camera recording was forcibly stopped because of not enough license for recording</p>
+<p>Not enough licenses</p>
+<p>Camera recording was forcibly stopped on cameras:</p>
 <table class="description">
-    <thead>
-    <tr>
-        <th>Cameras</th>
-        <th>Time</th>
-    </tr>
-    </thead>
     <tbody>
     {{#aggregated}}
         <tr>
-            <td>{{reason}}</td>
-            <td><i>{{timestamp}}</i></td>
+            <td>
+                <img src="{{sourceIcon}}">
+            </td>
+            <td >
+                <b>{{sourceName}}</b> ({{sourceIp}})
+            </td>
+            {{#reason}}
+                <td class="error">{{reason}}</td>
+            {{/reason}}
         </tr>
     {{/aggregated}}
     </tbody>
 </table>
+
+<div class="date">
+    Recording was stopped at<br>
+    <b>{{timestamp}}</b>
+</div>

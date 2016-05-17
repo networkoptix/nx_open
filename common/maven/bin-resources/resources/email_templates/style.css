@@ -116,3 +116,7 @@ p{
 .description{
     background-color: #F8F9FA;
 }
+
+.error{
+    color: #C22626;
+}
