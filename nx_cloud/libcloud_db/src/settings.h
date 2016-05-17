@@ -66,6 +66,17 @@ public:
     SystemManager();
 };
 
+class EventManager
+{
+public:
+    /** If haven't heard anything from mediaserver during this timeout 
+        then closing event stream for mediaserver to send another request
+    */
+    std::chrono::seconds mediaServerConnectionIdlePeriod;
+
+    EventManager();
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -74,6 +85,9 @@ class Settings
 {
 public:
     Settings();
+
+    Settings(const Settings&) = delete;
+    Settings& operator=(const Settings&) = delete;
 
     bool showHelp() const;
 
@@ -87,6 +101,7 @@ public:
     const Notification& notification() const;
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
+    const EventManager& eventManager() const;
     const QString& changeUser() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
@@ -105,6 +120,7 @@ private:
     Notification m_notification;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
+    EventManager m_eventManager;
     QString m_changeUser;
 
     void fillSupportedCmdParameters();

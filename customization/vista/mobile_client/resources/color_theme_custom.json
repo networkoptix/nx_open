@@ -1,9 +1,6 @@
 {
     "window" : {
-        "accent" :      "#a5ce39"
-    },
-
-    "window" : {
+        "accent" :      "#a5ce39",
         "accentText" :      "palette.base.color_4"
     }
 }

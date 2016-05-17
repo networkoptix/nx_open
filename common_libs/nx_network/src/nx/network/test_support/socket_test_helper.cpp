@@ -297,7 +297,7 @@ void TestConnection::readAllAsync( std::function<void()> handler )
             if (code != SystemError::noError || bytes == 0)
                 return reportFinish( code );
 
-            if (m_readBuffer.size() >= READ_BUF_SIZE)
+            if (static_cast<size_t>(m_readBuffer.size()) >= READ_BUF_SIZE)
                 handler();
             else
                 return readAllAsync(std::move(handler));

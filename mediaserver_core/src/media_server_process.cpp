@@ -962,8 +962,8 @@ void MediaServerProcess::stopObjects()
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
 {
+    // migration from old version. move setting from registry to the DB
     static const QString DV_PROPERTY = QLatin1String("disabledVendors");
-
     QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     if (!disabledVendors.isNull())
     {
@@ -1119,7 +1119,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
 
             // initialize storage immediately in sync mode
-			// todo: remove this call. Need refactor
+            // todo: remove this call. Need refactor
             if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
             {
                 if (qnStorage->getParentId() == qnCommon->moduleGUID())
@@ -1766,7 +1766,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
-    auto authHelper = std::make_unique<QnAuthHelper>();
+    auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
@@ -1897,8 +1897,6 @@ void MediaServerProcess::run()
         nx::ServerSetting::setSysIdTime(0);
         systemName.saveToConfig();
     }
-    if (systemName.isDefault())
-        serverFlags |= Qn::SF_AutoSystemName;
 
     qnCommon->setLocalSystemName(systemName.value());
 
@@ -1922,9 +1920,7 @@ void MediaServerProcess::run()
     }
 #endif
 
-    int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
+    runtimeData.hardwareIds = LLUtil::getAllHardwareIds().toVector();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
@@ -1988,6 +1984,7 @@ void MediaServerProcess::run()
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
+
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
@@ -2286,9 +2283,10 @@ void MediaServerProcess::run()
 
     loadResourcesFromECS(messageProcessor.data());
 
-    if (isNewServerInstance)
+    if (isNewServerInstance || systemName.isDefault())
     {
         /* In case of error it will be instantly cleaned by the watcher. */
+        qnGlobalSettings->resetCloudParams();
         qnGlobalSettings->setNewSystem(true);
     }
 
@@ -2713,6 +2711,7 @@ protected:
 
         qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
+        LLUtil::initHardwareId(MSSettings::roSettings());
         updateGuidIfNeeded();
 
         QnUuid guid = serverGuid();
@@ -2740,7 +2739,7 @@ protected:
 
 private:
     QString hardwareIdAsGuid() {
-        auto hwId = LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings());
+        auto hwId = LLUtil::getLatestHardwareId();
         auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
         std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
         return hwIdString;

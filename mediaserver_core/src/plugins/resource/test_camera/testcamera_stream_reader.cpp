@@ -39,7 +39,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData()) 
+    if (needMetaData())
         return getMetaData();
 
     quint8 header[6];
@@ -71,7 +71,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         {
             QByteArray payloadArray((const char *) ctxData, size);
             m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(payloadArray));
-        }    
+        }
         delete [] ctxData;
         return getNextData();
     }
@@ -109,7 +109,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCa
     Q_UNUSED(isCameraControlRequired);
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
-    
+
     QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
 
@@ -118,7 +118,10 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCa
 
 
     if (m_tcpSock->isClosed())
-        m_tcpSock->reopen();
+    {
+        m_tcpSock = SocketFactory::createStreamSocket();
+        m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
+    }
 
     m_tcpSock->setRecvTimeout(TESTCAM_TIMEOUT);
     m_tcpSock->setSendTimeout(TESTCAM_TIMEOUT);

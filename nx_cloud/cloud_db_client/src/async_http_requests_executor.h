@@ -43,6 +43,8 @@ public:
 
     virtual ~AsyncRequestsExecutor()
     {
+        //TODO #ak cancel m_cdbEndPointFetcher->get operation
+
         QnMutexLocker lk(&m_mutex);
         while(!m_runningRequests.empty())
         {
@@ -86,22 +88,22 @@ protected:
             [this, username, password, path, input, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
-        {
-            if (resCode != nx_http::StatusCode::ok)
-                return errHandler(api::httpStatusCodeToResultCode(resCode));
+            {
+                if (resCode != nx_http::StatusCode::ok)
+                    return errHandler(api::httpStatusCodeToResultCode(resCode));
 
-            QUrl url;
-            url.setScheme("http");
-            url.setHost(endpoint.address.toString());
-            url.setPort(endpoint.port);
-            url.setPath(url.path() + path);
-            url.setUserName(username);
-            url.setPassword(password);
-            execute(
-                std::move(url),
-                input,
-                std::move(handler));
-        });
+                QUrl url;
+                url.setScheme("http");
+                url.setHost(endpoint.address.toString());
+                url.setPort(endpoint.port);
+                url.setPath(url.path() + path);
+                url.setUserName(username);
+                url.setPassword(password);
+                execute(
+                    std::move(url),
+                    input,
+                    std::move(handler));
+            });
     }
 
     template<typename HandlerFunc, typename ErrHandlerFunc>
@@ -122,21 +124,21 @@ protected:
             [this, username, password, path, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
                 SocketAddress endpoint) mutable
-        {
-            if (resCode != nx_http::StatusCode::ok)
-                return errHandler(api::httpStatusCodeToResultCode(resCode));
+            {
+                if (resCode != nx_http::StatusCode::ok)
+                    return errHandler(api::httpStatusCodeToResultCode(resCode));
 
-            QUrl url;
-            url.setScheme("http");
-            url.setHost(endpoint.address.toString());
-            url.setPort(endpoint.port);
-            url.setPath(url.path() + path);
-            url.setUserName(username);
-            url.setPassword(password);
-            execute(
-                std::move(url),
-                std::move(handler));
-        });
+                QUrl url;
+                url.setScheme("http");
+                url.setHost(endpoint.address.toString());
+                url.setPort(endpoint.port);
+                url.setPath(url.path() + path);
+                url.setUserName(username);
+                url.setPassword(password);
+                execute(
+                    std::move(url),
+                    std::move(handler));
+            });
     }
 
 private:
@@ -190,9 +192,9 @@ private:
             std::move(completionHandler));
     }
     
-    template<typename HttpClienType, typename ... OutputData>
+    template<typename HttpClientType, typename ... OutputData>
     void execute(
-        std::unique_ptr<HttpClienType> client,
+        std::unique_ptr<HttpClientType> client,
         std::function<void(api::ResultCode, OutputData...)> completionHandler)
     {
         QnMutexLocker lk(&m_mutex);

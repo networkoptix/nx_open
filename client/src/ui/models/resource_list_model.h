@@ -35,6 +35,9 @@ public:
     bool isCheckable() const;
     void setCheckable(bool value);
 
+    bool isStatusIgnored() const;
+    void setStatusIgnored(bool value);
+
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
@@ -45,11 +48,15 @@ public:
     virtual QModelIndex parent(const QModelIndex& child) const override;
 
 private slots:
-    void at_resource_resourceChanged(const QnResourcePtr &resource);
+    void at_resource_resourceChanged(const QnResourcePtr& resource);
 
-protected:
+private:
+    QIcon resourceIcon(const QnResourcePtr& resource) const;
+
+private:
     bool m_readOnly;
     bool m_checkable;
+    bool m_statusIgnored;
     QnResourceList m_resources;
     QSet<QnUuid> m_checkedResources;
 };

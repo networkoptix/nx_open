@@ -178,6 +178,10 @@ private:
     uint64_t generateNextTimerId();
 };
 
+/** Parses time period like 123ms (milliseconds).
+    Supported suffix: ms, s (second), m (minute), h (hour), d (day).
+    If no suffix is found value considered to be seconds
+*/
 std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());

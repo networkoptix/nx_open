@@ -22,6 +22,7 @@ class QnMediaServerResource : public QnResource
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
+    typedef QnResource base_type;
 public:
     QnMediaServerResource();
     virtual ~QnMediaServerResource();

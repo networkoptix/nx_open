@@ -87,8 +87,7 @@ void QnTransactionTcpProcessor::run()
     }
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    bool isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_AutoSystemName);
-    if (peerType == Qn::PT_Server && isDefaultSystemName)
+    if (peerType == Qn::PT_Server)
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;

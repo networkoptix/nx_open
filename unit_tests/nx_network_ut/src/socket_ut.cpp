@@ -318,8 +318,7 @@ TEST( Socket, HostNameResolveCancellation )
 
 TEST( Socket, BadHostNameResolve )
 {
-    static const int TEST_RUNS = 10000;
-
+    static const int TEST_RUNS = 1000;
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );

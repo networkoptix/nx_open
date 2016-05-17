@@ -2382,6 +2382,9 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     m_sliderZoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
     m_sliderZoomButtonsWidget->setOpacity(0.0);
 
+    m_sliderZoomButtonsWidget->setVisible(m_sliderItem->timeSlider()->archiveAvailable());
+    connect(m_sliderItem->timeSlider(), &QnTimeSlider::archiveAvailabilityChanged, this, [this](bool hasArchive) { m_sliderZoomButtonsWidget->setVisible(hasArchive); });
+
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerWidget->stackBefore(m_sliderShowButton);

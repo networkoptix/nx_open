@@ -357,6 +357,65 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
     });
 }
 
+void QnResourcesChangesManager::saveUserGroup(const ec2::ApiUserGroupData& userGroup)
+{
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    auto backup = qnResourceAccessManager->userGroup(userGroup.id);
+    qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
+
+    connection->getUserManager()->saveUserGroup(userGroup, this,
+        [backup, userGroup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        if (backup.id.isNull())
+            qnResourceAccessManager->removeUserGroup(userGroup.id);  /*< New group was not added */
+        else
+            qnResourceAccessManager->addOrUpdateUserGroup(backup);
+    });
+}
+
+void QnResourcesChangesManager::removeUserGroup(const QnUuid& groupId)
+{
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+
+    auto backup = qnResourceAccessManager->userGroup(groupId);
+    qnResourceAccessManager->removeUserGroup(groupId);
+
+    connection->getUserManager()->removeUserGroup(groupId, this,
+        [backup, sessionGuid](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        qnResourceAccessManager->addOrUpdateUserGroup(backup);
+    });
+}
+
 /************************************************************************/
 /* VideoWalls block                                                     */
 /************************************************************************/

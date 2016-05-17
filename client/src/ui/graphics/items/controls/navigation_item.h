@@ -34,7 +34,7 @@ public:
 private slots:
     void updateSyncButtonChecked();
     void updateSyncButtonEnabled();
-    void updateLiveState();
+    void updateLiveButtonChecked();
     void updateLiveButtonEnabled();
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();
@@ -81,6 +81,7 @@ private:
     QnTimeScrollBar* m_timeScrollBar;
     QnSpeedSlider* m_speedSlider;
     QnVolumeSlider* m_volumeSlider;
+    QnFramedWidget* m_separators;
 };
 
 #endif // QN_NAVIGATION_ITEM_H

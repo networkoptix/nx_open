@@ -15,4 +15,5 @@ namespace ec2
     };
 #define ApiUserGroupData_Fields ApiIdData_Fields (name)(permissions)
 
+    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ApiUserGroupData), (eq));
 }

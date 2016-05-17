@@ -207,7 +207,7 @@ INSERT INTO system_status( code, description )                              \
 //#CLOUD-299
 static const char kSystemExpirationTime[] =
 "                                                                           \
-ALTER TABLE system ADD COLUMN expiration_utc_timestamp INTEGER DEFAULT 0;   \
+ALTER TABLE system ADD COLUMN expiration_utc_timestamp INTEGER DEFAULT 2147483647;   \
 ";
 
 }   //db

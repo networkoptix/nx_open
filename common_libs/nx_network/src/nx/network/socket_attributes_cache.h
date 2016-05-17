@@ -184,7 +184,7 @@ public:
 
         return m_delegate->handle();
     }
-    virtual aio::AbstractAioThread* getAioThread() override
+    virtual aio::AbstractAioThread* getAioThread() const override
     {
         if (!m_delegate)
         {

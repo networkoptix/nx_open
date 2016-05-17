@@ -1,6 +1,7 @@
 #include "resource_searcher.h"
 
 #include <core/resource/resource_type.h>
+#include <api/global_settings.h>
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
     m_discoveryMode(DiscoveryMode::fullyEnabled),
@@ -26,6 +27,8 @@ void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
 
 DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
 {
+    if (qnGlobalSettings->isInitialized() && qnGlobalSettings->isNewSystem())
+        return DiscoveryMode::disabled;
     return m_discoveryMode;
 }
 

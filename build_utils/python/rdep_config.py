@@ -20,6 +20,13 @@ class ConfigHelper:
     def has_section(self, section):
         return self.__config.has_section(section)
 
+    def add_section(self, section):
+        if not self.__config.has_section(section):
+            self.__config.add_section(section)
+
+        with open(self.__file_name, "w") as file:
+            self.__config.write(file)
+
     def get_items(self, section):
         return self.__config.items(section)
 
@@ -41,11 +48,12 @@ class ConfigHelper:
 class RdepConfig(ConfigHelper):
     FILE_NAME = ".rdeprc"
 
-    def __init__(self, file_name):
-        ConfigHelper.__init__(self, file_name)
+    def __init__(self):
+        ConfigHelper.__init__(self, os.path.join(os.path.expanduser("~")))
+        self.add_section("General")
 
     def get_name(self):
-        return self.get_value("General", "name")
+        return self.get_value("General", "name", "").strip()
     def set_name(self, name):
         self.set_value("General", "name", name)
 
@@ -54,8 +62,8 @@ class RdepConfig(ConfigHelper):
     def set_ssh(self, ssh):
         self.set_value("General", "ssh", ssh)
 
-    def get_rsync(self):
-        return self.get_value("General", "rsync", "rsync")
+    def get_rsync(self, default_value = None):
+        return self.get_value("General", "rsync", default_value)
     def set_rsync(self, rsync):
         self.set_value("General", "rsync", rsync)
 
