@@ -524,7 +524,7 @@ void QnRecordingManager::at_checkLicenses()
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
-            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(true, licenseOverflowTime);
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::kDefaultUserAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
         }
         if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTime) {
             return; // not enough license, but timeout not reached yet
@@ -550,7 +550,7 @@ void QnRecordingManager::at_checkLicenses()
     else {
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
-            QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(false, 0);
+            QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::kDefaultUserAccess)->markLicenseOverflowSync(false, 0);
         m_tooManyRecordingCnt = 0;
     }
 }
@@ -578,7 +578,7 @@ void QnRecordingManager::at_licenseMutexLocked()
             ec2::ApiCameraAttributesDataList apiAttributes;
             fromResourceListToApi(userAttributes, apiAttributes);
 
-            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(apiAttributes);
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager(Qn::kDefaultUserAccess)->saveUserAttributesSync(apiAttributes);
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);

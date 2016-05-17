@@ -504,7 +504,7 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
     for (const auto &camera : camerasToAdd)
     {
         bool result = QnAppServerConnectionFactory::getConnection2()
-            ->getCameraManager()
+            ->getCameraManager(Qn::kDefaultUserAccess)
             ->addCamera(
                 camera.coreData,
                 ec2::DummyHandler::instance(),
@@ -696,7 +696,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         auto newCatalogIt = std::find_if(newCatalogs.begin(), newCatalogs.end(),
                                          [&c](const DeviceFileCatalogPtr &catalog)
                                          {
-                                             return c->cameraUniqueId() == catalog->cameraUniqueId() && 
+                                             return c->cameraUniqueId() == catalog->cameraUniqueId() &&
                                                     c->getCatalog() == catalog->getCatalog();
                                          });
         if (newCatalogIt == newCatalogs.end())
@@ -1877,7 +1877,7 @@ void QnStorageManager::resetCameraInfoSavedFlagsForStorage(const QnStorageResour
         for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
             cameraUniqueIds[i].push_back(it.key());
     }
-    
+
     for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
     {
         for (const QString &cameraUniqueId : cameraUniqueIds[i])
@@ -1919,7 +1919,7 @@ void QnStorageManager::writeCameraInfoFiles()
             for (auto it = m_devFileCatalog[i].cbegin(); it != m_devFileCatalog[i].cend(); ++it)
                 cameraUniqueIds[i].push_back(it.key());
         }
-        
+
         for (size_t i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
             for (const QString &cameraUniqueId : cameraUniqueIds[i])

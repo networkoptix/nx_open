@@ -753,6 +753,15 @@ namespace ec2
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
             break;
+        case ApiCommand::ApiSystemNameData:
+            if (!sender->userAccess().isAdministrator())
+            {
+                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2 because of no administrator rights. Reopening connection...").
+                    arg(ApiCommand::toString(tran.command)).arg(ec2::toString(errorCode)), cl_logWARNING);
+                sender->setState(QnTransactionTransport::Error);
+                return;
+            }
+            break;
         default:
             // general transaction
             if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
