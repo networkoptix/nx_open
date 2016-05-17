@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
@@ -79,6 +80,12 @@ Page
         displayMarginBeginning: anchors.topMargin
         displayMarginEnd: anchors.bottomMargin
         enabled: d.enabled
+
+        ScrollIndicator.vertical: ScrollIndicator
+        {
+            leftPadding: 6
+            width: 4
+        }
     }
 
     Loader
@@ -111,6 +118,12 @@ Page
                 {
                     target: searchToolBar
                     onTextChanged: camerasList.model.setFilterFixedString(searchToolBar.text)
+                }
+
+                ScrollIndicator.vertical: ScrollIndicator
+                {
+                    leftPadding: 10
+                    width: 4
                 }
             }
         }

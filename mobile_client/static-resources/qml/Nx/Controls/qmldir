@@ -9,6 +9,7 @@ SearchToolBar 1.0 SearchToolBar.qml
 PageTitleLabel 1.0 PageTitleLabel.qml
 PageBase 1.0 PageBase.qml
 Page 1.0 Page.qml
+ScrollIndicator 1.0 ScrollIndicator.qml
 MaterialEffect 1.0 MaterialEffect.qml
 ThreeDotBusyIndicator 1.0 ThreeDotBusyIndicator.qml
 CirclesBusyIndicator 1.0 CirclesBusyIndicator.qml
