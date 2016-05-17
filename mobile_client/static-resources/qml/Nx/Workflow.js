@@ -113,3 +113,10 @@ function openSettingsScreen(systemName)
 {
     stackView.push(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
 }
+
+function openOldClientDownloadSuggestion()
+{
+    var component = Qt.createComponent("Dialogs/DownloadOldClientDialog.qml")
+    var dialog = component.createObject(stackView)
+    dialog.open()
+}

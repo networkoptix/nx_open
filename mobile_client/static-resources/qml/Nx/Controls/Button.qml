@@ -10,8 +10,10 @@ Button
 
     property color color: ColorTheme.base9
     property color textColor: ColorTheme.windowText
+    property color highlightColor: "#30ffffff"
     property bool flat: false
     property string icon: ""
+    property real radius: 2
 
     property real mouseX: mouseTracker.mouseX
     property real mouseY: mouseTracker.mouseY
@@ -56,7 +58,7 @@ Button
     {
         implicitWidth: 64
         implicitHeight: 40
-        radius: 2
+        radius: control.radius
 
         width: parent.availableWidth
         height: parent.availableHeight
@@ -71,9 +73,10 @@ Button
         {
             anchors.fill: parent
             clip: true
-            radius: 2 //parent.radius
+            radius: parent.radius
             mouseArea: control
             rippleSize: 160
+            highlightColor: control.highlightColor
         }
     }
 
