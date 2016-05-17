@@ -43,23 +43,30 @@
         <td></td>
         <td class="content" bgcolor="white" width="800" style="width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
             <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}: {{source}}</h1>
-<p style="font-size: 15px;line-height: 20px;margin-top: 5px;padding: 0 20px">Camera recording was forcibly stopped because of not enough license for recording</p>
+<p style="font-size: 15px;line-height: 20px;margin-top: 5px;padding: 0 20px">Not enough licenses</p>
+<p style="font-size: 15px;line-height: 20px;margin-top: 5px;padding: 0 20px">Camera recording was forcibly stopped on cameras:</p>
 <table class="description" style="color: #263137;padding: 0 20px;background-color: #F8F9FA">
-    <thead>
-    <tr>
-        <th>Cameras</th>
-        <th>Time</th>
-    </tr>
-    </thead>
     <tbody>
     {{#aggregated}}
         <tr>
-            <td>{{reason}}</td>
-            <td><i>{{timestamp}}</i></td>
+            <td>
+                <img src="{{sourceIcon}}" />
+            </td>
+            <td>
+                <b>{{sourceName}}</b> ({{sourceIp}})
+            </td>
+            {{#reason}}
+                <td class="error" style="color: #C22626">{{reason}}</td>
+            {{/reason}}
         </tr>
     {{/aggregated}}
     </tbody>
 </table>
+
+<div class="date" style="padding: 0 20px">
+    Recording was stopped at<br />
+    <b>{{timestamp}}</b>
+</div>
 
         </td>
         <td></td>

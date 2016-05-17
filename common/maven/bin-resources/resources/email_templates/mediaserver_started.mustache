@@ -47,6 +47,7 @@
 <table class="description" style="color: #263137;padding: 0 20px;background-color: #F8F9FA">
     <thead>
     <tr>
+        <th>#</th>
         <th>Reason</th>
         <th>Time</th>
     </tr>
@@ -54,8 +55,9 @@
     <tbody>
     {{#aggregated}}
         <tr>
+            <td>{{number}}</td>
             <td>{{reason}}</td>
-            <td><i>{{timestamp}}</i></td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
         </tr>
     {{/aggregated}}
     </tbody>

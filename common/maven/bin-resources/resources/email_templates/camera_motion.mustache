@@ -51,22 +51,18 @@
 {{/screenshot}}
 
 <div class="date" style="padding: 0 20px">
-    <h4>Date(s) when the motion is detected:</h4>
-        {{#aggregated}}
-        <table class="details" style="color: #263137">
-            <tr>
-                <td><i>{{timestamp}}</i></td>
-            </tr>
-        </table>
-        {{/aggregated}}
+    <p style="font-size: 15px;line-height: 20px;margin-top: 5px">
+        Motion has been detected {{count}} times, last:
+        <b>{{timestamp}}</b>
+    </p>
 
-		{{#urlint}}
-			<p style="font-size: 15px;line-height: 20px;margin-top: 5px"><a href="{{urlint}}">Play archive from the local network</a></p>
-		{{/urlint}}
+    {{#urlint}}
+        <p style="font-size: 15px;line-height: 20px;margin-top: 5px"><a href="{{urlint}}">Play archive from the local network</a></p>
+    {{/urlint}}
 
-		{{#urlext}}
-			<p style="font-size: 15px;line-height: 20px;margin-top: 5px"><a href="{{urlext}}">Play archive from the web</a></p>
-		{{/urlext}}
+    {{#urlext}}
+        <p style="font-size: 15px;line-height: 20px;margin-top: 5px"><a href="{{urlext}}">Play archive from the web</a></p>
+    {{/urlext}}
 </div>
         </td>
         <td></td>

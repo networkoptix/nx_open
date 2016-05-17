@@ -48,7 +48,7 @@
 <table class="description" style="color: #263137;padding: 0 20px;background-color: #F8F9FA">
     <thead>
     <tr>
-        <th>Number</th>
+        <th>#</th>
         <th>Server IP</th>
         <th>Camera Physical ID</th>
     </tr>
@@ -65,7 +65,8 @@
 </table>
 
 <div class="date" style="padding: 0 20px">
-    <p style="font-size: 15px;line-height: 20px;margin-top: 5px">Conflict detected at: {{timestamp}}</p>
+    Conflict has been detected {{count}} times, last:<br />
+    <b>{{timestamp}}</b>
 </div>
 {{/aggregated}}
 

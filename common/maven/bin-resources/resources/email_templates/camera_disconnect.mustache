@@ -42,19 +42,20 @@
     <tr>
         <td></td>
         <td class="content" bgcolor="white" width="800" style="width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
-            
-
-<h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}</h1>
+            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}</h1>
 <table class="description" style="color: #263137;padding: 0 20px;background-color: #F8F9FA">
 <tbody>
     {{#aggregated}}
         <tr>
-            <td width="50%">
-                <h6 class="no-margin">{{source}}</h6>
+			<td>
+				<img src="{{sourceIcon}}" />
+			</td>
+            <td>
+                <b>{{sourceName}}</b> ({{sourceIp}})
             </td>
             <td>
                 {{#aggregated}}
-                    {{timestamp}}
+                    {{timestampDate}} <b>{{timestampTime}}</b>
                 {{/aggregated}}
             </td>
         </tr>
