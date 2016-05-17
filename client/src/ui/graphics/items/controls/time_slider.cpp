@@ -889,6 +889,8 @@ void QnTimeSlider::shiftWindow(qint64 delta, bool animate)
         qint64 newWindowEnd = qMin(m_windowEnd + delta, maximum());
         setWindow(newWindowEnd - windowSize, newWindowEnd, animate);
     }
+
+    m_zoomAnchor = qBound(m_windowStart, m_zoomAnchor + delta, m_windowEnd);
 }
 
 bool QnTimeSlider::windowContains(qint64 position)
