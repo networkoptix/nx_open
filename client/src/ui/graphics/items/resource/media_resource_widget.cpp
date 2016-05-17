@@ -1272,16 +1272,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         if (!states.isRealTimeSource)
             return Qn::NoVideoDataOverlay;
 
-        if (m_ioCouldBeShown) /// If vidget could be shown then licences Ok
+        if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
 
         const bool buttonIsVisible = (buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::IoModuleButton);
         const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
-        const bool licenceError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisble in this case if licence error
-        const bool isNotZoomWindow = zoomRect().isNull();
+        const bool licenseError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisible in this case if license error
+        const bool isZoomWindow = !zoomRect().isNull();
 
-        if (licenceError && isNotZoomWindow)
+        if (licenseError && !isZoomWindow)
             return Qn::IoModuleDisabledOverlay;
     }
 

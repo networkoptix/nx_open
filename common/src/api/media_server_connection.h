@@ -7,7 +7,6 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QRegion>
 
-#include <api/api_fwd.h>
 #include <api/helpers/request_helpers_fwd.h>
 #include <api/helpers/thumbnail_request_data.h> //for RoundMethod, delete when getImage... will be removed
 

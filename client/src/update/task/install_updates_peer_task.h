@@ -5,7 +5,6 @@
 #include <update/task/network_peer_task.h>
 #include <utils/common/software_version.h>
 #include <network/module_information.h>
-#include <api/api_fwd.h>
 
 class QTimer;
 struct QnUploadUpdateReply;

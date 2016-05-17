@@ -1149,7 +1149,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         const qint64 kAnimationThresholdMs = 100;
         qint64 threshold = qMax(kAnimationThresholdMs, static_cast<qint64>(m_timeSlider->msecsPerPixel()));
 
-        if (qAbs(deltaMs) < threshold || (wasLive && timeMSec == endTimeMSec))
+        if (!keepInWindow || qAbs(deltaMs) < threshold || (wasLive && timeMSec == endTimeMSec))
             /* Immediate setting of desired new position: */
             m_timeSlider->setValue(timeMSec, keepInWindow);
         else

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <rest/server/fusion_rest_handler.h>
 
 #include <api/helpers/request_helpers_fwd.h>
+
+#include <recording/time_period_list.h>
 
 class QnMultiserverChunksRestHandler: public QnFusionRestHandler
 {

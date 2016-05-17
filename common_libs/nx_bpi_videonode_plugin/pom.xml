@@ -18,6 +18,6 @@
         <product.title>${company.name} nx_bpi_videonode_plugin</product.title>
 
         <qt.libs>core quick multimedia-private qtmultimediaquicktools-private</qt.libs>
-        <buildLib>siharedlib</buildLib>
+        <buildLib>sharedlib</buildLib>
     </properties>
 </project>

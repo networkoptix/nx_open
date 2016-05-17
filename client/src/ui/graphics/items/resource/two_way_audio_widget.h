@@ -7,15 +7,13 @@
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
-#include <utils/common/connective.h>
-
 class QnTwoWayAudioWidgetPrivate;
 
-class QnTwoWayAudioWidget : public Connective<Customized<GraphicsWidget> >
+class QnTwoWayAudioWidget : public Customized<GraphicsWidget>
 {
     Q_OBJECT
     Q_PROPERTY(QnTwoWayAudioWidgetColors colors READ colors WRITE setColors)
-    typedef Connective<Customized<GraphicsWidget> > base_type;
+    typedef Customized<GraphicsWidget> base_type;
 
 public:
     QnTwoWayAudioWidget(QGraphicsWidget* parent = nullptr);

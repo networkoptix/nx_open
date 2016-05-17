@@ -833,19 +833,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
+        ModifyLayoutPermission          = Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission, /**< Permission to modify without saving. */
         FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
         FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
-                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
+                                            WritePasswordPermission | WriteAccessRightsPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+        ExportPermission                = 0x800,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
         WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
@@ -913,7 +913,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
                                               GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessAllServersPermission  ,
+                                              GlobalAccessResourcesPermissionsSet  ,
         GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
     };
 
