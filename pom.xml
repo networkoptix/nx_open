@@ -72,6 +72,7 @@
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
         <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
+        <cloud_connect_auto_test.guid>{D2C6C354-447F-4786-9270-FD2F73552322}</cloud_connect_auto_test.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -102,6 +103,7 @@
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
+        <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
