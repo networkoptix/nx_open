@@ -16,6 +16,9 @@
 #include "utils/serialization/json.h"
 #include "core/resource/user_resource.h"
 
+#include <database/migrations/business_rules_db_migration.h>
+#include <database/migrations/user_permissions_db_migration.h>
+
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_stored_file_data.h"
@@ -486,10 +489,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
         qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
         return false;
     }
-
-
-
-
 
     m_storageTypeId = getType( "Storage" );
     m_serverTypeId = getType( QnResourceTypePool::kServerTypeId );
@@ -1045,129 +1044,6 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
     return true;
 }
 
-
-namespace oldBusinessData // TODO: #Elric #EC2 sane naming
-{
-    enum BusinessEventType
-    {
-        NotDefinedEvent,
-        Camera_Motion,
-        Camera_Input,
-        Camera_Disconnect,
-        Storage_Failure,
-        Network_Issue,
-        Camera_Ip_Conflict,
-        MediaServer_Failure,
-        MediaServer_Conflict,
-        MediaServer_Started
-    };
-
-    enum BusinessActionType
-    {
-        UndefinedAction,
-        CameraOutput,
-        Bookmark,
-        CameraRecording,
-        PanicRecording,
-        SendMail,
-        Diagnostics,
-        ShowPopup,
-        CameraOutputInstant,
-        PlaySound,
-        SayText,
-        PlaySoundRepeated
-    };
-}
-
-int EventRemapData[][2] =
-{
-    { oldBusinessData::Camera_Motion,        QnBusiness::CameraMotionEvent     },
-    { oldBusinessData::Camera_Input,         QnBusiness::CameraInputEvent      },
-    { oldBusinessData::Camera_Disconnect,    QnBusiness::CameraDisconnectEvent },
-    { oldBusinessData::Storage_Failure,      QnBusiness::StorageFailureEvent   },
-    { oldBusinessData::Network_Issue,        QnBusiness::NetworkIssueEvent     },
-    { oldBusinessData::Camera_Ip_Conflict,   QnBusiness::CameraIpConflictEvent },
-    { oldBusinessData::MediaServer_Failure,  QnBusiness::ServerFailureEvent    },
-    { oldBusinessData::MediaServer_Conflict, QnBusiness::ServerConflictEvent   },
-    { oldBusinessData::MediaServer_Started,  QnBusiness::ServerStartEvent      },
-    { -1,                                    -1                                }
-};
-
-int ActionRemapData[][2] =
-{
-    { oldBusinessData::CameraOutput,        QnBusiness::CameraOutputAction     },
-    { oldBusinessData::Bookmark,            QnBusiness::BookmarkAction         },
-    { oldBusinessData::CameraRecording,     QnBusiness::CameraRecordingAction  },
-    { oldBusinessData::PanicRecording,      QnBusiness::PanicRecordingAction   },
-    { oldBusinessData::SendMail,            QnBusiness::SendMailAction         },
-    { oldBusinessData::Diagnostics,         QnBusiness::DiagnosticsAction      },
-    { oldBusinessData::ShowPopup,           QnBusiness::ShowPopupAction        },
-    { oldBusinessData::CameraOutputInstant, QnBusiness::CameraOutputOnceAction },
-    { oldBusinessData::PlaySound,           QnBusiness::PlaySoundOnceAction    },
-    { oldBusinessData::SayText,             QnBusiness::SayTextAction          },
-    { oldBusinessData::PlaySoundRepeated,   QnBusiness::PlaySoundAction        },
-    { -1,                                   -1                                 }
-};
-
-int remapValue(int oldVal, const int remapData[][2])
-{
-    for (int i = 0; remapData[i][0] >= 0; ++i)
-    {
-        if (remapData[i][0] == oldVal)
-            return remapData[i][1];
-    }
-    return oldVal;
-}
-
-bool QnDbManager::doRemap(int id, int newVal, const QString& fieldName)
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    QString sqlText = QString(lit("UPDATE vms_businessrule set %1 = ? where id = ?")).arg(fieldName);
-    query.prepare(sqlText);
-    query.addBindValue(newVal);
-    query.addBindValue(id);
-    return query.exec();
-}
-
-struct BeRemapData
-{
-    BeRemapData(): id(0), eventType(0), actionType(0) {}
-
-    int id;
-    int eventType;
-    int actionType;
-};
-
-bool QnDbManager::migrateBusinessEvents()
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id,event_type, action_type from vms_businessrule");
-    if (!query.exec())
-        return false;
-
-    QVector<BeRemapData> oldData;
-    while (query.next())
-    {
-        BeRemapData data;
-        data.id = query.value("id").toInt();
-        data.eventType = query.value("event_type").toInt();
-        data.actionType = query.value("action_type").toInt();
-        oldData << data;
-    }
-
-    for(const BeRemapData& remapData: oldData)
-    {
-        if (!doRemap(remapData.id, remapValue(remapData.eventType, EventRemapData), "event_type"))
-            return false;
-        if (!doRemap(remapData.id, remapValue(remapData.actionType, ActionRemapData), "action_type"))
-            return false;
-    }
-
-    return true;
-}
-
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/29_update_history_guid.sql")) {
@@ -1515,6 +1391,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
+    else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
+    {
+        if (!ec2::db::migrateUserPermissions(m_sdb))
+            return false;
+
+        if (!m_dbJustCreated)
+            m_needResyncUsers = true;
+    }
 
     return true;
 }
@@ -1545,9 +1429,11 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
 
-        if (!migrateBusinessEvents())
+        if (!ec2::db::migrateBusinessEvents(m_sdb))
             return false;
-        if (!m_dbJustCreated) {
+
+        if (!m_dbJustCreated)
+        {
             m_needResyncLog = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
@@ -1674,22 +1560,6 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
 
     return ErrorCode::ok;
 }
-
-/*
-ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
-{
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = ?");
-    insQuery.addBindValue(resourceId);
-    if (insQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
-}
-*/
 
 qint32 QnDbManager::getResourceInternalId( const QnUuid& guid ) {
     QSqlQuery query(m_sdb);
