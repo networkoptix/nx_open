@@ -80,6 +80,7 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPortChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentLoginChanged);
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentPasswordChanged);
+    connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
 }
 
 QnConnectionManager::~QnConnectionManager() {
@@ -93,6 +94,12 @@ QnConnectionManager::State QnConnectionManager::connectionState() const
 {
     Q_D(const QnConnectionManager);
     return d->connectionState;
+}
+
+bool QnConnectionManager::isOnline() const
+{
+    Q_D(const QnConnectionManager);
+    return d->connectionState == Connected || d->connectionState == Suspended;
 }
 
 int QnConnectionManager::defaultServerPort() const {

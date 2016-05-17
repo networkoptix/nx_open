@@ -12,6 +12,7 @@ class QnConnectionManager : public QObject, public QnContextAware {
 
     Q_PROPERTY(QString systemName READ systemName NOTIFY systemNameChanged)
     Q_PROPERTY(State connectionState READ connectionState NOTIFY connectionStateChanged)
+    Q_PROPERTY(bool isOnline READ isOnline NOTIFY isOnlineChanged)
     Q_PROPERTY(QUrl currentUrl READ currentUrl NOTIFY currentUrlChanged)
     Q_PROPERTY(QString currentHost READ currentHost NOTIFY currentHostChanged)
     Q_PROPERTY(int currentPort READ currentPort NOTIFY currentPortChanged)
@@ -40,6 +41,7 @@ public:
     QString systemName() const;
 
     State connectionState() const;
+    bool isOnline() const;
 
     Q_INVOKABLE int defaultServerPort() const;
 
@@ -54,6 +56,7 @@ signals:
     void systemNameChanged(const QString &systemName);
     void initialResourcesReceived();
     void connectionStateChanged();
+    void isOnlineChanged();
 
     void currentUrlChanged();
     void currentHostChanged();

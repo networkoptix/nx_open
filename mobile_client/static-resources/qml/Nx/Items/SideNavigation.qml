@@ -29,21 +29,24 @@ Drawer
             flickableDirection: Flickable.VerticalFlick
             clip: true
 
-            model: savedSessionsModel
-            delegate: SessionItem
+            header: Column
             {
                 width: savedSessionsList.width
-                active: currentSessionId == sessionId
 
-                sessionId: model.sessionId
-                systemName: model.systemName
-                address: model.address
-                port: model.port
-                user: model.user
-                password: model.password
+                CloudPanel {}
+
+                SystemInformationPanel
+                {
+                    visible: connectionManager.isOnline
+                }
             }
+        }
 
-            header: SavedSessionsHeader {}
+        OfflineDummy
+        {
+            anchors.fill: savedSessionsList
+            anchors.margins: 16
+            visible: !connectionManager.isOnline
         }
 
         Column
@@ -53,7 +56,10 @@ Drawer
             width: parent.width
             anchors.bottom: parent.bottom
 
-            BottomSeparator {}
+            BottomSeparator
+            {
+                visible: connectionManager.isOnline
+            }
 
             SideNavigationButton
             {
