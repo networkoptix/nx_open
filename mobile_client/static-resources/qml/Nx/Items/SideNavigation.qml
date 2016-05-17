@@ -25,7 +25,7 @@ Drawer
 
             anchors.fill: parent
             anchors.topMargin: getStatusBarHeight()
-            anchors.bottomMargin: bottomContent.height - 16
+            anchors.bottomMargin: bottomContent.height
             flickableDirection: Flickable.VerticalFlick
             clip: true
 
@@ -53,7 +53,7 @@ Drawer
             width: parent.width
             anchors.bottom: parent.bottom
 
-            SideNavigationSeparator {}
+            BottomSeparator {}
 
             SideNavigationButton
             {
