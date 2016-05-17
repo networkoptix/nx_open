@@ -491,8 +491,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             /* Nobody's layout. Bug. */
             QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(ownerId);
             NX_ASSERT(owner);
-            if (owner)
-                return hasGlobalPermission(user, Qn::GlobalAdminPermission);
+            if (!owner)
+                return hasGlobalPermission(user, Qn::GlobalAdminPermission)
+                    ? Qn::FullLayoutPermissions
+                    : Qn::NoPermissions;
 
             /* We can modify layout for user if we can modify this user. */
             Qn::Permissions userPermissions = permissions(user, owner);
