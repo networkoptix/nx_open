@@ -5,7 +5,7 @@
 #include "utils/common/util.h"
 #include "utils/common/string.h"
 
-QnServerAddressesModel::QnServerAddressesModel(QObject *parent) 
+QnServerAddressesModel::QnServerAddressesModel(QObject *parent)
     : base_type(parent)
     , m_readOnly(false)
     , m_port(-1)

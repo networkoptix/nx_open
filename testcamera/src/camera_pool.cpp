@@ -3,10 +3,8 @@
 
 #include <memory>
 
-#include "plugins/resource/test_camera/testcamera_const.h"
+#include <plugins/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
-
-//#include "plugins/resources/test_camera/testcamera_resource_searcher.h"
 
 int MEDIA_PORT = 4985;
 

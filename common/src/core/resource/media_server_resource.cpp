@@ -42,6 +42,7 @@ namespace {
 }
 
 QnMediaServerResource::QnMediaServerResource():
+    base_type(),
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
@@ -129,7 +130,10 @@ QString QnMediaServerResource::getName() const
 void QnMediaServerResource::setName( const QString& name )
 {
     if (getId().isNull())
+    {
+        base_type::setName(name);
         return;
+    }
 
     if (getServerFlags() & Qn::SF_Edge)
         return;

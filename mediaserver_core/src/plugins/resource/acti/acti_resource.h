@@ -13,7 +13,6 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/multipartcontentparser.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 

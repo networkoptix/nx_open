@@ -250,8 +250,10 @@ namespace nx_http
             serviceUnavailable = 503
         };
 
-        NX_NETWORK_API StringType toString( Value );
-        NX_NETWORK_API StringType toString( int );
+        NX_NETWORK_API StringType toString(Value);
+        NX_NETWORK_API StringType toString(int);
+        NX_NETWORK_API bool isSuccessCode(Value);
+        NX_NETWORK_API bool isSuccessCode(int);
     };
 
     class NX_NETWORK_API Method

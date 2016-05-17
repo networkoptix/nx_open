@@ -15,8 +15,6 @@
 #include <api/model/servers_reply.h>
 #include <api/model/connection_info.h>
 
-#include "api_fwd.h"
-
 class QnAppServerConnectionFactory;
 class QnApiSerializer;
 
@@ -41,9 +39,6 @@ public:
     /** If the client is started in videowall mode, instance's guid is stored here. */
     static QnUuid instanceGuid();
     static void setInstanceGuid(const QnUuid &uuid);
-
-    //static QnAppServerConnectionPtr createConnection();
-    //static QnAppServerConnectionPtr createConnection(const QUrl &url);
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
     static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();

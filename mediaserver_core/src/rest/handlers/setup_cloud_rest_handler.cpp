@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include "rest/server/rest_connection_processor.h"
+#include <api/resource_property_adaptor.h>
 
 namespace
 {
@@ -27,9 +28,10 @@ struct SetupRemoveSystemData : public CloudCredentialsData
     }
 
     QString systemName;
+    QMap<QString, QString> systemSettings;
 };
 
-#define SetupRemoveSystemData_Fields CloudCredentialsData_Fields (systemName)
+#define SetupRemoveSystemData_Fields CloudCredentialsData_Fields (systemName)(systemSettings)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SetupRemoveSystemData),
@@ -73,12 +75,20 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, const QnU
 
     QnSaveCloudSystemCredentialsHandler subHandler;
     int httpResult = subHandler.execute(data, result);
-    if (result.error == QnJsonRestResult::NoError)
-    {
+    if (result.error != QnJsonRestResult::NoError)
+        return httpResult;
         changeSystemName(newSystemName, 0, 0, userId);
-        qnGlobalSettings->setNewSystem(false);
-        if (qnGlobalSettings->synchronizeNowSync())
-            qnCommon->updateModuleInformation();
+    qnGlobalSettings->setNewSystem(false);
+    if (qnGlobalSettings->synchronizeNowSync())
+        qnCommon->updateModuleInformation();
+
+    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    for (QnAbstractResourcePropertyAdaptor* setting : settings)
+    {
+        auto paramIter = data.systemSettings.find(setting->key());
+        if (paramIter != data.systemSettings.end())
+            setting->setValue(paramIter.value());
     }
+
     return httpResult;
 }

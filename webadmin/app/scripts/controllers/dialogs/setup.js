@@ -3,6 +3,7 @@
 angular.module('webadminApp')
     .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
+        $scope.Config = Config;
 
         if( $location.search().retry) {
             $log.log("This is second try");
@@ -94,7 +95,7 @@ angular.module('webadminApp')
         function checkInternet(reload){
 
             $log.log("check internet connection");
-            if(true || debugMode){ // Temporary skip all internet checks
+            if(debugMode){ // Temporary skip all internet checks
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
                 return;
@@ -173,6 +174,13 @@ angular.module('webadminApp')
         }
 
 
+        $scope.getSystemName = function(model){
+            if(model.systemName){
+                return model.systemName;
+            }
+            return model;
+        };
+
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
@@ -195,43 +203,6 @@ angular.module('webadminApp')
                 });
             });
         }
-
-        var lastList = [];
-        var lastSearch = null;
-        $scope.getSystems = function(search){
-
-            if(search == lastSearch){
-                return lastList;
-            }
-            if(!search) {
-                return $scope.discoveredUrls;
-            }
-
-            var systems = $scope.discoveredUrls;
-
-            if(lastSearch){
-                systems.shift();
-            }
-
-            var oldSystem = _.find($scope.discoveredUrls,function(system){
-                return system.visibleName == search;
-            });
-
-            if(!oldSystem) {
-                systems.unshift({
-                    url: search,
-                    systemName: search,
-                    visibleName: search,
-                    hint: search,
-                    ip: search,
-                    name: search
-                });
-            }
-
-            lastSearch = search;
-            lastList = systems;
-            return lastList;
-        };
 
         function classifyError(error){
             var errorClasses = {
@@ -322,12 +293,13 @@ angular.module('webadminApp')
 
         function connectToAnotherSystem(){
             $log.log("Connect to another system");
+            var systemUrl = $scope.settings.remoteSystem.url || $scope.settings.remoteSystem;
             $scope.settings.remoteError = false;
             if(debugMode){
-                $log.log("Debug mode - only ping remote system: " + $scope.settings.remoteSystem.url);
+                $log.log("Debug mode - only ping remote system: " + systemUrl);
 
                 mediaserver.pingSystem(
-                    $scope.settings.remoteSystem.url,
+                    systemUrl,
                     $scope.settings.remoteLogin,
                     $scope.settings.remotePassword).then(function(r){
                         if(r.data.error !== 0 && r.data.error !=='0') {
@@ -342,7 +314,7 @@ angular.module('webadminApp')
 
             $log.log("Request /api/mergeSystems ...");
             mediaserver.mergeSystems(
-                $scope.settings.remoteSystem.url,
+                systemUrl,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
                 Config.defaultPassword,

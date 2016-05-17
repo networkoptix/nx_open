@@ -9,6 +9,7 @@
 
 #include <utils/common/model_functions.h>
 #include "rest/server/rest_connection_processor.h"
+#include <api/resource_property_adaptor.h>
 
 namespace
 {
@@ -27,9 +28,10 @@ struct SetupLocalSystemData: public PasswordData
     }
 
     QString systemName;
+    QMap<QString, QString> systemSettings;
 };
 
-#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)
+#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)(systemSettings)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SetupLocalSystemData),
@@ -105,6 +107,14 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, const QnUu
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::internalServerError;
+    }
+
+    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    for (QnAbstractResourcePropertyAdaptor* setting : settings)
+    {
+        auto paramIter = data.systemSettings.find(setting->key());
+        if (paramIter != data.systemSettings.end())
+            setting->setValue(paramIter.value());
     }
 
     return nx_http::StatusCode::ok;

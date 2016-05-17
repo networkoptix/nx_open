@@ -18,6 +18,7 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/common/app_info.h>
 #include "rest/server/rest_connection_processor.h"
+#include "llutil/hardware_id.h"
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -54,28 +55,19 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QLocale locale;
     params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
 
-    const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
-    int hw = 0;
-    for (const QString& hwid: mainHardwareIds) {
+    const QVector<QString> hardwareIds = qnLicensePool->hardwareIds();
+    for (const QString& hwid: hardwareIds) {
+        int version = LLUtil::hardwareIdVersion(hwid);
+
         QString name;
-        if (hw == 0)
-            name = QLatin1String("oldhwid");
-        else if (hw == 1)
-            name = QLatin1String("hwid");
+        if (version == 0)
+            name = QLatin1String("oldhwid[]");
+        else if (version == 1)
+            name = QLatin1String("hwid[]");
         else
-            name = QString(QLatin1String("hwid%1")).arg(hw);
+            name = QString(QLatin1String("hwid%1[]")).arg(version);
 
         params.addQueryItem(name, hwid);
-
-        hw++;
-    }
-
-    hw = 1;
-    for(const QString& hwid: compatibleHardwareIds) {
-        QString name = QString(QLatin1String("chwid%1")).arg(hw);
-        params.addQueryItem(name, hwid);
-        hw++;
     }
 
     if (infoMode)

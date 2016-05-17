@@ -1269,44 +1269,40 @@ namespace ec2
 
         // add new outgoing connections
         QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-        bool isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_AutoSystemName);
-        if (!isDefaultSystemName)
+        for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
         {
-            for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
+            const QUrl& url = itr.key();
+            RemoteUrlConnectInfo& connectInfo = itr.value();
+            bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
+
+            if (isTimeout && !isPeerUsing(url) && !m_restartPending &&
+                (ApiPeerData::isClient(m_localPeerType) ||
+                !ec2::Settings::instance()->dbReadOnly()))
             {
-                const QUrl& url = itr.key();
-                RemoteUrlConnectInfo& connectInfo = itr.value();
-                bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
-
-                if (isTimeout && !isPeerUsing(url) && !m_restartPending &&
-                    (ApiPeerData::isClient(m_localPeerType) ||
-                    !ec2::Settings::instance()->dbReadOnly()))
+                if (!connectInfo.discoveredPeer.isNull())
                 {
-                    if (!connectInfo.discoveredPeer.isNull())
+                    if (connectInfo.discoveredTimeout.elapsed() >
+                        std::chrono::milliseconds(
+                            PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR *
+                            QnGlobalSettings::instance()->aliveUpdateInterval()).count())
                     {
-                        if (connectInfo.discoveredTimeout.elapsed() >
-                            std::chrono::milliseconds(
-                                PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR *
-                                QnGlobalSettings::instance()->aliveUpdateInterval()).count())
-                        {
-                            connectInfo.discoveredPeer = QnUuid();
-                            connectInfo.discoveredTimeout.restart();
-                        }
-                        else if (m_connections.contains(connectInfo.discoveredPeer))
-                        {
-                            continue;
-                        }
+                        connectInfo.discoveredPeer = QnUuid();
+                        connectInfo.discoveredTimeout.restart();
                     }
-
-                    itr.value().lastConnectedTime.restart();
-                    QnTransactionTransport* transport = new QnTransactionTransport(localPeer());
-                    connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction, Qt::QueuedConnection);
-                    connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged, Qt::QueuedConnection);
-                    connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::QueuedConnection);
-                    connect(transport, &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered, Qt::QueuedConnection);
-                    transport->doOutgoingConnect(url);
-                    m_connectingConnections << transport;
+                    else if (m_connections.contains(connectInfo.discoveredPeer))
+                    {
+                        continue;
+                    }
                 }
+
+                itr.value().lastConnectedTime.restart();
+                QnTransactionTransport* transport = new QnTransactionTransport(localPeer());
+                connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction, Qt::QueuedConnection);
+                connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged, Qt::QueuedConnection);
+                connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::QueuedConnection);
+                connect(transport, &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered, Qt::QueuedConnection);
+                transport->doOutgoingConnect(url);
+                m_connectingConnections << transport;
             }
         }
 

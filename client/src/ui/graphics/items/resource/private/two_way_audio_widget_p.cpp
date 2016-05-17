@@ -19,6 +19,7 @@
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/license_usage_helper.h>
 
 namespace
 {
@@ -33,6 +34,12 @@ namespace
 
     /** Animation speed. 1.0 means show/hide for 1 second. */
     const qreal kHintOpacityAnimationSpeed = 3.0;
+
+    /** How opaque should enabled button be painted. */
+    const qreal kEnabledOpacityCoeff = 1.0;
+
+    /** How opaque should disabled button be painted. */
+    const qreal kDisabledOpacityCoeff = 0.3;
 
     /** Label font size. */
     const int kHintFontPixelSize = 14;
@@ -165,13 +172,13 @@ namespace
 
 
 QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner) :
+    base_type(),
     button(new QnImageButtonWidget(lit("two_way_audio"), owner)),
     hint(new GraphicsLabel(owner)),
-    camera(),
     colors(),
 
     q_ptr(owner),
-    
+
     m_started(false),
     m_state(OK),
     m_requestHandle(0),
@@ -180,7 +187,9 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     m_hintVisibility(kHidden),
     m_stateTimer(),
     m_visualizerData(),
-    m_paintTimeStamp(0)
+    m_paintTimeStamp(0),
+    m_camera(),
+    m_licenseHelper()
 {
     hint->setAcceptedMouseButtons(0);
     hint->setPerformanceHint(GraphicsLabel::PixmapCaching);
@@ -237,16 +246,68 @@ QnTwoWayAudioWidgetPrivate::QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owne
     });
 }
 
+QnTwoWayAudioWidgetPrivate::~QnTwoWayAudioWidgetPrivate()
+{
+}
+
+void QnTwoWayAudioWidgetPrivate::updateCamera(const QnVirtualCameraResourcePtr& camera)
+{
+    NX_ASSERT(!m_camera);
+    NX_ASSERT(camera);
+
+    if (m_camera)
+        disconnect(m_camera, nullptr, this, nullptr);
+
+    m_camera = camera;
+
+    /* If the given camera is I/O Module, then the license is required. */
+    if (camera && m_camera->isIOModule())
+        m_licenseHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
+    else
+        m_licenseHelper.reset();
+
+    auto updateState = [this]
+    {
+        Q_Q(QnTwoWayAudioWidget);
+        bool enabled = isAllowed();
+        q->setEnabled(enabled);
+        button->setEnabled(enabled);
+        q->setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
+    };
+
+    if (camera)
+        connect(camera, &QnResource::statusChanged, this, updateState);
+    if (m_licenseHelper)
+        connect(m_licenseHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this, updateState);
+
+    updateState();
+}
+
+bool QnTwoWayAudioWidgetPrivate::isAllowed() const
+{
+    if (!m_camera)
+        return false;
+
+    bool allowedStatus = (m_camera->getStatus() == Qn::Online || m_camera->getStatus() == Qn::Recording);
+    if (!allowedStatus)
+        return false;
+
+    /* Check if we are require licenses for two-way audio. */
+    if (m_licenseHelper)
+        return m_licenseHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed;
+
+    return true;
+}
+
 void QnTwoWayAudioWidgetPrivate::startStreaming()
 {
-    Q_Q(QnTwoWayAudioWidget);
-    if (!q->isEnabled())
+    if (!isAllowed())
         return;
 
-    if (!camera)
+    if (!m_camera)
         return;
 
-    auto server = camera->getParentServer();
+    auto server = m_camera->getParentServer();
     if (!server || server->getStatus() != Qn::Online)
         return;
 
@@ -255,8 +316,7 @@ void QnTwoWayAudioWidgetPrivate::startStreaming()
 
     setState(Pressed);
 
-
-    m_requestHandle = server->restConnection()->twoWayAudioCommand(camera->getId(), true, [this]
+    m_requestHandle = server->restConnection()->twoWayAudioCommand(m_camera->getId(), true, [this]
         (bool success, rest::Handle handle, const QnJsonRestResult& result)
     {
         if (handle != m_requestHandle)
@@ -294,16 +354,16 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     m_started = false;
     m_requestHandle = 0;
 
-    if (!camera)
+    if (!m_camera)
         return;
 
-    auto server = camera->getParentServer();
+    auto server = m_camera->getParentServer();
     if (!server || server->getStatus() != Qn::Online)
         return;
 
     //TODO: #GDM What should we do if we cannot stop streaming?
     if (m_state != Error)
-        server->restConnection()->twoWayAudioCommand(camera->getId(), false, rest::ServerConnection::GetCallback());
+        server->restConnection()->twoWayAudioCommand(m_camera->getId(), false, rest::ServerConnection::GetCallback());
 }
 
 void QnTwoWayAudioWidgetPrivate::setFixedHeight(qreal height)

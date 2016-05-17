@@ -66,9 +66,10 @@ bool Pollable::getLastError( SystemError::ErrorCode* /*errorCode*/ ) const
     return false;
 }
 
-nx::network::aio::AbstractAioThread* Pollable::getAioThread()
+nx::network::aio::AbstractAioThread* Pollable::getAioThread() const
 {
-    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
+    return nx::network::SocketGlobals::aioService().getSocketAioThread(
+        const_cast<Pollable*>(this));   //TODO #ak deal with this const_cast
 }
 
 void Pollable::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)

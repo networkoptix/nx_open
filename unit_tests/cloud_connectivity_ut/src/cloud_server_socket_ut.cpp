@@ -552,7 +552,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     {
         CloudServerSocket cloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
-        ASSERT_TRUE(cloudServerSocket.registerOnMediatorSync());
+        ASSERT_EQ(cloudServerSocket.registerOnMediatorSync(), hpm::api::ResultCode::ok);
         ASSERT_TRUE(cloudServerSocket.listen(128));
         cloudServerSocket.moveToListeningState();
 

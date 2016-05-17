@@ -5,11 +5,11 @@
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnUserSettingsModel : public QnAbstractPermissionsModel, public QnWorkbenchContextAware
+class QnUserSettingsModel : public QObject, public QnAbstractPermissionsModel, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QnAbstractPermissionsModel base_type;
+    typedef QObject base_type;
 public:
     /** User editing mode */
     enum Mode
@@ -45,7 +45,7 @@ public:
     QString permissionsDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const;
 
 private:
-    QString getCustomPermissionsDescription(const QnUuid &id, Qn::GlobalPermissions permissions) const;
+    QString getCustomPermissionsDescription(const QnUuid& id, Qn::GlobalPermissions permissions) const;
 
 private:
     Mode m_mode;

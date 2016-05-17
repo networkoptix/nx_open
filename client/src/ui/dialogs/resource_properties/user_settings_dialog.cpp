@@ -6,9 +6,10 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
-
+#include <ui/actions/action.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
+#include <ui/actions/action_manager.h>
 #include <ui/models/resource_properties/user_settings_model.h>
 #include <ui/widgets/properties/user_profile_widget.h>
 #include <ui/widgets/properties/user_settings_widget.h>
@@ -18,7 +19,7 @@
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
+QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
     m_model(new QnUserSettingsModel(this)),
@@ -26,9 +27,10 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     m_profilePage(new QnUserProfileWidget(m_model, this)),
     m_settingsPage(new QnUserSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
-    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::CamerasFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnAbstractPermissionsModel::ServersFilter, this))
+    m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
+    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
+    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::ServersFilter, this)),
+    m_editGroupsButton(new QPushButton(tr("Edit User Groups..."), this))
 {
     ui->setupUi(this);
 
@@ -39,8 +41,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
     addPage(ServersPage, m_serversPage, tr("Servers"));
 
-    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
-    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updatePagesVisibility);
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
+    connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
 
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this, [this](const QnResourceList &resources)
@@ -65,6 +67,14 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
         tryClose(true);
     });
 
+    ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
+    connect(m_editGroupsButton, &QPushButton::clicked, this, [this]
+    {
+        menu()->trigger(QnActions::UserGroupsAction);
+        m_settingsPage->updateAccessRightsPresets();
+    });
+    m_editGroupsButton->setVisible(false);
+
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
@@ -75,7 +85,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
 
-    updatePagesVisibility();
+    updateControlsVisibility();
 }
 
 QnUserSettingsDialog::~QnUserSettingsDialog()
@@ -109,8 +119,8 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
-    updatePagesVisibility();
     loadDataToUi();
+    updateControlsVisibility();
 }
 
 QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
@@ -189,8 +199,9 @@ void QnUserSettingsDialog::applyChanges()
 
     //TODO: #GDM #access SafeMode what to rollback if current password changes cannot be saved?
     //TODO: #GDM #access SafeMode what to rollback if we were creating new user
-    qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr &user)
+    qnResourcesChangesManager->saveUser(m_user, [this, mode](const QnUserResourcePtr& user)
     {
+        Q_UNUSED(user);
         for (const auto& page : allPages())
         {
             if (page.enabled && page.visible)
@@ -207,7 +218,7 @@ void QnUserSettingsDialog::applyChanges()
     updateButtonBox();
 }
 
-void QnUserSettingsDialog::updatePagesVisibility()
+void QnUserSettingsDialog::updateControlsVisibility()
 {
     auto mode = m_model->mode();
 
@@ -233,6 +244,8 @@ void QnUserSettingsDialog::updatePagesVisibility()
         && m_permissionsPage->selectedPermissions().testFlag(Qn::GlobalEditServersPermissions);
 
     setPageVisible(ServersPage,     serverPagesVisible);
+
+    m_editGroupsButton->setVisible(settingsPageVisible);
 
     /* Buttons state takes into account pages visibility, so we must recalculate it. */
     updateButtonBox();

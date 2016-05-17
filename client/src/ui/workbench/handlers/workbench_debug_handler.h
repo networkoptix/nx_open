@@ -1,11 +1,11 @@
-#ifndef QN_WORKBENCH_DEBUG_HANDLER_H
-#define QN_WORKBENCH_DEBUG_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchDebugHandler : public QObject, public QnWorkbenchContextAware {
+class QnWorkbenchDebugHandler : public QObject, public QnWorkbenchContextAware
+{
     Q_OBJECT
     typedef QObject base_type;
 
@@ -19,4 +19,3 @@ private slots:
     void at_debugShowResourcePoolAction_triggered();
 };
 
-#endif // QN_WORKBENCH_DEBUG_HANDLER_H

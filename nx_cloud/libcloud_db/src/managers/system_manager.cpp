@@ -20,6 +20,7 @@
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "account_manager.h"
+#include "event_manager.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
 
@@ -31,11 +32,13 @@ SystemManager::SystemManager(
     const conf::Settings& settings,
     nx::utils::TimerManager* const timerManager,
     const AccountManager& accountManager,
+    const EventManager& eventManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
 :
     m_settings(settings),
     m_timerManager(timerManager),
     m_accountManager(accountManager),
+    m_eventManager(eventManager),
     m_dbManager(dbManager),
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false)
@@ -247,6 +250,15 @@ void SystemManager::getSystems(
             systemDataEx.sharingPermissions = 
                 std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
         }
+    }
+
+    //adding system health
+    for (auto& systemDataEx : resultData.systems)
+    {
+        systemDataEx.stateOfHealth = 
+            m_eventManager.isSystemOnline(systemDataEx.id)
+            ? api::SystemHealth::online
+            : api::SystemHealth::offline;
     }
 
     completionHandler(

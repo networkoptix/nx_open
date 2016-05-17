@@ -12,7 +12,6 @@
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource/storage_plugin_factory.h"
-#include "plugins/storage/file_storage/file_storage_resource.h"
 
 #include <utils/common/app_info.h>
 
@@ -30,8 +29,38 @@ void ffmpegInit()
 {
     av_register_all();
 
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
 }
+
+QStringList checkFileNames(const QString& fileNames)
+{
+    QStringList files;
+    for (auto& file: fileNames.split(',')) {
+        if (!QFile::exists(file))
+            qWarning() << "File" << file << "not found";
+        else
+            files.append(file);
+    }
+    return files;
+}
+
+void showUsage(char* exeName)
+{
+    qDebug() << "usage:";
+    qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
+    qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
+    qDebug() << "count=N";
+    qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
+    qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
+    qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
+    qDebug() << "";
+    qDebug() << "example:";
+    QString str = QFileInfo(exeName).baseName() + QString(" files=\"c:/test.264\";count=20");
+    qDebug() << str;
+    qDebug() << "\n[options]: ";
+    qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -50,25 +79,13 @@ int main(int argc, char *argv[])
 
     new QnLongRunnablePool();
 
-    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
+    //QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     qDebug() << qApp->applicationName() << "version" << qApp->applicationVersion();
 
     if (argc == 1)
     {
-        qDebug() << "usage:";
-        qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
-        qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
-        qDebug() << "count=N";
-        qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
-        qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-        qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
-        qDebug() << "";
-        qDebug() << "example:";
-        QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20");
-        qDebug() << str;
-        qDebug() << "\n[options]: ";
-        qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+        showUsage(argv[0]);
         return 1;
     }
 
@@ -145,23 +162,15 @@ int main(int argc, char *argv[])
             continue;
         }
 
-
-        primaryFiles = primaryFileNames.split(',');
-        for (int k = 0; k < primaryFiles.size(); ++k)
-        if (!QFile::exists(primaryFiles[k])) {
-            qWarning() << "File" << primaryFiles[k] << "not found";
+        primaryFiles = checkFileNames(primaryFileNames);
+        if (primaryFiles.isEmpty()) {
+            qWarning() << "No one of the specified files exists!";
             continue;
         }
 
         if (!secondaryFileNames.isEmpty())
-            secondaryFiles = secondaryFileNames.split(',');
-        for (int k = 0; k < secondaryFiles.size(); ++k)
-            if (!QFile::exists(secondaryFiles[k])) {
-                qWarning() << "File" << secondaryFiles[k] << "not found";
-                continue;
-            }
-
-        if(secondaryFiles.isEmpty())
+            secondaryFiles = checkFileNames(secondaryFileNames);
+        if (secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
         QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, offlineFreq);

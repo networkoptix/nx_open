@@ -429,7 +429,7 @@ AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 }
 
 template<typename InterfaceToImplement>
-aio::AbstractAioThread* UdtSocket<InterfaceToImplement>::getAioThread()
+aio::AbstractAioThread* UdtSocket<InterfaceToImplement>::getAioThread() const
 {
     return Pollable::getAioThread();
 }

@@ -614,6 +614,26 @@ api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     return findSharing(sharings, accountEmail, systemID).accessRole;
 }
 
+api::ResultCode CdbFunctionalTest::fetchSystemData(
+    const std::string& accountEmail,
+    const std::string& accountPassword,
+    const std::string& systemId,
+    api::SystemDataEx* const systemData)
+{
+    std::vector<api::SystemDataEx> systems;
+    const auto result = getSystems(accountEmail, accountPassword, &systems);
+    if (result != api::ResultCode::ok)
+        return result;
+    for (auto& system: systems)
+    {
+        if (system.id == systemId)
+        {
+            *systemData = system;
+            return api::ResultCode::ok;
+        }
+    }
+    return api::ResultCode::notFound;
+}
 
 namespace api {
     bool operator==(const api::AccountData& left, const api::AccountData& right)

@@ -60,7 +60,7 @@ HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
     // Get the data from the WQL sentence
     IWbemClassObject* pclsObj = NULL;
     ULONG uReturnCount = 0;
-    
+
     while (pEnumerator)
     {
         HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturnCount);
@@ -222,15 +222,6 @@ static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devic
     pEnumerator->Release();
 }
 
-
-
-static QByteArray getMacAddress(const QnMacAndDeviceClassList& devices,  QSettings* settings) {
-    if (devices.empty())
-        return QByteArray();
-
-    return getSaveMacAddress(devices, settings).toUtf8();
-}
-
 static QString execQueryForHWID1(IWbemServices* pSvc, const BSTR fieldName, const BSTR objectName)
 {
     bstr_t rezStr = _T("");
@@ -390,8 +381,12 @@ static void fillHardwareInfo(IWbemServices* pSvc, ExecQueryFunction execQuery, Q
     hardwareInfo.memorySerialNumber = execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"));
 }
 
-static void calcHardwareId(QString& hardwareId, const QnHardwareInfo& hi, int version, bool guidCompatibility)
+void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
+    hardwareIdMap.clear();
+
+    QString hardwareId;
+
     if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length())
     {
         hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
@@ -399,22 +394,32 @@ static void calcHardwareId(QString& hardwareId, const QnHardwareInfo& hi, int ve
         {
             hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
         }
-    } else
-    {
-        hardwareId.clear();
     }
 
-    if ((version == 4 || version == 5) && hi.mac.length() > 0)
-        hardwareId += hi.mac;
+    if (version == 4 || version == 5)
+    {
+        for (const auto& nic : hi.nics)
+        {
+            const QString& mac = nic.mac;
+
+            if (!mac.isEmpty())
+            {
+                hardwareIdMap[mac] = hardwareId + mac;
+            }
+        }
+    } else
+    {
+        hardwareIdMap[""] = hardwareId;
+    }
 }
 
 } // namespace {}
 
 namespace LLUtil {
-    void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo);
+    void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 }
 
-void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
+void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     bool needUninitialize = true;
     HRESULT hres;
@@ -589,20 +594,21 @@ void LLUtil::fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHa
         DisableNICSAtPaths(pSvc, paths);
     }
 
-    hardwareInfo.mac = getMacAddress(hardwareInfo.nics, settings);
+    HardwareIdListForVersion macHardwareIds;
 
     // Only for HWID1
     QnHardwareInfo v1HardwareInfo;
     fillHardwareInfo(pSvc, execQueryForHWID1, v1HardwareInfo);
-    calcHardwareId(hardwareIds[0], v1HardwareInfo, 1, false);
-    calcHardwareId(hardwareIds[LATEST_HWID_VERSION], v1HardwareInfo, 1, true);
+
+    calcHardwareIds(macHardwareIds, v1HardwareInfo, 1);
+    hardwareIds << macHardwareIds;
 
     // For HWID>1
     fillHardwareInfo(pSvc, execQuery2, hardwareInfo);
-    for (int i = 1; i < LATEST_HWID_VERSION; i++)
+    for (int i = 2; i <= LATEST_HWID_VERSION; i++)
     {
-        calcHardwareId(hardwareIds[i], hardwareInfo, i + 1, false);
-        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], hardwareInfo, i + 1, true);
+        calcHardwareIds(macHardwareIds, hardwareInfo, i);
+        hardwareIds << macHardwareIds;
     }
 
     // Cleanup

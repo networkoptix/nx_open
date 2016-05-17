@@ -19,6 +19,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
     (ssNotActivated, "notActivated")
     (ssActivated, "activated"));
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemHealth,
+    (SystemHealth::offline, "offline")
+    (SystemHealth::online, "online"));
+
 
 ////////////////////////////////////////////////////////////
 //// class SystemRegistrationData

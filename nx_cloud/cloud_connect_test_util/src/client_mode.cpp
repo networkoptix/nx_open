@@ -106,8 +106,13 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
     trafficLimitBytes = trafficLimitBytes ? trafficLimitBytes : kDefaultBytesToReceive;
 
+    QStringList targetStrings;
+    for (const auto t: targetList)
+        targetStrings << t.toString();
+
+    limitStringList(&targetStrings);
     std::cout
-        << lm("Target(s): %1\n").arg(containerString(targetList)).toStdString()
+        << lm("Target(s): %1\n").arg(targetStrings.join(lit(", "))).toStdString()
         << lm("Limit(type=%1): %2").arg(static_cast<int>(trafficLimitType))
            .arg(bytesToString(trafficLimitBytes))
            .toStdString()

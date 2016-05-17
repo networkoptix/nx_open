@@ -25,7 +25,8 @@ static const QString LAST_CRASH = lit("statisticsReportLastCrash");
 static const QString SENT_PREFIX = lit("sent_");
 
 static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
-static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* 30 mb */
+static const uint SENDING_MIN_SIZE = 1 * 1024; /* less then 1kb is not informative */
+static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* over 30mb is too big */
 static const uint SCAN_TIMER_CYCLE = 10 * 60 * 1000; /* every 10 minutes */
 
 static QFileInfoList readCrashes(const QString& prefix = QString())
@@ -113,6 +114,14 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     while (!crashes.isEmpty())
     {
         const auto& crash = crashes.first();
+
+        if (crash.size() < SENDING_MIN_SIZE)
+        {
+            QFile::remove(crash.absoluteFilePath());
+            NX_LOGX(lit("Remove not informative crash: %1")
+                .arg(crash.absolutePath()), cl_logDEBUG2);
+        }
+        else
         if (crash.size() < SENDING_MAX_SIZE)
             return CrashReporter::send(url, crash, settings);
 

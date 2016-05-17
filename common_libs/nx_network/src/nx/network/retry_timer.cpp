@@ -107,7 +107,7 @@ void RetryTimer::pleaseStopSync()
     m_timer.pleaseStopSync();
 }
 
-aio::AbstractAioThread* RetryTimer::getAioThread()
+aio::AbstractAioThread* RetryTimer::getAioThread() const
 {
     return m_timer.getAioThread();
 }

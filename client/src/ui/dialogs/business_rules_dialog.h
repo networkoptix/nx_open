@@ -9,8 +9,6 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
-#include <api/api_fwd.h>
-
 #include <business/business_event_rule.h>
 
 #include <ui/dialogs/common/workbench_state_dependent_dialog.h>

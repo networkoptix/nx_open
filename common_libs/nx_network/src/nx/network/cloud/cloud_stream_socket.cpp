@@ -354,7 +354,7 @@ void CloudStreamSocket::registerTimer(
     m_aioThreadBinder->registerTimer(timeoutMs, std::move(handler));
 }
 
-aio::AbstractAioThread* CloudStreamSocket::getAioThread()
+aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
 {
     return m_aioThreadBinder->getAioThread();
 }
@@ -362,6 +362,7 @@ aio::AbstractAioThread* CloudStreamSocket::getAioThread()
 void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     m_aioThreadBinder->bindToAioThread(aioThread);
+    m_socketAttributes.aioThread = aioThread;
 }
 
 void CloudStreamSocket::onAddressResolved(

@@ -25,6 +25,9 @@ namespace api {
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemHealth)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemHealth), (lexical))
+
 #define SystemRegistrationData_Fields (name)(customization)
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
@@ -73,7 +76,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
-#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)
+#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)
 #define SystemDataExList_Fields (systems)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

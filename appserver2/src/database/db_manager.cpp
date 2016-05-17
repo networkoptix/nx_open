@@ -224,7 +224,7 @@ void mergeObjectListData(
         [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
 }
 
-/** 
+/**
 * Updaters are used to update object's fields, which are stored as a raw json string
 * Returns true if object is updated
 */
@@ -1510,7 +1510,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
-    else if (updateName == lit(":/updates/50_fix_migration.sql")) 
+    else if (updateName == lit(":/updates/50_fix_migration.sql"))
     {
         if (!m_dbJustCreated)
         {
@@ -1518,7 +1518,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
-	
+
     return true;
 }
 
@@ -2386,7 +2386,7 @@ ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
     /* Cleanup all users, belonging to this group. */
     {
         QSqlQuery query(m_sdb);
-        const QString queryStr("UPDATE vms_userprofile SET group = NULL WHERE group = :groupId");
+        const QString queryStr("UPDATE vms_userprofile SET group_guid = NULL WHERE group_guid = :groupId");
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
