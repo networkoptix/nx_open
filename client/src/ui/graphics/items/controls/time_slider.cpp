@@ -2805,6 +2805,9 @@ void QnTimeSlider::keyPressEvent(QKeyEvent* event)
                     setSelectionEnd(sliderPosition());
             }
 
+            /* To handle two cases - when the first begin/end marker was either placed for the first time
+             *  or when it was moved to another location before complementary end/begin marker was placed -
+             *  we can do this simple check: */
             m_keyboardSelectionInitiated = m_selectionStart == m_selectionEnd;
 
             /* Accept selection events. */
