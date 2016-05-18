@@ -74,22 +74,11 @@ namespace ec2
     };
 
     struct SendTransactionToTransportFastFuction {
-        bool operator()(
-            QnTransactionMessageBus *bus,
-            Qn::SerializationFormat srcFormat,
-            const QByteArray& serializedTran,
-            QnTransactionTransport *sender,
-            const QnTransactionTransportHeader &transportHeader,
-            const QnUuid &tranParamsId,
-            ApiCommand::Value value) const
+        bool operator()(QnTransactionMessageBus *bus, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender,
+                        const QnTransactionTransportHeader &transportHeader, const QnUuid &tranParamsId, ApiCommand::Value value) const
         {
             Q_UNUSED(bus)
-                return sender->sendSerializedTransaction(
-                    srcFormat,
-                    serializedTran,
-                    transportHeader,
-                    tranParamsId,
-                    value);
+                return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader, tranParamsId, value);
         }
     };
 

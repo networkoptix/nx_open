@@ -1457,12 +1457,9 @@ void QnTransactionTransport::setExtraDataBuffer(const QByteArray& data)
     m_extraData = data;
 }
 
-bool QnTransactionTransport::sendSerializedTransaction(
-    Qn::SerializationFormat srcFormat,
-    const QByteArray& serializedTran,
-    const QnTransactionTransportHeader& _header,
-    const QnUuid &tranParamsId,
-    ApiCommand::Value value)
+bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran,
+                                                       const QnTransactionTransportHeader& _header, const QnUuid &tranParamsId,
+                                                       ApiCommand::Value value)
 {
     if (srcFormat != m_remotePeer.dataFormat)
         return false;
