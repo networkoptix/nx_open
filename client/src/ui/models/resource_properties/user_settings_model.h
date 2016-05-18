@@ -42,7 +42,7 @@ public:
     QString permissionsDescription() const;
 
     /** Return human-readable permissions description for the selected permissions set. */
-    QString permissionsDescription(Qn::GlobalPermissions permissions, const QnUuid& groupId) const;
+    QString permissionsDescription(const QnUserResourcePtr& user, const QnUuid& groupId) const;
 
 private:
     QString getCustomPermissionsDescription(const QnUuid& id, Qn::GlobalPermissions permissions) const;

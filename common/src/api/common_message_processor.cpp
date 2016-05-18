@@ -580,8 +580,7 @@ void QnCommonMessageProcessor::updateResource(const QnResourcePtr& )
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user)
 {
-    QnUserResourcePtr qnUser(new QnUserResource());
-    fromApiToResource(user, qnUser);
+    QnUserResourcePtr qnUser(fromApiToResource(user));
     updateResource(qnUser);
 }
 
