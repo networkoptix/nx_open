@@ -193,6 +193,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->selectFilterButton->setVisible(false);
 
     m_itemDelegate = new QnResourceItemDelegate(this);
+    m_itemDelegate->setFixedHeight(0); // automatic height
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
