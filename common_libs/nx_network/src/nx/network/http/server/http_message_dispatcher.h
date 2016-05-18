@@ -13,8 +13,6 @@
 #include <nx/network/connection_server/message_dispatcher.h>
 #include "utils/common/cpp14.h"
 
-#define SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-
 
 namespace nx_http
 {
@@ -31,20 +29,6 @@ namespace nx_http
         MessageDispatcher();
         virtual ~MessageDispatcher();
 
-#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-        /*!
-            \param messageProcessor Ownership of this object is not passed
-            \note All processors MUST be registered before connection processing is started, since this class methods are not thread-safe
-            \return \a true if \a requestProcessor has been registered, \a false otherwise
-            \note Message processing function MUST be non-blocking
-        */
-        bool registerRequestProcessor(
-            const QString& path,
-            AbstractHttpRequestHandler* messageProcessor )
-        {
-            return m_processors.emplace( path, messageProcessor ).second;
-        }
-#else
         template<typename RequestHandlerType>
         bool registerRequestProcessor(
             const QString& path,
@@ -52,7 +36,7 @@ namespace nx_http
         {
             return m_factories.emplace(
                 path,
-                factoryFunc ).second;
+                std::move(factoryFunc)).second;
         }
 
         template<typename RequestHandlerType>
@@ -63,7 +47,24 @@ namespace nx_http
                 []()->std::unique_ptr<AbstractHttpRequestHandler>{
                     return std::make_unique<RequestHandlerType>(); } ).second;
         }
-#endif
+
+        template<typename RequestHandlerType>
+        void setDefaultProcessor(
+            std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc)
+        {
+            m_defaultHandlerFactory = std::move(factoryFunc);
+        }
+
+        template<typename RequestHandlerType>
+        void setDefaultProcessor()
+        {
+            m_defaultHandlerFactory = 
+                []()->std::unique_ptr<AbstractHttpRequestHandler>
+                {
+                    return std::make_unique<RequestHandlerType>();
+                };
+        }
+
         //!Pass message to corresponding processor
         /*!
             \param message This object is not moved in case of failure to find processor
@@ -78,19 +79,15 @@ namespace nx_http
         {
             NX_ASSERT( message.type == nx_http::MessageType::request );
 
-#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-            auto it = m_processors.find( message.request->requestLine.url.path() );
-            if( it == m_processors.end() )
-                return false;
-            return it->second->processRequest(
-                conn,
-                std::move( message ),
-                std::forward<CompletionFuncRefType>( completionFunc ) );
-#else
             auto it = m_factories.find( message.request->requestLine.url.path() );
-            if( it == m_factories.end() )
+            std::unique_ptr<AbstractHttpRequestHandler> requestProcessor;
+            if (it != m_factories.end())
+                requestProcessor = it->second();
+            else if (m_defaultHandlerFactory)
+                requestProcessor = m_defaultHandlerFactory();
+            else
                 return false;
-            auto requestProcessor = it->second();
+
             auto requestProcessorPtr = requestProcessor.release();  //TODO #ak get rid of this when general lambdas available
 
             return requestProcessorPtr->processRequest(
@@ -104,18 +101,14 @@ namespace nx_http
                     completionFunc( std::move(responseMsg), std::move(responseMsgBody) );
                     delete requestProcessorPtr;
                 } );
-#endif
         }
 
     private:
-#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-        std::map<QString, AbstractHttpRequestHandler*> m_processors;
-#else
         std::map<
             QString,
             std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
-            > m_factories;
-#endif
+        > m_factories;
+        std::function<std::unique_ptr<AbstractHttpRequestHandler>()> m_defaultHandlerFactory;
     };
 }
 

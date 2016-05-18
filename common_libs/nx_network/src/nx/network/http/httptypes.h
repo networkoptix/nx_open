@@ -274,6 +274,12 @@ namespace nx_http
         StringType protocol;
         StringType version;
 
+        MimeProtoVersion() = default;
+        MimeProtoVersion(MimeProtoVersion&&) = default;
+        MimeProtoVersion& operator=(MimeProtoVersion&&) = default;
+        MimeProtoVersion(const MimeProtoVersion&) = default;
+        MimeProtoVersion& operator=(const MimeProtoVersion&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
@@ -299,6 +305,12 @@ namespace nx_http
         QUrl url;
         MimeProtoVersion version;
 
+        RequestLine() = default;
+        RequestLine(RequestLine&&) = default;
+        RequestLine& operator=(RequestLine&&) = default;
+        RequestLine(const RequestLine&) = default;
+        RequestLine& operator=(const RequestLine&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
@@ -312,6 +324,11 @@ namespace nx_http
         StringType reasonPhrase;
 
         StatusLine();
+        StatusLine(StatusLine&&) = default;
+        StatusLine& operator=(StatusLine&&) = default;
+        StatusLine(const StatusLine&) = default;
+        StatusLine& operator=(const StatusLine&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
@@ -325,6 +342,12 @@ namespace nx_http
         RequestLine requestLine;
         HttpHeaders headers;
         BufferType messageBody;
+
+        Request() = default;
+        Request(Request&&) = default;
+        Request& operator=(Request&&) = default;
+        Request(const Request&) = default;
+        Request& operator=(const Request&) = default;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
@@ -343,6 +366,12 @@ namespace nx_http
         StatusLine statusLine;
         HttpHeaders headers;
         BufferType messageBody;
+
+        Response() = default;
+        Response(Response&&) = default;
+        Response& operator=(Response&&) = default;
+        Response(const Response&) = default;
+        Response& operator=(const Response&) = default;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
