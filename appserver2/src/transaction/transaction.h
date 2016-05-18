@@ -28,7 +28,7 @@ APPLY(1, tranSyncRequest, ApiSyncRequestData, \
                        InvalidTriggerNotificationHelper()) /* trigger notification*/ \
 APPLY(2, tranSyncResponse, QnTranStateResponse, \
                        false, /* persistent*/ \
-                       false,  /* system*/ \
+                       true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper()) /* trigger notification*/ \
 APPLY(3, lockRequest, ApiLockData, \

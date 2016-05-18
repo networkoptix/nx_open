@@ -202,18 +202,28 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
-    /* Init style option: */
-    QStyleOptionViewItem option(styleOption);
-    initStyleOption(&option, index);
+    return base_type::sizeHint(styleOption, index) + QSize(0, m_spacing);
+}
 
-    /* Obtain sub-elements layout: */
-    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
-    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
-    QRect iconRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &option, option.widget);
-    QRect checkRect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &option, option.widget);
+void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+{
+    /* Save default decoration size: */
+    QSize defaultDecorationSize = option->decorationSize;
 
-    /* Return minimal required size: */
-    return (textRect | iconRect | checkRect).size() + QSize(0, m_spacing);
+    /* If icon size is explicitly specified in itemview, decorationSize already holds that value.
+     * If icon size is not specified in itemview, set decorationSize to something big.
+     * It will be treated as maximal allowed size: */
+    auto view = qobject_cast<const QAbstractItemView*>(option->widget);
+    if (!view || !view->iconSize().isValid())
+        option->decorationSize = QSize(1024, 1024);
+
+    /* Call inherited implementation.
+     * When it configures item icon, it sets decorationSize to actual icon size: */
+    base_type::initStyleOption(option, index);
+
+    /* But if the item has no icon, restore decoration size to saved default: */
+    if (option->icon.isNull())
+        option->decorationSize = defaultDecorationSize;
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const

@@ -80,6 +80,11 @@ static_unique_ptr_cast(
 template<typename T, typename Type = void>
 using SfinaeCheck = Type;
 
+template<typename Object, typename Deleter>
+std::unique_ptr<Object, Deleter> uniquePtr(Object* ptr, Deleter deleter)
+{
+    return std::unique_ptr<Object, Deleter>(ptr, std::move(deleter));
+}
 
 }   //namespace utils
 }   //namespace nx

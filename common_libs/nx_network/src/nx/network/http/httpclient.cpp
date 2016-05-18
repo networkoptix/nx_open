@@ -56,6 +56,11 @@ namespace nx_http
         return m_asyncHttpClient->response();
     }
 
+    SystemError::ErrorCode HttpClient::lastSysErrorCode() const
+    {
+        return m_asyncHttpClient->lastSysErrorCode();
+    }
+
     //!
     bool HttpClient::eof() const
     {

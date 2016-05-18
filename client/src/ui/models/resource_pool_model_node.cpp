@@ -468,7 +468,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
-            m_editable.value = m_model->context()->accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
+            m_editable.value = m_model->context()->accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
             break;
         case Qn::RecorderNode:
             m_editable.value = true;

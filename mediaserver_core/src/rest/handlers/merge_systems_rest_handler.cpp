@@ -367,14 +367,14 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
             }
         }
 
-        QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
+        QnUserResourcePtr userResource;
         for (const ec2::ApiUserData &userData: users) {
             if (userData.id == admin->getId()) {
-                ec2::fromApiToResource(userData, userResource);
+                userResource = ec2::fromApiToResource(userData);
                 break;
             }
         }
-        if (userResource->getId() != admin->getId())
+        if (userResource.isNull())
             return false;
 
         admin->update(userResource);

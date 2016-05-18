@@ -66,8 +66,6 @@ namespace
 
     };
 
-    const int kRowSpacing = 4;
-
     const QString kDummyResourceId(lit("dummy_resource"));
 }
 
@@ -107,7 +105,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui->controlsTreeView->setModel(m_controlsModel.data());
 
     auto itemDelegate = new QnResourceItemDelegate(this);
-    itemDelegate->setSpacing(kRowSpacing);
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {
@@ -120,7 +117,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     setupTreeView(ui->controlsTreeView);
 
     ui->resourcesTreeView->setMouseTracking(true);
-    ui->resourcesTreeView->setEnabled(false);
+    ui->resourcesTreeView->setEnabled(true);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this, viewModel](const QModelIndex& index)

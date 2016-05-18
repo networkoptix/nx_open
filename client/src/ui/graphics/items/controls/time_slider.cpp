@@ -127,6 +127,9 @@ namespace {
     const int kLineLabelFontHeight = 14;
     const int kLineLabelFontWeight = QFont::DemiBold;
 
+    /** Padding at the left of line labels. */
+    const int kLineLabelPaddingPixels = 6;
+
     const qreal kDegreesFor2x = 180.0;
 
     const qreal kZoomSideSnapDistance = 0.075;
@@ -889,6 +892,8 @@ void QnTimeSlider::shiftWindow(qint64 delta, bool animate)
         qint64 newWindowEnd = qMin(m_windowEnd + delta, maximum());
         setWindow(newWindowEnd - windowSize, newWindowEnd, animate);
     }
+
+    m_zoomAnchor = qBound(m_windowStart, m_zoomAnchor + delta, m_windowEnd);
 }
 
 bool QnTimeSlider::windowContains(qint64 position)
@@ -2023,7 +2028,7 @@ void QnTimeSlider::paint(QPainter* painter, const QStyleOptionGraphicsItem* , QW
         QPixmap pixmap = m_lineData[line].commentPixmap;
 
         QRectF pixmapRect = pixmap.rect();
-        QRectF fullRect(lineBarRect.left(), lineTop, pixmapRect.width(), lineHeight);
+        QRectF fullRect(lineBarRect.left() + kLineLabelPaddingPixels, lineTop, pixmapRect.width(), lineHeight);
         QRectF centeredRect = QnGeometry::aligned(pixmapRect.size(), fullRect);
 
         painter->drawPixmap(centeredRect, pixmap, pixmapRect);
@@ -2805,6 +2810,9 @@ void QnTimeSlider::keyPressEvent(QKeyEvent* event)
                     setSelectionEnd(sliderPosition());
             }
 
+            /* To handle two cases - when the first begin/end marker was either placed for the first time
+             *  or when it was moved to another location before complementary end/begin marker was placed -
+             *  we can do this simple check: */
             m_keyboardSelectionInitiated = m_selectionStart == m_selectionEnd;
 
             /* Accept selection events. */
