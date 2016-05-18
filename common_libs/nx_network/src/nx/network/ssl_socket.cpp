@@ -1116,10 +1116,11 @@ String SslEngine::makeCertificateAndKey(
 
 bool SslEngine::useCertificateAndPkey(const String& certData)
 {
+    Buffer certBytes(certData);
     const auto data = SslStaticData::instance();
     {
         auto bio = utils::uniquePtr(
-            BIO_new_mem_buf((void*) certData.data(), certData.size()),
+            BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
             &BIO_free);
 
         auto x509 = utils::uniquePtr(
@@ -1140,7 +1141,7 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
 
     {
         auto bio = utils::uniquePtr(
-            BIO_new_mem_buf((void*) certData.data(), certData.size()),
+            BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
             &BIO_free);
 
         data->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
