@@ -142,13 +142,15 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (!remoteModuleInformation.cloudSystemId.isEmpty() &&
-        !qnCommon->moduleInformation().cloudSystemId.isEmpty() &&
-        remoteModuleInformation.cloudSystemId != qnCommon->moduleInformation().cloudSystemId)
+    const bool canMerge = 
+        (remoteModuleInformation.cloudSystemId == qnCommon->moduleInformation().cloudSystemId) ||
+        (takeRemoteSettings && qnCommon->moduleInformation().cloudSystemId.isEmpty()) ||
+        (!takeRemoteSettings && remoteModuleInformation.cloudSystemId.isEmpty());
+    if (!canMerge)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge systems bound to cloud")
             .arg(url.toString()), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("BOTH_SYSTEMS_BOUND_TO_CLOUD"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD"));
         return nx_http::StatusCode::ok;
     }
 

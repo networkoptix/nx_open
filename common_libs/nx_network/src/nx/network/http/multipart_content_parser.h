@@ -31,7 +31,7 @@ namespace nx_http
         void setBoundary( const StringType& boundary );
         /** Returns headers of last read frame */
         const nx_http::HttpHeaders& prevFrameHeaders() const;
-        /** Returns \a true if epilogue haws been received */
+        /** Returns \a true if epilogue has been received */
         bool eof() const;
 
     private:

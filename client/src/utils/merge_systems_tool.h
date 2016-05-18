@@ -21,7 +21,7 @@ public:
         SafeModeError,
         ForbiddenError,
         ConfigurationError,
-        BothSystemsBoundToCloudError,
+        DependentSystemBoundToCloudError,
         UnconfiguredSystemError
     };
 
