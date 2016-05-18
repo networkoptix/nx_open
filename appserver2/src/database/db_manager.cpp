@@ -18,6 +18,7 @@
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
+#include <database/migrations/accessible_resources_db_migration.h>
 
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
@@ -77,152 +78,7 @@ static bool removeDirRecursive(const QString & dirName)
     return result;
 }
 
-template <class T>
-void assertSorted(std::vector<T> &data) {
-#ifdef _DEBUG
-    assertSorted(data, &T::id);
-#else
-    Q_UNUSED(data);
-#endif // DEBUG
-}
 
-template <class T, class Field>
-void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
-#ifdef _DEBUG
-    if (data.empty())
-        return;
-
-    QByteArray prev = (data[0].*idField).toRfc4122();
-    for (size_t i = 1; i < data.size(); ++i) {
-        QByteArray next = (data[i].*idField).toRfc4122();
-        NX_ASSERT(next >= prev);
-        prev = next;
-    }
-#else
-    Q_UNUSED(data);
-    Q_UNUSED(idField);
-#endif // DEBUG
-}
-
-/**
- * Function merges sorted query into the sorted Data list. Data list contains placeholder
- * field for the data, that is contained in the query.
- * Data elements should have 'id' field and should be sorted by it.
- * Query should have 'id' and 'parentId' fields and should be sorted by 'id'.
- */
-template <class MainData>
-void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnUuid> MainData::*subList)
-{
-    assertSorted(data);
-
-    QSqlRecord rec = query.record();
-    int idIdx = rec.indexOf("id");
-    int parentIdIdx = rec.indexOf("parentId");
-    NX_ASSERT(idIdx >=0 && parentIdIdx >= 0);
-
-    bool eof = true;
-    QnUuid id, parentId;
-    QByteArray idRfc;
-
-    auto step = [&eof, &id, &idRfc, &parentId, &query, idIdx, parentIdIdx]{
-        eof = !query.next();
-        if (eof)
-            return;
-        idRfc = query.value(idIdx).toByteArray();
-        NX_ASSERT(idRfc == id.toRfc4122() || idRfc > id.toRfc4122());
-        id = QnUuid::fromRfc4122(idRfc);
-        parentId = QnUuid::fromRfc4122(query.value(parentIdIdx).toByteArray());
-    };
-
-    step();
-    size_t i = 0;
-    while (i < data.size() && !eof) {
-        if (id == data[i].id) {
-            (data[i].*subList).push_back(parentId);
-            step();
-        } else if (idRfc > data[i].id.toRfc4122()) {
-            ++i;
-        } else {
-            step();
-        }
-    }
-}
-
-/**
- * Function merges two sorted lists. First of them (data) contains placeholder
- * field for the data, that is contained in the second (subData).
- * Data elements should have 'id' field and should be sorted by it.
- * SubData elements should be sorted by parentIdField.
- */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
-void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
-{
-    assertSorted(data);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-    while (i < data.size() && j < subDataList.size()) {
-        if (subDataList[j].*parentIdField == data[i].id) {
-            (data[i].*subDataListField).push_back(subDataList[j]);
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > data[i].id.toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
-}
-
-template <class MainData, class SubData, class MainOrParentType, class IdType, class SubOrParentType, class Handler>
-void mergeObjectListData(
-    std::vector<MainData>& data,
-    std::vector<SubData>& subDataList,
-    IdType MainOrParentType::*idField,
-    IdType SubOrParentType::*parentIdField,
-    Handler mergeHandler )
-{
-    assertSorted(data, idField);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-
-    while (i < data.size() && j < subDataList.size()) {
-        if (subDataList[j].*parentIdField == data[i].*idField) {
-            mergeHandler( data[i], subDataList[j] );
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > (data[i].*idField).toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
-}
-
-//!Same as above but does not require field "id" of type QnUuid
-/**
- * Function merges two sorted lists. First of them (data) contains placeholder
- * field for the data, that is contained in the second (subData).
- * Data elements MUST be sorted by \a idField.
- * SubData elements should be sorted by parentIdField.
- * Types MainOrParentType1 and MainOrParentType2 are separated to allow \a subDataListField and \a idField to be pointers to fields of related types
- */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType1, class MainOrParentType2, class IdType, class SubOrParentType>
-void mergeObjectListData(
-    std::vector<MainData>& data,
-    std::vector<SubData>& subDataList,
-    std::vector<MainSubData> MainOrParentType1::*subDataListField,
-    IdType MainOrParentType2::*idField,
-    IdType SubOrParentType::*parentIdField )
-{
-    mergeObjectListData(
-        data,
-        subDataList,
-        idField,
-        parentIdField,
-        [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
-}
 
 /**
 * Updaters are used to update object's fields, which are stored as a raw json string
@@ -1394,6 +1250,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
     {
         if (!ec2::db::migrateUserPermissions(m_sdb))
+            return false;
+
+        if (!m_dbJustCreated)
+            m_needResyncUsers = true;
+    }
+    else if (updateName == lit(":/updates/55_migrate_accessible_resources.sql"))
+    {
+        if (!ec2::db::migrateAccessibleResources(m_sdb))
             return false;
 
         if (!m_dbJustCreated)
