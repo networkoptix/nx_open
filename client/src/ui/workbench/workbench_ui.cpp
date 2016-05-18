@@ -1020,7 +1020,6 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
 {
-
     QPointF pos(
         treeGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
@@ -1028,7 +1027,7 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
     QSizeF size(
         treeGeometry.width(),
         ((!m_sliderVisible && m_treeVisible)
-            ? m_controlsWidgetRect.bottom() - pos.y()
+            ? m_controlsWidgetRect.bottom()
             : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y());
 
     return QRectF(pos, size);
