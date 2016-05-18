@@ -314,7 +314,7 @@ class Rdep:
         url = self._repo_config.get_url()
         url = posixpath.join(url, target) + "/"
 
-        command = [ self._config.get_rsync(), "--list-only", url ]
+        command = [ self._config.get_rsync("rsync"), "--list-only", url ]
         self._verbose_rsync(command)
         try:
             output = subprocess.check_output(command)
@@ -380,6 +380,9 @@ def main():
         print >> sys.stderr, "Please specify target."
         return False
 
+    if args.list:
+        return rdep.list_packages()
+
     if not packages:
         print >> sys.stderr, "No packages specified"
         return False
@@ -388,8 +391,6 @@ def main():
         return rdep.print_path(packages[0])
     elif args.upload:
         return rdep.upload_packages(packages)
-    elif args.list:
-        return rdep.list_packages()
     else:
         return rdep.sync_packages(packages)
 

@@ -188,6 +188,10 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
 
     GENERATE_CMAKE_DEPS = deps_file == "cmake"
 
+    # Clear dependenciy files
+    for debug in [ False, True ]:
+        open(get_deps_file(debug), "w").close()
+
     if not packages:
         print "No dependencies found"
         return
@@ -222,10 +226,6 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
 
     if not os.path.isdir(target_dir):
         os.makedirs(target_dir)
-
-    # Clear dependenciy files
-    for debug in [ False, True ]:
-        open(get_deps_file(debug), "w").close()
 
     rdep = Rdep(REPOSITORY_PATH)
 
