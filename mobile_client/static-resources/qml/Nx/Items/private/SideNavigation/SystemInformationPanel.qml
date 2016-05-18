@@ -60,11 +60,9 @@ Pane
                 width: parent.width
                 spacing: 2
 
-                Rectangle
+                Image
                 {
-                    width: 20
-                    height: 20
-                    color: "yellow"
+                    source: lp("/images/tile_server.png")
                 }
 
                 Text
@@ -82,11 +80,9 @@ Pane
                 width: parent.width
                 spacing: 2
 
-                Rectangle
+                Image
                 {
-                    width: 20
-                    height: 20
-                    color: "yellow"
+                    source: lp("/images/tile_user.png")
                 }
 
                 Text
