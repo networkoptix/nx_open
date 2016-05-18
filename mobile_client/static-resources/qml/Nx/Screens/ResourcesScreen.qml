@@ -15,6 +15,7 @@ Page
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
     warningText: qsTr("Server offline")
+    sideNavigationEnabled: !searchToolBar.visible
 
     titleControls:
     [
@@ -23,8 +24,13 @@ Page
             icon: lp("/images/search.png")
             enabled: d.enabled
             opacity: !warningVisible ? 1.0 : 0.2
-            onClicked: searchToolBar.open()
+            onClicked:
+            {
+                sideNavigation.close()
+                searchToolBar.open()
+            }
             alwaysCompleteHighlightAnimation: false
+            visible: !liteMode
         }
     ]
 

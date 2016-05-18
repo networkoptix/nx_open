@@ -1,5 +1,11 @@
 .import Qt.labs.controls 1.0 as Controls
 
+function focusCurrentScreen()
+{
+    if (stackView.currentItem)
+        stackView.currentItem.forceActiveFocus()
+}
+
 function popCurrentScreen()
 {
     if (stackView.depth > 1)

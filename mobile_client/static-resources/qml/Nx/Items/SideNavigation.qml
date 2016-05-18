@@ -12,6 +12,8 @@ Drawer
     position: 0
     enabled: stackView.depth == 1
 
+    readonly property bool opened: position > 0
+
     Rectangle
     {
         width: Math.min(ApplicationWindow.window.width - 56, ApplicationWindow.window.height - 56, 56 * 6)
@@ -96,6 +98,21 @@ Drawer
             }
 
             VersionLabel {}
+        }
+    }
+
+    onOpenedChanged:
+    {
+        if (opened)
+            forceActiveFocus()
+    }
+
+    Keys.onPressed:
+    {
+        if (Utils.keyIsBack(event.key))
+        {
+            close()
+            Workflow.focusCurrentScreen()
         }
     }
 }
