@@ -1,4 +1,4 @@
-#include "resource_pool_model_node.h"
+#include "resource_tree_model_node.h"
 
 #include <common/common_meta_types.h>
 #include <common/common_module.h>
@@ -19,13 +19,15 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn::NodeType type, const QString &name):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, Qn::NodeType type, const QString &name):
+    base_type(),
+    QnWorkbenchContextAware(model),
     m_model(model),
     m_type(type),
     m_state(Normal),
@@ -97,7 +99,9 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
 /**
  * Constructor for resource nodes.
  */
-QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType):
+    base_type(),
+    QnWorkbenchContextAware(model),
     m_model(model),
     m_type(nodeType),
     m_state(Invalid),
@@ -119,7 +123,9 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
 /**
  * Constructor for item nodes.
  */
-QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, const QnUuid &uuid, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, const QnUuid &uuid, Qn::NodeType nodeType):
+    base_type(),
+    QnWorkbenchContextAware(model),
     m_model(model),
     m_type(nodeType),
     m_uuid(uuid),
@@ -135,16 +141,16 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
     m_editable.checked = false;
 }
 
-QnResourcePoolModelNode::~QnResourcePoolModelNode() {
+QnResourceTreeModelNode::~QnResourceTreeModelNode() {
     clear();
 
-    foreach(QnResourcePoolModelNode *childNode, m_children) {
+    foreach(QnResourceTreeModelNode *childNode, m_children) {
         childNode->setParent(NULL);
         m_model->removeNode(childNode);
     }
 }
 
-void QnResourcePoolModelNode::clear() {
+void QnResourceTreeModelNode::clear() {
     setParent(NULL);
 
     if (m_type == Qn::ItemNode ||
@@ -156,7 +162,7 @@ void QnResourcePoolModelNode::clear() {
     }
 }
 
-void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
+void QnResourceTreeModelNode::setResource(const QnResourcePtr &resource) {
     NX_ASSERT(
         m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode ||
@@ -178,7 +184,7 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
     update();
 }
 
-void QnResourcePoolModelNode::update() {
+void QnResourceTreeModelNode::update() {
     /* Update stored fields. */
     if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode) {
         if(m_resource.isNull()) {
@@ -249,52 +255,52 @@ void QnResourcePoolModelNode::update() {
     changeInternal();
 }
 
-void QnResourcePoolModelNode::updateRecursive() {
+void QnResourceTreeModelNode::updateRecursive() {
     update();
 
-    foreach(QnResourcePoolModelNode *child, m_children)
+    foreach(QnResourceTreeModelNode *child, m_children)
         child->updateRecursive();
 }
 
-Qn::NodeType QnResourcePoolModelNode::type() const {
+Qn::NodeType QnResourceTreeModelNode::type() const {
     return m_type;
 }
 
-const QnResourcePtr& QnResourcePoolModelNode::resource() const {
+const QnResourcePtr& QnResourceTreeModelNode::resource() const {
     return m_resource;
 }
 
-Qn::ResourceFlags QnResourcePoolModelNode::resourceFlags() const {
+Qn::ResourceFlags QnResourceTreeModelNode::resourceFlags() const {
     return m_flags;
 }
 
-Qn::ResourceStatus QnResourcePoolModelNode::resourceStatus() const {
+Qn::ResourceStatus QnResourceTreeModelNode::resourceStatus() const {
     return m_status;
 }
 
-const QnUuid& QnResourcePoolModelNode::uuid() const {
+const QnUuid& QnResourceTreeModelNode::uuid() const {
     return m_uuid;
 }
 
-QnResourcePoolModelNode::State QnResourcePoolModelNode::state() const {
+QnResourceTreeModelNode::State QnResourceTreeModelNode::state() const {
     return m_state;
 }
 
-bool QnResourcePoolModelNode::isValid() const {
+bool QnResourceTreeModelNode::isValid() const {
     return m_state == Normal;
 }
 
-void QnResourcePoolModelNode::setState(State state) {
+void QnResourceTreeModelNode::setState(State state) {
     if(m_state == state)
         return;
 
     m_state = state;
 
-    foreach(QnResourcePoolModelNode *node, m_children)
+    foreach(QnResourceTreeModelNode *node, m_children)
         node->setState(state);
 }
 
-bool QnResourcePoolModelNode::calculateBastard() const {
+bool QnResourceTreeModelNode::calculateBastard() const {
     switch(m_type)
     {
     case Qn::ItemNode:
@@ -384,11 +390,11 @@ bool QnResourcePoolModelNode::calculateBastard() const {
     }
 }
 
-bool QnResourcePoolModelNode::isBastard() const {
+bool QnResourceTreeModelNode::isBastard() const {
     return m_bastard;
 }
 
-void QnResourcePoolModelNode::setBastard(bool bastard) {
+void QnResourceTreeModelNode::setBastard(bool bastard) {
     if(m_bastard == bastard)
         return;
 
@@ -404,19 +410,19 @@ void QnResourcePoolModelNode::setBastard(bool bastard) {
     }
 }
 
-const QList<QnResourcePoolModelNode *>& QnResourcePoolModelNode::children() const {
+const QList<QnResourceTreeModelNode *>& QnResourceTreeModelNode::children() const {
     return m_children;
 }
 
-QnResourcePoolModelNode* QnResourcePoolModelNode::child(int index) {
+QnResourceTreeModelNode* QnResourceTreeModelNode::child(int index) {
     return m_children[index];
 }
 
-QnResourcePoolModelNode* QnResourcePoolModelNode::parent() const {
+QnResourceTreeModelNode* QnResourceTreeModelNode::parent() const {
     return m_parent;
 }
 
-void QnResourcePoolModelNode::setParent(QnResourcePoolModelNode *parent) {
+void QnResourceTreeModelNode::setParent(QnResourceTreeModelNode *parent) {
     if(m_parent == parent)
         return;
 
@@ -438,7 +444,7 @@ void QnResourcePoolModelNode::setParent(QnResourcePoolModelNode *parent) {
     }
 }
 
-QModelIndex QnResourcePoolModelNode::index(int col) {
+QModelIndex QnResourceTreeModelNode::index(int col) {
     NX_ASSERT(isValid()); /* Only valid nodes have indices. */
 
     if(m_parent == NULL)
@@ -447,14 +453,14 @@ QModelIndex QnResourcePoolModelNode::index(int col) {
     return index(m_parent->m_children.indexOf(this), col);
 }
 
-QModelIndex QnResourcePoolModelNode::index(int row, int col) {
+QModelIndex QnResourceTreeModelNode::index(int row, int col) {
     NX_ASSERT(isValid()); /* Only valid nodes have indices. */
     NX_ASSERT(m_parent != NULL && row == m_parent->m_children.indexOf(this));
 
     return m_model->createIndex(row, col, this);
 }
 
-Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
+Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const {
     if (column == Qn::CheckColumn)
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
@@ -464,11 +470,11 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
         switch(m_type) {
         case Qn::ResourceNode:
         case Qn::EdgeNode:
-            m_editable.value = m_model->context()->menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
+            m_editable.value = menu()->canTrigger(QnActions::RenameResourceAction, QnActionParameters(m_resource));
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
-            m_editable.value = m_model->context()->accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
+            m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -500,7 +506,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     return result;
 }
 
-QVariant QnResourcePoolModelNode::data(int role, int column) const {
+QVariant QnResourceTreeModelNode::data(int role, int column) const {
     switch(role) {
     case Qt::DisplayRole:
     case Qt::StatusTipRole:
@@ -588,7 +594,7 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
     return QVariant();
 }
 
-bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int column) {
+bool QnResourceTreeModelNode::setData(const QVariant &value, int role, int column) {
     if (column == Qn::CheckColumn && role == Qt::CheckStateRole)
     {
         m_checkState = static_cast<Qt::CheckState>(value.toInt());
@@ -620,7 +626,7 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
         //sending first camera to get groupId and check WriteName permission
         if (this->children().isEmpty())
             return false;
-        QnResourcePoolModelNode* child = this->child(0);
+        QnResourceTreeModelNode* child = this->child(0);
         if (!child->resource())
             return false;
         parameters = QnActionParameters(child->resource());
@@ -631,17 +637,17 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
     parameters.setArgument(Qn::NodeTypeRole, m_type);
 
     if (isVideoWallEntity)
-        m_model->context()->menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
+        menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
     else
-        m_model->context()->menu()->trigger(QnActions::RenameResourceAction, parameters);
+        menu()->trigger(QnActions::RenameResourceAction, parameters);
     return true;
 }
 
-bool QnResourcePoolModelNode::isModified() const {
+bool QnResourceTreeModelNode::isModified() const {
     return !m_modified;
 }
 
-void QnResourcePoolModelNode::setModified(bool modified) {
+void QnResourceTreeModelNode::setModified(bool modified) {
     if(m_modified == modified)
         return;
 
@@ -650,7 +656,7 @@ void QnResourcePoolModelNode::setModified(bool modified) {
     changeInternal();
 }
 
-void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child) {
+void QnResourceTreeModelNode::removeChildInternal(QnResourceTreeModelNode *child) {
     NX_ASSERT(child->parent() == this);
 
     if(isValid() && !isBastard()) {
@@ -675,7 +681,7 @@ void QnResourcePoolModelNode::removeChildInternal(QnResourcePoolModelNode *child
     }
 }
 
-void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
+void QnResourceTreeModelNode::addChildInternal(QnResourceTreeModelNode *child) {
     NX_ASSERT(child->parent() == this);
 
     if(isValid() && !isBastard()) {
@@ -700,7 +706,7 @@ void QnResourcePoolModelNode::addChildInternal(QnResourcePoolModelNode *child) {
     }
 }
 
-void QnResourcePoolModelNode::changeInternal() {
+void QnResourceTreeModelNode::changeInternal() {
     if(!isValid() || isBastard())
         return;
 

@@ -39,7 +39,7 @@
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/processors/hover_processor.h>
@@ -179,7 +179,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourcePoolModel(QnResourcePoolModel::FullScope, this);
+    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
