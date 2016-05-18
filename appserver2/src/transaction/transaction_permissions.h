@@ -14,10 +14,15 @@ namespace ec2
     template<typename TransactionParamType>
     bool hasPermission(const QnUuid &userId, const TransactionParamType &data, Qn::Permission permission)
     {
+        auto user = qnResPool->getResourceById<QnUserResource>(userId);
+        if (!user)
+            return false;
+
         /* Check if resource needs to be created. */
         QnResourcePtr target = qnResPool->getResourceById(data.id);
         if (!target)
-            return qnResourceAccessManager->canCreateResource(userId, data);
+            return qnResourceAccessManager->canCreateResource(user, data);
+
 
         return qnResourceAccessManager->hasPermission(user, target, permission);
     }

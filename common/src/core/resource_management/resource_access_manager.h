@@ -73,17 +73,17 @@ public:
     bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
     template <typename ApiDataType>
-    bool canCreateResource(const QnUuid& userId, const ApiDataType& data) const
+    bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& data) const
     {
         /* By default we cannot create resources manually. */
         return false;
     }
 
-    bool canCreateResource(const QnUuid& userId, const ec2::ApiStorageData& data) const;
-    bool canCreateResource(const QnUuid& userId, const ec2::ApiLayoutData& data) const;
-    bool canCreateResource(const QnUuid& userId, const ec2::ApiUserData& data) const;
-    bool canCreateResource(const QnUuid& userId, const ec2::ApiVideowallData& data) const;
-    bool canCreateResource(const QnUuid& userId, const ec2::ApiWebPageData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
