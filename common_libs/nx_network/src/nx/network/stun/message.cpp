@@ -244,6 +244,30 @@ bool Message::verifyIntegrity( const String& userName, const String& key )
     return messageHmac == realHmac;
 }
 
+boost::optional< QString > Message::hasError( SystemError::ErrorCode code ) const
+{
+    if( code != SystemError::noError )
+    {
+        return QString( lm( "System error %1: %2" )
+            .arg( code ).arg( SystemError::toString( code ) ) );
+    }
+
+    if( header.messageClass != MessageClass::successResponse )
+    {
+        if( const auto err = getAttribute< attrs::ErrorDescription >() )
+        {
+            return QString( lm( "STUN error %1: %2" )
+                .arg( err->getCode() ).arg( err->getString() ) );
+        }
+        else
+        {
+            return QString( lm( "STUN error without ErrorDescription" ) );
+        }
+    }
+
+    return boost::none;
+}
+
 Message::Message( Header header_, AttributesMap attributes_ )
     : header( std::move(header_) )
     , attributes( std::move(attributes_) )
