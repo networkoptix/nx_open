@@ -13,17 +13,30 @@ class QnUserResource : public QnResource
     typedef QnResource base_type;
 
 public:
-    QnUserResource();
-    QnUserResource(const QnUserResource&);
+    enum UserType
+    {
+        LocalUser,
+        LdapUser,
+        CloudUser
+    };
+
+public:
+    QnUserResource(UserType userType);
+    QnUserResource(const QnUserResource& right);
+
+    UserType userType() const;
+    bool isLdap()  const { return userType() == LdapUser; }
+    bool isCloud() const { return userType() == CloudUser; }
+    bool isLocal() const { return userType() == LocalUser; }
 
     QByteArray getHash() const;
-    void setHash(const QByteArray&hash);
+    void setHash(const QByteArray& hash);
 
     QString getPassword() const;
-    void setPassword(const QString &password);
+    void setPassword(const QString& password);
 
     void generateHash();
-    bool checkPassword(const QString &password);
+    bool checkPassword(const QString& password);
 
     QByteArray getDigest() const;
     void setDigest(const QByteArray& digest, bool isValidated = false);
@@ -45,17 +58,11 @@ public:
     QnUuid userGroup() const;
     void setUserGroup(const QnUuid& group);
 
-    bool isLdap() const;
-    void setLdap(bool isLdap);
-
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
 
-    bool isCloud() const;
-    void setCloud(bool value);
-
     QString getEmail() const;
-    void setEmail(const QString &email);
+    void setEmail(const QString& email);
 
     virtual Qn::ResourceStatus getStatus() const override;
 
@@ -67,21 +74,21 @@ public:
     void prolongatePassword(qint64 value = PasswordProlongationAuto);
 
 signals:
-    void hashChanged(const QnResourcePtr &resource);
-    void passwordChanged(const QnResourcePtr &resource);
-    void digestChanged(const QnResourcePtr &resource);
-    void cryptSha512HashChanged(const QnResourcePtr &resource);
-    void permissionsChanged(const QnResourcePtr &user);
-    void userGroupChanged(const QnResourcePtr &user);
-    void emailChanged(const QnResourcePtr &user);
-	void realmChanged(const QnResourcePtr &user);
-    void enabledChanged(const QnResourcePtr &user);
-    void ldapChanged(const QnResourcePtr &user);
+    void hashChanged(const QnResourcePtr& user);
+    void passwordChanged(const QnResourcePtr& user);
+    void digestChanged(const QnResourcePtr& user);
+    void cryptSha512HashChanged(const QnResourcePtr& user);
+    void permissionsChanged(const QnResourcePtr& user);
+    void userGroupChanged(const QnResourcePtr& user);
+    void emailChanged(const QnResourcePtr& user);
+	void realmChanged(const QnResourcePtr& user);
+    void enabledChanged(const QnResourcePtr& user);
 
 protected:
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInner(const QnResourcePtr& other, QSet<QByteArray>& modifiedFields) override;
 
 private:
+    UserType m_userType;
     QString m_password;
     QByteArray m_hash;
     QByteArray m_digest;
@@ -90,9 +97,7 @@ private:
     Qn::GlobalPermissions m_permissions;
     QnUuid m_userGroup;
     bool m_isOwner;
-    bool m_isLdap;
     bool m_isEnabled;
-    bool m_isCloud;
     QString m_email;
     qint64 m_passwordExpirationTimestamp;
 };

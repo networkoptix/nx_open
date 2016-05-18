@@ -483,8 +483,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (iter == users.cend())
             return false;
 
-        userResource.reset(new QnUserResource());
-        fromApiToResource(*iter, userResource);
+        userResource = fromApiToResource(*iter);
         NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
     }
 
@@ -1488,7 +1487,15 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         QSqlQuery authQuery(m_sdb);
         if (!prepareSQLQuery(&authQuery, authQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
-        QnSql::bind(data, &authQuery);
+
+        ApiUserData dataCopy(data);
+        if (dataCopy.isLdap && dataCopy.isCloud)
+        {
+            NX_LOG(lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId), cl_logWARNING);
+            dataCopy.isCloud = false;
+        }
+
+        QnSql::bind(dataCopy, &authQuery);
         authQuery.bindValue(":internalId", internalId);
         if (!execSQLQuery(&authQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
