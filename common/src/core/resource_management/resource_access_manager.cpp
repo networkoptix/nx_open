@@ -32,19 +32,19 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         m_permissionsCache.clear();
     });
 
-    connect(qnResPool,& QnResourcePool::resourceAdded, this, [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this] (const QnResourcePtr& resource)
     {
         if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
         {
-            connect(layout,& QnResource::parentIdChanged,           this,& QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
-            connect(layout,& QnLayoutResource::userCanEditChanged,  this,& QnResourceAccessManager::invalidateResourceCache);
-            connect(layout,& QnLayoutResource::lockedChanged,       this,& QnResourceAccessManager::invalidateResourceCache);
+            connect(layout, &QnResource::parentIdChanged,           this, &QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
+            connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(layout, &QnLayoutResource::lockedChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
         {
-            connect(user,& QnUserResource::permissionsChanged,  this,& QnResourceAccessManager::invalidateResourceCache);
-            connect(user,& QnUserResource::userGroupChanged,    this,& QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::permissionsChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::userGroupChanged,    this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         /* Storage can be added (and permissions requested) before the server. */
@@ -55,11 +55,11 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         }
     });
 
-    connect(qnResPool,& QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
     });
-    connect(qnResPool,& QnResourcePool::resourceRemoved, this,& QnResourceAccessManager::invalidateResourceCache);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceAccessManager::invalidateResourceCache);
 }
 
 void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
