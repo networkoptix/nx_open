@@ -50,7 +50,6 @@ Page
             else
                 warningVisible = false
         }
-
     }
 
     Timer

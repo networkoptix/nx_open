@@ -31,7 +31,7 @@ Pane
 
         Image
         {
-            source: lp("/images/calendar.png") // TODO: #dklychkov Use proper icon
+            source: lp("/images/cloud_not_logged_in.png")
             anchors.verticalCenter: parent.verticalCenter
         }
 
