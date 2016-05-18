@@ -230,7 +230,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     auto filteredUsers = filterExistingUsers(users);
 
     for (const QnLdapUser &ldapUser: filteredUsers) {
-        QnUserResourcePtr user(new QnUserResource(QnUserResource::LdapUser));
+        QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setId(QnUuid::createUuid());
         user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
         user->setEnabled(false);

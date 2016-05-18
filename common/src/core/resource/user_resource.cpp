@@ -10,7 +10,7 @@ static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;
 
 
-QnUserResource::QnUserResource(UserType userType):
+QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
     m_permissions(0),
     m_userGroup(),
@@ -130,7 +130,7 @@ void QnUserResource::setDigest(const QByteArray& digest, bool isValidated)
         QnMutexLocker locker(&m_mutex);
         if (m_digest == digest)
             return;
-        if (m_userType == LdapUser)
+        if (m_userType == QnUserType::Ldap)
         {
             m_passwordExpirationTimestamp = isValidated
                 ? qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC
@@ -244,7 +244,7 @@ void QnUserResource::setEnabled(bool isEnabled)
     emit enabledChanged(::toSharedPointer(this));
 }
 
-QnUserResource::UserType QnUserResource::userType() const
+QnUserType QnUserResource::userType() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_userType;
@@ -272,7 +272,10 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
     base_type::updateInner(other, modifiedFields);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
-    if (localOther) {
+    if (localOther)
+    {
+        NX_ASSERT(m_userType == localOther->m_userType, Q_FUNC_INFO, "User type was designed to be read-only");
+
         if (m_password != localOther->m_password)
         {
             m_password = localOther->m_password;
@@ -331,12 +334,6 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         {
             m_isEnabled = localOther->m_isEnabled;
             modifiedFields << "enabledChanged";
-        }
-
-        if (m_userType != localOther->m_userType)
-        {
-            m_userType = localOther->userType();
-            NX_ASSERT(false, Q_FUNC_INFO, "User type was designed to be read-only");
         }
     }
 }

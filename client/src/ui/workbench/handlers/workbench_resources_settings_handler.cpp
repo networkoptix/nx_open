@@ -73,7 +73,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
-    QnUserResourcePtr user(new QnUserResource(QnUserResource::LocalUser));
+    QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
     user->setId(QnUuid::createUuid());
     user->addFlags(Qn::local);

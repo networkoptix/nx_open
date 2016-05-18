@@ -1488,14 +1488,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         if (!prepareSQLQuery(&authQuery, authQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        ApiUserData dataCopy(data);
-        if (dataCopy.isLdap && dataCopy.isCloud)
-        {
-            NX_LOG(lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId), cl_logWARNING);
-            dataCopy.isCloud = false;
-        }
-
-        QnSql::bind(dataCopy, &authQuery);
+        QnSql::bind(data, &authQuery);
         authQuery.bindValue(":internalId", internalId);
         if (!execSQLQuery(&authQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
@@ -1513,7 +1506,13 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         QSqlQuery profileQuery(m_sdb);
         if (!prepareSQLQuery(&profileQuery, profileQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
+
         QnSql::bind(data, &profileQuery);
+        if (data.isLdap && data.isCloud)
+        {
+            NX_LOG(lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId), cl_logWARNING);
+            profileQuery.bindValue(":isCloud", false);
+        }
 
         if (data.digest.isEmpty() && !data.isLdap)
         {

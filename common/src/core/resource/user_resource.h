@@ -6,6 +6,13 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 
+enum class QnUserType
+{
+    Local,
+    Ldap,
+    Cloud
+};
+
 class QnUserResource : public QnResource
 {
     Q_OBJECT
@@ -13,21 +20,13 @@ class QnUserResource : public QnResource
     typedef QnResource base_type;
 
 public:
-    enum UserType
-    {
-        LocalUser,
-        LdapUser,
-        CloudUser
-    };
-
-public:
-    QnUserResource(UserType userType);
+    QnUserResource(QnUserType userType);
     QnUserResource(const QnUserResource& right);
 
-    UserType userType() const;
-    bool isLdap()  const { return userType() == LdapUser; }
-    bool isCloud() const { return userType() == CloudUser; }
-    bool isLocal() const { return userType() == LocalUser; }
+    QnUserType userType() const;
+    bool isLdap()  const { return userType() == QnUserType::Ldap;  }
+    bool isCloud() const { return userType() == QnUserType::Cloud; }
+    bool isLocal() const { return userType() == QnUserType::Local; }
 
     QByteArray getHash() const;
     void setHash(const QByteArray& hash);
@@ -88,7 +87,7 @@ protected:
     virtual void updateInner(const QnResourcePtr& other, QSet<QByteArray>& modifiedFields) override;
 
 private:
-    UserType m_userType;
+    QnUserType m_userType;
     QString m_password;
     QByteArray m_hash;
     QByteArray m_digest;

@@ -720,11 +720,11 @@ void fromApiToResourceList(const ApiResourceTypeDataList& src, QnResourceTypeLis
     }
 }
 
-static QnUserResource::UserType userResourceType(bool isLdap, bool isCloud)
+static QnUserType userResourceType(bool isLdap, bool isCloud)
 {
-    return isLdap  ? QnUserResource::LdapUser :
-           isCloud ? QnUserResource::CloudUser:
-                     QnUserResource::LocalUser;
+    return isLdap  ? QnUserType::Ldap :
+           isCloud ? QnUserType::Cloud:
+                     QnUserType::Local;
 }
 
 QnUserResourcePtr fromApiToResource(const ApiUserData& src)
@@ -754,18 +754,18 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
 
 void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
 {
-    QnUserResource::UserType userType = src->userType();
+    QnUserType userType = src->userType();
     fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
     dst.hash = src->getHash();
     dst.digest = src->getDigest();
     dst.isAdmin = src->isOwner();
-    dst.isLdap = userType == QnUserResource::LdapUser;
+    dst.isLdap = userType == QnUserType::Ldap;
 	dst.isEnabled = src->isEnabled();
     dst.permissions = src->getRawPermissions();
     dst.email = src->getEmail();
     dst.cryptSha512Hash = src->getCryptSha512Hash();
     dst.realm = src->getRealm();
-    dst.isCloud = userType == QnUserResource::CloudUser;
+    dst.isCloud = userType == QnUserType::Cloud;
     dst.groupId = src->userGroup();
 }
 

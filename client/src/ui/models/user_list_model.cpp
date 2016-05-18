@@ -227,9 +227,9 @@ QVariant QnUserListModel::data(const QModelIndex &index, int role) const {
         case LdapColumn:
             switch (user->userType())
             {
-            case QnUserResource::LocalUser : return tr("Local user");
-            case QnUserResource::CloudUser : return tr("Cloud user");
-            case QnUserResource::LdapUser  : return tr("LDAP user");
+            case QnUserType::Local : return tr("Local user");
+            case QnUserType::Cloud : return tr("Cloud user");
+            case QnUserType::Ldap  : return tr("LDAP user");
             }
         case EnabledColumn:
             return user->isEnabled() ? tr("Enabled") : tr("Disabled");
