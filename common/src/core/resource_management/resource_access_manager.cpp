@@ -46,6 +46,13 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
             connect(user,& QnUserResource::permissionsChanged,  this,& QnResourceAccessManager::invalidateResourceCache);
             connect(user,& QnUserResource::userGroupChanged,    this,& QnResourceAccessManager::invalidateResourceCache);
         }
+
+        /* Storage can be added (and permissions requested) before the server. */
+        if (const QnMediaServerResourcePtr& server = resource.dynamicCast<QnMediaServerResource>())
+        {
+            for (auto storage : server->getStorages())
+                invalidateResourceCache(storage);
+        }
     });
 
     connect(qnResPool,& QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
@@ -352,7 +359,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(storage);
     auto server = storage->getParentServer();
-    NX_ASSERT(server);
+    if (!server)
+        return Qn::ReadPermission;  /*< Server is not added to resource pool. Really we shouldn't request storage permissions in that case. */
 
     auto serverPermissions = permissions(user, server);
     if (serverPermissions.testFlag(Qn::SavePermission))
