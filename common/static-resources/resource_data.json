@@ -114,10 +114,12 @@
             "keys": [
                 "ISD|XPM-FL72-48MP",
                 "DW|XPM-FL72-48MP",
-                "DW|DWC-PZV2M72T"
+                "DW|DWC-PZV2M72T",
+                "DigitalWatchdog|DWC-PZV2M72T"
             ],
             "isDW": true,
-            "showUrl": true
+            "showUrl": true,
+            "urlLocalePath": "priv/cam.html"
         },
         {
             "keys": [

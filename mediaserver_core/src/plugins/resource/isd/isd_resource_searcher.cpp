@@ -385,7 +385,7 @@ void QnPlISDResourceSearcher::createResource(
             return;
     }
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
+    QnResourceData resourceData = qnCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
