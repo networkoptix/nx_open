@@ -161,25 +161,23 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
     return target
 
 def get_package(rdep, target, package, target_dir, debug = False):
-    lock_file = os.path.join(tempfile.gettempdir(), "rdep.lock")
     pack = None
 
-    with filelock.Lock(lock_file) as lock:
-        for pack in package.split("|"):
-            explicit_target, pack = posixpath.split(pack)
-            rdep.targets = [ explicit_target ] if explicit_target else [ target ] + platform_detection.get_alternative_targets(target)
+    for pack in package.split("|"):
+        explicit_target, pack = posixpath.split(pack)
+        rdep.targets = [ explicit_target ] if explicit_target else [ target ] + platform_detection.get_alternative_targets(target)
 
-            found_target = get_package_for_configuration(rdep, pack, target_dir, False)
-            if found_target:
-                break
+        found_target = get_package_for_configuration(rdep, pack, target_dir, False)
+        if found_target:
+            break
 
-        if not found_target:
+    if not found_target:
+        return False
+
+    if debug:
+        rdep.targets = found_target if type(found_target) is list else [ found_target ]
+        if not get_package_for_configuration(rdep, pack, target_dir, True):
             return False
-
-        if debug:
-            rdep.targets = found_target if type(found_target) is list else [ found_target ]
-            if not get_package_for_configuration(rdep, pack, target_dir, True):
-                return False
 
     return True
 
@@ -196,43 +194,45 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
         print "No dependencies found"
         return
 
-    if not os.path.isdir(REPOSITORY_PATH):
-        os.makedirs(REPOSITORY_PATH)
+    lock_file = os.path.join(tempfile.gettempdir(), "rdep.lock")
+    with filelock.Lock(lock_file) as lock:
+        if not os.path.isdir(REPOSITORY_PATH):
+            os.makedirs(REPOSITORY_PATH)
 
-    config = rdep_config.RepositoryConfig(REPOSITORY_PATH)
-    if not config.get_url():
-        config.set_url(SYNC_URL)
-    if not config.get_push_url(None):
-        config.set_push_url(PUSH_URL)
+        config = rdep_config.RepositoryConfig(REPOSITORY_PATH)
+        if not config.get_url():
+            config.set_url(SYNC_URL)
+        if not config.get_push_url(None):
+            config.set_push_url(PUSH_URL)
 
-    global_config = rdep_config.RdepConfig()
-    if not global_config.get_rsync():
-        if not distutils.spawn.find_executable("rsync"):
-            rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
-            if not os.path.isfile(rsync):
-                print "Cannot find rsync executable. Please specify it in .rderc"
-                exit(1)
-            global_config.set_rsync(rsync)
-    if not global_config.get_name():
-        homedir = os.path.join(os.path.expanduser("~"))
-        hg_config_file = os.path.join(homedir, ".hgrc")
-        if not os.path.isfile(hg_config_file):
-            hg_config_file = os.path.join(homedir, "Mercurial.ini")
-        if os.path.isfile(hg_config_file):
-            hg_config = rdep_config.ConfigHelper(hg_config_file)
-            username = hg_config.get_value("ui", "username", "").strip()
-            if username:
-                global_config.set_name(username)
+        global_config = rdep_config.RdepConfig()
+        if not global_config.get_rsync():
+            if not distutils.spawn.find_executable("rsync"):
+                rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
+                if not os.path.isfile(rsync):
+                    print "Cannot find rsync executable. Please specify it in .rderc"
+                    exit(1)
+                global_config.set_rsync(rsync)
+        if not global_config.get_name():
+            homedir = os.path.join(os.path.expanduser("~"))
+            hg_config_file = os.path.join(homedir, ".hgrc")
+            if not os.path.isfile(hg_config_file):
+                hg_config_file = os.path.join(homedir, "Mercurial.ini")
+            if os.path.isfile(hg_config_file):
+                hg_config = rdep_config.ConfigHelper(hg_config_file)
+                username = hg_config.get_value("ui", "username", "").strip()
+                if username:
+                    global_config.set_name(username)
 
-    if not os.path.isdir(target_dir):
-        os.makedirs(target_dir)
+        if not os.path.isdir(target_dir):
+            os.makedirs(target_dir)
 
-    rdep = Rdep(REPOSITORY_PATH)
+        rdep = Rdep(REPOSITORY_PATH)
 
-    for package in packages:
-        if not get_package(rdep, target, package, target_dir, debug):
-            print "Cannot get package {0}".format(package)
-            sys.exit(1)
+        for package in packages:
+            if not get_package(rdep, target, package, target_dir, debug):
+                print "Cannot get package {0}".format(package)
+                sys.exit(1)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
