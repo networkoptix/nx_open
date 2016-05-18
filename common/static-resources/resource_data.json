@@ -92,6 +92,13 @@
 
         {
             "keys": [
+                "*|DW-CP04", "*|DW-CP16"
+            ],
+            "isRebrendedActiCamera": true
+        },
+		
+        {
+            "keys": [
                 "ISD|*"
             ],
             "showUrl": true,
