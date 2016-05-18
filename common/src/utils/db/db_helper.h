@@ -2,6 +2,8 @@
 #define __QN_DB_HELPER_H__
 
 #include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -101,8 +103,8 @@ public:
         assertSorted(data);
 
         QSqlRecord rec = query.record();
-        int idIdx = rec.indexOf("id");
-        int parentIdIdx = rec.indexOf("parentId");
+        int idIdx = rec.indexOf(lit("id"));
+        int parentIdIdx = rec.indexOf(lit("parentId"));
         NX_ASSERT(idIdx >=0 && parentIdIdx >= 0);
 
         bool eof = true;
