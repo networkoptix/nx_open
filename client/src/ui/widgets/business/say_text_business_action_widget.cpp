@@ -13,7 +13,7 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_pool.h>
 
 QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -52,7 +52,7 @@ void QnSayTextBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *aft
 QString QnSayTextBusinessActionWidget::getActionTargetsHolderText(
     const QnBusinessActionParameters& params) const
 {
-    auto resources = qnResPool->getResources<QnResource>(params.actionTargets);
+    auto resources = qnResPool->getResources<QnResource>(params.additionalResources);
 
     if(resources.empty())
         return tr("<Choose camera>");
@@ -74,7 +74,6 @@ void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     auto params = model()->actionParams();
-
     if (fields & QnBusiness::ActionParamsField)
     {
         ui->textEdit->setText(params.sayText);
@@ -117,17 +116,18 @@ void QnSayTextBusinessActionWidget::at_actionTargetsHolder_clicked() {
 
     auto params = model()->actionParams();
     QnResourceSelectionDialog dialog(this);
-    QnResourceList selected = qnResPool->getResources(params.actionTargets);
+    QnResourceList selected = qnResPool->getResources(params.additionalResources);
 
-    dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
+    dialog.setDelegate(
+        new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
     dialog.setSelectedResources(selected);
 
     if (dialog.exec() != QDialog::Accepted)
         return;
 
-    params.actionTargets.clear();
+    params.additionalResources.clear();
     for(const auto& res: dialog.selectedResources())
-        params.actionTargets.push_back(res->getId());
+        params.additionalResources.push_back(res->getId());
 
     model()->setActionParams(params);
 }

@@ -48,12 +48,6 @@ struct QnBusinessActionParameters {
     // Generic additional resources List: Show On Alarm Layout - users
     std::vector<QnUuid> additionalResources;
 
-    //Devices that should execute the action (Say text)
-    std::vector<QnUuid> actionTargets;
-
-    //Say text
-    bool playToClient;
-
     // Alarm Layout - if it must be opened immediately
     bool forced;
 
@@ -66,6 +60,9 @@ struct QnBusinessActionParameters {
     //! Bookmark start time adjusted to the left by this value
     int recordBeforeMs;
 
+    //Say text
+    bool playToClient;
+
     /**
      * \returns                        Whether all parameters have default values.
      */
@@ -73,7 +70,8 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(actionTargets)(playToClient)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)\
+    (forced)(presetId)(useSource)(recordBeforeMs)(playToClient)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

@@ -3,6 +3,8 @@
 #include "utils/common/unused.h"
 #include "core/resource_management/resource_pool.h"
 #include <camera/camera_pool.h>
+#include <providers/stored_file_data_provider.h>
+#include <business/actions/abstract_business_action.h>
 
 namespace
 {
@@ -87,6 +89,49 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         transmitter->subscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
     else
         transmitter->unsubscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
+
+    return true;
+}
+
+QString QnAudioStreamerPool::calcActionUniqueKey(const QnAbstractBusinessActionPtr &action) const
+{
+    auto actionKey = action->getExternalUniqKey();
+    auto targets = action->getParams().additionalResources;
+
+    if(!targets.empty())
+    {
+        for(const auto& resId: targets)
+            actionKey += resId.toString() + lit("_");
+    }
+
+    return actionKey;
+}
+
+QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const QnAbstractBusinessActionPtr &action)
+{
+    QnMutexLocker lock(&m_prolongedProvidersMutex);
+    auto type = action->actionType();
+    auto params = action->getParams();
+    auto actionKey = calcActionUniqueKey(action);
+
+    if (m_actionDataProviders.contains(actionKey))
+        return m_actionDataProviders[actionKey];
+
+    QnAbstractStreamDataProviderPtr provider;
+    if (type == QnBusiness::PlaySoundAction)
+        provider.reset(new QnStoredFileDataProvider(params.soundUrl));
+
+    m_actionDataProviders[actionKey] = provider;
+
+    return provider;
+}
+
+bool QnAudioStreamerPool::destroyActionDataProvider(const QnAbstractBusinessActionPtr &action)
+{
+    QnMutexLocker lock(&m_prolongedProvidersMutex);
+    auto actionKey = calcActionUniqueKey(action);
+    if(m_actionDataProviders.contains(actionKey))
+        m_actionDataProviders.remove(actionKey);
 
     return true;
 }

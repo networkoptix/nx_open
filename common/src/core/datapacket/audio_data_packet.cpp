@@ -101,6 +101,16 @@ void QnCompressedAudioData::assign(const QnCompressedAudioData* other)
     duration = other->duration;
 }
 
+quint64 QnCompressedAudioData::getDuration() const
+{
+    auto ctx = context->ctx();
+
+    if(ctx->sample_rate)
+        return (quint64)((ctx->frame_size / (double)ctx->sample_rate) * 1000);
+    else
+        return 0;
+}
+
 
 ////////////////////////////////////////////////////////////
 //// class QnWritableCompressedAudioData

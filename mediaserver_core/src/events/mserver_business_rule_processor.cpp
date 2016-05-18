@@ -47,7 +47,9 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
-#include <nx_speach_synthesizer/speach_synthesis_data_provider.h>
+#include <providers/speach_synthesis_data_provider.h>
+#include <providers/stored_file_data_provider.h>
+#include <streaming/audio_streamer_pool.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -222,6 +224,9 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::SayTextAction:
             result = executeSayTextAction(action);
             break;
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
+            result = executePlaySoundAction(action);
         default:
             break;
         }
@@ -233,12 +238,76 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
     return result;
 }
 
+bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
+{
+    const auto params = action->getParams();
+    const auto resources = qnResPool
+        ->getResources<QnSecurityCamResource>(params.additionalResources);
+
+    QList<QnAudioTransmitterPtr> transmitters;
+
+    if (resources.empty())
+        return true;
+
+    for (const auto& res: resources)
+    {
+        if (res->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        {
+            auto transmitter = res->getAudioTransmitter();
+            if (transmitter)
+                transmitters << transmitter;
+        }
+    }
+
+    if (transmitters.isEmpty())
+        return true;
+
+
+    if (action->actionType() == QnBusiness::PlaySoundOnceAction)
+    {
+
+        const auto cyclesCount = 1;
+        QnAbstractStreamDataProviderPtr provider(new QnStoredFileDataProvider(params.soundUrl, cyclesCount));
+
+        for (const auto& t: transmitters)
+            t->subscribe(provider, QnDataProviderInfo::kSingleNotificationPriority);
+
+        provider->startIfNotRunning();
+    }
+    else
+    {
+
+        QnAbstractStreamDataProviderPtr provider;
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+
+            for (const auto& t: transmitters)
+                t->subscribe(provider, QnDataProviderInfo::kContinuousNotificationPriority);
+
+            provider->startIfNotRunning();
+        }
+        else if (action->getToggleState() == QnBusiness::InactiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+
+            for (const auto& t: transmitters)
+                t->unsubscribe(provider);
+
+            QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+        }
+    }
+
+    return true;
+
+}
+
 bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
 {
     const auto params = action->getParams();
     const auto text = params.sayText;
     const auto resources = qnResPool
-        ->getResources<QnSecurityCamResource>(params.actionTargets);
+        ->getResources<QnSecurityCamResource>(params.additionalResources);
 
     QList<QnAudioTransmitterPtr> transmitters;
 
@@ -260,11 +329,8 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
 
     QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
     for(const auto& transmitter: transmitters)
-    {
-        transmitter->stop();
-        transmitter->subscribe(speachProvider);
-        transmitter->start();
-    }
+        transmitter->subscribe(speachProvider, QnDataProviderInfo::kSingleNotificationPriority);
+
     speachProvider->startIfNotRunning();
     return true;
 }

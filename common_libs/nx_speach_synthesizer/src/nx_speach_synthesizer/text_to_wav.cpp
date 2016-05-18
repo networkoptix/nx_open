@@ -299,11 +299,28 @@ TextToWaveServer::TextToWaveServer()
 :
     m_prevTaskID( 1 )
 {
+    m_audioFormat.setSampleRate(32000);
+    m_audioFormat.setChannelCount(1);
+    m_audioFormat.setCodec(QString("PCM"));
+    m_audioFormat.setByteOrder(QnAudioFormat::LittleEndian);
+    m_audioFormat.setSampleSize(2);
+    m_audioFormat.setSampleType(QnAudioFormat::SignedInt);
+
 }
 
 TextToWaveServer::~TextToWaveServer()
 {
     stop();
+}
+
+QnAudioFormat TextToWaveServer::getAudioFormat()
+{
+    return m_audioFormat;
+}
+
+CodecID TextToWaveServer::getCodecId()
+{
+    return CODEC_ID_PCM_S16LE;
 }
 
 void TextToWaveServer::pleaseStop()

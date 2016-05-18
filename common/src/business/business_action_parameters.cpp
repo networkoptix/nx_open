@@ -29,6 +29,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , presetId()
     , useSource(false)
     , recordBeforeMs(kDefaultRecordBeforeMs)
+    , playToClient(true)
 {}
 
 

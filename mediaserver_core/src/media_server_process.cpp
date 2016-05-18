@@ -225,6 +225,7 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <nx_speach_synthesizer/text_to_wav.h>
+#include <streaming/audio_streamer_pool.h>
 
 #ifdef __arm__
 #include "nx1/info.h"
@@ -2190,6 +2191,8 @@ void MediaServerProcess::run()
 
     std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
     speechSynthesizer->start();
+
+    std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     // Roman asked Ivan to comment it for Brian
     // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());

@@ -19,10 +19,42 @@
 
 #include "auth_cache.h"
 #include "httpstreamreader.h"
+#include <boost/optional.hpp>
+#include <utils/common/systemerror.h>
+#include "httptypes.h"
 
 
 namespace nx_http
 {
+    /**
+        If \a AbstractMsgBodySource::contentLength returns existing value then exactly
+            specified number of bytes is fetched using \a AbstractMsgBodySource::readAsync.
+        Otherwise, data is fetched until empty buffer is received or error occurs
+    */
+    class AbstractMsgBodySource
+    {
+    public:
+        virtual ~AbstractMsgBodySource() {}
+
+        //TODO #ak introduce convenient type for MIME type
+        /** Returns full MIME type of content. E.g., application/octet-stream */
+        virtual StringType mimeType() const = 0;
+        /** Returns length of content, provided by this data source.
+            MUST be non-blocking and have constant complexity!
+        */
+        virtual boost::optional<uint64_t> contentLength() const = 0;
+        /**
+            \note \a completionHandler can be invoked from within this call
+            \note End-of-data is signalled with (SystemError::noError, {empty buffer})
+        */
+        virtual void readAsync(
+            std::function<
+                void(SystemError::ErrorCode, BufferType)
+            > completionHandler) = 0;
+    };
+
+
+
     class AsyncHttpClientPtr;
 
     //!Http client. All operations are done asynchronously
@@ -63,7 +95,9 @@ namespace nx_http
             sResponseReceived,
             sReadingMessageBody,
             sFailed,
-            sDone
+            sDone,
+
+            sStreamingBody
         };
 
         static const int UNLIMITED_RECONNECT_TRIES = -1;
@@ -95,6 +129,12 @@ namespace nx_http
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody );
+
+        bool doPost(
+            const QUrl& url,
+            std::shared_ptr<AbstractMsgBodySource> body,
+            bool waitForResponse = true);
+
         bool doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
@@ -245,9 +285,15 @@ namespace nx_http
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
+        std::shared_ptr<AbstractMsgBodySource> m_bodySource;
+        bool m_waitForResponseAfterStreaming;
+        bool m_bodyDeliveryPaused;
+        bool m_messageBodyStreamingMode;
+        BufferType m_currentDataChunk;
 
         AsyncHttpClient();
-
+        void sendDataPortion(SystemError::ErrorCode, BufferType dataChunk);
+        void dataPortionHasBeenSent(SystemError::ErrorCode, size_t bytesSent);
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );
         void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
@@ -275,6 +321,9 @@ namespace nx_http
         AsyncHttpClient& operator=( const AsyncHttpClient& );
 
         static const char* toString( State state );
+
+        void startBodyStreaming();
+
     };
 
 
@@ -430,6 +479,7 @@ namespace nx_http
         , const QString &password
         , const AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest
         , nx_http::StatusCode::Value *httpCode = nullptr);
+
 }
 
 #endif  //ASYNCHTTPCLIENT_H
