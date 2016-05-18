@@ -72,6 +72,10 @@
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
         <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
+        <cloud_connect_auto_test.guid>{D2C6C354-447F-4786-9270-FD2F73552322}</cloud_connect_auto_test.guid>
+        <libvms_gateway.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway.guid>
+        <vms_gateway.guid>{A2C631CB-073C-4F1A-9B47-63C52B68B71C}</vms_gateway.guid>
+        <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -102,6 +106,7 @@
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
+        <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
@@ -396,7 +401,6 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
-                <!-- <module>testcamera</module> -->
             </modules>
         </profile>
         <profile>
@@ -446,7 +450,6 @@
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
-                <!-- <module>testcamera</module> -->
             </modules>
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>
@@ -475,6 +478,8 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
             </modules>
         </profile>
         <profile>
@@ -551,6 +556,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
+                <module>testcamera</module>
                 <module>wixsetup</module>
             </modules>
         </profile>

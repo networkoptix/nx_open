@@ -13,7 +13,7 @@ fi
 if [ $run_tests == "true" ]; then
     mkdir -p ../devtools 
     cd ../devtools 
-    hg update || hg clone ssh://hg@hdw.mx/devtools .
+    hg pull -u || hg clone ssh://hg@hdw.mx/devtools .
     ERRORLEVEL=$?
     if [[ $ERRORLEVEL -ne 0 ]]; then echo $ERRORLEVEL && exit $ERRORLEVEL; fi
     cd testing

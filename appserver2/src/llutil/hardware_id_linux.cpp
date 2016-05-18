@@ -214,7 +214,7 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(HardwareIdListType& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
+void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     Q_UNUSED(settings)
 
@@ -237,10 +237,6 @@ void fillHardwareIds(HardwareIdListType& hardwareIds, QSettings *settings, QnHar
     for (int i = 0; i < LATEST_HWID_VERSION; i++) {
         hardwareIds << macHardwareIds;
     }
-}
-
-void fillHardwareIds(HardwareIdListType& /*hardwareIds*/, QnHardwareInfo& /*hardwareInfo*/)
-{
 }
 
 void calcHardwareIdMap(QMap<QString, QString>& /* hardwareIdMap */, const QnHardwareInfo& /*hi*/, int /*version*/, bool /*guidCompatibility*/)

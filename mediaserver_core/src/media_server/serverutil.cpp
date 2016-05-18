@@ -245,11 +245,10 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
 
     if (systemName.isDefault())
-    {
         qnGlobalSettings->resetCloudParams();
-        qnGlobalSettings->setNewSystem(true);
-        qnGlobalSettings->synchronizeNowSync();
-    }
+    qnGlobalSettings->setNewSystem(systemName.isDefault());
+    qnGlobalSettings->synchronizeNowSync();
+
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
 
     // update auth key if system name changed
