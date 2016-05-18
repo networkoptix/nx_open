@@ -1135,7 +1135,7 @@ void QnWorkbenchNavigator::timelineCorrect(qint64 toMs)
 void QnWorkbenchNavigator::timelineCatchUp(qint64 toMs)
 {
     const qint64 kMinCatchUpMsPerSecond = kCatchUpThresholdMs;
-    qreal catchUpMsPerSecond = qMax(toMs - m_animatedPosition, kMinCatchUpMsPerSecond) * kCatchUpTimeFactor;
+    qreal catchUpMsPerSecond = qMax(qAbs(toMs - m_animatedPosition), kMinCatchUpMsPerSecond) * kCatchUpTimeFactor;
 
     m_positionAnimator->setSpeed(catchUpMsPerSecond);
     m_positionAnimator->animateTo(toMs);
