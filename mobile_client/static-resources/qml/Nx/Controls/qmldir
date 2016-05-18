@@ -1,6 +1,7 @@
 module Nx.Controls
 
 Button 1.0 Button.qml
+TextField 1.0 TextField.qml
 IconButton 1.0 IconButton.qml
 CheckBox 1.0 CheckBox.qml
 StackView 1.0 StackView.qml

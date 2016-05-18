@@ -1,7 +1,6 @@
 import QtQuick 2.6
 import Qt.labs.controls 1.0
-
-import "../../controls"
+import Nx.Controls 1.0
 
 Pane
 {
@@ -29,7 +28,7 @@ Pane
 
         Row
         {
-            QnTextField
+            TextField
             {
                 id: hostField
 
@@ -43,7 +42,7 @@ Pane
                 onAccepted: KeyNavigation.tab.forceActiveFocus()
             }
 
-            QnTextField
+            TextField
             {
                 id: portField
 
@@ -65,7 +64,7 @@ Pane
             height: 24
         }
 
-        QnTextField
+        TextField
         {
             id: loginField
 
@@ -79,7 +78,7 @@ Pane
             onAccepted: KeyNavigation.tab.forceActiveFocus()
         }
 
-        QnTextField
+        TextField
         {
             id: passwordField
 

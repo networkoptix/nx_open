@@ -1,110 +1,133 @@
-import QtQuick 2.4
+import QtQuick 2.6
 
-Item {
+Item
+{
     id: handle
 
-    property color color: "red"
-
     property string anchor: "cursorPosition"
-    property TextInput input
-    property Flickable flickable
+    property TextInput input: parent
 
     readonly property alias pressed: mouseArea.pressed
 
-    readonly property bool insideInputBounds: {
-        var minX = flickable.contentX
-        var maxX = flickable.x + flickable.width + flickable.contentX
-        var ax = anchorX + flickable.contentX
+    readonly property bool insideInputBounds:
+    {
+        var minX = input.leftPadding
+        var maxX = input.width - input.rightPadding + 1
+        var ax = anchorX
 
         return ax >= minX && ax <= maxX
     }
 
-    property real autoScrollMargin: dp(8)
+    property real autoScrollMargin: 8
 
     property real anchorShift: 0
 
-    property real anchorX: {
-        if (!input || !flickable)
+    property real anchorX:
+    {
+        if (!input)
             return 0
 
         var rect = input.positionToRectangle(input[anchor])
-        return flickable.x - flickable.contentX + rect.x + rect.width / 2
+        return rect.x + rect.width / 2 + control.leftPadding
     }
 
     implicitWidth: handleItem.width
     implicitHeight: handleItem.height
 
     x: anchorX - anchorShift
-    y: parent.height
+    y: input.cursorRectangle.y + input.cursorRectangle.height
 
-    Binding {
+    visible: false
+
+    Binding
+    {
         target: handle
         property: "opacity"
         value: insideInputBounds ? 1.0 : 0.0
     }
 
-    Behavior on opacity {
+    Behavior on opacity
+    {
         enabled: handle.visible
         NumberAnimation { duration: 50 }
     }
 
-    Image {
-        id: handleItem
-    }
+    Image { id: handleItem }
 
-    MouseArea {
+    MouseArea
+    {
         id: mouseArea
 
         property real pressX
         preventStealing: true
 
         anchors.fill: parent
-        drag.minimumX: flickable.x - anchorShift
-        drag.maximumX: flickable.x + flickable.width - anchorShift
+        drag.minimumX: input.leftPadding + anchorShift
+        drag.maximumX: input.width - input.rightPadding - anchorShift
 
         onPressed: pressX = mouse.x
         onMouseXChanged: updateAnchor(mouse.x)
         onReleased: autoScrollTimer.stop()
     }
 
-    states: [
-        State {
+    Timer
+    {
+        running: visible && opacity > 0 && !pressed
+        interval: 5000
+        onTriggered:
+        {
+            opacity = 0.0
+        }
+    }
+
+    states:
+    [
+        State
+        {
             name: "cursorPosition"
             when: handle.anchor == "cursorPosition"
 
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: handleItem
-                source: "image://icon/controls/cursor_handle.png"
+                source: lp("/images/controls/cursor_handle.png")
             }
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: handle
                 implicitHeight: handleItem.height + handleItem.width / 4
                 anchorShift: width / 2
             }
         },
-        State {
+        State
+        {
             name: "selectionStart"
             when: handle.anchor == "selectionStart"
 
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: handleItem
-                source: "image://icon/controls/selection_start_handle.png"
+                source: lp("/images/controls/selection_start_handle.png")
             }
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: handle
                 implicitHeight: handleItem.height
                 anchorShift: width
             }
         },
-        State {
+        State
+        {
             name: "selectionEnd"
             when: handle.anchor == "selectionEnd"
 
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: handleItem
-                source: "image://icon/controls/selection_end_handle.png"
+                source: lp("/images/controls/selection_end_handle.png")
             }
-            PropertyChanges {
+            PropertyChanges
+            {
                 target: handle
                 implicitHeight: handleItem.height
                 anchorShift: 0
@@ -112,7 +135,8 @@ Item {
         }
     ]
 
-    Timer {
+    Timer
+    {
         id: autoScrollTimer
         interval: 20
         running: false
@@ -120,21 +144,29 @@ Item {
 
         property int direction: 0
 
-        onTriggered: {
-            if (!input || !flickable)
+        onTriggered:
+        {
+            if (!input)
                 return
 
-            if (anchor == "cursorPosition") {
+            if (anchor == "cursorPosition")
+            {
                 input.cursorPosition += direction
-            } else if (anchor == "selectionStart") {
+            }
+            else if (anchor == "selectionStart")
+            {
                 var selectionStart = input.selectionStart + direction
-                if (selectionStart >= 0 && selectionStart < input.selectionEnd) {
+                if (selectionStart >= 0 && selectionStart < input.selectionEnd)
+                {
                     input.ensureVisible(selectionStart)
                     input.select(selectionStart, input.selectionEnd)
                 }
-            } else if (anchor == "selectionEnd") {
+            }
+            else if (anchor == "selectionEnd")
+            {
                 var selectionEnd = input.selectionEnd + direction
-                if (selectionEnd < input.text.length && selectionEnd > input.selectionStart) {
+                if (selectionEnd < input.text.length && selectionEnd > input.selectionStart)
+                {
                     input.ensureVisible(selectionEnd)
                     input.select(input.selectionStart, selectionEnd)
                 }
@@ -142,33 +174,38 @@ Item {
         }
     }
 
-    function updateAnchor(mouseX) {
-        if (!input || !flickable)
+    function updateAnchor(mouseX)
+    {
+        if (!input)
             return
 
         var dx = mouseX - mouseArea.pressX
 
-        var minX = flickable.contentX
-        var maxX = flickable.x + flickable.width + flickable.contentX
-        var ax = Math.max(minX, Math.min(maxX, anchorX + dx + flickable.contentX))
+        var minX = input.leftPadding
+        var maxX = input.width - input.rightPadding
+        var ax = Math.max(minX, Math.min(maxX, anchorX + dx))
 
         var pos = input.positionAt(ax, input.height / 2)
 
-        if (anchor == "cursorPosition") {
+        if (anchor == "cursorPosition")
             input.cursorPosition = pos
-        } else if (anchor == "selectionStart") {
+        else if (anchor == "selectionStart")
             input.select(Math.min(input.selectionEnd - 1, pos), input.selectionEnd)
-        } else if (anchor == "selectionEnd") {
+        else if (anchor == "selectionEnd")
             input.select(input.selectionStart, Math.max(input.selectionStart + 1, pos))
-        }
 
-        if (ax == minX) {
+        if (ax == minX)
+        {
             autoScrollTimer.direction = -1
             autoScrollTimer.start()
-        } else if (ax == maxX) {
+        }
+        else if (ax == maxX)
+        {
             autoScrollTimer.direction = 1
             autoScrollTimer.start()
-        } else {
+        }
+        else
+        {
             autoScrollTimer.stop()
         }
     }

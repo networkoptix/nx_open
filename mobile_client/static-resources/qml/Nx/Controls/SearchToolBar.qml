@@ -2,9 +2,6 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.3
 import Nx.Controls 1.0
 
-// TODO: #dklychkov remove
-import "../../controls"
-
 ToolBarBase
 {
     id: toolBar
@@ -31,7 +28,7 @@ ToolBarBase
             alwaysCompleteHighlightAnimation: false
         }
 
-        QnTextField
+        TextField
         {
             id: searchField
 
@@ -39,9 +36,9 @@ ToolBarBase
 
             placeholderText: qsTr("Search")
 
-            showDecoration: false
+            background: null
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-            cursorColor: textColor
+            cursorColor: color
         }
 
         IconButton

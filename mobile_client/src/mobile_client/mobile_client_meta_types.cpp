@@ -9,6 +9,7 @@
 #include "ui/color_theme.h"
 #include "ui/timeline/timeline.h"
 #include <ui/qml/quick_item_mouse_tracker.h>
+#include <ui/qml/text_input.h>
 #include "models/camera_list_model.h"
 #include "models/server_list_model.h"
 #include "models/saved_sessions_model.h"
@@ -54,6 +55,10 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<nx::media::Player>("com.networkoptix.qml", 1, 0, "QnPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
+    qmlRegisterType<QnQuickTextInput>("com.networkoptix.qml", 1, 0, "QnTextInput");
+
+    qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
+    qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
     qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");
 }
