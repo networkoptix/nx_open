@@ -29,7 +29,28 @@ namespace ec2
 
         static QnTransactionLog* instance();
 
-        ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
+        struct TranMiscData
+        {
+            QnUuid paramsId;
+            ApiCommand::Value value;
+            QByteArray data;
+
+            TranMiscData(
+                const QnUuid &paramsId,
+                ApiCommand::Value value,
+                const QByteArray &data)
+            :
+                paramsId(paramsId),
+                value(value),
+                data(data)
+            {}
+        };
+
+        typedef QList<TranMiscData> TranMiscDataListType;
+
+        ErrorCode getTransactionsAfter(
+            const QnTranState& state,
+            TranMiscDataListType &result);
         QnTranState getTransactionsState();
 
         bool contains(const QnTranState& state) const;
@@ -95,7 +116,11 @@ namespace ec2
 
         qint64 getTransactionLogTime() const;
         void setTransactionLogTime(qint64 value);
-        ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
+        ErrorCode saveToDB(
+            const QnAbstractTransaction &tranID,
+            const QnUuid &paramId,
+            const QnUuid &hash,
+            const QByteArray &data);
     private:
         friend class detail::QnDbManager;
 

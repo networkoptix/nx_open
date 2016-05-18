@@ -107,8 +107,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(userManager, &ec2::AbstractUserNotificationManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
     connect(userManager, &ec2::AbstractUserNotificationManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(userManager, &ec2::AbstractUserNotificationManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged);
-    connect(userManager, &ec2::AbstractUserManager::groupAddedOrUpdated,            this, &QnCommonMessageProcessor::on_userGroupChanged);
-    connect(userManager, &ec2::AbstractUserManager::groupRemoved,                   this, &QnCommonMessageProcessor::on_userGroupRemoved);
+    connect(userManager, &ec2::AbstractUserNotificationManager::groupAddedOrUpdated,            this, &QnCommonMessageProcessor::on_userGroupChanged);
+    connect(userManager, &ec2::AbstractUserNotificationManager::groupRemoved,                   this, &QnCommonMessageProcessor::on_userGroupRemoved);
 
     auto layoutManager = connection->getLayoutNotificationManager();
     connect(layoutManager, &ec2::AbstractLayoutNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));

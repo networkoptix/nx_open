@@ -654,7 +654,7 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     {
         apiMessage.videowallGuid = index.videowall()->getId();
         apiMessage.instanceGuid = index.uuid();
-        connection2()->getVideowallManager()->sendControlMessage(apiMessage, this, []{});
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->sendControlMessage(apiMessage, this, []{});
     }
 }
 
@@ -1419,7 +1419,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
     for (const QnVideoWallItem &item: videoWall->items()->getItems())
     {
         message.instanceGuid = item.uuid;
-        connection2()->getVideowallManager()->sendControlMessage(message, this, []{});
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->sendControlMessage(message, this, []{});
     }
 }
 
@@ -1520,7 +1520,7 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered() {
 
         message.videowallGuid = item.videowall()->getId();
         message.instanceGuid = item.uuid();
-        connection2()->getVideowallManager()->sendControlMessage(message, this, []{});
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->sendControlMessage(message, this, []{});
     }
 }
 
@@ -2413,7 +2413,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout( QnWorkbenchLayout *layout, s
     {
         ec2::ApiVideowallData apiVideowall;
         fromResourceToApi(videowall, apiVideowall);
-        connection2()->getVideowallManager()->save(apiVideowall, this,
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->save(apiVideowall, this,
             [this, callback]( int reqID, ec2::ErrorCode errorCode ) {
                 callback(reqID, errorCode);
         } );
@@ -2685,6 +2685,6 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
         //TODO: #GDM SafeMode
         ec2::ApiVideowallData apiVideowall;
         fromResourceToApi(videowall, apiVideowall);
-        connection2()->getVideowallManager()->save(apiVideowall, this, callback);
+        connection2()->getVideowallManager(Qn::kDefaultUserAccess)->save(apiVideowall, this, callback);
     }
 }

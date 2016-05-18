@@ -17,12 +17,11 @@ namespace ec2
         QnRestTransactionReceiver();
 
         //!Implementation of QnRestRequestHandler::executeGet
-        virtual int executeGet(
-            const QString& /*path*/,
+        virtual int executeGet(const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             QByteArray& /*result*/,
-            QByteArray&, /*contentType*/ 
-            const QnRestConnectionProcessor* ) override;
+            QByteArray&, /*contentType*/
+            const QnRestConnectionProcessor* owner) override;
 
         //!Implementation of QnRestRequestHandler::executePost
         virtual int executePost(

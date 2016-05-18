@@ -45,15 +45,15 @@ namespace ec2
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
         QList<QnTransportConnectionInfo> connectionsInfo() const;
-        void gotConnectionFromRemotePeer(
-            const QnUuid& connectionGuid,
+        void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
             QSharedPointer<AbstractStreamSocket> socket,
             ConnectionType::Type connectionType,
             const ApiPeerData& remotePeer,
             qint64 remoteSystemIdentityTime,
             const nx_http::Request& request,
             const QByteArray& contentEncoding,
-			std::function<void ()> ttFinishCallback);
+            std::function<void ()> ttFinishCallback,
+            const Qn::UserAccessData &userAccessData);
 		bool moveConnectionToReadyForStreaming( const QnUuid& connectionGuid );
         //!Report socket to receive transactions from
         /*!
@@ -70,7 +70,7 @@ namespace ec2
         bool gotTransactionFromRemotePeer(
             const QnUuid& connectionGuid,
             const nx_http::Request& request,
-            const QByteArray& requestMsgBody );
+            const QByteArray& requestMsgBody) ;
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
         void connectionFailure( const QnUuid& connectionGuid );

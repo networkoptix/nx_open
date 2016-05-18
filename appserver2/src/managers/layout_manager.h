@@ -11,8 +11,6 @@ namespace ec2
     class QnLayoutNotificationManager : public AbstractLayoutNotificationManager
     {
     public:
-        QnLayoutNotificationManager( );
-
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran );
         void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran );

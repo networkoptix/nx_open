@@ -58,10 +58,12 @@
 #include "managers/videowall_manager.h"
 #include "managers/webpage_manager.h"
 
+#include "nx/utils/type_utils.h"
+#include "transaction/transaction_permissions.h"
+
 namespace ec2
 {
 class QnTransactionLog;
-typedef std::function<bool (Qn::SerializationFormat, const QByteArray&)> FastFunctionType;
 
 class AbstractECConnection;
 class QnLicenseNotificationManager;
@@ -86,13 +88,19 @@ template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
 
 template<typename ParamType>
-using SaveTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType> &, QnTransactionLog *)>;
+using SaveTranFuncType =
+    std::function<ErrorCode(const QnTransaction<ParamType> &, QnTransactionLog *)>;
 
 template<typename ParamType>
-using SaveSerializedTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType> &, const QByteArray &, QnTransactionLog *)>;
+using SaveSerializedTranFuncType =
+    std::function<ErrorCode(
+        const QnTransaction<ParamType> &,
+        const QByteArray &,
+        QnTransactionLog *)>;
 
 template<typename ParamType>
-using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction &tran)>;
+using CreateTransactionFromAbstractTransactionFuncType =
+    std::function<QnTransaction<ParamType>(const QnAbstractTransaction &tran)>;
 
 struct NotificationParams
 {
@@ -113,7 +121,8 @@ struct NotificationParams
 };
 
 template<typename ParamType>
-using TriggerNotificationFuncType = std::function<void(const QnTransaction<ParamType> &, const NotificationParams &)>;
+using TriggerNotificationFuncType =
+    std::function<void(const QnTransaction<ParamType> &, const NotificationParams &)>;
 
 struct TransactionDescriptorBase
 {
@@ -125,14 +134,49 @@ struct TransactionDescriptorBase
     ApiCommand::Value getValue() const { return value; }
     const QString& getName() const { return name; }
 
-    TransactionDescriptorBase(ApiCommand::Value value, bool isPersistent, bool isSystem, const char *name)
-        : value(value),
-          isPersistent(isPersistent),
-          isSystem(isSystem),
-          name(name)
+    TransactionDescriptorBase(
+        ApiCommand::Value value,
+        bool isPersistent,
+        bool isSystem,
+        const char *name)
+    :
+      value(value),
+      isPersistent(isPersistent),
+      isSystem(isSystem),
+      name(name)
     {}
 
     virtual ~TransactionDescriptorBase() {}
+    virtual bool checkPermissions(
+        const QnUuid &userId,
+        const QnUuid &tranParamsId,
+        Qn::Permission permission) const = 0;
+};
+
+struct DefaultPermissionCheckHelper
+{
+    template<typename Param>
+    static auto check(
+        const QnUuid &userId,
+        const QnUuid &paramsId,
+        Qn::Permission permission,
+        int)
+    -> nx::utils::SfinaeCheck<decltype(std::declval<Param>().id), bool>
+    {
+        Param param;
+        param.id = paramsId;
+        return hasPermission(userId, param, permission);
+    }
+
+    template<typename Param>
+    static auto check(
+        const QnUuid &/*userId*/,
+        const QnUuid &/*paramsId*/,
+        Qn::Permission /*permission*/,
+        char) -> bool
+    {
+        return true;
+    }
 };
 
 template<typename ParamType>
@@ -143,22 +187,48 @@ struct TransactionDescriptor : TransactionDescriptorBase
     GetHashFuncType<ParamType> getHashFunc;
     SaveTranFuncType<ParamType> saveFunc;
     SaveSerializedTranFuncType<ParamType> saveSerializedFunc;
-    CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
+    CreateTransactionFromAbstractTransactionFuncType<ParamType>
+        createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
 
-    template<typename GetHashF, typename SaveF, typename SaveSerializedF, typename CreateTranF, typename TriggerNotificationF>
-    TransactionDescriptor(ApiCommand::Value value, bool isPersistent, bool isSystem, const char *name,
-                          GetHashF&& getHashFunc, SaveF&& saveFunc,
-                          SaveSerializedF&& saveSerializedFunc,
-                          CreateTranF&& createTransactionFromAbstractTransactionFunc,
-                          TriggerNotificationF&& triggerNotificationFunc)
-        : TransactionDescriptorBase(value, isPersistent, isSystem, name),
+    template<
+        typename GetHashF,
+        typename SaveF,
+        typename SaveSerializedF,
+        typename CreateTranF,
+        typename TriggerNotificationF
+    >
+    TransactionDescriptor(
+        ApiCommand::Value value,
+        bool isPersistent,
+        bool isSystem,
+        const char *name,
+        GetHashF &&getHashFunc,
+        SaveF &&saveFunc,
+        SaveSerializedF &&saveSerializedFunc,
+        CreateTranF &&createTransactionFromAbstractTransactionFunc,
+        TriggerNotificationF &&triggerNotificationFunc)
+        :
+          TransactionDescriptorBase(value, isPersistent, isSystem, name),
           getHashFunc(std::forward<GetHashF>(getHashFunc)),
           saveFunc(std::forward<SaveF>(saveFunc)),
           saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
-          createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
+          createTransactionFromAbstractTransactionFunc(
+                std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
           triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc))
     {}
+
+    virtual bool checkPermissions(
+        const QnUuid &userId,
+        const QnUuid &tranParamsId,
+        Qn::Permission permission) const override
+    {
+        return DefaultPermissionCheckHelper::check<ParamType>(
+            userId,
+            tranParamsId,
+            permission,
+            0);
+    }
 };
 
 typedef std::shared_ptr<TransactionDescriptorBase> DescriptorBasePtr;
@@ -166,8 +236,20 @@ typedef std::shared_ptr<TransactionDescriptorBase> DescriptorBasePtr;
 typedef boost::multi_index_container<
     DescriptorBasePtr,
     boost::multi_index::indexed_by<
-        boost::multi_index::ordered_unique<boost::multi_index::const_mem_fun<TransactionDescriptorBase, ec2::ApiCommand::Value, &TransactionDescriptorBase::getValue> >,
-        boost::multi_index::ordered_non_unique<boost::multi_index::const_mem_fun<TransactionDescriptorBase, const QString&, &TransactionDescriptorBase::getName> >
+        boost::multi_index::ordered_unique<
+            boost::multi_index::const_mem_fun<
+                TransactionDescriptorBase,
+                ec2::ApiCommand::Value,
+                &TransactionDescriptorBase::getValue
+            >
+        >,
+        boost::multi_index::ordered_non_unique<
+            boost::multi_index::const_mem_fun<
+                TransactionDescriptorBase,
+                const QString&,
+                &TransactionDescriptorBase::getName
+            >
+        >
     >
 > DescriptorBaseContainer;
 

@@ -2006,7 +2006,7 @@ void MediaServerProcess::run()
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
-    connect( ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeManager::timeChanged,
+    connect( ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
@@ -2586,7 +2586,7 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
-        appServerConnection->getUserManager()->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
+        appServerConnection->getUserManager(Qn::kDefaultUserAccess)->save(userData, password, this, [this, userId]( int reqID, ec2::ErrorCode errorCode )
         {
             QN_UNUSED(reqID, errorCode);
             m_updateUserRequests.remove(userId);

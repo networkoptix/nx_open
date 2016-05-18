@@ -107,7 +107,7 @@ void QnAppServerFileCache::getFileList() {
     }
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    connection->getStoredFileManager(Qn::kSuperUserAccess)->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
+    connection->getStoredFileManager(Qn::kDefaultUserAccess)->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
         Q_UNUSED(handle);
         bool ok = errorCode == ec2::ErrorCode::ok;
         emit fileListReceived(filenames, ok ? OperationResult::ok : OperationResult::serverError);
@@ -142,7 +142,7 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
       return;
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    int handle = connection->getStoredFileManager(Qn::kSuperUserAccess)->getStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kDefaultUserAccess)->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
                 &QnAppServerFileCache::at_fileLoaded );
@@ -212,7 +212,7 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
     file.close();
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    int handle = connection->getStoredFileManager(Qn::kSuperUserAccess)->addStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kDefaultUserAccess)->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
@@ -266,7 +266,7 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
       return;
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    int handle = connection->getStoredFileManager(Qn::kSuperUserAccess)->deleteStoredFile(
+    int handle = connection->getStoredFileManager(Qn::kDefaultUserAccess)->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
                     &QnAppServerFileCache::at_fileDeleted );

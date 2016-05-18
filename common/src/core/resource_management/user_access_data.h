@@ -2,6 +2,7 @@
 #define __USER_ACCESS_DATA_H__
 
 #include <nx/utils/uuid.h>
+#include <core/resource/resource_fwd.h>
 
 namespace Qn
 {
@@ -24,6 +25,8 @@ inline bool operator != (const UserAccessData &lhs, const UserAccessData &rhs)
 {
     return ! operator == (lhs, rhs);
 }
+
+QnUserResourcePtr getUserResourceByAccessData(const UserAccessData &userAccessData);
 
 /**
 * Default kDefaultUserAccess for server side is superuser.

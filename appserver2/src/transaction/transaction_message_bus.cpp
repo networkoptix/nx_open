@@ -74,10 +74,22 @@ namespace ec2
     };
 
     struct SendTransactionToTransportFastFuction {
-        bool operator()(QnTransactionMessageBus *bus, Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, QnTransactionTransport *sender, const QnTransactionTransportHeader &transportHeader) const
+        bool operator()(
+            QnTransactionMessageBus *bus,
+            Qn::SerializationFormat srcFormat,
+            const QByteArray& serializedTran,
+            QnTransactionTransport *sender,
+            const QnTransactionTransportHeader &transportHeader,
+            const QnUuid &tranParamsId,
+            ApiCommand::Value value) const
         {
             Q_UNUSED(bus)
-                return sender->sendSerializedTransaction(srcFormat, serializedTran, transportHeader);
+                return sender->sendSerializedTransaction(
+                    srcFormat,
+                    serializedTran,
+                    transportHeader,
+                    tranParamsId,
+                    value);
         }
     };
 
@@ -753,21 +765,33 @@ namespace ec2
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
             break;
-        case ApiCommand::ApiSystemNameData:
-            if (!sender->userAccess().isAdministrator())
+        case ApiCommand::changeSystemName:
+        {
+            auto userResource = Qn::getUserResourceByAccessData(sender->getUserAccessData());
+
+            bool userHasAdminRights = userResource &&
+                                      qnResourceAccessManager->hasGlobalPermission(
+                                            userResource,
+                                            Qn::GlobalPermission::GlobalAdminPermissionsSet);
+            if (!userHasAdminRights)
             {
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2 because of no administrator rights. Reopening connection...").
-                    arg(ApiCommand::toString(tran.command)).arg(ec2::toString(errorCode)), cl_logWARNING);
+                NX_LOG(
+                    QnLog::EC2_TRAN_LOG,
+                    lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...")
+                        .arg(ApiCommand::toString(tran.command)),
+                    cl_logWARNING);
                 sender->setState(QnTransactionTransport::Error);
                 return;
             }
             break;
+        }
         default:
             // general transaction
             if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
             {
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                ErrorCode errorCode = dbManager(Qn::kDefaultUserAccess).executeTransaction(tran, serializedTran);
+                ErrorCode errorCode = dbManager(
+                    Qn::UserAccessData(sender->getUserAccessData())).executeTransaction(tran, serializedTran);
                 switch(errorCode) {
                 case ErrorCode::ok:
                     break;
@@ -873,8 +897,11 @@ namespace ec2
         QnTransactionTransportHeader ttBroadcast(ttUnicast);
         ttBroadcast.flags |= Qn::TT_ProxyToClient;
 
-        QList<QByteArray> serializedTransactions;
-        const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params.persistentState, serializedTransactions);
+        QnTransactionLog::TranMiscDataListType serializedTransactions;
+        const ErrorCode errorCode = transactionLog->getTransactionsAfter(
+            tran.params.persistentState,
+            serializedTransactions);
+
         if (errorCode == ErrorCode::ok)
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
@@ -890,11 +917,15 @@ namespace ec2
             sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState);
 
             using namespace std::placeholders;
-            for(const QByteArray& serializedTran: serializedTransactions)
+            for(const auto& tranMiscData: serializedTransactions)
                 if(!handleTransaction(Qn::UbjsonFormat,
-                    serializedTran,
+                    tranMiscData.data,
                     std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast),
-                    std::bind(SendTransactionToTransportFastFuction(), this, _1, _2, sender, ttBroadcast)))
+                    std::bind(
+                        SendTransactionToTransportFastFuction(),
+                        this, _1, _2, sender, ttBroadcast,
+                        tranMiscData.paramsId,
+                        tranMiscData.value)))
                     sender->setState(QnTransactionTransport::Error);
 
             QnTransaction<ApiTranSyncDoneData> tranSyncDone(ApiCommand::tranSyncDone);
@@ -959,7 +990,7 @@ namespace ec2
             QnTransaction<ApiFullInfoData> tran;
             tran.command = ApiCommand::getFullInfo;
             tran.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tran.params) != ErrorCode::ok) {
+            if (dbManager(Qn::UserAccessData(transport->getUserAccessData())).doQuery(nullptr, tran.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -985,13 +1016,13 @@ namespace ec2
             QnTransaction<ApiMediaServerDataExList> tranServers;
             tranServers.command = ApiCommand::getMediaServersEx;
             tranServers.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
+            if (dbManager(Qn::UserAccessData(transport->getUserAccessData())).doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
 
             ec2::ApiCameraDataExList cameras;
-            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, cameras) != ErrorCode::ok) {
+            if (dbManager(Qn::UserAccessData(transport->getUserAccessData())).doQuery(nullptr, cameras) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1014,7 +1045,7 @@ namespace ec2
             QnTransaction<ApiUserDataList> tranUsers;
             tranUsers.command = ApiCommand::getUsers;
             tranUsers.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
+            if (dbManager(Qn::UserAccessData(transport->getUserAccessData())).doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1022,7 +1053,7 @@ namespace ec2
             QnTransaction<ApiLayoutDataList> tranLayouts;
             tranLayouts.command = ApiCommand::getLayouts;
             tranLayouts.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+            if (dbManager(Qn::UserAccessData(transport->getUserAccessData())).doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1030,7 +1061,7 @@ namespace ec2
             QnTransaction<ApiServerFootageDataList> tranCameraHistory;
             tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
             tranCameraHistory.peerID = qnCommon->moduleGUID();
-            if (dbManager(Qn::kDefaultUserAccess).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
+            if (dbManager(Qn::UserAccessData(transport->getUserAccessData())).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
                 qWarning() << "Can't execute query for sync with client peer!";
                 return false;
             }
@@ -1407,7 +1438,8 @@ namespace ec2
         qint64 remoteSystemIdentityTime,
         const nx_http::Request& request,
         const QByteArray& contentEncoding,
-        std::function<void ()> ttFinishCallback )
+        std::function<void ()> ttFinishCallback,
+        const Qn::UserAccessData &userAccessData)
     {
         if (!detail::QnDbManager::instance())
         {
@@ -1425,7 +1457,8 @@ namespace ec2
             std::move(socket),
             connectionType,
             request,
-            contentEncoding );
+            contentEncoding,
+            userAccessData);
         transport->setRemoteIdentityTime(remoteSystemIdentityTime);
         transport->setBeforeDestroyCallback(ttFinishCallback);
         connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);

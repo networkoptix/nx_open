@@ -30,7 +30,7 @@ namespace ec2
         const QnRequestParamList& /*params*/,
         QByteArray& /*result*/,
         QByteArray&, /*contentType*/ 
-        const QnRestConnectionProcessor* )
+        const QnRestConnectionProcessor* owner)
     {
         return nx_http::StatusCode::badRequest;
     }
@@ -52,7 +52,7 @@ namespace ec2
         if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
                 connectionGuid,
                 connection->request(),
-                body ) )
+                body))
         {
             return nx_http::StatusCode::notFound;
         }

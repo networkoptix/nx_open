@@ -7,17 +7,43 @@ namespace ec2
 {
 namespace detail
 {
-    template<typename T, typename F>
-    ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
+    template<typename Param>
+    auto getApiIdImpl(const Param &p, int) -> nx::utils::SfinaeCheck<decltype(p.id), QnUuid>
     {
-        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-        return tlog->saveToDB(tran, f(tran.params), serializedTran);
+        return p.id;
+    }
+
+    template<typename Param>
+    auto getApiIdImpl(const Param &, char) -> QnUuid
+    {
+        return QnUuid();
+    }
+
+    template<typename Param>
+    QnUuid getApiId(const QnTransaction<Param> &tran)
+    {
+        return getApiIdImpl(tran.params, 0);
     }
 
     template<typename T, typename F>
-    ErrorCode saveSerializedTransactionImpl(const QnTransaction<T>& tran, const QByteArray& serializedTran, QnTransactionLog *tlog, F f)
+    ErrorCode saveTransactionImpl(
+        const QnTransaction<T>& tran,
+        ec2::QnTransactionLog *tlog,
+        F f)
     {
-        return tlog->saveToDB(tran, f(tran.params), serializedTran);
+        QByteArray serializedTran =
+            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+        return tlog->saveToDB(tran, getApiId(tran), f(tran.params), serializedTran);
+    }
+
+    template<typename T, typename F>
+    ErrorCode saveSerializedTransactionImpl(
+        const QnTransaction<T>& tran,
+        const QByteArray& serializedTran,
+        QnTransactionLog *tlog,
+        F f)
+    {
+        return tlog->saveToDB(tran, getApiId(tran), f(tran.params), serializedTran);
     }
 
     struct InvalidGetHashHelper
@@ -306,9 +332,25 @@ namespace detail
         }
     }
 
-#define TRANSACTION_DESCRIPTOR_APPLY(_, Key, ParamType, isPersistent, isSystem, getHashFunc, triggerNotificationFunc) \
-    std::make_shared<TransactionDescriptor<ParamType>>(ApiCommand::Key, isPersistent, isSystem, #Key, getHashFunc, createDefaultSaveTransactionHelper(getHashFunc), createDefaultSaveSerializedTransactionHelper(getHashFunc), \
-                                          [](const QnAbstractTransaction &tran) { return QnTransaction<ParamType>(tran); }, triggerNotificationFunc),
+#define TRANSACTION_DESCRIPTOR_APPLY( \
+    _, \
+    Key, \
+    ParamType, \
+    isPersistent, \
+    isSystem, \
+    getHashFunc, \
+    triggerNotificationFunc \
+    ) \
+    std::make_shared<TransactionDescriptor<ParamType>>( \
+        ApiCommand::Key, \
+        isPersistent, \
+        isSystem, \
+        #Key, \
+        getHashFunc, \
+        createDefaultSaveTransactionHelper(getHashFunc), \
+        createDefaultSaveSerializedTransactionHelper(getHashFunc), \
+        [](const QnAbstractTransaction &tran) { return QnTransaction<ParamType>(tran); },  \
+        triggerNotificationFunc),
 
 
 DescriptorBaseContainer transactionDescriptors = {

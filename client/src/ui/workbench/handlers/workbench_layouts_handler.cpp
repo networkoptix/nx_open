@@ -318,7 +318,7 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
         if(snapshotManager()->isLocal(layout))
             resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
         else
-            connection2()->getLayoutManager()->remove( layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
+            connection2()->getLayoutManager(Qn::kDefaultUserAccess)->remove( layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
     }
 }
 

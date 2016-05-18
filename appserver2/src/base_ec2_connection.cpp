@@ -180,6 +180,12 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
+    AbstractWebPageNotificationManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageNotificationManager()
+    {
+        return m_webPageNotificationManager;
+    }
+
+    template<class QueryProcessorType>
     AbstractStoredFileManagerPtr BaseEc2Connection<QueryProcessorType>::getStoredFileManager(const Qn::UserAccessData &userAccessData)
     {
         return std::make_shared<QnStoredFileManager<QueryProcessorType>>(m_queryProcessor, userAccessData);

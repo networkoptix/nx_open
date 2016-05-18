@@ -210,7 +210,11 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
     return ErrorCode::ok;
 }
 
-ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QnUuid& hash, const QByteArray& data)
+ErrorCode QnTransactionLog::saveToDB(
+    const QnAbstractTransaction& tran,
+    const QnUuid &paramId,
+    const QnUuid& hash,
+    const QByteArray& data)
 {
     if (tran.isLocal)
         return ErrorCode::ok; // local transactions just changes DB without logging
@@ -224,13 +228,15 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
-    //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
-    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?)");
+    //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_command, tran_param_id, tran_data) values (?, ?, ?, ?, ?)");
+    query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?, ?)");
     query.addBindValue(tran.peerID.toRfc4122());
     query.addBindValue(tran.persistentInfo.dbID.toRfc4122());
     query.addBindValue(tran.persistentInfo.sequence);
     query.addBindValue(tran.persistentInfo.timestamp);
     query.addBindValue(hash.toRfc4122());
+    query.addBindValue((int)tran.command);
+    query.addBindValue(paramId.toRfc4122());
     query.addBindValue(data);
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -337,7 +343,9 @@ bool QnTransactionLog::contains(const QnTranState& state) const
     return true;
 }
 
-ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)
+ErrorCode QnTransactionLog::getTransactionsAfter(
+    const QnTranState& state,
+    TranMiscDataListType &result)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
@@ -346,7 +354,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
         const QnTranStateKey& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
         query.setForwardOnly(true);
-        query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
+        query.prepare("SELECT tran_data, sequence, tran_api_command, tran_param_id FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
         query.addBindValue(state.values.value(key));
@@ -354,7 +362,10 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
             return ErrorCode::failure;
 
         while (query.next()) {
-            result << query.value(0).toByteArray();
+            result << TranMiscData(
+                            QnUuid::fromRfc4122(query.value(3).toByteArray()),
+                            ApiCommand::Value(query.value(2).toInt()),
+                            query.value(0).toByteArray());
             tranLogSequence[key] = query.value(1).toInt();
         }
     }
@@ -380,7 +391,11 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
             syncMarkersTran.params.markers.push_back(record);
         }
     }
-    result << QnUbjsonTransactionSerializer::instance()->serializedTransaction(syncMarkersTran);
+    result << TranMiscData(
+                    QnUuid(),
+                    ApiCommand::updatePersistentSequence,
+                    QnUbjsonTransactionSerializer::instance()
+                        ->serializedTransaction(syncMarkersTran));
 
     return ErrorCode::ok;
 }

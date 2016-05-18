@@ -20,5 +20,6 @@ namespace ec2
             return qnResourceAccessManager->canCreateResource(userId, data);
 
         return qnResourceAccessManager->hasPermission(user, target, permission);
+        return true;
     }
 }

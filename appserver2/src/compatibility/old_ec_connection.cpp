@@ -60,7 +60,7 @@ namespace ec2
         return AbstractUserManagerPtr();
     }
 
-    AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &)
+    AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
     {
         return AbstractLayoutManagerPtr();
     }

@@ -112,7 +112,7 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     ec2::fromResourceToApi(layout, apiLayout);
 
 
-    int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager()->save(
+    int reqID = QnAppServerConnectionFactory::getConnection2()->getLayoutManager(Qn::kDefaultUserAccess)->save(
         apiLayout, this, [this, layout, callback](int reqID, ec2::ErrorCode errorCode)
     {
         Q_UNUSED(reqID);

@@ -72,7 +72,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
             return CODE_OK;
         }
 
-        if (!changeSystemName(systemName, sysIdTime, tranLogTime))
+        if (!changeSystemName(systemName, sysIdTime, tranLogTime, owner->authUserId()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
@@ -101,7 +101,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     /* set password */
     if (passwordData.hasPassword())
     {
-        if (!changeAdminPassword(owner->authUserId(), passwordData)) {
+        if (!changeAdminPassword(passwordData, owner->authUserId())) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
         else {
