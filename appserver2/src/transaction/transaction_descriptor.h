@@ -88,19 +88,13 @@ template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
 
 template<typename ParamType>
-using SaveTranFuncType =
-    std::function<ErrorCode(const QnTransaction<ParamType> &, QnTransactionLog *)>;
+using SaveTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType> &, QnTransactionLog *)>;
 
 template<typename ParamType>
-using SaveSerializedTranFuncType =
-    std::function<ErrorCode(
-        const QnTransaction<ParamType> &,
-        const QByteArray &,
-        QnTransactionLog *)>;
+using SaveSerializedTranFuncType = std::function<ErrorCode(const QnTransaction<ParamType> &, const QByteArray &, QnTransactionLog *)>;
 
 template<typename ParamType>
-using CreateTransactionFromAbstractTransactionFuncType =
-    std::function<QnTransaction<ParamType>(const QnAbstractTransaction &tran)>;
+using CreateTransactionFromAbstractTransactionFuncType = std::function<QnTransaction<ParamType>(const QnAbstractTransaction &tran)>;
 
 struct NotificationParams
 {
@@ -121,8 +115,7 @@ struct NotificationParams
 };
 
 template<typename ParamType>
-using TriggerNotificationFuncType =
-    std::function<void(const QnTransaction<ParamType> &, const NotificationParams &)>;
+using TriggerNotificationFuncType = std::function<void(const QnTransaction<ParamType> &, const NotificationParams &)>;
 
 struct TransactionDescriptorBase
 {
@@ -134,34 +127,21 @@ struct TransactionDescriptorBase
     ApiCommand::Value getValue() const { return value; }
     const QString& getName() const { return name; }
 
-    TransactionDescriptorBase(
-        ApiCommand::Value value,
-        bool isPersistent,
-        bool isSystem,
-        const char *name)
-    :
-      value(value),
-      isPersistent(isPersistent),
-      isSystem(isSystem),
-      name(name)
+    TransactionDescriptorBase(ApiCommand::Value value, bool isPersistent, bool isSystem, const char *name) :
+        value(value),
+        isPersistent(isPersistent),
+        isSystem(isSystem),
+        name(name)
     {}
 
     virtual ~TransactionDescriptorBase() {}
-    virtual bool checkPermissions(
-        const QnUuid &userId,
-        const QnUuid &tranParamsId,
-        Qn::Permission permission) const = 0;
+    virtual bool checkPermissions(const QnUuid &userId, const QnUuid &tranParamsId, Qn::Permission permission) const = 0;
 };
 
 struct DefaultPermissionCheckHelper
 {
     template<typename Param>
-    static auto check(
-        const QnUuid &userId,
-        const QnUuid &paramsId,
-        Qn::Permission permission,
-        int)
-    -> nx::utils::SfinaeCheck<decltype(std::declval<Param>().id), bool>
+    static auto check(const QnUuid &userId, const QnUuid &paramsId, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(std::declval<Param>().id), bool>
     {
         Param param;
         param.id = paramsId;
@@ -169,11 +149,7 @@ struct DefaultPermissionCheckHelper
     }
 
     template<typename Param>
-    static auto check(
-        const QnUuid &/*userId*/,
-        const QnUuid &/*paramsId*/,
-        Qn::Permission /*permission*/,
-        char) -> bool
+    static auto check(const QnUuid &/*userId*/, const QnUuid &/*paramsId*/, Qn::Permission /*permission*/, char) -> bool
     {
         return true;
     }
@@ -187,8 +163,7 @@ struct TransactionDescriptor : TransactionDescriptorBase
     GetHashFuncType<ParamType> getHashFunc;
     SaveTranFuncType<ParamType> saveFunc;
     SaveSerializedTranFuncType<ParamType> saveSerializedFunc;
-    CreateTransactionFromAbstractTransactionFuncType<ParamType>
-        createTransactionFromAbstractTransactionFunc;
+    CreateTransactionFromAbstractTransactionFuncType<ParamType> createTransactionFromAbstractTransactionFunc;
     TriggerNotificationFuncType<ParamType> triggerNotificationFunc;
 
     template<
@@ -198,36 +173,21 @@ struct TransactionDescriptor : TransactionDescriptorBase
         typename CreateTranF,
         typename TriggerNotificationF
     >
-    TransactionDescriptor(
-        ApiCommand::Value value,
-        bool isPersistent,
-        bool isSystem,
-        const char *name,
-        GetHashF &&getHashFunc,
-        SaveF &&saveFunc,
-        SaveSerializedF &&saveSerializedFunc,
-        CreateTranF &&createTransactionFromAbstractTransactionFunc,
-        TriggerNotificationF &&triggerNotificationFunc)
+    TransactionDescriptor(ApiCommand::Value value, bool isPersistent, bool isSystem, const char *name,
+                          GetHashF &&getHashFunc, SaveF &&saveFunc, SaveSerializedF &&saveSerializedFunc,
+                          CreateTranF &&createTransactionFromAbstractTransactionFunc, TriggerNotificationF &&triggerNotificationFunc)
         :
           TransactionDescriptorBase(value, isPersistent, isSystem, name),
           getHashFunc(std::forward<GetHashF>(getHashFunc)),
           saveFunc(std::forward<SaveF>(saveFunc)),
           saveSerializedFunc(std::forward<SaveSerializedF>(saveSerializedFunc)),
-          createTransactionFromAbstractTransactionFunc(
-                std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
+          createTransactionFromAbstractTransactionFunc(std::forward<CreateTranF>(createTransactionFromAbstractTransactionFunc)),
           triggerNotificationFunc(std::forward<TriggerNotificationF>(triggerNotificationFunc))
     {}
 
-    virtual bool checkPermissions(
-        const QnUuid &userId,
-        const QnUuid &tranParamsId,
-        Qn::Permission permission) const override
+    virtual bool checkPermissions(const QnUuid &userId, const QnUuid &tranParamsId, Qn::Permission permission) const override
     {
-        return DefaultPermissionCheckHelper::check<ParamType>(
-            userId,
-            tranParamsId,
-            permission,
-            0);
+        return DefaultPermissionCheckHelper::check<ParamType>(userId, tranParamsId, permission, 0);
     }
 };
 

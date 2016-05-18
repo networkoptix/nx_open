@@ -19,6 +19,7 @@
 #include "core/resource_management/user_access_data.h"
 #include "core/resource_management/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include "transaction/transaction_permissions.h"
 
 
 namespace ec2
@@ -729,11 +730,9 @@ private:
     }
 
     template<typename Param>
-    auto hasPermissionImpl(const Param&param, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
+    auto hasPermissionImpl(const Param& param, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
     {
-        return qnResourceAccessManager->hasPermission(qnResPool->getResourceById(m_userAccessData.userId).dynamicCast<QnUserResource>(),
-                                                      qnResPool->getResourceById(param.id),
-                                                      permission);
+        return ec2::hasPermission(m_userAccessData.userId, param, permission);
     }
 
     template<typename Param>

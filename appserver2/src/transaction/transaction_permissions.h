@@ -19,7 +19,7 @@ namespace ec2
         if (!target)
             return qnResourceAccessManager->canCreateResource(userId, data);
 
-        return qnResourceAccessManager->hasPermission(user, target, permission);
-        return true;
+        auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
+        return qnResourceAccessManager->hasPermission(userResource, target, permission);
     }
 }

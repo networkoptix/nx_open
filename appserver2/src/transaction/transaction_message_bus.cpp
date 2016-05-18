@@ -765,21 +765,16 @@ namespace ec2
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
             break;
+        case ApiCommand::installUpdate:
+        case ApiCommand::uploadUpdate:
         case ApiCommand::changeSystemName:
         {
             auto userResource = Qn::getUserResourceByAccessData(sender->getUserAccessData());
+            bool userHasAdminRights = userResource && qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
 
-            bool userHasAdminRights = userResource &&
-                                      qnResourceAccessManager->hasGlobalPermission(
-                                            userResource,
-                                            Qn::GlobalPermission::GlobalAdminPermissionsSet);
             if (!userHasAdminRights)
             {
-                NX_LOG(
-                    QnLog::EC2_TRAN_LOG,
-                    lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...")
-                        .arg(ApiCommand::toString(tran.command)),
-                    cl_logWARNING);
+                NX_LOG(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1 because of no administrator rights. Reopening connection...").arg(ApiCommand::toString(tran.command)), cl_logWARNING);
                 sender->setState(QnTransactionTransport::Error);
                 return;
             }
@@ -790,8 +785,7 @@ namespace ec2
             if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
             {
                 QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                ErrorCode errorCode = dbManager(
-                    Qn::UserAccessData(sender->getUserAccessData())).executeTransaction(tran, serializedTran);
+                ErrorCode errorCode = dbManager(Qn::UserAccessData(sender->getUserAccessData())).executeTransaction(tran, serializedTran);
                 switch(errorCode) {
                 case ErrorCode::ok:
                     break;

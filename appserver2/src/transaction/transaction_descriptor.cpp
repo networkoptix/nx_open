@@ -26,22 +26,14 @@ namespace detail
     }
 
     template<typename T, typename F>
-    ErrorCode saveTransactionImpl(
-        const QnTransaction<T>& tran,
-        ec2::QnTransactionLog *tlog,
-        F f)
+    ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
     {
-        QByteArray serializedTran =
-            QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
         return tlog->saveToDB(tran, getApiId(tran), f(tran.params), serializedTran);
     }
 
     template<typename T, typename F>
-    ErrorCode saveSerializedTransactionImpl(
-        const QnTransaction<T>& tran,
-        const QByteArray& serializedTran,
-        QnTransactionLog *tlog,
-        F f)
+    ErrorCode saveSerializedTransactionImpl(const QnTransaction<T>& tran, const QByteArray& serializedTran, QnTransactionLog *tlog, F f)
     {
         return tlog->saveToDB(tran, getApiId(tran), f(tran.params), serializedTran);
     }
