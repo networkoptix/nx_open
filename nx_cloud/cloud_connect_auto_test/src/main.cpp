@@ -22,12 +22,13 @@ struct TestAddressDescriptor
 };
 
 static TestAddressDescriptor kCloudAddressList[] = {
-    {"0d8dcea3-057a-4f44-81a4-d70e9127ab14", "la_office"}
+    {"0d8dcea3-057a-4f44-81a4-d70e9127ab14", "la_office"},
+    {"df6a3827-56c7-4ff8-b38e-67993983d5d8", "msk_office"}
 };
 
 constexpr const int kSendTimeoutMs = 11*1000;
 
-constexpr const char* kLogFileUploadUrl = "http://hdw.mx/cloud_connect_log_file";
+constexpr const char* kLogFileUploadUrl = "http://ps.hdw.mx/";
 
 int main(int /*argc*/, char* /*argv*/[])
 {
@@ -103,7 +104,7 @@ int main(int /*argc*/, char* /*argv*/[])
         }
     }
 
-    if (!succeeded)
+    //if (!succeeded)
     {
         //on failure uploading log to some server
         std::cout<<"Uploading log file...    ";
@@ -115,7 +116,7 @@ int main(int /*argc*/, char* /*argv*/[])
         }
         const auto logFileContents = logFile.readAll();
         nx_http::HttpClient httpClient;
-        if (!httpClient.doPost(QUrl(kLogFileUploadUrl), "application/text", logFileContents))
+        if (!httpClient.doPost(QUrl(kLogFileUploadUrl), "text/plain", logFileContents))
         {
             std::cout << "Could not upload log" << std::endl;
             return 2;
