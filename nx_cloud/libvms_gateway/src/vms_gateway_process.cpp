@@ -29,6 +29,7 @@
 #include <utils/common/systemerror.h>
 
 #include "access_control/authentication_manager.h"
+#include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
 #include "stree/cdb_ns.h"
 
@@ -93,6 +94,9 @@ int VmsGatewayProcess::executeApplication()
         }
 
         initializeLogging(settings);
+
+        //enabling nat traversal
+        nx::network::SocketGlobals::mediatorConnector().enable(true);
 
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
@@ -223,6 +227,8 @@ void VmsGatewayProcess::initializeLogging(const conf::Settings& settings)
 void VmsGatewayProcess::registerApiHandlers(
     nx_http::MessageDispatcher* const msgDispatcher)
 {
+    msgDispatcher->setDefaultProcessor<ProxyHandler>();
+
     //msgDispatcher->registerRequestProcessor<PingHandler>(
     //    PingHandler::kHandlerPath,
     //    [&authorizationManager]() -> std::unique_ptr<PingHandler> {
