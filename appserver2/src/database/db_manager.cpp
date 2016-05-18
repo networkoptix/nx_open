@@ -2124,11 +2124,11 @@ ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
     /* Cleanup all users, belonging to this group. */
     {
         QSqlQuery query(m_sdb);
-        const QString queryStr("UPDATE vms_userprofile SET group_guid = NULL WHERE group_guid = :groupId");
+        const QString queryStr("UPDATE vms_userprofile SET group_guid = NULL WHERE group_guid = ?");
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        query.bindValue(":groupId", guid.toRfc4122());
+        query.addBindValue(guid.toRfc4122());
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
