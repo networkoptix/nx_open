@@ -133,13 +133,7 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
     {
         /* Check if peer has enough rights to receive transaction */
-        bool peerHasEnoughRights =
-            ec2::hasPermission(
-                m_userAccessData.userId,
-                transaction.params,
-                Qn::Permission::ReadPermission
-            );
-
+        bool peerHasEnoughRights = ec2::hasPermission(m_userAccessData.userId, transaction.params, Qn::Permission::ReadPermission);
         if (!peerHasEnoughRights)
             return;
 

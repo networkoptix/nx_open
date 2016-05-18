@@ -42,6 +42,7 @@
 #include "nx_ec/data/api_statistics.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_lock_data.h"
+#include "core/resource/user_resource.h"
 
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
