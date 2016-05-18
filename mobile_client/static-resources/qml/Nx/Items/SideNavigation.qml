@@ -77,7 +77,7 @@ Drawer
 
             SideNavigationButton
             {
-                icon: lp("/images/close.png")
+                icon: lp("/images/disconnect.png")
                 text: qsTr("Disconnect from server")
                 visible: currentSessionId
                 onClicked:
