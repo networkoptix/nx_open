@@ -4,11 +4,13 @@ function popCurrentScreen()
 {
     if (stackView.depth > 1)
         stackView.pop()
+    stackView.currentItem.forceActiveFocus()
 }
 
 function openSessionsScreen()
 {
-    stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
+    var item = stackView.replace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
+    item.forceActiveFocus()
 }
 
 function openNewSessionScreen()
@@ -52,6 +54,7 @@ function openFailedSessionScreen(sessionId, systemName, host, port, login, passw
         )
     }
     item.showWarning(connectionStatus, info)
+    item.forceActiveFocus()
 }
 
 function openDiscoveredSession(systemName, host, port)
@@ -69,7 +72,7 @@ function openDiscoveredSession(systemName, host, port)
 
 function openSavedSession(sessionId, systemName, host, port, login, password)
 {
-    stackView.push(
+    var item = stackView.push(
             Qt.resolvedUrl("Screens/SavedConnectionScreen.qml"),
             {
                 "sessionId": sessionId,
@@ -80,6 +83,7 @@ function openSavedSession(sessionId, systemName, host, port, login, password)
                 "password": password
             }
     )
+    item.forceActiveFocus()
 }
 
 function openResourcesScreen(systemName)
@@ -88,30 +92,33 @@ function openResourcesScreen(systemName)
     if (item && item.objectName == "resourcesScreen")
         return
 
-    stackView.replace(
+    item = stackView.replace(
             null,
             Qt.resolvedUrl("Screens/ResourcesScreen.qml"),
             {
                 "title": systemName
             }
     )
+    item.forceActiveFocus()
 }
 
 function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
 {
     stackView.setScaleTransitionHint(xHint, yHint)
-    stackView.push(
+    var item = stackView.push(
             Qt.resolvedUrl("Screens/VideoScreen.qml"),
             {
                 "resourceId": resourceId,
                 "initialScreenshot": screenshotUrl
             }
     )
+    item.forceActiveFocus()
 }
 
 function openSettingsScreen(systemName)
 {
-    stackView.push(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
+    var item = stackView.push(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
+    item.forceActiveFocus()
 }
 
 function openOldClientDownloadSuggestion()
@@ -119,4 +126,5 @@ function openOldClientDownloadSuggestion()
     var component = Qt.createComponent("Dialogs/DownloadOldClientDialog.qml")
     var dialog = component.createObject(stackView)
     dialog.open()
+    dialog.forceActiveFocus()
 }

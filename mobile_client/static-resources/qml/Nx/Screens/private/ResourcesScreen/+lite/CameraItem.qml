@@ -1,13 +1,13 @@
-import QtQuick 2.4
-
-import com.networkoptix.qml 1.0
+import QtQuick 2.6
 import QtMultimedia 5.5
+import Qt.labs.templates 1.0
+import Nx 1.0
+import Nx.Controls 1.0
+import Nx.Items 1.0
+import com.networkoptix.qml 1.0
 
-import "../controls"
-import "../icons"
-import "../items"
-
-Item {
+Control
+{
     id: cameraItem
 
     property alias text: label.text
@@ -17,50 +17,52 @@ Item {
     property bool useVideo: false
     property bool paused: false
 
-    signal clicked
-    signal pressAndHold
-    signal thumbnailRefreshRequested
+    signal clicked()
+    signal thumbnailRefreshRequested()
 
-    QtObject {
+    padding: 4
+    implicitWidth: 200
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
+
+    QtObject
+    {
         id: d
 
-        property bool hidden: false
-        property bool offline: status == QnCameraListModel.Offline || status == QnCameraListModel.NotDefined || status == QnCameraListModel.Unauthorized
+        property bool offline: status == QnCameraListModel.Offline ||
+                               status == QnCameraListModel.NotDefined ||
+                               status == QnCameraListModel.Unauthorized
         property bool unauthorized: status == QnCameraListModel.Unauthorized
-
-        onHiddenChanged: {
-            if (hidden)
-                return
-
-            content.x = 0
-        }
     }
 
-    Rectangle {
-        id: content
+    background: Rectangle
+    {
+        color: ColorTheme.windowBackground
+    }
 
-        anchors.fill: parent
-        color: QnTheme.windowBackground
+    contentItem: Column
+    {
+        spacing: 8
+        width: parent.availableWidth
+        height: parent.availableHeight
+        anchors.centerIn: parent
 
         Rectangle
         {
             id: thumbnailContainer
 
             width: parent.width
-            height: parent.height - informationRow.height - dp(8)
+            height: parent.height - informationRow.height - parent.spacing
+            color: d.offline ? ColorTheme.base7 : ColorTheme.base4
 
-            color: d.offline ? QnTheme.cameraOfflineBackground : QnTheme.cameraBackground
-
-            Loader {
+            Loader
+            {
                 id: thumbnailContentLoader
 
                 anchors.centerIn: parent
-
-                sourceComponent: {
+                sourceComponent:
+                {
                     if (d.offline || d.unauthorized)
                         return thumbnailDummyComponent
-                    else if (useVideo)
-                        return videoComponent
                     else if (!cameraItem.thumbnail)
                         return thumbnailPreloaderComponent
                     else
@@ -69,75 +71,99 @@ Item {
             }
         }
 
-        Row {
+        Row
+        {
             id: informationRow
 
             width: parent.width
-            anchors.bottom: parent.bottom
-            spacing: dp(8)
+            spacing: 6
 
-            QnStatusIndicator {
+            StatusIndicator
+            {
                 id: statusIndicator
+
                 status: cameraItem.status
-                y: dp(4)
+                y: 4
             }
 
-            Text {
+            Text
+            {
                 id: label
+
                 width: parent.width - x - parent.spacing
-                height: dp(24)
+                height: 24
                 maximumLineCount: 1
-                font.pixelSize: sp(16)
+                font.pixelSize: 16
                 font.weight: d.offline ? Font.DemiBold : Font.Normal
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
-                color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
+                color: d.offline ? ColorTheme.base11 : ColorTheme.windowText
             }
         }
-
-        Behavior on x { NumberAnimation { duration: 200 } }
     }
 
-    Component {
+    MouseArea
+    {
+        id: mouseArea
+        anchors.fill: parent
+        onClicked: cameraItem.clicked()
+    }
+
+    MaterialEffect
+    {
+        clip: true
+        anchors.fill: parent
+        mouseArea: mouseArea
+        rippleSize: width * 2
+    }
+
+    Component
+    {
         id: thumbnailDummyComponent
 
-        Column {
-            width: thumbnailContainer.width - dp(16)
+        Column
+        {
+            width: parent ? parent.width : 0
+            leftPadding: 8
+            rightPadding: 8
 
-            Image {
+            Image
+            {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
-                width: dp(64)
-                height: dp(64)
+                source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
             }
 
-            Text {
+            Text
+            {
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width
-                height: dp(32)
+                width: parent.width - parent.leftPadding - parent.rightPadding
+                height: 32
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
 
                 text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
-                font.pixelSize: sp(14)
+                font.pixelSize: 14
                 font.weight: Font.Normal
-                color: QnTheme.cameraText
+                color: ColorTheme.windowText
             }
         }
     }
 
-    Component {
+    Component
+    {
         id: thumbnailPreloaderComponent
 
-        QnThreeDotPreloader {}
+        ThreeDotBusyIndicator {}
     }
 
-    Component {
+    Component
+    {
         id: thumbnailComponent
 
-        Image {
+        Image
+        {
             source: cameraItem.thumbnail
             width: thumbnailContainer.width
             height: thumbnailContainer.height
@@ -160,7 +186,7 @@ Item {
                 source: player
             }
 
-            QnMediaPlayer
+            MediaPlayer
             {
                 id: player
 
@@ -183,16 +209,8 @@ Item {
         }
     }
 
-    QnMaterialSurface {
-        id: materialSurface
-
-        anchors.fill: parent
-
-        onClicked: cameraItem.clicked()
-        onPressAndHold: cameraItem.pressAndHold()
-    }
-
-    Timer {
+    Timer
+    {
         id: refreshTimer
 
         readonly property int initialLoadDelay: 400
@@ -202,14 +220,18 @@ Item {
         repeat: true
         running: connectionManager.connectionState == QnConnectionManager.Connected
 
-        onTriggered: {
+        onTriggered:
+        {
             interval = reloadDelay
             cameraItem.thumbnailRefreshRequested()
         }
 
-        onRunningChanged: {
+        onRunningChanged:
+        {
             if (!running)
                 interval = initialLoadDelay
         }
     }
+
+    Keys.onReturnPressed: clicked()
 }

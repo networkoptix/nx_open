@@ -13,7 +13,7 @@ Control
     property string thumbnail
     property int status
 
-    signal clicked
+    signal clicked()
     signal thumbnailRefreshRequested()
 
     padding: 4
