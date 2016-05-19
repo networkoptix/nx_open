@@ -56,7 +56,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
     ASSERT_EQ(api::ResultCode::ok, server1->listen());
 
     //requesting connect to the server 
-    nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+    nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
     std::promise<api::ResultCode> connectResultPromise;
 
@@ -133,16 +133,21 @@ TEST_F(HolePunchingProcessor, server_failure)
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
 
-    for (int i = 0; i < 2; ++i)
+    typedef MediaServerEmulator::ActionToTake MsAction;
+    static const std::map<MsAction, api::ResultCode> kTestCases =
     {
+        { MsAction::ignoreIndication, api::ResultCode::noReplyFromServer },
+        { MsAction::closeConnectionToMediator, api::ResultCode::notFound },
+    };
+
+    for (const auto& testCase: kTestCases)
+    {
+        const auto actionToTake = testCase.first;
+        const auto expectedResult = testCase.second;
+
         //TODO #ak #msvc2015 use future/promise
         QnMutex mtx;
         QnWaitCondition waitCond;
-
-        const MediaServerEmulator::ActionToTake actionToTake =
-            i == 0
-            ? MediaServerEmulator::ActionToTake::ignoreIndication
-            : MediaServerEmulator::ActionToTake::closeConnectionToMediator;
 
         boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
         server1->setOnConnectionRequestedHandler(
@@ -156,7 +161,7 @@ TEST_F(HolePunchingProcessor, server_failure)
         ASSERT_EQ(api::ResultCode::ok, server1->listen());
 
         //requesting connect to the server 
-        nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
         boost::optional<api::ResultCode> connectResult;
 
@@ -188,21 +193,24 @@ TEST_F(HolePunchingProcessor, server_failure)
         }
 
         const auto connectResultVal = connectResult.get();
-        ASSERT_EQ(api::ResultCode::noReplyFromServer, connectResultVal);
+        ASSERT_EQ(expectedResult, connectResultVal);
 
-        //testing that mediator has cleaned up session data
-        api::ResultCode resultCode = api::ResultCode::ok;
-        api::ConnectionResultRequest connectionResult;
-        connectionResult.connectSessionId = connectRequest.connectSessionId;
-        connectionResult.resultCode = api::UdpHolePunchingResultCode::udtConnectFailed;
-        std::tie(resultCode) =
-            makeSyncCall<api::ResultCode>(
-                std::bind(
-                    &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
-                    &udpClient,
-                    std::move(connectionResult),
-                    std::placeholders::_1));
-        ASSERT_EQ(api::ResultCode::notFound, resultCode);
+        if (actionToTake != MsAction::closeConnectionToMediator)
+        {
+            //testing that mediator has cleaned up session data
+            api::ResultCode resultCode = api::ResultCode::ok;
+            api::ConnectionResultRequest connectionResult;
+            connectionResult.connectSessionId = connectRequest.connectSessionId;
+            connectionResult.resultCode = api::UdpHolePunchingResultCode::udtConnectFailed;
+            std::tie(resultCode) =
+                makeSyncCall<api::ResultCode>(
+                    std::bind(
+                        &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                        &udpClient,
+                        std::move(connectionResult),
+                        std::placeholders::_1));
+            ASSERT_EQ(api::ResultCode::notFound, resultCode);
+        }
 
         udpClient.pleaseStopSync();
     }
@@ -219,7 +227,7 @@ TEST_F(HolePunchingProcessor, destruction)
 
     for (int i = 0; i < 100; ++i)
     {
-        nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
 
         api::ConnectRequest connectRequest;
         connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();

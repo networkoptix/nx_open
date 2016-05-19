@@ -243,10 +243,12 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     systemName.saveToConfig();
     server->setSystemName(systemName.value());
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
+
     if (systemName.isDefault())
-        server->setServerFlags(server->getServerFlags() | Qn::SF_AutoSystemName);
-    else
-        server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
+        qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setNewSystem(systemName.isDefault());
+    qnGlobalSettings->synchronizeNowSync();
+
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
 
     // update auth key if system name changed

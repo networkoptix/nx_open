@@ -142,13 +142,15 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    if (!remoteModuleInformation.cloudSystemId.isEmpty() &&
-        !qnCommon->moduleInformation().cloudSystemId.isEmpty() &&
-        remoteModuleInformation.cloudSystemId != qnCommon->moduleInformation().cloudSystemId)
+    const bool canMerge = 
+        (remoteModuleInformation.cloudSystemId == qnCommon->moduleInformation().cloudSystemId) ||
+        (takeRemoteSettings && qnCommon->moduleInformation().cloudSystemId.isEmpty()) ||
+        (!takeRemoteSettings && remoteModuleInformation.cloudSystemId.isEmpty());
+    if (!canMerge)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler (%1). Cannot merge systems bound to cloud")
             .arg(url.toString()), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("BOTH_SYSTEMS_BOUND_TO_CLOUD"));
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("DEPENDENT_SYSTEM_BOUND_TO_CLOUD"));
         return nx_http::StatusCode::ok;
     }
 
@@ -168,9 +170,9 @@ int QnMergeSystemsRestHandler::executeGet(
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool isDefaultSystemName;
     if (takeRemoteSettings)
-        isDefaultSystemName = remoteModuleInformation.serverFlags & Qn::SF_AutoSystemName;
+        isDefaultSystemName = remoteModuleInformation.serverFlags.testFlag(Qn::SF_NewSystem);
     else
-        isDefaultSystemName = mServer && (mServer->getServerFlags() & Qn::SF_AutoSystemName);
+        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(Qn::SF_NewSystem));
     if (isDefaultSystemName)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Can not merge to the non configured system"), cl_logDEBUG1);

@@ -351,7 +351,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_HasPublicIP      = 0x004,
         SF_IfListCtrl       = 0x008,
         SF_timeCtrl         = 0x010,
-        SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+        //SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
         SF_ArmServer        = 0x040,
         SF_Has_HDD          = 0x080,
         SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
@@ -536,7 +536,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
         ConnectionAliasRole,                        /**< Role for alias of connection. Used in QnActions::ConnectAction, QnLoginDialog. */
-        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials 
+        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                         (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
@@ -833,19 +833,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
+        ModifyLayoutPermission          = Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission, /**< Permission to modify without saving. */
         FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
         FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
-                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
+                                            WritePasswordPermission | WriteAccessRightsPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+        ExportPermission                = 0x800,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
         WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
@@ -913,7 +913,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
                                               GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessAllServersPermission  ,
+                                              GlobalAccessResourcesPermissionsSet  ,
         GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
     };
 

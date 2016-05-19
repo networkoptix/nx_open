@@ -1,6 +1,8 @@
 #ifndef NX_CC_DNS_TABLE_H
 #define NX_CC_DNS_TABLE_H
 
+#include <set>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
 #include <utils/common/guard.h>
@@ -158,7 +160,7 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
-    struct HostAddressInfo
+    struct NX_NETWORK_API HostAddressInfo
     {
         explicit HostAddressInfo(const HostAddress& hostAddress);
 

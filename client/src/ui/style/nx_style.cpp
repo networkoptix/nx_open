@@ -293,7 +293,7 @@ void QnNxStyle::drawPrimitive(
             {
                 QColor lineColor = (shape == TabShape::Rectangular)
                                    ? option->palette.shadow().color()
-                                   : mainColor.lighter(1);
+                                   : mainColor.lighter(1).color();
                 lineColor.setAlpha(QnPaletteColor::kMaxAlpha);
 
                 QnScopedPainterPenRollback penRollback(painter, lineColor);
@@ -2057,6 +2057,8 @@ int QnNxStyle::pixelMetric(
     case PM_FocusFrameVMargin:
         return dp(1);
 
+    case PM_HeaderDefaultSectionSizeVertical:
+        return Metrics::kViewRowHeight;
     case PM_HeaderMarkSize:
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:
@@ -2228,6 +2230,19 @@ QSize QnNxStyle::sizeFromContents(
             sz.setWidth(sz.width() + (Metrics::kStandardPadding - pixelMetric(PM_FocusFrameHMargin, option, widget) - 1) * 2);
             return sz;
         }
+
+    case CT_ProgressBar:
+        if (const QStyleOptionProgressBar* progressBar = qstyleoption_cast<const QStyleOptionProgressBar*>(option))
+        {
+            bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
+            if (!hasText)
+            {
+                QStyleOptionProgressBar subOption(*progressBar);
+                subOption.rect.setSize(size);
+                return subElementRect(SE_ProgressBarGroove, &subOption, widget).size();
+            }
+        }
+        break;
 
     default:
         break;

@@ -42,6 +42,9 @@ enum class ResultCode
     /** Credentials used for authentication are no longer valid */
     credentialsRemovedPermanently,
 
+    /** received data in unexpected/unsupported format */
+    invalidFormat,
+
     unknownError
 };
 

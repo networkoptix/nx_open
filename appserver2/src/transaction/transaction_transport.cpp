@@ -1390,7 +1390,7 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
     if (m_state == ReadyForStreaming) {
         // allow to send system command immediately, without tranSyncRequest
-        return ApiCommand::isSystem(command) ? true : m_writeSync;
+        return (command != ApiCommand::NotDefined && ApiCommand::isSystem(command)) ? true : m_writeSync;
     }
     else {
         return false;
@@ -1401,7 +1401,7 @@ bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const
 {
     if (m_state == ReadyForStreaming) {
         // allow to read system command immediately, without tranSyncRequest
-        return ApiCommand::isSystem(command) ? true : m_readSync;
+        return (command != ApiCommand::NotDefined && ApiCommand::isSystem(command)) ? true : m_readSync;
     }
     else {
         return false;

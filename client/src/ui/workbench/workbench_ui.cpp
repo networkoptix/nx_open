@@ -820,7 +820,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
         {
             if (!alreadyZoomed)
                 m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(openedPanels() & SliderPanel, true); /* Leave slider open. */
+            setOpenedPanels(NoPanel, true);
         }
         else
         {
@@ -2346,7 +2346,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     pane button "CLND" here and not in createCalendarWidget()
     */
     m_calendarHidingProcessor->addTargetItem(m_sliderItem->calendarButton());
-    m_calendarShowingProcessor->addTargetItem(m_sliderItem->calendarButton());
+    // m_calendarShowingProcessor->addTargetItem(m_sliderItem->calendarButton()); // - show unpinned calendar on hovering its button without pressing
 
     const auto toggleSliderAction = action(QnActions::ToggleSliderAction);
     m_sliderShowButton = newShowHideButton(m_controlsWidget, toggleSliderAction);
@@ -2381,6 +2381,13 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
     m_sliderZoomButtonsWidget = new GraphicsWidget(m_controlsWidget);
     m_sliderZoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
     m_sliderZoomButtonsWidget->setOpacity(0.0);
+
+    m_sliderZoomButtonsWidget->setVisible(navigator()->hasArchive());
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
+        [this]()
+        {
+            m_sliderZoomButtonsWidget->setVisible(navigator()->hasArchive());
+        });
 
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());

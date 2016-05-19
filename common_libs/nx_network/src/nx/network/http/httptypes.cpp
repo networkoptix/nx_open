@@ -263,6 +263,17 @@ namespace nx_http
                     return StringType("Unknown_") + StringType::number(val);
             }
         }
+
+
+        bool isSuccessCode(Value statusCode)
+        {
+            return isSuccessCode(static_cast<int>(statusCode));
+        }
+        
+        bool isSuccessCode(int statusCode)
+        {
+            return statusCode >= ok && statusCode <= lastSuccessCode;
+        }
     }
 
     const StringType Method::GET( "GET" );

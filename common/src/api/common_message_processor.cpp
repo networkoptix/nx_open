@@ -106,6 +106,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData));
     connect(userManager, &ec2::AbstractUserManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(userManager, &ec2::AbstractUserManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged);
+    connect(userManager, &ec2::AbstractUserManager::groupAddedOrUpdated,            this, &QnCommonMessageProcessor::on_userGroupChanged);
+    connect(userManager, &ec2::AbstractUserManager::groupRemoved,                   this, &QnCommonMessageProcessor::on_userGroupRemoved);
 
     auto layoutManager = connection->getLayoutManager();
     connect(layoutManager, &ec2::AbstractLayoutManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData));
@@ -262,6 +264,16 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
     for (const QnUuid& id : accessRights.resourceIds)
         accessibleResources << id;
     qnResourceAccessManager->setAccessibleResources(accessRights.userId, accessibleResources);
+}
+
+void QnCommonMessageProcessor::on_userGroupChanged(const ec2::ApiUserGroupData& userGroup)
+{
+    qnResourceAccessManager->addOrUpdateUserGroup(userGroup);
+}
+
+void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& groupId)
+{
+    qnResourceAccessManager->removeUserGroup(groupId);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(const ec2::ApiCameraAttributesData& attrs)

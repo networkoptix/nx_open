@@ -22,7 +22,7 @@ angular.module('webadminApp')
         }
 
         function getModuleInformation(){
-            return $http.get(proxy + '/api/moduleInformation?showAddresses=true');
+            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true');
         }
 
         var offlineDialog = null;
@@ -40,14 +40,14 @@ angular.module('webadminApp')
             }
         }
         function offlineHandler(error){
-            // Check 401 against offline
+            // Check 403 against offline
             var inlineMode = typeof(setupDialog)!='undefined'; // Qt registered object
             var isInFrame = window.self !== window.top; // If we are in frame - do not show dialog
 
             if(isInFrame || inlineMode){
                 return; // inline mode - do not do anything
             }
-            if(error.status === 401) {
+            if(error.status === 403 || error.status === 401) {
                 callLogin();
                 return;
             }
@@ -96,11 +96,11 @@ angular.module('webadminApp')
 
         return {
             getNonce:function(){
-               return $http.get(proxy + '/api/getNonce');
+               return $http.get(proxy + '/web/api/getNonce');
             },
             logout:function(){
                 $localStorage.$reset();
-                return $http.post(proxy + '/api/cookieLogout');
+                return $http.post(proxy + '/web/api/cookieLogout');
             },
             login:function(login,password){
                 var deferred = $q.defer();
@@ -128,7 +128,7 @@ angular.module('webadminApp')
                         $localStorage.auth = auth;
 
                         // Check auth again - without catching errors
-                        return $http.post(proxy + '/api/cookieLogin',{
+                        return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
                         }).then(function(data){
                             deferred.resolve(data);
@@ -149,7 +149,7 @@ angular.module('webadminApp')
                 return false;
             },
             logUrl:function(params){
-                return proxy + '/api/showLog' + (params||'');
+                return proxy + '/web/api/showLog' + (params||'');
             },
             authForMedia:function(){
                 return $localStorage.auth;
@@ -163,7 +163,7 @@ angular.module('webadminApp')
                     return '';
                 }
 
-                return proxy + '/api/image' +
+                return proxy + '/web/api/image' +
                     '?physicalId=' + cameraPhysicalId +
                     (width? '&width=' + width:'') +
                     (height? '&height=' + height:'') +
@@ -197,10 +197,10 @@ angular.module('webadminApp')
                 return deferred.promise;
             },
             getScripts:function(){
-                return $http.get('/api/scriptList');
+                return $http.get('/web/api/scriptList');
             },
             execute:function(script,mode){
-                return $http.post('/api/execute/' + script + '?' + (mode||''));
+                return $http.post('/web/api/execute/' + script + '?' + (mode||''));
             },
             getModuleInformation: function(url) {
                 url = url || proxy;
@@ -216,7 +216,7 @@ angular.module('webadminApp')
                     return cacheModuleInfo;
                 }
                 //Some another server
-                return $http.get(url + '/api/moduleInformation?showAddresses=true',{
+                return $http.get(url + '/web/api/moduleInformation?showAddresses=true',{
                     timeout: 3*1000
                 });
             },
@@ -249,12 +249,12 @@ angular.module('webadminApp')
             },
 
             detachFromSystem:function(oldPassword){
-                return wrapPost(proxy + '/api/detachFromSystem',{
+                return wrapPost(proxy + '/web/api/detachFromSystem',{
                     oldPassword:oldPassword
                 });
             },
             setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName){
-                return wrapPost(proxy + '/api/setupCloudSystem',{
+                return wrapPost(proxy + '/web/api/setupCloudSystem',{
                     systemName: systemName,
                     cloudSystemID: systemId,
                     cloudAuthKey: authKey,
@@ -263,7 +263,7 @@ angular.module('webadminApp')
             },
 
             setupLocalSystem:function(systemName, adminAccount, adminPassword){
-                return wrapPost(proxy + '/api/setupLocalSystem',{
+                return wrapPost(proxy + '/web/api/setupLocalSystem',{
                     systemName: systemName,
                     adminAccount: adminAccount,
                     password: adminPassword
@@ -272,12 +272,12 @@ angular.module('webadminApp')
 
 
             changeSystemName:function(systemName){
-                return wrapPost(proxy + '/api/configure?' + $.param({
+                return wrapPost(proxy + '/web/api/configure?' + $.param({
                     systemName:systemName
                 }));
             },
             changeSystem:function(systemName,login,password){
-                return wrapPost(proxy + '/api/configure?' + $.param({
+                return wrapPost(proxy + '/web/api/configure?' + $.param({
                     systemName: systemName,
                     login: login,
                     password: password
@@ -285,7 +285,7 @@ angular.module('webadminApp')
             },
 
             changePort: function(port) {
-                return wrapPost(proxy + '/api/configure?' + $.param({
+                return wrapPost(proxy + '/web/api/configure?' + $.param({
                     port:port
                 }));
             },
@@ -295,7 +295,7 @@ angular.module('webadminApp')
                 if(url.indexOf('http')!=0){
                     url = 'http://' + url;
                 }
-                return wrapPost(proxy + '/api/mergeSystems?' + $.param({
+                return wrapPost(proxy + '/web/api/mergeSystems?' + $.param({
                     login: remoteLogin,
                     password: remotePassword,
                     currentPassword: currentPassword,
@@ -307,74 +307,74 @@ angular.module('webadminApp')
                 if(url.indexOf('http')!=0){
                     url = 'http://' + url;
                 }
-                return wrapPost(proxy + '/api/pingSystem?' + $.param({
+                return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
                     password:password,
                     login:login,
                     url:url
                 }));
             },
-            restart: function() { return wrapPost(proxy + '/api/restart'); },
-            getStorages: function(){ return wrapGet(proxy + '/api/storageSpace'); },
-            saveStorages:function(info){return wrapPost(proxy + '/ec2/saveStorages',info); },
-            discoveredPeers:function(){return wrapGet(proxy + '/api/discoveredPeers?showAddresses=true'); },
-            getMediaServer: function(id){return wrapGet(proxy + '/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}','')); },
-            getMediaServers: function(){return wrapGet(proxy + '/ec2/getMediaServersEx'); },
-            getResourceTypes:function(){return wrapGet(proxy + '/ec2/getResourceTypes'); },
+            restart: function() { return wrapPost(proxy + '/web/api/restart'); },
+            getStorages: function(){ return wrapGet(proxy + '/web/api/storageSpace'); },
+            saveStorages:function(info){return wrapPost(proxy + '/web/ec2/saveStorages',info); },
+            discoveredPeers:function(){return wrapGet(proxy + '/web/api/discoveredPeers?showAddresses=true'); },
+            getMediaServer: function(id){return wrapGet(proxy + '/web/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}','')); },
+            getMediaServers: function(){return wrapGet(proxy + '/web/ec2/getMediaServersEx'); },
+            getResourceTypes:function(){return wrapGet(proxy + '/web/ec2/getResourceTypes'); },
 
-            getLayouts:function(){return wrapGet(proxy + '/ec2/getLayouts'); },
+            getLayouts:function(){return wrapGet(proxy + '/web/ec2/getLayouts'); },
 
             getCameras:function(id){
                 if(typeof(id)!=='undefined'){
-                    return wrapGet(proxy + '/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
+                    return wrapGet(proxy + '/web/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
                 }
-                return wrapGet(proxy + '/ec2/getCamerasEx');
+                return wrapGet(proxy + '/web/ec2/getCamerasEx');
             },
-            saveMediaServer: function(info){return wrapPost(proxy + '/ec2/saveMediaServer',info); },
+            saveMediaServer: function(info){return wrapPost(proxy + '/web/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || proxy;
-                return wrapGet(url + '/api/statistics?salt=' + (new Date()).getTime());
+                return wrapGet(url + '/web/api/statistics?salt=' + (new Date()).getTime());
             },
             getCurrentUser:function (forcereload){
                 if(cacheCurrentUser === null || forcereload){
-                    cacheCurrentUser = wrapGet(proxy + '/api/getCurrentUser');
+                    cacheCurrentUser = wrapGet(proxy + '/web/api/getCurrentUser');
                 }
                 return cacheCurrentUser;
             },
             getTime:function(){
-                return wrapGet(proxy + '/api/gettime');
+                return wrapGet(proxy + '/web/api/gettime');
             },
             logLevel:function(logId,level){
-                return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?'&value=' + level:''));
+                return wrapGet(proxy + '/web/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
 
 
             systemSettings:function(setParams){
                 //return;
                 if(!setParams) {
-                    return wrapGet(proxy + '/api/systemSettings');
+                    return wrapGet(proxy + '/web/api/systemSettings');
                 }else{
                     var requestParams = [];
                     for(var key in setParams){
                         requestParams.push(key + '=' + setParams[key]);
                     }
 
-                    return wrapGet(proxy + '/api/systemSettings?' + requestParams.join('&'));
+                    return wrapGet(proxy + '/web/api/systemSettings?' + requestParams.join('&'));
                 }
             },
             getSystemSettings:function(){
-                return wrapGet(proxy + '/ec2/getSettings');
+                return wrapGet(proxy + '/web/ec2/getSettings');
             },
 
 
             saveCloudSystemCredentials: function( cloudSystemId, cloudAuthKey, cloudAccountName){
-                return wrapPost(proxy + '/api/saveCloudSystemCredentials',{
+                return wrapPost(proxy + '/web/api/saveCloudSystemCredentials',{
                     cloudSystemID:cloudSystemId,
                     cloudAuthKey:cloudAuthKey,
                     cloudAccountName: cloudAccountName
                 });
             },
             clearCloudSystemCredentials: function(){
-                return wrapPost(proxy + '/api/saveCloudSystemCredentials',{
+                return wrapPost(proxy + '/web/api/saveCloudSystemCredentials',{
                     reset: true
                 });
             },
@@ -433,15 +433,15 @@ angular.module('webadminApp')
 
                 this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.serverFlags.includes(Config.newServerFlag) && !r.data.reply.ecDbReadOnly){
+                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
                         $location.path("/setup");
-                        deferred.resolve("setup");
+                        deferred.resolve(null);
                         return;
                     }
                     self.getCurrentUser().then(function(data){
-                        deferred.resolve(data);
+                        deferred.resolve(data.data.reply);
                     },function(error){
-                        deferred.reject(error);
+                        deferred.resolve(null);
                     });
                 });
 

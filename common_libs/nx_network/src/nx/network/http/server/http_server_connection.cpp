@@ -1,6 +1,8 @@
+
 #include "http_server_connection.h"
 
 #include <memory>
+
 #include <QtCore/QDateTime>
 
 #include <utils/common/util.h>
@@ -28,6 +30,17 @@ namespace nx_http
     {
     }
 
+    void HttpServerConnection::pleaseStop(
+        nx::utils::MoveOnlyFunc<void()> completionHandler)
+    {
+        BaseType::pleaseStop(
+            [this, completionHandler = std::move(completionHandler)]()
+            {
+                m_currentMsgBody.reset();   //we are in aio thread, so this is ok
+                completionHandler();
+            });
+    }
+
     void HttpServerConnection::processMessage( nx_http::Message&& request )
     {
         //TODO incoming message body
@@ -50,7 +63,7 @@ namespace nx_http
         auto strongRef = shared_from_this();
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
-        nx_http::MimeProtoVersion version = request.request->requestLine.version;
+        const nx_http::MimeProtoVersion version = request.request->requestLine.version;
         auto sendResponseFunc = [this, weakThis, version](
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
@@ -58,10 +71,16 @@ namespace nx_http
             auto strongThis = weakThis.lock();
             if( !strongThis )
                 return; //connection has been removed while request has been processed
-            strongThis->prepareAndSendResponse(
-                version,
-                std::move(response),
-                std::move(responseMsgBody) );
+            strongThis->post(
+                [this, strongThis = std::move(strongThis), version, 
+                    response = std::move(response), 
+                    responseMsgBody = std::move(responseMsgBody)]() mutable
+                {
+                    prepareAndSendResponse(
+                        version,
+                        std::move(response),
+                        std::move(responseMsgBody));
+                });
         };
 
         if( !m_httpMessageDispatcher ||
@@ -75,7 +94,7 @@ namespace nx_http
             nx_http::Message response( nx_http::MessageType::response );
             response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
             return prepareAndSendResponse(
-                request.request->requestLine.version,
+                version,
                 std::move( response ),
                 nullptr );
         }
@@ -163,6 +182,8 @@ namespace nx_http
         }
 
         m_currentMsgBody = std::move(responseMsgBody);
+        if (m_currentMsgBody)
+            m_currentMsgBody->bindToAioThread(getAioThread());
         sendMessage(
             std::move( msg ),
             std::bind( &HttpServerConnection::responseSent, this ) );
@@ -177,13 +198,7 @@ namespace nx_http
             return;
         }
 
-        using namespace std::placeholders;
-        if( !m_currentMsgBody->readAsync(
-                std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
-        {
-            closeConnection(SystemError::getLastOSErrorCode());
-            return;
-        }
+        readMoreMessageBodyData();
     }
 
     void HttpServerConnection::someMsgBodyRead(
@@ -208,24 +223,21 @@ namespace nx_http
 
         sendData(
             std::move( buf ),
-            std::bind( &HttpServerConnection::someMessageBodySent, this ) );
+            std::bind( &HttpServerConnection::readMoreMessageBodyData, this ) );
     }
 
-    void HttpServerConnection::someMessageBodySent()
+    void HttpServerConnection::readMoreMessageBodyData()
     {
         using namespace std::placeholders;
-        if( !m_currentMsgBody->readAsync(
-                std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
-        {
-            closeConnection(SystemError::getLastOSErrorCode());
-            return;
-        }
+        m_currentMsgBody->readAsync(
+            std::bind(&HttpServerConnection::someMsgBodyRead, this, _1, _2));
     }
 
     void HttpServerConnection::fullMessageHasBeenSent()
     {
         //if connection is NOT persistent then closing it
-        if( !m_isPersistent )
+        m_currentMsgBody.reset();
+        if (!m_isPersistent)
             closeConnection(SystemError::noError);
     }
 

@@ -82,7 +82,7 @@ protected:
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
-            if (const auto error = nx::stun::AsyncClient::hasError(code, message))
+            if (const auto error = message.hasError(code))
             {
                 NX_LOGX(*error, cl_logDEBUG1);
                 //TODO #ak get detailed error from response
@@ -137,7 +137,7 @@ protected:
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
-            if (const auto error = nx::stun::AsyncClient::hasError(code, message))
+            if (const auto error = message.hasError(code))
             {
                 NX_LOGX(*error, cl_logDEBUG1);
                 //TODO #ak get detailed error from response

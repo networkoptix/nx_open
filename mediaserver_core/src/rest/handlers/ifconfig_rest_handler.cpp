@@ -31,7 +31,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields);
 
 
-namespace 
+namespace
 {
     QnNetworkAddressEntryList readNetworSettings(bool* ok)
     {
@@ -64,7 +64,7 @@ namespace
             if (worlds.size() < 2)
                 continue;
 
-            if (data.startsWith("iface")) 
+            if (data.startsWith("iface"))
             {
                 result.push_back(QnNetworkAddressEntry());
                 result.last().name = worlds[1].trimmed();
@@ -88,7 +88,7 @@ namespace
                     result.last().extraParams.insert(worlds[0], worlds[1]);
             }
         }
-    
+
         return result;
     }
 
@@ -97,15 +97,23 @@ namespace
         static const char ENDL = '\n';
     #ifdef Q_OS_WIN
         QFile netSettingsFile(lit("c:/etc/network/interfaces"));
+        QFile resolveConfFile(lit("c:/etc/resolv.conf"));
     #else
         QFile netSettingsFile(lit("/etc/network/interfaces"));
+        QFile resolveConfFile(lit("/etc/resolv.conf"));
     #endif
         if (!netSettingsFile.open(QFile::WriteOnly | QFile::Truncate))
         {
             qWarning() << "Can't write network settings file";
             return false;
         }
-    
+
+        if (!resolveConfFile.open(QFile::WriteOnly | QFile::Truncate))
+        {
+            qWarning() << "Can't write network settings file (dns server list)";
+            return false;
+        }
+
         QTextStream out(&netSettingsFile);
         for(const auto& value: settings)
         {
@@ -124,11 +132,18 @@ namespace
             if (!value.gateway.isEmpty())
                 out << "    gateway " << value.gateway << ENDL;
             if (!value.dns_servers.isEmpty())
+            {
                 out << "    dns-nameservers " << value.dns_servers << ENDL;
+
+                QTextStream out2(&resolveConfFile);
+                for (const auto& server : value.dns_servers.split(L' '))
+                    out2 << "nameserver " << server << ENDL;
+            }
             for(auto itr = value.extraParams.constBegin(); itr != value.extraParams.constEnd(); ++itr)
                 out << "    " << itr.key() << " " << itr.value() << ENDL;
             out << ENDL;
         }
+
         return true;
     }
 
@@ -137,7 +152,7 @@ namespace
     {
         bool modified = false;
         // merge existing data
-        for(auto& value :currentSettings) 
+        for(auto& value :currentSettings)
         {
             for (auto itr = newSettings.begin(); itr != newSettings.end(); ++itr)
             {
@@ -175,7 +190,7 @@ namespace
         for (const auto& newValue :newSettings)
             currentSettings.push_back(newValue);
     #endif
-        
+
         return modified;
     }
 
@@ -211,7 +226,7 @@ QnIfConfigRestHandler::QnIfConfigRestHandler()
 
 bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettings, QString* errString)
 {
-    for (const auto& value: newSettings) 
+    for (const auto& value: newSettings)
     {
         if (value.name == "lo")
             continue;
@@ -220,19 +235,19 @@ bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettin
             *errString = lit("Invalid IP address for interface '%1'").arg(value.name);
             return false;
         }
-        
+
         if (!value.netMask.isNull() && !isValidMask(value.netMask)) {
             *errString = lit("Invalid network mask for interface '%1'").arg(value.name);
             return false;
         }
 
-        if (!value.gateway.isEmpty()) 
+        if (!value.gateway.isEmpty())
         {
             if (!isValidIP(value.gateway)) {
                 *errString = lit("Invalid gateway address for interface '%1'").arg(value.name);
                 return false;
             }
-            if (!value.netMask.isEmpty() && !value.ipAddr.isEmpty()) 
+            if (!value.netMask.isEmpty() && !value.ipAddr.isEmpty())
             {
                 if (getNetworkAddr(value.ipAddr, value.netMask) != getNetworkAddr(value.gateway, value.netMask)) {
                     *errString = lit("IP address and gateway belong to different networks for interface '%1'").arg(value.name);
@@ -273,14 +288,14 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
 
     bool ok = false;
     QnNetworkAddressEntryList currentSettings = readNetworSettings(&ok);
-    if (!ok) 
+    if (!ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't read network settings file"));
         return CODE_OK;
     }
-    
+
     QnNetworkAddressEntryList newSettings;
-    if (!QJson::deserialize(body, &newSettings)) 
+    if (!QJson::deserialize(body, &newSettings))
     {
         result.setError(QnJsonRestResult::InvalidParameter, lit("Invalid message body format"));
         return CODE_OK;
@@ -329,7 +344,7 @@ void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestPar
 
     if (!m_modified)
         return;
-    
+
 #ifndef Q_OS_WIN
     if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
     {

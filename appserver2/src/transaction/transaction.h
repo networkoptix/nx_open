@@ -17,168 +17,583 @@
 
 namespace ec2
 {
+
+struct NotDefinedApiData {};
+
+#define TRANSACTION_DESCRIPTOR_LIST(APPLY)  \
+APPLY(1, tranSyncRequest, ApiSyncRequestData, \
+                       false, /* persistent*/ \
+                       true,  /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(2, tranSyncResponse, QnTranStateResponse, \
+                       false, /* persistent*/ \
+                       true,  /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(3, lockRequest, ApiLockData, \
+                       false, /* persistent*/ \
+                       true, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(4, lockResponse, ApiLockData, \
+                       false, /* persistent*/ \
+                       true,  /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(5, unlockRequest, ApiLockData, \
+                       false, /* persistent*/ \
+                       true, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(6, peerAliveInfo, ApiPeerAliveData, \
+                       false, /* persistent*/ \
+                       true, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(7, tranSyncDone, ApiTranSyncDoneData, \
+                       false, /* persistent*/ \
+                       true,  /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(100, testConnection, ApiLoginData, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(101, connect, ApiLoginData, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(102, openReverseConnection, ApiReverseConnectionData, \
+                       false, /* persistent*/ \
+                       true,  /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       [](const QnTransaction<ApiReverseConnectionData> &tran, const NotificationParams &notificationParams) \
+                       { \
+                            NX_ASSERT(tran.command == ApiCommand::openReverseConnection); \
+                            emit notificationParams.ecConnection->reverseConnectionRequested(tran.params); \
+                       })  /* trigger notification*/ \
+APPLY(201, removeResource, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) /* trigger notification*/ \
+APPLY(202, setResourceStatus, ApiResourceStatusData, \
+                       true,  /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdRfc4122Helper(), /* getHash*/ \
+                       ResourceNotificationManagerHelper()) \
+APPLY(204, setResourceParams, ApiResourceParamWithRefDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       ResourceNotificationManagerHelper()) \
+APPLY(203, getResourceParams, ApiResourceParamWithRefDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       ResourceNotificationManagerHelper()) \
+APPLY(205, getResourceTypes, ApiResourceTypeDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(206, getFullInfo, ApiFullInfoData, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       [] (const QnTransaction<ApiFullInfoData> & tran, const NotificationParams &notificationParams) \
+                       { \
+                           emit notificationParams.ecConnection->initNotification(tran.params); \
+                           for(const ApiDiscoveryData& data: tran.params.discoveryData) \
+                               notificationParams.discoveryNotificationManager->triggerNotification(data); \
+                       }) \
+APPLY(208, setResourceParam, ApiResourceParamWithRefData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
+                       ResourceNotificationManagerHelper()) \
+APPLY(209, removeResourceParam, ApiResourceParamWithRefData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashForResourceParamWithRefDataHelper(), /* getHash*/ \
+                       ResourceNotificationManagerHelper()) \
+APPLY(210, removeResourceParams, ApiResourceParamWithRefDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       ResourceNotificationManagerHelper()) \
+APPLY(211, getStatusList, ApiResourceStatusDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(212, removeResources, ApiIdDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       &apiIdDataListTriggerNotificationHelper) \
+APPLY(300, getCameras, ApiCameraDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(301, saveCamera, ApiCameraData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(302, saveCameras, ApiCameraDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       [] (const QnTransaction<ApiCameraDataList> &tran, const NotificationParams &notificationParams) \
+                         { \
+                            notificationParams.cameraNotificationManager->triggerNotification(tran); \
+                         }) \
+APPLY(303, removeCamera, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(304, getCameraHistoryItems, ApiServerFootageDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(305, addCameraHistoryItem, ApiServerFootageData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       &createHashForServerFootageDataHelper, /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(309, removeCameraHistoryItem, ApiServerFootageData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       &createHashForServerFootageDataHelper, /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(310, saveCameraUserAttributes, ApiCameraAttributesData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       &createHashForApiCameraAttributesDataHelper, /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(311, saveCameraUserAttributesList, ApiCameraAttributesDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(312, getCameraUserAttributes, ApiCameraAttributesDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       CameraNotificationManagerHelper()) \
+APPLY(313, getCamerasEx, ApiCameraDataExList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(400, getMediaServers, ApiMediaServerDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(401, saveMediaServer, ApiMediaServerData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(402, removeMediaServer, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(403, saveServerUserAttributes, ApiMediaServerUserAttributesData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       &createHashForApiMediaServerUserAttributesDataHelper, /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(404, saveServerUserAttributesList, ApiMediaServerUserAttributesDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(405, getServerUserAttributes, ApiMediaServerUserAttributesDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(406, removeServerUserAttributes, ApiIdData, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(407, saveStorage, ApiStorageData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(408, saveStorages, ApiStorageDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(409, removeStorage, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(410, removeStorages, ApiIdDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       &apiIdDataListTriggerNotificationHelper) \
+APPLY(411, getMediaServersEx, ApiMediaServerDataExList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(412, getStorages, ApiStorageDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       MediaServerNotificationManagerHelper()) \
+APPLY(500, getUsers, ApiUserDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(501, saveUser, ApiUserData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       UserNotificationManagerHelper()) \
+APPLY(502, removeUser, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) /* trigger notification*/ \
+APPLY(503, getAccessRights, ApiAccessRightsDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(504, setAccessRights, ApiAccessRightsData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByUserIdHelper(), /* getHash*/ \
+                       UserNotificationManagerHelper()) /* trigger notification*/ \
+APPLY(505, getUserGroups, ApiUserGroupDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(506, saveUserGroup, ApiUserGroupData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       UserNotificationManagerHelper()) \
+APPLY(507, removeUserGroup, ApiIdData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(600, getLayouts, ApiLayoutDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(601, saveLayout, ApiLayoutData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       LayoutNotificationManagerHelper()) /* trigger notification*/ \
+APPLY(602, saveLayouts, ApiLayoutDataList, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       LayoutNotificationManagerHelper()) /* trigger notification*/ \
+APPLY(603, removeLayout, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       &apiIdDataTriggerNotificationHelper) /* trigger notification*/ \
+APPLY(700, getVideowalls, ApiVideowallDataList, \
+                       false, /* persistent*/ \
+                       false, /* system*/ \
+                       InvalidGetHashHelper(), /* getHash*/ \
+                       InvalidTriggerNotificationHelper()) /* trigger notification*/ \
+APPLY(701, saveVideowall, ApiVideowallData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), /* getHash*/ \
+                       VideowallNotificationManagerHelper()) /* trigger notification*/ \
+APPLY(702, removeVideowall, ApiIdData, \
+                       true, /* persistent*/ \
+                       false, /* system*/ \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(703, videowallControl, ApiVideowallControlMessageData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       VideowallNotificationManagerHelper()) \
+APPLY(800, getBusinessRules, ApiBusinessRuleDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(801, saveBusinessRule, ApiBusinessRuleData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       BusinessEventNotificationManagerHelper()) \
+APPLY(802, removeBusinessRule, ApiIdData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(803, resetBusinessRules, ApiResetBusinessRuleData, \
+                       true, \
+                       false, \
+                       [] (const ApiResetBusinessRuleData&) { return QnTransactionLog::makeHash("reset_brule", ADD_HASH_DATA); }, \
+                       BusinessEventNotificationManagerHelper()) \
+APPLY(804, broadcastBusinessAction, ApiBusinessActionData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       BusinessEventNotificationManagerHelper()) \
+APPLY(805, execBusinessAction, ApiBusinessActionData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       BusinessEventNotificationManagerHelper()) \
+APPLY(904, removeStoredFile, ApiStoredFilePath, \
+                       true, \
+                       false, \
+                       [] (const ApiStoredFilePath &params) { return QnTransactionLog::makeHash(params.path.toUtf8()); }, \
+                       [] (const QnTransaction<ApiStoredFilePath> &tran, const NotificationParams &notificationParams) \
+                        { \
+                            NX_ASSERT(tran.command == ApiCommand::removeStoredFile); \
+                            notificationParams.storedFileNotificationManager->triggerNotification(tran); \
+                        }) \
+APPLY(901, getStoredFile, ApiStoredFileData, \
+                       false, \
+                       false, \
+                       &createHashForApiStoredFileDataHelper, \
+                       StoredFileNotificationManagerHelper()) \
+APPLY(902, addStoredFile, ApiStoredFileData, \
+                       true, \
+                       false, \
+                       &createHashForApiStoredFileDataHelper, \
+                       StoredFileNotificationManagerHelper()) \
+APPLY(903, updateStoredFile, ApiStoredFileData, \
+                       true, \
+                       false, \
+                       &createHashForApiStoredFileDataHelper, \
+                       StoredFileNotificationManagerHelper()) \
+APPLY(900, listDirectory, ApiStoredDirContents, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(905, getStoredFiles, ApiStoredFileDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(1000, getLicenses, ApiLicenseDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       LicenseNotificationManagerHelper()) \
+APPLY(1001, addLicense, ApiLicenseData, \
+                       true, \
+                       false, \
+                       &createHashForApiLicenseDataHelper, \
+                       LicenseNotificationManagerHelper()) \
+APPLY(1002, addLicenses, ApiLicenseDataList, \
+                       true, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       LicenseNotificationManagerHelper()) \
+APPLY(1003, removeLicense, ApiLicenseData, \
+                       true, \
+                       false, \
+                       &createHashForApiLicenseDataHelper, \
+                       LicenseNotificationManagerHelper()) \
+APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       UpdateNotificationManagerHelper()) \
+APPLY(1201, uploadUpdateResponce, ApiUpdateUploadResponceData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       UpdateNotificationManagerHelper()) \
+APPLY(1202, installUpdate, ApiUpdateInstallData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       UpdateNotificationManagerHelper()) \
+APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       DiscoveryNotificationManagerHelper()) \
+APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       DiscoveryNotificationManagerHelper()) \
+APPLY(1401, discoverPeer, ApiDiscoverPeerData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       DiscoveryNotificationManagerHelper()) \
+APPLY(1402, addDiscoveryInformation, ApiDiscoveryData, \
+                       true, \
+                       false, \
+                       &createHashForApiDiscoveryDataHelper, \
+                       DiscoveryNotificationManagerHelper()) \
+APPLY(1403, removeDiscoveryInformation, ApiDiscoveryData, \
+                       true, \
+                       false, \
+                       &createHashForApiDiscoveryDataHelper, \
+                       DiscoveryNotificationManagerHelper()) \
+APPLY(1404, getDiscoveryData, ApiDiscoveryDataList, \
+                       true, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       DiscoveryNotificationManagerHelper()) \
+APPLY(1500, getWebPages, ApiWebPageDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(1501, saveWebPage, ApiWebPageData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       WebPageNotificationManagerHelper()) \
+APPLY(1502, removeWebPage, ApiIdData, \
+                       true, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(2001, forcePrimaryTimeServer, ApiIdData, \
+                       false, \
+                       false, \
+                       CreateHashByIdHelper(), \
+                       &apiIdDataTriggerNotificationHelper) \
+APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       EmptyNotificationHelper()) \
+APPLY(2003, getCurrentTime, ApiTimeData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(2004, changeSystemName, ApiSystemNameData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       [] (const QnTransaction<ApiSystemNameData> &tran, const NotificationParams &notificationParams) \
+                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }) \
+APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
+                       true, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       ResourceNotificationManagerHelper()) \
+APPLY(2007, getSettings, ApiResourceParamDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(4001, getClientInfos, ApiClientInfoDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(4002, saveClientInfo, ApiClientInfoData, \
+                       true, \
+                       false, \
+                       CreateHashByIdRfc4122Helper(), \
+                       EmptyNotificationHelper()) \
+APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(5002, triggerStatisticsReport, ApiStatisticsServerInfo, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper()) \
+APPLY(9004, runtimeInfoChanged, ApiRuntimeData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       [] (const QnTransaction<ApiRuntimeData> & tran, const NotificationParams &notificationParams) \
+                        { \
+                            NX_ASSERT(tran.command == ApiCommand::runtimeInfoChanged); \
+                            emit notificationParams.ecConnection->runtimeInfoChanged(tran.params); \
+                        }) \
+APPLY(9005, dumpDatabase, ApiDatabaseDumpData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       [] (const QnTransaction<ApiDatabaseDumpData> &, const NotificationParams &notificationParams) \
+                        { \
+                            emit notificationParams.ecConnection->databaseDumped(); \
+                        }) \
+APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
+                       true, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       [] (const QnTransaction<ApiDatabaseDumpData> &, const NotificationParams &notificationParams) \
+                        { \
+                            emit notificationParams.ecConnection->databaseDumped(); \
+                        }) \
+APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       EmptyNotificationHelper()) \
+APPLY(9010, dumpDatabaseToFile, ApiDatabaseDumpToFileData, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       EmptyNotificationHelper()) \
+APPLY(10000, getTransactionLog, ApiTransactionDataList, \
+                       false, \
+                       false, \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper())
+
+
+#define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
+
     namespace ApiCommand
     {
-        // TODO: #Elric #enum
+        /* TODO: #Elric #enum*/
         enum Value
         {
-            NotDefined                  = 0,
-
-            /* System */
-            tranSyncRequest             = 1,    /**< ApiSyncRequestData */
-            tranSyncResponse            = 2,    /**< QnTranStateResponse */
-            lockRequest                 = 3,    /**< ApiLockData */
-            lockResponse                = 4,    /**< ApiLockData */
-            unlockRequest               = 5,    /**< ApiLockData */
-            peerAliveInfo               = 6,    /**< ApiPeerAliveData */
-            tranSyncDone                = 7,    /**< ApiTranSyncDoneData */
-
-            /* Connection */
-            testConnection              = 100,  /**< ApiLoginData */
-            connect                     = 101,  /**< ApiLoginData */
-            openReverseConnection       = 102,  /**< ApiReverseConnectionData */
-
-            /* Common resource */
-            removeResource              = 201,  /**< ApiIdData */
-            setResourceStatus           = 202,  /**< ApiResourceStatusData */
-            getResourceParams           = 203,  /**< ApiResourceParamDataList */
-            setResourceParams           = 204,  /**< ApiResourceParamWithRefDataList */
-            getResourceTypes            = 205,  /**< ApiResourceTypeDataList*/
-            getFullInfo                 = 206,  /**< ApiFullInfoData */
-            setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
-            removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
-            removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
-            getStatusList               = 211,  /**< ApiResourceStatusDataList */
-            removeResources             = 212,  /**< ApiIdDataList */
-
-            /* Camera resource */
-            getCameras                  = 300,  /**< ApiCameraDataList */
-            saveCamera                  = 301,  /**< ApiCameraData */
-            saveCameras                 = 302,  /**< ApiCameraDataList */
-            removeCamera                = 303,  /**< ApiIdData */
-            getCameraHistoryItems       = 304,  /**< ApiServerFootageDataList */
-            addCameraHistoryItem        = 305,  /**< ApiServerFootageData */
-            removeCameraHistoryItem     = 309,  /**< ApiServerFootageData */
-            saveCameraUserAttributes    = 310,  /**< ApiCameraAttributesData */
-            saveCameraUserAttributesList= 311,  /**< ApiCameraAttributesDataList */
-            getCameraUserAttributes     = 312,  /**< ApiCameraAttributesDataList */
-            getCamerasEx                = 313,  /**< ApiCameraDataExList */
-
-
-            /* MediaServer resource */
-            getMediaServers             = 400,  /**< ApiMediaServerDataList */
-            saveMediaServer             = 401,  /**< ApiMediaServerData */
-            removeMediaServer           = 402,  /**< ApiIdData */
-            saveServerUserAttributes    = 403,  /**< QnMediaServerUserAttributesList */
-            saveServerUserAttributesList= 404,  /**< QnMediaServerUserAttributesList */
-            getServerUserAttributes     = 405,  /**< ApiIdData, QnMediaServerUserAttributesList */
-            removeServerUserAttributes  = 406,  /**< ApiIdData */
-            saveStorage                 = 407,  /**< ApiStorageData */
-            saveStorages                = 408,  /**< ApiStorageDataList */
-            removeStorage               = 409,  /**< ApiIdData */
-            removeStorages              = 410,  /**< QList<ApiIdData> */
-            getMediaServersEx           = 411,  /**< ApiMediaServerDataExList */
-            getStorages                 = 412,  /**< ApiStorageDataList */
-
-            /* User resource */
-            getUsers                    = 500,  /**< ApiUserDataList */
-            saveUser                    = 501,  /**< ApiUserData */
-            removeUser                  = 502,  /**< ApiIdData */
-            getAccessRights             = 503,  /**< ApiAccessRightsDataList */
-            setAccessRights             = 504,  /**< ApiAccessRightsDataList */
-            getUserGroups               = 505,  /**< ApiUserGroupDataList */
-            saveUserGroup               = 506,  /**< ApiUserGroupData */
-            removeUserGroup             = 507,  /**< ApiIdData */
-
-            /* Layout resource */
-            getLayouts                  = 600,  /**< ApiLayoutDataList */
-            saveLayout                  = 601,  /**< ApiLayoutData */
-            saveLayouts                 = 602,  /**< ApiLayoutDataList */
-            removeLayout                = 603,  /**< ApiIdData */
-
-            /* Videowall resource */
-            getVideowalls               = 700,  /**< ApiVideowallDataList */
-            saveVideowall               = 701,  /**< ApiVideowallData */
-            removeVideowall             = 702,  /**< ApiIdData */
-            videowallControl            = 703,  /**< ApiVideowallControlMessageData */
-
-            /* Business rules */
-            getBusinessRules            = 800,  /**< ApiBusinessRuleDataList */
-            saveBusinessRule            = 801,  /**< ApiBusinessRuleData */
-            removeBusinessRule          = 802,  /**< ApiIdData */
-            resetBusinessRules          = 803,  /**< ApiResetBusinessRuleData */
-            broadcastBusinessAction     = 804,  /**< ApiBusinessActionData */
-            execBusinessAction          = 805,  /**< ApiBusinessActionData */
-
-            /* Stored files */
-            listDirectory               = 900,  /**< ApiStoredDirContents */
-            getStoredFile               = 901,  /**< ApiStoredFileData */
-            addStoredFile               = 902,  /**< ApiStoredFileData */
-            updateStoredFile            = 903,  /**< ApiStoredFileData */
-            removeStoredFile            = 904,  /**< ApiStoredFilePath */
-            getStoredFiles              = 905,  /**< ApiStoredFileDataList */
-
-            /* Licenses */
-            getLicenses                 = 1000, /**< ApiLicenseDataList */
-            addLicense                  = 1001, /**< ApiLicenseData */
-            addLicenses                 = 1002, /**< ApiLicenseDataList */
-            removeLicense               = 1003, /**< ApiLicenseData */
-
-            /* Email */
-            testEmailSettings           = 1100, /**< ApiEmailSettingsData */
-            sendEmail                   = 1101, /**< ApiEmailData */
-
-            /* Auto-updates */
-            uploadUpdate                = 1200, /**< ApiUpdateUploadData */
-            uploadUpdateResponce        = 1201, /**< ApiUpdateUploadResponceData */
-            installUpdate               = 1202, /**< ApiUpdateInstallData  */
-
-            /* Module information */
-            discoveredServerChanged     = 1301, /**< ApiDiscoveredServerData */
-            discoveredServersList       = 1302, /**< ApiDiscoveredServerDataList */
-
-            /* Discovery */
-            discoverPeer                = 1401, /**< ApiDiscoveryData */
-            addDiscoveryInformation     = 1402, /**< ApiDiscoveryData*/
-            removeDiscoveryInformation  = 1403, /**< ApiDiscoveryData*/
-            getDiscoveryData            = 1404, /**< ApiDiscoveryDataList */
-
-            /* WebPage resource */
-            getWebPages                 = 1500,  /**< ApiWebPageDataList */
-            saveWebPage                 = 1501,  /**< ApiWebPageData */
-            removeWebPage               = 1502,  /**< ApiIdData */
-
-            /* Misc */
-            forcePrimaryTimeServer      = 2001,  /**< ApiIdData */
-            broadcastPeerSystemTime     = 2002,  /**< ApiPeerSystemTimeData*/
-            getCurrentTime              = 2003,  /**< ApiTimeData */
-            changeSystemName            = 2004,  /**< ApiSystemNameData */
-            getKnownPeersSystemTime     = 2005,  /**< ApiPeerSystemTimeDataList */
-            markLicenseOverflow         = 2006,  /**< ApiLicenseOverflowData */
-            getSettings                 = 2007,  /**< ApiResourceParamDataList */
-
-            /* Client information */
-            getClientInfos              = 4001,  /**< ApiClientInfoDataList */
-            saveClientInfo              = 4002,  /**< ApiClientInfoData */
-
-            /* Statistics */
-            getStatisticsReport         = 5001,  /**< ApiSystemStatistics */
-            triggerStatisticsReport     = 5002,  /**< ApiStatisticsServerInfo */
-
-            //getHelp                     = 9003,  /**< ApiHelpGroupDataList */
-			runtimeInfoChanged          = 9004,  /**< ApiRuntimeData */
-            dumpDatabase                = 9005,  /**< ApiDatabaseDumpData */
-            restoreDatabase             = 9006,  /**< ApiDatabaseDumpData */
-            updatePersistentSequence    = 9009,  /**< ApiUpdateSequenceData*/
-            dumpDatabaseToFile          = 9010,  /**< ApiStoredFilePath, size_t (dump size) */
-
-            getTransactionLog           = 10000,  /**< QnAbstractTransactionList*/
-
-            /* Ldap */
-            testLdapSettings            = 11001, /**< QnLdapSettings */
-
+            NotDefined = 0,
+            TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_ENUM_APPLY)
+            testLdapSettings = 11001,
             maxTransactionValue         = 65535
         };
+#undef TRANSACTION_ENUM_APPLY
+
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
@@ -190,9 +605,11 @@ namespace ec2
 
         /** Check if transaction should be written to data base. */
         bool isPersistent( Value val );
+
     }
 
-    //!Contains information on how transaction has been delivered
+
+    /*!Contains information on how transaction has been delivered*/
     class QnTranDeliveryInformation
     {
     public:
@@ -215,7 +632,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
+        QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
         QnAbstractTransaction(ApiCommand::Value value): command(value), isLocal(false) { peerID = qnCommon->moduleGUID(); }
 
         struct PersistentInfo
@@ -243,7 +660,7 @@ namespace ec2
         PersistentInfo persistentInfo;
         QnTranDeliveryInformation deliveryInfo;
 
-        bool isLocal; // do not propagate transactions to other server peers
+        bool isLocal; /* do not propagate transactions to other server peers*/
 
         QString toString() const;
     };
@@ -262,30 +679,36 @@ namespace ec2
         QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
         QnTransaction(ApiCommand::Value command, const T& params = T()): QnAbstractTransaction(command), params(params) {}
 
+        template<typename U>
+        QnTransaction(const QnTransaction<U>&)
+        {
+            NX_ASSERT(0, "Constructing from transaction with another Params type is disallowed");
+        }
+
         T params;
     };
 
     QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson)(xml)(csv_record))
     QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (json)(ubjson)(xml)(csv_record))
 
-    //Binary format functions for QnTransaction<T>
-    //template <class T, class Output>
-    //void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
-    //{
-    //    QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
-    //    QnBinary::serialize(transaction.params, stream);
-    //}
+    /*Binary format functions for QnTransaction<T>*/
+    /*template <class T, class Output>*/
+    /*void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)*/
+    /*{*/
+    /*    QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);*/
+    /*    QnBinary::serialize(transaction.params, stream);*/
+    /*}*/
 
-    //template <class T, class Input>
-    //bool deserialize(QnInputBinaryStream<Input>* stream,  QnTransaction<T> *transaction)
-    //{
-    //    return
-    //        QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
-    //        QnBinary::deserialize(stream, &transaction->params);
-    //}
+    /*template <class T, class Input>*/
+    /*bool deserialize(QnInputBinaryStream<Input>* stream,  QnTransaction<T> *transaction)*/
+    /*{*/
+    /*    return*/
+    /*        QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&*/
+    /*        QnBinary::deserialize(stream, &transaction->params);*/
+    /*}*/
 
 
-    //Json format functions for QnTransaction<T>
+    /*Json format functions for QnTransaction<T>*/
     template<class T>
     void serialize(QnJsonContext* ctx, const QnTransaction<T>& tran, QJsonValue* target)
     {
@@ -303,7 +726,7 @@ namespace ec2
             QJson::deserialize(ctx, value.toObject(), "params", &target->params);
     }
 
-    //QnUbjson format functions for QnTransaction<T>
+    /*QnUbjson format functions for QnTransaction<T>*/
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction,  QnUbjsonWriter<Output> *stream)
     {
@@ -329,7 +752,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
 
     int generateRequestID();
-} // namespace ec2
+} /* namespace ec2*/
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
 
@@ -337,4 +760,4 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numer
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)
 #endif
 
-#endif  //EC2_TRANSACTION_H
+#endif  /*EC2_TRANSACTION_H*/

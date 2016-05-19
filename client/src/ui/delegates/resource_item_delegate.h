@@ -22,6 +22,8 @@ public:
     const QnResourceItemColors& colors() const;
     void setColors(const QnResourceItemColors& colors);
 
+    int spacing() const;
+    void setSpacing(int value);
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const override;
@@ -43,6 +45,9 @@ private:
 
 private:
     QPointer<QnWorkbench> m_workbench;
-    QIcon m_recordingIcon, m_scheduledIcon, m_buggyIcon;
+    QIcon m_recordingIcon;
+    QIcon m_scheduledIcon;
+    QIcon m_buggyIcon;
     QnResourceItemColors m_colors;
+    int m_spacing;
 };

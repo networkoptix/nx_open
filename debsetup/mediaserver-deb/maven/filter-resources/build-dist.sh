@@ -36,7 +36,6 @@ INITDSTAGE=$STAGE$INITDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 SERVER_SHARE_PATH=${libdir}/share
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
-SERVER_IMAGEFORMATS_PATH=$SERVER_BIN_PATH/imageformats
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
@@ -44,7 +43,6 @@ SCRIPTS_PATH=${basedir}/../scripts
 # Prepare stage dir
 rm -rf $STAGE
 mkdir -p $BINSTAGE
-mkdir -p $BINSTAGE/imageformats
 mkdir -p $LIBSTAGE
 mkdir -p $LIBPLUGINSTAGE
 mkdir -p $ETCSTAGE
@@ -58,7 +56,6 @@ cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
-cp -r $SERVER_IMAGEFORMATS_PATH/*.* $BINSTAGE/imageformats
 cp -P $SERVER_LIB_PLUGIN_PATH/*.so* $LIBPLUGINSTAGE
 #'libstdc++.so.6 is needed on some machines
 cp -r /usr/lib/${arch.dir}/libstdc++.so.6* $LIBSTAGE

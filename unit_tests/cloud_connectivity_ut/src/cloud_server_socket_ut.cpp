@@ -192,7 +192,7 @@ private:
                 system.id,
                 server->serverId(),
                 system.authKey));
-        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.endpoint());
+        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
 };
@@ -249,9 +249,10 @@ class CloudServerSocketBaseTcpTest
 
 TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 {
-    auto stunAsyncClient = std::make_shared<network::test::StunAsyncClientMock>();
+    auto stunAsyncClient = std::make_shared<stun::test::AsyncClientMock>();
     EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
-        stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+        stun::cc::indications::connectionRequested,
+        ::testing::_, ::testing::_)).Times(1);
     EXPECT_CALL(*stunAsyncClient, remoteAddress()).Times(::testing::AnyNumber());
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
@@ -319,9 +320,10 @@ protected:
                 QnUuid::createUuid().toSimpleString().toUtf8(),
                 SocketAddress(addr.address, addr.port + i));
 
-        m_stunClient = std::make_shared<network::test::StunAsyncClientMock>();
+        m_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         EXPECT_CALL(*m_stunClient, setIndicationHandler(
-            stun::cc::indications::connectionRequested, ::testing::_)).Times(1);
+            stun::cc::indications::connectionRequested,
+            ::testing::_, ::testing::_)).Times(1);
         EXPECT_CALL(*m_stunClient, remoteAddress()).Times(::testing::AnyNumber());
 
         std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
@@ -514,7 +516,7 @@ protected:
     }
 
     std::map<String, SocketAddress> m_peerAddresses;
-    std::shared_ptr<network::test::StunAsyncClientMock> m_stunClient;
+    std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     TestSyncQueue<Counters> m_connectedResults;
     std::vector<nx::utils::thread> m_threads;
@@ -552,7 +554,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     {
         CloudServerSocket cloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
-        ASSERT_TRUE(cloudServerSocket.registerOnMediatorSync());
+        ASSERT_EQ(cloudServerSocket.registerOnMediatorSync(), hpm::api::ResultCode::ok);
         ASSERT_TRUE(cloudServerSocket.listen(128));
         cloudServerSocket.moveToListeningState();
 

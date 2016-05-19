@@ -167,7 +167,7 @@ public:
         m_aioThreadBinder.pleaseStop(std::move(completionHandler));
     }
 
-    virtual aio::AbstractAioThread* getAioThread() override
+    virtual aio::AbstractAioThread* getAioThread() const override
     {
         return m_aioThreadBinder.getAioThread();
     }
@@ -307,9 +307,7 @@ private:
 
 TEST_F(OutgoingTunnelTest, general)
 {
-    const int testLoopLength = 10000;
-
-    for (int i = 0; i < testLoopLength; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         const bool connectorWillSucceed = (rand() % 7) > 0;
         const bool connectionWillSucceed = (rand() % 5) > 0;

@@ -52,7 +52,7 @@ void Timer::cancelSync()
     UDPSocket::cancelIOSync(etTimedOut);
 }
 
-AbstractAioThread* Timer::getAioThread()
+AbstractAioThread* Timer::getAioThread() const
 {
     return UDPSocket::getAioThread();
 }

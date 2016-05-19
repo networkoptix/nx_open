@@ -10,11 +10,11 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-void UdpHolePunchingSyn::serialize(nx::stun::Message* const message)
+void UdpHolePunchingSyn::serialize(nx::stun::Message* const /*message*/)
 {
 }
 
-bool UdpHolePunchingSyn::parse(const nx::stun::Message& message)
+bool UdpHolePunchingSyn::parse(const nx::stun::Message& /*message*/)
 {
     return true;
 }

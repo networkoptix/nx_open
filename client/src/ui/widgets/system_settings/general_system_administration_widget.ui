@@ -54,7 +54,7 @@
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>3</number>
       </property>
       <item row="0" column="0">
        <widget class="QPushButton" name="businessRulesButton">
@@ -96,6 +96,13 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="bookmarksLabel">
+        <property name="text">
+         <string notr="true" extracomment="Test set in source file">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="0">
        <widget class="QPushButton" name="cameraListButton">
         <property name="text">
@@ -107,20 +114,6 @@
        <widget class="QLabel" name="cameraListLabel">
         <property name="text">
          <string notr="true" extracomment="Text set in source file">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QPushButton" name="healthMonitorButton">
-        <property name="text">
-         <string>&amp;Health Monitoring...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QLabel" name="healthMonitoringLabel">
-        <property name="text">
-         <string>Monitor All Servers on a Single Layout</string>
         </property>
        </widget>
       </item>
@@ -138,6 +131,20 @@
         </property>
        </widget>
       </item>
+      <item row="6" column="0">
+       <widget class="QPushButton" name="healthMonitorButton">
+        <property name="text">
+         <string>&amp;Health Monitoring...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="healthMonitoringLabel">
+        <property name="text">
+         <string>Monitor All Servers on a Single Layout</string>
+        </property>
+       </widget>
+      </item>
       <item row="3" column="0">
        <widget class="QPushButton" name="bookmarksButton">
         <property name="sizePolicy">
@@ -148,13 +155,6 @@
         </property>
         <property name="text">
          <string>&amp;Bookmarks...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="bookmarksLabel">
-        <property name="text">
-         <string notr="true" extracomment="Test set in source file">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>

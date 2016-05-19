@@ -135,8 +135,12 @@ void findMacAddresses(QnMacAndDeviceClassList& devices) {
     }
 }
 
-static void calcHardwareId(QString &hardwareId, const QnHardwareInfo& hi, int version, bool guidCompatibility)
+void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
+    hardwareIdMap.clear();
+
+    QString hardwareId;
+
     if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
         hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
         if (version == 3 || version == 4) { // this part differs from windows, unfortunately
@@ -146,11 +150,24 @@ static void calcHardwareId(QString &hardwareId, const QnHardwareInfo& hi, int ve
         hardwareId.clear();
     }
 
-    if ((version == 4 || version == 5) && hi.mac.length() > 0)
-        hardwareId += hi.mac;
+    if (version == 4 || version == 5)
+    {
+        for (const auto& nic : hi.nics)
+        {
+            const QString& mac = nic.mac;
+
+            if (!mac.isEmpty())
+            {
+                hardwareIdMap[mac] = hardwareId + mac;
+            }
+        }
+    } else
+    {
+        hardwareIdMap[""] = hardwareId;
+    }
 }
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
+void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     hardwareInfo.boardUUID = read_file("/sys/class/dmi/id/product_uuid");
     hardwareInfo.compatibilityBoardUUID = changedGuidByteOrder(hardwareInfo.boardUUID);
@@ -165,11 +182,12 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
     getMemoryInfo(hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
 
     findMacAddresses(hardwareInfo.nics);
-    hardwareInfo.mac = getSaveMacAddress(hardwareInfo.nics, settings);
 
-    for (int i = 0; i < LATEST_HWID_VERSION; i++) {
-        calcHardwareId(hardwareIds[i], hardwareInfo, i + 1, false);
-        calcHardwareId(hardwareIds[LATEST_HWID_VERSION + i], hardwareInfo, i + 1, true);
+    HardwareIdListForVersion macHardwareIds;
+
+    for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
+        calcHardwareIds(macHardwareIds, hardwareInfo, i);
+        hardwareIds << macHardwareIds;
     }
 }
 
@@ -196,7 +214,7 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
+void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     Q_UNUSED(settings)
 
@@ -211,9 +229,18 @@ void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareIn
     // when copying bytearray to string, trailing '\0' is removed
     hardwareInfo.mac = hardwareId;
 
-    for (int i = 0; i < 2 * LATEST_HWID_VERSION; i++) {
-        hardwareIds << QString::fromLatin1(hardwareId.constData(), hardwareId.size());
+    QStringList hardwareIdList = QStringList() << QString::fromLatin1(hardwareId.constData(), hardwareId.size());
+
+    HardwareIdListForVersion macHardwareIds;
+    macHardwareIds << QPair<QString, QStringList>("",  hardwareIdList);
+
+    for (int i = 0; i < LATEST_HWID_VERSION; i++) {
+        hardwareIds << macHardwareIds;
     }
+}
+
+void calcHardwareIdMap(QMap<QString, QString>& /* hardwareIdMap */, const QnHardwareInfo& /*hi*/, int /*version*/, bool /*guidCompatibility*/)
+{
 }
 
 #endif

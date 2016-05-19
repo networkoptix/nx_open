@@ -14,7 +14,7 @@ void ResourceAllocator::at_execLambda()
     QMutexLocker lock(&m_mutex);
     if (m_lambda) {
         m_lambda(m_opaque);
-        m_lambda = 0;
+        m_lambda = nullptr;
         m_waitCond.wakeOne();
     }
 }
@@ -31,6 +31,7 @@ void ResourceAllocator::at_execLambdaAsync()
         lock.relock();
     }
 }
+
 
 void ResourceAllocator::execAtGlThread(std::function<void (void*)> lambda, void* opaque)
 {

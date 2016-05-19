@@ -113,7 +113,7 @@ void Impl::displayDecodedFrame(void* frameHandle)
 
 ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplDisplay(const Params& params)
 {
-    qDebug() << "ProxyVideoDecoder: Using 'display' impl";
+    PRINT << "Using this impl";
     return new Impl(params);
 }
 

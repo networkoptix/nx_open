@@ -2,6 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
+#include <nx_ec/data/api_fwd.h>
 #include <nx/utils/singleton.h>
 
 /**
@@ -57,6 +58,8 @@ public:
     /** Apply changes to the given user. */
     void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges);
 
+    void saveUserGroup(const ec2::ApiUserGroupData& userGroup);
+    void removeUserGroup(const QnUuid& groupId);
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);

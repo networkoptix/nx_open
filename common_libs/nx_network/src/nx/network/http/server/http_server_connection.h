@@ -26,31 +26,37 @@ namespace nx_http
     class AbstractAuthenticationManager;
     class MessageDispatcher;
 
-    class NX_NETWORK_API HttpServerConnection
-    :
-        public nx_api::BaseStreamProtocolConnection<
-            HttpServerConnection,
+    template<typename ConnectionType> using BaseConnection = 
+        nx_api::BaseStreamProtocolConnection<
+            ConnectionType,
             nx_http::Message,
             nx_http::MessageParser,
-            nx_http::MessageSerializer>,
+            nx_http::MessageSerializer>;
+
+    typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+        nx_http::Message,
+        nx_http::MessageParser,
+        nx_http::MessageSerializer> AsyncMessagePipeline;
+
+    class NX_NETWORK_API HttpServerConnection
+    :
+        public BaseConnection<HttpServerConnection>,
         public std::enable_shared_from_this<HttpServerConnection>
     {
     public:
-        typedef BaseStreamProtocolConnection<
-            HttpServerConnection,
-            nx_http::Message,
-            nx_http::MessageParser,
-            nx_http::MessageSerializer
-        > BaseType;
+        typedef BaseConnection<HttpServerConnection> BaseType;
 
         HttpServerConnection(
             StreamConnectionHolder<HttpServerConnection>* socketServer,
             std::unique_ptr<AbstractCommunicatingSocket> sock,
             nx_http::AbstractAuthenticationManager* const authenticationManager,
-            nx_http::MessageDispatcher* const httpMessageDispatcher );
-        ~HttpServerConnection();
+            nx_http::MessageDispatcher* const httpMessageDispatcher);
+        virtual ~HttpServerConnection();
 
-        void processMessage( nx_http::Message&& request );
+        virtual void pleaseStop(
+            nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+
+        void processMessage(nx_http::Message&& request);
 
     private:
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;
@@ -67,7 +73,7 @@ namespace nx_http
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
         void responseSent();
         void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
-        void someMessageBodySent();
+        void readMoreMessageBodyData();
         void fullMessageHasBeenSent();
         void checkForConnectionPersistency( const Message& request );
 

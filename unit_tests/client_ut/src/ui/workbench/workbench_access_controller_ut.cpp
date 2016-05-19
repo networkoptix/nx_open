@@ -104,14 +104,6 @@ TEST_F( QnWorkbenchAccessControllerTest, init )
     ASSERT_EQ(user, m_context->user());
 }
 
-/** Test for safe mode. Check if the user cannot create new layouts on server. */
-TEST_F( QnWorkbenchAccessControllerTest, safeDisableSaveLayoutAs )
-{
-    loginAs(Qn::GlobalOwnerPermissions);
-    qnCommon->setReadOnly(true);
-    checkForbiddenPermissions(m_context->user(), Qn::CreateLayoutPermission);
-}
-
 /** Test for safe mode. Check if the user cannot save layout created with external permissions. */
 TEST_F( QnWorkbenchAccessControllerTest, safeCannotSaveExternalPermissionsLayout )
 {

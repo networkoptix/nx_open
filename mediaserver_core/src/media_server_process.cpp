@@ -175,7 +175,6 @@
 #include <utils/common/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/util.h>
@@ -248,6 +247,7 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
+static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class MediaServerProcess;
@@ -963,8 +963,8 @@ void MediaServerProcess::stopObjects()
 
 void MediaServerProcess::updateDisabledVendorsIfNeeded()
 {
+    // migration from old version. move setting from registry to the DB
     static const QString DV_PROPERTY = QLatin1String("disabledVendors");
-
     QString disabledVendors = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     if (!disabledVendors.isNull())
     {
@@ -1120,7 +1120,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             messageProcessor->updateResource( storage );
 
             // initialize storage immediately in sync mode
-			// todo: remove this call. Need refactor
+            // todo: remove this call. Need refactor
             if (QnStorageResourcePtr qnStorage = qnResPool->getResourceById(storage.id).dynamicCast<QnStorageResource>())
             {
                 if (qnStorage->getParentId() == qnCommon->moduleGUID())
@@ -1602,7 +1602,7 @@ bool MediaServerProcess::initTcpListener(
 
     // Server return code 403 (forbidden) instead of 401 if user isn't authorized for requests starting with 'web' path
     m_universalTcpListener->setPathIgnorePrefix("web/");
-    QnAuthHelper::instance()->restrictionList()->deny(lit("web/*"), AuthMethod::http);
+    QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), AuthMethod::http);
 
     AuthMethod::Values methods = (AuthMethod::Values)(AuthMethod::cookie | AuthMethod::urlQueryParam | AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
@@ -1716,31 +1716,46 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
-    QString sslCertPath = MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString();
+    const auto sslCertPath = MSSettings::roSettings()->value(
+        nx_ms_conf::SSL_CERTIFICATE_PATH,
+        getDataDirectory() + lit( "/ssl/cert.pem")).toString();
+
+    nx::String sslCertData;
     QFile f(sslCertPath);
-    if (!f.open(QIODevice::ReadOnly)) {
-        qWarning() << "Could not find SSL certificate at "<<f.fileName()<<". Generating a new one";
+    if (!f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
+    {
+        f.close();
+        qWarning() << "Could not find valid SSL certificate at "
+            << f.fileName() << ". Generating a new one";
 
         QDir parentDir = QFileInfo(f).absoluteDir();
-        if (!parentDir.exists()) {
-            if (!QDir().mkpath(parentDir.absolutePath())) {
-                qWarning() << "Could not create directory " << parentDir.absolutePath();
+        if (!parentDir.exists() && !QDir().mkpath(parentDir.absolutePath()))
+        {
+            qWarning() << "Could not create directory "
+                << parentDir.absolutePath();
+        }
+
+        sslCertData = nx::network::SslEngine::makeCertificateAndKey(
+            QnAppInfo::productName().toUtf8(), "US",
+            QnAppInfo::organizationName().toUtf8());
+
+        if (sslCertData.isEmpty())
+        {
+             qWarning() << "Could not generate SSL certificate ";
+        }
+        else
+        {
+            if (!f.open(QIODevice::WriteOnly) ||
+                f.write(sslCertData) != sslCertData.size())
+            {
+                qWarning() << "Could not write SSL certificate to file";
             }
-        }
 
-        //TODO: #ivigasin sslCertPath can contain non-latin1 symbols
-        if (generateSslCertificate(sslCertPath.toLatin1(), qApp->applicationName().toLatin1(), "US", QnAppInfo::organizationName().toLatin1())) {
-            qWarning() << "Could not generate SSL certificate ";
+            f.close();
         }
+    }
 
-        if( !f.open( QIODevice::ReadOnly ) )
-            qWarning() << "Could not load SSL certificate "<<f.fileName();
-    }
-    if( f.isOpen() )
-    {
-        const QByteArray& certData = f.readAll();
-        nx::network::SslSocket::initSSLEngine( certData );
-    }
+    nx::network::SslEngine::useCertificateAndPkey(sslCertData);
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
@@ -1752,7 +1767,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
     CloudConnectionManager cloudConnectionManager;
-    auto authHelper = std::make_unique<QnAuthHelper>();
+    auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
@@ -1767,10 +1782,10 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/static/*"), AuthMethod::noAuth );
 
     //by following delegating hls authentication to target server
-    QnAuthHelper::instance()->restrictionList()->allow( lit("/proxy/*/hls/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
 
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
@@ -1795,8 +1810,6 @@ void MediaServerProcess::run()
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
-
-    //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     std::unique_ptr<QnStorageManager> normalStorageManager(
         new QnStorageManager(
@@ -1883,8 +1896,6 @@ void MediaServerProcess::run()
         nx::ServerSetting::setSysIdTime(0);
         systemName.saveToConfig();
     }
-    if (systemName.isDefault())
-        serverFlags |= Qn::SF_AutoSystemName;
 
     qnCommon->setLocalSystemName(systemName.value());
 
@@ -1908,9 +1919,7 @@ void MediaServerProcess::run()
     }
 #endif
 
-    int guidCompatibility = 0;
-    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
-    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility, MSSettings::roSettings()).toVector();
+    runtimeData.hardwareIds = LLUtil::getAllHardwareIds().toVector();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
@@ -1974,6 +1983,7 @@ void MediaServerProcess::run()
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
+
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
@@ -2062,6 +2072,7 @@ void MediaServerProcess::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
+    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -2070,7 +2081,8 @@ void MediaServerProcess::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
-            isNewServerInstance = true;
+            if (!noSetupWizardFlag)
+                isNewServerInstance = true;
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 
@@ -2272,9 +2284,10 @@ void MediaServerProcess::run()
 
     loadResourcesFromECS(messageProcessor.data());
 
-    if (isNewServerInstance)
+    if (isNewServerInstance || systemName.isDefault())
     {
         /* In case of error it will be instantly cleaned by the watcher. */
+        qnGlobalSettings->resetCloudParams();
         qnGlobalSettings->setNewSystem(true);
     }
 
@@ -2490,7 +2503,6 @@ void MediaServerProcess::run()
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
 
-
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
 
@@ -2514,9 +2526,7 @@ void MediaServerProcess::run()
     //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
-    nx::network::SslSocket::releaseSSLEngine();
     authHelper.reset();
-
     fileDeletor.reset();
     normalStorageManager.reset();
     backupStorageManager.reset();
@@ -2525,7 +2535,6 @@ void MediaServerProcess::run()
         m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
 }
-
 
 void MediaServerProcess::at_appStarted()
 {
@@ -2703,6 +2712,7 @@ protected:
 
         qnPlatform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
 
+        LLUtil::initHardwareId(MSSettings::roSettings());
         updateGuidIfNeeded();
 
         QnUuid guid = serverGuid();
@@ -2730,7 +2740,7 @@ protected:
 
 private:
     QString hardwareIdAsGuid() {
-        auto hwId = LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false, MSSettings::roSettings());
+        auto hwId = LLUtil::getLatestHardwareId();
         auto hwIdString = QnUuid::fromHardwareId(hwId).toString();
         std::cout << "Got hwID \"" << hwIdString.toStdString() << "\"" << std::endl;
         return hwIdString;

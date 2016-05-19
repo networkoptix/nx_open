@@ -635,7 +635,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.beginSubMenu(); {
         factory(QnActions::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-            requiredTargetPermissions(Qn::CreateLayoutPermission).
+            requiredTargetPermissions(Qn::WritePermission). //TODO: #GDM #access check canCreateResource
             text(tr("Layout...")).
             pulledText(tr("New Layout...")).
             condition(hasFlags(Qn::user));
@@ -1176,7 +1176,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::SaveLayoutAsAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
-        requiredTargetPermissions(Qn::UserResourceRole, Qn::CreateLayoutPermission).
+        requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission).    //TODO: #GDM #access check canCreateResource permission
         text(tr("Save Layout As...")).
         condition(new QnSaveLayoutAsActionCondition(false, this));
 
@@ -1438,6 +1438,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
         condition(hasFlags(Qn::user));
+
+    factory(QnActions::UserGroupsAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Users Groups...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        condition(new QnTreeNodeTypeCondition(Qn::UsersNode, this));
 
     factory(QnActions::CameraIssuesAction).
         mode(QnActionTypes::DesktopMode).

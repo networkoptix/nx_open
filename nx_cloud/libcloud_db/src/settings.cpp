@@ -11,9 +11,11 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
+#include <nx/utils/timer_manager.h>
+#include <libcloud_db_app_info.h>
 #include <utils/serialization/lexical.h>
 #include <utils/common/app_info.h>
-#include <libcloud_db_app_info.h>
+
 
 namespace
 {
@@ -62,16 +64,16 @@ namespace
     const QLatin1String kNotificationEnabled("notification/enabled");
     const bool kDefaultNotificationEnabled = true;
 
-    const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeoutSec");
+    const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeout");
     const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout = std::chrono::hours(24);
 
-    const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriodSec");
+    const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriod");
     const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec = std::chrono::hours(30 * 24);  //a month
 
-    const QLatin1String kNotActivatedSystemLivePeriodSec("systemManager/notActivatedSystemLivePeriodSec");
+    const QLatin1String kNotActivatedSystemLivePeriodSec("systemManager/notActivatedSystemLivePeriod");
     const std::chrono::seconds kDefaultNotActivatedSystemLivePeriodSec = std::chrono::hours(30 * 24);  //a month
 
-    const QLatin1String kDropExpiredSystemsPeriodSec("systemManager/dropExpiredSystemsPeriodSec");
+    const QLatin1String kDropExpiredSystemsPeriodSec("systemManager/dropExpiredSystemsPeriod");
     const std::chrono::seconds kDefaultDropExpiredSystemsPeriodSec = std::chrono::hours(12);
 
     const QLatin1String kControlSystemStatusByDb("systemManager/controlSystemStatusByDb");
@@ -83,11 +85,15 @@ namespace
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
 
-    const QLatin1String kNonceValidityPeriod("auth/nonceValidityPeriodSec");
+    const QLatin1String kNonceValidityPeriod("auth/nonceValidityPeriod");
     const std::chrono::seconds kDefaultNonceValidityPeriod = std::chrono::hours(4);
 
-    const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriodSec");
+    const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriod");
     const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
+
+    //event manager settings
+    const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
+    const auto kDefaultMediaServerConnectionIdlePeriod = std::chrono::minutes(1);
 }
 
 
@@ -104,6 +110,13 @@ Notification::Notification()
 SystemManager::SystemManager()
 :
     controlSystemStatusByDb(kDefaultControlSystemStatusByDb)
+{
+}
+
+
+EventManager::EventManager()
+:
+    mediaServerConnectionIdlePeriod(kDefaultMediaServerConnectionIdlePeriod)
 {
 }
 
@@ -158,6 +171,11 @@ const AccountManager& Settings::accountManager() const
 const SystemManager& Settings::systemManager() const
 {
     return m_systemManager;
+}
+
+const EventManager& Settings::eventManager() const
+{
+    return m_eventManager;
 }
 
 const QString& Settings::changeUser() const
@@ -218,6 +236,8 @@ void Settings::fillSupportedCmdParameters()
 
 void Settings::loadConfiguration()
 {
+    using namespace std::chrono;
+
     //log
     m_logging.logLevel = m_settings.value( kLogLevel, kDefaultLogLevel ).toString();
     m_logging.logDir = m_settings.value( kLogDir, dataDir() + lit( "/log/" ) ).toString();
@@ -243,30 +263,26 @@ void Settings::loadConfiguration()
             kDefaultNotificationEnabled ? "true" : "false").toString() == "true";
 
     //accountManager
-    m_accountManager.passwordResetCodeExpirationTimeout =
-        std::chrono::seconds(
-            m_settings.value(
-                kPasswordResetCodeExpirationTimeout,
-                (qlonglong)kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
+    m_accountManager.passwordResetCodeExpirationTimeout = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kPasswordResetCodeExpirationTimeout).toString(),
+            kDefaultPasswordResetCodeExpirationTimeout));
 
     //system manager
-    m_systemManager.reportRemovedSystemPeriod =
-        std::chrono::seconds(
-            m_settings.value(
-                kReportRemovedSystemPeriodSec,
-                (qlonglong)kDefaultReportRemovedSystemPeriodSec.count()).toInt());
+    m_systemManager.reportRemovedSystemPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kReportRemovedSystemPeriodSec).toString(),
+            kDefaultReportRemovedSystemPeriodSec));
 
-    m_systemManager.notActivatedSystemLivePeriod =
-        std::chrono::seconds(
-            m_settings.value(
-                kNotActivatedSystemLivePeriodSec,
-                (qlonglong)kDefaultNotActivatedSystemLivePeriodSec.count()).toInt());
+    m_systemManager.notActivatedSystemLivePeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kNotActivatedSystemLivePeriodSec).toString(),
+            kDefaultNotActivatedSystemLivePeriodSec));
 
-    m_systemManager.dropExpiredSystemsPeriod =
-        std::chrono::seconds(
-            m_settings.value(
-                kDropExpiredSystemsPeriodSec,
-                (qlonglong)kDefaultDropExpiredSystemsPeriodSec.count()).toInt());
+    m_systemManager.dropExpiredSystemsPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kDropExpiredSystemsPeriodSec).toString(),
+            kDefaultDropExpiredSystemsPeriodSec));
 
     m_systemManager.controlSystemStatusByDb =
         m_settings.value(
@@ -275,16 +291,20 @@ void Settings::loadConfiguration()
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
-    m_auth.nonceValidityPeriod = 
-        std::chrono::seconds(
-            m_settings.value(
-                kNonceValidityPeriod,
-                (int)kDefaultNonceValidityPeriod.count()).toInt());
-    m_auth.intermediateResponseValidityPeriod = 
-        std::chrono::seconds(
-            m_settings.value(
-                kIntermediateResponseValidityPeriod,
-                (int)kDefaultIntermediateResponseValidityPeriod.count()).toInt());
+    m_auth.nonceValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kNonceValidityPeriod).toString(),
+            kDefaultNonceValidityPeriod));
+    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kIntermediateResponseValidityPeriod).toString(),
+            kDefaultIntermediateResponseValidityPeriod));
+
+    //event manager
+    m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kMediaServerConnectionIdlePeriod).toString(),
+            kDefaultMediaServerConnectionIdlePeriod));
 }
 
 }   //conf

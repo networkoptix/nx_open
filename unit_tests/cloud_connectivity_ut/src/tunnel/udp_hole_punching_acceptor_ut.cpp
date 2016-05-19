@@ -47,7 +47,7 @@ class UdpHolePunchingTunnelAcceptorTest
 protected:
     UdpHolePunchingTunnelAcceptorTest()
     :
-        stunClientMock(std::make_shared<network::test::StunAsyncClientMock>()),
+        stunClientMock(std::make_shared<stun::test::AsyncClientMock>()),
         manualAcceptorStop(false),
         udpStunServer(&stunMessageDispatcher),
         isUdpServerEnabled(true),
@@ -210,7 +210,7 @@ protected:
             mediatorConnection->pleaseStopSync();
     }
 
-    std::shared_ptr<network::test::StunAsyncClientMock> stunClientMock;
+    std::shared_ptr<stun::test::AsyncClientMock> stunClientMock;
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
 
     bool manualAcceptorStop;
@@ -252,6 +252,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectTimeout)
 
 TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
 {
+    manualAcceptorStop = true;
     std::random_device device;
     std::mt19937 generator(device());
     std::uniform_int_distribution<int64_t> distribution(0, kUdpRetryTimeout.count() * 2);
