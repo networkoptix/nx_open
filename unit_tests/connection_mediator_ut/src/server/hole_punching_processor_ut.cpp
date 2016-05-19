@@ -28,7 +28,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
 
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
@@ -128,7 +128,7 @@ TEST_F(HolePunchingProcessor, server_failure)
 
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
@@ -218,7 +218,7 @@ TEST_F(HolePunchingProcessor, server_failure)
 
 TEST_F(HolePunchingProcessor, destruction)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);

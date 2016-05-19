@@ -44,13 +44,12 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
-    auto b = std::back_inserter(m_args);
-    *b = strdup("/path/to/bin");
-    *b = strdup("-e");
-    *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_stunPort).toLatin1().constData());
-    *b = strdup("-http/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
-    *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
-    *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
+    addArg("/path/to/bin");
+    addArg("-e");
+    addArg("-stun/addrToListenList"); addArg(lit("127.0.0.1:%1").arg(m_stunPort).toLatin1().constData());
+    addArg("-http/addrToListenList"); addArg(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
+    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
 
     network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
     registerCloudDataProvider(&m_cloudDataProvider);
@@ -61,66 +60,6 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
     stop();
 
     QDir(m_tmpDir).removeRecursively();
-}
-
-void MediatorFunctionalTest::start()
-{
-    nx::utils::promise<void> mediatorInstantiatedCreatedPromise;
-    auto mediatorInstantiatedCreatedFuture = mediatorInstantiatedCreatedPromise.get_future();
-
-    m_mediatorProcessThread = nx::utils::thread(
-        [this, &mediatorInstantiatedCreatedPromise]()->int {
-            m_mediatorInstance = std::make_unique<nx::hpm::MediatorProcessPublic>(
-                static_cast<int>(m_args.size()), m_args.data());
-            m_mediatorInstance->setOnStartedEventHandler(
-                [this](bool result)
-                {
-                    m_mediatorStartedPromise.set_value(result);
-                });
-            mediatorInstantiatedCreatedPromise.set_value();
-            return m_mediatorInstance->exec();
-        });
-    mediatorInstantiatedCreatedFuture.wait();
-}
-
-bool MediatorFunctionalTest::startAndWaitUntilStarted()
-{
-    start();
-    return waitUntilStarted();
-}
-
-bool MediatorFunctionalTest::waitUntilStarted()
-{
-    static const std::chrono::seconds initializedMaxWaitTime(15);
-
-    auto mediatorStartedFuture = m_mediatorStartedPromise.get_future();
-    if (mediatorStartedFuture.wait_for(initializedMaxWaitTime) !=
-            std::future_status::ready)
-    {
-        return false;
-    }
-
-    return mediatorStartedFuture.get();
-}
-
-void MediatorFunctionalTest::stop()
-{
-    m_mediatorInstance->pleaseStop();
-    m_mediatorProcessThread.join();
-    m_mediatorInstance.reset();
-}
-
-void MediatorFunctionalTest::restart()
-{
-    stop();
-    start();
-    waitUntilStarted();
-}
-
-void MediatorFunctionalTest::addArg(const char* arg)
-{
-    auto b = std::back_inserter(m_args);
-    *b = strdup(arg);
 }
 
 SocketAddress MediatorFunctionalTest::stunEndpoint() const
