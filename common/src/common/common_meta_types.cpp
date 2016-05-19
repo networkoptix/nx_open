@@ -82,6 +82,7 @@
 #include "api/model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
 #include "health/system_health.h"
+#include <utils/common/credentials.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -298,14 +299,19 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
+    qRegisterMetaType<QList<QMap<QString, QString>>>();
+
+    qRegisterMetaType<QList<QnCredentials>>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
     QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+    QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
+    QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
 
     qn_commonMetaTypes_initialized = true;
 }
