@@ -8,12 +8,20 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log.h>
 
+#include "settings.h"
+
 
 namespace nx {
 namespace cloud {
 namespace gateway {
 
 constexpr const int kSocketTimeoutMs = 29*1000;
+
+ProxyHandler::ProxyHandler(const conf::Settings& settings)
+:
+    m_settings(settings)
+{
+}
 
 ProxyHandler::~ProxyHandler()
 {
@@ -60,8 +68,8 @@ void ProxyHandler::processRequest(
     m_targetPeerSocket = SocketFactory::createStreamSocket();
     m_targetPeerSocket->bindToAioThread(connection.getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
-        !m_targetPeerSocket->setRecvTimeout(kSocketTimeoutMs) ||
-        !m_targetPeerSocket->setSendTimeout(kSocketTimeoutMs))
+        !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
+        !m_targetPeerSocket->setSendTimeout(m_settings.tcp().sendTimeout))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Failed to set socket options. %1")
@@ -74,7 +82,7 @@ void ProxyHandler::processRequest(
     m_request = std::move(request);
     //TODO #ak updating request (e.g., Host header)
     m_targetPeerSocket->connectAsync(
-        SocketAddress(systemAddressString.toString(), nx_http::DEFAULT_HTTP_PORT),  //TODO #ak remove http port
+        SocketAddress(systemAddressString.toString(), m_settings.http().proxyTargetPort),
         std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
 }
 

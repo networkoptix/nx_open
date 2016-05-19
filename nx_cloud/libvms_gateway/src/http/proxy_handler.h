@@ -13,12 +13,17 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
+namespace conf {
+class Settings;
+}
+
 class ProxyHandler
 :
     public nx_http::AbstractHttpRequestHandler,
     public StreamConnectionHolder<nx_http::AsyncMessagePipeline>
 {
 public:
+    ProxyHandler(const conf::Settings& settings);
     virtual ~ProxyHandler();
 
     virtual void processRequest(
@@ -36,6 +41,7 @@ public:
         nx_http::AsyncMessagePipeline* connection) override;
 
 private:
+    const conf::Settings& m_settings;
     std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
     nx_http::Request m_request;
     std::function<void(

@@ -127,7 +127,9 @@ int VmsGatewayProcess::executeApplication()
             streeManager);
 
         //registering HTTP handlers
-        registerApiHandlers(&httpMessageDispatcher);
+        registerApiHandlers(
+            settings,
+            &httpMessageDispatcher);
 
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
@@ -225,15 +227,13 @@ void VmsGatewayProcess::initializeLogging(const conf::Settings& settings)
 }
 
 void VmsGatewayProcess::registerApiHandlers(
+    const conf::Settings& settings,
     nx_http::MessageDispatcher* const msgDispatcher)
 {
-    msgDispatcher->setDefaultProcessor<ProxyHandler>();
-
-    //msgDispatcher->registerRequestProcessor<PingHandler>(
-    //    PingHandler::kHandlerPath,
-    //    [&authorizationManager]() -> std::unique_ptr<PingHandler> {
-    //        return std::make_unique<PingHandler>( authorizationManager );
-    //    } );
+    msgDispatcher->setDefaultProcessor<ProxyHandler>(
+        [&settings]() -> std::unique_ptr<ProxyHandler> {
+            return std::make_unique<ProxyHandler>(settings);
+        });
 }
 
 }   //namespace cloud
