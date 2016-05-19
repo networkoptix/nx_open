@@ -11,9 +11,10 @@
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
+#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 namespace  {
 
@@ -221,14 +222,30 @@ void QnToolTipWidget::setGeometry(const QRectF &rect) {
         invalidateShape();
 }
 
-void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    QN_UNUSED(option, widget);
+
     ensureShape();
 
     /* Render background. */
+
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    painter->setPen(QPen(frameBrush(), frameWidth()));
-    painter->setBrush(windowBrush());
-    painter->drawPath(m_borderShape);
+    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), frameWidth()));
+    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
+
+    bool corrected(false);
+    QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+
+    if (corrected)
+    {
+        QnScopedPainterTransformRollback xformRollback(painter, roundedTransform);
+        painter->drawPath(m_borderShape);
+    }
+    else
+    {
+        painter->drawPath(m_borderShape);
+    }
 }
 
 void QnToolTipWidget::updateGeometry() {

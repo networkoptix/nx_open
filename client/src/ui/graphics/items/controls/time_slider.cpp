@@ -2215,6 +2215,7 @@ void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color
     pen.setCapStyle(Qt::FlatCap);
 
     QnScopedPainterPenRollback penRollback(painter, pen);
+    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
     qreal x = quickPositionFromValue(pos);
     painter->drawLine(QPointF(x, rect().top()), QPointF(x, rect().bottom()));
