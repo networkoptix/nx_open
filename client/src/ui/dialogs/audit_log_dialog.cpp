@@ -640,14 +640,16 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
     for(int i = 0; i < resList.size(); i++)
     {
+        auto resource = resList[i];
+
         QnLayoutItemData item;
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
-        item.resource.id = resList[i]->getId();
-        item.resource.path = resList[i]->getUniqueId();
+        item.resource.id = resource->getId();
+        item.resource.uniqueId = resource->getUniqueId();
         item.dataByRole[Qn::ItemTimeRole] = period.startTimeMs;
 
-        QString forcedRotation = resList[i]->getProperty(QnMediaResource::rotationKey());
+        QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
         if (!forcedRotation.isEmpty())
             item.rotation = forcedRotation.toInt();
 

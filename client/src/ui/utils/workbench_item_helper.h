@@ -14,11 +14,8 @@ namespace helpers
     QnSharedResourcePointer<ResourceType> extractResource(QnWorkbenchItem *item)
     {
         const auto layoutItemData = item->data();
-        const auto id = layoutItemData.resource.id;
+        return qnResPool->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
 
-        return (id.isNull()
-            ? qnResPool->getResourceByUniqueId<ResourceType>(layoutItemData.resource.path)
-            : qnResPool->getResourceById<ResourceType>(id));
     }
 
     QnVirtualCameraResourcePtr extractCameraResource(QnWorkbenchItem *item);

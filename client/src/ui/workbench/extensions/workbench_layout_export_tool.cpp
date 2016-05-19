@@ -108,16 +108,16 @@ bool QnLayoutExportTool::prepareStorage() {
     return true;
 }
 
-QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout() {
+QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout()
+{
     ItemInfoList result;
 
     QSet<QString> uniqIdList;
     QnLayoutItemDataMap items;
 
-    for (const QnLayoutItemData &item: m_layout->getItems()) {
-        QnResourcePtr resource = qnResPool->getResourceById(item.resource.id);
-        if (!resource)
-            resource = qnResPool->getResourceByUniqueId(item.resource.path);
+    for (const QnLayoutItemData &item: m_layout->getItems())
+    {
+        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
 
@@ -125,11 +125,13 @@ QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout() {
 
         ItemInfo info(resource->getName(), Qn::InvalidUtcOffset);
 
-        if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>()) {
+        if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
+        {
             QString uniqueId = resource->getUniqueId();
             localItem.resource.id = resource->getId();
-            localItem.resource.path = uniqueId;
-            if (!uniqIdList.contains(uniqueId)) {
+            localItem.resource.uniqueId = uniqueId;
+            if (!uniqIdList.contains(uniqueId))
+            {
                 m_resources << mediaRes;
                 uniqIdList << uniqueId;
             }
@@ -330,10 +332,11 @@ void QnLayoutExportTool::finishExport(bool success) {
             QString oldUrl = m_layout->getUrl();
             QString newUrl = m_storage->getUrl();
 
-            for (const QnLayoutItemData &item: m_layout->getItems()) {
-                QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.path);
+            for (const QnLayoutItemData &item: m_layout->getItems())
+            {
+                QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
                 if (aviRes)
-                    qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.path));
+                    qnResPool->updateUniqId(aviRes, QnLayoutFileStorageResource::updateNovParent(newUrl, item.resource.uniqueId));
             }
             m_layout->setUrl(newUrl);
             m_layout->setName(QFileInfo(newUrl).fileName());

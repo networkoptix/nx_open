@@ -204,12 +204,12 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     int index = tabAt(event->pos());
     if(index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
-    
+
     QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, mainWindow(), target));
     if(menu->isEmpty())
         return;
 
-    /** 
+    /**
      * Note that we cannot use event->globalPos() here as it doesn't work when
      * the widget is embedded into graphics scene.
      */
@@ -227,7 +227,7 @@ void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
 
 void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
     if (event->button() == Qt::MiddleButton) {
-        if (m_midClickedTab >= 0 && m_midClickedTab == tabAt(event->pos())) 
+        if (m_midClickedTab >= 0 && m_midClickedTab == tabAt(event->pos()))
             emit tabCloseRequested(m_midClickedTab);
         m_midClickedTab = -1;
     }
@@ -272,7 +272,7 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
         /* Current layout may have changed. Sync. */
         at_workbench_currentLayoutChanged();
     }
-    
+
     checkInvariants();
 }
 

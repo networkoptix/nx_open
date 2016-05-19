@@ -5,17 +5,21 @@
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
+
+#include <ui/models/resource/resource_tree_model_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnResourceTreeModel;
+#include <utils/common/from_this_to_shared.h>
 
-class QnResourceTreeModelNode: public QObject, public QnWorkbenchContextAware
+class QnResourceTreeModelNode: public QObject, public QnWorkbenchContextAware, public QnFromThisToShared<QnResourceTreeModelNode>
 {
     Q_OBJECT
 
     typedef QObject base_type;
 public:
-    enum State {
+    enum State
+    {
         Normal,     /**< Normal node. */
         Invalid     /**< Invalid node that should not be displayed.
                      * Invalid nodes are parts of dangling tree branches during incremental
@@ -23,19 +27,24 @@ public:
     };
 
     /**
-     * Constructor for toplevel nodes.
+     * Constructor for root nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel *model, Qn::NodeType type, const QString &name = QString());
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type);
+
+    /**
+    * Constructor for other virtual group nodes (recorders, other systems).
+    */
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QString &name);
 
     /**
      * Constructor for resource nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType);
 
     /**
      * Constructor for item nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel *model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
 
     ~QnResourceTreeModelNode();
 
@@ -68,13 +77,13 @@ public:
     void setBastard(bool bastard);
 
 
-    const QList<QnResourceTreeModelNode *> &children() const;
+    QList<QnResourceTreeModelNodePtr> children() const;
 
-    QnResourceTreeModelNode *child(int index) ;
+    QnResourceTreeModelNodePtr child(int index) ;
 
-    QnResourceTreeModelNode *parent() const ;
+    QnResourceTreeModelNodePtr parent() const ;
 
-    void setParent(QnResourceTreeModelNode *parent) ;
+    void setParent(const QnResourceTreeModelNodePtr& parent) ;
 
     QModelIndex index(int col);
 
@@ -90,13 +99,15 @@ public:
 
     void setModified(bool modified) ;
 protected:
-    void removeChildInternal(QnResourceTreeModelNode *child) ;
-    void addChildInternal(QnResourceTreeModelNode *child);
+    void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
+    void addChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
 private:
     /** Recalculated 'bastard' state for the node. */
     bool calculateBastard() const;
+
+    QnResourceTreeModelNodePtr toSharedPointer() const;
 
 private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
@@ -105,7 +116,7 @@ private:
     /* Node state. */
 
     /** Model that this node belongs to. */
-    QnResourceTreeModel *const m_model;
+    QPointer<QnResourceTreeModel> const m_model;
 
     /** Type of this node. */
     const Qn::NodeType m_type;
@@ -124,10 +135,10 @@ private:
     bool m_bastard;
 
     /** Parent of this node. */
-    QnResourceTreeModelNode *m_parent;
+    QnResourceTreeModelNodePtr m_parent;
 
     /** Children of this node. */
-    QList<QnResourceTreeModelNode *> m_children;
+    QList<QnResourceTreeModelNodePtr> m_children;
 
     /* Resource-related state. */
 
@@ -162,3 +173,5 @@ private:
         bool checked;
     } m_editable;
 };
+
+

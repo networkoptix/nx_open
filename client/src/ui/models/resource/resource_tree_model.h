@@ -1,11 +1,15 @@
 #pragma once
 
+#include <array>
+
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QScopedPointer>
 
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
+
+#include <ui/models/resource/resource_tree_model_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -14,26 +18,25 @@
 
 class QnResourceModelPrivate;
 class QnResourcePool;
-class QnLayoutItemData;
 class QnVideoWallItem;
 class QnVideoWallMatrix;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
-class QnResourceTreeModelNode;
+
 class QnResourceTreeModelCustomColumnDelegate;
 
-class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware 
+class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QAbstractItemModel> base_type;
 public:
     /** Narrowed scope for the minor widgets and dialogs. */
-    enum Scope {
+    enum Scope
+    {
         FullScope,
         CamerasScope,
         UsersScope
-        //TODO: #GDM non-admin-scope?
     };
 
     explicit QnResourceTreeModel(Scope scope = FullScope, QObject *parent = NULL);
@@ -64,22 +67,23 @@ public:
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 private:
-    QnResourceTreeModelNode *node(const QnResourcePtr &resource);
-    QnResourceTreeModelNode *node(const QnUuid &uuid);
-    QnResourceTreeModelNode *node(const QModelIndex &index) const;
-    QnResourceTreeModelNode *node(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource);
-    QnResourceTreeModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
-    QnResourceTreeModelNode *systemNode(const QString &systemName);
-    QnResourceTreeModelNode *expectedParent(QnResourceTreeModelNode *node);
-    bool isIgnored(const QnResourcePtr &resource) const;
+    QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
-    void removeNode(QnResourceTreeModelNode *node);
+    QnResourceTreeModelNodePtr getResourceNode(const QnResourcePtr& resource);
+    QnResourceTreeModelNodePtr getItemNode(const QnUuid& uuid, const QnResourcePtr& parentResource, Qn::NodeType nodeType = Qn::ItemNode);
+    QnResourceTreeModelNodePtr getRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
+    QnResourceTreeModelNodePtr getSystemNode(const QString &systemName);
 
-    void removeNode(Qn::NodeType nodeType, const QnUuid &uuid, const QnResourcePtr &resource);
+    QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
+    void updateNodeParent(const QnResourceTreeModelNodePtr& node);
+
+    void removeNode(const QnResourceTreeModelNodePtr& node);
+
+    void removeItemNode(const QnUuid& uuid, const QnResourcePtr& parentResource);
 
     /** Some nodes can have deleting node set as parent, but this node will not
-     ** have them as children because of their 'bastard' flag.*/
-    void deleteNode(QnResourceTreeModelNode *node);
+     * have them as children because of their 'bastard' flag.*/
+    void deleteNode(const QnResourceTreeModelNodePtr& node);
 
     /** Fully rebuild resources tree. */
     void rebuildTree();
@@ -116,36 +120,28 @@ private slots:
 private:
     friend class QnResourceTreeModelNode;
 
-    typedef QPair<QnResourcePtr, QnUuid> NodeKey;
-
-    typedef QHash<QString, QnResourceTreeModelNode *> RecorderHash;
+    typedef QHash<QString, QnResourceTreeModelNodePtr> RecorderHash;
 
     /** Root nodes array */
-    QnResourceTreeModelNode *m_rootNodes[Qn::NodeTypeCount];
-
-    /** Generic node list */
-    QHash<NodeKey, QnResourceTreeModelNode*> m_nodes[Qn::NodeTypeCount];
-
-    /** Set of top-level node types */
-    QList<Qn::NodeType> m_rootNodeTypes;
+    std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
 
     /** Mapping for resource nodes, by resource. */
-    QHash<QnResourcePtr, QnResourceTreeModelNode *> m_resourceNodeByResource;
+    QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_resourceNodeByResource;
 
-    /** Mapping for recorder nodes, by resource. */
-    QHash<QnResourcePtr, RecorderHash> m_recorderHashByResource;
+    /** Mapping for recorder nodes, by parent node. */
+    QHash<QnResourceTreeModelNodePtr, RecorderHash> m_recorderHashByParent;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QnUuid, QnResourceTreeModelNode *> m_itemNodeByUuid;
+    QHash<QnUuid, QnResourceTreeModelNodePtr> m_itemNodeByUuid;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
-    QHash<QnResourcePtr, QList<QnResourceTreeModelNode *> > m_itemNodesByResource;
+    QHash<QnResourcePtr, QList<QnResourceTreeModelNodePtr> > m_itemNodesByResource;
 
     /** Mapping for system nodes, by system name. */
-    QHash<QString, QnResourceTreeModelNode *> m_systemNodeBySystemName;
+    QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
 
     /** Full list of all created nodes. */
-    QList<QnResourceTreeModelNode *> m_allNodes;
+    QList<QnResourceTreeModelNodePtr> m_allNodes;
 
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
@@ -154,5 +150,5 @@ private:
     bool m_urlsShown;
 
     /** Narrowed scope for displaying the limited set of nodes. */
-    Scope m_scope;
+    const Scope m_scope;
 };

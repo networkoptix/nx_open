@@ -5,11 +5,13 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -26,7 +28,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, Qn::NodeType type, const QString &name):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type):
     base_type(),
     QnWorkbenchContextAware(model),
     m_model(model),
@@ -38,26 +40,33 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, Qn:
     m_modified(false),
     m_checkState(Qt::Unchecked)
 {
-    NX_ASSERT(type == Qn::LocalNode ||
-           type == Qn::ServersNode ||
-           type == Qn::OtherSystemsNode ||
-           type == Qn::UsersNode ||
-           type == Qn::WebPagesNode ||
-           type == Qn::RootNode ||
-           type == Qn::BastardNode ||
-           type == Qn::SystemNode ||
-           type == Qn::RecorderNode);
+    NX_ASSERT(
+        type == Qn::LocalNode ||
+        type == Qn::CurrentSystemNode ||
+        type == Qn::OtherSystemsNode ||
+        type == Qn::UsersNode ||
+        type == Qn::WebPagesNode ||
+        type == Qn::UserDevicesNode ||
+        type == Qn::UserLayoutsNode ||
+        type == Qn::UserServersNode ||
+        type == Qn::GlobalLayoutsNode ||
+        type == Qn::RootNode ||
+        type == Qn::BastardNode);
 
-    switch(type) {
+    switch(type)
+    {
     case Qn::RootNode:
-        m_displayName = m_name = tr("Root");
+        m_displayName = m_name = lit("Root");   /* This node is not visible directly. */
+        break;
+    case Qn::BastardNode:
+        m_displayName = m_name = lit("Invalid Resources");
+        m_bastard = true; /* This node is always hidden. */
         break;
     case Qn::LocalNode:
         m_displayName = m_name = tr("Local");
         m_icon = qnResIconCache->icon(QnResourceIconCache::LocalServer);
         break;
-    case Qn::ServersNode:
-        m_displayName = m_name = tr("System");
+    case Qn::CurrentSystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
     case Qn::OtherSystemsNode:
@@ -74,10 +83,53 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, Qn:
         m_icon = qnResIconCache->icon(QnResourceIconCache::WebPages);
         m_bastard = true; /* Invisible by default until has children. */
         break;
-    case Qn::BastardNode:
-        m_displayName = m_name = lit("Invalid Resources"); /* This node is always hidden. */
-        m_bastard = true;
+    case Qn::UserDevicesNode:
+        m_displayName = m_name = QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Devices"),
+            tr("Cameras")
+        );
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Camera);
+        m_bastard = true; /* Invisible by default until has children. */
         break;
+    case Qn::UserLayoutsNode:
+        m_displayName = m_name = tr("Layouts");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layout);
+        break;
+    case Qn::GlobalLayoutsNode:
+        m_displayName = m_name = tr("Global Layouts");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layout);
+        break;
+    case Qn::UserServersNode:
+        m_displayName = m_name = tr("Servers");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_bastard = true; /* Invisible by default until has children. */
+        break;
+    default:
+        break;
+    }
+
+    m_editable.checked = false;
+}
+
+/**
+* Constructor for other virtual group nodes (recorders, other systems).
+*/
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QString &name) :
+    base_type(),
+    QnWorkbenchContextAware(model),
+    m_model(model),
+    m_type(type),
+    m_state(Normal),
+    m_bastard(false),
+    m_parent(NULL),
+    m_status(Qn::Online),
+    m_modified(false),
+    m_checkState(Qt::Unchecked)
+{
+    NX_ASSERT(type == Qn::SystemNode || type == Qn::RecorderNode);
+
+    switch (type)
+    {
     case Qn::RecorderNode:
         m_displayName = m_name = name;
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
@@ -100,7 +152,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, Qn:
 /**
  * Constructor for resource nodes.
  */
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
     base_type(),
     QnWorkbenchContextAware(model),
     m_model(model),
@@ -113,8 +165,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, con
     m_checkState(Qt::Unchecked)
 {
     NX_ASSERT(model != NULL);
-    NX_ASSERT(nodeType == Qn::ResourceNode ||
-           nodeType == Qn::EdgeNode);
+    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode);
 
     setResource(resource);
 
@@ -124,7 +175,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, con
 /**
  * Constructor for item nodes.
  */
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel *model, const QnUuid &uuid, Qn::NodeType nodeType):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType):
     base_type(),
     QnWorkbenchContextAware(model),
     m_model(model),
@@ -146,16 +197,17 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
 {
     clear();
 
-    for (QnResourceTreeModelNode *childNode : m_children)
+    for (QnResourceTreeModelNodePtr childNode : m_children)
     {
-        childNode->setParent(NULL);
-        m_model->removeNode(childNode);
+        childNode->setParent(QnResourceTreeModelNodePtr());
+        if (m_model)
+            m_model->removeNode(childNode);
     }
 }
 
 void QnResourceTreeModelNode::clear()
 {
-    setParent(NULL);
+    setParent(QnResourceTreeModelNodePtr());
 
     if (m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode ||
@@ -166,7 +218,7 @@ void QnResourceTreeModelNode::clear()
     }
 }
 
-void QnResourceTreeModelNode::setResource(const QnResourcePtr &resource)
+void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
     NX_ASSERT(
         m_type == Qn::ItemNode ||
@@ -174,17 +226,19 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr &resource)
         m_type == Qn::VideoWallItemNode ||
         m_type == Qn::EdgeNode);
 
-    if(m_resource == resource)
+    if (m_resource == resource)
         return;
 
-    if(m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
-        if (m_model->m_itemNodesByResource.contains(m_resource))
-            m_model->m_itemNodesByResource[m_resource].removeOne(this);
+    if (m_model)
+        if (m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
+            if (m_model->m_itemNodesByResource.contains(m_resource))
+                m_model->m_itemNodesByResource[m_resource].removeOne(toSharedPointer());
 
     m_resource = resource;
 
-    if(m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
-        m_model->m_itemNodesByResource[m_resource].push_back(this);
+    if (m_model)
+        if (m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
+            m_model->m_itemNodesByResource[m_resource].push_back(toSharedPointer());
 
     update();
 }
@@ -272,9 +326,9 @@ void QnResourceTreeModelNode::update()
             break;
         }
     }
-    else if (m_type == Qn::ServersNode)
+    else if (m_type == Qn::CurrentSystemNode)
     {
-        m_displayName = m_name + lit(" (%1)").arg(qnCommon->localSystemName());
+        m_displayName = qnCommon->localSystemName();
     }
 
     /* Update bastard state. */
@@ -288,7 +342,7 @@ void QnResourceTreeModelNode::updateRecursive()
 {
     update();
 
-    for(QnResourceTreeModelNode *child: m_children)
+    for(auto child: m_children)
         child->updateRecursive();
 }
 
@@ -329,32 +383,49 @@ bool QnResourceTreeModelNode::isValid() const
 
 void QnResourceTreeModelNode::setState(State state)
 {
-    if(m_state == state)
+    if (m_state == state)
         return;
 
     m_state = state;
 
-    foreach(QnResourceTreeModelNode *node, m_children)
-        node->setState(state);
+    for (auto child: m_children)
+        child->setState(state);
 }
 
 bool QnResourceTreeModelNode::calculateBastard() const
 {
+    /* Here we can narrow nodes visibility, based on permissions, if needed. */
+
+    bool isLoggedIn = !context()->user().isNull();
+    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+
     switch (m_type)
     {
     /* Hide non-readable resources. */
     case Qn::ItemNode:
         return !m_resource || !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
+    /* These will be hidden or displayed together with videowall. */
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
         return false;
 
+    /* Always hidden. */
     case Qn::BastardNode:
         return true;
 
     case Qn::OtherSystemsNode:
         return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled() || m_children.isEmpty();
+
+    case Qn::UserDevicesNode:
+    case Qn::UserServersNode:
+        return !isLoggedIn || isAdmin || m_children.isEmpty();
+
+    case Qn::UserLayoutsNode:
+        return !isLoggedIn || isAdmin;
+
+    case Qn::GlobalLayoutsNode:
+        return !isLoggedIn;
 
     case Qn::WebPagesNode:
         return m_children.isEmpty();
@@ -384,8 +455,16 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
             if (qnResPool->isAutoGeneratedLayout(layout))
                 return true;
+
+            return false;
         }
-        else
+
+        if (QnUserResourcePtr user = m_resource.dynamicCast<QnUserResource>())
+        {
+            /* Hide disabled users. */
+            return !user->isEnabled();
+        }
+
         {
 #ifndef DESKTOP_CAMERA_DEBUG
             /* Hide desktop camera resources from the tree. */
@@ -418,19 +497,23 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        /* Hide non-readable resources. */
-        return !(accessController()->permissions(m_resource) & Qn::ReadPermission);
-
-    case Qn::UsersNode:
+        /* Only admins can see edge nodes. */
         return !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
-    case Qn::ServersNode:
-        return !accessController()->hasGlobalPermission(Qn::GlobalEditServersPermissions);
+    case Qn::UsersNode:
+    case Qn::CurrentSystemNode:
+        return !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+        return !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
     default:
         NX_ASSERT("Should never get here");
         return false;
     }
+}
+
+QnResourceTreeModelNodePtr QnResourceTreeModelNode::toSharedPointer() const
+{
+    return QnFromThisToShared<QnResourceTreeModelNode>::toSharedPointer();
 }
 
 bool QnResourceTreeModelNode::isBastard() const
@@ -440,47 +523,47 @@ bool QnResourceTreeModelNode::isBastard() const
 
 void QnResourceTreeModelNode::setBastard(bool bastard)
 {
-    if(m_bastard == bastard)
+    if (m_bastard == bastard)
         return;
 
     m_bastard = bastard;
 
-    if(m_parent)
+    if (!m_parent)
+        return;
+
+    if (m_bastard)
     {
-        if(m_bastard)
-        {
-            m_parent->removeChildInternal(this);
-        }
-        else
-        {
-            setState(m_parent->state());
-            m_parent->addChildInternal(this);
-        }
+        m_parent->removeChildInternal(toSharedPointer());
+    }
+    else
+    {
+        setState(m_parent->state());
+        m_parent->addChildInternal(toSharedPointer());
     }
 }
 
-const QList<QnResourceTreeModelNode *>& QnResourceTreeModelNode::children() const
+QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::children() const
 {
     return m_children;
 }
 
-QnResourceTreeModelNode* QnResourceTreeModelNode::child(int index)
+QnResourceTreeModelNodePtr QnResourceTreeModelNode::child(int index)
 {
     return m_children[index];
 }
 
-QnResourceTreeModelNode* QnResourceTreeModelNode::parent() const
+QnResourceTreeModelNodePtr QnResourceTreeModelNode::parent() const
 {
     return m_parent;
 }
 
-void QnResourceTreeModelNode::setParent(QnResourceTreeModelNode *parent)
+void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent)
 {
     if(m_parent == parent)
         return;
 
     if(m_parent && !m_bastard)
-        m_parent->removeChildInternal(this);
+        m_parent->removeChildInternal(toSharedPointer());
 
     m_parent = parent;
 
@@ -489,7 +572,7 @@ void QnResourceTreeModelNode::setParent(QnResourceTreeModelNode *parent)
         if(!m_bastard)
         {
             setState(m_parent->state());
-            m_parent->addChildInternal(this);
+            m_parent->addChildInternal(toSharedPointer());
 
             if (m_type == Qn::VideoWallItemNode)
                 update();
@@ -508,13 +591,16 @@ QModelIndex QnResourceTreeModelNode::index(int col)
     if(m_parent == NULL)
         return QModelIndex(); /* That's root node. */
 
-    return index(m_parent->m_children.indexOf(this), col);
+    return index(m_parent->m_children.indexOf(toSharedPointer()), col);
 }
 
 QModelIndex QnResourceTreeModelNode::index(int row, int col)
 {
+    if (!m_model)
+        return QModelIndex();
+
     NX_ASSERT(isValid()); /* Only valid nodes have indices. */
-    NX_ASSERT(m_parent != NULL && row == m_parent->m_children.indexOf(this));
+    NX_ASSERT(m_parent != NULL && row == m_parent->m_children.indexOf(toSharedPointer()));
 
     return m_model->createIndex(row, col, this);
 }
@@ -708,9 +794,10 @@ bool QnResourceTreeModelNode::setData(const QVariant &value, int role, int colum
     else if (m_type == Qn::RecorderNode)
     {
         //sending first camera to get groupId and check WriteName permission
-        if (this->children().isEmpty())
+        if (children().isEmpty())
             return false;
-        QnResourceTreeModelNode* child = this->child(0);
+
+        auto child = this->child(0);
         if (!child->resource())
             return false;
         parameters = QnActionParameters(child->resource());
@@ -744,11 +831,11 @@ void QnResourceTreeModelNode::setModified(bool modified)
     changeInternal();
 }
 
-void QnResourceTreeModelNode::removeChildInternal(QnResourceTreeModelNode *child)
+void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)
 {
     NX_ASSERT(child->parent() == this);
 
-    if(isValid() && !isBastard())
+    if (isValid() && !isBastard() && m_model)
     {
         QModelIndex index = this->index(Qn::NameColumn);
         int row = m_children.indexOf(child);
@@ -774,11 +861,11 @@ void QnResourceTreeModelNode::removeChildInternal(QnResourceTreeModelNode *child
     }
 }
 
-void QnResourceTreeModelNode::addChildInternal(QnResourceTreeModelNode *child)
+void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr& child)
 {
     NX_ASSERT(child->parent() == this);
 
-    if(isValid() && !isBastard())
+    if (isValid() && !isBastard() && m_model)
     {
         QModelIndex index = this->index(Qn::NameColumn);
         int row = m_children.size();
@@ -806,7 +893,7 @@ void QnResourceTreeModelNode::addChildInternal(QnResourceTreeModelNode *child)
 
 void QnResourceTreeModelNode::changeInternal()
 {
-    if(!isValid() || isBastard())
+    if (!isValid() || isBastard() || !m_model)
         return;
 
     QModelIndex index = this->index(Qn::NameColumn);

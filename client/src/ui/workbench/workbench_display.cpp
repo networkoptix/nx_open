@@ -1723,7 +1723,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if (data1.resource.id != data2.resource.id)
             return data1.resource.id < data2.resource.id;
 
-        return data1.resource.path < data2.resource.path;
+        return data1.resource.uniqueId < data2.resource.uniqueId;
     });
 
     for (QnWorkbenchItem *item: sortedItems)
