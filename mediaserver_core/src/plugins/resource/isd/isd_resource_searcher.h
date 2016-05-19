@@ -48,6 +48,8 @@ private:
         const QUrl& url,
         const QAuthenticator& auth);
 
+    void cleanupSpaces(QString& rowWithSpaces) const;
+
     bool isDwOrIsd(const QString& vendorName) const;
 };
 

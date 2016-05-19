@@ -8,11 +8,12 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <utils/common/credentials.h>
 
 
 extern QString getValueFromString(const QString& line);
 
-typedef QList<QMap<QString, QString>> DefaultCredentialsList;
+typedef QList<QnCredentials> DefaultCredentialsList;
 
 namespace
 {
@@ -90,20 +91,17 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-        QMap<QString, QString> defaultCreds;
-        defaultCreds["user"] = kDefaultIsdUsername;
-        defaultCreds["password"] = kDefaultIsdPassword;
+        QnCredentials defaultCreds;
+        defaultCreds.user = kDefaultIsdUsername;
+        defaultCreds.password = kDefaultIsdPassword;
         possibleCreds << defaultCreds;
 
         for (const auto& creds: possibleCreds)
         {
-            if ( creds["user"].isEmpty() || creds["password"].isEmpty())
+            if ( creds.user.isEmpty() || creds.password.isEmpty())
                 continue;
 
-            QAuthenticator auth;
-            auth.setUser(creds["user"]);
-            auth.setPassword(creds["password"]);
-
+            QAuthenticator auth = creds.toAuthenticator();
             resList = checkHostAddrInternal(url, auth);
             if (!resList.isEmpty())
                 break;
@@ -143,11 +141,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     {
         if (line.startsWith(kIsdModelParamName.toLatin1())) {
             name = getValueFromString(QString::fromUtf8(line)).trimmed();
-            name.replace(QLatin1Char(' '), QString());
-            //name.replace(QLatin1Char('-'), QString());
-            name.replace(QLatin1Char('\r'), QString());
-            name.replace(QLatin1Char('\n'), QString());
-            name.replace(QLatin1Char('\t'), QString());
+            cleanupSpaces(name);
         }
         else if (line.startsWith(kIsdBrandParamName.toLatin1())) {
             vendor = getValueFromString(QString::fromUtf8(line)).trimmed();
@@ -168,18 +162,12 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
             kDefaultIsdHttpTimeout,
             auth)));
 
-    mac.replace(QLatin1Char(' '), QString());
-    mac.replace(QLatin1Char('\r'), QString());
-    mac.replace(QLatin1Char('\n'), QString());
-    mac.replace(QLatin1Char('\t'), QString());
+    cleanupSpaces(mac);
 
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
-
     mac = getValueFromString(mac).trimmed();
-
-    //int n = mac.length();
 
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);
@@ -224,12 +212,22 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     return result;
 }
 
+void QnPlISDResourceSearcher::cleanupSpaces(QString& rowWithSpaces) const
+{
+    rowWithSpaces.replace(QLatin1Char(' '), QString());
+    rowWithSpaces.replace(QLatin1Char('\r'), QString());
+    rowWithSpaces.replace(QLatin1Char('\n'), QString());
+    rowWithSpaces.replace(QLatin1Char('\t'), QString());
+}
+
 QString extractWord(int index, const QByteArray& rawData)
 {
     int endIndex = index;
     for (;endIndex < rawData.size() && rawData.at(endIndex) != ' '; ++endIndex);
     return QString::fromLatin1(rawData.mid(index, endIndex - index));
 }
+
+
 
 /*QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     QnResourceList& result,
@@ -355,9 +353,7 @@ void QnPlISDResourceSearcher::processPacket(
 
         for (const auto& creds: possibleCreds)
         {
-            QAuthenticator auth;
-            auth.setUser(creds["user"]);
-            auth.setPassword(creds["password"]);
+            QAuthenticator auth = creds.toAuthenticator();
             QUrl url(lit("//") + host.toString());
             if (testCredentials(url, auth))
             {

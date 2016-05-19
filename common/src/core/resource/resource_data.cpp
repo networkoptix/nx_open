@@ -5,7 +5,7 @@
 #include <core/ptz/ptz_mapper.h>
 #include <core/onvif/onvif_config_data.h>
 #include <utils/serialization/json_functions.h>
-
+#include <utils/common/credentials.h>
 
 class QnResourceDataJsonSerializer: public QnJsonSerializer {
 public:
@@ -17,7 +17,7 @@ public:
         registerKey<Qn::PtzCapabilities>(lit("ptzCapabilities"));
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
-        registerKey<QList<QMap<QString, QString>>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
     }
 
 protected:
