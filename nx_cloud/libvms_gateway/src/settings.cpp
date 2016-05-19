@@ -35,7 +35,7 @@ namespace
 #ifdef _DEBUG
     const QLatin1String kDefaultLogLevel( "DEBUG" );
 #else
-    const QLatin1String kDefaultLogLevel( "INFO" );
+    const QLatin1String kDefaultLogLevel( "ERROR" );
 #endif
     const QLatin1String kLogDir( "log/logDir" );
 
