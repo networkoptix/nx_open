@@ -265,6 +265,10 @@ void QnLayoutTabBar::at_workbench_layoutsChanged() {
         while(count() > layouts.size())
             removeTab(count() - 1);
 
+        /* Force parent widget layout recalculation: */
+        if (auto parent = parentWidget())
+            parent->layout()->activate();
+
         /* Current layout may have changed. Sync. */
         at_workbench_currentLayoutChanged();
     }
