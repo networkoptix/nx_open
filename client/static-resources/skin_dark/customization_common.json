@@ -247,6 +247,14 @@
         }}
     },
 
+    "QnSliderTooltipWidget": {
+        "palette": { "default": { 
+            "window": "light4",
+            "windowText": "dark5",
+            "highlight": "light4.setAlpha(0)"
+        }}
+    },
+
     "QnTimelinePlaceholder": {
         "palette": { "default": { 
             "windowText": "dark11"

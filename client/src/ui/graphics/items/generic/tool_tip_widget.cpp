@@ -11,7 +11,7 @@
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
 
@@ -156,21 +156,21 @@ void QnToolTipWidget::pointTo(const QPointF &pos) {
     setPos(pos + parentZeroPos - parentTailPos);
 }
 
-QnProxyLabel *QnToolTipWidget::label() const {
+GraphicsLabel* QnToolTipWidget::label() const {
     if(layout() && layout()->count() == 1) {
-        return dynamic_cast<QnProxyLabel *>(layout()->itemAt(0));
+        return dynamic_cast<GraphicsLabel*>(layout()->itemAt(0));
     } else {
         return NULL;
     }
 }
 
 QString QnToolTipWidget::text() const {
-    QnProxyLabel *label = this->label();
+    GraphicsLabel* label = this->label();
     return label ? label->text() : QString();
 }
 
 void QnToolTipWidget::setText(const QString &text) {
-    QnProxyLabel *label = this->label();
+    GraphicsLabel* label = this->label();
     if(label) {
         label->setText(text);
         return;
@@ -179,10 +179,9 @@ void QnToolTipWidget::setText(const QString &text) {
     while(layout() && layout()->count() > 0)
         delete layout()->itemAt(0);
 
-    label = new QnProxyLabel();
+    label = new GraphicsLabel();
     label->setText(text);
     label->setAlignment(Qt::AlignCenter);
-    setPaletteColor(label, QPalette::Window, Qt::transparent);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);

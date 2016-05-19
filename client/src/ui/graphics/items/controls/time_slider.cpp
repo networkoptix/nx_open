@@ -29,7 +29,7 @@
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
-#include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
@@ -129,6 +129,12 @@ namespace {
 
     /** Padding at the left of line labels. */
     const int kLineLabelPaddingPixels = 6;
+
+    /** Minimal width of big datetime tooltips. */
+    const qreal kDateTimeTooltipMinimalWidth = 128.0;
+
+    /** Gap between position marker and tooltip tail. */
+    const qreal kToolTipMargin = 4.0;
 
     const qreal kDegreesFor2x = 180.0;
 
@@ -473,7 +479,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_bookmarksVisible(false),
     m_bookmarksHelper(nullptr),
     m_liveSupported(false),
-    m_keyboardSelectionInitiated(false)
+    m_keyboardSelectionInitiated(false),
+    m_tooltipLine1(new GraphicsLabel(this)),
+    m_tooltipLine2(new GraphicsLabel(this))
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -484,6 +492,25 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastMinuteIndicatorVisible.fill(true, kMaxLines);
 
     generateProgressPatterns();
+
+    /* Create tooltip layout. */
+    QGraphicsLinearLayout* tooltipLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    tooltipLayout->setContentsMargins(5.0, 4.0, 5.0, 3.0);
+    tooltipLayout->setSpacing(2.0);
+    tooltipLayout->addItem(m_tooltipLine1);
+    tooltipLayout->addItem(m_tooltipLine2);
+
+    toolTipItem()->setLayout(tooltipLayout);
+    toolTipItem()->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    setTooltipMargin(kToolTipMargin);
+
+    m_tooltipLine1->setAlignment(Qt::AlignCenter);
+    m_tooltipLine2->setAlignment(Qt::AlignCenter);
+
+    QFont font;
+    font.setPixelSize(font.pixelSize() + 2);
+    font.setBold(true);
+    m_tooltipLine2->setFont(font);
 
     /* Prepare kinetic zoom processor. */
     KineticCuttingProcessor* kineticProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
@@ -516,8 +543,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow;
 #endif
     setOptions(defaultOptions);
-
-    setToolTipFormat(lit("hh:mm:ss"));
 
     /* Run handlers. */
     updateSteps();
@@ -778,6 +803,7 @@ void QnTimeSlider::setOptions(Options options)
     {
         updateSteps();
         updateTickmarkTextSteps();
+        updateToolTipText();
     }
 }
 
@@ -988,20 +1014,6 @@ void QnTimeSlider::setSelectionValid(bool valid)
 
     if (!m_selectionValid)
         m_keyboardSelectionInitiated = false;
-}
-
-const QString& QnTimeSlider::toolTipFormat() const
-{
-    return m_toolTipFormat;
-}
-
-void QnTimeSlider::setToolTipFormat(const QString& format)
-{
-    if (m_toolTipFormat == format)
-        return;
-
-    m_toolTipFormat = format;
-    updateToolTipText();
 }
 
 QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
@@ -1513,13 +1525,50 @@ void QnTimeSlider::updateToolTipText()
 
     qint64 pos = sliderPosition();
 
-    QString toolTip;
-    if (m_options.testFlag(UseUTC))
-        toolTip = m_locale.toString(QDateTime::fromMSecsSinceEpoch(pos + m_localOffset), m_toolTipFormat);
-    else
-        toolTip = m_locale.toString(msecsToTime(pos), m_toolTipFormat);
+    QString line1;
+    QString line2;
 
-    setToolTip(toolTip);
+    if (m_liveSupported && pos == maximum())
+    {
+        line1 = tr("Live");
+    }
+    else
+    {
+        static const QString tooltipFormatDate = lit("dd MMMM yyyy");
+        static const QString tooltipFormatTime = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeShort = lit("mm:ss");
+
+        if (m_options.testFlag(UseUTC))
+        {
+            QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos + m_localOffset);
+            line1 = m_locale.toString(dateTime, tooltipFormatDate);
+            line2 = m_locale.toString(dateTime, tooltipFormatTime);
+        }
+        else
+        {
+            const QString& format = maximum() >= 60ll * 60ll * 1000ll ? /* Longer than 1 hour? */
+                tooltipFormatTime :
+                tooltipFormatTimeShort;
+
+            line1 = m_locale.toString(msecsToTime(pos), format);
+        }
+    }
+
+    m_tooltipLine1->setText(line1);
+
+    if (line2.isEmpty())
+    {
+        m_tooltipLine2->setVisible(false);
+        toolTipItem()->setMinimumWidth(0.0);
+    }
+    else
+    {
+        m_tooltipLine2->setText(line2);
+        m_tooltipLine2->setVisible(true);
+
+        /* Big datetime tooltips shouldn't be narrower than some minimal value: */
+        toolTipItem()->setMinimumWidth(kDateTimeTooltipMinimalWidth);
+    }
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line)
