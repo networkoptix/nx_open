@@ -7,6 +7,7 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/cpp14.h>
 
 #include "settings.h"
 
