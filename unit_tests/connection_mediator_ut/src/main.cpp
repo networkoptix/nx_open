@@ -10,12 +10,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_global.h>
 
-#include <test_support/socket_globals_holder.h>
-
 
 int main( int argc, char **argv )
 {
-    SocketGlobalsHolder socketGlobalsInstance;
+    nx::network::SocketGlobalsHolder socketGlobalsInstance;
     ::testing::InitGoogleTest(&argc, argv);
 
     for (int i = 0; i < argc; ++i)

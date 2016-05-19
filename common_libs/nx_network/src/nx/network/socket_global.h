@@ -2,6 +2,8 @@
 #define NX_NETWORK_SOCKET_GLOBAL_H
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/singleton.h>
+#include <utils/common/cpp14.h>
 
 #include "aio/aioservice.h"
 
@@ -70,6 +72,27 @@ private:
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
     cloud::OutgoingTunnelPool m_outgoingTunnelPool;
+};
+
+class SocketGlobalsHolder
+:
+    public Singleton<SocketGlobalsHolder>
+{
+public:
+    SocketGlobalsHolder()
+    :
+        m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>())
+    {
+    }
+
+    void reinitialize()
+    {
+        m_socketGlobalsGuard.reset();
+        m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>();
+    }
+
+private:
+    std::unique_ptr<SocketGlobals::InitGuard> m_socketGlobalsGuard;
 };
 
 } // namespace network

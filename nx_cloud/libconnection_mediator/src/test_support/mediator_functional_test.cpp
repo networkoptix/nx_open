@@ -16,6 +16,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/socket.h>
+#include <nx/network/socket_global.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
@@ -25,7 +26,6 @@
 
 #include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"
-#include "socket_globals_holder.h"
 
 
 namespace nx {
@@ -37,7 +37,7 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     m_httpPort(0)
 {
     //starting clean test
-    SocketGlobalsHolder::instance()->reinitialize();
+    nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
     m_stunPort = (std::rand() % 10000) + 50000;
     m_httpPort = m_stunPort+1;

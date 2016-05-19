@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
-#include <libconnection_mediator/src/test_support/socket_globals_holder.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
