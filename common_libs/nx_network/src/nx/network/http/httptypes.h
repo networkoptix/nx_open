@@ -254,6 +254,8 @@ namespace nx_http
         NX_NETWORK_API StringType toString(int);
         NX_NETWORK_API bool isSuccessCode(Value);
         NX_NETWORK_API bool isSuccessCode(int);
+
+        NX_NETWORK_API bool isMessageBodyAllowed(int statusCode);
     };
 
     class NX_NETWORK_API Method
