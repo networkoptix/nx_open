@@ -207,14 +207,19 @@ def get_dependencies(target, packages, target_dir, debug = False, deps_file = "q
             config.set_push_url(PUSH_URL)
 
         global_config = rdep_config.RdepConfig()
-        if OS_IS_WINDOWS:
-            if not global_config.get_rsync():
-                if not distutils.spawn.find_executable("rsync"):
-                    rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
-                    if not os.path.isfile(rsync):
-                        print "Cannot find rsync executable. Please specify it in .rderc"
-                        exit(1)
-                    global_config.set_rsync(rsync)
+
+        if not global_config.get_rsync():
+            if not distutils.spawn.find_executable("rsync"):
+                if not OS_IS_WINDOWS:
+                    print "Cannot find rsync executable. Please install it or specify in .rderc."
+                    exit(1)
+
+                rsync = os.path.join(os.getenv("environment"), "rsync-win32", "rsync.exe")
+                if not os.path.isfile(rsync):
+                    print "Cannot find rsync executable. Please specify it in .rderc."
+                    exit(1)
+                global_config.set_rsync(rsync)
+
         if not global_config.get_name():
             homedir = os.path.join(os.path.expanduser("~"))
             hg_config_file = os.path.join(homedir, ".hgrc")
