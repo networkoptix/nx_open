@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="video_offline">攝像機離線</string>
+    <string name="video_loading">"連接中: "</string>
+    <string name="video_no_signal">無信號</string>
+    <string name="video_stopped">已停止</string>
+    <string name="video_button_rewind">倒帶</string>
+    <string name="video_live_detail">即時影像</string>
+    <string name="video_button_forward">快轉</string>
+    <string name="video_button_live">即時影像</string>
+    <string name="video_button_archive">歷史影像</string>
+    <string name="video_button_play_pause">播放/暫停</string>
+    <string name="datetime_full_format">MMM dd, yyyy kk:mm:ss</string>
+    <string name="datetime_live_format">即時影像</string>
+    <string name="datetime_short_format">kk:mm:ss</string>
+    <string name="video_resolution">解析度</string>
+    <string name="video_transport">傳輸</string>
+    <string name="video_live">即時影像</string>
+    <string name="video_archive">歷史影像</string>
+    <string name="video_actionbar_pin">釘選</string>
+
+</resources>

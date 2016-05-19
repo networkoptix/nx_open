@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/generalResourcesLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="0dp" >
+
+    <RelativeLayout
+        android:id="@+id/promoteLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="@color/promote_background"
+        android:gravity="center"
+        android:measureWithLargestChild="true"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        tools:ignore="UnusedAttribute" >
+
+        <TextView
+            android:id="@+id/promoteTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:paddingBottom="6dp"
+            android:text="@string/promote_title"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/promote_font"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/promoteTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/promoteTitleTextView"
+            android:gravity="left"
+            android:lineSpacingMultiplier="1.05"
+            android:text="@string/promote"
+            android:textColor="@color/promote_font" />
+
+        <TextView
+            android:id="@+id/promoteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/promoteTextView"
+            android:paddingTop="10dp"
+            android:text="@string/download"
+            android:textColor="@color/promote_link"
+            android:textSize="22sp" />
+
+    </RelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:padding="4dp" >
+
+    </android.support.v4.view.ViewPager>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:measureWithLargestChild="true"
+        android:orientation="horizontal"
+        tools:ignore="UnusedAttribute" >
+
+        <Button
+            android:id="@+id/mode_tree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resources_tree" >
+        </Button>
+
+        <Button
+            android:id="@+id/mode_grid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resources_grid" >
+        </Button>
+    </LinearLayout>
+
+</LinearLayout>

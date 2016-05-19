@@ -48,7 +48,7 @@ static const int METADATA_TRACK_NUM = 7;
 static const double TIME_RESYNC_THRESHOLD = 10.0; // at seconds
 static const double LOCAL_TIME_RESYNC_THRESHOLD = 500; // at ms
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
-static const QString DEFAULT_REALM(lit("NetworkOptix"));
+
 
 
 QByteArray RTPSession::m_guid;
@@ -64,6 +64,15 @@ static QString getValueFromString(const QString& line)
 }
 #endif
 
+namespace
+{
+    const quint8 FFMPEG_CODE = 102;
+    QString FFMPEG_STR(lit("FFMPEG"));
+    const quint8 METADATA_CODE = 126;
+    const QString METADATA_STR(lit("ffmpeg-metadata"));
+    const QString DEFAULT_REALM(lit("NetworkOptix"));
+}
+
 // --------------------- RTPIODevice --------------------------
 
 RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
@@ -75,7 +84,7 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_rtpTrackNum(0)
 {
     m_tcpMode = useTCP;
-    if (!m_tcpMode) 
+    if (!m_tcpMode)
     {
         m_mediaSocket = SocketFactory::createDatagramSocket();
         m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
@@ -108,16 +117,16 @@ qint64 RTPIODevice::read(char *data, qint64 maxSize)
 }
 
 AbstractCommunicatingSocket* RTPIODevice::getMediaSocket()
-{ 
-    if (m_tcpMode) 
+{
+    if (m_tcpMode)
         return m_owner->m_tcpSock.get();
     else
-        return m_mediaSocket; 
+        return m_mediaSocket;
 }
 
 void RTPIODevice::setTcpMode(bool value)
-{ 
-    m_tcpMode = value; 
+{
+    m_tcpMode = value;
     if (m_tcpMode && m_mediaSocket) {
         m_mediaSocket->close();
         m_rtcpSocket->close();
@@ -205,12 +214,12 @@ QnRtspTimeHelper::~QnRtspTimeHelper()
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
     double localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
-    
+
     QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
-    if (m_cameraClockToLocalDiff->timeDiff == INT_MAX)  
+    if (m_cameraClockToLocalDiff->timeDiff == INT_MAX)
         m_cameraClockToLocalDiff->timeDiff = localtime - cameraTime;
     double result = cameraTime + m_cameraClockToLocalDiff->timeDiff;
-    
+
 
     qint64 currentDrift = (localtime - result)*1000;
     m_cameraClockToLocalDiff->driftSum += currentDrift;
@@ -236,7 +245,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 void QnRtspTimeHelper::reset()
 {
     QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
-    
+
     m_cameraClockToLocalDiff->timeDiff = INT_MAX;
     m_cameraClockToLocalDiff->driftStats.clear();
     m_cameraClockToLocalDiff->driftSum = 0;
@@ -310,7 +319,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         // Such data can not be recorded to archive. I ofter got that situation if server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
-        //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
+        //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed)
 
         //bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
         //bool gotInvalidTime = resultInSecs - localTimeInSecs > TIME_FUTURE_THRESHOLD;
@@ -320,7 +329,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         //    m_lastTime = 0; // time goes to the past
 
         //qWarning() << "RTSP time drift reached" << localTimeInSecs - resultInSecs;
-        //if (qAbs(localTimeInSecs - resultInSecs) > TIME_RESYNC_THRESHOLD && recursiveAllowed) 
+        //if (qAbs(localTimeInSecs - resultInSecs) > TIME_RESYNC_THRESHOLD && recursiveAllowed)
 
         double jitter = qAbs(resultInSecs - localTimeInSecs);
         bool gotInvalidTime = jitter > TIME_RESYNC_THRESHOLD;
@@ -388,7 +397,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
     m_userAgent(nx_http::userAgentString()),
-    m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
+    m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
     m_responseBufferLen = 0;
@@ -431,11 +440,6 @@ void RTPSession::usePredefinedTracks()
     if(!m_sdpTracks.isEmpty())
         return;
 
-    static const quint8 FFMPEG_CODE = 102;
-    static const QString FFMPEG_STR(QLatin1String("FFMPEG"));
-    static const quint8 METADATA_CODE = 126;
-    static const QString METADATA_STR(QLatin1String("ffmpeg-metadata"));
-
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
@@ -477,7 +481,7 @@ void RTPSession::updateTrackNum()
         else if (m_sdpTracks[i]->trackType == TT_AUDIO)
             m_sdpTracks[i]->trackNum = videoNum + curAudio++;
         else if (m_sdpTracks[i]->trackType == TT_METADATA) {
-            if (m_sdpTracks[i]->codecName == QLatin1String("ffmpeg-metadata"))
+            if (m_sdpTracks[i]->codecName == METADATA_STR)
                 m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
             else
                 m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
@@ -540,7 +544,7 @@ void RTPSession::parseSDP()
     if (mapNum >= 0) {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
-        //if (codecName == QLatin1String("ffmpeg-metadata"))
+        //if (codecName == METADATA_STR)
         //    trackNumber = METADATA_TRACK_NUM;
         QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
         m_sdpTracks << sdpTrack;
@@ -571,7 +575,7 @@ void RTPSession::parseRangeHeader(const QString& rangeStr)
             double val = start.toDouble();
             m_startTime = val < 1000000 ? val * 1000000.0 : val;
         }
-        if (index > 0) 
+        if (index > 0)
         {
             if (end == QLatin1String("now")) {
                 m_endTime = DATETIME_NOW;
@@ -612,6 +616,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
 
     if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
+
     m_SessionId.clear();
     m_responseCode = CODE_OK;
     m_url = url;
@@ -669,6 +674,10 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
 
+    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
+    if (!tmp.isEmpty())
+        m_contentBase = tmp;
+
     tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
     if (!tmp.isEmpty())
         m_contentBase = tmp;
@@ -723,7 +732,7 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
             return TrackMap();
     }
 
-    if (!sendPlay(positionStart, positionEnd, scale)) 
+    if (!sendPlay(positionStart, positionEnd, scale))
         m_sdpTracks.clear();
 
     return m_sdpTracks;
@@ -770,10 +779,18 @@ QByteArray RTPSession::calcDefaultNonce() const
 #if 1
 void RTPSession::addAuth( nx_http::Request* const request )
 {
-    QnClientAuthHelper::addAuthorizationToRequest(
-        m_auth,
-        request,
-        &m_rtspAuthCtx );   //ignoring result
+    if(m_defaultAuthScheme != nx_http::header::AuthScheme::automatic)
+    {
+        QnClientAuthHelper::addAuthorizationToRequest(
+            m_auth,
+            request,
+            &m_rtspAuthCtx );   //ignoring result
+    }
+    else
+    {
+        m_defaultAuthScheme = nx_http::header::AuthScheme::basic;
+        m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
+    }
 }
 #else
 void RTPSession::addAuth(QByteArray& request)
@@ -797,7 +814,7 @@ void RTPSession::addAuth(QByteArray& request)
         request.append(CLSimpleHTTPClient::basicAuth(m_auth));
         request.append(QLatin1String("\r\n"));
     }
-}   
+}
 #endif
 
 void RTPSession::addCommonHeaders(nx_http::HttpHeaders& headers)
@@ -874,7 +891,7 @@ QList<QByteArray> RTPSession::getSdpByTrackNum(int trackNum) const
 {
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
-    
+
     int mapNum = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
@@ -937,7 +954,7 @@ bool RTPSession::sendSetup()
         {
             ;
         }
-        else if (trackInfo->codecName != QLatin1String("ffmpeg-metadata"))
+        else if (trackInfo->codecName != METADATA_STR)
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -950,7 +967,7 @@ bool RTPSession::sendSetup()
         {
             // full track url in a prefix
             request += trackInfo->setupURL;
-        }   
+        }
         else {
             request += m_url.toString();
             request += '/';
@@ -1002,18 +1019,23 @@ bool RTPSession::sendSetup()
 #else
 
         nx_http::Request request;
+        auto setupUrl = trackInfo->setupURL == "*" ?
+            QUrl() : QUrl(QString::fromLatin1(trackInfo->setupURL));
+
         request.requestLine.method = "SETUP";
-        if( trackInfo->setupURL.startsWith("rtsp://") )
+        if( setupUrl.isRelative() )
         {
-            // full track url in a prefix
-            request.requestLine.url = QString::fromLatin1(trackInfo->setupURL);
-        }   
+            // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
+            request.requestLine.url = m_contentBase
+                    + ((m_contentBase.endsWith(lit("/")) || setupUrl.isEmpty()) ? lit("") : lit("/"))
+                    + setupUrl.toString();
+        }
         else
         {
-            request.requestLine.url = m_url;
-            // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
-            request.requestLine.urlPostfix = QByteArray("/") + trackInfo->setupURL;
+            // full track url in a prefix
+            request.requestLine.url = setupUrl;//QString::fromLatin1(trackInfo->setupURL);
         }
+
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         addCommonHeaders(request.headers);
 
@@ -1221,7 +1243,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
             break;
         else if (!readTextResponce(response))
             return false; // try next response
-    }    
+    }
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
     if (!tmp.isEmpty())
@@ -1303,7 +1325,7 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
         }
     } catch(...)
     {
-        
+
     }
     return stats;
 }
@@ -1645,7 +1667,7 @@ RTPSession::TrackType RTPSession::getTrackTypeByRtpChannelNum(int channelNum)
         if (track)
             rez = track->trackType;
     }
-    //following code was a camera rtsp bug workaround. Which camera no one can recall. 
+    //following code was a camera rtsp bug workaround. Which camera no one can recall.
         //Commented because it interferes with another bug on TP-LINK shitty camera.
         //So, let's try to be closer to RTSP rfc
     //if (rez == TT_UNKNOWN)
@@ -1865,7 +1887,6 @@ int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readS
 bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
 {
     int prevStatusCode = nx_http::StatusCode::ok;
-
     addAuth( &request );
     addAdditionAttrs( &request );
 
@@ -1882,7 +1903,7 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
         if( !readTextResponce(responseBuf) )
             return false;
 
-        nx_http::Response response;
+        nx_rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
             return false;
         m_responseCode = response.statusLine.statusCode;

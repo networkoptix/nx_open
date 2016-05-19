@@ -7,6 +7,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include "api/app_server_connection.h"
+#include "api/global_settings.h"
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
@@ -17,7 +19,6 @@
 #include "server_stream_recorder.h"
 #include <utils/common/log.h>
 #include "utils/common/synctime.h"
-#include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include <business/business_event_rule.h>
 #include <business/business_rule_processor.h>
@@ -324,6 +325,9 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     if (!cameraRes)
         return;
     if (cameraRes->hasFlags(Qn::foreigner) && !m_recordMap.contains(cameraRes))
+        return;
+
+    if (cameraRes->hasFlags(Qn::desktop_camera))
         return;
 
     auto camera = qnCameraPool->getVideoCamera(cameraRes);

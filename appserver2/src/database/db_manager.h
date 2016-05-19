@@ -530,7 +530,7 @@ namespace ec2
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
         template <class ObjectType, class ObjectListType> 
-        bool fillTransactionLogInternal(ApiCommand::Value command);
+        bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
 
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;

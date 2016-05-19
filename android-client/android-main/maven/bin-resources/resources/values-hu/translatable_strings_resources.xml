@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">Összes kamera</string>
+    <string name="menu_hide_offline">Elérhető kamerák</string>
+    <string name="resources_logout_offer">A kilépéshez nyomja meg a vissza gombot mégegyszer</string>
+    <string name="resources_loading_title">Betöltés…</string>
+    <string name="resources_loading_text">Adat fogadása…</string>
+    <string name="menu_clear_cache">Gyorsítótár törlése</string>
+    <string name="resources_tree">Fa nézet</string>
+    <string name="resources_grid">Bélyegképek</string>
+    <string name="resources_logout">Kijelentkezés</string>
+    <string name="promote_title">Frissítés most!</string>
+    <string name="promote">v2.5 vagy újabb rendszerhez próbál csatlakozni. Töltse le legújabb alkalmazásunkat a legjobb mobil megjelenítés eléréséhez.</string>
+    <string name="download">Letöltés</string>    
+
+</resources>

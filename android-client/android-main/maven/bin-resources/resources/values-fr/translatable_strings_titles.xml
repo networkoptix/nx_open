@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_resources">Cameras</string>
+    <string name="title_activity_video">Vidéo</string>
+    <string name="title_activity_archive">Archive</string>
+	<string name="title_activity_sendlog">Collecter et envoyer journal</string>
+</resources>

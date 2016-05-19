@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_show_offline">Afficher hors ligne</string>
+    <string name="menu_hide_offline">Masquer hors ligne</string>
+    <string name="resources_logout_offer">Appuyer sur Retour une fois de plus pour vous déconnecter</string>
+    <string name="resources_loading_title">Chargement</string>
+    <string name="resources_loading_text">Réception de données</string>
+    <string name="menu_clear_cache">Effacer le cache</string>
+    <string name="resources_tree">Vue Arborescence</string>
+    <string name="resources_grid">Vignettes</string>
+    <string name="resources_logout">Déconnection</string>
+    <string name="promote_title">Mettre é jour maintenant!</string>
+    <string name="promote">Vous vous connectez é un système exécutant v2.5 ou plus récent. Téléchargez notre nouvelle application pour une meilleure expérience de visionnage mobile.</string>
+    <string name="download">Téléchargement</string>    
+
+</resources>

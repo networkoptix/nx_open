@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="collect_log">Collect Log</string>
+    <string name="acquiring_log_progress_dialog_message">Acquiring log from the system &#8230;</string>
+    <string name="chooser_title">"Select an application to send the log"</string>
+    <string name="failed_to_get_log_message">"Failed to get the log from the system."</string>
+    <string name="main_dialog_text">"This application will attempt to collect the device log.
+The collected log will be sent using an application of your choice.
+You also will have an opportunity to see and modify the data being sent."
+    </string>  
+</resources>

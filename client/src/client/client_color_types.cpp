@@ -124,6 +124,12 @@ QnHistogramColors::QnHistogramColors() {
     text = QColor(255, 255, 255);
 }
 
+QnTwoWayAudioWidgetColors::QnTwoWayAudioWidgetColors() :
+    background("#212a2f"),
+    visualizer("#cf2727")
+{
+}
+
 QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     normal = QColor(128, 128, 128, 196);
     active = normal.lighter();

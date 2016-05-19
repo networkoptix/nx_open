@@ -6673,11 +6673,11 @@ If you would like to disable this feature you can do so in the System Settings d
     <name>QnWorkbenchExportHandler</name>
     <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
-        <translation>可執行的 %1 媒體檔案  (x64) (*.exe)</translation>
+        <translation>可執行的 %1 媒體檔案 (x64) (*.exe)</translation>
     </message>
     <message>
         <source>Executable %1 Media File (x86) (*.exe)</source>
-        <translation>可執行的 %1 媒體檔案  (x86) (*.exe)</translation>
+        <translation>可執行的 %1 媒體檔案 (x86) (*.exe)</translation>
     </message>
     <message>
         <source>File &apos;%1&apos; is used for recording already. Please enter another name.</source>

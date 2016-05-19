@@ -41,6 +41,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
+#include <utils/media/voice_spectrum_analyzer.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -141,7 +142,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnRedAssController>(new QnRedAssController());
 
     common->store<QnPlatformAbstraction>(new QnPlatformAbstraction());
-    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
+
     common->store<QnClientPtzControllerPool>(new QnClientPtzControllerPool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnDesktopClientMessageProcessor>(new QnDesktopClientMessageProcessor());
@@ -153,7 +154,12 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
     common->store<QnServerStorageManager>(new QnServerStorageManager());
 
+    common->store<QnVoiceSpectrumAnalyzer>(new QnVoiceSpectrumAnalyzer());
+
     initializeStatisticsManager(common);
+
+    /* Long runnables depend on QnCameraHistoryPool and other singletons. */
+    common->store<QnLongRunnablePool>(new QnLongRunnablePool());
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());

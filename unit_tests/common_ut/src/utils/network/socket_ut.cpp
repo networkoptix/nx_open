@@ -320,10 +320,10 @@ TEST( Socket, postCancellation )
         }
     };
 
-    std::vector<std::future<void>> futures;
+    std::vector<std::thread> testThreads;
     for( int i = 0; i < 25; ++i )
-        futures.emplace_back( std::async( std::launch::async, testFunctor ) );
+        testThreads.emplace_back( std::thread( testFunctor ) );
 
-    for( auto& f: futures )
-        f.wait();
+    for (auto& testThread: testThreads)
+        testThread.join();
 }

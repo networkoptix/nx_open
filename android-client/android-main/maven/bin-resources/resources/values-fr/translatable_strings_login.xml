@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_error_unknown">Erreur inconnue</string>
+    <string name="login_error_path">Port ou nom d\'hôte invalide</string>
+    <string name="login_error_protocol">Le serveur ne supporte pas ce protocol</string>
+    <string name="login_error_connection">Ne peut pas se connecter au serveur à cette adresse</string>
+    <string name="login_error_credentials">Informations d\'identification invalides</string>
+    <string name="login_error_port">Port Invalide</string>
+    <string name="login_error_brand">Incompatible Serveur</string>    
+    <string name="login_hint">Votre identifiant</string>
+    <string name="login_caption">Identifiant:</string>
+    <string name="password_caption">Mot de passe:</string>
+    <string name="password_hint">Votre mot de passe</string>
+    <string name="host_caption">Hôte:</string>
+    <string name="host_hint">Adresse du serveur</string>
+    <string name="port_caption">Port:</string>
+    <string name="port_hint">Port du serveur</string>
+    <string name="login_progress_caption">Connexion en cours…</string>
+    <string name="login_connecting">Connexion…</string>
+    <string name="login_version_incompatible_title">Version incompatible.</string>
+    <string name="login_version_incompatible_text">Version serveur incompatible avec cette version du client. Vous pouvez consulter la liste des caméras, mais il n\'y a aucune garantie que vous pouvez les regarder.</string>
+	<string name="login_empty_host">Le champ de l\'hôte ne peut pas être vide</string>
+	<string name="login_empty_port">Le champ du port ne peut pas être vide</string>
+	<string name="login_empty_login">Le champ d\'identifiant ne peut pas être vide</string>
+	<string name="login_empty_pass">Le champ du mot de passe ne peut pas être vide</string>
+	<string name="login_title_caption">"Titre: "</string>
+	<string name="login_title_hint">Nom de session</string>
+	<string name="login_saved_sessions">Sessions sauvegardées</string>
+	<string name="login_host_title">"Hôte: "</string>
+	<string name="login_login_title">"Identifiant: "</string>
+	<string name="login_connect">Connecter</string>
+	<string name="login_delete_confirm">Êtes-vous sûr de vouloir supprimer la session enregistrée:</string>
+</resources>
