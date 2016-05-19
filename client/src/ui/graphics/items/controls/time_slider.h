@@ -386,7 +386,7 @@ private:
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
 
-    void setThumbnailSelecting(qint64 time, bool selecting);
+    qint64 setThumbnailSelecting(qint64 time, bool selecting);
 
     void setAnimationStart(qint64 start);
     void setAnimationEnd(qint64 end);
@@ -476,7 +476,7 @@ private:
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 
     bool m_liveSupported;
-    bool m_keyboardSelectionInitiated;
+    bool m_selectionInitiated;
 
     GraphicsLabel* m_tooltipLine1;
     GraphicsLabel* m_tooltipLine2;
