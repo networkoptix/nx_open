@@ -2591,23 +2591,27 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
 
+        bool hovered = bookmarkRect.contains(m_currentRulerRectMousePos);
+        const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
+        const QColor& futureBg = hovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
+
         QBrush leftBoundBrush;
         QBrush rightBoundBrush;
         if (pos > bookmarkRect.left() && pos < bookmarkRect.right())
         {
-            painter->fillRect(bookmarkRect.x(), bookmarkRect.y(), pos - bookmarkRect.x(), bookmarkRect.height(), m_colors.pastBookmark);
-            painter->fillRect(pos, bookmarkRect.y(), bookmarkRect.right() - pos, bookmarkRect.height(), m_colors.futureBookmark);
+            painter->fillRect(bookmarkRect.x(), bookmarkRect.y(), pos - bookmarkRect.x(), bookmarkRect.height(), pastBg);
+            painter->fillRect(pos, bookmarkRect.y(), bookmarkRect.right() - pos, bookmarkRect.height(), futureBg);
             leftBoundBrush = pastBrush;
             rightBoundBrush = futureBrush;
         }
         else if (pos >= bookmarkRect.right())
         {
-            painter->fillRect(bookmarkRect, m_colors.pastBookmark);
+            painter->fillRect(bookmarkRect, pastBg);
             leftBoundBrush = rightBoundBrush = pastBrush;
         }
         else
         {
-            painter->fillRect(bookmarkRect, m_colors.futureBookmark);
+            painter->fillRect(bookmarkRect, futureBg);
             leftBoundBrush = rightBoundBrush = futureBrush;
         }
 

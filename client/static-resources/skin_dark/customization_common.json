@@ -292,6 +292,8 @@
 
             "pastBookmark": "blue12.setAlpha(204)",
             "futureBookmark": "blue12.setAlpha(204)",
+            "pastBookmarkHover": "brand_core.setAlpha(230)",
+            "futureBookmarkHover": "brand_core.setAlpha(230)",
             "pastBookmarkBound": "brand_core",
             "futureBookmarkBound": "brand_core",
 
