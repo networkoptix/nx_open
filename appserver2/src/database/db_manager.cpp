@@ -1458,6 +1458,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
+    else if (updateName == lit(":/updates/51_http_business_action.sql")) {
+        if (!m_dbJustCreated)
+        {
+            m_needResyncbRules = true;
+        }
+    }
 
     return true;
 }

@@ -71,6 +71,8 @@ namespace QnBusiness {
         case ExecutePtzPresetAction:
         case ShowOnAlarmLayoutAction:
             return false;
+        case ExecHttpRequestAction:
+            return false;
 
         case CameraOutputAction:
         case CameraRecordingAction:
@@ -147,6 +149,7 @@ namespace QnBusiness {
             << ExecutePtzPresetAction
             << ShowTextOverlayAction
             << ShowOnAlarmLayoutAction
+            << ExecHttpRequestAction
             ;
         return result;
     }
