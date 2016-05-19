@@ -74,7 +74,7 @@ void ProxyHandler::processRequest(
     m_request = std::move(request);
     //TODO #ak updating request (e.g., Host header)
     m_targetPeerSocket->connectAsync(
-        SocketAddress(systemAddressString.toString(), nx_http::DEFAULT_HTTP_PORT),
+        SocketAddress(systemAddressString.toString(), nx_http::DEFAULT_HTTP_PORT),  //TODO #ak remove http port
         std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
 }
 
@@ -103,7 +103,15 @@ void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
             .arg(m_request.requestLine.url.toString()),
             cl_logDEBUG1);
         auto handler = std::move(m_requestCompletionHandler);
-        handler(nx_http::StatusCode::serviceUnavailable, nullptr);
+        if (errorCode == SystemError::hostNotFound ||
+            errorCode == SystemError::hostUnreach)
+        {
+            handler(nx_http::StatusCode::notFound, nullptr);
+        }
+        else
+        {
+            handler(nx_http::StatusCode::serviceUnavailable, nullptr);
+        }
         return;
     }
 
@@ -143,6 +151,10 @@ void ProxyHandler::onMessageFromTargetHost(nx_http::Message message)
     const auto contentTypeIter = message.response->headers.find("Content-Type");
     if (contentTypeIter != message.response->headers.end())
     {
+        nx_http::insertOrReplaceHeader(
+            &message.response->headers,
+            nx_http::HttpHeader("Content-Encoding", "identity"));
+
         msgBody = std::make_unique<nx_http::BufferSource>(
             contentTypeIter->second,
             std::move(message.response->messageBody));
