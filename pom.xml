@@ -30,6 +30,7 @@
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
+        <media_db_util.guid>{931E412E-4CB2-426B-93CD-1F581CA69D93}</media_db_util.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
@@ -478,6 +479,7 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
             </modules>
