@@ -13,10 +13,10 @@
                     <h2>{{system.name}}</h2>
                     <span class="user-name">{{getSystemOwnerName(system)}}</span>
 
-                    <span ng-if="system.status!=Config.systemStatuses.onlineStatus" class="label"
-                          ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">
-                        {{Config.systemStatuses[system.status].label||system.status}}</span>
-                    <button ng-if="system.status==Config.systemStatuses.onlineStatus" class="btn btn-default"
+                    <span ng-if="system.stateOfHealth!=Config.systemStatuses.onlineStatus" class="label"
+                          ng-class="Config.systemStatuses[system.stateOfHealth].style || Config.systemStatuses.default.style">
+                        {{Config.systemStatuses[system.stateOfHealth].label||system.stateOfHealth}}</span>
+                    <button ng-if="system.stateOfHealth==Config.systemStatuses.onlineStatus" class="btn btn-default"
                             ng-click="openClient(system,$event);">Open in VMS_NAME</button>
                 </div>
             </div>

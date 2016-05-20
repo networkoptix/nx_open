@@ -36,3 +36,5 @@ python localize.py
 
 
 echo "Done!"
+
+say "Cloud portal build is finished"

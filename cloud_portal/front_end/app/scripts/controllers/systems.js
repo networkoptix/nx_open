@@ -11,7 +11,7 @@ angular.module('cloudApp')
 
         function sortSystems(systems){
             return _.sortBy(systems,function(system){
-                var statusOrder = Config.systemStatuses.sortOrder.indexOf(system.status);
+                var statusOrder = Config.systemStatuses.sortOrder.indexOf(system.stateOfHealth);
                 if(statusOrder < 0){ // unknown yet status
                     statusOrder = Config.systemStatuses.sortOrder.length;
                 }
