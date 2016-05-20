@@ -114,7 +114,6 @@ bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
     if (!query->exec())
     {
         qWarning() << details << query->lastError().text();
-        NX_ASSERT(false, details, "Unable to execute SQL query");
         return false;
     }
     return true;
