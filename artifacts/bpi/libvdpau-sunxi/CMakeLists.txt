@@ -10,6 +10,7 @@ set(SOURCE_FILES
     kernel-headers/g2d_driver.h
     kernel-headers/sunxi_disp_ioctl.h
     kernel-headers/sunxi_display2.h
+    vdpau_private.c
     decoder.c
     device.c
     h264.c
@@ -33,7 +34,13 @@ set(SOURCE_FILES
     surface_video.c
     tiled_yuv.h
     vdpau_private.h
-    video_mixer.c)
+    video_mixer.c
+    conf.h
+    conf.cpp
+    flag_config_c.h
+    flag_config.h
+    flag_config.cpp
+)
 
 # Directory containing all necessary headers from the libraries used.
 include_directories(

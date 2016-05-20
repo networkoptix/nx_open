@@ -31,6 +31,7 @@
 #include <X11/Xlib.h>
 #include "sunxi_disp.h"
 #include "pixman.h"
+#include "conf.h"
 
 #define INTERNAL_YCBCR_FORMAT (VdpYCbCrFormat)0xffff
 
@@ -169,17 +170,21 @@ typedef struct
 #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 
 
-#ifdef DEBUG
-#include <stdio.h>
-#define VDPAU_DBG(format, ...) fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__)
-#define VDPAU_DBG_ONCE(format, ...) do { static uint8_t __once; if (!__once) { fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__); __once = 1; } } while(0)
-// Log execution of a line - to use, put double-L at the beginning of the line.
-#define LL fprintf(stderr, "####### line %d [%s]\n", __LINE__, __FILE__);
-#else
-#define VDPAU_DBG(format, ...)
-#define VDPAU_DBG_ONCE(format, ...)
-#define LL
-#endif
+#if defined(DEBUG)
+	#include <stdio.h>
+
+	#define VDPAU_DBG(format, ...) fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__)
+
+	#define VDPAU_DBG_ONCE(format, ...) do { static uint8_t __once; if (!__once) { fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__); __once = 1; } } while(0)
+
+	// Log execution of a line - to use, put double-L at the beginning of the line.
+	#define LL fprintf(stderr, "####### line %d [%s]\n", __LINE__, __FILE__);
+#else // DEBUG
+	#define VDPAU_DBG(format, ...)
+	#define VDPAU_DBG_ONCE(format, ...)
+	#define LL
+    #define LOG(format, ...)
+#endif // DEBUG
 
 #define EXPORT __attribute__ ((visibility ("default")))
 
@@ -202,7 +207,6 @@ void *handle_get(VdpHandle handle);
 void handle_destroy(VdpHandle handle);
 
 // device.c
-EXPORT VdpDeviceCreateX11 vdp_imp_device_create_x11;
 VdpDeviceDestroy vdp_device_destroy;
 VdpPreemptionCallbackRegister vdp_preemption_callback_register;
 VdpGetProcAddress vdp_get_proc_address;
@@ -276,5 +280,13 @@ VdpBitmapSurfaceDestroy vdp_bitmap_surface_destroy;
 VdpBitmapSurfaceGetParameters vdp_bitmap_surface_get_parameters;
 VdpBitmapSurfacePutBitsNative vdp_bitmap_surface_put_bits_native;
 VdpBitmapSurfaceQueryCapabilities vdp_bitmap_surface_query_capabilities;
+
+extern void *const functions[]; //< Pointers to functions.
+extern const int function_count; //< Number of items in functions[].
+
+// Calls which are not in functions[].
+VdpPresentationQueueTargetCreateX11 log_presentation_queue_target_create_x11; //< vdpau_private.c
+VdpDeviceCreateX11 vdp_device_create_x11; //< device.c
+EXPORT VdpDeviceCreateX11 vdp_imp_device_create_x11; //< vdpau_private.c
 
 #endif

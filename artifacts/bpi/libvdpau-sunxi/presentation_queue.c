@@ -51,9 +51,15 @@ VdpStatus vdp_presentation_queue_target_create_x11(VdpDevice device,
     if (dev->display)
     {
         if (!drawable)
-            return VDP_STATUS_INVALID_POINTER;
-        qt->drawable = drawable;
-        XSetWindowBackground(dev->display, drawable, 0x000102);
+		{
+            // Nx extension to Vdpau: Allow drawable == 0 to bypass coords adjustment.
+			//return VDP_STATUS_INVALID_POINTER;
+		}
+		else
+		{
+			qt->drawable = drawable;
+			XSetWindowBackground(dev->display, drawable, 0x000102);
+		}
     }
 
     VDPAU_DBG("Trying to open /dev/disp v1");
@@ -193,11 +199,25 @@ VdpStatus vdp_presentation_queue_display(VdpPresentationQueue presentation_queue
 	Window c;
     int x = 0;
     int y = 0;
-	if (q->device->display)
+	if (q->device->display && q->target->drawable)
 	{
 		XTranslateCoordinates(q->device->display, q->target->drawable,
     	    RootWindow(q->device->display, q->device->screen), 0, 0, &x, &y, &c);
-		XClearWindow(q->device->display, q->target->drawable);
+		VDPAU_DBG_ONCE("Video coords: x: %d, y: %d; provided by XTranslateCoordinates()", x, y);
+		if (conf.enableXClearWindow)
+            XClearWindow(q->device->display, q->target->drawable);
+	}
+	else if (!q->device->display && q->target->drawable)
+	{
+		// Nx extension to Vdpau: If used without X11, drawable provides video coords:
+		// x in low 16 bits, and y in high 16 bits.
+		x = q->target->drawable & 0xFFFF;
+		y = (q->target->drawable >> 16) & 0xFFFF;
+		VDPAU_DBG_ONCE("Video coords: x: %d, y: %d; provided by Drawable", x, y);
+	}
+	else
+	{
+		VDPAU_DBG_ONCE("Video coords: x: 0, y: 0; used defaults because Drawable not supplied");
 	}
 
 	if (os->vs)

@@ -31,19 +31,6 @@
 #include "vdpau_private.h"
 #include "sunxi_disp.h"
 
-// Configuration.
-static const struct
-{
-	bool enableColorKey;
-	bool enableIoctlOutput;
-	bool enableSetFb;
-} conf =
-{
-	.enableColorKey = 0,
-	.enableIoctlOutput = 0,
-	.enableSetFb = 1,
-};
-
 struct sunxi_disp_private
 {
 	struct sunxi_disp pub;
@@ -61,35 +48,79 @@ static void sunxi_disp_close_video_layer(struct sunxi_disp *sunxi_disp);
 static int sunxi_disp_set_osd_layer(struct sunxi_disp *sunxi_disp, int x, int y, int width, int height, output_surface_ctx_t *surface);
 static void sunxi_disp_close_osd_layer(struct sunxi_disp *sunxi_disp);
 
-static int disp_ioctl(int fd, int cmd, const uint32_t args[],
-	const char* cmdStr, const char* argsStr)
+static const char* print_ioctl_args(char* target, int len, int fd, int cmd, const uint32_t args[],
+	const char* cmdStr, const char* arg0, const char* arg1, const char* arg2, const char* arg3)
 {
-    if (conf.enableIoctlOutput)
-		fprintf(stderr, "ioctl(/dev/disp, %s, %s) -> ", cmdStr, argsStr);
+	char v1[100];
+	if (strcmp(arg1, "0") != 0 && strncmp(arg1, "DISP", 4) != 0)
+		snprintf(v1, sizeof(v1), "%s: %u", arg1, args[1]);
+	else
+		snprintf(v1, sizeof(v1), "%s", arg1);
 
-	int result = ioctl(fd, cmd, args);
-
-	if (conf.enableIoctlOutput)
+	char v2[100];
+	if (arg2[0] == '&')
 	{
-		if (result < 0)
-			fprintf(stderr, "ERROR %d: %s\n", result, strerror(errno));
-		else
-			fprintf(stderr, "%d\n", result);
+		switch (cmd)
+		{
+			case DISP_CMD_LAYER_SET_PARA:
+			{
+				const __disp_layer_info_t* const t = (const __disp_layer_info_t*) args[2];
+				snprintf(v2, sizeof(v2), "{.fb: {.addr: {0x%08X, 0x%08X, 0x%08X}}}",
+					t->fb.addr[0], t->fb.addr[1], t->fb.addr[2]);
+				break;
+			}
+			case DISP_CMD_LAYER_SET_FB:
+			{
+				const __disp_fb_t* const t = (const __disp_fb_t*) args[2];
+				snprintf(v2, sizeof(v2), "{.addr: {0x%08X, 0x%08X, 0x%08X}}",
+					t->addr[0], t->addr[1], t->addr[2]);
+				break;
+			}
+			default:
+				snprintf(v2, sizeof(v2), "%s: %u", arg2, args[2]);
+		}
+	}
+	else if (strcmp(arg2, "0") != 0)
+	{
+		snprintf(v2, sizeof(v2), "%s: %u", arg2, args[2]);
 	}
 	else
 	{
+		snprintf(v2, sizeof(v2), "%s", arg2);
+	}
+
+	snprintf(target, len, "/dev/disp, %s, {%s, %s, %s, %s}", cmdStr, arg0, v1, v2, arg3);
+	return target;
+}
+
+static int disp_ioctl(int fd, int cmd, const uint32_t args[],
+	const char* cmdStr, const char* arg0, const char* arg1, const char* arg2, const char* arg3)
+{
+	int result = ioctl(fd, cmd, args);
+
+	if (conf.enableIoctlOutput || result < 0)
+	{
+		char s[1000];
 		if (result < 0)
 		{
-			fprintf(stderr, "ERROR: ioctl(/dev/disp, %s, %s) -> %d: %s\n",
-				cmdStr, argsStr, result, strerror(errno));
+			fprintf(stderr, "[VDPAU SUNXI] [disp1] ERROR: ioctl(%s) -> %d: %s\n",
+				print_ioctl_args(s, sizeof(s), fd, cmd, args, cmdStr, arg0, arg1, arg2, arg3),
+				result, strerror(errno));
+		}
+		else
+		{
+			fprintf(stderr, "[VDPAU SUNXI] [disp1] ioctl(%s) -> %d\n",
+				print_ioctl_args(s, sizeof(s), fd, cmd, args, cmdStr, arg0, arg1, arg2, arg3),
+				result);
 		}
 	}
 
 	return result;
 }
 
-#define ARGS(A1, A2, A3, A4) {(uint32_t) (A1), (uint32_t) (A2), (uint32_t) (A3), (uint32_t) (A4)}
-#define DISP(CMD, ARGS) disp_ioctl(disp->fd, (CMD), (const uint32_t[]) ARGS, #CMD, #ARGS)
+#define DISP(CMD, A0, A1, A2, A3) disp_ioctl(disp->fd, (CMD), \
+    (const uint32_t[]) {(uint32_t) (A0), (uint32_t) (A1), (uint32_t) (A2), (uint32_t) (A3)}, \
+    #CMD, #A0, #A1, #A2, #A3)
 
 struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 {
@@ -102,12 +133,12 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 		goto err_open;
 	}
 
-	int version = DISP(DISP_CMD_VERSION, {SUNXI_DISP_VERSION});
+	int version = DISP(DISP_CMD_VERSION, SUNXI_DISP_VERSION, 0, 0, 0);
 	if (version < 0)
 		goto err_version;
 	VDPAU_DBG("[disp1] /dev/disp reported version %d", version);
 
-	disp->video_layer = DISP(DISP_CMD_LAYER_REQUEST, ARGS(0, DISP_LAYER_WORK_MODE_SCALER, 0, 0));
+	disp->video_layer = DISP(DISP_CMD_LAYER_REQUEST, 0, DISP_LAYER_WORK_MODE_SCALER, 0, 0);
 	if (disp->video_layer == 0)
 		VDPAU_DBG("[disp1] ERROR: Video Layer request returned 0");
     if (disp->video_layer <= 0)
@@ -116,15 +147,15 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 
 	if (osd_enabled)
 	{
-		DISP(DISP_CMD_LAYER_TOP, ARGS(0, disp->video_layer, 0, 0));
+		DISP(DISP_CMD_LAYER_TOP, 0, disp->video_layer, 0, 0);
 
-		disp->osd_layer = DISP(DISP_CMD_LAYER_REQUEST, ARGS(0, DISP_LAYER_WORK_MODE_NORMAL, 0, 0));
+		disp->osd_layer = DISP(DISP_CMD_LAYER_REQUEST, 0, DISP_LAYER_WORK_MODE_NORMAL, 0, 0);
 		if (disp->osd_layer == 0)
 			VDPAU_DBG("[disp1] ERROR: OSD Layer request returned 0");
 		if (disp->osd_layer <= 0)
 			goto err_osd_layer;
 
-		DISP(DISP_CMD_LAYER_TOP, ARGS(0, disp->osd_layer, 0, 0));
+		DISP(DISP_CMD_LAYER_TOP, 0, disp->osd_layer, 0, 0);
 
 		disp->osd_info.pipe = 1;
 		disp->osd_info.mode = DISP_LAYER_WORK_MODE_NORMAL;
@@ -135,7 +166,7 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 	}
 	else
 	{
-		DISP(DISP_CMD_LAYER_TOP, ARGS(0, disp->video_layer, 0, 0));
+		DISP(DISP_CMD_LAYER_TOP, 0, disp->video_layer, 0, 0);
 
 		if (conf.enableColorKey)
 		{
@@ -150,7 +181,7 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 			ck.green_match_rule = 2;
 			ck.blue_match_rule = 2;
 
-			DISP(DISP_CMD_SET_COLORKEY, ARGS(0, &ck, 0, 0));
+			DISP(DISP_CMD_SET_COLORKEY, 0, &ck, 0, 0);
 		}
 	}
 
@@ -167,7 +198,7 @@ struct sunxi_disp *sunxi_disp_open(int osd_enabled)
 	return (struct sunxi_disp *)disp;
 
 err_osd_layer:
-	DISP(DISP_CMD_LAYER_RELEASE, ARGS(0, disp->osd_layer, 0, 0));
+	DISP(DISP_CMD_LAYER_RELEASE, 0, disp->osd_layer, 0, 0);
 err_video_layer:
 err_version:
 	close(disp->fd);
@@ -180,13 +211,13 @@ static void sunxi_disp_close(struct sunxi_disp *sunxi_disp)
 {
 	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
 
-	DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->video_layer, 0, 0));
-	DISP(DISP_CMD_LAYER_RELEASE, ARGS(0, disp->video_layer, 0, 0));
+	DISP(DISP_CMD_LAYER_CLOSE, 0, disp->video_layer, 0, 0);
+	DISP(DISP_CMD_LAYER_RELEASE, 0, disp->video_layer, 0, 0);
 
 	if (disp->osd_layer)
 	{
-		DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->osd_layer, 0, 0));
-		DISP(DISP_CMD_LAYER_RELEASE, ARGS(0, disp->osd_layer, 0, 0));
+		DISP(DISP_CMD_LAYER_CLOSE, 0, disp->osd_layer, 0, 0);
+		DISP(DISP_CMD_LAYER_RELEASE, 0, disp->osd_layer, 0, 0);
 	}
 
 	close(disp->fd);
@@ -258,19 +289,19 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 		if (first_time)
 		{
 			first_time = false;
-			DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->video_layer, &disp->video_info, 0));
-			DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->video_layer, 0, 0));
+			DISP(DISP_CMD_LAYER_SET_PARA, 0, disp->video_layer, &disp->video_info, 0);
+			DISP(DISP_CMD_LAYER_OPEN, 0, disp->video_layer, 0, 0);
 			VDPAU_DBG("First time: DISP_CMD_LAYER_SET_PARA, DISP_CMD_LAYER_OPEN");
 		}
 		else
 		{
-			DISP(DISP_CMD_LAYER_SET_FB, ARGS(0, disp->video_layer, &disp->video_info.fb, 0));
+			DISP(DISP_CMD_LAYER_SET_FB, 0, disp->video_layer, &disp->video_info.fb, 0);
 		}
 	}
 	else
 	{
-        DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->video_layer, &disp->video_info, 0));
-        DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->video_layer, 0, 0));
+        DISP(DISP_CMD_LAYER_SET_PARA, 0, disp->video_layer, &disp->video_info, 0);
+        DISP(DISP_CMD_LAYER_OPEN, 0, disp->video_layer, 0, 0);
 	}
 
 	// Note: might be more reliable (but slower and problematic when there
@@ -280,13 +311,16 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 	// set doing this unconditionally is costly.
 	if (surface->csc_change)
 	{
-        DISP(DISP_CMD_LAYER_ENHANCE_OFF, ARGS(0, disp->video_layer, 0, 0));
-		DISP(DISP_CMD_LAYER_SET_BRIGHT, ARGS(0, disp->video_layer, 0xff * surface->brightness + 0x20, 0));
-		DISP(DISP_CMD_LAYER_SET_CONTRAST, ARGS(0, disp->video_layer, 0x20 * surface->contrast, 0));
-		DISP(DISP_CMD_LAYER_SET_SATURATION, ARGS(0, disp->video_layer, 0x20 * surface->saturation, 0));
-		// hue scale is randomly chosen, no idea how it maps exactly
-		DISP(DISP_CMD_LAYER_SET_HUE, ARGS(0, disp->video_layer, (32 / 3.14) * surface->hue + 0x20, 0));
-		DISP(DISP_CMD_LAYER_ENHANCE_ON, ARGS(0, disp->video_layer, 0, 0));
+		if (!conf.disableCscMatrix)
+		{
+			DISP(DISP_CMD_LAYER_ENHANCE_OFF, 0, disp->video_layer, 0, 0);
+			DISP(DISP_CMD_LAYER_SET_BRIGHT, 0, disp->video_layer, 0xff * surface->brightness + 0x20, 0);
+			DISP(DISP_CMD_LAYER_SET_CONTRAST, 0, disp->video_layer, 0x20 * surface->contrast, 0);
+			DISP(DISP_CMD_LAYER_SET_SATURATION, 0, disp->video_layer, 0x20 * surface->saturation, 0);
+			// hue scale is randomly chosen, no idea how it maps exactly
+			DISP(DISP_CMD_LAYER_SET_HUE, 0, disp->video_layer, (32 / 3.14) * surface->hue + 0x20, 0);
+			DISP(DISP_CMD_LAYER_ENHANCE_ON, 0, disp->video_layer, 0, 0);
+		}
 		surface->csc_change = 0;
 	}
 
@@ -297,7 +331,7 @@ static void sunxi_disp_close_video_layer(struct sunxi_disp *sunxi_disp)
 {
 	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
 
-	DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->video_layer, 0, 0));
+	DISP(DISP_CMD_LAYER_CLOSE, 0, disp->video_layer, 0, 0);
 }
 
 static int sunxi_disp_set_osd_layer(struct sunxi_disp *sunxi_disp, int x, int y, int width, int height, output_surface_ctx_t *surface)
@@ -327,8 +361,8 @@ static int sunxi_disp_set_osd_layer(struct sunxi_disp *sunxi_disp, int x, int y,
 	disp->osd_info.scn_win.width = min_nz(width, surface->rgba.dirty.x1) - surface->rgba.dirty.x0;
 	disp->osd_info.scn_win.height = min_nz(height, surface->rgba.dirty.y1) - surface->rgba.dirty.y0;
 
-	DISP(DISP_CMD_LAYER_SET_PARA, ARGS(0, disp->osd_layer, &disp->osd_info, 0));
-	DISP(DISP_CMD_LAYER_OPEN, ARGS(0, disp->osd_layer, 0, 0));
+	DISP(DISP_CMD_LAYER_SET_PARA, 0, disp->osd_layer, &disp->osd_info, 0);
+	DISP(DISP_CMD_LAYER_OPEN, 0, disp->osd_layer, 0, 0);
 
 	return 0;
 }
@@ -337,5 +371,5 @@ static void sunxi_disp_close_osd_layer(struct sunxi_disp *sunxi_disp)
 {
 	struct sunxi_disp_private *disp = (struct sunxi_disp_private *)sunxi_disp;
 
-	DISP(DISP_CMD_LAYER_CLOSE, ARGS(0, disp->osd_layer, 0, 0));
+	DISP(DISP_CMD_LAYER_CLOSE, 0, disp->osd_layer, 0, 0);
 }

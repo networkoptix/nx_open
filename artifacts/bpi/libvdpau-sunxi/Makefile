@@ -1,5 +1,5 @@
 TARGET = libvdpau_sunxi.so.1
-SRC = device.c presentation_queue.c surface_output.c surface_video.c \
+SRC = vdpau_private.c device.c presentation_queue.c surface_output.c surface_video.c \
 	surface_bitmap.c video_mixer.c decoder.c handles.c \
 	h264.c mpeg12.c mpeg4.c rgba.c tiled_yuv.S h265.c sunxi_disp.c \
 	sunxi_disp2.c sunxi_disp1_5.c rgba_g2d.c rgba_pixman.c
@@ -7,9 +7,9 @@ CFLAGS ?= -Wall -O3
 LDFLAGS ?=
 #LIBS = -lrt -lm -lX11 -lpthread -lcedrus
 LIBS = -lrt -lm -lpthread -lcedrus
-CC ?= gcc
+CC ?= cc
 
-CFLAGS += $(shell pkg-config --cflags pixman-1)
+CFLAGS += -std=gnu99 $(shell pkg-config --cflags pixman-1)
 LIBS += $(shell pkg-config --libs pixman-1)
 
 DEP_CFLAGS = -MD -MP -MQ $@
@@ -27,10 +27,16 @@ endif
 
 .PHONY: clean all install uninstall
 
-all: $(TARGET)
-$(TARGET): $(OBJ)
-	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(OBJ) $(LIBS) -o $@
+CONF_DEFINES = -DNX_UTILS_API='__attribute__ ((visibility ("hidden")))'
 
+all: $(TARGET)
+$(TARGET): $(OBJ) conf
+	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(OBJ) conf.o flag_config.o $(LIBS) -o $@
+
+conf:
+	g++ $(CONF_DEFINES) -fPIC -std=c++11 -c flag_config.cpp -o flag_config.o
+	g++ $(CONF_DEFINES) -fPIC -std=c++11 -c conf.cpp -o conf.o
+	
 clean:
 	rm -f $(OBJ)
 	rm -f $(DEP)
@@ -45,7 +51,7 @@ uninstall:
 	rm -f $(DESTDIR)$(MODULEDIR)/$(TARGET)
 
 %.o: %.c
-	$(CC) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CFLAGS) -c $< -o $@
+	$(CC) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CFLAGS) $(CONF_DEFINES) -c $< -o $@
 
 %.o: %.S
 	$(CC) -c $< -o $@
