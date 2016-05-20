@@ -632,13 +632,26 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::TitleBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
-    factory.beginSubMenu(); {
+    factory.beginSubMenu();
+    {
         factory(QnActions::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
             requiredTargetPermissions(Qn::WritePermission). //TODO: #GDM #access check canCreateResource
             text(tr("Layout...")).
             pulledText(tr("New Layout...")).
             condition(hasFlags(Qn::user));
+
+        factory(QnActions::NewGlobalLayoutAction).
+            flags(Qn::Main | Qn::Tree).
+            requiredGlobalPermission(Qn::GlobalEditLayoutsPermission).
+            text(tr("Global Layout")).
+            pulledText(tr("New Global Layout")).
+            condition(new QnConjunctionActionCondition(
+                new QnTreeNodeTypeCondition(Qn::GlobalLayoutsNode, this),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+            ).
+            autoRepeat(false);
 
         factory(QnActions::OpenNewTabAction).
             flags(Qn::Main | Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::GlobalHotkey).
@@ -694,7 +707,8 @@ QnActionManager::QnActionManager(QObject *parent):
                 ).
             autoRepeat(false);
 
-    } factory.endSubMenu();
+    }
+    factory.endSubMenu();
 
     factory(QnActions::OpenCurrentUserLayoutMenu).
         flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
