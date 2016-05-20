@@ -15,6 +15,8 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
+
 #include <cdb/connection.h>
 #include <cloud_db_process_public.h>
 
@@ -24,6 +26,7 @@ namespace cdb {
 
 class CdbFunctionalTest
 :
+    public utils::test::ModuleLauncher<CloudDBProcessPublic>,
     public ::testing::Test
 {
 public:
@@ -31,14 +34,7 @@ public:
     CdbFunctionalTest();
     ~CdbFunctionalTest();
 
-    void start();
-    bool startAndWaitUntilStarted();
-    bool waitUntilStarted();
-    void stop();
-    //!restarts process
-    bool restart();
-
-    void addArg(const char* arg);
+    virtual bool waitUntilStarted() override;
 
     SocketAddress endpoint() const;
 
@@ -148,15 +144,11 @@ public:
 private:
     QString m_tmpDir;
     int m_port;
-    std::vector<char*> m_args;
-    std::unique_ptr<CloudDBProcessPublic> m_cdbInstance;
-    std::future<int> m_cdbProcessFuture;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
-    std::unique_ptr<nx::utils::promise<bool /*result*/>> m_cdbStartedPromise;
 };
 
 namespace api {

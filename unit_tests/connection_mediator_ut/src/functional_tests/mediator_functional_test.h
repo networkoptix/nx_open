@@ -16,14 +16,6 @@ class MediatorFunctionalTest
     public testing::Test
 {
 public:
-    void startAndWaitUntilStarted()
-    {
-        ASSERT_TRUE(nx::hpm::MediatorFunctionalTest::startAndWaitUntilStarted());
-    }
-    void waitUntilStarted()
-    {
-        ASSERT_TRUE(nx::hpm::MediatorFunctionalTest::waitUntilStarted());
-    }
 };
 
 }   //test

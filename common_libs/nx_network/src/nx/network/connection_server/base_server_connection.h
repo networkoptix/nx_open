@@ -54,7 +54,7 @@ namespace nx_api
         class CustomConnectionType
     > class BaseServerConnection
     :
-            public nx::network::aio::AbstractPollable
+        public nx::network::aio::AbstractPollable
     {
     public:
         typedef BaseServerConnection<CustomConnectionType> SelfType;

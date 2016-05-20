@@ -1,0 +1,59 @@
+/**********************************************************
+* Dec 21, 2015
+* akolesnikov
+***********************************************************/
+
+#include "vms_gateway_functional_test.h"
+
+#include <chrono>
+#include <functional>
+#include <iostream>
+#include <sstream>
+#include <thread>
+#include <tuple>
+
+#include <common/common_globals.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/socket.h>
+#include <nx/network/socket_global.h>
+#include <utils/common/cpp14.h>
+#include <utils/common/string.h>
+#include <utils/common/sync_call.h>
+#include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/serialization/json.h>
+#include <utils/serialization/lexical.h>
+
+
+namespace nx {
+namespace cloud {
+namespace gateway {
+
+VmsGatewayFunctionalTest::VmsGatewayFunctionalTest()
+:
+    m_httpPort(0)
+{
+    //starting clean test
+    nx::network::SocketGlobalsHolder::instance()->reinitialize();
+
+    m_httpPort = (std::rand() % 10000) + 50000;
+    m_tmpDir = QDir::homePath() + "/vms_gateway_ut.data";
+    QDir(m_tmpDir).removeRecursively();
+
+    addArg("/path/to/bin");
+    addArg("-e");
+    addArg("-general/listenOn"); addArg(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
+    addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-log/logLevel"); addArg("DEBUG2");
+}
+
+VmsGatewayFunctionalTest::~VmsGatewayFunctionalTest()
+{
+    stop();
+
+    QDir(m_tmpDir).removeRecursively();
+}
+
+}   // namespace gateway
+}   // namespace cloud
+}   // namespace nx

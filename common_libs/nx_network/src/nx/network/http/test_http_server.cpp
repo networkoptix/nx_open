@@ -50,7 +50,7 @@ public:
     virtual void processRequest(
         const nx_http::HttpServerConnection& /*connection*/,
         stree::ResourceContainer /*authInfo*/,
-        const nx_http::Request& /*request*/,
+        nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         std::function<void(
             const nx_http::StatusCode::Value statusCode,
