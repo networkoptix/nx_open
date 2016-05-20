@@ -913,7 +913,7 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
             result.emplace_back(it.key(), it.value());
     }
 
-#ifdef 0
+#if 0
     printf("\n==== Camera: %s ====\n", getName().toLatin1().constData());
     printf("\tStatic properties:\n");
     for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
