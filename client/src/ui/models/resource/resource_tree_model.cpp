@@ -216,8 +216,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
 
     /* Make sure resources without parent will never be visible. */
     auto bastardNode = m_rootNodes[Qn::BastardNode];
-    if (node == bastardNode)
-        bastardNode = QnResourceTreeModelNodePtr();
 
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
@@ -231,10 +229,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
 
     /* Recursively remove all child nodes. */
     for (auto child : children)
-    {
-        child->setParent(bastardNode);
         removeNode(child);
-    }
 
     /* Remove node from all hashes. */
     m_recorderHashByParent.remove(node);
@@ -271,7 +266,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         break;
     }
 
-
+    node->setParent(QnResourceTreeModelNodePtr());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceTreeModelNodePtr& node)
