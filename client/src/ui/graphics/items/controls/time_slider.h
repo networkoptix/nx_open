@@ -117,7 +117,12 @@ public:
         /**
         * Whether drag operations at window sides should scroll the window.
         */
-        DragScrollsWindow = 0x1000
+        DragScrollsWindow = 0x1000,
+
+        /**
+        * Whether bookmarks viewer should be anchored to timeline pixel location (otherwise - to a timestamp).
+        */
+        StillBookmarksViewer = 0x2000
     };
     Q_DECLARE_FLAGS(Options, Option);
 
