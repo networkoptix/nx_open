@@ -11,12 +11,16 @@ namespace Qn
      */
     enum NodeType
     {
-        RootNode,               /**< Root node for the tree. */
+        RootNode,               /**< Root node for the tree (current system node). */
         LocalNode,              /**< Root node for local resources. */
-        ServersNode,            /**< Root node for remote resources. */
+        CurrentSystemNode,      /**< Root node for remote resources if we are the admin. */
         OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
-        WebPagesNode,           /**> Root node for webpages. */
+        WebPagesNode,           /**< Root node for web pages. */
+        UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
+        UserLayoutsNode,        /**< Root node for layouts for non-admin user. */
+        UserServersNode,        /**< Root node for servers for non-admin user. */
+        GlobalLayoutsNode,      /**< Root node for global layouts. */
 
         BastardNode,            /**< Root node for hidden resources. */
 

@@ -48,7 +48,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   [this]()
     {
-        ui->permissionsLabel->setText(m_model->permissionsDescription(selectedPermissions(), selectedUserGroup()));
+        //ui->permissionsLabel->setText(m_model->permissionsDescription(selectedPermissions(), selectedUserGroup()));
+        ui->permissionsLabel->setText(tr("TODO: #GDM #FIXME"));
     });
 
     //setWarningStyle(ui->hintLabel);
@@ -285,12 +286,8 @@ void QnUserSettingsWidget::updateAccessRightsPresets()
 
     Qn::GlobalPermissions permissions = qnResourceAccessManager->globalPermissions(m_model->user());
 
-    // show only for view of owner
-    if (permissions.testFlag(Qn::GlobalOwnerPermission))
-        addBuiltInGroup(tr("Owner"), Qn::GlobalOwnerPermissionsSet);    /* Really we should never see this group. */
-
     // show for an admin or for anyone opened by owner
-    if (permissions.testFlag(Qn::GlobalAdminPermission) || accessController()->hasGlobalPermission(Qn::GlobalOwnerPermission))
+    if (permissions.testFlag(Qn::GlobalAdminPermission) || (context()->user() && context()->user()->isOwner()))
         addBuiltInGroup(tr("Administrator"), Qn::GlobalAdminPermissionsSet);
 
     addBuiltInGroup(tr("Advanced Viewer"),   Qn::GlobalAdvancedViewerPermissionSet);

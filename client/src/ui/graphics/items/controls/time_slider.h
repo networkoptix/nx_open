@@ -24,6 +24,7 @@
 
 class QTimer;
 
+class GraphicsLabel;
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
@@ -172,9 +173,6 @@ public:
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
 
-    const QString& toolTipFormat() const;
-    void setToolTipFormat(const QString& format);
-
     bool isLiveSupported() const;
     void setLiveSupported(bool value);
 
@@ -222,8 +220,6 @@ public:
 
     bool positionMarkerVisible() const;
 
-    bool archiveAvailable() const;
-
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -235,7 +231,6 @@ signals:
     void thumbnailClicked();
     void msecsPerPixelChanged();
     void lineCommentChanged(int line, const QString& comment);
-    void archiveAvailabilityChanged(bool hasArchive);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -391,7 +386,7 @@ private:
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
 
-    void setThumbnailSelecting(qint64 time, bool selecting);
+    qint64 setThumbnailSelecting(qint64 time, bool selecting);
 
     void setAnimationStart(qint64 start);
     void setAnimationEnd(qint64 end);
@@ -422,7 +417,6 @@ private:
 
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
-    QString m_toolTipFormat;
 
     QnLinearFunction m_unboundMapper;
     QnBoundedLinearFunction m_boundMapper;
@@ -482,6 +476,10 @@ private:
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 
     bool m_liveSupported;
+    bool m_selectionInitiated;
+
+    GraphicsLabel* m_tooltipLine1;
+    GraphicsLabel* m_tooltipLine2;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

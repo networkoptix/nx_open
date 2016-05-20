@@ -85,7 +85,7 @@ public:
     QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
 
     /* exact match name for fixed resourceTypes (Layout, Server, etc) */
-    QnUuid getFixedResourceTypeId(const QString& name) const;
+    static QnUuid getFixedResourceTypeId(const QString& name);
 
     /* match name using like operation */
     QnUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;

@@ -39,7 +39,7 @@
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/processors/hover_processor.h>
@@ -179,7 +179,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
-    m_resourceModel = new QnResourcePoolModel(QnResourcePoolModel::FullScope, this);
+    m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
@@ -384,22 +384,6 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
                 if(resource && !result.contains(resource))
                     result.append(resource);
             }
-            break;
-//         case Qn::EdgeNode: {
-//             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-//             if (resource && !result.contains(resource))
-//                 result.append(resource);
-//             QnResourcePtr server = resource->getParentResource();
-//             if (server && !result.contains(server))
-//                 result.append(server);
-//             }
-//             break;
-        case Qn::LocalNode:
-        case Qn::ServersNode:
-        case Qn::UsersNode:
-        case Qn::ItemNode:
-        case Qn::BastardNode:
-        case Qn::RootNode:
             break;
         default:
             break;

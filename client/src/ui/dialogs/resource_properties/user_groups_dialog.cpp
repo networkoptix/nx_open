@@ -77,7 +77,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
         ec2::ApiUserGroupData group;
         group.id = QnUuid::createUuid();
         group.name = generateUniqueString(usedNames, tr("New Group"), tr("New Group %1"));
-        group.permissions = Qn::GlobalViewLivePermission;
+        group.permissions = Qn::NoGlobalPermissions;
 
         int row = m_model->addGroup(group);
         ui->groupsTreeView->selectionModel()->setCurrentIndex(m_model->index(row), QItemSelectionModel::ClearAndSelect);

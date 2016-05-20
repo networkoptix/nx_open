@@ -32,6 +32,9 @@ public:
     bool isToolTipAutoHidden() const;
     void setAutoHideToolTip(bool autoHideToolTip);
 
+    qreal tooltipMargin() const;
+    void setTooltipMargin(qreal margin);
+
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -50,7 +53,7 @@ protected:
 private:
     void hideToolTip();
     void showToolTip();
-    
+
     void updateToolTipVisibility();
     Q_SLOT void updateToolTipPosition();
     void updateToolTipOpacity();
@@ -62,7 +65,7 @@ private:
 
     QScopedPointer<QnToolTipSliderAnimationListener> m_animationListener;
     QPointer<QnToolTipWidget> m_tooltipWidget;
-    VariantAnimator *m_tooltipWidgetVisibilityAnimator;
+    VariantAnimator* m_tooltipWidgetVisibilityAnimator;
     qreal m_tooltipWidgetVisibility;
     QBasicTimer m_hideTimer;
     bool m_autoHideToolTip;
@@ -71,6 +74,7 @@ private:
     bool m_pendingPositionUpdate;
     bool m_instantPositionUpdate;
     QPointF m_dragOffset;
+    qreal m_tooltipMargin;
 };
 
 #endif // QN_TOOL_TIP_SLIDER_H

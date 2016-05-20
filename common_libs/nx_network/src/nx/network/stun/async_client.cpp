@@ -9,25 +9,6 @@ namespace stun {
 
 const AbstractAsyncClient::Settings AbstractAsyncClient::kDefaultSettings;
 
-boost::optional< QString >
-    AbstractAsyncClient::hasError(SystemError::ErrorCode code, const Message& message)
-{
-    if( code != SystemError::noError )
-        return lit( "System error %1: %2" )
-            .arg( code ).arg( SystemError::toString( code ) );
-
-    if( message.header.messageClass != MessageClass::successResponse )
-    {
-        if( const auto err = message.getAttribute< attrs::ErrorDescription >() )
-            return lit( "STUN error %1: %2" )
-                .arg( err->getCode() ).arg( QString::fromUtf8( err->getString() ) );
-        else
-            return lit( "STUN error without ErrorDescription" );
-    }
-
-    return boost::none;
-}
-
 AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_useSsl(false),
@@ -64,23 +45,27 @@ void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
     openConnectionImpl( &lock );
 }
 
-bool AsyncClient::setIndicationHandler(int method, IndicationHandler handler)
+bool AsyncClient::setIndicationHandler(
+    int method, IndicationHandler handler, void* client)
 {
     QnMutexLocker lock(&m_mutex);
-    return m_indicationHandlers.emplace(method, std::move(handler)).second;
+    return m_indicationHandlers.emplace(
+        method, std::make_pair(client, std::move(handler))).second;
 }
 
-void AsyncClient::addOnReconnectedHandler(ReconnectHandler handler)
+void AsyncClient::addOnReconnectedHandler(
+    ReconnectHandler handler, void* client)
 {
     QnMutexLocker lock(&m_mutex);
-    m_reconnectHandlers.push_back(std::move(handler));
+    m_reconnectHandlers.emplace(client, std::move(handler));
 }
 
-void AsyncClient::sendRequest(Message request, RequestHandler handler)
+void AsyncClient::sendRequest(
+    Message request, RequestHandler handler, void* client)
 {
     QnMutexLocker lock( &m_mutex );
     m_requestQueue.push_back( std::make_pair(
-        std::move( request ), std::move( handler ) ) );
+        std::move( request ), std::make_pair( client, std::move( handler ) ) ) );
 
     switch( m_state )
     {
@@ -123,6 +108,36 @@ SocketAddress AsyncClient::remoteAddress() const
 void AsyncClient::closeConnection(SystemError::ErrorCode errorCode)
 {
     closeConnection(errorCode, nullptr);
+}
+
+template<typename Container>
+void removeByClient(Container* container, void* client)
+{
+    // std::remove_if does not work for std::map and multimap O_o
+    for (auto it = container->begin(); it != container->end(); )
+    {
+        if (it->second.first == client)
+            it = container->erase(it);
+        else
+            ++it;
+    }
+}
+
+void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler)
+{
+    NX_ASSERT(client);
+    m_timer.post(
+        [this, client, handler = std::move(handler)]()
+        {
+            QnMutexLocker lock(&m_mutex);
+            removeByClient(&m_requestQueue, client);
+            removeByClient(&m_indicationHandlers, client);
+            m_reconnectHandlers.erase(client);
+            removeByClient(&m_requestsInProgress, client);
+
+            lock.unlock();
+            handler();
+        });
 }
 
 void AsyncClient::closeConnection(
@@ -198,31 +213,31 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 void AsyncClient::closeConnectionImpl(
         QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
-    auto connectingSocket = std::move( m_connectingSocket );
-    auto requestQueue = std::move( m_requestQueue );
-    auto requestsInProgress = std::move( m_requestsInProgress );
+    auto connectingSocket = std::move(m_connectingSocket);
+    auto requestQueue = std::move(m_requestQueue);
+    auto requestsInProgress = std::move(m_requestsInProgress);
 
-    if( m_state != State::terminated )
+    if (m_state != State::terminated)
         m_state = State::disconnected;
 
     lock->unlock();
+    {
+        if (connectingSocket)
+            connectingSocket->pleaseStopSync();
 
-    if( connectingSocket )
-        connectingSocket->pleaseStopSync();
-
-    for( const auto& req : requestsInProgress )   req.second( code, Message() );
-    for( const auto& req : requestQueue )         req.second( code, Message() );
-
+        for (const auto& r: requestsInProgress) r.second.second(code, Message());
+        for (const auto& r: requestQueue) r.second.second(code, Message());
+    }
     lock->relock();
 
-    if( m_state != State::terminated )
+    if (m_state != State::terminated)
     {
         m_timer.scheduleNextTry(
             [this]
             {
                 NX_LOGX(lm("Try to restore mediator connection..."), cl_logDEBUG1);
-                QnMutexLocker lock( &m_mutex );
-                openConnectionImpl( &lock );
+                QnMutexLocker lock(&m_mutex);
+                openConnectionImpl(&lock);
             });
     }
 }
@@ -285,7 +300,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
     const auto reconnectHandlers = m_reconnectHandlers;
     lock.unlock();
     for( const auto& handler: reconnectHandlers )
-        handler();
+        handler.second();
 }
 
 void AsyncClient::processMessage(Message message)
@@ -307,16 +322,10 @@ void AsyncClient::processMessage(Message message)
             // find corresponding handler by transactionId
             const auto it = m_requestsInProgress.find( message.header.transactionId );
             if( it == m_requestsInProgress.end() )
-            {
-                NX_ASSERT( false, Q_FUNC_INFO, "unexpected transactionId" );
-                NX_LOGX( lit( "Unexpected transactionId: %2" )
-                         .arg( QString::fromUtf8( message.header.transactionId.toHex() ) ),
-                         cl_logERROR );
-                return;
-            }
+                return; // request is already canceled
 
             // use and erase the handler (transactionId is unique per transaction)
-            RequestHandler handler( std::move( it->second ) );
+            RequestHandler handler( std::move( it->second.second ) );
             m_requestsInProgress.erase( it );
 
             lock.unlock();
@@ -331,7 +340,7 @@ void AsyncClient::processMessage(Message message)
             {
                 auto handler = it->second;
                 lock.unlock();
-                handler( std::move( message ) );
+                handler.second( std::move( message ) );
             }
             else
             {

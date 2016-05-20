@@ -136,7 +136,11 @@ int CloudDBProcess::executeApplication()
 
         std::unique_ptr<AbstractEmailManager> emailManager(
             EMailManagerFactory::create(settings));
-        StreeManager streeManager(settings.auth());
+
+        CdbAttrNameSet cdbAttrNameSet;
+        StreeManager streeManager(
+            cdbAttrNameSet,
+            settings.auth().rulesXmlPath);
 
         nx_http::MessageDispatcher httpMessageDispatcher;
 

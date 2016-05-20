@@ -7,7 +7,6 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <business/business_fwd.h>
 
-#include <api/api_fwd.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
@@ -24,6 +23,8 @@
 #include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
+
+#include <recording/time_period_list.h>
 #include <utils/common/ldap_fwd.h>
 
 class QnTimePeriodList;

@@ -28,14 +28,19 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
         return checkbox;
     };
 
-    createCheckBox(Qn::GlobalEditLayoutsPermission,     tr("Can create and edit global layouts"));
-    createCheckBox(Qn::GlobalEditServersPermissions,    tr("Can edit server settings"));
-    createCheckBox(Qn::GlobalViewLivePermission,        tr("Can view live stream of available cameras"));
-    createCheckBox(Qn::GlobalViewArchivePermission,     tr("Can view archives of available cameras"));
-    createCheckBox(Qn::GlobalExportPermission,          tr("Can export archives of available cameras"));
-    createCheckBox(Qn::GlobalEditCamerasPermission,     tr("Can edit camera settings"));
-    createCheckBox(Qn::GlobalPtzControlPermission,      tr("Can change camera's PTZ state"));
-    createCheckBox(Qn::GlobalEditVideoWallPermission,   tr("Can create and edit videowalls"));
+    /* Manager permissions. */
+    createCheckBox(Qn::GlobalEditServersPermissions,        tr("Can edit server settings"));
+    createCheckBox(Qn::GlobalEditCamerasPermission,         tr("Can edit camera settings"));
+    createCheckBox(Qn::GlobalEditLayoutsPermission,         tr("Can create and edit global layouts"));
+    createCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Can control videowalls"));
+
+    /* Viewer permissions. */
+    createCheckBox(Qn::GlobalViewArchivePermission,         tr("Can view archives of available cameras"));
+    createCheckBox(Qn::GlobalExportPermission,              tr("Can export archives of available cameras"));
+    createCheckBox(Qn::GlobalViewBookmarksPermission,       tr("Can view bookmarks of available cameras"));
+    createCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Can modify bookmarks of available cameras"));
+    createCheckBox(Qn::GlobalUserInputPermission,           tr("Can change camera's PTZ state"));
+
     ui->permissionsLayout->addStretch();
 }
 

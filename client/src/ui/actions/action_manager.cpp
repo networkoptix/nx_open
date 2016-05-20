@@ -536,7 +536,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Control Video Wall")).
         condition(new QnConjunctionActionCondition(
             new QnStartVideoWallControlActionCondition(this),
@@ -545,7 +545,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Push my screen")).
         condition(new QnConjunctionActionCondition(
             new QnDesktopCameraActionCondition(this),
@@ -635,7 +635,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory.beginSubMenu(); {
         factory(QnActions::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-            requiredTargetPermissions(Qn::CreateLayoutPermission).
+            requiredTargetPermissions(Qn::WritePermission). //TODO: #GDM #access check canCreateResource
             text(tr("Layout...")).
             pulledText(tr("New Layout...")).
             condition(hasFlags(Qn::user));
@@ -676,7 +676,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewVideoWallAction).
             flags(Qn::Main).
-            requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+            requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
             text(tr("Video Wall...")).
             pulledText(tr("New Video Wall...")).
             condition(new QnForbiddenInSafeModeCondition(this)).
@@ -860,14 +860,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
 
     factory(QnActions::WebClientAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
 
     factory(QnActions::SystemUpdateAction).
         flags(Qn::NoTarget).
@@ -946,10 +946,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::MergeSystems).
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
-        requiredGlobalPermission(Qn::GlobalOwnerPermission).
         condition(new QnConjunctionActionCondition(
-            new QnTreeNodeTypeCondition(Qn::ServersNode, this),
+            new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
             new QnForbiddenInSafeModeCondition(this),
+            new QnRequiresOwnerCondition(this),
             this)
             );
 
@@ -1083,14 +1083,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::IdentifyVideoWallAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Identify")).
         autoRepeat(false).
         condition(new QnIdentifyVideoWallActionCondition(this));
 
     factory(QnActions::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
@@ -1100,7 +1100,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Switch to Video Wall mode...")).
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
@@ -1109,7 +1109,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Save Video Wall View")).
         shortcut(lit("Ctrl+S")).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
             new QnSaveVideowallReviewActionCondition(false, this),
@@ -1118,7 +1118,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Save Current Matrix")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
@@ -1128,13 +1128,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoadVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallMatrixTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         condition(new QnForbiddenInSafeModeCondition(this)).
         text(tr("Load Matrix"));
 
     factory(QnActions::DeleteVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallMatrixTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Delete")).
         shortcut(lit("Del")).
         shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
@@ -1156,14 +1156,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::StopVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
         condition(new QnRunningVideowallActionCondition(this));
 
     factory(QnActions::DetachFromVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Detach Layout")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
@@ -1176,7 +1176,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::SaveLayoutAsAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
-        requiredTargetPermissions(Qn::UserResourceRole, Qn::CreateLayoutPermission).
+        requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission).    //TODO: #GDM #access check canCreateResource permission
         text(tr("Save Layout As...")).
         condition(new QnSaveLayoutAsActionCondition(false, this));
 
@@ -1191,7 +1191,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::DeleteVideoWallItemAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Delete")).
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
@@ -1407,7 +1407,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::RenameVideowallEntityAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallItemTarget | Qn::VideoWallMatrixTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalEditVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Rename")).
         shortcut(lit("F2")).
         condition(new QnForbiddenInSafeModeCondition(this)).
@@ -1565,12 +1565,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        requiredGlobalPermission(Qn::GlobalOwnerPermission).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),
             new QnForbiddenInSafeModeCondition(this),
             new QnMergeToCurrentSystemActionCondition(this),
+            new QnRequiresOwnerCondition(this),
             this));
 
     factory().

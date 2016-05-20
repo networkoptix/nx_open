@@ -13,7 +13,7 @@ class QnResourceItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
 class QnResourceTreeSortProxyModel;
-class QnResourcePoolModelCustomColumnDelegate;
+class QnResourceTreeModelCustomColumnDelegate;
 
 namespace Ui {
     class QnResourceTreeWidget;
@@ -112,8 +112,8 @@ public:
 
     bool isSimpleSelectionEnabled() const;
 
-    QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
-    void setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate);
+    QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
+    void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 
     QAbstractItemView* treeView() const;
 

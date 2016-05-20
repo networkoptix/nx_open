@@ -51,7 +51,7 @@ namespace nx_http
         virtual void processRequest(
             const nx_http::HttpServerConnection& connection,
             stree::ResourceContainer authInfo,
-            const nx_http::Request& request,
+            nx_http::Request request,
             nx_http::Response* const response,
             std::function<void(
                 const nx_http::StatusCode::Value statusCode,
@@ -60,7 +60,6 @@ namespace nx_http
         nx_http::Response* response();
 
     private:
-        nx_http::Message m_requestMsg;
         nx_http::Message m_responseMsg;
         std::function<void(
             nx_http::Message&&,

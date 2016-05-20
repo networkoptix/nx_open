@@ -7,26 +7,31 @@
 #include <core/resource/resource_fwd.h>
 
 #include <utils/media/voice_spectrum_analyzer.h>
+#include <utils/common/connective.h>
 
 class QnTwoWayAudioWidget;
 class QnImageButtonWidget;
 class GraphicsLabel;
 class VariantAnimator;
+class QnSingleCamLicenceStatusHelper;
 
 typedef decltype(QnSpectrumData::data) VisualizerData;
 
-class QnTwoWayAudioWidgetPrivate: public QObject
+class QnTwoWayAudioWidgetPrivate: public Connective<QObject>
 {
     Q_OBJECT
 
+    typedef Connective<QObject> base_type;
 public:
     QnImageButtonWidget* button;
     GraphicsLabel* hint;
-    QnVirtualCameraResourcePtr camera;
     QnTwoWayAudioWidgetColors colors;
 
 public:
     QnTwoWayAudioWidgetPrivate(QnTwoWayAudioWidget* owner);
+    virtual ~QnTwoWayAudioWidgetPrivate();
+
+    void updateCamera(const QnVirtualCameraResourcePtr& camera);
 
     void startStreaming();
     void stopStreaming();
@@ -48,6 +53,9 @@ private:
     void setHint(const QString& text);
 
     void ensureAnimator();
+
+    /** Check if two-way audio translation is allowed. */
+    bool isAllowed() const;
 private:
     Q_DECLARE_PUBLIC(QnTwoWayAudioWidget)
     QnTwoWayAudioWidget *q_ptr;
@@ -63,4 +71,7 @@ private:
 
     VisualizerData m_visualizerData;
     qint64 m_paintTimeStamp;
+
+    QnVirtualCameraResourcePtr m_camera;
+    QScopedPointer<QnSingleCamLicenceStatusHelper> m_licenseHelper;
 };

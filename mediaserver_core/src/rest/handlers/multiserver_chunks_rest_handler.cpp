@@ -2,9 +2,6 @@
 
 #include <QUrlQuery>
 
-#include <recording/time_period.h>
-#include <recording/time_period_list.h>
-
 #include <api/helpers/chunks_request_data.h>
 
 #include <common/common_module.h>

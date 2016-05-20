@@ -27,7 +27,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
 
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);

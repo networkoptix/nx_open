@@ -188,7 +188,7 @@ namespace {
         else
             itemData.flags = Qn::PendingGeometryAdjustment;
         itemData.resource.id = firstIdx.videowall()->getId();
-        itemData.resource.path = firstIdx.videowall()->getUniqueId();
+        itemData.resource.uniqueId = firstIdx.videowall()->getUniqueId();
         itemData.dataByRole[Qn::VideoWallItemIndicesRole] = qVariantFromValue<QnVideoWallItemIndexList>(indices);
         layout->addItem(itemData);
     }
@@ -1172,18 +1172,22 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         aspectRatios[ar] = aspectRatios[ar] + 1;
     };
 
-    foreach (const QnResourcePtr &resource, resources) {
-        if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-            foreach (const QnLayoutItemData &item, layout->getItems()) {
-                addToFiltered(qnResPool->getResourceByUniqueId(item.resource.path));
-            }
-        } else {
+    for (const QnResourcePtr &resource: resources)
+    {
+        if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+        {
+            for (const QnLayoutItemData &item: layout->getItems())
+                addToFiltered(qnResPool->getResourceByDescriptor(item.resource));
+        }
+        else
+        {
             addToFiltered(resource);
         }
     }
 
     qreal desiredAspectRatio = defaultAr;
-    foreach (qreal ar, aspectRatios.keys()) {
+    for (qreal ar: aspectRatios.keys())
+    {
         if (aspectRatios[ar] > aspectRatios[desiredAspectRatio])
             desiredAspectRatio = ar;
     }
@@ -1224,7 +1228,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.path = resource->getUniqueId();
+        item.resource.uniqueId = resource->getUniqueId();
         layout->addItem(item);
         i++;
     }
@@ -1573,7 +1577,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         layout->setId(m_uuidPool->getFreeId());
         if(context()->user())
             layout->setParentId(context()->user()->getId());
-        if (accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission))
+        if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
             layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
 
         QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;

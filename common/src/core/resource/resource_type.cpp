@@ -202,11 +202,12 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     return QnUuid();
 }
 
-QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name) const {
+QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name)
+{
     QnUuid result = guidFromArbitraryData(name.toUtf8() + QByteArray("-"));
 
 #ifdef _DEBUG
-    QnUuid online = getResourceTypeId(QString(), name, false);
+    QnUuid online = qnResTypePool->getResourceTypeId(QString(), name, false);
     if (!online.isNull())
         NX_ASSERT(result == online);
 #endif

@@ -32,6 +32,9 @@ donotrebuild
 vms.pro
 .idea
 .branch.properties
+x86/*
+x64/*
+target/*
 
 .DS_Store
 Debug

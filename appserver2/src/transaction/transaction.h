@@ -28,7 +28,7 @@ APPLY(1, tranSyncRequest, ApiSyncRequestData, \
                        InvalidTriggerNotificationHelper()) /* trigger notification*/ \
 APPLY(2, tranSyncResponse, QnTranStateResponse, \
                        false, /* persistent*/ \
-                       false,  /* system*/ \
+                       true,  /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
                        InvalidTriggerNotificationHelper()) /* trigger notification*/ \
 APPLY(3, lockRequest, ApiLockData, \
@@ -420,8 +420,8 @@ APPLY(1002, addLicenses, ApiLicenseDataList, \
 APPLY(1003, removeLicense, ApiLicenseData, \
                        true, \
                        false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       &createHashForApiLicenseDataHelper, \
+                       LicenseNotificationManagerHelper()) \
 APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        false, \
                        true, \

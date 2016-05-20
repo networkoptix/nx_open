@@ -9,21 +9,19 @@
 #include <QtCore/QVector>
 #endif
 
-#include <api/api_fwd.h>
-
 #include "time_period.h"
 #include <nx/utils/uuid.h>
 class QnTimePeriodListTimeIterator;
 
 /**
- * A sorted list of time periods that basically is an implementation of 
+ * A sorted list of time periods that basically is an implementation of
  * an interval container concept.
  */
-class QnTimePeriodList: 
+class QnTimePeriodList:
 #ifdef QN_TIME_PERIODS_STD
     public std::vector<QnTimePeriod>
 #else
-    public QVector<QnTimePeriod> 
+    public QVector<QnTimePeriod>
 #endif
 {
 #ifdef QN_TIME_PERIODS_STD
@@ -39,8 +37,8 @@ public:
     /**
      * \param timeMs                    Time value to search for, in milliseconds.
      * \param searchForward             How to behave when there is no interval containing the given time value.
-     *                                  If false, position of an interval preceding the value is returned. 
-     *                                  Otherwise, position of an interval that follows the value is returned. 
+     *                                  If false, position of an interval preceding the value is returned.
+     *                                  Otherwise, position of an interval that follows the value is returned.
      *                                  Note that this position may equal <tt>end</tt>.
      * \returns                         Position of a time period that is closest to the given time value.
      */
@@ -65,7 +63,7 @@ public:
     /**
      * \returns                         Total duration of all periods in this list,
      *                                  or -1 if the last time period of this list is infinite.
-     * 
+     *
      * \note                            This function performs in O(N), so you may want to cache the results.
      */
     qint64 duration() const;
@@ -86,34 +84,34 @@ public:
     bool isEmpty() const { return empty(); }
 #endif
 
-    /** 
-     * Encode (compress) data to a byte array. 
+    /**
+     * Encode (compress) data to a byte array.
      * In high-optimized mode time periods must be arranged by time and must not intersect.
-     * If this condition is not met, the function returns false. 
+     * If this condition is not met, the function returns false.
      * Average compressed QnTimePeriod size is close to 6 bytes in high-optimized mode and 7 bytes otherwise.
-     * 
-     * \param stream                    Byte array to compress time periods to. 
+     *
+     * \param stream                    Byte array to compress time periods to.
      */
     bool encode(QByteArray &stream);
-    
-    /** 
-     * Decode (decompress) data from a byte array. 
-     * 
+
+    /**
+     * Decode (decompress) data from a byte array.
+     *
      * \param[in] stream                Byte array to decompress time periods from.
      */
     bool decode(QByteArray &stream);
 
     /**
-     * Decode (decompress) data from a byte array. 
-     * 
+     * Decode (decompress) data from a byte array.
+     *
      * \param[in] data                  Compressed data pointer.
      * \param[in] dataSize              Size of the compressed data.
      */
     bool decode(const quint8 *data, int dataSize);
 
-    /** 
+    /**
      * Find nearest period for specified time.
-     * 
+     *
      * \param[in] timeMs                Time to find at usec
      * \param[in] searchForward         Rount time to the future if true or to the past if false
      * \returns                         Time moved to nearest chunk at usec
@@ -124,7 +122,7 @@ public:
     static QnTimePeriodList mergeTimePeriods(const std::vector<QnTimePeriodList>& periods, int limit = INT_MAX);
 
     /** Update tail of the period list with provided tail.
-     * 
+     *
      * \param[in] periods               Base list.
      * \param[in] tail                  List of updates.
      * \param[in] dividerPoint          Point where the tail should be appended.
@@ -133,7 +131,7 @@ public:
     static void overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList &tail, qint64 dividerPoint);
 
     /** Union two time period lists. Does not delete periods from the base list.
-     * 
+     *
      * \param[in] basePeriods           Base list.
      * \param[in] appendingPeriods      Appending list.
      * \returns                         Merged list.
@@ -178,6 +176,8 @@ struct MultiServerPeriodData
     QnUuid guid;
     QnTimePeriodList periods;
 };
+
+typedef std::vector<MultiServerPeriodData> MultiServerPeriodDataList;
 
 QN_FUSION_DECLARE_FUNCTIONS(MultiServerPeriodData, (json)(metatype)(ubjson)(xml)(csv_record)(compressed_time)(eq));
 

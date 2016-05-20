@@ -8,7 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/style/custom_style.h>
 
-class QnResourcePoolModelCustomColumnDelegate;
+class QnResourceTreeModelCustomColumnDelegate;
 
 class QnResourceSelectionDialogDelegate: public QObject {
     Q_OBJECT
@@ -43,7 +43,7 @@ public:
      */
     virtual bool isFlat() const;
 
-    virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
+    virtual QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
 
     virtual int helpTopicId() const;
 };

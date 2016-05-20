@@ -14,6 +14,7 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/test_support/module_instance_launcher.h>
 
 #include "../cloud_data_provider.h"
 #include "../data/listening_peer.h"
@@ -27,20 +28,13 @@ namespace nx {
 namespace hpm {
 
 class MediatorFunctionalTest
+:
+    public utils::test::ModuleLauncher<MediatorProcessPublic>
 {
 public:
     //!Calls \a start
     MediatorFunctionalTest();
     ~MediatorFunctionalTest();
-
-    void start();
-    bool startAndWaitUntilStarted();
-    bool waitUntilStarted();
-    void stop();
-    //!restarts process
-    void restart();
-
-    void addArg(const char* arg);
 
     SocketAddress stunEndpoint() const;
     SocketAddress httpEndpoint() const;
@@ -69,10 +63,6 @@ private:
     QString m_tmpDir;
     int m_stunPort;
     int m_httpPort;
-    std::vector<char*> m_args;
-    std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;
-    nx::utils::thread m_mediatorProcessThread;
-    nx::utils::promise<bool /*result*/> m_mediatorStartedPromise;
     //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
 };

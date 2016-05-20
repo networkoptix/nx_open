@@ -1,7 +1,6 @@
-
 #pragma once
 
-#include <QtCore/QAbstractListModel>
+#include <QtCore/QStringListModel>
 
 #include <utils/common/connective.h>
 #include <network/system_description.h>
