@@ -79,8 +79,6 @@ private:
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
 
-    void removeItemNode(const QnUuid& uuid);
-
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
 
@@ -120,6 +118,7 @@ private:
     friend class QnResourceTreeModelNode;
 
     typedef QHash<QString, QnResourceTreeModelNodePtr> RecorderHash;
+    typedef QHash<QnUuid, QnResourceTreeModelNodePtr> ItemHash;
 
     /** Root nodes array */
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
@@ -131,7 +130,7 @@ private:
     QHash<QnResourceTreeModelNodePtr, RecorderHash> m_recorderHashByParent;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QnUuid, QnResourceTreeModelNodePtr> m_itemNodeByUuid;
+    QHash<QnResourceTreeModelNodePtr, ItemHash> m_itemNodesByParent;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
     QHash<QnResourcePtr, QList<QnResourceTreeModelNodePtr> > m_itemNodesByResource;
