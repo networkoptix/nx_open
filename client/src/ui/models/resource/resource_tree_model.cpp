@@ -426,7 +426,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
     if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
     {
-        if (layout->flags().testFlag(Qn::local_layout))
+        if (layout->isFile())
             return m_rootNodes[Qn::LocalNode];
 
         if (layout->isGlobal())
