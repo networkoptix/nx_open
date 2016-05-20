@@ -134,7 +134,7 @@ def get_package_for_configuration(rdep, package, target_dir, debug):
             return False
 
         if location:
-            repo_ts = rdep_config.PackageConfig(location).get_timestamp(None)
+            repo_ts = rdep_config.PackageConfig(location).get_timestamp()
             set_package_synctime(target_dir, full_name, repo_ts)
 
     if not location or repo_ts == None:
