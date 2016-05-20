@@ -391,7 +391,7 @@ private:
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
 
-    qint64 setThumbnailSelecting(qint64 time, bool selecting);
+    void setThumbnailSelecting(qint64 time, bool selecting);
 
     void setAnimationStart(qint64 start);
     void setAnimationEnd(qint64 end);
