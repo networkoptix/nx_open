@@ -98,12 +98,15 @@ public:
     bool isModified() const;
 
     void setModified(bool modified) ;
+
 protected:
     void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
     void addChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
 private:
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+
     /** Recalculated 'bastard' state for the node. */
     bool calculateBastard() const;
 

@@ -75,15 +75,14 @@ private:
     QnResourceTreeModelNodePtr getSystemNode(const QString &systemName);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
+    QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
+
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
 
+    void removeItemNode(const QnUuid& uuid);
+
+    /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
-
-    void removeItemNode(const QnUuid& uuid, const QnResourcePtr& parentResource);
-
-    /** Some nodes can have deleting node set as parent, but this node will not
-     * have them as children because of their 'bastard' flag.*/
-    void deleteNode(const QnResourceTreeModelNodePtr& node);
 
     /** Fully rebuild resources tree. */
     void rebuildTree();

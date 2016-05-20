@@ -28,11 +28,12 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type):
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid) :
     base_type(),
     QnWorkbenchContextAware(model),
     m_model(model),
     m_type(type),
+    m_uuid(uuid),
     m_state(Normal),
     m_bastard(false),
     m_parent(NULL),
@@ -40,19 +41,15 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     m_modified(false),
     m_checkState(Qt::Unchecked)
 {
-    NX_ASSERT(
-        type == Qn::LocalNode ||
-        type == Qn::CurrentSystemNode ||
-        type == Qn::OtherSystemsNode ||
-        type == Qn::UsersNode ||
-        type == Qn::WebPagesNode ||
-        type == Qn::UserDevicesNode ||
-        type == Qn::UserLayoutsNode ||
-        type == Qn::UserServersNode ||
-        type == Qn::GlobalLayoutsNode ||
-        type == Qn::RootNode ||
-        type == Qn::BastardNode);
+    NX_ASSERT(model != NULL);
+    m_editable.checked = false;
+}
 
+
+
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type):
+    QnResourceTreeModelNode(model, type, QnUuid())
+{
     switch(type)
     {
     case Qn::RootNode:
@@ -104,93 +101,51 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         m_bastard = true; /* Invisible by default until has children. */
         break;
+    case Qn::RecorderNode:
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+        m_bastard = true; /* Invisible by default until has children. */
+        break;
+    case Qn::SystemNode:
+        m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
+        m_bastard = true; /* Invisible by default until has children. */
+        break;
     default:
         break;
     }
-
-    m_editable.checked = false;
 }
 
 /**
 * Constructor for other virtual group nodes (recorders, other systems).
 */
-QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QString &name) :
-    base_type(),
-    QnWorkbenchContextAware(model),
-    m_model(model),
-    m_type(type),
-    m_state(Normal),
-    m_bastard(false),
-    m_parent(NULL),
-    m_status(Qn::Online),
-    m_modified(false),
-    m_checkState(Qt::Unchecked)
+QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QString &name) :
+    QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(type == Qn::SystemNode || type == Qn::RecorderNode);
-
-    switch (type)
-    {
-    case Qn::RecorderNode:
-        m_displayName = m_name = name;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
-        m_bastard = true; /* Invisible by default until has children. */
-        m_state = Invalid;
-        break;
-    case Qn::SystemNode:
-        m_displayName = m_name = name;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
-        m_bastard = true; /* Invisible by default until has children. */
-        m_state = Invalid;
-        break;
-    default:
-        break;
-    }
-
-    m_editable.checked = false;
+    NX_ASSERT(nodeType == Qn::SystemNode || nodeType == Qn::RecorderNode);
+    m_displayName = m_name = name;
+    m_state = Invalid;
 }
 
 /**
  * Constructor for resource nodes.
  */
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
-    base_type(),
-    QnWorkbenchContextAware(model),
-    m_model(model),
-    m_type(nodeType),
-    m_state(Invalid),
-    m_bastard(false),
-    m_parent(NULL),
-    m_status(Qn::Offline),
-    m_modified(false),
-    m_checkState(Qt::Unchecked)
+    QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(model != NULL);
     NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode);
-
+    m_state = Invalid;
+    m_status = Qn::Offline;
     setResource(resource);
-
-    m_editable.checked = false;
 }
 
 /**
  * Constructor for item nodes.
  */
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType):
-    base_type(),
-    QnWorkbenchContextAware(model),
-    m_model(model),
-    m_type(nodeType),
-    m_uuid(uuid),
-    m_state(Invalid),
-    m_bastard(false),
-    m_parent(NULL),
-    m_status(Qn::Offline),
-    m_modified(false),
-    m_checkState(Qt::Unchecked)
+    QnResourceTreeModelNode(model, nodeType, uuid)
 {
-    NX_ASSERT(model != NULL);
-
-    m_editable.checked = false;
+    NX_ASSERT(nodeType == Qn::ItemNode || nodeType == Qn::VideoWallItemNode || nodeType == Qn::VideoWallMatrixNode);
+    m_state = Invalid;
+    m_status = Qn::Offline;
 }
 
 QnResourceTreeModelNode::~QnResourceTreeModelNode()
@@ -559,17 +514,17 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNode::parent() const
 
 void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent)
 {
-    if(m_parent == parent)
+    if (m_parent == parent)
         return;
 
-    if(m_parent && !m_bastard)
+    if (m_parent && !m_bastard)
         m_parent->removeChildInternal(toSharedPointer());
 
     m_parent = parent;
 
-    if(m_parent)
+    if (m_parent)
     {
-        if(!m_bastard)
+        if (!m_bastard)
         {
             setState(m_parent->state());
             m_parent->addChildInternal(toSharedPointer());
