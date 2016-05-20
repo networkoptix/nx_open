@@ -489,6 +489,22 @@ void QnResourceTreeModel::updateNodeParent(const QnResourceTreeModelNodePtr& nod
     node->setParent(expectedParent(node));
 }
 
+void QnResourceTreeModel::cleanupSystemNodes()
+{
+    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+    for (auto node : m_allNodes)
+    {
+        if (node->type() != Qn::SystemNode)
+            continue;
+
+        if (node->children().isEmpty())
+            nodesToDelete << node;
+    }
+
+    for (auto node : nodesToDelete)
+        removeNode(node);
+}
+
 bool QnResourceTreeModel::isUrlsShown()
 {
     return m_urlsShown;
@@ -863,7 +879,6 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (server)
     {
-        m_rootNodes[Qn::OtherSystemsNode]->update();
         for (const QnResourcePtr &camera : qnResPool->getResourcesByParentId(server->getId()))
         {
             if (m_resourceNodeByResource.contains(camera))
@@ -910,6 +925,9 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
     m_itemNodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
+
+    if (QnMediaServerResource::isFakeServer(resource))
+        cleanupSystemNodes();
 }
 
 
@@ -1076,7 +1094,7 @@ void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     auto node = getResourceNode(resource);
     updateNodeParent(node);
-    m_rootNodes[Qn::OtherSystemsNode]->update();
+    cleanupSystemNodes();
 }
 
 void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resource)
