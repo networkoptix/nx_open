@@ -32,6 +32,17 @@ Page
             online: model.isOnline
             compatible: model.isCompatible
         }
+        highlight: Rectangle
+        {
+            z: 2.0
+            color: "transparent"
+            border.color: ColorTheme.contrast5
+            border.width: 4
+
+        }
+        highlightResizeDuration: 0
+        highlightMoveDuration: 0
+
         displayMarginBeginning: 16
         displayMarginEnd: 16 + mainWindow.bottomPadding
 
@@ -52,6 +63,15 @@ Page
 
                 onClicked: Workflow.openNewSessionScreen()
             }
+        }
+
+        focus: true
+
+        Keys.onPressed:
+        {
+            // TODO: #dklychkov Implement transparent navigation to the footer item.
+            if (event.key == Qt.Key_C)
+                Workflow.openNewSessionScreen()
         }
     }
 }

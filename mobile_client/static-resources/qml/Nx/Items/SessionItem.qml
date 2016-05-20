@@ -54,21 +54,7 @@ Pane
 
         enabled: compatible
         anchors.fill: parent
-        onClicked:
-        {
-            if (connectionsModel.hasConnections)
-            {
-                connectionManager.connectToServer(
-                            LoginUtils.makeUrl(informationBlock.address,
-                                               informationBlock.user,
-                                               connectionsModel.getData("password", 0)))
-                Workflow.openResourcesScreen(systemName)
-            }
-            else
-            {
-                Workflow.openDiscoveredSession(systemName, informationBlock.address)
-            }
-        }
+        onClicked: open()
     }
 
     contentItem: SystemInformationBlock
@@ -91,4 +77,23 @@ Pane
                                       connectionsModel.getData("password", 0))
         }
     }
+
+    function open()
+    {
+        if (connectionsModel.hasConnections)
+        {
+            connectionManager.connectToServer(
+                        LoginUtils.makeUrl(informationBlock.address,
+                                           informationBlock.user,
+                                           connectionsModel.getData("password", 0)))
+            Workflow.openResourcesScreen(systemName)
+        }
+        else
+        {
+            Workflow.openDiscoveredSession(systemName, informationBlock.address)
+        }
+    }
+
+    Keys.onEnterPressed: open()
+    Keys.onReturnPressed: open()
 }
