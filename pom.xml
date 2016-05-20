@@ -443,6 +443,7 @@
 
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
+                <module>media_db_util</module>
 
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>
@@ -480,7 +481,6 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
-                <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
             </modules>
