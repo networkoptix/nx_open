@@ -30,6 +30,7 @@ extern "C" {
 #include <vector>
 #include <random>
 #include <cmath>
+#include <stdio.h>
 
 const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
@@ -53,7 +54,11 @@ bool recursiveClean(const QString &path)
             f.setPermissions(QFile::ReadOther | QFile::WriteOther);
             auto result = f.remove();
             if (!result)
+            {
+                printf("Cleanup failed. Couldn't remove %1\n", 
+                        f.fileName().toLatin1().constData());
                 return false;
+            }
         }
     }
     dir.rmpath(path);

@@ -913,6 +913,19 @@ ec2::ApiResourceParamDataList QnResource::getAllProperties() const
             result.emplace_back(it.key(), it.value());
     }
 
+#ifdef 0
+    printf("\n==== Camera: %s ====\n", getName().toLatin1().constData());
+    printf("\tStatic properties:\n");
+    for (auto it = staticDefaultProperties.cbegin(); it != staticDefaultProperties.cend(); ++it)
+        printf("\t\t%s = %s\n", it.key().toLatin1().constData(), it.value().toLatin1().constData());
+    
+    printf("\tRuntime properties:\n");
+    for (auto it = runtimeProperties.cbegin(); it != runtimeProperties.cend(); ++it)
+        printf("\t\t%s = %s\n", it->name.toLatin1().constData(), it->value.toLatin1().constData());
+
+    printf("\n");
+#endif
+
     std::copy(runtimeProperties.cbegin(), runtimeProperties.cend(), std::back_inserter(result));
     return result;
 }
