@@ -36,12 +36,13 @@ ApplicationWindow
     {
         updateNavigationBarPadding()
 
-        if (loginSessionManager.lastUsedSessionId)
+        var lastUsedUrl = getLastUsedUrl()
+
+        if (lastUsedUrl)
         {
             lockScreenOrientation()
-            currentSessionId = loginSessionManager.lastUsedSessionId
-            Workflow.openResourcesScreen(loginSessionManager.lastUsedSessionSystemName())
-            connectionManager.connectToServer(loginSessionManager.lastUsedSessionUrl())
+            Workflow.openResourcesScreen(getLastUsedSystemId())
+            connectionManager.connectToServer(lastUsedUrl)
         }
         else
         {

@@ -22,8 +22,6 @@ GridView
     model: QnCameraListModel
     {
         id: camerasModel
-        showOffline: settings.showOfflineCameras
-        hiddenCameras: settings.hiddenCameras
     }
 
     delegate: CameraItem

@@ -6,25 +6,20 @@
 #include <utils/common/instance_storage.h>
 
 class QnConnectionManager;
-class QnLoginSessionManager;
 class QnColorTheme;
 class QnMobileAppInfo;
 class QnResolutionUtil;
 class QnContextSettings;
-class QnSavedSessionsModel;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
     typedef QObject base_type;
 
     Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
-    Q_PROPERTY(QnLoginSessionManager* loginSessionManager READ loginSessionManager NOTIFY loginSessionManagerChanged)
     Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
     Q_PROPERTY(QnContextSettings* settings READ settings NOTIFY settingsChanged)
-    Q_PROPERTY(QnSavedSessionsModel* savedSessionsModel READ savedSessionsModel NOTIFY savedSessionsModelChanged)
     Q_PROPERTY(bool liteMode READ liteMode NOTIFY liteModeChanged)
-    Q_PROPERTY(QString currentSessionId READ currentSessionId WRITE setCurrentSessionId NOTIFY currentSessionIdChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -32,10 +27,6 @@ public:
 
     QnConnectionManager *connectionManager() const {
         return m_connectionManager;
-    }
-
-    QnLoginSessionManager *loginSessionManager() const {
-        return m_loginSessionManager;
     }
 
     QnColorTheme *colorTheme() const {
@@ -48,11 +39,6 @@ public:
 
     QnContextSettings *settings() const {
         return m_settings;
-    }
-
-    QnSavedSessionsModel* savedSessionsModel() const
-    {
-        return m_savedSessionsModel;
     }
 
     QnResolutionUtil *resolutionUtil() const {
@@ -80,8 +66,12 @@ public:
 
     Q_INVOKABLE bool liteMode() const;
 
-    QString currentSessionId() const;
-    void setCurrentSessionId(const QString& id);
+    Q_INVOKABLE void removeSavedConnection(const QString& systemName);
+
+    Q_INVOKABLE void setLastUsedConnection(const QString& systemId, const QUrl& url);
+    Q_INVOKABLE void clearLastUsedConnection();
+    Q_INVOKABLE QString getLastUsedSystemId() const;
+    Q_INVOKABLE QString getLastUsedUrl() const;
 
     Q_INVOKABLE QString lp(const QString& path) const;
     void setLocalPrefix(const QString& prefix);
@@ -89,26 +79,19 @@ public:
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
-    void loginSessionManagerChanged();
     void colorThemeChanged();
     void applicationInfoChanged();
     void settingsChanged();
     void liteModeChanged();
-    void savedSessionsModelChanged();
-    void currentSessionIdChanged();
 
 private:
     QnConnectionManager *m_connectionManager;
-    QnLoginSessionManager *m_loginSessionManager;
     QnColorTheme *m_colorTheme;
     QnMobileAppInfo *m_appInfo;
     QnContextSettings *m_settings;
-    QnSavedSessionsModel* m_savedSessionsModel;
 
     QString m_localPrefix;
     QScopedPointer<QnResolutionUtil> m_resolutionUtil;
-
-    QString m_currentSessionId;
 };
 
 Q_DECLARE_METATYPE(QnContext*)

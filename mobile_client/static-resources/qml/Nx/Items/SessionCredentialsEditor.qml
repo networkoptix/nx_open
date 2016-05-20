@@ -10,8 +10,7 @@ Pane
     implicitWidth: parent ? parent.width : 400
     background: null
 
-    property alias host: hostField.text
-    property alias port: portField.text
+    property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
 
@@ -26,36 +25,18 @@ Pane
         id: content
         width: parent.width
 
-        Row
+        TextField
         {
-            TextField
-            {
-                id: hostField
+            id: addressField
 
-                width: content.width * 0.6
-                placeholderText: qsTr("Host")
-                showError: displayAddressError
-                onTextChanged: credentialsEditor.changed()
-                selectionAllowed: false
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
-                activeFocusOnTab: true
-                onAccepted: KeyNavigation.tab.forceActiveFocus()
-            }
-
-            TextField
-            {
-                id: portField
-
-                width: parent.width * 2 / 5 - parent.spacing
-                placeholderText: qsTr("Port (optional)")
-                showError: displayAddressError
-                onTextChanged: credentialsEditor.changed()
-                selectionAllowed: false
-                inputMethodHints: Qt.ImhDigitsOnly
-                validator: IntValidator { bottom: 0; top: 32767 }
-                activeFocusOnTab: liteMode
-                onAccepted: KeyNavigation.tab.forceActiveFocus()
-            }
+            width: parent.width
+            placeholderText: qsTr("Host : Port")
+            showError: displayAddressError
+            onTextChanged: credentialsEditor.changed()
+            selectionAllowed: false
+            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+            activeFocusOnTab: true
+            onAccepted: KeyNavigation.tab.forceActiveFocus()
         }
 
         Item
@@ -100,9 +81,9 @@ Pane
         }
     }
 
-    function focusHostField()
+    function focusAddressField()
     {
-        hostField.forceActiveFocus()
+        addressField.forceActiveFocus()
     }
 
     function focusLoginField()

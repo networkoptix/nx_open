@@ -193,16 +193,7 @@ Page
 
         onConnectionStateChanged:
         {
-            if (connectionManager.connectionState === QnConnectionManager.Connected)
-            {
-                savedSessionsModel.updateSession(
-                            currentSessionId,
-                            connectionManager.currentUrl,
-                            connectionManager.systemName,
-                            true)
-                loginSessionManager.lastUsedSessionId = currentSessionId
-            }
-            else if (connectionManager.connectionState === QnConnectionManager.Disconnected)
+            if (connectionManager.connectionState === QnConnectionManager.Disconnected)
             {
                 loadingDummy.opacity = 1
             }
@@ -210,13 +201,10 @@ Page
 
         onConnectionFailed:
         {
-            var sessionId = currentSessionId
-            currentSessionId = ""
+            var lastUsedSystemId = getLastUsedSystemId()
             Workflow.openFailedSessionScreen(
-                        sessionId,
-                        title,
+                        lastUsedSystemId,
                         connectionManager.currentHost,
-                        connectionManager.currentPort,
                         connectionManager.currentLogin,
                         connectionManager.currentPassword,
                         status,

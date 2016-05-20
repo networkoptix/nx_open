@@ -1,26 +1,42 @@
 import QtQuick 2.6
-import Qt.labs.templates 1.0
+import QtQuick.Layouts 1.1
+import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import com.networkoptix.qml 1.0
 
-Control
+Pane
 {
     id: control
 
-    property string systemName
-    property string host
-    property int port
-    property string version
-    property bool compatible
+    property alias systemId: informationBlock.systemId
+    property alias systemName: informationBlock.systemName
+    property alias cloudSystem: informationBlock.cloud
+    property alias online: informationBlock.online
+    property alias compatible: informationBlock.compatible
+    property alias ownerDescription: informationBlock.ownerDescription
 
-    padding: 16
+    padding: 0
 
-    implicitHeight: contentItem.implicitHeight + 2 * padding
+    implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
     implicitWidth: 200
+
+    enabled: compatible && online
+
+    QnSystemHostsModel
+    {
+        id: hostsModel
+        systemId: control.systemId
+    }
+    QnRecentUserConnectionsModel
+    {
+        id: connectionsModel
+        systemName: control.systemName
+    }
 
     background: Rectangle
     {
-        color: compatible ? ColorTheme.base7 : ColorTheme.base6
+        color: control.enabled ? ColorTheme.base7 : ColorTheme.base6
         radius: 2
 
         MaterialEffect
@@ -32,54 +48,47 @@ Control
         }
     }
 
-    contentItem: Column
-    {
-        width: control.availableWidth
-
-        Text
-        {
-            text: systemName ? systemName : "<%1>".arg(qsTr("Unknown"))
-            width: parent.width
-            height: 32
-            font.pixelSize: 18
-            font.weight: Font.DemiBold
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-            color: compatible ? ColorTheme.windowText : ColorTheme.base17
-        }
-
-        Text
-        {
-            text: host + ":" + port
-            width: parent.width
-            height: 24
-            font.pixelSize: 15
-            font.weight: Font.DemiBold
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-            color: compatible ? ColorTheme.contrast2 : ColorTheme.base17
-        }
-
-        Text
-        {
-            text: qsTr("incompatible server version") + (version ? ": " + version : "")
-            width: parent.width
-            height: 24
-            font.pixelSize: 12
-            font.weight: Font.DemiBold
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-            color: ColorTheme.orange_main
-            visible: !compatible
-        }
-    }
-
     MouseArea
     {
         id: mouseArea
 
         enabled: compatible
         anchors.fill: parent
-        onClicked: Workflow.openDiscoveredSession(systemName, host, port)
+        onClicked:
+        {
+            if (connectionsModel.hasConnections)
+            {
+                connectionManager.connectToServer(
+                            LoginUtils.makeUrl(informationBlock.address,
+                                               informationBlock.user,
+                                               connectionsModel.getData("password", 0)))
+                Workflow.openResourcesScreen(systemName)
+            }
+            else
+            {
+                Workflow.openDiscoveredSession(systemName, informationBlock.address)
+            }
+        }
+    }
+
+    contentItem: SystemInformationBlock
+    {
+        id: informationBlock
+        address: hostsModel.firstHost
+        user: connectionsModel.firstUser
+    }
+
+    IconButton
+    {
+        anchors.right: parent.right
+        icon: lp("/images/edit.png")
+        visible: connectionsModel.hasConnections
+        onClicked:
+        {
+            Workflow.openSavedSession(systemName,
+                                      informationBlock.address,
+                                      informationBlock.user,
+                                      connectionsModel.getData("password", 0))
+        }
     }
 }

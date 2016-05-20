@@ -39,7 +39,7 @@ Drawer
 
                 SystemInformationPanel
                 {
-                    visible: connectionManager.isOnline
+                    visible: connectionManager.online
                 }
             }
         }
@@ -48,7 +48,7 @@ Drawer
         {
             anchors.fill: savedSessionsList
             anchors.margins: 16
-            visible: !connectionManager.isOnline
+            visible: !connectionManager.online
         }
 
         Column
@@ -60,14 +60,14 @@ Drawer
 
             BottomSeparator
             {
-                visible: connectionManager.isOnline
+                visible: connectionManager.online
             }
 
             SideNavigationButton
             {
                 icon: lp("/images/plus.png")
                 text: qsTr("New connection")
-                visible: !currentSessionId
+                visible: !connectionManager.online
                 onClicked:
                 {
                     sideNavigation.close()
@@ -79,12 +79,12 @@ Drawer
             {
                 icon: lp("/images/disconnect.png")
                 text: qsTr("Disconnect from server")
-                visible: currentSessionId
+                visible: connectionManager.online
                 onClicked:
                 {
+                    clearLastUsedConnection()
                     sideNavigation.close()
                     connectionManager.disconnectFromServer(false)
-                    currentSessionId = ""
                     Workflow.openSessionsScreen()
                 }
             }

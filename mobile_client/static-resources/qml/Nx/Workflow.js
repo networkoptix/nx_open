@@ -25,7 +25,7 @@ function openNewSessionScreen()
     item.focusHostField()
 }
 
-function openFailedSessionScreen(sessionId, systemName, host, port, login, password, connectionStatus, info)
+function openFailedSessionScreen(systemName, address, login, password, connectionStatus, info)
 {
     var item = null
     if (stackView.get(0, Controls.StackView.ForceLoad).objectName == "sessionsScreen")
@@ -33,10 +33,8 @@ function openFailedSessionScreen(sessionId, systemName, host, port, login, passw
         item = stackView.push(
                 Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
                 {
-                    "sessionId": sessionId,
-                    "title": systemName,
-                    "host": host,
-                    "port": port,
+                    "systemName": systemName,
+                    "address": address,
                     "login": login,
                     "password": password,
                 }
@@ -50,10 +48,8 @@ function openFailedSessionScreen(sessionId, systemName, host, port, login, passw
                 {},
                 Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
                 {
-                    "sessionId": sessionId,
-                    "title": systemName,
-                    "host": host,
-                    "port": port,
+                    "systemName": systemName,
+                    "address": address,
                     "login": login,
                     "password": password,
                 }
@@ -63,30 +59,28 @@ function openFailedSessionScreen(sessionId, systemName, host, port, login, passw
     item.forceActiveFocus()
 }
 
-function openDiscoveredSession(systemName, host, port)
+function openDiscoveredSession(systemName, address)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
-                "title": systemName,
-                "host": host,
-                "port": port
+                "systemName": systemName,
+                "address": address
             }
     )
     item.focusLoginField()
 }
 
-function openSavedSession(sessionId, systemName, host, port, login, password)
+function openSavedSession(systemName, address, login, password)
 {
     var item = stackView.push(
-            Qt.resolvedUrl("Screens/SavedConnectionScreen.qml"),
+            Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
-                "sessionId": sessionId,
-                "title": systemName,
-                "host": host,
-                "port": port,
+                "systemName": systemName,
+                "address": address,
                 "login": login,
-                "password": password
+                "password": password,
+                "saved": true
             }
     )
     item.forceActiveFocus()

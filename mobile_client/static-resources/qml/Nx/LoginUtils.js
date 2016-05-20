@@ -1,10 +1,8 @@
 .import com.networkoptix.qml 1.0 as Nx
 
-function makeUrl(host, port, login, password)
+function makeUrl(address, login, password)
 {
-    var result = "http://" + login + ":" + password + "@" + host
-    if (port)
-        result += ":" + port
+    var result = "http://" + login + ":" + password + "@" + address
     return result
 }
 

@@ -2,6 +2,7 @@ import QtQuick 2.6
 import QtQuick.Layouts 1.1
 import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.Items 1.0
 
 Pane
 {
@@ -9,7 +10,7 @@ Pane
 
     implicitWidth: parent ? parent.width : contentItem.implicitWidth
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
-    padding: 16
+    padding: 0
 
     background: Item
     {
@@ -23,105 +24,12 @@ Pane
         }
     }
 
-    contentItem: Column
+    contentItem: SystemInformationBlock
     {
-        width: systemInformationPanel.availableWidth
-
-        Text
-        {
-            width: parent.width
-            height: 28
-            text: connectionManager.systemName
-            verticalAlignment: Text.AlignVCenter
-            font.pixelSize: 18
-            font.weight: Font.DemiBold
-            elide: Text.ElideRight
-            color: ColorTheme.windowText
-        }
-
-        Loader
-        {
-            sourceComponent: localSystemInformationComponent
-        }
-    }
-
-    Component
-    {
-        id: localSystemInformationComponent
-
-        Column
-        {
-            width: systemInformationPanel.availableWidth
-            topPadding: 6
-            spacing: 2
-
-            RowLayout
-            {
-                width: parent.width
-                spacing: 2
-
-                Image
-                {
-                    source: lp("/images/tile_server.png")
-                }
-
-                Text
-                {
-                    Layout.fillWidth: true
-                    text: connectionManager.currentHost + ":" + connectionManager.currentPort
-                    font.pixelSize: 14
-                    elide: Text.ElideRight
-                    color: ColorTheme.contrast4
-                }
-            }
-
-            RowLayout
-            {
-                width: parent.width
-                spacing: 2
-
-                Image
-                {
-                    source: lp("/images/tile_user.png")
-                }
-
-                Text
-                {
-                    Layout.fillWidth: true
-                    text: connectionManager.currentLogin
-                    font.pixelSize: 14
-                    elide: Text.ElideRight
-                    color: ColorTheme.contrast4
-                }
-            }
-        }
-    }
-
-    Component
-    {
-        id: cloudSystemInformationComponent
-
-        Column
-        {
-            width: systemInformationPanel.availableWidth
-            spacing: 4
-
-            Text
-            {
-                text: "Demo Demov's system" // TODO: #dklychkov Implement
-                width: parent.width
-                height: 20
-                font.pixelSize: 14
-                elide: Text.ElideRight
-                color: ColorTheme.windowText
-            }
-
-            Rectangle
-            {
-                width: 24
-                height: 24
-                color: "yellow"
-            }
-        }
+        topPadding: 16
+        bottomPadding: 16
+        systemName: connectionManager.systemName
+        address: connectionManager.currentHost
+        user: connectionManager.currentLogin
     }
 }

@@ -21,14 +21,15 @@ Page
         anchors.fill: parent
         spacing: 1
 
-        model: QnDiscoveredSessionsModel { id: discoveredSessionsModel }
+        model: QnSystemsModel { id: systemsModel }
         delegate: SessionItem
         {
             width: sessionsList.width
             systemName: model.systemName
-            host: model.address
-            port: model.port
-            version: model.serverVersion
+            systemId: model.systemId
+            cloudSystem: model.isCloudSystem
+            ownerDescription: cloudSystem ? model.ownerDescription : ""
+            online: model.isOnline
             compatible: model.isCompatible
         }
         displayMarginBeginning: 16

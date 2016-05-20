@@ -8,14 +8,14 @@ Page
 {
     id: customConnectionScreen
 
-    title: qsTr("Connect to Server")
+    title: systemName ? systemName : qsTr("Connect to Server")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
-    property alias host: credentialsEditor.host
-    property alias port: credentialsEditor.port
+    property string systemName
+    property alias address: credentialsEditor.address
     property alias login: credentialsEditor.login
     property alias password: credentialsEditor.password
-    property string sessionId: ""
+    property bool saved: false
 
     QtObject
     {
@@ -28,21 +28,27 @@ Page
         width: parent.width
         leftPadding: 16
         rightPadding: 16
-        spacing: 24
+        spacing: 8
         enabled: !d.connecting
 
-        property real contentWidth: width - leftPadding - rightPadding
+        property real availableWidth: width - leftPadding - rightPadding
 
         SessionCredentialsEditor
         {
             id: credentialsEditor
-            width: parent.contentWidth
+            width: parent.availableWidth
             onAccepted: customConnectionScreen.connect()
         }
 
         Item
         {
-            width: parent.contentWidth
+            width: 1
+            height: 8
+        }
+
+        Item
+        {
+            width: parent.availableWidth
             height: connectButton.height
 
             Button
@@ -64,6 +70,19 @@ Page
                 opacity: 1.0 - connectButton.opacity
             }
         }
+
+        Button
+        {
+            width: parent.availableWidth
+            text: qsTr("Delete")
+            visible: saved
+
+            onClicked:
+            {
+                removeSavedConnection(systemName)
+                Workflow.popCurrentScreen()
+            }
+        }
     }
 
     Connections
@@ -74,8 +93,6 @@ Page
         {
             if (connectionManager.connectionState === QnConnectionManager.Connected)
             {
-                currentSessionId = savedSessionsModel.updateSession(
-                        sessionId, host, port, login, password, connectionManager.systemName, true)
                 Workflow.openResourcesScreen(connectionManager.systemName)
             }
         }
@@ -92,7 +109,7 @@ Page
         hideWarning()
         connectButton.forceActiveFocus()
         d.connecting = true
-        connectionManager.connectToServer(LoginUtils.makeUrl(host, port, login, password))
+        connectionManager.connectToServer(LoginUtils.makeUrl(address, login, password))
     }
 
     function showWarning(status, info)
@@ -118,7 +135,7 @@ Page
 
     function focusHostField()
     {
-        credentialsEditor.focusHostField()
+        credentialsEditor.focusAddressField()
     }
 
     function focusLoginField()
