@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import Qt.labs.templates 1.0
 import Nx 1.0
 import Nx.Controls 1.0
@@ -54,5 +54,8 @@ Control
             control.clicked()
         }
     }
+
+    Keys.onEnterPressed: clicked()
+    Keys.onReturnPressed: clicked()
 }
 

@@ -77,6 +77,8 @@ Drawer
 
             SideNavigationButton
             {
+                id: disconnectButton
+
                 icon: lp("/images/disconnect.png")
                 text: qsTr("Disconnect from server")
                 visible: connectionManager.online
@@ -104,7 +106,10 @@ Drawer
     onOpenedChanged:
     {
         if (opened)
-            forceActiveFocus()
+        {
+            // TODO: #dklychkov Implement proper focus control
+            disconnectButton.forceActiveFocus()
+        }
     }
 
     Keys.onPressed:
