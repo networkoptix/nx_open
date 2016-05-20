@@ -1,10 +1,5 @@
 #pragma once
 
-// Configuration: should be defined elsewhere in the project which uses vdpau_helper.
-extern bool outputVdpauCalls();
-extern bool enableX11Vdpau();
-extern bool suppressX11LogVdpau();
-
 #include <stdio.h>
 #include <stdint.h>
 
@@ -28,6 +23,7 @@ extern VdpOutputSurfaceGetBitsNative* vdp_output_surface_get_bits_native;
 extern VdpOutputSurfaceGetParameters* vdp_output_surface_get_parameters;
 extern VdpVideoMixerCreate* vdp_video_mixer_create;
 extern VdpVideoMixerDestroy* vdp_video_mixer_destroy;
+extern VdpVideoMixerSetAttributeValues* vdp_video_mixer_set_attribute_values;
 extern VdpVideoMixerRender* vdp_video_mixer_render;
 extern VdpPresentationQueueCreate* vdp_presentation_queue_create;
 extern VdpPresentationQueueDestroy* vdp_presentation_queue_destroy;
@@ -45,7 +41,7 @@ void checkedVdpCall(VdpStatus status, const char* funcName);
  */
 #define VDP(CALL) do \
 { \
-    if (outputVdpauCalls()) \
+    if (conf.outputVdpauCalls) \
         fprintf(stderr, "VDPAU CALL: %s\n", #CALL); \
     checkedVdpCall(CALL, #CALL); \
 } while(0)
@@ -55,8 +51,9 @@ void vdpCheckHandle(uint32_t handle, const char* name);
 /**
  * Attempt to use Nx extension to vdpau_sunxi which allows to work without X11; if fails, then
  * initialize VDPAU with X11.
+ * @param outDrawable Can be used for vdp_presentation_queue_target_create_x11().
  */
-VdpDevice createVdpDevice();
+VdpDevice createVdpDevice(Drawable* outDrawable);
 
 typedef struct
 {

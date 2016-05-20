@@ -1,31 +1,34 @@
 #pragma once
 
 #include "flag_config.h"
-class ProxyDecoderFlagConfig: public nx::utils::FlagConfig
+class NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
 {
 public:
     using nx::utils::FlagConfig::FlagConfig;
 
-    NX_FLAG(0, enableStub);
-    NX_FLAG(0, enableFps);
+    NX_FLAG(0, enableStub, "");
+    NX_FLAG(0, enableFps, "");
+    NX_FLAG(0, disableCscMatrix, "Avoid setting VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX.");
+    NX_INT_PARAM(8, videoSurfaceCount, "");
 
     // vdpau_helper
-    NX_FLAG(0, outputVdpauCalls); //< Log each VDPAU call (errors are logged anyway).
-    NX_FLAG(0, enableX11Vdpau); //< Open X11 Display for VDPAU (otherwise, use null for Display).
-    NX_FLAG(0, suppressX11LogVdpau); //< If enableX11Vdpau, do not suppress X logging to stderr.
+    NX_FLAG(0, outputVdpauCalls, "Log each VDPAU call (errors are logged anyway).");
+    NX_FLAG(0, enableX11Vdpau, "Open X11 Display for VDPAU (otherwise, use null for Display).");
+    NX_FLAG(0, suppressX11LogVdpau, "If enableX11Vdpau, do not suppress X logging to stderr.");
+    NX_FLAG(0, createX11Window, "Note: Nx ext to vdpau_sunxi allows to run with X11 without a window.");
 
     // proxy_decoder_utils
-    NX_FLAG(0, enableOutput);
-    NX_FLAG(0, enableTime);
+    NX_FLAG(0, enableOutput, "");
+    NX_FLAG(0, enableTime, "");
 
     // proxy_decoder_impl
-    NX_FLAG(0, disableGetBits); //< Avoid calling ...get_bits... (thus no picture).
-    NX_FLAG(1, enableRgbYOnly); //< Convert only Y to Blue, setting Red and Green to 0.
-    NX_FLAG(1, enableRgbPartOnly); //< Convert to RGB only a part of the frame.
-    NX_FLAG(0, enableYuvDump); //< Dump frames in both Native and Planar YUV to files.
-    NX_FLAG(0, enableLogYuvNative); //< Log struct returned from vdpau with native data ref.
+    NX_FLAG(0, disableGetBits, "Avoid calling ...get_bits... (thus no picture).");
+    NX_FLAG(1, enableRgbYOnly, "Convert only Y to Blue, setting Red and Green to 0.");
+    NX_FLAG(1, enableRgbPartOnly, "Convert to RGB only a part of the frame.");
+    NX_FLAG(0, enableYuvDump, "Dump frames in both Native and Planar YUV to files.");
+    NX_FLAG(0, enableLogYuvNative, "Log struct returned from vdpau with native data ref.");
 };
-extern __attribute__ ((visibility ("hidden"))) ProxyDecoderFlagConfig conf;
+extern NX_UTILS_API ProxyDecoderFlagConfig conf;
 
 // Configuration: should be defined before including this header.
 //#define OUTPUT_PREFIX "<ModuleName>: "
@@ -66,7 +69,7 @@ struct EndWithEndl
 
 #define OUTPUT if (!conf.enableOutput) {} else EndWithEndl() /*operator,*/, std::cerr << OUTPUT_PREFIX
 
-#define PRINT EndWithEndl() /*operator,*/, std::cerr
+#define PRINT EndWithEndl() /*operator,*/, std::cerr << OUTPUT_PREFIX
 
 long getTimeMs();
 void logTimeMs(long oldTime, const char* tag);

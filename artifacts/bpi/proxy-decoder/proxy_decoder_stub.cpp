@@ -7,7 +7,7 @@
 
 #include "vdpau_helper.h"
 
-#define OUTPUT_PREFIX "ProxyDecoder[STUB]: "
+#define OUTPUT_PREFIX "proxydecoder[STUB]: "
 #include "proxy_decoder_utils.h"
 
 namespace {
@@ -34,7 +34,6 @@ private:
     VdpPresentationQueueTarget m_vdpTarget = VDP_INVALID_HANDLE;
     VdpPresentationQueue m_vdpQueue = VDP_INVALID_HANDLE;
 
-    static const int kSurfaceCount = 20;
     int m_videoSurfaceIndex = 0;
     std::vector<VdpVideoSurface> m_vdpVideoSurfaces;
 };
@@ -44,15 +43,16 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
     m_frameWidth(frameWidth),
     m_frameHeight(frameHeight)
 {
-    PRINT << OUTPUT_PREFIX << "Initializing VDPAU; using " << kSurfaceCount << " surfaces";
+    PRINT << "Initializing VDPAU; using " << conf.videoSurfaceCount << " video surfaces";
 
-    m_vdpDevice = createVdpDevice();
+    Drawable drawable;
+    m_vdpDevice = createVdpDevice(&drawable);
 
     VDP(vdp_decoder_create(m_vdpDevice,
         VDP_DECODER_PROFILE_H264_HIGH,
         m_frameWidth,
         m_frameHeight,
-        /*max_references*/ 16, //< Used only for checking to be <= 16.
+        /*max_references*/ conf.videoSurfaceCount, //< Used only for checking to be <= 16.
         &m_vdpDecoder));
     vdpCheckHandle(m_vdpDecoder, "Decoder");
 
@@ -65,13 +65,29 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
         &m_vdpMixer));
     vdpCheckHandle(m_vdpMixer, "Mixer");
 
-    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, /*drawable*/ 0, &m_vdpTarget));
+    if (!conf.disableCscMatrix)
+    {
+        static const VdpVideoMixerAttribute attr = VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX;
+        // Values grabbed from mpv logs.
+        static const VdpCSCMatrix matrix =
+            {
+                {1.164384, 0.000000, 1.792741, -0.972945},
+                {1.164384, -0.213249, -0.532909, 0.301483},
+                {1.164384, 2.112402, 0.000000, -1.133402},
+            };
+        static const VdpCSCMatrix* const pMatrix = &matrix;
+
+        VDP(vdp_video_mixer_set_attribute_values(m_vdpMixer, /*attributes_count*/ 1, &attr,
+            (void const * const *) &pMatrix));
+    }
+
+    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, drawable, &m_vdpTarget));
     vdpCheckHandle(m_vdpTarget, "Presentation Queue Target");
 
     VDP(vdp_presentation_queue_create(m_vdpDevice, m_vdpTarget, &m_vdpQueue));
     vdpCheckHandle(m_vdpQueue, "Presentation Queue");
 
-    while (m_vdpVideoSurfaces.size() < kSurfaceCount)
+    while (m_vdpVideoSurfaces.size() < conf.videoSurfaceCount)
     {
         VdpVideoSurface surface = VDP_INVALID_HANDLE;
         VDP(vdp_video_surface_create(m_vdpDevice,
@@ -85,7 +101,7 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
         memset(yuvNative.virt, 0, yuvNative.size);
     }
 
-    PRINT << OUTPUT_PREFIX << "VDPAU Initialized OK";
+    PRINT << "VDPAU Initialized OK";
 }
 
 VdpauStub::~VdpauStub()
@@ -120,12 +136,12 @@ VdpauStub::~VdpauStub()
 void VdpauStub::display()
 {
     const int videoSurfaceIndex = m_videoSurfaceIndex;
-    m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % kSurfaceCount;
+    m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % conf.videoSurfaceCount;
 
     VdpVideoSurface videoSurface = m_vdpVideoSurfaces[videoSurfaceIndex];
 
     OUTPUT << stringFormat("VdpauStub::display() BEGIN, surface #%2d of %d {index %2d}",
-        videoSurface, kSurfaceCount, videoSurfaceIndex);
+        videoSurface, conf.videoSurfaceCount, videoSurfaceIndex);
 
     static YuvNative yuvNative;
     getVideoSurfaceYuvNative(videoSurface, &yuvNative);

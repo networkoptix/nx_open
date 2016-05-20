@@ -10,7 +10,9 @@ cd $(dirname "$0")
 # Install to /opt/networkoptix/lite_client
 
 if \
-g++ -Wfatal-errors -std=c++11 -fPIC -shared -o libproxydecoder.so \
+g++ \
+    -DNX_UTILS_API='__attribute__ ((visibility ("hidden")))' \
+    -Wfatal-errors -std=c++14 -fPIC -shared -o libproxydecoder.so \
     -L/opt/ffmpeg/lib -lavcodec -lavfilter -lavformat -lavutil -lavdevice -lswscale \
     -lvdpau -lcedrus -lpixman-1 \
     flag_config.cpp vdpau_helper.cpp proxy_decoder_*.cpp \

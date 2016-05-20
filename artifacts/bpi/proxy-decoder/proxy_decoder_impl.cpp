@@ -13,12 +13,10 @@ extern "C" {
 
 #include "vdpau_helper.h"
 
-#define OUTPUT_PREFIX "ProxyDecoder: "
+#define OUTPUT_PREFIX "proxydecoder: "
 #include "proxy_decoder_utils.h"
 
 namespace {
-
-static const char* const DEBUG_FRAME_PATH = "/tmp";
 
 class Impl
 :
@@ -82,7 +80,7 @@ private:
     int m_frameWidth;
     int m_frameHeight;
 
-    int m_renderStateIndex = 0;
+    int m_videoSurfaceIndex = 0;
     std::vector<vdpau_render_state*> m_renderStates;
 
     VdpDevice m_vdpDevice = VDP_INVALID_HANDLE;
@@ -140,15 +138,16 @@ Impl::~Impl()
 
 void Impl::initializeVdpau()
 {
-    PRINT << "Initializing VDPAU...";
+    PRINT << "Initializing VDPAU; using " << conf.videoSurfaceCount << " video surfaces";
 
-    m_vdpDevice = createVdpDevice();
+    Drawable drawable;
+    m_vdpDevice = createVdpDevice(&drawable);
 
     VDP(vdp_decoder_create(m_vdpDevice,
         VDP_DECODER_PROFILE_H264_HIGH,
         m_frameWidth,
         m_frameHeight,
-        /*max_references*/ 16,
+        /*max_references*/ conf.videoSurfaceCount, //< Used only for checking to be <= 16.
         &m_vdpDecoder));
     vdpCheckHandle(m_vdpDecoder, "Decoder");
 
@@ -163,7 +162,23 @@ void Impl::initializeVdpau()
         &m_vdpMixer));
     vdpCheckHandle(m_vdpMixer, "Mixer");
 
-    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, /*drawable*/ 0, &m_vdpTarget));
+    if (!conf.disableCscMatrix)
+    {
+        static const VdpVideoMixerAttribute attr = VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX;
+        // Values grabbed from mpv logs.
+        static const VdpCSCMatrix matrix =
+        {
+            {1.164384, 0.000000, 1.792741, -0.972945},
+            {1.164384, -0.213249, -0.532909, 0.301483},
+            {1.164384, 2.112402, 0.000000, -1.133402},
+        };
+        static const VdpCSCMatrix* const pMatrix = &matrix;
+
+        VDP(vdp_video_mixer_set_attribute_values(m_vdpMixer, /*attributes_count*/ 1, &attr,
+            (void const * const *) &pMatrix));
+    }
+
+    VDP(vdp_presentation_queue_target_create_x11(m_vdpDevice, drawable, &m_vdpTarget));
     vdpCheckHandle(m_vdpTarget, "Presentation Queue Target");
 
     VDP(vdp_presentation_queue_create(m_vdpDevice, m_vdpTarget, &m_vdpQueue));
@@ -206,7 +221,7 @@ void Impl::initializeFfmpeg()
     AVCodec* codec = avcodec_find_decoder_by_name("h264_vdpau");
     if (!codec)
     {
-        PRINT << "avcodec_find_decoder_by_name(\"h264_vdpau\") failed";
+        PRINT << "ERROR: avcodec_find_decoder_by_name(\"h264_vdpau\") failed";
         assert(false);
         return;
     }
@@ -223,7 +238,7 @@ void Impl::initializeFfmpeg()
     int res = avcodec_open2(m_codecContext, codec, nullptr);
     if (res < 0)
     {
-        PRINT << "avcodec_open2() failed with status " << res;
+        PRINT << "ERROR: avcodec_open2() failed with status " << res;
         assert(false);
         return;
     }
@@ -253,9 +268,7 @@ vdpau_render_state* Impl::getRenderState()
 {
     vdpau_render_state* renderState = nullptr;
 
-    static const int kRenderStatesCount = 20;
-
-    while (m_renderStates.size() < kRenderStatesCount)
+    while (m_renderStates.size() < conf.videoSurfaceCount)
     {
         renderState = new vdpau_render_state();
         m_renderStates.push_back(renderState);
@@ -267,10 +280,10 @@ vdpau_render_state* Impl::getRenderState()
         vdpCheckHandle(renderState->surface, "Video Surface");
     }
 
-    renderState = m_renderStates[m_renderStateIndex];
-    OUTPUT << "getRenderState(): use vdpau_render_state #" << m_renderStateIndex << " {flags: "
+    renderState = m_renderStates[m_videoSurfaceIndex];
+    OUTPUT << "getRenderState(): use vdpau_render_state #" << m_videoSurfaceIndex << " {flags: "
             << debugDumpRenderStateFlags(renderState) <<  "}";
-    m_renderStateIndex = (m_renderStateIndex + 1) % kRenderStatesCount;
+    m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % conf.videoSurfaceCount;
 
     assert(renderState);
     return renderState;
@@ -578,7 +591,7 @@ int Impl::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
 
             if (conf.enableYuvDump)
             {
-                debugDumpYuvSurfaceToFiles(DEBUG_FRAME_PATH, renderState->surface,
+                debugDumpYuvSurfaceToFiles(conf.tempPath(), renderState->surface,
                     yBuffer, yLineSize, uBuffer, vBuffer, uVLineSize);
             }
         }
@@ -643,14 +656,6 @@ void Impl::displayDecoded(void* frameHandle)
 
     OUTPUT << "displayDecoded(" << debugDumpRenderStateRef(renderState, m_renderStates) << ") BEGIN";
     assert(renderState->surface != VDP_INVALID_HANDLE);
-
-// TODO mike: REMOVE
-#if 0
-static YuvNative yuvNative;
-getVideoSurfaceYuvNative(renderState->surface, &yuvNative);
-////memset(yuvNative.virt, 0, yuvNative.luma_size);
-debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
-#endif // 0
 
     if (conf.enableFps)
     {

@@ -16,6 +16,8 @@ static bool fileExists(const char* filename)
 
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
+
 FlagConfig::FlagConfig(const char* moduleName)
 :
     m_moduleName(moduleName)
@@ -53,57 +55,119 @@ const char* FlagConfig::moduleName() const
 
 void FlagConfig::printHeader() const
 {
-    std::cerr << m_moduleName << " configuration (touch "
-        << flagFilename("<0|1>", "<CONF>") << " to override):\n";
+    std::cerr << m_moduleName << " config ("
+        << flagFilename("<0|1>", "<FLAG>") << ", "
+        << txtFilename("<INT_PARAM>") <<"):\n";
 }
 
-bool FlagConfig::regFlag(bool* pFlag, bool defaultValue, const char* flagName)
+bool FlagConfig::regFlagParam(
+    bool* pValue, bool defaultValue, const char* paramName, const char* descr)
 {
-    m_flags.push_back(Flag{pFlag, defaultValue, flagName});
-    reloadFlag(m_flags.back(), /*printLog*/ true);
+    m_params.push_back(std::unique_ptr<FlagParam>(
+        new FlagParam(this, pValue, defaultValue, paramName, descr)));
+    m_params.back()->reload(/*printLog*/ true);
     return defaultValue;
 }
 
-std::string FlagConfig::flagFilename(const char* value, const char* flagName) const
+int FlagConfig::regIntParam(
+    int* pValue, int defaultValue, const char* paramName, const char* descr)
 {
-    return std::string(m_tempPath) + m_moduleName + "_" + value + "_" + flagName + ".flag";
+    m_params.push_back(std::unique_ptr<IntParam>(
+        new IntParam(this, pValue, defaultValue, paramName, descr)));
+    m_params.back()->reload(/*printLog*/ true);
+    return defaultValue;
 }
 
-void FlagConfig::reloadFlag(const Flag& flag, bool printLog)
+std::string FlagConfig::flagFilename(const char* value, const char* paramName) const
 {
-    const bool exists1 = fileExists(flagFilename("1", flag.name).c_str());
-    const bool exists0 = fileExists(flagFilename("0", flag.name).c_str());
+    return std::string(m_tempPath) + m_moduleName + "_" + value + "_" + paramName + ".flag";
+}
+
+std::string FlagConfig::txtFilename(const char* paramName) const
+{
+    return std::string(m_tempPath) + m_moduleName + "_" + paramName + ".txt";
+}
+
+void FlagConfig::FlagParam::reload(bool printLog) const
+{
+    const bool exists1 = fileExists(owner->flagFilename("1", name).c_str());
+    const bool exists0 = fileExists(owner->flagFilename("0", name).c_str());
     if (exists1 == exists0)
-        *flag.pFlag = flag.defaultValue;
+        *pValue = defaultValue;
     else
-        *flag.pFlag = exists1;
+        *pValue = exists1;
 
     if (printLog)
     {
-        std::cerr << "    " << *flag.pFlag << "_" << flag.name
-            << ((exists1 && exists0) ?  " (conflicting .flag files)" : "")
-            << ((*flag.pFlag != flag.defaultValue) ? " (.flag)" : "") << "\n";
+        bool error = false;
+        const char* note = "";
+        if (exists1 && exists0)
+        {
+            note = " [conflicting .flag files]";
+            error = true;
+        }
+        else if (*pValue != defaultValue)
+        {
+            note = " [.flag]";
+        }
+        printLine(std::to_string(*pValue), "_", note, error, *pValue == defaultValue);
     }
 }
 
-void FlagConfig::reloadSingleFlag(bool* pFlag)
+void FlagConfig::Param::printLine(const std::string& value, const char* valueNameSeparator,
+    const char* note, bool error, bool equalsDefault) const
 {
-    for (const auto& flag: m_flags)
+    const char* const prefix = error ? "!!! " : (equalsDefault ? "    " : "  + ");
+    const char* const descr_prefix = (strlen(descr) == 0) ? "" : " // ";
+    std::cerr << prefix << value << valueNameSeparator << name
+        << note << descr_prefix << descr << "\n";
+}
+
+void FlagConfig::IntParam::reload(bool printLog) const
+{
+    *pValue = defaultValue;
+
+    std::string txt = owner->txtFilename(name);
+    std::ifstream f(txt);
+    bool txtExists = static_cast<bool>(f);
+    bool error = false;
+    if (txtExists)
     {
-        if (flag.pFlag == pFlag)
+        if (!(f >> *pValue))
         {
-            reloadFlag(flag, /*printLog*/ false);
-            return;
+            *pValue = defaultValue;
+            error = true;
         }
     }
-    std::cerr << m_moduleName << " configuration WARNING: Flag to reload not found.\n";
+
+    if (printLog)
+    {
+        const char* note = error ? " [unable to read from .txt]" : (txtExists ? " [.txt]" : "");
+        printLine(std::to_string(*pValue), " = ", note, error, *pValue == defaultValue);
+    }
 }
 
-void FlagConfig::reload()
+void FlagConfig::reloadSingleFlag(bool* pValue) const
+{
+    for (const auto& param: m_params)
+    {
+        if (auto flag = dynamic_cast<const FlagParam*>(param.get()))
+        {
+            if (pValue == flag->pValue)
+            {
+                flag->reload(/*printLog*/ false);
+                return;
+            }
+        }
+    }
+    std::cerr << m_moduleName << " configuration WARNING: Param to reload not found.\n";
+}
+
+void FlagConfig::reload() const
 {
     printHeader();
-    for (const auto& item: m_flags)
-        reloadFlag(item, /*printLog*/ true);
+    for (const auto& param: m_params)
+        param->reload(/*printLog*/ true);
 }
 
 } // namespace utils

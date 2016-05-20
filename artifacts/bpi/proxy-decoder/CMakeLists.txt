@@ -3,7 +3,7 @@ project(proxy_decoder)
 
 # ATTENTION: This cmake file is not intended for building but rather just for IDE convenience.
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -DNX_UTILS_API=")
 
 set(SOURCE_FILES
     proxy_decoder.h

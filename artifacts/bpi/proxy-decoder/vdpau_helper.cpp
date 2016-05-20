@@ -5,33 +5,37 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#define OUTPUT_PREFIX "proxydecoder[vdpau]: "
+#include "proxy_decoder_utils.h"
+
 //-------------------------------------------------------------------------------------------------
 
-VdpGetProcAddress* vdp_get_proc_address = NULL;
-VdpGetErrorString* vdp_get_error_string = NULL;
-VdpVideoSurfaceGetParameters* vdp_video_surface_get_parameters = NULL;
-VdpVideoSurfaceGetBitsYCbCr* vdp_video_surface_get_bits_y_cb_cr = NULL;
-VdpVideoSurfaceCreate* vdp_video_surface_create = NULL;
-VdpVideoSurfaceDestroy* vdp_video_surface_destroy = NULL;
-VdpDeviceDestroy* vdp_device_destroy = NULL;
-VdpDecoderCreate* vdp_decoder_create = NULL;
-VdpDecoderDestroy* vdp_decoder_destroy = NULL;
-VdpDecoderRender* vdp_decoder_render = NULL;
-VdpOutputSurfaceCreate* vdp_output_surface_create = NULL;
-VdpOutputSurfaceDestroy* vdp_output_surface_destroy = NULL;
-VdpOutputSurfaceGetBitsNative* vdp_output_surface_get_bits_native = NULL;
-VdpOutputSurfaceGetParameters* vdp_output_surface_get_parameters = NULL;
-VdpVideoMixerCreate* vdp_video_mixer_create = NULL;
-VdpVideoMixerDestroy* vdp_video_mixer_destroy = NULL;
-VdpVideoMixerRender* vdp_video_mixer_render = NULL;
-VdpPresentationQueueCreate* vdp_presentation_queue_create = NULL;
-VdpPresentationQueueDestroy* vdp_presentation_queue_destroy = NULL;
-VdpPresentationQueueGetTime* vdp_presentation_queue_get_time = NULL;
-VdpPresentationQueueTargetCreateX11* vdp_presentation_queue_target_create_x11 = NULL;
-VdpPresentationQueueTargetDestroy* vdp_presentation_queue_target_destroy = NULL;
-VdpPresentationQueueQuerySurfaceStatus* vdp_presentation_queue_query_surface_status = NULL;
-VdpPresentationQueueDisplay* vdp_presentation_queue_display = NULL;
-VdpPresentationQueueBlockUntilSurfaceIdle* vdp_presentation_queue_block_until_surface_idle = NULL;
+VdpGetProcAddress* vdp_get_proc_address = nullptr;
+VdpGetErrorString* vdp_get_error_string = nullptr;
+VdpVideoSurfaceGetParameters* vdp_video_surface_get_parameters = nullptr;
+VdpVideoSurfaceGetBitsYCbCr* vdp_video_surface_get_bits_y_cb_cr = nullptr;
+VdpVideoSurfaceCreate* vdp_video_surface_create = nullptr;
+VdpVideoSurfaceDestroy* vdp_video_surface_destroy = nullptr;
+VdpDeviceDestroy* vdp_device_destroy = nullptr;
+VdpDecoderCreate* vdp_decoder_create = nullptr;
+VdpDecoderDestroy* vdp_decoder_destroy = nullptr;
+VdpDecoderRender* vdp_decoder_render = nullptr;
+VdpOutputSurfaceCreate* vdp_output_surface_create = nullptr;
+VdpOutputSurfaceDestroy* vdp_output_surface_destroy = nullptr;
+VdpOutputSurfaceGetBitsNative* vdp_output_surface_get_bits_native = nullptr;
+VdpOutputSurfaceGetParameters* vdp_output_surface_get_parameters = nullptr;
+VdpVideoMixerCreate* vdp_video_mixer_create = nullptr;
+VdpVideoMixerDestroy* vdp_video_mixer_destroy = nullptr;
+VdpVideoMixerSetAttributeValues* vdp_video_mixer_set_attribute_values = nullptr;
+VdpVideoMixerRender* vdp_video_mixer_render = nullptr;
+VdpPresentationQueueCreate* vdp_presentation_queue_create = nullptr;
+VdpPresentationQueueDestroy* vdp_presentation_queue_destroy = nullptr;
+VdpPresentationQueueGetTime* vdp_presentation_queue_get_time = nullptr;
+VdpPresentationQueueTargetCreateX11* vdp_presentation_queue_target_create_x11 = nullptr;
+VdpPresentationQueueTargetDestroy* vdp_presentation_queue_target_destroy = nullptr;
+VdpPresentationQueueQuerySurfaceStatus* vdp_presentation_queue_query_surface_status = nullptr;
+VdpPresentationQueueDisplay* vdp_presentation_queue_display = nullptr;
+VdpPresentationQueueBlockUntilSurfaceIdle* vdp_presentation_queue_block_until_surface_idle = nullptr;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -40,9 +44,9 @@ void checkedVdpCall(VdpStatus status, const char* funcName)
     if (status != VDP_STATUS_OK)
     {
         if (vdp_get_error_string)
-            fprintf(stderr, "VDPAU ERROR: %s -> '%s'\n", funcName, vdp_get_error_string(status));
+            PRINT << "VDPAU ERROR: " << funcName << " -> '" << vdp_get_error_string(status) << "'";
         else
-            fprintf(stderr, "VDPAU ERROR: %s -> %d\n", funcName, status);
+            PRINT << "VDPAU ERROR: " << funcName << " -> " << status;
         assert(false);
     }
 }
@@ -51,23 +55,59 @@ void vdpCheckHandle(uint32_t handle, const char* name)
 {
     if (handle == VDP_INVALID_HANDLE)
     {
-        fprintf(stderr, "VDPAU ERROR: Unable to create %s.\n", name);
+        PRINT << "VDPAU ERROR: Unable to create " << name << ".";
         assert(false);
     }
 }
 
-static VdpDevice getVdpDeviceX11()
+static Drawable createX11Window(Display* display)
 {
-    fprintf(stderr, "VDPAU: Opening X11 Display...\n");
-    Display *pXDisplay = XOpenDisplay(0);
-    if (pXDisplay == NULL)
+    const int screen = DefaultScreen(display);
+    const unsigned long black = BlackPixel(display, screen);
+    const unsigned long white = WhitePixel(display, screen);
+
+    Window rootWindow = RootWindow(display, screen);
+
+    XWindowAttributes rootWindowAttrs;
+    if (!XGetWindowAttributes(display, rootWindow, &rootWindowAttrs))
     {
-        fprintf(stderr, "VDPAU ERROR: XOpenDisplay(0) returned null.\n");
+        PRINT << "ERROR: XGetWindowAttributes() for Root Window failed.";
+        assert(false);
+    }
+
+    const Window window = XCreateSimpleWindow(
+        display, rootWindow, /*x*/ 0, /*y*/ 0, rootWindowAttrs.width, rootWindowAttrs.height,
+        /*border_width*/ 0, black, white);
+
+    if (!XMapWindow(display, window))
+    {
+        PRINT << "ERROR: XMapWindow() failed.";
+        assert(false);
+    }
+
+    if (!XFlush(display))
+    {
+        PRINT << "ERROR: XFlush() failed.";
+        assert(false);
+    }
+
+    return window;
+}
+
+static VdpDevice getVdpDeviceX11(Drawable* outDrawable)
+{
+    assert(outDrawable);
+
+    PRINT << "Opening X11 Display...";
+    Display *display = XOpenDisplay(nullptr);
+    if (display == nullptr)
+    {
+        PRINT << "ERROR: XOpenDisplay(nullptr) returned null.";
         assert(false);
     }
 
     int stderrFile = -1;
-    if (suppressX11LogVdpau())
+    if (conf.suppressX11LogVdpau)
     {
         // Redirect stderr to /dev/null temporarily to prevent libvdpau console spam.
         int devNullFile = open("/dev/null", O_WRONLY);
@@ -75,12 +115,12 @@ static VdpDevice getVdpDeviceX11()
         dup2(devNullFile, STDERR_FILENO);
     }
 
-    fprintf(stderr, "VDPAU: vdp_device_create_x11() with X11...\n");
+    PRINT << "vdp_device_create_x11() with X11...";
     VdpDevice vdpDevice = VDP_INVALID_HANDLE;
     VDP(vdp_device_create_x11(
-        pXDisplay,  DefaultScreen(pXDisplay), &vdpDevice, &vdp_get_proc_address));
+        display,  DefaultScreen(display), &vdpDevice, &vdp_get_proc_address));
 
-    if (suppressX11LogVdpau())
+    if (conf.suppressX11LogVdpau)
     {
         dup2(stderrFile, STDERR_FILENO);
         close(stderrFile);
@@ -89,20 +129,27 @@ static VdpDevice getVdpDeviceX11()
     vdpCheckHandle(vdpDevice, "Device");
     assert(vdp_get_proc_address);
 
-    fprintf(stderr, "VDPAU: vdp_device_create_x11() with X11 OK\n");
+    if (conf.createX11Window)
+        *outDrawable = createX11Window(display);
+    else
+        *outDrawable = 0;
+
+    PRINT << "vdp_device_create_x11() with X11 OK";
     return vdpDevice;
 }
 
-static VdpDevice getVdpDeviceWithoutX11()
+static VdpDevice getVdpDeviceWithoutX11(Drawable* outDrawable)
 {
-    fprintf(stderr, "VDPAU: vdp_device_create_x11() without X11 (Nx extension to VDPAU)...\n");
+    PRINT << "vdp_device_create_x11() without X11 (Nx extension to VDPAU)...";
+    assert(outDrawable);
+    *outDrawable = 0;
     VdpDevice vdpDevice = VDP_INVALID_HANDLE;
-    VDP(vdp_device_create_x11(NULL, -1, &vdpDevice, &vdp_get_proc_address));
+    VDP(vdp_device_create_x11(nullptr, -1, &vdpDevice, &vdp_get_proc_address));
 
     vdpCheckHandle(vdpDevice, "Device");
     assert(vdp_get_proc_address);
 
-    fprintf(stderr, "VDPAU: vdp_device_create_x11() without X11 OK\n");
+    PRINT << "vdp_device_create_x11() without X11 OK";
     return vdpDevice;
 }
 
@@ -140,6 +187,8 @@ static void getProcAddresses(VdpDevice vdpDevice)
         (void**) &vdp_video_mixer_create);
     getProcAddress(vdpDevice, VDP_FUNC_ID_VIDEO_MIXER_DESTROY,
         (void**) &vdp_video_mixer_destroy);
+    getProcAddress(vdpDevice, VDP_FUNC_ID_VIDEO_MIXER_SET_ATTRIBUTE_VALUES,
+        (void**) &vdp_video_mixer_set_attribute_values);
     getProcAddress(vdpDevice, VDP_FUNC_ID_VIDEO_MIXER_RENDER,
         (void**) &vdp_video_mixer_render);
     getProcAddress(vdpDevice, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE,
@@ -164,9 +213,10 @@ static void getProcAddresses(VdpDevice vdpDevice)
         (void**) &vdp_output_surface_get_parameters);
 }
 
-VdpDevice createVdpDevice()
+VdpDevice createVdpDevice(Drawable* outDrawable)
 {
-    VdpDevice vdpDevice = enableX11Vdpau() ?  getVdpDeviceX11() : getVdpDeviceWithoutX11();
+    VdpDevice vdpDevice =
+        conf.enableX11Vdpau ? getVdpDeviceX11(outDrawable) : getVdpDeviceWithoutX11(outDrawable);
     getProcAddresses(vdpDevice);
     return vdpDevice;
 }
@@ -188,16 +238,15 @@ void getVideoSurfaceYuvNative(VdpVideoSurface surface, YuvNative* yuvNative)
     };
 
     VDP(vdp_video_surface_get_bits_y_cb_cr(surface,
-        VDP_YCBCR_FORMAT_YV12, dest, /*pitches*/ NULL));
+        VDP_YCBCR_FORMAT_YV12, dest, /*pitches*/ nullptr));
 }
 
-static void logStrOrHex(
-    const char *prefix, const char *valueStr, uint32_t value, const char *suffix)
+static std::string toStrOrHex(const char* valueStr, uint32_t value)
 {
     if (valueStr)
-        fprintf(stderr, "%s%s%s", prefix, valueStr, suffix);
+        return valueStr;
     else
-        fprintf(stderr, "%s0x%08X%s", prefix, value, suffix);
+        return stringFormat("0x%08X", value);
 }
 
 uint32_t calcYuvNativeQuickHash(const YuvNative* yuvNative)
@@ -213,12 +262,13 @@ uint32_t calcYuvNativeQuickHash(const YuvNative* yuvNative)
 
 void logYuvNative(const YuvNative* y)
 {
-    fprintf(stderr, "YuvNative { ");
-    fprintf(stderr, "virt %p, size %u, ", y->virt, (unsigned int) y->size);
-    fprintf(stderr, "width %d, height %d, ", y->width, y->height);
-    logStrOrHex("chroma_type ", vdpChromaTypeToStr(y->chroma_type), y->chroma_type, ", ");
-    logStrOrHex("source_format ", vdpYCbCrFormatToStr(y->source_format), y->source_format, ", ");
-    fprintf(stderr, "luma_size %d, chroma_size %d }\n", y->luma_size, y->chroma_size);
+    PRINT << "YuvNative { "
+        << "virt " << stringFormat("%p", y->virt)
+        << ", size " << y->size << ", width " << y->width << ", height " << y->height
+        << ", chroma_type " << toStrOrHex(vdpChromaTypeToStr(y->chroma_type), y->chroma_type)
+        << ", source_format " << toStrOrHex(vdpYCbCrFormatToStr(y->source_format), y->source_format)
+        << ", luma_size " << y->luma_size << ", chroma_size " << y->chroma_size
+        << " }";
 }
 
 const char* vdpChromaTypeToStr(VdpChromaType v)
@@ -228,7 +278,7 @@ const char* vdpChromaTypeToStr(VdpChromaType v)
         case VDP_CHROMA_TYPE_420: return "VDP_CHROMA_TYPE_420";
         case VDP_CHROMA_TYPE_422: return "VDP_CHROMA_TYPE_422";
         case VDP_CHROMA_TYPE_444: return "VDP_CHROMA_TYPE_444";
-        default: return NULL;
+        default: return nullptr;
     }
 }
 
@@ -242,7 +292,7 @@ const char* vdpYCbCrFormatToStr(VdpYCbCrFormat v)
         case VDP_YCBCR_FORMAT_YUYV: return "VDP_YCBCR_FORMAT_YUYV";
         case VDP_YCBCR_FORMAT_Y8U8V8A8: return "VDP_YCBCR_FORMAT_Y8U8V8A8";
         case VDP_YCBCR_FORMAT_V8U8Y8A8: return "VDP_YCBCR_FORMAT_V8U8Y8A8";
-        default: return NULL;
+        default: return nullptr;
     }
 }
 
@@ -252,9 +302,9 @@ static FILE* debugCreateFrameDumpFile(
     char filename[1000];
     snprintf(filename, sizeof(filename), "%s/frame_%dx%d_%d%s", filesPath, w, h, n, suffix);
     FILE* fp = fopen(filename, mode);
-    if (fp == NULL)
+    if (fp == nullptr)
     {
-        fprintf(stderr, "VDPAU DUMP ERROR: Unable to create file: %s\n", filename);
+        PRINT << "ERROR: Unable to create dump file: " << filename;
         assert(false);
     }
     return fp;
@@ -266,7 +316,7 @@ static void debugDumpFrameToFile(
     FILE* fp = debugCreateFrameDumpFile(filesPath, w, h, n, suffix, "wb");
     if (fwrite(buffer, 1, bufferSize, fp) != bufferSize)
     {
-        fprintf(stderr, "VDPAU DUMP ERROR: Unable to write to a file.\n");
+        PRINT << "ERROR: Unable to write to a dump file.";
         assert(false);
     }
     fclose(fp);
@@ -315,5 +365,5 @@ void debugDumpYuvSurfaceToFiles(
     debugDumpFrameToFile(filesPath, vBuffer, uVLineSize * h / 2, w, h, n, "_v.dat");
     debugDumpFrameToFile(filesPath, yuvNative.virt, (int) yuvNative.size, w, h, n, "_native.dat");
 
-    fprintf(stderr, "VDPAU DUMP: Frame %d dumped to %s\n", n, filesPath);
+    PRINT << "Dump: Frame " << n << " dumped to " << filesPath;
 }
