@@ -9,7 +9,8 @@ public:
     NX_FLAG(0, enableStub, "");
     NX_FLAG(0, enableFps, "");
     NX_FLAG(0, disableCscMatrix, "Avoid setting VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX.");
-    NX_INT_PARAM(8, videoSurfaceCount, "");
+    NX_INT_PARAM(8, videoSurfaceCount, "1..16");
+    NX_INT_PARAM(0, outputSurfaceCount, "0 (alloc/dealloc for each frame), 1..255).");
 
     // vdpau_helper
     NX_FLAG(0, outputVdpauCalls, "Log each VDPAU call (errors are logged anyway).");

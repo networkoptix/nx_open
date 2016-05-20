@@ -34,6 +34,9 @@ private:
     VdpPresentationQueueTarget m_vdpTarget = VDP_INVALID_HANDLE;
     VdpPresentationQueue m_vdpQueue = VDP_INVALID_HANDLE;
 
+    int m_outputSurfaceIndex = 0;
+    std::vector<VdpOutputSurface> m_outputSurfaces;
+
     int m_videoSurfaceIndex = 0;
     std::vector<VdpVideoSurface> m_vdpVideoSurfaces;
 };
@@ -43,7 +46,21 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
     m_frameWidth(frameWidth),
     m_frameHeight(frameHeight)
 {
-    PRINT << "Initializing VDPAU; using " << conf.videoSurfaceCount << " video surfaces";
+    if (conf.videoSurfaceCount < 1 || conf.videoSurfaceCount > 16)
+    {
+        PRINT << "WARNING: configuration param videoSurfaceCount is "
+            << conf.videoSurfaceCount << " but should be 1..16; defaults to 1.";
+        conf.videoSurfaceCount = 1;
+    }
+    if (conf.outputSurfaceCount < 0 || conf.outputSurfaceCount > 255)
+    {
+        PRINT << "WARNING: configuration param outputSurfaceCount is "
+            << conf.outputSurfaceCount << " but should be 1..100; defaults to 1.";
+        conf.outputSurfaceCount = 1;
+    }
+    PRINT << "Initializing VDPAU; using "
+        << conf.videoSurfaceCount << " video surfaces, "
+        << conf.outputSurfaceCount << " output surfaces";
 
     Drawable drawable;
     m_vdpDevice = createVdpDevice(&drawable);
@@ -101,6 +118,15 @@ VdpauStub::VdpauStub(int frameWidth, int frameHeight)
         memset(yuvNative.virt, 0, yuvNative.size);
     }
 
+    for (int i = 0; i < conf.outputSurfaceCount; ++i)
+    {
+        VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
+        VDP(vdp_output_surface_create(m_vdpDevice,
+            VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
+        vdpCheckHandle(outputSurface, "Output Surface");
+        m_outputSurfaces.push_back(outputSurface);
+    }
+
     PRINT << "VDPAU Initialized OK";
 }
 
@@ -139,9 +165,11 @@ void VdpauStub::display()
     m_videoSurfaceIndex = (m_videoSurfaceIndex + 1) % conf.videoSurfaceCount;
 
     VdpVideoSurface videoSurface = m_vdpVideoSurfaces[videoSurfaceIndex];
+    assert(videoSurface != VDP_INVALID_HANDLE);
 
-    OUTPUT << stringFormat("VdpauStub::display() BEGIN, surface #%2d of %d {index %2d}",
-        videoSurface, conf.videoSurfaceCount, videoSurfaceIndex);
+    OUTPUT << "VdpauStub::display() BEGIN";
+    OUTPUT << stringFormat("Using videoSurface %02d of %d {handle #%02d}",
+        videoSurfaceIndex, conf.videoSurfaceCount, videoSurface);
 
     static YuvNative yuvNative;
     getVideoSurfaceYuvNative(videoSurface, &yuvNative);
@@ -152,10 +180,22 @@ void VdpauStub::display()
         /*x*/ 12 * (videoSurfaceIndex % 4), /*y*/ 6 * (videoSurfaceIndex / 4),
         stringFormat("%02d", videoSurface).c_str());
 
-    VdpOutputSurface outputSurface;
-    VDP(vdp_output_surface_create(m_vdpDevice,
-        VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
-    vdpCheckHandle(outputSurface, "Output Surface");
+    VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
+    if (conf.outputSurfaceCount == 0)
+    {
+        VDP(vdp_output_surface_create(m_vdpDevice,
+            VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
+        vdpCheckHandle(outputSurface, "Output Surface");
+    }
+    else
+    {
+        const int outputSurfaceIndex = m_outputSurfaceIndex;
+        m_outputSurfaceIndex = (m_outputSurfaceIndex + 1) % conf.outputSurfaceCount;
+        outputSurface = m_outputSurfaces[outputSurfaceIndex];
+        OUTPUT << stringFormat("Using outputSurface %02d of %d {handle #%02d}",
+                outputSurfaceIndex, conf.outputSurfaceCount, outputSurface);
+    }
+    assert(outputSurface != VDP_INVALID_HANDLE);
 
     // In vdpau_sunxi, this links Video Surface to Output Surface; does not process pixel data.
     VDP(vdp_video_mixer_render(m_vdpMixer,
@@ -179,7 +219,8 @@ void VdpauStub::display()
         /*clip_width*/ m_frameWidth, /*clip_height*/ m_frameHeight,
         /*earliest_presentation_time, not implemented*/ 0));
 
-    VDP(vdp_output_surface_destroy(outputSurface));
+    if (conf.outputSurfaceCount == 0)
+        VDP(vdp_output_surface_destroy(outputSurface));
 
     OUTPUT << "VdpauStub::display() END";
 }

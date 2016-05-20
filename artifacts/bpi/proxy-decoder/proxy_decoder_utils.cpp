@@ -213,7 +213,10 @@ std::string debugDumpRenderStateRef(const vdpau_render_state* renderState,
     for (int i = 0; i < renderStates.size(); ++i)
     {
         if (renderStates[i] == renderState)
-            return "vdpau_render_state #" + std::to_string(i);
+        {
+            return stringFormat("vdpau_render_state %02d of %d {videoSurface handle #%02d}",
+                i, renderStates.size(), renderState->surface);
+        }
     }
     return "vdpau_render_state NOT_FOUND";
 }

@@ -80,6 +80,9 @@ private:
     int m_frameWidth;
     int m_frameHeight;
 
+    int m_outputSurfaceIndex = 0;
+    std::vector<VdpOutputSurface> m_outputSurfaces;
+
     int m_videoSurfaceIndex = 0;
     std::vector<vdpau_render_state*> m_renderStates;
 
@@ -138,7 +141,21 @@ Impl::~Impl()
 
 void Impl::initializeVdpau()
 {
-    PRINT << "Initializing VDPAU; using " << conf.videoSurfaceCount << " video surfaces";
+    if (conf.videoSurfaceCount < 1 || conf.videoSurfaceCount > 16)
+    {
+        PRINT << "WARNING: configuration param videoSurfaceCount is "
+            << conf.videoSurfaceCount << " but should be 1..16; defaults to 1.";
+        conf.videoSurfaceCount = 1;
+    }
+    if (conf.outputSurfaceCount < 0 || conf.outputSurfaceCount > 255)
+    {
+        PRINT << "WARNING: configuration param outputSurfaceCount is "
+            << conf.outputSurfaceCount << " but should be 1..100; defaults to 1.";
+        conf.outputSurfaceCount = 1;
+    }
+    PRINT << "Initializing VDPAU; using "
+        << conf.videoSurfaceCount << " video surfaces, "
+        << conf.outputSurfaceCount << " output surfaces";
 
     Drawable drawable;
     m_vdpDevice = createVdpDevice(&drawable);
@@ -184,6 +201,15 @@ void Impl::initializeVdpau()
     VDP(vdp_presentation_queue_create(m_vdpDevice, m_vdpTarget, &m_vdpQueue));
     vdpCheckHandle(m_vdpQueue, "Presentation Queue");
 
+    for (int i = 0; i < conf.outputSurfaceCount; ++i)
+    {
+        VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
+        VDP(vdp_output_surface_create(m_vdpDevice,
+            VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
+        vdpCheckHandle(outputSurface, "Output Surface");
+        m_outputSurfaces.push_back(outputSurface);
+    }
+
     PRINT << "VDPAU Initialized OK";
 }
 
@@ -207,6 +233,13 @@ void Impl::deinitializeVdpau()
     {
         if (m_renderStates[i]->surface != VDP_INVALID_HANDLE)
             VDP(vdp_video_surface_destroy(m_renderStates[i]->surface));
+        delete m_renderStates[i];
+    }
+
+    for (int i = 0; i < m_outputSurfaces.size(); ++i)
+    {
+        if (m_outputSurfaces[i] != VDP_INVALID_HANDLE)
+            VDP(vdp_output_surface_destroy(m_outputSurfaces[i]));
         delete m_renderStates[i];
     }
 
@@ -650,12 +683,30 @@ int Impl::decodeToDisplayQueue(const CompressedFrame* compressedFrame, int64_t* 
 
 void Impl::displayDecoded(void* frameHandle)
 {
+    OUTPUT << "displayDecoded() BEGIN";
     if (!frameHandle)
         return;
     vdpau_render_state* renderState = reinterpret_cast<vdpau_render_state*>(frameHandle);
-
-    OUTPUT << "displayDecoded(" << debugDumpRenderStateRef(renderState, m_renderStates) << ") BEGIN";
     assert(renderState->surface != VDP_INVALID_HANDLE);
+
+    OUTPUT << "Using " << debugDumpRenderStateRef(renderState, m_renderStates);
+
+    VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
+    if (conf.outputSurfaceCount == 0)
+    {
+        VDP(vdp_output_surface_create(m_vdpDevice,
+            VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
+        vdpCheckHandle(outputSurface, "Output Surface");
+    }
+    else
+    {
+        const int outputSurfaceIndex = m_outputSurfaceIndex;
+        m_outputSurfaceIndex = (m_outputSurfaceIndex + 1) % conf.outputSurfaceCount;
+        outputSurface = m_outputSurfaces[outputSurfaceIndex];
+        OUTPUT << stringFormat("Using outputSurface %02d of %d {handle #%02d}",
+            outputSurfaceIndex, conf.outputSurfaceCount, outputSurface);
+    }
+    assert(outputSurface != VDP_INVALID_HANDLE);
 
     if (conf.enableFps)
     {
@@ -669,11 +720,6 @@ void Impl::displayDecoded(void* frameHandle)
             + " ").c_str());
         prevHash = curHash;
     }
-
-    VdpOutputSurface outputSurface;
-    VDP(vdp_output_surface_create(m_vdpDevice,
-        VDP_RGBA_FORMAT_B8G8R8A8, m_frameWidth, m_frameHeight, &outputSurface));
-    vdpCheckHandle(outputSurface, "Output Surface");
 
     // In vdpau_sunxi, this links Video Surface to Output Surface; does not process pixel data.
     VDP(vdp_video_mixer_render(m_vdpMixer,
@@ -697,7 +743,8 @@ void Impl::displayDecoded(void* frameHandle)
         /*clip_width*/ m_frameWidth, /*clip_height*/ m_frameHeight,
         /*earliest_presentation_time, not implemented*/ 0));
 
-    VDP(vdp_output_surface_destroy(outputSurface));
+    if (conf.outputSurfaceCount == 0)
+        VDP(vdp_output_surface_destroy(outputSurface));
 
     //renderState->state &= ~FF_VDPAU_STATE_USED_FOR_REFERENCE; //< Old approach.
 
