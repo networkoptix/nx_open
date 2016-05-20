@@ -274,6 +274,19 @@ namespace nx_http
         {
             return statusCode >= ok && statusCode <= lastSuccessCode;
         }
+
+        bool isMessageBodyAllowed(int statusCode)
+        {
+            switch (statusCode)
+            {
+                case noContent:
+                case notModified:
+                    return false;
+
+                default:
+                    return true;
+            }
+        }
     }
 
     const StringType Method::GET( "GET" );

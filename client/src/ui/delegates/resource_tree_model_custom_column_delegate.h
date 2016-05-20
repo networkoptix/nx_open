@@ -2,12 +2,12 @@
 
 #include <QtCore/QAbstractItemModel>
 
-class QnResourcePoolModelCustomColumnDelegate: public QObject {
+class QnResourceTreeModelCustomColumnDelegate: public QObject {
     Q_OBJECT
 public:
-    QnResourcePoolModelCustomColumnDelegate(QObject* parent = nullptr):
+    QnResourceTreeModelCustomColumnDelegate(QObject* parent = nullptr):
         QObject(parent){}
-    virtual ~QnResourcePoolModelCustomColumnDelegate(){}
+    virtual ~QnResourceTreeModelCustomColumnDelegate(){}
 
     virtual Qt::ItemFlags flags(const QModelIndex &index) const = 0;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const = 0;

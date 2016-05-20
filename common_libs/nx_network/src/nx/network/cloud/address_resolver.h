@@ -1,6 +1,8 @@
 #ifndef NX_CC_DNS_TABLE_H
 #define NX_CC_DNS_TABLE_H
 
+#include <set>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
 #include <utils/common/guard.h>

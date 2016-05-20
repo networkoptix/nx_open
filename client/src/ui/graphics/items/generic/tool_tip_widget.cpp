@@ -11,9 +11,10 @@
 #include <utils/math/math.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
+#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 
 namespace  {
 
@@ -156,21 +157,21 @@ void QnToolTipWidget::pointTo(const QPointF &pos) {
     setPos(pos + parentZeroPos - parentTailPos);
 }
 
-QnProxyLabel *QnToolTipWidget::label() const {
+GraphicsLabel* QnToolTipWidget::label() const {
     if(layout() && layout()->count() == 1) {
-        return dynamic_cast<QnProxyLabel *>(layout()->itemAt(0));
+        return dynamic_cast<GraphicsLabel*>(layout()->itemAt(0));
     } else {
         return NULL;
     }
 }
 
 QString QnToolTipWidget::text() const {
-    QnProxyLabel *label = this->label();
+    GraphicsLabel* label = this->label();
     return label ? label->text() : QString();
 }
 
 void QnToolTipWidget::setText(const QString &text) {
-    QnProxyLabel *label = this->label();
+    GraphicsLabel* label = this->label();
     if(label) {
         label->setText(text);
         return;
@@ -179,10 +180,9 @@ void QnToolTipWidget::setText(const QString &text) {
     while(layout() && layout()->count() > 0)
         delete layout()->itemAt(0);
 
-    label = new QnProxyLabel();
+    label = new GraphicsLabel();
     label->setText(text);
     label->setAlignment(Qt::AlignCenter);
-    setPaletteColor(label, QPalette::Window, Qt::transparent);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -222,14 +222,30 @@ void QnToolTipWidget::setGeometry(const QRectF &rect) {
         invalidateShape();
 }
 
-void QnToolTipWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    QN_UNUSED(option, widget);
+
     ensureShape();
 
     /* Render background. */
+
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-    painter->setPen(QPen(frameBrush(), frameWidth()));
-    painter->setBrush(windowBrush());
-    painter->drawPath(m_borderShape);
+    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), frameWidth()));
+    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
+
+    bool corrected(false);
+    QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+
+    if (corrected)
+    {
+        QnScopedPainterTransformRollback xformRollback(painter, roundedTransform);
+        painter->drawPath(m_borderShape);
+    }
+    else
+    {
+        painter->drawPath(m_borderShape);
+    }
 }
 
 void QnToolTipWidget::updateGeometry() {

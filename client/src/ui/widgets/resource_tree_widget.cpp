@@ -16,7 +16,7 @@
 #include <core/resource/videowall_resource.h>
 
 #include <ui/delegates/resource_item_delegate.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 
 #include <ui/style/noptix_style.h>
@@ -193,6 +193,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->selectFilterButton->setVisible(false);
 
     m_itemDelegate = new QnResourceItemDelegate(this);
+    m_itemDelegate->setFixedHeight(0); // automatic height
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
@@ -307,24 +308,24 @@ bool QnResourceTreeWidget::isCheckboxesVisible() const {
     return m_checkboxesVisible;
 }
 
-QnResourcePoolModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDelegate() const {
+QnResourceTreeModelCustomColumnDelegate* QnResourceTreeWidget::customColumnDelegate() const {
     QAbstractItemModel* sourceModel = model();
     while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
         sourceModel = proxy->sourceModel();
 
-    if (QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel))
+    if (QnResourceTreeModel* resourceModel = qobject_cast<QnResourceTreeModel*>(sourceModel))
         return resourceModel->customColumnDelegate();
 
 
     return nullptr;
 }
 
-void QnResourceTreeWidget::setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate) {
+void QnResourceTreeWidget::setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate) {
     QAbstractItemModel* sourceModel = model();
     while (QAbstractProxyModel* proxy = qobject_cast<QAbstractProxyModel*>(sourceModel))
         sourceModel = proxy->sourceModel();
 
-    QnResourcePoolModel* resourceModel = qobject_cast<QnResourcePoolModel*>(sourceModel);
+    QnResourceTreeModel* resourceModel = qobject_cast<QnResourceTreeModel*>(sourceModel);
     NX_ASSERT(resourceModel != nullptr, Q_FUNC_INFO, "Invalid model");
 
     if (!resourceModel)
@@ -537,15 +538,17 @@ void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index) {
     }
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end)
+{
     for(int i = start; i <= end; i++)
         at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
+{
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if((resource && resource->hasFlags(Qn::server)) || nodeType == Qn::ServersNode)
+    if((resource && resource->hasFlags(Qn::server)) || nodeType == Qn::CurrentSystemNode)
         ui->resourcesTreeView->expand(index);
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

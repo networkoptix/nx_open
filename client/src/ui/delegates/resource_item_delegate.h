@@ -22,8 +22,14 @@ public:
     const QnResourceItemColors& colors() const;
     void setColors(const QnResourceItemColors& colors);
 
-    int spacing() const;
-    void setSpacing(int value);
+    /* If this value is non-zero, it is used as a fixed row height.
+     * If zero, a minimal sufficient height is computed automatically. */
+    int fixedHeight() const;
+    void setFixedHeight(int height);
+
+    /* Additional row spacing. */
+    int rowSpacing() const;
+    void setRowSpacing(int value);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
@@ -52,5 +58,6 @@ private:
     QIcon m_scheduledIcon;
     QIcon m_buggyIcon;
     QnResourceItemColors m_colors;
-    int m_spacing;
+    int m_fixedHeight;
+    int m_rowSpacing;
 };

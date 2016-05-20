@@ -31,7 +31,8 @@ QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
     m_buggyIcon(qnSkin->icon("tree/buggy.png")),
     m_colors(),
-    m_spacing(0)
+    m_fixedHeight(style::Metrics::kViewRowHeight),
+    m_rowSpacing(0)
 {
 }
 
@@ -55,14 +56,24 @@ void QnResourceItemDelegate::setColors(const QnResourceItemColors& colors)
     m_colors = colors;
 }
 
-int QnResourceItemDelegate::spacing() const
+int QnResourceItemDelegate::rowSpacing() const
 {
-    return m_spacing;
+    return m_rowSpacing;
 }
 
-void QnResourceItemDelegate::setSpacing(int value)
+void QnResourceItemDelegate::setRowSpacing(int value)
 {
-    m_spacing = value;
+    m_rowSpacing = qMax(value, 0);
+}
+
+int QnResourceItemDelegate::fixedHeight() const
+{
+    return m_fixedHeight;
+}
+
+void QnResourceItemDelegate::setFixedHeight(int value)
+{
+    m_fixedHeight = qMax(value, 0);
 }
 
 void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
@@ -131,25 +142,23 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     /* Draw text: */
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay) && !editing)
     {
-        option.font.setWeight(QFont::DemiBold);
-
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
 
-        QFontMetrics metrics(option.font);
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
-        const int kTextPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
-        textRect.adjust(kTextPadding, 0, -kTextPadding, 0);
+        const int textFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
+        const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
+        textRect.adjust(textPadding, 0, -textPadding, 0);
 
         if (extraResourceInfo)
         {
+            /* Two-component text from resource information: */
             QString name, host;
             getResourceDisplayInformation(resource, name, host);
 
             QRect actualRect;
-            QString elidedName = metrics.elidedText(name, option.textElideMode, textRect.width(), kTextFlags);
+            QString elidedName = option.fontMetrics.elidedText(name, option.textElideMode, textRect.width(), textFlags);
 
-            painter->drawText(textRect, kTextFlags, elidedName, &actualRect);
+            painter->drawText(textRect, textFlags, elidedName, &actualRect);
 
             if (elidedName == name && !host.isEmpty())
             {
@@ -159,18 +168,19 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
                 /* If name was empty, actualRect will be invalid: */
                 int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
-                textRect.setLeft(startPos + kTextPadding*2);
-                QString elidedHost = extraMetrics.elidedText(host, option.textElideMode, textRect.width(), kTextFlags);
+                textRect.setLeft(startPos + textPadding*2);
+                QString elidedHost = extraMetrics.elidedText(host, option.textElideMode, textRect.width(), textFlags);
 
                 painter->setFont(option.font);
                 painter->setPen(extraColor);
-                painter->drawText(textRect, kTextFlags, elidedHost);
+                painter->drawText(textRect, textFlags, elidedHost);
             }
         }
         else
         {
-            QString elidedText = metrics.elidedText(option.text, option.textElideMode, textRect.width(), kTextFlags);
-            painter->drawText(textRect, kTextFlags, elidedText);
+            /* One-component text directly from style option: */
+            QString elidedText = option.fontMetrics.elidedText(option.text, option.textElideMode, textRect.width(), textFlags);
+            painter->drawText(textRect, textFlags, elidedText);
         }
     }
 
@@ -202,11 +212,76 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
-    return base_type::sizeHint(styleOption, index) + QSize(0, m_spacing);
+    /* Initialize style option: */
+    QStyleOptionViewItem option(styleOption);
+    initStyleOption(&option, index);
+
+    // TODO #vkutin Keep this while checkboxed items are painted by default implementation:
+    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) 
+        return base_type::sizeHint(option, index);
+
+    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
+
+    /* Let the style calculate text offset: */
+    option.rect.setSize(QSize(10000, 20)); // any nonzero height and some really big width
+    QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
+
+    /* Initial size: */
+    int width = textRect.left();
+    int height = option.decorationSize.height();
+
+    /* Adjust size to text: */
+    if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
+    {
+        /* Get resource from model: */
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        bool extraResourceInfo = qnSettings->isIpShownInTree() && !resource.isNull();
+
+        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
+        int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
+
+        /* Adjust height to text: */
+        height = qMax(height, option.fontMetrics.height());
+
+        if (extraResourceInfo)
+        {
+            /* Two-component text from resource information: */
+            QString name, host;
+            getResourceDisplayInformation(resource, name, host);
+
+            /* Width of the main text: */
+            width += option.fontMetrics.width(name, -1, kTextFlags);
+
+            option.font.setWeight(QFont::Normal);
+            QFontMetrics metrics(option.font);
+
+            /* Width of the extra text: */
+            width += option.fontMetrics.width(host, -1, kTextFlags) + leftRightPadding;
+        }
+        else
+        {
+            /* One-component text directly from style option: */
+            width += option.fontMetrics.width(option.text, -1, kTextFlags);
+        }
+
+        /* Add paddings: */
+        width += leftRightPadding;
+    }
+
+    /* If fixed height is requested, override calculated height: */
+    if (m_fixedHeight > 0)
+        height = m_fixedHeight;
+
+    /* Add extra row spacing and return results: */
+    return QSize(width, height + m_rowSpacing);
 }
 
 void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
+    /* Init font options: */
+    option->font.setWeight(QFont::DemiBold);
+    option->fontMetrics = QFontMetrics(option->font);
+
     /* Save default decoration size: */
     QSize defaultDecorationSize = option->decorationSize;
 
@@ -215,7 +290,7 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
      * It will be treated as maximal allowed size: */
     auto view = qobject_cast<const QAbstractItemView*>(option->widget);
     if (!view || !view->iconSize().isValid())
-        option->decorationSize = QSize(1024, 1024);
+        option->decorationSize = QSize(1024, m_fixedHeight > 0 ? m_fixedHeight : 1024);
 
     /* Call inherited implementation.
      * When it configures item icon, it sets decorationSize to actual icon size: */

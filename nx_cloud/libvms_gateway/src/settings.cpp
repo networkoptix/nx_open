@@ -11,36 +11,48 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <nx/utils/timer_manager.h>
 #include <libvms_gateway_app_info.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/serialization/lexical.h>
 #include <utils/common/app_info.h>
 
 
 namespace
 {
-    //general
-    const QLatin1String kEndpointsToListen("listenOn");
-    const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3347");
-
-    const QLatin1String kDataDir("dataDir");
-
-    const QLatin1String kChangeUser("changeUser");
-
-
     const QString kModuleName = lit("vms_gateway");
+
+
+    //general
+    const QLatin1String kGeneralEndpointsToListen("general/listenOn");
+    const QLatin1String kDefaultGeneralEndpointsToListen("0.0.0.0:3347");
+
+    const QLatin1String kGeneralDataDir("general/dataDir");
+
+    const QLatin1String kGeneralChangeUser("general/changeUser");
 
     //log settings
     const QLatin1String kLogLevel( "log/logLevel" );
 #ifdef _DEBUG
     const QLatin1String kDefaultLogLevel( "DEBUG" );
 #else
-    const QLatin1String kDefaultLogLevel( "INFO" );
+    const QLatin1String kDefaultLogLevel( "ERROR" );
 #endif
     const QLatin1String kLogDir( "log/logDir" );
 
+    //auth
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
+
+    //tcp
+    const QLatin1String kTcpRecvTimeout("tcp/recvTimeout");
+    const std::chrono::milliseconds kDefaultTcpRecvTimeout = std::chrono::seconds(17);
+
+    const QLatin1String kTcpSendTimeout("tcp/sendTimeout");
+    const std::chrono::milliseconds kDefaultTcpSendTimeout = std::chrono::seconds(17);
+
+    //http
+    const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
+    const int kDefaultHttpProxyTargetPort = 0;
 }
 
 
@@ -48,6 +60,13 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 namespace conf {
+
+Http::Http()
+:
+    proxyTargetPort(0)
+{
+}
+
 
 Settings::Settings()
 :
@@ -86,6 +105,16 @@ const Auth& Settings::auth() const
     return m_auth;
 }
 
+const Tcp& Settings::tcp() const
+{
+    return m_tcp;
+}
+
+const Http& Settings::http() const
+{
+    return m_http;
+}
+
 void Settings::load( int argc, char **argv )
 {
     m_commandLineParser.parse(argc, argv, stderr);
@@ -111,15 +140,15 @@ void Settings::loadConfiguration()
 
     //general
     const QStringList& httpAddrToListenStrList = m_settings.value(
-        kEndpointsToListen,
-        kDefaultEndpointsToListen).toString().split(',');
+        kGeneralEndpointsToListen,
+        kDefaultGeneralEndpointsToListen).toString().split(',');
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter(m_general.endpointsToListen),
         [](const QString& str) { return SocketAddress(str); });
 
-    const QString& dataDirFromSettings = m_settings.value(kDataDir).toString();
+    const QString& dataDirFromSettings = m_settings.value(kGeneralDataDir).toString();
     if (!dataDirFromSettings.isEmpty())
     {
         m_general.dataDir = dataDirFromSettings;
@@ -137,7 +166,7 @@ void Settings::loadConfiguration()
 #endif
     }
 
-    m_general.changeUser = m_settings.value(kChangeUser).toString();
+    m_general.changeUser = m_settings.value(kGeneralChangeUser).toString();
 
     //log
     m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
@@ -147,6 +176,20 @@ void Settings::loadConfiguration()
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+
+    //tcp
+    m_tcp.recvTimeout = 
+        nx::utils::parseTimerDuration(
+            m_settings.value(kTcpRecvTimeout).toString(),
+            kDefaultTcpRecvTimeout);
+    m_tcp.sendTimeout =
+        nx::utils::parseTimerDuration(
+            m_settings.value(kTcpSendTimeout).toString(),
+            kDefaultTcpSendTimeout);
+
+    //http
+    m_http.proxyTargetPort = 
+        m_settings.value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
 }
 
 }   //namespace conf

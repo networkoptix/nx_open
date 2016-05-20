@@ -40,6 +40,21 @@ public:
     QString rulesXmlPath;
 };
 
+class Tcp
+{
+public:
+    std::chrono::milliseconds recvTimeout;
+    std::chrono::milliseconds sendTimeout;
+};
+
+class Http
+{
+public:
+    int proxyTargetPort;
+
+    Http();
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -57,6 +72,8 @@ public:
     const General& general() const;
     const Logging& logging() const;
     const Auth& auth() const;
+    const Tcp& tcp() const;
+    const Http& http() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
     void load( int argc, char **argv );
@@ -71,6 +88,8 @@ private:
     General m_general;
     Logging m_logging;
     Auth m_auth;
+    Tcp m_tcp;
+    Http m_http;
 
     void fillSupportedCmdParameters();
     void loadConfiguration();

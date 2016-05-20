@@ -915,8 +915,11 @@ namespace ec2
 
         QnMutexLocker lk( &m_mutex );
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
-        if( peerIter == m_peersToSendTimeSyncTo.end() )
+        if( peerIter == m_peersToSendTimeSyncTo.end() ||
+            peerIter->second.httpClient != clientPtr )
+        {
             return;
+        }
         NX_ASSERT( !peerIter->second.syncTimerID );
         peerIter->second.httpClient.reset();
         //scheduling next synchronization

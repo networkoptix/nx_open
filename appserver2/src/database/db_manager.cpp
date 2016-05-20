@@ -430,6 +430,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
             return false;
         }
 
+    if (!syncLicensesBetweenDB())
+        return false;
+
     if( m_needResyncLog ) {
         if (!resyncTransactionLog())
 		    return false;
@@ -573,6 +576,52 @@ bool QnDbManager::init(const QUrl& dbUrl)
     m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
     emit initialized();
     m_initialized = true;
+
+    return true;
+}
+
+bool QnDbManager::syncLicensesBetweenDB()
+{
+    // move license table to static DB
+    ec2::ApiLicenseDataList licensesMainDbVect;
+    ec2::ApiLicenseDataList licensesStaticDbVect;
+    if (getLicenses(licensesMainDbVect, m_sdb) != ErrorCode::ok)
+        return false;
+    if (getLicenses(licensesStaticDbVect, m_sdbStatic) != ErrorCode::ok)
+        return false;
+
+    std::set<ApiLicenseData> licensesMainDbSet(licensesMainDbVect.begin(), licensesMainDbVect.end());
+    std::set<ApiLicenseData> licensesStaticDbSet(licensesStaticDbVect.begin(), licensesStaticDbVect.end());
+
+    ec2::ApiLicenseDataList addToMain;
+    std::set_difference(
+        licensesStaticDbSet.begin(),
+        licensesStaticDbSet.end(),
+        licensesMainDbSet.begin(),
+        licensesMainDbSet.end(),
+        std::inserter(addToMain, addToMain.begin()));
+
+    ec2::ApiLicenseDataList addToStatic;
+    std::set_difference(
+        licensesMainDbSet.begin(),
+        licensesMainDbSet.end(),
+        licensesStaticDbSet.begin(),
+        licensesStaticDbSet.end(),
+        std::inserter(addToStatic, addToStatic.begin()));
+
+
+    for (const auto& license : addToMain)
+    {
+        if (saveLicense(license, m_sdb) != ErrorCode::ok)
+            return false;
+        m_needResyncLicenses = true; //< resync transaction log due to data changes
+    }
+
+    for (const auto& license : addToStatic)
+    {
+        if (saveLicense(license, m_sdbStatic) != ErrorCode::ok)
+            return false;
+    }
 
     return true;
 }
@@ -1329,30 +1378,6 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/05_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
     }
-    else if (m_dbJustCreated)
-        m_needResyncLicenses = true;
-
-    // move license table to static DB
-    ec2::ApiLicenseDataList licenses;
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
-    if (!query.exec())
-    {
-        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
-        return false;
-    }
-    QnSql::fetch_many(query, &licenses);
-
-    for(const ApiLicenseData& data: licenses)
-    {
-        if (saveLicense(data) != ErrorCode::ok)
-            return false;
-        m_needResyncLicenses = true;
-    }
-    if (!execSQLQuery("DELETE FROM vms_license", m_sdb, Q_FUNC_INFO))
-        return false;
-
 
     if (!applyUpdates(":/updates"))
         return false;
@@ -3828,8 +3853,17 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataLis
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
-    QSqlQuery insQuery(m_sdbStatic);
+ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license)
+{
+    auto result = saveLicense(license, m_sdbStatic);
+    if (result == ErrorCode::ok)
+        result = saveLicense(license, m_sdb);
+    return result;
+}
+
+ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license, QSqlDatabase& database)
+{
+    QSqlQuery insQuery(database);
     insQuery.prepare("INSERT OR REPLACE INTO vms_license (license_key, license_block) VALUES(:licenseKey, :licenseBlock)");
     insQuery.bindValue(":licenseKey", license.key);
     insQuery.bindValue(":licenseBlock", license.licenseBlock);
@@ -3842,8 +3876,17 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
     }
 }
 
-ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
-    QSqlQuery delQuery(m_sdbStatic);
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license)
+{
+    auto result = removeLicense(license, m_sdbStatic);
+    if (result == ErrorCode::ok)
+        result = removeLicense(license, m_sdb);
+    return result;
+}
+
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license, QSqlDatabase& database)
+{
+    QSqlQuery delQuery(database);
     delQuery.prepare("DELETE FROM vms_license WHERE license_key = ?");
     delQuery.addBindValue(license.key);
     if (delQuery.exec()) {
@@ -3886,7 +3929,12 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
 {
-    QSqlQuery query(m_sdbStatic);
+    return getLicenses(data, m_sdb);
+}
+
+ErrorCode QnDbManager::getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database)
+{
+    QSqlQuery query(database);
 
     QString q = QString(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
     query.setForwardOnly(true);

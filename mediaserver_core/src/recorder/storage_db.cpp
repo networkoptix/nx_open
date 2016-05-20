@@ -35,13 +35,15 @@ public:
 
     void handleError(nx::media_db::Error error) override
     {
-        NX_LOG(lit("%1 temporary DB file error").arg(Q_FUNC_INFO), cl_logWARNING);
+        if (error != nx::media_db::Error::NoError)
+            NX_LOG(lit("%1 temporary DB file error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
         m_error = error;
     }
 
     void handleRecordWrite(nx::media_db::Error error) override
     {
-        NX_LOG(lit("%1 temporary DB file write error").arg(Q_FUNC_INFO), cl_logWARNING);
+        if (error != nx::media_db::Error::NoError)
+            NX_LOG(lit("%1 temporary DB file write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
         m_error = error;
     }
 
@@ -622,13 +624,15 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
 void QnStorageDb::handleError(nx::media_db::Error error) 
 {
     QnMutexLocker lk(&m_errorMutex);
-    NX_LOG(lit("%1 DB error").arg(Q_FUNC_INFO), cl_logWARNING);
+    if (error != nx::media_db::Error::NoError)
+        NX_LOG(lit("%1 DB error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
     m_lastReadError = error;
 }
 
 void QnStorageDb::handleRecordWrite(nx::media_db::Error error)
 {
     QnMutexLocker lk(&m_errorMutex);
-    NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
+    if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
+        NX_LOG(lit("%1 DB write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
     m_lastWriteError = error;
 }

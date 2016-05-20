@@ -1,5 +1,4 @@
-#ifndef QN_LAYOUT_ITEM_DATA_H
-#define QN_LAYOUT_ITEM_DATA_H
+#pragma once
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -13,14 +12,17 @@
 #include <utils/common/id.h>
 #include <utils/color_space/image_correction.h>
 
-class QnLayoutItemData {
-public:
+struct QnLayoutItemResourceDescriptor
+{
+    QnUuid id;
+    QString uniqueId;
+};
+
+struct QnLayoutItemData
+{
     QnLayoutItemData();
 
-    struct {
-        QnUuid id;
-        QString path;
-    } resource;
+    QnLayoutItemResourceDescriptor resource;
 
     QnUuid uuid;
     int flags;
@@ -46,5 +48,3 @@ typedef QHash<QnUuid, QnLayoutItemData> QnLayoutItemDataMap;
 
 Q_DECLARE_METATYPE(QnLayoutItemDataList);
 Q_DECLARE_METATYPE(QnLayoutItemDataMap);
-
-#endif // QN_LAYOUT_ITEM_DATA_H

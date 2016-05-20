@@ -420,8 +420,8 @@ APPLY(1002, addLicenses, ApiLicenseDataList, \
 APPLY(1003, removeLicense, ApiLicenseData, \
                        true, \
                        false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper()) \
+                       &createHashForApiLicenseDataHelper, \
+                       LicenseNotificationManagerHelper()) \
 APPLY(1200, uploadUpdate, ApiUpdateUploadData, \
                        false, \
                        true, \

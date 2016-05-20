@@ -344,7 +344,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
 
     QnLayoutItemData data;
     data.resource.id = resource->getId();
-    data.resource.path = resource->getUniqueId();
+    data.resource.uniqueId = resource->getUniqueId();
     data.uuid = QnUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
@@ -1369,7 +1369,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.path = resource->getUniqueId();
+        item.resource.uniqueId = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation =  widget->item()->rotation();

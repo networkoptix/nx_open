@@ -363,7 +363,7 @@ void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst)
     dst.combinedGeometry = QRectF(QPointF(src.left, src.top), QPointF(src.right, src.bottom));
     dst.rotation = src.rotation;
     dst.resource.id =  src.resourceId;
-    dst.resource.path = src.resourcePath;
+    dst.resource.uniqueId = src.resourcePath;
     dst.zoomRect = QRectF(QPointF(src.zoomLeft, src.zoomTop), QPointF(src.zoomRight, src.zoomBottom));
     dst.zoomTargetUuid = src.zoomTargetId;
     dst.contrastParams = ImageCorrectionParams::deserialize(src.contrastParams);
@@ -381,7 +381,7 @@ void fromResourceToApi(const QnLayoutItemData& src, ApiLayoutItemData& dst)
     dst.bottom = src.combinedGeometry.bottomRight().y();
     dst.rotation = src.rotation;
     dst.resourceId = src.resource.id;
-    dst.resourcePath = src.resource.path;
+    dst.resourcePath = src.resource.uniqueId;
     dst.zoomLeft = src.zoomRect.topLeft().x();
     dst.zoomTop = src.zoomRect.topLeft().y();
     dst.zoomRight = src.zoomRect.bottomRight().x();

@@ -1,20 +1,25 @@
-#ifndef RESOURCE_POOL_MODEL_NODE_H
-#define RESOURCE_POOL_MODEL_NODE_H
+#pragma once
 
-#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
-#include <QtCore/QString>
 #include <nx/utils/uuid.h>
 
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
 
-class QnResourcePoolModel;
+#include <ui/models/resource/resource_tree_model_fwd.h>
 
-class QnResourcePoolModelNode: public QObject {
+#include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/from_this_to_shared.h>
+
+class QnResourceTreeModelNode: public QObject, public QnWorkbenchContextAware, public QnFromThisToShared<QnResourceTreeModelNode>
+{
     Q_OBJECT
+
+    typedef QObject base_type;
 public:
-    enum State {
+    enum State
+    {
         Normal,     /**< Normal node. */
         Invalid     /**< Invalid node that should not be displayed.
                      * Invalid nodes are parts of dangling tree branches during incremental
@@ -22,23 +27,26 @@ public:
     };
 
     /**
-     * Constructor for toplevel nodes.
+     * Constructor for root nodes.
      */
-    QnResourcePoolModelNode(QnResourcePoolModel *model, Qn::NodeType type, const QString &name = QString());
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type);
+
+    /**
+    * Constructor for other virtual group nodes (recorders, other systems).
+    */
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QString &name);
 
     /**
      * Constructor for resource nodes.
      */
-    QnResourcePoolModelNode(QnResourcePoolModel *model, const QnResourcePtr &resource, Qn::NodeType nodeType);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType);
 
     /**
      * Constructor for item nodes.
      */
-    QnResourcePoolModelNode(QnResourcePoolModel *model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
 
-    ~QnResourcePoolModelNode();
-
-    void clear() ;
+    ~QnResourceTreeModelNode();
 
     void setResource(const QnResourcePtr &resource);
 
@@ -47,37 +55,19 @@ public:
     void updateRecursive() ;
 
     Qn::NodeType type() const ;
-
-    const QnResourcePtr &resource() const;
-
+    QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
 
-    Qn::ResourceStatus resourceStatus() const ;
+    QList<QnResourceTreeModelNodePtr> children() const;
 
-    const QnUuid &uuid() const ;
+    QnResourceTreeModelNodePtr child(int index) ;
 
-    State state() const ;
+    QnResourceTreeModelNodePtr parent() const ;
 
-    bool isValid() const;
+    void setParent(const QnResourceTreeModelNodePtr& parent) ;
 
-    void setState(State state) ;
-
-    bool isBastard() const ;
-
-    void setBastard(bool bastard);
-
-
-    const QList<QnResourcePoolModelNode *> &children() const;
-
-    QnResourcePoolModelNode *child(int index) ;
-
-    QnResourcePoolModelNode *parent() const ;
-
-    void setParent(QnResourcePoolModelNode *parent) ;
-
-    QModelIndex index(int col);
-
-    QModelIndex index(int row, int col);
+    QModelIndex createIndex(int row, int col);
+    QModelIndex createIndex(int col);
 
     Qt::ItemFlags flags(int column) const ;
 
@@ -88,23 +78,34 @@ public:
     bool isModified() const;
 
     void setModified(bool modified) ;
+
 protected:
-    void removeChildInternal(QnResourcePoolModelNode *child) ;
-    void addChildInternal(QnResourcePoolModelNode *child);
+    void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
+    void addChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
 private:
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+
+    const QnUuid &uuid() const;
+    bool isValid() const;
+    State state() const;
+    void setState(State state);
+
     /** Recalculated 'bastard' state for the node. */
     bool calculateBastard() const;
 
+    bool isBastard() const;
+    void setBastard(bool bastard);
+
 private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
-    friend class QnResourcePoolModel;
+    friend class QnResourceTreeModel;
 
     /* Node state. */
 
     /** Model that this node belongs to. */
-    QnResourcePoolModel *const m_model;
+    QPointer<QnResourceTreeModel> const m_model;
 
     /** Type of this node. */
     const Qn::NodeType m_type;
@@ -123,10 +124,10 @@ private:
     bool m_bastard;
 
     /** Parent of this node. */
-    QnResourcePoolModelNode *m_parent;
+    QnResourceTreeModelNodePtr m_parent;
 
     /** Children of this node. */
-    QList<QnResourcePoolModelNode *> m_children;
+    QList<QnResourceTreeModelNodePtr> m_children;
 
     /* Resource-related state. */
 
@@ -162,4 +163,4 @@ private:
     } m_editable;
 };
 
-#endif // RESOURCE_POOL_MODEL_NODE_H
+

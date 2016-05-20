@@ -36,10 +36,6 @@ namespace nx_http
 
         responseMsg.response->statusLine.version = requestMsg.request->requestLine.version;
 
-        const auto& request = *requestMsg.request;
-        auto response = responseMsg.response;
-
-        m_requestMsg = std::move( requestMsg );
         m_responseMsg = std::move( responseMsg );
         m_completionHandler = std::move( completionHandler );
 
@@ -52,10 +48,10 @@ namespace nx_http
 
         processRequest(
             connection,
-            std::move( authInfo ),
-            request,
-            response,
-            sendResponseFunc );
+            std::move(authInfo),
+            std::move(std::move(*requestMsg.request)),
+            m_responseMsg.response,
+            sendResponseFunc);
         return true;
     }
 

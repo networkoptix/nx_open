@@ -454,21 +454,6 @@ void QnTransactionTransport::removeEventHandler( int eventHandlerID )
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
-QSharedPointer<AbstractStreamSocket> QnTransactionTransport::getSocket() const
-{
-    if( m_connectionType == ConnectionType::bidirectional )
-    {
-        return m_incomingDataSocket;
-    }
-    else
-    {
-        if( m_peerRole == prOriginating )
-            return m_incomingDataSocket;
-        else
-            return m_outgoingDataSocket;
-    }
-}
-
 void QnTransactionTransport::close()
 {
     setState(State::Closed);    //changing state before freeing socket so that everyone

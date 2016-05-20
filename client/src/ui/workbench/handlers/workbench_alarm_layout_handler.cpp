@@ -161,7 +161,7 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
 
         QnLayoutItemData data;
         data.resource.id = camera->getId();
-        data.resource.path = camera->getUniqueId();
+        data.resource.uniqueId = camera->getUniqueId();
         data.uuid = QnUuid::createUuid();
         data.flags = Qn::PendingGeometryAdjustment;
 
