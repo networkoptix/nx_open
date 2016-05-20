@@ -50,6 +50,7 @@ namespace nx_http
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody );
         const Response* response() const;
+        SystemError::ErrorCode lastSysErrorCode() const;
         //!
         bool eof() const;
         //!
@@ -68,11 +69,15 @@ namespace nx_http
 
         //!See \a AsyncHttpClient::setSendTimeoutMs
         void setSendTimeoutMs( unsigned int sendTimeoutMs );
+        //!See \a AsyncHttpClient::setResponseReadTimeoutMs
+        void setResponseReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         //!See \a AsyncHttpClient::setMessageBodyReadTimeoutMs
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+        AbstractStreamSocket* socket();
+        QSharedPointer<AbstractStreamSocket> takeSocket();
 
     private:
         nx_http::AsyncHttpClientPtr m_asyncHttpClient;
@@ -85,6 +90,7 @@ namespace nx_http
         boost::optional<int> m_subsequentReconnectTries;
         boost::optional<int> m_reconnectTries;
         boost::optional<unsigned int> m_sendTimeoutMs;
+        boost::optional<unsigned int> m_responseReadTimeoutMs;
         boost::optional<unsigned int> m_messageBodyReadTimeoutMs;
         boost::optional<QString> m_userAgent;
         boost::optional<QString> m_userName;

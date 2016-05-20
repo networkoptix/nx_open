@@ -65,9 +65,9 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
     }
 
     if (m_lastTimeMs != (qint64)AV_NOPTS_VALUE && timeMs > m_lastTimeMs)
-        m_indexItr = qUpperBound(m_indexItr, m_index.end(), timeMs - m_indexHeader.startTime);
+        m_indexItr = std::upper_bound(m_indexItr, m_index.end(), timeMs - m_indexHeader.startTime);
     else 
-        m_indexItr = qUpperBound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
+        m_indexItr = std::upper_bound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
 
     if (m_indexItr > m_index.begin())
         m_indexItr--;
@@ -207,12 +207,12 @@ QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msSt
         QVector<IndexRecord>::iterator endItr = index.end();
 
         if (isFirstStep) {
-            startItr = qUpperBound(index.begin(), index.end(), msStartTime-indexHeader.startTime);
+            startItr = std::upper_bound(index.begin(), index.end(), msStartTime-indexHeader.startTime);
             if (startItr > index.begin())
                 startItr--;
         }
         if (maxTime <= msEndTime)
-            endItr = qUpperBound(startItr, index.end(), msEndTime-indexHeader.startTime);
+            endItr = std::upper_bound(startItr, index.end(), msEndTime-indexHeader.startTime);
         int totalSteps = endItr - startItr;
 
         motionFile.seek((startItr-index.begin()) * MOTION_DATA_RECORD_SIZE);
@@ -315,7 +315,7 @@ int QnMotionArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
 {
     if (reloadIndex)
         loadIndexFile(m_index, m_indexHeader, m_detailedIndexFile);
-    QVector<IndexRecord>::iterator indexIterator = qLowerBound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
+    QVector<IndexRecord>::iterator indexIterator = std::lower_bound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
     return indexIterator - m_index.begin();
 }
 

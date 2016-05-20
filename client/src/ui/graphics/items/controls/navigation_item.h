@@ -60,6 +60,8 @@ protected:
 private:
     QnImageButtonWidget* newActionButton(QnActions::IDType id);
 
+    bool isTimelineRelevant() const;
+
 private:
     QnImageButtonWidget* m_jumpBackwardButton;
     QnImageButtonWidget* m_stepBackwardButton;
@@ -81,6 +83,7 @@ private:
     QnTimeScrollBar* m_timeScrollBar;
     QnSpeedSlider* m_speedSlider;
     QnVolumeSlider* m_volumeSlider;
+    QnFramedWidget* m_separators;
 };
 
 #endif // QN_NAVIGATION_ITEM_H

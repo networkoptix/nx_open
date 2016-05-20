@@ -36,21 +36,10 @@ namespace
     static const QByteArray PREV_SYSTEM_NAME_KEY("prevSystemName");
     static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
     static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
+    static const QByteArray AUTH_KEY("authKey");
 }
 
 static QnMediaServerResourcePtr m_server;
-
-QByteArray decodeAuthKey(const QByteArray& authKey) {
-    // convert from v2.2 format and encode value
-    QByteArray prefix("SK_");
-    if (authKey.startsWith(prefix)) {
-        QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
-        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
-        return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
-    } else {
-        return authKey;
-    }
-}
 
 QnUuid serverGuid()
 {
@@ -108,7 +97,7 @@ bool PasswordData::hasPassword() const
         !passwordDigest.isEmpty();
 }
 
-bool changeAdminPassword(PasswordData data)
+bool changeAdminPassword(PasswordData data, QString* errString)
 {
     //genereating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
@@ -117,7 +106,11 @@ bool changeAdminPassword(PasswordData data)
 
     QnUserResourcePtr admin = qnResPool->getAdministrator();
     if (!admin)
+    {
+        if (errString)
+            *errString = lit("Temporary unavailable. Please try later.");
         return false;
+    }
 
     //making copy of admin user to be able to rollback local changed on DB update failure
     QnUserResourcePtr updatedAdmin = QnUserResourcePtr(new QnUserResource(*admin));
@@ -135,7 +128,11 @@ bool changeAdminPassword(PasswordData data)
     {
         /* check old password */
         if (!admin->checkPassword(data.oldPassword))
+        {
+            if (errString)
+                *errString = lit("Wrong current password specified");
             return false;
+        }
 
         /* set new password */
         updatedAdmin->setPassword(data.password);
@@ -143,8 +140,13 @@ bool changeAdminPassword(PasswordData data)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password) != ec2::ErrorCode::ok)
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        if (errCode != ec2::ErrorCode::ok)
+        {
+            if (errString)
+                *errString = lit("Internal server database error: %1").arg(toString(errCode));
             return false;
+        }
         updatedAdmin->setPassword(QString());
     }
     else
@@ -157,8 +159,13 @@ bool changeAdminPassword(PasswordData data)
 
         ec2::ApiUserData apiUser;
         fromResourceToApi(updatedAdmin, apiUser);
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser) != ec2::ErrorCode::ok)
+        auto errCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password);
+        if (errCode != ec2::ErrorCode::ok)
+        {
+            if (errString)
+                *errString = lit("Internal server database error: %1").arg(toString(errCode));
             return false;
+        }
     }
 
     //applying changes to local resource
@@ -236,11 +243,17 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     systemName.saveToConfig();
     server->setSystemName(systemName.value());
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
+
     if (systemName.isDefault())
-        server->setServerFlags(server->getServerFlags() | Qn::SF_AutoSystemName);
-    else
-        server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
+        qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setNewSystem(systemName.isDefault());
+    qnGlobalSettings->synchronizeNowSync();
+
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
+
+    // update auth key if system name changed
+    server->setAuthKey(QnUuid::createUuid().toString());
+    nx::ServerSetting::setAuthKey(server->getAuthKey().toLatin1());
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
@@ -249,16 +262,59 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
     return true;
 }
 
-qint64 getSysIdTime()
+// -------------- nx::ServerSetting -----------------------
+
+qint64 nx::ServerSetting::getSysIdTime()
 {
     return MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
 }
 
-void setSysIdTime(qint64 value)
+void nx::ServerSetting::setSysIdTime(qint64 value)
 {
     auto settings = MSSettings::roSettings();
     settings->setValue(SYSTEM_IDENTITY_TIME, QString());
 }
+
+QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
+{
+    // convert from v2.2 format and encode value
+    QByteArray prefix("SK_");
+    if (authKey.startsWith(prefix)) {
+        QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
+        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+        return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
+    }
+    else {
+        return authKey;
+    }
+}
+
+QByteArray nx::ServerSetting::getAuthKey()
+{
+    QByteArray authKey = MSSettings::roSettings()->value(AUTH_KEY).toByteArray();
+    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    if (!authKey.isEmpty())
+    {
+        // convert from v2.2 format and encode value
+        QByteArray prefix("SK_");
+        if (!authKey.startsWith(prefix))
+            setAuthKey(authKey);
+        else
+            authKey = decodeAuthKey(authKey);
+    }
+    return authKey;
+}
+
+void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
+{
+    QByteArray prefix("SK_");
+    QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
+    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+}
+
+
+// -------------- nx::SystemName -----------------------
 
 nx::SystemName::SystemName(const SystemName& other):
     m_value(other.m_value)

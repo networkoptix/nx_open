@@ -26,28 +26,37 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
 {
 }
 
+void AsyncClientUser::setOnReconnectedHandler(
+    AbstractAsyncClient::ReconnectHandler handler)
+{
+    m_client->addOnReconnectedHandler(
+        [self = shared_from_this(), handler = std::move(handler)]()
+        {
+            if (!self->startOperation())
+                return;
+
+            handler();
+            self->stopOperation();
+        });
+}
+
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     QnMutexLocker lk(&m_mutex);
-    NX_ASSERT(!m_stopHandler, Q_FUNC_INFO, "pleaseStop is called 2nd time");
+    NX_ASSERT(!m_stopHandler, Q_FUNC_INFO,
+              "pleaseStop(...) is called 2nd time before handler is waited");
+
     m_stopHandler = std::move(handler);
     m_pleaseStopHasBeenCalled = true;
-    m_client.reset();
     checkHandler(&lk);
 }
 
-void AsyncClientUser::setOnReconnectedHandler(
-    nx::utils::MoveOnlyFunc<void()> handler)
-{
-    //TODO
-}
-
-void AsyncClientUser::sendRequest(Message request,
-                                  AbstractAsyncClient::RequestHandler handler)
+void AsyncClientUser::sendRequest(
+    Message request, AbstractAsyncClient::RequestHandler handler)
 {
     m_client->sendRequest(
         std::move(request),
-        [this, self = shared_from_this(), handler = std::move(handler)](
+        [self = shared_from_this(), handler = std::move(handler)](
             SystemError::ErrorCode code, Message message) mutable
         {
             if (!self->startOperation())
@@ -58,34 +67,26 @@ void AsyncClientUser::sendRequest(Message request,
         });
 }
 
-bool AsyncClientUser::setIndicationHandler(int method,
-                                         AbstractAsyncClient::IndicationHandler handler)
+bool AsyncClientUser::setIndicationHandler(
+    int method, AbstractAsyncClient::IndicationHandler handler)
 {
-    auto wrapper = [method](const std::shared_ptr<AsyncClientUser>& self,
-                            const AbstractAsyncClient::IndicationHandler& handler,
-                            Message message)
-    {
-        if (!self->startOperation())
-        {
-            self->m_client->ignoreIndications(method); // break the cycle
-            return;
-        }
-
-        handler(std::move(message));
-        self->stopOperation();
-    };
-
-    using namespace std::placeholders;
     return m_client->setIndicationHandler(
         method,
-        std::bind(
-            std::move(wrapper), shared_from_this(), std::move(handler), _1));
+        [self = shared_from_this(), handler = std::move(handler)](
+            Message message) mutable
+        {
+            if (!self->startOperation())
+                return;
+
+            handler(std::move(message));
+            self->stopOperation();
+        });
 }
 
 bool AsyncClientUser::startOperation()
 {
     QnMutexLocker lk(&m_mutex);
-    if (m_stopHandler)
+    if (m_pleaseStopHasBeenCalled)
         return false;
 
     ++m_operationsInProgress;
@@ -104,7 +105,10 @@ void AsyncClientUser::checkHandler(QnMutexLockerBase* lk)
     if (m_stopHandler && m_operationsInProgress == 0)
     {
         const auto client = std::move(m_client);
+        m_client.reset();
+
         const auto handler = std::move(m_stopHandler);
+        m_stopHandler = nullptr;
 
         lk->unlock();
         handler();

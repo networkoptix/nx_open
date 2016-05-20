@@ -263,6 +263,17 @@ namespace nx_http
                     return StringType("Unknown_") + StringType::number(val);
             }
         }
+
+
+        bool isSuccessCode(Value statusCode)
+        {
+            return isSuccessCode(static_cast<int>(statusCode));
+        }
+        
+        bool isSuccessCode(int statusCode)
+        {
+            return statusCode >= ok && statusCode <= lastSuccessCode;
+        }
     }
 
     const StringType Method::GET( "GET" );
@@ -449,7 +460,8 @@ namespace nx_http
     bool parseRequestOrResponse(
         const ConstBufferRefType& data,
         MessageType* message,
-        MessageLineType MessageType::*messageLine )
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict)
     {
         enum ParseState
         {
@@ -486,7 +498,12 @@ namespace nx_http
                         StringType headerName;
                         StringType headerValue;
                         if( !parseHeader( &headerName, &headerValue, currentLine ) )
-                            return false;
+                        {
+                            if(parseHeadersNonStrict)
+                                break;
+                            else
+                                return false;
+                        }
                         message->headers.insert( std::make_pair( headerName, headerValue ) );
                         break;
                     }
@@ -601,6 +618,7 @@ namespace nx_http
         serializeMultipartResponse( &buf, boundary );
         return buf;
     }
+
 
     namespace MessageType
     {

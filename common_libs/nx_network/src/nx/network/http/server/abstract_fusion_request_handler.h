@@ -31,8 +31,9 @@ class AbstractFusionRequestHandler
 public:
     //!Implement this method in a descendant
     /*!
-        On request processing completion \a requestCompleted( nx_http::StatusCode::Value, Output ) MUST be invoked
+        On request processing completion \a requestCompleted(FusionRequestResult, Output) MUST be invoked
         \note If \a Input is \a void, then this method does not have \a inputData argument
+        \note If \a Output is \a void, then \a requestCompleted(FusionRequestResult)
     */
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,
@@ -45,12 +46,12 @@ public:
         This method is here just for information purpose. Defined in a base class
     */
     //void requestCompleted(
-    //    const nx_http::StatusCode::Value statusCode,
+    //    FusionRequestResult result,
     //    Output outputData );
 };
 
 /*!
-    Partial specifalization with no input
+    Partial specialization with no input
 */
 template<typename Output>
 class AbstractFusionRequestHandler<void, Output>
@@ -60,7 +61,7 @@ class AbstractFusionRequestHandler<void, Output>
 public:
     //!Implement this method in a descendant
     /*!
-        On request processing completion \a requestCompleted( nx_http::StatusCode::Value ) MUST be invoked
+        On request processing completion \a requestCompleted(FusionRequestResult) MUST be invoked
     */
     virtual void processRequest(
         const nx_http::HttpServerConnection& connection,

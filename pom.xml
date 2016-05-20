@@ -38,6 +38,7 @@
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
+        <nx_bpi_videonode_plugin.guid>{5e528d46-180a-4ea2-85b0-eeccef76ef79}</nx_bpi_videonode_plugin.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
@@ -71,6 +72,10 @@
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
         <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
+        <cloud_connect_auto_test.guid>{D2C6C354-447F-4786-9270-FD2F73552322}</cloud_connect_auto_test.guid>
+        <libvms_gateway.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway.guid>
+        <vms_gateway.guid>{A2C631CB-073C-4F1A-9B47-63C52B68B71C}</vms_gateway.guid>
+        <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -101,6 +106,7 @@
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
+        <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
@@ -115,7 +121,7 @@
         <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
-        <newmobile></newmobile>
+        <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
@@ -125,7 +131,7 @@
         <angle>false</angle>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1></compile.option1>
+        <compile.option1/>
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
@@ -137,8 +143,8 @@
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-         <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
-        <qt.debug></qt.debug>
+        <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
+        <qt.debug/>
         <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -161,8 +167,8 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>3.0.0</server-external.version>
-        <help.version>${customization}-3.0.0</help.version>
+        <server-external.version>${release.version}</server-external.version>
+        <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -173,7 +179,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines></global.defines>
+        <global.defines/>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
@@ -217,13 +223,35 @@
         <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <exec dir="${root.dir}" executable="${init.python.dir}/${python.executable}" failifexecutionfails="true" failonerror="true">
+                                    <arg value="get_branch.py" />
+                                </exec>
+                            </tasks>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
                 <version>1.0-alpha-2</version>
                 <executions>
                     <execution>
                         <id>read</id>
-                        <phase>validate</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
@@ -232,6 +260,7 @@
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
+                                <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
@@ -320,7 +349,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1.1</version>
-                <executions>
+                <executions>               
                     <execution>
                         <id>get-rdep-artifacts</id>
                         <phase>generate-sources</phase>
@@ -373,7 +402,6 @@
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
-                <!-- <module>testcamera</module> -->
             </modules>
         </profile>
         <profile>
@@ -385,14 +413,12 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/cloud_connectivity_ut</module>
-                <module>unit_tests/cloud_db_ut</module>
                 <module>unit_tests/common_ut</module>
+                <module>unit_tests/cloud_connectivity_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
+                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <module>unit_tests/mediaserver_core_ut</module>
                 <module>unit_tests/nx_network_ut</module>
-                <module>unit_tests/utils_ut</module>
-                <!--<module>unit_tests/image_library_plugin_ut</module>-->
                 <!--<module>unit_tests/traytool_ut</module>-->
             </modules>
         </profile>
@@ -425,7 +451,6 @@
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
-                <!-- <module>testcamera</module> -->
             </modules>
             <properties>
                 <additional.compiler>${compiler}</additional.compiler>
@@ -454,10 +479,13 @@
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
             </modules>
         </profile>
         <profile>
             <id>windows</id>
+
             <activation>
                 <os>
                     <family>Windows</family>
@@ -491,6 +519,11 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
             </properties>
+
+            <modules>
+                <module>common_libs/nx_bpi_videonode_plugin</module>
+            </modules>
+
         </profile>
         <profile>
             <id>windows-x86</id>
@@ -507,7 +540,7 @@
             <properties>
                 <machine.type>X86</machine.type>
             </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -524,6 +557,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
+                <module>testcamera</module>
                 <module>wixsetup</module>
             </modules>
         </profile>
@@ -812,13 +846,17 @@
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
-                <qt.spec/>
-                <!-- TODO get rid of this variable. We already have corresponding package name in common/pom.xml -->
                 <gcc.version>4.8.3</gcc.version>
+                <qt.spec/>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
+                <module>common_libs/nx_bpi_videonode_plugin</module>
                 <module>edge_firmware/rpi</module>
+                <module>client.core</module>
+                <module>common_libs/nx_media</module>
+                <module>common_libs/nx_audio</module>
+                <module>mobile_client</module>
             </modules>
         </profile>
         <profile>
@@ -842,6 +880,7 @@
                 <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
+                <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
             </properties>
             <modules>
@@ -897,7 +936,6 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
-                <qt.spec>linux-g++-4.9-64</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -917,7 +955,6 @@
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
                 <target.arch>i386</target.arch>
-                <qt.spec>linux-g++-4.9-32</qt.spec>
             </properties>
         </profile>
         <profile>
@@ -937,7 +974,7 @@
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
             </properties>
         </profile>
         <profile>
@@ -1017,6 +1054,7 @@
                 <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
+                <qt.version>5.5.1</qt.version>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2d</openssl.version>
                 <ffmpeg.version>0.11.5</ffmpeg.version>
@@ -1105,7 +1143,8 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
-            </modules>
+                <module>unit_tests_run</module>
+            </modules>                
         </profile>
     </profiles>
 </project>

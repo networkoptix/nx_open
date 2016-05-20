@@ -10,7 +10,8 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 
 // Template multitype socket tests to ensure that every common_ut run checks
 // TCP and UDT basic functionality
@@ -166,8 +167,8 @@ void socketSimpleSync(
 
     nx::utils::promise<void> promise;
     auto server = serverMaker();
-    std::thread serverThread(
-        syncSocketServerMainFunc<decltype(server)>,
+    nx::utils::thread serverThread(
+        &syncSocketServerMainFunc<decltype(server)>,
         endpointToBindTo,
         testMessage,
         clientCount,
@@ -176,7 +177,7 @@ void socketSimpleSync(
 
     promise.get_future().wait();
 
-    std::thread clientThread([&endpointToConnectTo, &testMessage,
+    nx::utils::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
     {
         for (int i = clientCount; i > 0; --i)
@@ -237,7 +238,7 @@ void socketSimpleAsync(
     QByteArray serverBuffer;
     serverBuffer.reserve(128);
     std::vector<std::unique_ptr<AbstractStreamSocket>> clients;
-    std::function< void(SystemError::ErrorCode, AbstractStreamSocket*) > acceptor
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> acceptor
         = [&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
         serverResults.push(code);
@@ -247,13 +248,13 @@ void socketSimpleAsync(
         clients.emplace_back(socket);
         auto& client = clients.back();
         ASSERT_TRUE(client->setNonBlockingMode(true));
-        client->readSomeAsync(
-            &serverBuffer,
+        client->readAsyncAtLeast(
+            &serverBuffer, testMessage.size(),
             [&](SystemError::ErrorCode code, size_t size)
             {
                 if (code == SystemError::noError)
                 {
-                    EXPECT_GT(size, 0);
+                    EXPECT_GT(size, (size_t)0);
                     EXPECT_STREQ(serverBuffer.data(), testMessage.data());
                     serverBuffer.resize(0);
                 }
@@ -286,7 +287,7 @@ void socketSimpleAsync(
                         return;
 
                     EXPECT_EQ(code, SystemError::noError);
-                    EXPECT_EQ(size, testMessage.size());
+                    EXPECT_EQ(size, (size_t)testMessage.size());
                 });
         });
 
@@ -382,8 +383,8 @@ void shutdownSocket(
     {
         nx::utils::promise<void> promise;
         auto server = serverMaker();
-        std::thread serverThread(
-            syncSocketServerMainFunc<decltype(server)>,
+        nx::utils::thread serverThread(
+            &syncSocketServerMainFunc<decltype(server)>,
             endpointToBindTo,
             boost::none,
             1,
@@ -396,7 +397,7 @@ void shutdownSocket(
         ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
 
         nx::utils::promise<void> recvExitedPromise;
-        std::thread clientThread(
+        nx::utils::thread clientThread(
             [&client, &recvExitedPromise, &endpointToConnectTo]()
             {
                 nx::Buffer readBuffer;
@@ -522,7 +523,7 @@ void socketSingleAioThread(
 {
     aio::AbstractAioThread* aioThread(nullptr);
     std::vector<decltype(clientMaker())> sockets;
-    nx::TestSyncQueue<std::thread::id> threadIdQueue;
+    nx::TestSyncQueue<nx::utils::thread::id> threadIdQueue;
 
     for (auto i = 0; i < clientCount; ++i)
     {
@@ -546,7 +547,7 @@ void socketSingleAioThread(
         sockets.push_back(std::move(client));
     }
 
-    boost::optional<std::thread::id> aioThreadId;
+    boost::optional<nx::utils::thread::id> aioThreadId;
     for (auto i = 0; i < clientCount; ++i)
     {
         const auto threadId = threadIdQueue.pop();
@@ -629,43 +630,43 @@ void socketAcceptTimeoutAsync(
 } // namespace network
 } // namespace nx
 
-#define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
-    Type(Name, SingleAioThread)                                                 \
-        { nx::network::test::socketSingleAioThread(mkClient); }                 \
-    Type(Name, Shutdown)                                                        \
-        { nx::network::test::shutdownSocket(mkServer, mkClient); }              \
-    Type(Name, connectToBadAddress)                                                 \
-        { nx::network::test::connectToBadAddress(mkClient); }                 \
+#define NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+    Type(Name, SingleAioThread) \
+        { nx::network::test::socketSingleAioThread(mkClient); } \
+    Type(Name, Shutdown) \
+        { nx::network::test::shutdownSocket(mkServer, mkClient); } \
+    Type(Name, connectToBadAddress) \
+        { nx::network::test::connectToBadAddress(mkClient); } \
 
-#define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
-    Type(Name, SimpleAcceptMixed)                                               \
-        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient); }     \
-    Type(Name, AcceptTimeoutSync)                                               \
-        { nx::network::test::socketAcceptTimeoutSync(mkServer); }               \
-    Type(Name, AcceptTimeoutAsync)                                              \
-        { nx::network::test::socketAcceptTimeoutAsync(mkServer); }              \
+#define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+    Type(Name, SimpleAcceptMixed) \
+        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient); } \
+    Type(Name, AcceptTimeoutSync) \
+        { nx::network::test::socketAcceptTimeoutSync(mkServer); } \
+    Type(Name, AcceptTimeoutAsync) \
+        { nx::network::test::socketAcceptTimeoutAsync(mkServer); } \
 
-#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
-    Type(Name, SimpleSync)                                                      \
-        { nx::network::test::socketSimpleSync(mkServer, mkClient); }            \
-    Type(Name, SimpleAsync)                                                     \
-        { nx::network::test::socketSimpleAsync(mkServer, mkClient); }           \
-    Type(Name, SimpleTrueAsync)                                                 \
-        { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient); }       \
-    Type(Name, SimpleMultiConnect)                                              \
-        { nx::network::test::socketMultiConnect(mkServer, mkClient); }          \
+#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
+    Type(Name, SimpleSync) \
+        { nx::network::test::socketSimpleSync(mkServer, mkClient); } \
+    Type(Name, SimpleAsync) \
+        { nx::network::test::socketSimpleAsync(mkServer, mkClient); } \
+    Type(Name, SimpleTrueAsync) \
+        { nx::network::test::socketSimpleTrueAsync(mkServer, mkClient); } \
+    Type(Name, SimpleMultiConnect) \
+        { nx::network::test::socketMultiConnect(mkServer, mkClient); } \
 
-#define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient)  \
-    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
+#define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
 
-#define NX_NETWORK_SERVER_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient)  \
-    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
+#define NX_NETWORK_SERVER_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
 
-#define NX_NETWORK_BOTH_SOCKETS_TEST_CASE(Type, Name, mkServer, mkClient)   \
-    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
-    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient)     \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient)  \
+#define NX_NETWORK_BOTH_SOCKETS_TEST_CASE(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient) \
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

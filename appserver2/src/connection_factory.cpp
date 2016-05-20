@@ -196,7 +196,7 @@ namespace ec2
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>(p, ApiCommand::saveMediaServer);
 
-        /**%apidoc POST saveServerUserAttributes
+        /**%apidoc POST /ec2/saveServerUserAttributes
          * Save user attributes of a server.
          * <p>
          * Parameters should be passed as a JSON object in POST message body with
@@ -730,16 +730,16 @@ namespace ec2
          *     %value false
          *     %value true
  * %param permissions Combination (via "|") of the following flags:
-         *     %value GlobalOwnerPermission Root, can edit admins.
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
-         *     %value GlobalEditLayoutsPermission Can create and edit layouts.
          *     %value GlobalEditServersPermissions Can edit server settings.
-         *     %value GlobalViewLivePermission Can view live stream of available cameras.
+         *     %value GlobalEditCamerasPermission Can edit camera settings.
+         *     %value GlobalEditLayoutsPermission Can create and edit global layouts.
+         *     %value GlobalControlVideoWallPermission Can control videowalls.
          *     %value GlobalViewArchivePermission Can view archives of available cameras.
          *     %value GlobalExportPermission Can export archives of available cameras.
-         *     %value GlobalEditCamerasPermission Can edit camera settings.
-         *     %value GlobalPtzControlPermission Can change camera's PTZ state.
-         *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+         *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
+         *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
+         *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
          *     %value GlobalAccessAllCamerasPermission Has access to all cameras
          *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
          *     %value GlobalAccessAllServersPermission Has access to all servers
@@ -787,14 +787,15 @@ namespace ec2
         * %param id Group unique id. Should be generated when creating a new group.
         * %param name Group name.
         * %param permissions Combination (via "|") of the following flags:
-        *     %value GlobalEditLayoutsPermission Can create and edit layouts.
         *     %value GlobalEditServersPermissions Can edit server settings.
-        *     %value GlobalViewLivePermission Can view live stream of available cameras.
+        *     %value GlobalEditCamerasPermission Can edit camera settings.
+        *     %value GlobalEditLayoutsPermission Can create and edit global layouts.
+        *     %value GlobalControlVideoWallPermission Can control videowalls.
         *     %value GlobalViewArchivePermission Can view archives of available cameras.
         *     %value GlobalExportPermission Can export archives of available cameras.
-        *     %value GlobalEditCamerasPermission Can edit camera settings.
-        *     %value GlobalPtzControlPermission Can change camera's PTZ state.
-        *     %value GlobalEditVideoWallPermission Can create and edit videowalls.
+        *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
+        *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
+        *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
         *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
         *     %value GlobalAccessAllServersPermission Has access to all servers
@@ -1076,7 +1077,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>(p, ApiCommand::getLicenses);
 
         registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>(p, ApiCommand::dumpDatabase);
-        registerGetFuncHandler<ApiStoredFilePath, qint64>(p, ApiCommand::dumpDatabaseToFile);
+        registerGetFuncHandler<ApiStoredFilePath, ApiDatabaseDumpToFileData>(p, ApiCommand::dumpDatabaseToFile);
 
         //AbstractECConnectionFactory
         registerFunctorWithResponseHandler<ApiLoginData, QnConnectionInfo>( p, ApiCommand::connect,

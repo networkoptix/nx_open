@@ -88,12 +88,15 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
         natTraversalRequired,
         s_enforcedStreamSocketType);
 
-#ifdef ENABLE_SSL
-    if( result && sslRequired )
-        result.reset( new QnSSLSocket( result.release(), false ) );
-#endif
+    if (!result)
+        return std::unique_ptr<AbstractStreamSocket>();
+
+    #ifdef ENABLE_SSL
+        if (sslRequired || s_isSslEnforced)
+            result.reset(new SslSocket(result.release(), false));
+    #endif // ENABLE_SSL
     
-    return std::move( result );
+    return std::move(result);
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
@@ -107,10 +110,16 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
         natTraversalRequired,
         s_enforcedStreamSocketType);
 
-#ifdef ENABLE_SSL
-    if( result && sslRequired )
-        result.reset( new SSLServerSocket( result.release(), true ) );
-#endif // ENABLE_SSL
+    if (!result)
+        return std::unique_ptr<AbstractStreamServerSocket>();
+
+    #ifdef ENABLE_SSL
+        if (s_isSslEnforced)
+            result.reset(new SslServerSocket(result.release(), false));
+        else
+        if (sslRequired)
+            result.reset(new SslServerSocket(result.release(), true));
+    #endif // ENABLE_SSL
 
     return std::move( result );
 }
@@ -156,6 +165,12 @@ bool SocketFactory::isStreamSocketTypeEnforced()
     return s_enforcedStreamSocketType != SocketType::cloud;
 }
 
+void SocketFactory::enforceSsl( bool isEnforced )
+{
+    s_isSslEnforced = isEnforced;
+    qWarning() << ">>> SocketFactory::enforceSsl(" << isEnforced << ") <<<";
+}
+
 SocketFactory::CreateStreamSocketFuncType 
     SocketFactory::setCreateStreamSocketFunc(
         CreateStreamSocketFuncType newFactoryFunc)
@@ -178,3 +193,5 @@ SocketFactory::CreateStreamServerSocketFuncType
 std::atomic< SocketFactory::SocketType >
     SocketFactory::s_enforcedStreamSocketType(
         SocketFactory::SocketType::cloud );
+
+std::atomic< bool > SocketFactory::s_isSslEnforced( false );

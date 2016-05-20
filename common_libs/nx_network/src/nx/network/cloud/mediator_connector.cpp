@@ -16,18 +16,25 @@ namespace hpm {
 namespace api {
 
 MediatorConnector::MediatorConnector()
-    : m_isTerminating( false )
-    , m_stunClient(std::make_shared<stun::AsyncClient>())
-    , m_endpointFetcher(
+:
+    m_isTerminating( false ),
+    m_stunClient(std::make_shared<stun::AsyncClient>()),
+    m_endpointFetcher(
         lit( "hpm" ),
-        std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
-    , m_fetchEndpointRetryTimer(
+        std::make_unique<nx::network::cloud::RandomEndpointSelector>() ),
+    m_fetchEndpointRetryTimer(
         nx::network::RetryPolicy(
             nx::network::RetryPolicy::kInfiniteRetries,
             kRetryIntervalInitial,
             2,
             kRetryIntervalMax))
 {
+}
+
+void MediatorConnector::reinitializeStunClient(
+    stun::AbstractAsyncClient::Settings stunClientSettings)
+{
+    m_stunClient = std::make_shared<stun::AsyncClient>(stunClientSettings);
 }
 
 void MediatorConnector::enable( bool waitComplete )
@@ -62,7 +69,7 @@ std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection
                 new MediatorServerTcpConnection( m_stunClient, this ) );
 }
 
-void MediatorConnector::mockupAddress( SocketAddress address )
+void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarning )
 {
     {
         QnMutexLocker lk( &m_mutex );
@@ -73,19 +80,21 @@ void MediatorConnector::mockupAddress( SocketAddress address )
         m_future = m_promise->get_future();
     }
 
-
-    NX_LOGX( lit( "Mediator address is mocked up: %1" )
-             .arg( address.toString() ), cl_logWARNING );
+    if (!suppressWarning)
+    {
+        NX_LOGX( lit( "Mediator address is mocked up: %1" )
+                 .arg( address.toString() ), cl_logWARNING );
+    }
 
     m_mediatorAddress = std::move(address);
     m_stunClient->connect( address );
     m_promise->set_value( true );
 }
 
-void MediatorConnector::mockupAddress( const MediatorConnector* mc )
+void MediatorConnector::mockupAddress( const MediatorConnector& connector )
 {
-    if (auto address = mc->mediatorAddress())
-        mockupAddress(std::move(*address));
+    if (auto address = connector.mediatorAddress())
+        mockupAddress(std::move(*address), true);
 }
 
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )

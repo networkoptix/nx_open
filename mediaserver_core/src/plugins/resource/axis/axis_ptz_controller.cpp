@@ -190,7 +190,8 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     }
 }
 
-CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
+CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const
+{
     return new CLSimpleHTTPClient(
         m_resource->getHostAddress(), 
         QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 

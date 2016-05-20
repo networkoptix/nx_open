@@ -20,14 +20,41 @@
 #include <utils/common/model_functions.h>
 #include "utils/common/concurrent.h"
 #include "common/common_module.h"
+#include "axis_audio_transmitter.h"
 
 using namespace std;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
-static const float MAX_AR_EPS = 0.04f;
-static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
-static const quint16 DEFAULT_AXIS_API_PORT = 80;
-static const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+
+namespace{
+    const float MAX_AR_EPS = 0.04f;
+    const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
+    const quint16 DEFAULT_AXIS_API_PORT = 80;
+    const int AXIS_IO_KEEP_ALIVE_TIME = 1000 * 15;
+    const QString AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME("Properties.Audio.Decoder.Format");
+
+    QnAudioFormat toAudioFormat(const QString& codecName)
+    {
+        QnAudioFormat result;
+        if (codecName == lit("g711"))
+        {
+            result.setSampleRate(8000);
+            result.setCodec("MULAW");
+        }
+        else if (codecName == lit("g726"))
+        {
+            result.setSampleRate(8000);
+            result.setCodec("G726");
+        }
+        else if (codecName == lit("axis-mulaw-128"))
+        {
+            result.setSampleRate(16000);
+            result.setCodec("MULAW");
+        }
+
+        return result;
+    }
+}
 
 int QnPlAxisResource::portIdToIndex(const QString& id) const
 {
@@ -79,16 +106,18 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource()
+QnPlAxisResource::QnPlAxisResource() :
+    m_lastMotionReadTime(0),
+    m_audioTransmitter(new QnAxisAudioTransmitter(this))
 {
     setVendor(lit("Axis"));
     setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
-    m_lastMotionReadTime = 0;
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
 {
+    m_audioTransmitter.reset();
     stopInputPortMonitoringAsync();
 }
 
@@ -98,8 +127,11 @@ void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionH
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/axis-cgi/param.cgi") );
     apiUrl.setQuery( lit("action=list&group=root.Network.eth0.MACAddress") );
 
@@ -172,7 +204,7 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
 
     //based on VAPIX Version 3 I/O Port API
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
@@ -376,9 +408,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
+    QAuthenticator auth = getAuth();
+
     //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
         if (status == CL_HTTP_SUCCESS) {
             QByteArray firmware;
@@ -391,7 +425,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     if (hasVideo(0))
     {
         // enable send motion into H.264 stream
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes"));
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=").append(isAudioEnabled() ? "yes" : "no"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
@@ -404,7 +438,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     {
         //reading RTSP port
-        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), getAuth() );
+        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), auth );
         CLHttpStatus status = http.doGET( QByteArray( "axis-cgi/param.cgi?action=list&group=Network.RTSP.Port" ) );
         if( status != CL_HTTP_SUCCESS )
         {
@@ -423,16 +457,13 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     readMotionInfo();
 
     // determin camera max resolution
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), auth);
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
             setStatus(Qn::Unauthorized);
         return CameraDiagnostics::UnknownErrorResult();
     }
-
-
-
 
     QByteArray body;
     http.readAll(body);
@@ -485,11 +516,12 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
                 }
             }
         }
-    }   //releasing mutex so that not to make other threads using the resource to wait for completion of heavy-wait io & pts initialization,
-            //m_initMutex is locked up the stack
+    }
+
     if (hasVideo(0))
     {
-        qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
+        QnMutexLocker lock(&m_mutex);
+        std::sort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 
         //detecting primary & secondary resolution
         m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
@@ -506,6 +538,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     if (!initializeIOPorts( &http ))
         return CameraDiagnostics::CameraInvalidParams(tr("Can't initialize IO port settings"));
+
+    if(!initialize2WayAudio(&http))
+        return CameraDiagnostics::UnknownErrorResult();
 
     /* Ptz capabilities will be initialized by PTZ controller pool. */
 
@@ -728,7 +763,7 @@ bool QnPlAxisResource::setRelayOutputState(
         cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "");
     }
 
-    CLSimpleHTTPClient httpClient( getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth() );
+    CLSimpleHTTPClient httpClient( getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
 
     //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I0.Configurable");
     //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1.Output.Name");
@@ -825,6 +860,26 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
     CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
     *paramValue = val.toUInt();
     return status;
+}
+
+bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
+{
+    QString outputFormats;
+    auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
+    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+        return false;
+
+    for (const auto& formatStr: outputFormats.split(','))
+    {
+        QnAudioFormat outputFormat = toAudioFormat(formatStr);
+        if (m_audioTransmitter->isCompatible(outputFormat))
+        {
+            m_audioTransmitter->setOutputFormat(outputFormat);
+            setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+        }
+    }
+
+    return true;
 }
 
 void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
@@ -1069,14 +1124,8 @@ QnIOPortDataList QnPlAxisResource::mergeIOSettings(const QnIOPortDataList& camer
 
 bool QnPlAxisResource::ioPortErrorOccured()
 {
-    if (isIOModule()) {
-        return false; // it's error if can't read IO state for I/O module
-    }
-    else {
-        hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayInputCapability);
-        hasCameraCapabilities(getCameraCapabilities() &  ~Qn::RelayOutputCapability);
-        return true;
-    }
+    // it's error if can't read IO state for I/O module
+    return !isIOModule();
 };
 
 void QnPlAxisResource::readPortIdLIst()
@@ -1258,7 +1307,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
 
     //based on VAPIX Version 3 I/O Port API
 
-    const QAuthenticator& auth = getAuth();
+    QAuthenticator auth = getAuth();
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
@@ -1324,6 +1373,14 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
         QnConcurrent::run(QThreadPool::globalInstance(), std::bind(&QnPlAxisResource::asyncUpdateIOSettings, this, key));
+}
+
+QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
+{
+    if (!isInitialized() && !m_audioTransmitter->isInitialized())
+        return nullptr;
+
+    return m_audioTransmitter;
 }
 
 #endif // #ifdef ENABLE_AXIS

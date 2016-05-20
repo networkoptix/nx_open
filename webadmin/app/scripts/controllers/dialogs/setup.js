@@ -1,8 +1,9 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log, $timeout) {
+    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $log) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
+        $scope.Config = Config;
 
         if( $location.search().retry) {
             $log.log("This is second try");
@@ -30,6 +31,7 @@ angular.module('webadminApp')
             remoteLogin: Config.defaultLogin,
             remotePassword:''
         };
+        $scope.forms = {};
 
         $scope.serverAddress = window.location.host;
 
@@ -93,7 +95,7 @@ angular.module('webadminApp')
         function checkInternet(reload){
 
             $log.log("check internet connection");
-            if(true || debugMode){ // Temporary skip all internet checks
+            if(debugMode){ // Temporary skip all internet checks
                 $scope.hasInternetOnServer = true;
                 $scope.hasInternetOnClient = true;
                 return;
@@ -172,6 +174,13 @@ angular.module('webadminApp')
         }
 
 
+        $scope.getSystemName = function(model){
+            if(model.systemName){
+                return model.systemName;
+            }
+            return model;
+        };
+
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
@@ -195,43 +204,6 @@ angular.module('webadminApp')
             });
         }
 
-        var lastList = [];
-        var lastSearch = null;
-        $scope.getSystems = function(search){
-
-            if(search == lastSearch){
-                return lastList;
-            }
-            if(!search) {
-                return $scope.discoveredUrls;
-            }
-
-            var systems = $scope.discoveredUrls;
-
-            if(lastSearch){
-                systems.shift();
-            }
-
-            var oldSystem = _.find($scope.discoveredUrls,function(system){
-                return system.visibleName == search;
-            });
-
-            if(!oldSystem) {
-                systems.unshift({
-                    url: search,
-                    systemName: search,
-                    visibleName: search,
-                    hint: search,
-                    ip: search,
-                    name: search
-                });
-            }
-
-            lastSearch = search;
-            lastList = systems;
-            return lastList;
-        };
-
         function classifyError(error){
             var errorClasses = {
 
@@ -246,7 +218,7 @@ angular.module('webadminApp')
                 // Merge fail:
                 'INCOMPATIBLE':'fail',
                 'SAFE_MODE':'fail',
-                'CONFIGURATION_ERROR':'fail',
+                'CONFIGURATION_ERROR':'fail'
             };
             return errorClasses[error] || 'fail';
         }
@@ -283,12 +255,12 @@ angular.module('webadminApp')
                 return;
             }
             $scope.settings.remoteAuthError = false;
-            $scope.remoteSystemForm.remoteLogin.$setValidity('system',true);
-            $scope.remoteSystemForm.remotePassword.$setValidity('system',true);
+            $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system',true);
+            $scope.forms.remoteSystemForm.remotePassword.$setValidity('system',true);
 
             $scope.settings.remoteError = null;
             $scope.settings.remoteSystemError = false;
-            $scope.remoteSystemForm.remoteSystemName.$setValidity('system',true);
+            $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system',true);
         };
         function remoteErrorHandler(error){
             logMediaserverError(error);
@@ -302,14 +274,14 @@ angular.module('webadminApp')
             switch(classifyError(error.data.errorString)){
                 case 'auth':
                     $scope.settings.remoteAuthError = true;
-                    $scope.remoteSystemForm.remoteLogin.$setValidity('system',false);
-                    $scope.remoteSystemForm.remotePassword.$setValidity('system',false);
+                    $scope.forms.remoteSystemForm.remoteLogin.$setValidity('system',false);
+                    $scope.forms.remoteSystemForm.remotePassword.$setValidity('system',false);
                     $scope.next('merge');
                     break;
 
                 case 'system':
                     $scope.settings.remoteSystemError = true;
-                    $scope.remoteSystemForm.remoteSystemName.$setValidity('system',false);
+                    $scope.forms.remoteSystemForm.remoteSystemName.$setValidity('system',false);
                     $scope.next('merge');
                     break;
 
@@ -321,12 +293,13 @@ angular.module('webadminApp')
 
         function connectToAnotherSystem(){
             $log.log("Connect to another system");
+            var systemUrl = $scope.settings.remoteSystem.url || $scope.settings.remoteSystem;
             $scope.settings.remoteError = false;
             if(debugMode){
-                $log.log("Debug mode - only ping remote system: " + $scope.settings.remoteSystem.url);
+                $log.log("Debug mode - only ping remote system: " + systemUrl);
 
                 mediaserver.pingSystem(
-                    $scope.settings.remoteSystem.url,
+                    systemUrl,
                     $scope.settings.remoteLogin,
                     $scope.settings.remotePassword).then(function(r){
                         if(r.data.error !== 0 && r.data.error !=='0') {
@@ -341,7 +314,7 @@ angular.module('webadminApp')
 
             $log.log("Request /api/mergeSystems ...");
             mediaserver.mergeSystems(
-                $scope.settings.remoteSystem.url,
+                systemUrl,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
                 Config.defaultPassword,
@@ -712,8 +685,9 @@ angular.module('webadminApp')
             $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
                 discoverSystems();
-            },function(){
+            },function(error){
                 $log.log("Couldn't run setup wizard: auth failed");
+                $log.error(error);
                 if( $location.search().retry) {
                     $log.log("Second try: show error to user");
                     $scope.next("initFailure");

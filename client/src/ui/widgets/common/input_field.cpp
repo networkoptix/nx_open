@@ -62,7 +62,7 @@ class LabelWidthAccessor : public AbstractAccessor
 public:
     LabelWidthAccessor() {}
 
-    virtual QVariant get(const QObject *object) const override
+    virtual QVariant get(const QObject* object) const override
     {
         const QnInputField* w = qobject_cast<const QnInputField*>(object);
         if (!w)
@@ -70,7 +70,7 @@ public:
         return w->d_ptr->title->sizeHint().width();
     }
 
-    virtual void set(QObject *object, const QVariant &value) const override
+    virtual void set(QObject* object, const QVariant& value) const override
     {
         QnInputField* w = qobject_cast<QnInputField*>(object);
         if (!w)

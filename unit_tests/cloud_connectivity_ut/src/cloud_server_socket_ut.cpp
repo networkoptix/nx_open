@@ -9,7 +9,8 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 
 
 namespace nx {
@@ -167,9 +168,10 @@ public:
         init();
     }
 
-private:
+protected:
     hpm::MediatorFunctionalTest m_mediator;
 
+private:
     void init()
     {
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
@@ -177,12 +179,20 @@ private:
         auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
         ASSERT_NE(nullptr, server);
 
+        stun::AbstractAsyncClient::Settings stunClientSettings;
+        stunClientSettings.reconnectPolicy =
+            nx::network::RetryPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                std::chrono::milliseconds(0),
+                nx::network::RetryPolicy::kDefaultDelayMultiplier,
+                std::chrono::minutes(1));
+        SocketGlobals::mediatorConnector().reinitializeStunClient(stunClientSettings);
         SocketGlobals::mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 system.id,
                 server->serverId(),
                 system.authKey));
-        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.endpoint());
+        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
     }
 };
@@ -362,7 +372,7 @@ protected:
 
     void startClientThread(size_t clientCount)
     {
-        std::thread thread(
+        nx::utils::thread thread(
             [this, clientCount]()
             {
                 for (size_t i = 0; i < clientCount; ++i)
@@ -507,7 +517,7 @@ protected:
     std::shared_ptr<network::test::StunAsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     TestSyncQueue<Counters> m_connectedResults;
-    std::vector<std::thread> m_threads;
+    std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
@@ -523,6 +533,35 @@ TEST_F(CloudServerSocketStressTcpTest, MultiThread)
 {
     for (size_t i = 0; i < kThreadCount; ++i)
         startClientThread(kClientCount);
+}
+
+TEST_F(CloudServerSocketTest, reconnect)
+{
+    hpm::api::SystemCredentials currentCredentials =
+        *nx::network::SocketGlobals::mediatorConnector().getSystemCredentials();
+
+    auto system = m_mediator.addRandomSystem();
+    auto server = m_mediator.addRandomServerNotRegisteredOnMediator(system);
+
+    hpm::api::SystemCredentials otherCredentials;
+    otherCredentials.systemId = system.id;
+    otherCredentials.key = system.authKey;
+    otherCredentials.serverId = server->serverId();
+
+    for (int i = 0; i < 200; ++i)
+    {
+        CloudServerSocket cloudServerSocket(
+            nx::network::SocketGlobals::mediatorConnector().systemConnection());
+        ASSERT_EQ(cloudServerSocket.registerOnMediatorSync(), hpm::api::ResultCode::ok);
+        ASSERT_TRUE(cloudServerSocket.listen(128));
+        cloudServerSocket.moveToListeningState();
+
+        //breaking connection to mediator
+        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(otherCredentials);
+        std::swap(currentCredentials, otherCredentials);
+
+        cloudServerSocket.pleaseStopSync();
+    }
 }
 
 //TEST_F(CloudServerSocketTest, aioCancellation)

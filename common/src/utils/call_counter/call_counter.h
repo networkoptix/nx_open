@@ -4,13 +4,14 @@
 #include <map>
 #include <cstdint>
 #include <mutex>
-#include <thread>
 #include <atomic>
 #include <condition_variable>
 #include <chrono>
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/thread.h>
+
 
 class QnCallCounter : public Singleton<QnCallCounter>
 {
@@ -38,7 +39,7 @@ private:
 private:
     std::map<QString, CallInfo> m_callInfo;
 
-    std::thread m_thread;
+    nx::utils::thread m_thread;
     std::mutex m_mutex;
 
     std::condition_variable m_cond;

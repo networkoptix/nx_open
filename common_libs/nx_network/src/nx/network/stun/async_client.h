@@ -9,6 +9,7 @@
 #include "message_parser.h"
 #include "message_serializer.h"
 #include "nx/network/aio/timer.h"
+#include <nx/network/retry_timer.h>
 
 #ifdef _DEBUG
     #include <map>
@@ -22,11 +23,30 @@ namespace stun {
 class NX_NETWORK_API AbstractAsyncClient
 {
 public:
-    static const struct Timeouts { uint send, recv, reconnect; } DEFAULT_TIMEOUTS;
+    struct Settings
+    {
+        std::chrono::milliseconds sendTimeout;
+        std::chrono::milliseconds recvTimeout;
+        nx::network::RetryPolicy reconnectPolicy;
 
-    virtual ~AbstractAsyncClient() {}
+        Settings() /* Defaults */
+        :
+            sendTimeout(3000),
+            recvTimeout(3000),
+            reconnectPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                std::chrono::milliseconds(500),
+                nx::network::RetryPolicy::kDefaultDelayMultiplier,
+                std::chrono::minutes(1))
+        {}
+    };
+
+    static const Settings kDefaultSettings;
+
+    virtual ~AbstractAsyncClient() = default;
 
     typedef std::function<void(Message)> IndicationHandler;
+    typedef std::function<void()> ReconnectHandler;
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, Message)> RequestHandler;
 
@@ -46,13 +66,11 @@ public:
     */
     virtual bool setIndicationHandler(int method, IndicationHandler handler) = 0;
 
-    //!Stops monitoring for certain indications
+    //!Subscribes for the event of successful reconnect
     /*!
-        \param method Is monitoring indication type
-        \note does not affect indications in progress
-        \return true on success, false if this method was not monitored
+        \param handler is called on every successfull reconnect
     */
-    virtual bool ignoreIndications(int method) = 0;
+    virtual void addOnReconnectedHandler(ReconnectHandler handler) = 0;
 
     //!Sends message asynchronously
     /*!
@@ -94,14 +112,14 @@ public:
 
     typedef BaseConnectionType ConnectionType;
 
-    AsyncClient(Timeouts timeouts = DEFAULT_TIMEOUTS);
+    AsyncClient(Settings timeouts = kDefaultSettings);
     ~AsyncClient() override;
 
     Q_DISABLE_COPY( AsyncClient );
 
     void connect(SocketAddress endpoint, bool useSsl = false) override;
     bool setIndicationHandler(int method, IndicationHandler handler) override;
-    bool ignoreIndications(int method) override;
+    void addOnReconnectedHandler(ReconnectHandler handler) override;
     void sendRequest(Message request, RequestHandler handler) override;
     SocketAddress localAddress() const override;
     SocketAddress remoteAddress() const override;
@@ -123,24 +141,25 @@ private:
     void openConnectionImpl(QnMutexLockerBase* lock);
     void closeConnectionImpl(QnMutexLockerBase* lock, SystemError::ErrorCode code);
 
-    void dispatchRequestsInQueue(QnMutexLockerBase* lock);
+    void dispatchRequestsInQueue(const QnMutexLockerBase* lock);
     void onConnectionComplete(SystemError::ErrorCode code);
     void processMessage(Message message );
 
 private:
-    const Timeouts m_timeouts;
+    const Settings m_settings;
 
     mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
     bool m_useSsl;
     State m_state;
 
-    nx::network::aio::Timer m_timer;
+    nx::network::RetryTimer m_timer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 
     std::list<std::pair<Message, RequestHandler>> m_requestQueue;
     std::map<int, IndicationHandler> m_indicationHandlers;
+    std::vector<ReconnectHandler> m_reconnectHandlers;
     std::map<Buffer,RequestHandler> m_requestsInProgress;
 };
 

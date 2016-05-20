@@ -9,11 +9,11 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
 
-class QnResourceTreeItemDelegate;
+class QnResourceItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
 class QnResourceTreeSortProxyModel;
-class QnResourcePoolModelCustomColumnDelegate;
+class QnResourceTreeModelCustomColumnDelegate;
 
 namespace Ui {
     class QnResourceTreeWidget;
@@ -112,8 +112,8 @@ public:
 
     bool isSimpleSelectionEnabled() const;
 
-    QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
-    void setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate);
+    QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
+    void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 
     QAbstractItemView* treeView() const;
 
@@ -153,7 +153,7 @@ private:
 
     QnResourceCriterion m_criterion;
 
-    QnResourceTreeItemDelegate *m_itemDelegate;
+    QnResourceItemDelegate *m_itemDelegate;
 
     QnResourceTreeSortProxyModel *m_resourceProxyModel;
 

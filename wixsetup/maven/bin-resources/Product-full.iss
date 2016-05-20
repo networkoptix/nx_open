@@ -10,6 +10,8 @@ Uninstallable=no
 CreateAppDir=no
 ArchitecturesAllowed={#Arch}
 LicenseFile=License.rtf
+WizardImageFile=innosetup.bmp
+WizardSmallImageFile=innosetup_small.bmp
 
 [Languages]
 #if Lang == "ru-ru"
@@ -74,6 +76,14 @@ Name: "client"; Description: "Client"; Types: full client; Check: ClientCheck
 [Files]
 Source: "{#ServerMsiFolder}\{#ServerMsiName}"; DestDir: "{tmp}"; Components: server; Check: ServerCheck
 Source: "{#ClientMsiFolder}\{#ClientMsiName}"; DestDir: "{tmp}"; Components: client; Check: ClientCheck
+Source: "{#ClientMsiFolder}\cmnff1.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnff2.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnicu.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnlib1.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnlib2.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnqt1.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnqt2.cab"; DestDir: "{tmp}"
+Source: "{#ClientMsiFolder}\cmnqtui.cab"; DestDir: "{tmp}"
 
 [Run]
 Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\{#ServerMsiName}"" LICENSE_ALREADY_ACCEPTED=yes"; Components: server; Check: ServerCheck

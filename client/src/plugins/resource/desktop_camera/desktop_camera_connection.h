@@ -6,6 +6,7 @@
 #include "core/resource/resource_fwd.h"
 #include <nx/network/simple_http_client.h>
 #include "network/tcp_connection_processor.h"
+#include <nx/network/http/httpclient.h>
 
 class QnDesktopResource;
 class QnTCPConnectionProcessor;
@@ -19,6 +20,8 @@ class QnDesktopCameraConnectionProcessor;
 class QnDesktopCameraConnection: public QnLongRunnable
 {
 public:
+    typedef QnLongRunnable base_type;
+
     QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &server);
     virtual ~QnDesktopCameraConnection();
 
@@ -30,8 +33,9 @@ private:
 private:
     QnDesktopResource* m_owner;
     QnMediaServerResourcePtr m_server;
-    CLSimpleHTTPClient* connection;
-    QnDesktopCameraConnectionProcessor* processor;
+    std::shared_ptr<QnDesktopCameraConnectionProcessor> processor;
+    QSharedPointer<AbstractStreamSocket> tcpSocket;
+    std::unique_ptr<nx_http::HttpClient> httpClient;
     QnMutex m_mutex;
 };
 

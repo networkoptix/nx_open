@@ -3,7 +3,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 
@@ -154,7 +154,7 @@ AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
     return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
-aio::AbstractAioThread* MultipleServerSocket::getAioThread()
+aio::AbstractAioThread* MultipleServerSocket::getAioThread() const
 {
     return m_timerSocket.getAioThread();
 }

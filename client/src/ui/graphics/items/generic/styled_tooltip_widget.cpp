@@ -8,8 +8,9 @@
 #include <ui/common/palette.h>
 
 
-QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem *parent):
-    base_type(parent)
+QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
+    base_type(parent),
+    m_tailLength(10.0)
 {
     setContentsMargins(5.0, 5.0, 5.0, 5.0);
     setTailWidth(5.0);
@@ -27,9 +28,27 @@ QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem *parent):
     updateTailPos();
 }
 
-QnStyledTooltipWidget::~QnStyledTooltipWidget() {}
+QnStyledTooltipWidget::~QnStyledTooltipWidget() 
+{
+}
 
-void QnStyledTooltipWidget::setGeometry(const QRectF &rect) {
+qreal QnStyledTooltipWidget::tailLength() const
+{
+    return m_tailLength;
+}
+
+void QnStyledTooltipWidget::setTailLength(qreal tailLength)
+{
+    if (qFuzzyCompare(tailLength, m_tailLength))
+        return;
+
+    m_tailLength = tailLength;
+
+    updateTailPos();
+}
+
+void QnStyledTooltipWidget::setGeometry(const QRectF& rect) 
+{
     QSizeF oldSize = size();
 
     base_type::setGeometry(rect);
@@ -40,5 +59,5 @@ void QnStyledTooltipWidget::setGeometry(const QRectF &rect) {
 
 void QnStyledTooltipWidget::updateTailPos() {
     QRectF rect = this->rect();
-    setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + 10.0));
+    setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + m_tailLength));
 }

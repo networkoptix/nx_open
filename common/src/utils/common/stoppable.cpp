@@ -1,7 +1,7 @@
 
 #include "stoppable.h"
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 void QnStoppableAsync::pleaseStopSync()
@@ -24,18 +24,13 @@ void QnStoppableAsync::pleaseStopImpl(
     for( auto& ptr : stoppables )
         tmpStoppables.push_back( ptr.get() );
 
-    // TODO: #mux refactor with move lambda
-    auto sharedStopables = std::make_shared<
-            std::vector< std::unique_ptr< QnStoppableAsync > > >(
-                std::move( stoppables ) );
-    auto sharedHandler = std::make_shared<
-            nx::utils::MoveOnlyFunc< void() > >( std::move( completionHandler ) );
-
-    nx::BarrierHandler barrier( [ = ]()
-    {
-        sharedStopables->clear();
-        sharedHandler->operator()();
-    } );
+    nx::BarrierHandler barrier(
+        [stoppables = std::move(stoppables),
+            completionHandler = std::move(completionHandler)]() mutable
+        {
+            stoppables.clear();
+            completionHandler();
+        });
 
     for( const auto& ptr : tmpStoppables )
         ptr->pleaseStop( barrier.fork() );

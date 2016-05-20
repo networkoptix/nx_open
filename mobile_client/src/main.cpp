@@ -1,6 +1,8 @@
 #include <QtCore/QDir>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
+#include <QtGui/QFont>
+#include <QtGui/QOpenGLContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
@@ -8,19 +10,30 @@
 
 #include <time.h>
 
-#include "api/app_server_connection.h"
-#include "api/runtime_info_manager.h"
-#include "nx_ec/ec2_lib.h"
-#include "common/common_module.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/mobile_client_camera_factory.h"
-#include "utils/common/app_info.h"
-#include "nx/utils/log/log.h"
-#include "utils/settings_migration.h"
+#include <nx/utils/log/log.h>
+#include <nx/utils/flag_config.h>
 
-#include <context/context.h>
-#include <mobile_client/mobile_client_module.h>
-#include <mobile_client/mobile_client_settings.h>
+namespace mobile_client {
+
+class FlagConfig: public nx::utils::FlagConfig
+{
+public:
+    using nx::utils::FlagConfig::FlagConfig;
+    NX_FLAG(0, enableEc2TranLog);
+};
+FlagConfig conf("mobile_client");
+
+} // namespace mobile_client
+
+#include <api/app_server_connection.h>
+#include <api/runtime_info_manager.h>
+#include <nx_ec/ec2_lib.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <utils/settings_migration.h>
+
+#include "context/context.h"
+#include "mobile_client/mobile_client_module.h"
 
 #include "ui/color_theme.h"
 #include "ui/resolution_util.h"
@@ -29,39 +42,10 @@
 #include "ui/window_utils.h"
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
-#include <ui/helpers/font_loader.h>
+#include "ui/helpers/font_loader.h"
 
-#include <nx/media/video_decoder_registry.h>
-#include <nx/media/audio_decoder_registry.h>
-#include <nx/media/ffmpeg_video_decoder.h>
-#include <nx/media/ffmpeg_audio_decoder.h>
-#include <nx/media/jpeg_decoder.h>
-
-
-#if defined(Q_OS_ANDROID)
-#include <nx/media/android_video_decoder.h>
-#include <nx/media/android_audio_decoder.h>
-#endif
-
-#include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLFunctions>
+#include <nx/media/decoder_registrar.h>
 #include "resource_allocator.h"
-
-void initDecoders(QQuickWindow *window)
-{
-    using namespace nx::media;
-#if defined(Q_OS_ANDROID)
-    std::shared_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
-    static const int kHardwareDecodersCount = 1;
-    VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(std::move(allocator), kHardwareDecodersCount);
-    AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
-#endif
-#ifndef DISABLE_FFMPEG
-    VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
-    AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
-#endif
-    VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();
-}
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -154,7 +138,9 @@ int runUi(QGuiApplication *application) {
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    initDecoders(mainWindow.data());
+    std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
+        mainWindow.data()));
+    nx::media::DecoderRegistrar::registerDecoders(allocator);
 
     return application->exec();
 }
@@ -185,8 +171,18 @@ int runApplication(QGuiApplication *application) {
     return result;
 }
 
-void initLog() {
+void initLog()
+{
     QnLog::initLog(lit("INFO"));
+
+    if (mobile_client::conf.enableEc2TranLog)
+    {
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            QLatin1String(mobile_client::conf.tempPath()) + QLatin1String("ec2_tran"),
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
+            cl_logDEBUG2);
+    }
 }
 
 int main(int argc, char *argv[])

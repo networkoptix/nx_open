@@ -8,7 +8,6 @@
 
 #include <QObject>
 
-#include <api/api_fwd.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/camera/camera_diagnostics.h>

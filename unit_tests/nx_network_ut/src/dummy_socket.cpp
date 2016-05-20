@@ -197,7 +197,7 @@ void DummySocket::registerTimer(
 {
 }
 
-aio::AbstractAioThread* DummySocket::getAioThread()
+aio::AbstractAioThread* DummySocket::getAioThread() const
 {
     return nullptr;
 }

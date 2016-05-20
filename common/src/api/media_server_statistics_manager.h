@@ -4,9 +4,9 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/statistics_reply.h>
+#include <nx/utils/uuid.h>
 
 class QnMediaServerStatisticsStorage;
 

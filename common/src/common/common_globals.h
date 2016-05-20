@@ -73,7 +73,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020
+        ShareIpCapability                   = 0x020,
+        AudioTransmitCapability             = 0x040
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -350,7 +351,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         SF_HasPublicIP      = 0x004,
         SF_IfListCtrl       = 0x008,
         SF_timeCtrl         = 0x010,
-        SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+        //SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
         SF_ArmServer        = 0x040,
         SF_Has_HDD          = 0x080,
         SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
@@ -534,6 +535,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
+        ConnectionAliasRole,                        /**< Role for alias of connection. Used in QnActions::ConnectAction, QnLoginDialog. */
+        AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
+                                                        (or to the last system) automatically next time */
+        StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
+                                                         Used in QnActions::ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
@@ -827,19 +833,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
+        ModifyLayoutPermission          = Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission, /**< Permission to modify without saving. */
         FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
         FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
-                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
+                                            WritePasswordPermission | WriteAccessRightsPermission,
 
         /* Media-specific permissions. */
-        ExportPermission                = 0x2000,   /**< Permission to export video parts. */
+        ExportPermission                = 0x800,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
         WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
@@ -860,55 +866,58 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum GlobalPermission
     {
         /* Generic permissions. */
-        NoGlobalPermissions                     = 0x00000000,   /**< No access */
+        NoGlobalPermissions                     = 0x00000000,   /**< Only live video access. */
 
-        GlobalOwnerPermission                   = 0x00000001,   /**< Root, can edit admins. */
-        GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
-        GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
-        /* DeprecatedGlobalEditUsersPermission  = 0x00000008 */
-        /*DeprecatedEditCamerasPermission       = 0x00000010 */
-        GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
-        /*DeprecatedViewExportArchivePermission = 0x00000040 */
-        GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
-        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
-        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
-        GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
-        GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
-        /*DeprecatedPanicPermission             = 0x00001000 */
-        GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
+        /* Admin permissions. */
+        GlobalAdminPermission                   = 0x00000001,   /**< Admin, can edit other non-admins. */
+
+        /* Manager permissions. */
+        GlobalEditServersPermissions            = 0x00000002,   /**< Can edit server settings. */
+        GlobalEditCamerasPermission             = 0x00000004,   /**< Can edit camera settings. */
+        GlobalEditLayoutsPermission             = 0x00000008,   /**< Can create and edit _global_ layouts. */
+        GlobalControlVideoWallPermission        = 0x00000010,   /**< Can control videowalls */
+
+        /* Viewer permissions. */
+        GlobalViewArchivePermission             = 0x00000020,   /**< Can view archives of available cameras. */
+        GlobalExportPermission                  = 0x00000040,   /**< Can export archives of available cameras. */
+        GlobalViewBookmarksPermission           = 0x00000080,   /**< Can view bookmarks of available cameras. */
+        GlobalManageBookmarksPermission         = 0x00000100,   /**< Can modify bookmarks of available cameras. */
+
+        /* Input permissions. */
+        GlobalUserInputPermission               = 0x00000200,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
 
         /* Resources access permissions */
         GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
         GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
         GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
 
-        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
-
-        /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
-        DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */
-        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */
-        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Deprecated. Can view and export archives of available cameras. */
-        DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
 
         /* Shortcuts. */
 
-        /* Live viewer has access to all cameras by default */
-        GlobalLiveViewerPermissionSet       = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+        /* Access to all resources. */
+        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
 
-        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission,
+        /* Live viewer has access to all cameras and global layouts by default. */
+        GlobalLiveViewerPermissionSet       = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+
+        /* Viewer can additionally view archive and bookmarks and export video. */
+        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
+
+        /* Advanced viewer can manage bookmarks and use various input methods. */
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission,
+
+        GlobalManagerPermissionSet          = GlobalAccessResourcesPermissionsSet | GlobalControlVideoWallPermission |
+                                              GlobalEditServersPermissions | GlobalEditCamerasPermission| GlobalEditLayoutsPermission,
+
+        /* Admin can do everything. */
+        GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalManagerPermissionSet,
+
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalPtzControlPermission,
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalPtzControlPermission,
-
-        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-
-        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
-                                              GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessAllServersPermission  ,
-        GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
+        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,
     };
 
     Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)

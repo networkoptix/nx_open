@@ -6,7 +6,7 @@
 #include <nx/network/stun/async_client.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/retry_timer.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "cdb_endpoint_fetcher.h"
@@ -25,6 +25,9 @@ class NX_NETWORK_API MediatorConnector
 public:
     MediatorConnector();
 
+    /** Caller MUST ensure that no one uses stun client */
+    void reinitializeStunClient(
+        stun::AbstractAsyncClient::Settings stunClientSettings);
     /** Shall be called to enable cloud functionality for application */
     void enable( bool waitComplete = false );
 
@@ -35,8 +38,8 @@ public:
     std::shared_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
-    void mockupAddress( SocketAddress address );
-    void mockupAddress( const MediatorConnector* mc );
+    void mockupAddress( SocketAddress address, bool suppressWarning = false );
+    void mockupAddress( const MediatorConnector& connector );
 
     void setSystemCredentials( boost::optional<SystemCredentials> value );
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;

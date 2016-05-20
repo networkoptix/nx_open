@@ -56,4 +56,6 @@
 #include <QtCore/QtDebug>
 #include <QtCore/QUrlQuery>
 
+#include <nx/utils/deprecation.h>
+
 #endif

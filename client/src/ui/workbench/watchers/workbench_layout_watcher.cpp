@@ -20,34 +20,32 @@ QnWorkbenchLayoutWatcher::QnWorkbenchLayoutWatcher(QObject *parent):
 QnWorkbenchLayoutWatcher::~QnWorkbenchLayoutWatcher() {
 }
 
-void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
+{
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(!layout)
         return;
 
-    for (QnLayoutItemData data: layout->getItems()) {
+    for (QnLayoutItemData data: layout->getItems())
+    {
+        QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
 
-        QnResourcePtr resource;
-        /* Try to find online resource by id. */
-        if (!data.resource.id.isNull()) {
-            resource = qnResPool->getResourceById(data.resource.id);
-        }
-        else if (!data.resource.path.isEmpty()) {
-            /* Try to find online resource by unique id. */
-            resource = qnResPool->getResourceByUniqueId(data.resource.path);
-            if(!resource) {
+        if (!resource && !data.resource.uniqueId.isEmpty())
+        {
                 /* Try to load local resource. */
-                resource = QnResourcePtr(new QnAviResource(data.resource.path));
-                qnResPool->addResource(resource);
-            }
+            resource = QnResourcePtr(new QnAviResource(data.resource.uniqueId));
+            qnResPool->addResource(resource);
         }
 
-        if(resource) {
+        if (resource)
+        {
             data.resource.id = resource->getId();
-            data.resource.path = resource->getUniqueId();
+            data.resource.uniqueId = resource->getUniqueId();
             layout->updateItem(data.uuid, data);
-        } else {
-            qnWarning("Invalid item with empty id and invalid path in layout '%1', item id %2 path %3.", layout->getName(), data.resource.id, data.resource.path);
+        }
+        else
+        {
+            qnWarning("Invalid item with empty id and invalid path in layout '%1', item path %2.", layout->getName(), data.resource.uniqueId);
             layout->removeItem(data.uuid);
         }
     }

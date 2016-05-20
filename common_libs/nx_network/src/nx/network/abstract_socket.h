@@ -134,6 +134,7 @@ public:
         By default, there is no timeout
     */
     virtual bool setRecvTimeout( unsigned int millis ) = 0;
+    bool setRecvTimeout( std::chrono::milliseconds m ) { return setRecvTimeout( m.count() ); }
     //!Get socket's receive timeout (in millis)
     /*!
         \param millis In case of error value is udefined
@@ -147,6 +148,7 @@ public:
         By default, there is no timeout
     */
     virtual bool setSendTimeout( unsigned int ms ) = 0;
+    bool setSendTimeout( std::chrono::milliseconds m ) { return setSendTimeout( m.count() ); }
     //!Get socket's send timeout (in millis)
     /*!
         \param millis In case of error value is udefined
@@ -180,7 +182,7 @@ public:
     /*!
         \note if socket is not bound to any thread yet, binds it automatically
     */
-    virtual nx::network::aio::AbstractAioThread* getAioThread() = 0;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const = 0;
 
     //!Binds current socket to specified AIOThread
     /*!
@@ -254,7 +256,7 @@ public:
         \note uses sendTimeout
     */
     virtual void connectAsync(
-        const SocketAddress& addr,
+        const SocketAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 
     //!Reads bytes from socket asynchronously
@@ -272,8 +274,18 @@ public:
         \warning Multiple concurrent asynchronous write operations result in undefined behavour
     */
     virtual void readSomeAsync(
-        nx::Buffer* const buf,
+        nx::Buffer* const buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+
+    //!Reads at least @param minimalSize bytes from socket asynchronously
+    /*!
+        Calls @param handler when least @param minimalSize bytes are read or
+            error or disconnect has happend.
+        @note Works similar to POSIX MSG_WAITALL flag but async.
+    */
+    void readAsyncAtLeast(
+        nx::Buffer* const buffer, size_t minimalSize,
+        std::function<void(SystemError::ErrorCode, size_t)> handler);
 
     //!Asynchnouosly writes all bytes from input buffer
     /*!
@@ -285,7 +297,7 @@ public:
             \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
     */
     virtual void sendAsync(
-        const nx::Buffer& buf,
+        const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
     //!Register timer on this socket
@@ -306,7 +318,7 @@ public:
     */
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc< void() > handler) = 0;
+        nx::utils::MoveOnlyFunc<void()> handler) = 0;
 
     //!Cancels async operation and blocks until cancellation is stopped
     /*!
@@ -319,6 +331,12 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of QnStoppable::pleaseStopSync
     virtual void pleaseStopSync() override;
+
+private:
+    void readAsyncAtLeastImpl(
+        nx::Buffer* const buffer, size_t minimalSize,
+        std::function<void(SystemError::ErrorCode, size_t)> handler,
+        size_t initBufSize);
 };
 
 struct NX_NETWORK_API StreamSocketInfo

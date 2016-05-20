@@ -6,7 +6,6 @@
 #include <condition_variable>
 #include <chrono>
 #include <deque>
-#include <future>
 #include <mutex>
 #include <thread>
 
@@ -20,6 +19,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/utils/std/thread.h>
 
 
 namespace nx {
@@ -112,10 +112,10 @@ TEST( Socket, AsyncOperationCancellation )
     static const int TEST_RUNS = 5;
     static const int THREADS = 3;
 
-    std::vector<std::thread> threads(THREADS);
+    std::vector<nx::utils::thread> threads(THREADS);
     for (size_t i = 0; i < threads.size(); ++i)
     {
-        threads[i] = std::thread(
+        threads[i] = nx::utils::thread(
             [](){
                 for (int j = 0; j < TEST_RUNS; ++j)
                 {
@@ -318,8 +318,7 @@ TEST( Socket, HostNameResolveCancellation )
 
 TEST( Socket, BadHostNameResolve )
 {
-    static const int TEST_RUNS = 10000;
-
+    static const int TEST_RUNS = 1000;
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
@@ -335,47 +334,47 @@ TEST( Socket, BadHostNameResolve )
     }
 }
 
-TEST( Socket, postCancellation )
+TEST(Socket, postCancellation)
 {
     static const int TEST_RUNS = 10;
 
-    std::atomic<size_t> postCalls( 0 );
+    std::atomic<size_t> postCalls(0);
 
     auto testFunctor = [&postCalls]()
     {
-        std::atomic<size_t> counter( 0 );
+        std::atomic<size_t> counter(0);
 
-        for( int i = 0; i < TEST_RUNS; ++i )
+        for (int i = 0; i < TEST_RUNS; ++i)
         {
             size_t curCounterVal = ++counter;
 
-            std::vector<std::unique_ptr<AbstractStreamSocket>> sockets( 50 );
+            std::vector<std::unique_ptr<AbstractStreamSocket>> sockets(50);
             std::for_each(
                 sockets.begin(),
                 sockets.end(),
-                []( std::unique_ptr<AbstractStreamSocket>& ptr ){ ptr = SocketFactory::createStreamSocket(); } );
+                [](std::unique_ptr<AbstractStreamSocket>& ptr) { ptr = SocketFactory::createStreamSocket(); });
             //std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
 
-            for( const auto& sock: sockets )
-                sock->post( [curCounterVal, &counter, &postCalls]() {
-                    ASSERT_EQ( curCounterVal, (size_t)counter );
-                    ++postCalls;
-                    QThread::usleep( 10 );
-                } );
+            for (const auto& sock : sockets)
+                sock->post([curCounterVal, &counter, &postCalls]() {
+                ASSERT_EQ(curCounterVal, (size_t)counter);
+                ++postCalls;
+                QThread::usleep(10);
+            });
 
-            for( const auto& sock : sockets )
+            for (const auto& sock : sockets)
                 sock->pleaseStopSync();
 
             //QThread::usleep( 100 );
         }
     };
 
-    std::vector<std::future<void>> futures;
-    for( int i = 0; i < 25; ++i )
-        futures.emplace_back( std::async( std::launch::async, testFunctor ) );
+    std::vector<nx::utils::thread> testThreads;
+    for (int i = 0; i < 25; ++i)
+        testThreads.emplace_back(nx::utils::thread(testFunctor));
 
-    for( auto& f: futures )
-        f.wait();
+    for (auto& testThread : testThreads)
+        testThread.join();
 }
 
 }   //test

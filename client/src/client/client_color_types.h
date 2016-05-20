@@ -29,6 +29,8 @@ public:
 
     QColor pastBookmark;
     QColor futureBookmark;
+    QColor pastBookmarkHover;
+    QColor futureBookmarkHover;
     QColor pastBookmarkBound;
     QColor futureBookmarkBound;
 
@@ -46,10 +48,10 @@ public:
     std::vector<QColor> tickmarkText;
 };
 #define QnTimeSliderColors_Fields (positionMarker)(indicator)(selection)(selectionMarker)\
-    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)(separator)\
-    (dateBarBackgrounds)(dateBarText)(pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)\
+    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
+    (pastBookmark)(futureBookmark)(pastBookmarkHover)(futureBookmarkHover)(pastBookmarkBound)(futureBookmarkBound)\
     (pastLastMinuteBackground)(futureLastMinuteBackground)(pastLastMinuteStripe)(futureLastMinuteStripe)\
-    (tickmarkLines)(tickmarkText)
+    (separator)(dateBarBackgrounds)(dateBarText)(tickmarkLines)(tickmarkText)
 
 struct QnTimeScrollBarColors {
     QnTimeScrollBarColors();
@@ -160,6 +162,15 @@ struct QnHistogramColors {
     QColor text;
 };
 #define QnHistogramColors_Fields (background)(border)(histogram)(selection)(grid)(text)
+
+struct QnTwoWayAudioWidgetColors
+{
+    QnTwoWayAudioWidgetColors();
+
+    QColor background;
+    QColor visualizer;
+};
+#define QnTwoWayAudioWidgetColors_Fields (background)(visualizer)
 
 
 struct QnResourceWidgetFrameColors {
@@ -308,10 +319,25 @@ struct QnGraphicsMessageBoxColors {
 };
 #define QnGraphicsMessageBoxColors_Fields (text)(frame)(window)
 
+struct QnResourceItemColors
+{
+    QnResourceItemColors();
+
+    QColor mainText;
+    QColor mainTextSelected;
+    QColor mainTextAccented;
+    QColor extraText;
+    QColor extraTextSelected;
+    QColor extraTextAccented;
+};
+#define QnResourceItemColors_Fields (mainText)(mainTextSelected)(mainTextAccented) \
+                                (extraText)(extraTextSelected)(extraTextAccented)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
+    (QnTwoWayAudioWidgetColors) \
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \
@@ -320,6 +346,7 @@ struct QnGraphicsMessageBoxColors {
     (QnBookmarkColors) \
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
+    (QnResourceItemColors) \
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

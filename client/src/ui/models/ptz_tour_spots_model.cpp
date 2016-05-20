@@ -102,7 +102,7 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
 
 QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const {
     QnPtzPresetList result = m_presets;
-    qSort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
+    std::sort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
         return naturalStringLess(l.name, r.name);
     });
     return result;

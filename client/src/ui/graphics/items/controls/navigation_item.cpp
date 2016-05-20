@@ -6,6 +6,8 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
 
+#include <common/common_globals.h>
+
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -35,9 +37,11 @@
 #include <core/resource/resource.h>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include "time_slider.h"
 #include "time_scroll_bar.h"
+#include "timeline_placeholder.h"
 #include "clock_label.h"
 
 QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
@@ -103,10 +107,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_thumbnailsButton->setPreferredSize(34, 24);
 
     /* Create clock label. */
-    QnClockLabel *clockLabel = new QnClockLabel(this);
-    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignCenter);
+    QnClockLabel* clockLabel = new QnClockLabel(this);
+    clockLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     clockLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     clockLabel->setPreferredHeight(28.0);
+
+    /* Workaround to avoid size flickering due to our scene scaling: */
+    clockLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     /* Create sliders. */
     m_speedSlider = new QnSpeedSlider(this);
@@ -122,8 +129,32 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
 
+    GraphicsLabel* timelinePlaceholder = new QnTimelinePlaceholder(this, m_timeSlider);
+    timelinePlaceholder->setPerformanceHint(GraphicsLabel::PixmapCaching);
+
     m_timeScrollBar = new QnTimeScrollBar(this);
     m_timeScrollBar->setPreferredHeight(16);
+
+    m_separators = new QnFramedWidget(this);
+    m_separators->setWindowBrush(Qt::NoBrush);
+    m_separators->setFrameShape(Qn::RectangularFrame);
+    m_separators->setFrameBorders(Qt::LeftEdge | Qt::RightEdge);
+    m_separators->setFrameColor(palette().color(QPalette::Midlight));
+    m_separators->setFrameWidth(1.0);
+
+    auto updateTimelineMode =
+        [this, timelinePlaceholder]()
+        {
+            bool isTimeline = isTimelineRelevant();
+            m_timeSlider->setVisible(isTimeline);
+            m_timeScrollBar->setVisible(isTimeline);
+            timelinePlaceholder->setVisible(!isTimeline);
+            m_separators->setFrameColor(palette().color(isTimeline ? QPalette::Shadow : QPalette::Midlight));
+            m_separators->setFrameWidth(isTimeline ? 2.0 : 1.0);
+        };
+
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,      this, updateTimelineMode);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,   this, updateTimelineMode);
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
@@ -181,6 +212,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     sliderLayout->setSpacing(0);
     sliderLayout->addItem(m_timeSlider);
     sliderLayout->addItem(m_timeScrollBar);
+    sliderLayout->addItem(timelinePlaceholder);
+
+    m_timeSlider->hide();
+    m_timeScrollBar->hide();
 
     QGraphicsLinearLayout* mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -194,25 +229,26 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Set up handlers. */
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-    connect(streamSynchronizer,             SIGNAL(runningChanged()),                   this,           SLOT(updateSyncButtonChecked()));
-    connect(streamSynchronizer,             SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonChecked()));
-    connect(streamSynchronizer,             SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonEnabled()));
+    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::runningChanged,     this,           &QnNavigationItem::updateSyncButtonChecked);
+    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::effectiveChanged,   this,           &QnNavigationItem::updateSyncButtonChecked);
+    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::effectiveChanged,   this,           &QnNavigationItem::updateSyncButtonEnabled);
 
-    connect(m_speedSlider,                  SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
-    connect(m_volumeSlider,                 SIGNAL(valueChanged(qint64)),               this,           SLOT(updateMuteButtonChecked()));
+    connect(m_speedSlider,      &QnSpeedSlider::roundedSpeedChanged,                this,           &QnNavigationItem::updateNavigatorSpeedFromSpeedSlider);
+    connect(m_volumeSlider,     &QnVolumeSlider::valueChanged,                      this,           &QnNavigationItem::updateMuteButtonChecked);
 
-    connect(action(QnActions::PreviousFrameAction), SIGNAL(triggered()),                       this,           SLOT(at_stepBackwardButton_clicked()));
-    connect(action(QnActions::NextFrameAction),    SIGNAL(triggered()),                        this,           SLOT(at_stepForwardButton_clicked()));
-    connect(action(QnActions::JumpToStartAction),  SIGNAL(triggered()),                        navigator(),    SLOT(jumpBackward()));
-    connect(action(QnActions::JumpToEndAction),    SIGNAL(triggered()),                        navigator(),    SLOT(jumpForward()));
+    connect(action(QnActions::PreviousFrameAction), &QAction::triggered,            this,           &QnNavigationItem::at_stepBackwardButton_clicked);
+    connect(action(QnActions::NextFrameAction),     &QAction::triggered,            this,           &QnNavigationItem::at_stepForwardButton_clicked);
+    connect(action(QnActions::JumpToStartAction),   &QAction::triggered,            navigator(),    &QnWorkbenchNavigator::jumpBackward);
+    connect(action(QnActions::JumpToEndAction),     &QAction::triggered,            navigator(),    &QnWorkbenchNavigator::jumpForward);
+    connect(action(QnActions::JumpToLiveAction),    &QAction::triggered,            this,           &QnNavigationItem::at_liveButton_clicked);
+    connect(action(QnActions::ToggleSyncAction),    &QAction::triggered,            this,           &QnNavigationItem::at_syncButton_clicked);
+    connect(action(QnActions::PlayPauseAction),     &QAction::toggled,              navigator(),    &QnWorkbenchNavigator::setPlaying);
+    connect(action(QnActions::PlayPauseAction),     &QAction::toggled,              this,           &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
+    connect(action(QnActions::PlayPauseAction),     &QAction::toggled,              this,           &QnNavigationItem::updatePlaybackButtonsIcons);
 
-    connect(action(QnActions::PlayPauseAction),    SIGNAL(toggled(bool)),                      navigator(),    SLOT(setPlaying(bool)));
-    connect(action(QnActions::PlayPauseAction),    SIGNAL(toggled(bool)),                      this,           SLOT(updateSpeedSliderParametersFromNavigator()));
-    connect(action(QnActions::PlayPauseAction),    SIGNAL(toggled(bool)),                      this,           SLOT(updatePlaybackButtonsIcons()));
-
-    connect(action(QnActions::JumpToLiveAction),   SIGNAL(triggered()),                        this,           SLOT(at_liveButton_clicked()));
-    connect(action(QnActions::ToggleSyncAction),   SIGNAL(triggered()),                        this,           SLOT(at_syncButton_clicked()));
-    connect(action(QnActions::ToggleMuteAction),   SIGNAL(toggled(bool)),                      m_volumeSlider, SLOT(setMute(bool)));
+    connect(action(QnActions::ToggleMuteAction),    &QAction::toggled,              m_volumeSlider, &QnVolumeSlider::setMute);
+    connect(action(QnActions::VolumeUpAction),      &QAction::triggered,            m_volumeSlider, &QnVolumeSlider::stepForward);
+    connect(action(QnActions::VolumeDownAction),    &QAction::triggered,            m_volumeSlider, &QnVolumeSlider::stepBackward);
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this, [this]()
     {
@@ -228,22 +264,25 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
             connect(currentWidget, &QnResourceWidget::optionsChanged, this, &QnNavigationItem::updateBookButtonEnabled);
     });
 
-    connect(navigator(),                    SIGNAL(currentWidgetAboutToBeChanged()),    m_speedSlider,  SLOT(finishAnimations()));
-    connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateSyncButtonEnabled()));
-    connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateJumpButtonsTooltips()));
-    connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateBookButtonEnabled()));
-    connect(navigator(),                    SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
-    connect(navigator(),                    SIGNAL(liveChanged()),                      this,           SLOT(updateLiveButtonChecked()));
-    connect(navigator(),                    SIGNAL(liveSupportedChanged()),             this,           SLOT(updateLiveButtonEnabled()));
-    connect(navigator(),                    SIGNAL(liveChanged()),                      this,           SLOT(updatePlaybackButtonsEnabled()));
-    connect(navigator(),                    SIGNAL(playingSupportedChanged()),          this,           SLOT(updatePlaybackButtonsEnabled()));
-    connect(navigator(),                    SIGNAL(speedChanged()),                     this,           SLOT(updateSpeedSliderSpeedFromNavigator()));
-    connect(navigator(),                    SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, m_speedSlider, &QnSpeedSlider::finishAnimations);
 
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this, &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateSyncButtonEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateJumpButtonsTooltips);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateBookButtonEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
+    connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updateLiveButtonChecked);
+    connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::speedChanged,               this,   &QnNavigationItem::updateSpeedSliderSpeedFromNavigator);
+    connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,          this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   [this]() { m_timeSlider->setLiveSupported(navigator()->isLiveSupported()); });
 
     /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
-    connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()), Qt::QueuedConnection);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updatePlayButtonChecked, Qt::QueuedConnection);
+
+    connect(this, &QGraphicsWidget::geometryChanged, [this, sliderLayout]() { m_separators->setGeometry(sliderLayout->geometry()); });
 
     /* Register actions. */
     addAction(action(QnActions::PreviousFrameAction));
@@ -259,9 +298,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(QnActions::ToggleMuteAction));
     addAction(action(QnActions::ToggleSyncAction));
     addAction(action(QnActions::ToggleCalendarAction));
-
-    connect(action(QnActions::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
-    connect(action(QnActions::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
 
     /* Set help topics. */
     setHelpTopic(this,                  Qn::MainWindow_Playback_Help);
@@ -521,7 +557,10 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event)
         return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
 
     if (event->type() == QEvent::PaletteChange)
+    {
         setFrameColor(palette().color(QPalette::Midlight));
+        m_separators->setFrameColor(palette().color(isTimelineRelevant() ? QPalette::Shadow : QPalette::Midlight));
+    }
 
     return base_type::eventFilter(watched, event);
 }
@@ -616,4 +655,20 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
     button->setDefaultAction(action(id));
     button->setCached(true);
     return button;
+}
+
+bool QnNavigationItem::isTimelineRelevant() const
+{
+    auto navigator = this->navigator();
+
+    if (!navigator || !navigator->currentWidget())
+        return false;
+
+    if (!navigator->isPlayingSupported())
+        return false;
+
+    if (navigator->hasArchive())
+        return true;
+
+    return navigator->currentWidget()->resource()->flags().testFlag(Qn::local);
 }

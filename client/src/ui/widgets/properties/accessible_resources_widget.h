@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <core/resource_management/resource_access_filter.h>
+
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
@@ -19,7 +21,7 @@ class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget
 
     typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnAbstractPermissionsModel::Filter filter, QWidget* parent = 0);
+    QnAccessibleResourcesWidget(QnAbstractPermissionsModel* permissionsModel, QnResourceAccessFilter::Filter filter, QWidget* parent = 0);
     virtual ~QnAccessibleResourcesWidget();
 
     virtual bool hasChanges() const override;
@@ -27,9 +29,16 @@ public:
     virtual void applyChanges() override;
 
 private:
+    void initControlsModel();
+    void initResourcesModel();
+
+    void updateThumbnail(const QModelIndex& index = QModelIndex());
+
+private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
     QnAbstractPermissionsModel* const m_permissionsModel;
-    const QnAbstractPermissionsModel::Filter m_filter;
+    const QnResourceAccessFilter::Filter m_filter;
 
     QScopedPointer<QnResourceListModel> m_resourcesModel;
+    QScopedPointer<QnResourceListModel> m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */
 };

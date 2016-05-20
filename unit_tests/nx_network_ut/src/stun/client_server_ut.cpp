@@ -1,3 +1,6 @@
+
+#include <thread>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -9,6 +12,7 @@
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
+#include <nx/utils/std/future.h>
 
 namespace nx {
 namespace stun {
@@ -33,8 +37,6 @@ protected:
     };
 };
 
-const AbstractAsyncClient::Timeouts CLIENT_TIMEOUTS = { 1000, 1000, 5000 };
-
 class StunClientServerTest
         : public ::testing::Test
 {
@@ -45,9 +47,18 @@ protected:
         return ++port; // to avoid possible address overlap
     }
 
+    static AbstractAsyncClient::Settings defaultSettings()
+    {
+        AbstractAsyncClient::Settings settings;
+        settings.sendTimeout = std::chrono::seconds(1);
+        settings.recvTimeout = std::chrono::seconds(1);
+        settings.reconnectPolicy.setInitialDelay(std::chrono::seconds(3));
+        return settings;
+    }
+
     StunClientServerTest()
         : address( lit( "127.0.0.1"), newPort() )
-        , client( std::make_shared<AsyncClient>( CLIENT_TIMEOUTS ) )
+        , client( std::make_shared<AsyncClient>( defaultSettings() ) )
     {
     }
 
@@ -99,14 +110,17 @@ TEST_F( StunClientServerTest, Connectivity )
     EXPECT_EQ( server->connections.size(), 1 );
 
     server.reset();
-    EXPECT_THAT( sendTestRequestSync(), testing::AnyOf(
-        SystemError::connectionRefused, SystemError::connectionReset,
-        SystemError::timedOut ) ); // no server to connect
+    EXPECT_NE( sendTestRequestSync(), SystemError::noError ); // no server
+
+    utils::promise<void> promise;
+    client->addOnReconnectedHandler([&]{ promise.set_value(); });
 
     startServer();
-    EXPECT_EQ( server->connections.size(), 0 );
-    std::this_thread::sleep_for( std::chrono::milliseconds(
-        CLIENT_TIMEOUTS.reconnect * 2 ) ); // automatic reconnect is expected
+    promise.get_future().wait(); // automatic reconnect is expected
+
+    // there might be a small delay before server creates connection from
+    // accepted socket
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_EQ( server->connections.size(), 1 );
 }
 

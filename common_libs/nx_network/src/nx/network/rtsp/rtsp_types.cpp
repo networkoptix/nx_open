@@ -52,4 +52,9 @@ namespace nx_rtsp
 
         return false;
     }
+
+    bool RtspResponse::parse(const nx_http::ConstBufferRefType &data)
+    {
+        return nx_http::parseRequestOrResponse( data, (nx_http::Response*)this, &nx_http::Response::statusLine, true );
+    }
 }

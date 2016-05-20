@@ -14,7 +14,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <cdb/connection.h>
 #include <cloud_db_process_public.h>
 
@@ -139,6 +139,11 @@ public:
         const std::vector<api::SystemSharingEx>& sharings,
         const std::string& accountEmail,
         const std::string& systemID) const;
+    api::ResultCode fetchSystemData(
+        const std::string& accountEmail,
+        const std::string& accountPassword,
+        const std::string& systemId,
+        api::SystemDataEx* const systemData);
 
 private:
     QString m_tmpDir;

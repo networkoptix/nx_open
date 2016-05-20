@@ -17,7 +17,6 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     QObject(parent)
 {
     Q_INIT_RESOURCE(mediaserver_core);
-    Q_INIT_RESOURCE(mediaserver_core_additional);
     Q_INIT_RESOURCE(appserver2);
 
 #ifdef ENABLE_ONVIF

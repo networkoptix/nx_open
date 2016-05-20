@@ -1,5 +1,4 @@
 #include "android_video_decoder.h"
-
 #if defined(Q_OS_ANDROID)
 
 #include <deque>
@@ -12,8 +11,8 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
 #include <QtOpenGL/QtOpenGL>
-#include <QCache>
-#include <QMap>
+#include <QtCore/QCache>
+#include <QtCore/QMap>
 
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
@@ -21,9 +20,6 @@
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
-
-#include "abstract_resource_allocator.h"
-
 
 #define USE_GUI_RENDERING
 #define USE_SHARED_CTX
@@ -33,58 +29,60 @@ namespace media {
 
 namespace {
 
-    static const int kNoInputBuffers = -7;
-    static const qint64 kDecodeOneFrameTimeout = 1000 * 33;
+static const int kNoInputBuffers = -7;
+static const qint64 kDecodeOneFrameTimeout = 1000 * 33;
 
-    // some decoders may have not input buffers left because of long decoding time
-    // We will try to skip single output frame to clear space in input buffers
-    static const int kDequeueInputBufferRetyrCounter = 3;
+// some decoders may have not input buffers left because of long decoding time
+// We will try to skip single output frame to clear space in input buffers
+static const int kDequeueInputBufferRetyrCounter = 3;
 
-    static const GLfloat g_vertex_data[] = {
-        -1.f, 1.f,
-        1.f, 1.f,
-        1.f, -1.f,
-        -1.f, -1.f
-    };
+static const GLfloat g_vertex_data[] = {
+    -1.f, 1.f,
+    1.f, 1.f,
+    1.f, -1.f,
+    -1.f, -1.f
+};
 
-    static const GLfloat g_texture_data[] = {
-        0.f, 0.f,
-        1.f, 0.f,
-        1.f, 1.f,
-        0.f, 1.f
-    };
+static const GLfloat g_texture_data[] = {
+    0.f, 0.f,
+    1.f, 0.f,
+    1.f, 1.f,
+    0.f, 1.f
+};
 
-    QString codecToString(CodecID codecId)
+QString codecToString(CodecID codecId)
+{
+    switch(codecId)
     {
-        switch(codecId)
-        {
-            case CODEC_ID_H264:
-                return lit("video/avc");
-            case CODEC_ID_H263:
-                return lit("video/3gpp");
-            case CODEC_ID_MPEG4:
-                return lit("video/mp4v-es");
-            case CODEC_ID_MPEG2VIDEO:
-                return lit("video/mpeg2");
-            case CODEC_ID_VP8:
-                return lit("video/x-vnd.on2.vp8");
-            default:
-                return QString();
-        }
-    }
-
-    void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
-    {
-        Q_UNUSED(thiz);
-        void* bytes = env->GetDirectBufferAddress(buffer);
-        void* srcData = (void*) srcDataPtr;
-        if (capacity < dataSize)
-            qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
-        memcpy(bytes, srcData, qMin(dataSize, capacity));
+        case CODEC_ID_H264:
+            return lit("video/avc");
+        case CODEC_ID_H263:
+            return lit("video/3gpp");
+        case CODEC_ID_MPEG4:
+            return lit("video/mp4v-es");
+        case CODEC_ID_MPEG2VIDEO:
+            return lit("video/mpeg2");
+        case CODEC_ID_VP8:
+            return lit("video/x-vnd.on2.vp8");
+        default:
+            return QString();
     }
 }
 
-// --------------------------------------------------------------------------------------------------
+void fillInputBuffer(
+    JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
+{
+    Q_UNUSED(thiz);
+    void* bytes = env->GetDirectBufferAddress(buffer);
+    void* srcData = (void*) srcDataPtr;
+    if (capacity < dataSize)
+        qWarning() << "fillInputBuffer: capacity less then dataSize." << capacity << "<" << dataSize;
+    memcpy(bytes, srcData, qMin(dataSize, capacity));
+}
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
 
 typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
 
@@ -118,27 +116,37 @@ private:
     int m_index;
 };
 
-// --------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 class TextureBuffer: public QAbstractVideoBuffer
 {
 public:
-    TextureBuffer (const FboPtr& fbo, std::shared_ptr<AndroidVideoDecoderPrivate> owner):
+    TextureBuffer(const FboPtr& fbo, std::shared_ptr<AndroidVideoDecoderPrivate> owner)
+    :
         QAbstractVideoBuffer(GLTextureHandle),
         m_fbo(fbo),
         m_owner(owner)
     {
-
     }
 
     ~TextureBuffer()
     {
-
     }
 
-    virtual MapMode mapMode() const override { return NotMapped;}
-    virtual uchar *map(MapMode, int *, int *) override { return 0; }
-    virtual void unmap() override {}
+    virtual MapMode mapMode() const override
+    {
+        return NotMapped;
+    }
+
+    virtual uchar* map(MapMode, int*, int*) override
+    {
+        return 0;
+    }
+
+    virtual void unmap() override
+    {
+    }
+
     virtual QVariant handle() const override;
 
 private:
@@ -146,21 +154,20 @@ private:
     std::weak_ptr<AndroidVideoDecoderPrivate> m_owner;
 };
 
-// --------------------------------------------------------------------------------------------------
-
-
-
-// ------------------------- AndroidVideoDecoderPrivate -------------------------
+//-------------------------------------------------------------------------------------------------
+// AndroidVideoDecoderPrivate
 
 class AndroidVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
     AndroidVideoDecoder *q_ptr;
 public:
-    AndroidVideoDecoderPrivate():
+    AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator)
+    :
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder"),
+        allocator(allocator),
         program(nullptr)
     {
         registerNativeMethods();
@@ -207,12 +214,13 @@ public:
     }
 
     FboPtr renderFrameToFbo();
-    void createGLResources();
+    void createGlResources();
+
 private:
     qint64 frameNumber;
     bool initialized;
     QAndroidJniObject javaDecoder;
-    AbstractResourceAllocator* allocator;
+    ResourceAllocatorPtr allocator;
     QSize frameSize;
 
     std::unique_ptr<FboManager> fboManager;
@@ -232,7 +240,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
-    createGLResources();
+    createGlResources();
     FboPtr fbo = fboManager->getFbo();
 
     if (funcs->glGetError())
@@ -330,7 +338,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
     return fbo;
 }
 
-void AndroidVideoDecoderPrivate::createGLResources()
+void AndroidVideoDecoderPrivate::createGlResources()
 {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOpenGLFunctions *funcs = ctx->functions();
@@ -344,14 +352,14 @@ void AndroidVideoDecoderPrivate::createGLResources()
 
         QOpenGLShader *vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, program);
         vertexShader->compileSourceCode(
-            "attribute highp vec4 vertexCoordsArray; \n" \
-            "attribute highp vec2 textureCoordArray; \n" \
-            "uniform   highp mat4 texMatrix; \n" \
-            "varying   highp vec2 textureCoords; \n" \
-            "void main(void) \n" \
-            "{ \n" \
-            "    gl_Position = vertexCoordsArray; \n" \
-            "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n" \
+            "attribute highp vec4 vertexCoordsArray; \n"
+            "attribute highp vec2 textureCoordArray; \n"
+            "uniform   highp mat4 texMatrix; \n"
+            "varying   highp vec2 textureCoords; \n"
+            "void main(void) \n"
+            "{ \n"
+            "    gl_Position = vertexCoordsArray; \n"
+            "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n"
             "}\n");
         program->addShader(vertexShader);
         if (funcs->glGetError())
@@ -359,12 +367,12 @@ void AndroidVideoDecoderPrivate::createGLResources()
 
         QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, program);
         fragmentShader->compileSourceCode(
-            "#extension GL_OES_EGL_image_external : require \n" \
-            "varying highp vec2         textureCoords; \n" \
-            "uniform samplerExternalOES frameTexture; \n" \
-            "void main() \n" \
-            "{ \n" \
-            "    gl_FragColor = texture2D(frameTexture, textureCoords); \n" \
+            "#extension GL_OES_EGL_image_external : require \n"
+            "varying highp vec2         textureCoords; \n"
+            "uniform samplerExternalOES frameTexture; \n"
+            "void main() \n"
+            "{ \n"
+            "    gl_FragColor = texture2D(frameTexture, textureCoords); \n"
             "}\n");
         program->addShader(fragmentShader);
         if (funcs->glGetError())
@@ -380,43 +388,40 @@ void AndroidVideoDecoderPrivate::createGLResources()
 
 // ---------------------- AndroidVideoDecoder ----------------------
 
-AndroidVideoDecoder::AndroidVideoDecoder():
+AndroidVideoDecoder::AndroidVideoDecoder(
+    const ResourceAllocatorPtr& allocator, const QSize& resolution)
+:
     AbstractVideoDecoder(),
-    d(new AndroidVideoDecoderPrivate())
-
+    d(new AndroidVideoDecoderPrivate(allocator))
 {
+    QN_UNUSED(resolution);
+
+    #if defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
+        QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();
+        if (sharedContext)
+        {
+            d->threadGlCtx.reset(new QOpenGLContext());
+            d->threadGlCtx->setShareContext(sharedContext);
+            d->threadGlCtx->setFormat(sharedContext->format());
+
+            if (d->threadGlCtx->create() && d->threadGlCtx->shareContext())
+            {
+                NX_LOG(lit("Using shared openGL ctx"), cl_logINFO);
+                d->offscreenSurface.reset(new QOffscreenSurface());
+                d->offscreenSurface->setFormat(d->threadGlCtx->format());
+                d->offscreenSurface->create();
+
+                d->threadGlCtx->makeCurrent(d->offscreenSurface.get());
+            }
+            else {
+                d->threadGlCtx.reset();
+            }
+        }
+    #endif // USE_SHARED_CTX && !USE_GUI_RENDERING
 }
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
 {
-}
-
-void AndroidVideoDecoder::setAllocator(AbstractResourceAllocator* allocator)
-{
-    d->allocator = allocator;
-
-#if defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
-    QOpenGLContext* sharedContext = QOpenGLContext::globalShareContext();
-    if (sharedContext)
-    {
-        d->threadGlCtx.reset(new QOpenGLContext());
-        d->threadGlCtx->setShareContext(sharedContext);
-        d->threadGlCtx->setFormat(sharedContext->format());
-
-        if (d->threadGlCtx->create() && d->threadGlCtx->shareContext())
-        {
-            NX_LOG(lit("Using shared openGL ctx"), cl_logINFO);
-            d->offscreenSurface.reset(new QOffscreenSurface());
-            d->offscreenSurface->setFormat(d->threadGlCtx->format());
-            d->offscreenSurface->create();
-
-            d->threadGlCtx->makeCurrent(d->offscreenSurface.get());
-        }
-        else {
-            d->threadGlCtx.reset();
-        }
-    }
-#endif
 }
 
 bool AndroidVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
@@ -542,4 +547,4 @@ QVariant TextureBuffer::handle() const
 } // namespace media
 } // namespace nx
 
-#endif // #defined(Q_OS_ANDROID)
+#endif // Q_OS_ANDROID

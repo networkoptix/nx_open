@@ -8,7 +8,7 @@
 
 #include <functional>
 
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 
 //TODO #ak introduce generic implementation using variadic templates (when available)

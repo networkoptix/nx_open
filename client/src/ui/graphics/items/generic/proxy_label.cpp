@@ -39,7 +39,22 @@ void QnProxyLabel::init() {
 
 QnProxyLabel::~QnProxyLabel()
 {
-    setWidget(NULL); /* Note that without this call we get stack overflow. */
+    /*
+    * This workaround is required (Qt 5.6.0) because of the following crash scenario:
+    *  * Deleting of QnTooltipWidget causes all its children to be deleted (in dtor of QGraphicsItem)
+    *  * Some children are of class QnProxyLabel.
+    *  * In dtor of QnProxyLabel we're calling setWidget(nullptr), that calls unsetCursor() method
+    *  * Here we are seeking the next widget at the current position..
+    *  * .. finding our deleting QnTooltipWidget ..
+    *  * .. checking its boundingRect() ..
+    *  * .. and crashing, as boundingRect() is a virtual function, overridden in the destroyed class.
+    *
+    *  Fixed in the QnProxyLabel in case there were another widgets but QnTooltipWidget, which will
+    *  have the same problem on destruction.
+    */
+    if (scene())
+        scene()->removeItem(this);
+    setWidget(nullptr); /* Note that without this call we get stack overflow. */
 }
 
 QString QnProxyLabel::text() const {

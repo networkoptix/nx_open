@@ -3,7 +3,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/stream_socket_wrapper.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <utils/serialization/lexical.h>
 
 #include "tunnel/udp/acceptor.h"
@@ -202,7 +202,7 @@ void CloudServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
     m_mediatorRegistrationRetryTimer.dispatch(std::move(handler));
 }
 
-aio::AbstractAioThread* CloudServerSocket::getAioThread()
+aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 {
     return m_mediatorRegistrationRetryTimer.getAioThread();
 }
@@ -275,10 +275,12 @@ void CloudServerSocket::cancelIOSync()
     cancelledPromise.get_future().wait();
 }
 
-bool CloudServerSocket::registerOnMediatorSync()
+void CloudServerSocket::registerOnMediator(
+    nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler)
 {
     if (m_state == State::listening)
-        return true;
+        return handler(hpm::api::ResultCode::ok);
+
     if (m_state == State::init)
     {
         initTunnelPool(m_acceptQueueLen);
@@ -288,6 +290,7 @@ bool CloudServerSocket::registerOnMediatorSync()
             std::placeholders::_1));
         m_state = State::readyToListen;
     }
+
     NX_ASSERT(m_state == State::readyToListen);
     m_state = State::registeringOnMediator;
 
@@ -298,38 +301,42 @@ bool CloudServerSocket::registerOnMediatorSync()
     {
         SystemError::setLastErrorCode(SystemError::invalidData);
         m_state = State::readyToListen;
-        return false;
+        return handler(hpm::api::ResultCode::notAuthorized);
     }
 
     nx::hpm::api::ListenRequest listenRequestData;
     listenRequestData.systemId = cloudCredentials->systemId;
     listenRequestData.serverId = cloudCredentials->serverId;
 
-    nx::utils::promise<nx::hpm::api::ResultCode> listenCompletedPromise;
     m_mediatorConnection->listen(
         std::move(listenRequestData),
-        [this, &listenCompletedPromise](nx::hpm::api::ResultCode resultCode)
+        [this, handler = std::move(handler)](hpm::api::ResultCode code)
         {
             m_mediatorConnection->setOnReconnectedHandler(
                 std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
-            listenCompletedPromise.set_value(resultCode);
+            if (code == hpm::api::ResultCode::ok)
+            {
+                m_state = State::listening;
+            }
+            else
+            {
+                //TODO #ak set appropriate error code
+                SystemError::setLastErrorCode(SystemError::invalidData);
+                m_state = State::readyToListen;
+            }
+
+            handler(code);
         });
+}
 
-    auto listenCompletedFuture = listenCompletedPromise.get_future();
-    listenCompletedFuture.wait();
-    const auto resultCode = listenCompletedFuture.get();
+hpm::api::ResultCode CloudServerSocket::registerOnMediatorSync()
+{
+    nx::utils::promise<hpm::api::ResultCode> promise;
+    registerOnMediator(
+        [&promise](hpm::api::ResultCode code) { promise.set_value(code); });
 
-    if (resultCode == nx::hpm::api::ResultCode::ok)
-    {
-        m_state = State::listening;
-        return true;
-    }
-
-    //TODO #ak set appropriate error code
-    SystemError::setLastErrorCode(SystemError::invalidData);
-    m_state = State::readyToListen;
-    return false;
+    return promise.get_future().get();
 }
 
 void CloudServerSocket::moveToListeningState()
@@ -501,7 +508,7 @@ void CloudServerSocket::onConnectionRequested(
             }
 
             if (event.connectionMethods)
-                NX_LOG(lm("Unsupported ConnectionMethods: %1")
+                NX_LOGX(lm("Unsupported ConnectionMethods: %1")
                     .arg(event.connectionMethods), cl_logWARNING);
         });
 }
@@ -512,8 +519,8 @@ void CloudServerSocket::onMediatorConnectionRestored()
     m_mediatorRegistrationRetryTimer.dispatch(  //modifiyng state only in aio thread
         [this]
         {
-            NX_LOG(lm("Connection to mediator has been restored after failure. "
-                      "Re-sending listen request"), cl_logDEBUG1);
+            NX_LOGX(lm("Connection to mediator has been restored after failure. "
+                "Re-sending listen request"), cl_logDEBUG1);
 
             if (m_state == State::listening)
             {

@@ -44,6 +44,7 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
@@ -69,6 +70,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/collection.h>
 #include <utils/common/string.h>
+#include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
 #include <api/common_message_processor.h>
@@ -78,6 +80,8 @@
 namespace
 {
     enum { kMicroInMilliSeconds = 1000 };
+
+    const qreal kTwoWayAudioButtonSize = 44.0;
 
     bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
     {
@@ -227,10 +231,24 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
+    /* TODO: #GDM if (m_camera)? */
+    {
+        m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
+    	addOverlayWidget(m_compositeTextOverlay, detail::OverlayParams(UserVisible, true, true));
+        auto updateContentsMargins = [this]()
+        {
+            auto positionOverlayGeometry = overlayWidgets()->positionOverlay->contentSize();
+            auto margins = m_compositeTextOverlay->contentsMargins();
+            margins.setBottom(positionOverlayGeometry.height() + 4);
+            m_compositeTextOverlay->setContentsMargins(margins);
+        };
 
-    m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-    addOverlayWidget(m_compositeTextOverlay
-        , detail::OverlayParams(UserVisible, true, true));
+        connect(overlayWidgets()->positionOverlay, &GraphicsWidget::geometryChanged, this, updateContentsMargins);
+        connect(overlayWidgets()->positionOverlay, &QnScrollableOverlayWidget::contentSizeChanged, this, updateContentsMargins);
+        /* Let widgets to be displayed before updating margins. */
+        executeDelayedParented(updateContentsMargins, kDefaultDelay, this);
+    }
+
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -247,6 +265,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
+    }
+
+    if (m_camera && m_camera->hasTwoWayAudio())
+    {
+        auto twoWayAudioItem = new QnTwoWayAudioWidget();
+        twoWayAudioItem->setCamera(m_camera);
+        twoWayAudioItem->setFixedHeight(kTwoWayAudioButtonSize);
+
+        /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
+        overlayWidgets()->positionOverlay->insertItem(0, twoWayAudioItem);
     }
 
     /* Set up buttons. */
@@ -1244,16 +1272,16 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         if (!states.isRealTimeSource)
             return Qn::NoVideoDataOverlay;
 
-        if (m_ioCouldBeShown) /// If vidget could be shown then licences Ok
+        if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
 
         const bool buttonIsVisible = (buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::IoModuleButton);
         const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
-        const bool licenceError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisble in this case if licence error
-        const bool isNotZoomWindow = zoomRect().isNull();
+        const bool licenseError = (!button || button->isChecked() || !buttonIsVisible); /// Io is invisible in this case if license error
+        const bool isZoomWindow = !zoomRect().isNull();
 
-        if (licenceError && isNotZoomWindow)
+        if (licenseError && !isZoomWindow)
             return Qn::IoModuleDisabledOverlay;
     }
 

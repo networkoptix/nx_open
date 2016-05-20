@@ -14,6 +14,7 @@
 
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/common/util.h>
+#include <network/tcp_listener.h>
 
 namespace {
     static const qint64 CACHE_SIZE = 1024 * 256;
@@ -42,10 +43,11 @@ namespace {
         { "xml",  "application/xml" },
         { "xsl",  "applicaton/xslt+xml" },
         { "zip",  "application/zip" },
-        { "swf",  "application/x-shockwave-flash" }
+        { "swf",  "application/x-shockwave-flash" },
+        { "txt",  "text/plain" }
     };
 
-    const QByteArray kDefaultContentType = "application/xml";
+    const QByteArray kDefaultContentType = "text/html; charset=utf-8";
 
     const QString kExternalResourcesPackageName = "external.dat";
 
@@ -53,17 +55,17 @@ namespace {
 
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
-        {   /* Check external package. */
-            static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-            QIODevicePtr result(new QuaZipFile(packageName, relativePath));
-            if (result->open(QuaZipFile::ReadOnly))
-                return result;
-        }
-
         {   /* Check internal resources. */
             QString fileName = ":" + relativePath;
             QIODevicePtr result(new QFile(fileName));
             if (result->open(QFile::ReadOnly))
+                return result;
+        }
+
+        {   /* Check external package. */
+            static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
+            QIODevicePtr result(new QuaZipFile(packageName, relativePath));
+            if (result->open(QuaZipFile::ReadOnly))
                 return result;
         }
 
@@ -123,9 +125,7 @@ void QnFileConnectionProcessor::run()
     d->response.messageBody.clear();
 
     QUrl url = getDecodedUrl();
-    QString path = url.path();
-    while (path.endsWith(QLatin1String("/")))
-        path.chop(1);
+    QString path = QString('/') + QnTcpListener::normalizedPath(url.path());
 
     int rez = nx_http::StatusCode::ok;
     QByteArray contentType = kDefaultContentType;

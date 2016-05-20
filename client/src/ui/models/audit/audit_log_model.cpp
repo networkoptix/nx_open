@@ -11,7 +11,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
@@ -188,7 +187,7 @@ public:
             break;
         }
 
-        qSort(m_data.begin(), m_data.end(), lessThan);
+        std::sort(m_data.begin(), m_data.end(), lessThan);
     }
 
 private:
@@ -248,19 +247,27 @@ QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
     return getResourceName(qnResPool->getResourceById(id));
 }
 
-QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const {
+QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const
+{
     if (timestampSecs == 0)
         return QString();
 
     QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampSecs * 1000ll);
+    return formatDateTime(dateTime, showDate, showTime);
+}
+
+QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate, bool showTime)
+{
     if (showDate && showTime)
         return dateTime.toString(Qt::SystemLocaleShortDate);
-    else if (showDate)
+
+    if (showDate)
         return dateTime.date().toString(Qt::SystemLocaleShortDate);
-    else if (showTime)
+
+    if (showTime)
         return dateTime.time().toString(Qt::SystemLocaleShortDate);
-    else
-        return QString();
+
+    return QString();
 }
 
 QString QnAuditLogModel::formatDuration(int durationSecs)
@@ -345,24 +352,13 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
     return QString();
 }
 
-QString QnAuditLogModel::buttonNameForEvent(Qn::AuditRecordType eventType)
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* record)
 {
-    switch (eventType)
-    {
-    case Qn::AR_ViewLive:
-    case Qn::AR_ViewArchive:
-    case Qn::AR_ExportVideo:
-        return tr("Play this");
-    case Qn::AR_UserUpdate:
-    case Qn::AR_ServerUpdate:
-    case Qn::AR_CameraUpdate:
-    case Qn::AR_CameraInsert:
-        return tr("Settings");
-    }
-    return QString();
+    return record ? getCameras(record->resources) : QnVirtualCameraResourceList();
 }
 
-QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources) {
+QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources)
+{
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
         if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
@@ -382,7 +378,8 @@ QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources
     return result;
 }
 
-QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const {
+QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
+{
     QString result;
     switch (data->eventType)
     {
@@ -394,10 +391,12 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const {
     case Qn::AR_SystemNameChanged:
         result = QString::fromUtf8(data->extractParam("description"));
         break;
+
     case Qn::AR_UnauthorizedLogin:
     case Qn::AR_Login:
         result = data->authSession.userAgent;
         break;
+
     case Qn::AR_ViewArchive:
     case Qn::AR_ViewLive:
     case Qn::AR_ExportVideo:
@@ -406,6 +405,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const {
     case Qn::AR_CameraInsert:
         result += QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
         break;
+
     default:
         result = getResourcesString(data->resources);
     }
@@ -487,7 +487,8 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
     return result;
 }
 
-QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data) const {
+QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data) const
+{
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
     {
         QString result;
@@ -503,42 +504,53 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
     return textData(column, data);
 }
 
-QString QnAuditLogModel::textData(const Column& column, const QnAuditRecord* data) const {
-    switch (column) {
+QString QnAuditLogModel::textData(const Column& column, const QnAuditRecord* data) const
+{
+    switch (column)
+    {
     case SelectRowColumn:
         return QString();
+
     case TimestampColumn:
         return formatDateTime(data->createdTimeSec, true, true);
+
     case DateColumn:
         return formatDateTime(data->createdTimeSec, true, false);
+
     case TimeColumn:
         return formatDateTime(data->createdTimeSec, false, true);
+
     case EndTimestampColumn:
         if (data->eventType == Qn::AR_Login)
             return data->rangeEndSec ? formatDateTime(data->rangeEndSec, true, true) : QString();
         else if (data->eventType == Qn::AR_UnauthorizedLogin)
             return eventTypeToString(data->eventType);
         break;
+
     case DurationColumn:
         if (data->rangeEndSec)
             return formatDuration(data->rangeEndSec - data->rangeStartSec);
         else
             return QString();
+
     case UserNameColumn:
         return data->authSession.userName;
+
     case UserHostColumn:
         return data->authSession.userHost;
-        break;
+
     case EventTypeColumn:
         return eventTypeToString(data->eventType);
+
     case CameraNameColumn:
         return firstResourceName(data);
+
     case CameraIpColumn:
         return firstResourceIp(data);
+
     case DescriptionColumn:
         return eventDescriptionText(data);
-    case PlayButtonColumn:
-        return buttonNameForEvent(data->eventType);
+
     case UserActivityColumn:
         return tr("%n action(s)", "", data->extractParam(ChildCntParamName).toUInt());
     }
@@ -600,8 +612,6 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             return tr("Time");
         case DescriptionColumn:
             return tr("Description");
-        case PlayButtonColumn:
-            return tr("View it");
         }
     }
     return base_type::headerData(section, orientation, role);
@@ -666,7 +676,7 @@ bool QnAuditLogModel::setData(const QModelIndex &index, const QVariant &value, i
 
     if (role == Qt::CheckStateRole)
     {
-        if (value == Qt::Checked)
+        if (value.toInt() == Qt::Checked)
             m_index->at(index.row())->addParam(CheckedParamName, "1");
         else
             m_index->at(index.row())->removeParam(CheckedParamName);
@@ -783,67 +793,78 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
 
     const Column &column = m_columns[index.column()];
 
-
     const QnAuditRecord *record = m_index->at(index.row());
 
-    switch (role) {
+    switch (role)
+    {
     case Qt::CheckStateRole:
         if (column == SelectRowColumn)
             return record->extractParam(CheckedParamName) == "1" ? Qt::Checked : Qt::Unchecked;
         else
             return QVariant();
+
     case Qt::DisplayRole:
-    {
         if (column == DateColumn && skipDate(record, index.row()))
             return QString();
         else
             return QVariant(textData(column, record));
-    }
-    case Qn::AuditRecordDataRole:
-        return QVariant::fromValue<QnAuditRecord*>(m_index->at(index.row()));
+
     case Qn::DisplayHtmlRole:
         return htmlData(column, record, index.row(), false);
-    case Qn::DisplayHtmlHoveredRole:
-        return htmlData(column, record, index.row(), true);
+
+    case Qn::AuditRecordDataRole:
+        return QVariant::fromValue<QnAuditRecord*>(m_index->at(index.row()));
+
     case Qn::ColumnDataRole:
         return column;
+
     case Qn::AlternateColorRole:
         return m_interleaveInfo.size() == m_index->size() && m_interleaveInfo[index.row()];
+
     case Qt::ForegroundRole:
         if (column == EventTypeColumn)
             return colorForType(record->eventType);
         else
             return QVariant();
+
     case Qt::FontRole:
-        if (column == DateColumn) {
+        if (column == DateColumn)
+        {
             QFont font;
             font.setBold(true);
             return font;
         }
-        else
-            return QVariant();
+        return QVariant();
+
     case Qt::DecorationRole:
     case Qn::DecorationHoveredRole:
-    {
-        if (column != PlayButtonColumn)
-            return QVariant();
-        if (record->isPlaybackType()) {
-            if (role == Qt::DecorationRole)
-                return qnSkin->icon("audit/play.png");
-            else
-                return qnSkin->icon("audit/play.png");
+        {
+            if (column != DescriptionColumn)
+                return QVariant();
+
+            if (record->isPlaybackType())
+                    return qnSkin->icon("audit/play.png");
+
+            switch (record->eventType)
+            {
+            case Qn::AR_UserUpdate:
+                return qnSkin->icon("tree/user.png");
+
+            case Qn::AR_ServerUpdate:
+                return qnSkin->icon("tree/server.png");
+
+            case Qn::AR_CameraInsert:
+            case Qn::AR_CameraUpdate:
+                return qnSkin->icon("tree/camera.png");
+
+            default:
+                return QVariant();
+            }
         }
-        else if (record->eventType == Qn::AR_UserUpdate)
-            return qnSkin->icon("tree/user.png");
-        else if (record->eventType == Qn::AR_ServerUpdate)
-            return qnSkin->icon("tree/server.png");
-        else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
-            return qnSkin->icon("tree/camera.png");
-    }
+
     case Qt::ToolTipRole:
         if (column == DescriptionColumn)
             return descriptionTooltip(record);
-    default:
         break;
     }
 

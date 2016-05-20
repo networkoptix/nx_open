@@ -222,7 +222,7 @@ QnUuid QnLicense::serverId() const {
         if (info.data.peer.peerType != Qn::PT_Server)
             continue;
 
-        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool hwKeyOK = info.data.hardwareIds.contains(m_hardwareId);
         bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)
             return info.uuid;
@@ -709,19 +709,29 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QVector<QString> QnLicensePool::mainHardwareIds() const {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
-}
-
-QVector<QString> QnLicensePool::compatibleHardwareIds() const {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
+QVector<QString> QnLicensePool::hardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.hardwareIds;
 }
 
 QString QnLicensePool::currentHardwareId() const {
-    QVector<QString> hwIds = mainHardwareIds();
-    return hwIds.isEmpty()
-        ? QString()
-        : hwIds.last();
+    QString hardwareId;
+
+    // hardwareIds is a ordered list
+    // first come hwid1s, than hwid2s, etc..
+    // We need to find first hardware id of last version
+    QVector<QString> hwIds = hardwareIds();
+    QString lastPrefix;
+    for (QString hwid : hwIds) {
+        NX_ASSERT(hwid.length() >= 2);
+
+        QString prefix = hwid.mid(0, 2);
+        if (prefix != lastPrefix) {
+            lastPrefix = prefix;
+            hardwareId = hwid;
+        }
+    }
+
+    return hardwareId;
 }
 
 int QnLicensePool::camerasPerAnalogEncoder() {

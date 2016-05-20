@@ -8,6 +8,7 @@
 #include <media_server/serverutil.h>
 
 #include <utils/common/model_functions.h>
+#include <api/resource_property_adaptor.h>
 
 namespace
 {
@@ -26,9 +27,10 @@ struct SetupLocalSystemData: public PasswordData
     }
 
     QString systemName;
+    QMap<QString, QString> systemSettings;
 };
 
-#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)
+#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)(systemSettings)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SetupLocalSystemData),
@@ -94,8 +96,9 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeAdminPassword(data)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't change password."));
+    QString errString;
+    if (!changeAdminPassword(data, &errString)) {
+        result.setError(QnJsonRestResult::CantProcessRequest, errString);
         return nx_http::StatusCode::ok;
     }
 
@@ -103,6 +106,14 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
         return nx_http::StatusCode::internalServerError;
+    }
+
+    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    for (QnAbstractResourcePropertyAdaptor* setting : settings)
+    {
+        auto paramIter = data.systemSettings.find(setting->key());
+        if (paramIter != data.systemSettings.end())
+            setting->setValue(paramIter.value());
     }
 
     return nx_http::StatusCode::ok;

@@ -86,17 +86,18 @@ public:
     }
 
 protected:
+    void saveConnection(std::shared_ptr<ConnectionType> connection)
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_connections.emplace(connection.get(), std::move(connection));
+    }
+
+private:
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_connectionsBeingClosedCount;
     //TODO #ak this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
-
-    void saveConnection( std::shared_ptr<ConnectionType> connection )
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_connections.emplace( connection.get(), std::move( connection ) );
-    }
 };
 
 //!Listens local tcp address, accepts incoming connections and forwards them to the specified handler

@@ -15,7 +15,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 
 #include "../abstract_socket.h"
 #include "../socket_global.h"
@@ -279,10 +279,7 @@ public:
             return;
 
         NX_ASSERT( buf.size() > 0 );
-
-        //NX_ASSERT does not stop all threads immediately, so performing segmentation fault
-        if( m_asyncSendIssued.exchange(true) )
-            *((int*)nullptr) = 12;
+        NX_CRITICAL( !m_asyncSendIssued.exchange(true) );
 
         m_sendBuffer = &buf;
         m_sendHandler = std::move( handler );

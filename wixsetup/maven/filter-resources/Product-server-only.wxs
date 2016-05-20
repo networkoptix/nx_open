@@ -49,7 +49,7 @@
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
-        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
+        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="[FREEPORT1]" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
 
@@ -93,7 +93,7 @@
         </Property> -->
         
         <!-- Demo only!!! -->
-        <Property Id="SERVER_PORT" Value="7001" Secure="yes">
+        <Property Id="SERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>        
         <!-- <Property Id="SERVER_PORT" Secure="yes">
@@ -199,8 +199,8 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" After="SetServerPort2"/>
-            <Custom Action="AssignServerPort" After="FindFreePorts">NOT SERVER_PORT</Custom>
+            <Custom Action="FindFreePorts" Before="SetServerPort1"/>
+            <Custom Action="AssignServerPort" After="SetServerPort2">NOT SERVER_PORT</Custom>
             <Custom Action="FindConfiguredStorages" After="AssignServerPort"/> 
         </InstallUISequence>
 
@@ -251,18 +251,17 @@
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
-        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
-        <Media Id="2" Cabinet="media2.cab" EmbedCab="yes" />
-        <Media Id="3" Cabinet="media3.cab" EmbedCab="yes" />
-        <Media Id="4" Cabinet="media4.cab" EmbedCab="yes" />
-        <Media Id="5" Cabinet="media5.cab" EmbedCab="yes" />
-        <Media Id="6" Cabinet="media6.cab" EmbedCab="yes" />
-        <Media Id="7" Cabinet="media7.cab" EmbedCab="yes" />
-        <Media Id="8" Cabinet="media8.cab" EmbedCab="yes" />
-        <Media Id="9" Cabinet="media9.cab" EmbedCab="yes" />
-        <Media Id="10" Cabinet="media10.cab" EmbedCab="yes" />
-        <Media Id="11" Cabinet="media11.cab" EmbedCab="yes" />
-        <Media Id="12" Cabinet="media12.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="srvmisc.cab" EmbedCab="yes" />
+        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="yes" />
+        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="yes" />
+        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="yes" />
+        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="yes" />
+        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="yes" />
+        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="yes" />
+        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="yes" />
+        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="yes" />
+        <Media Id="10" Cabinet="srvlib.cab" EmbedCab="yes" />
+        <Media Id="11" Cabinet="srvexec.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="LocalAppDataFolder">
@@ -423,8 +422,8 @@
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish> -->           
             
             <!-- PortIsBusyDlg -->
-            <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
-            <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
+            <!-- <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
+            <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish> -->
 
             <!-- VerifyReadyDlg -->
             <!-- Demo only!!! <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading)</Publish> -->

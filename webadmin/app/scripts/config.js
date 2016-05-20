@@ -12,7 +12,9 @@ var Config = {
     globalViewArchivePermission:0x00000100,
     globalViewLivePermission:0x00000080,
 
+    productName: 'Nx Witness',
     cloud:{
+        productName: 'Nx Cloud',
         webadminSetupContext: '?from=webadmin&context=setup',
         clientSetupContext: '?from=client&context=setup',
         webadminContext:'?from=webadmin&context=settings',

@@ -15,10 +15,9 @@
 class QnWorkbench;
 class QnWorkbenchItem;
 class QnWorkbenchLayout;
-class QnLayoutItemData;
 
 /**
- * This class performs bidirectional synchronization of instances of 
+ * This class performs bidirectional synchronization of instances of
  * <tt>QnWorkbenchLayout</tt> and <tt>QnLayoutResource</tt>.
  */
 class QnWorkbenchLayoutSynchronizer: public Connective<QObject> {
@@ -74,7 +73,7 @@ public slots:
 protected:
     void clearLayout();
     void clearResource();
-    
+
     void initialize();
     void deinitialize();
 
@@ -117,14 +116,14 @@ private:
     /** Whether changes should be propagated from layout to resource. */
     bool m_submit;
 
-    /** Whether this layout synchronizer should delete itself once 
+    /** Whether this layout synchronizer should delete itself once
      * one of the objects it manages is destroyed. */
     bool m_autoDeleting;
 
     /** Whether queued submit is in progress. */
     bool m_submitPending;
 
-    /** Queue of item UUIDs that are to be submitted in deferred mode. 
+    /** Queue of item UUIDs that are to be submitted in deferred mode.
      *
      * It is needed to prevent races when two concurrent changes to the same
      * item are synchronized there-and-back many times until finally converging. */

@@ -1,8 +1,6 @@
 <Include>
     <?define arch = "${arch}"?>
     <?define vmax = "${vmax}"?>
-    <?define angle = "${angle}"?>
-    <?define webkit = "${webkit}"?>
 
     <?define customization = "${customization}"?>
     <?define uriProtocol = "${uri.protocol}"?>
@@ -18,7 +16,7 @@
     <?define clientName = "${product.name}"?>
     <?define nxtoolName = "${nxtool.company.name} Server Tool"?>
 
-    <?define productExeName = "${product_name}"?>
+    <?define productExeName = "${product.name}"?>
     <?define clientExeName = "${display.product.name}"?>
     <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 
@@ -58,8 +56,10 @@
     <?endif?>
 
     <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
-    <?define NxtoolSourceDir="${libdir}/${arch}/bin/${build.configuration}"?>    
-    <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
+    <?define NxtoolSourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
+    <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>
+    <?define QtDir="${qt.dir}/bin"?>
+    <?define QtPluginsDir="${qt.dir}/plugins"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

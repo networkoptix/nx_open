@@ -107,7 +107,7 @@ void RetryTimer::pleaseStopSync()
     m_timer.pleaseStopSync();
 }
 
-aio::AbstractAioThread* RetryTimer::getAioThread()
+aio::AbstractAioThread* RetryTimer::getAioThread() const
 {
     return m_timer.getAioThread();
 }
@@ -140,6 +140,8 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
         (m_currentDelay < m_effectiveMaxDelay))
     {
         auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier();
+        if (newDelay == std::chrono::milliseconds::zero())
+            newDelay = std::chrono::milliseconds(1);
         if (newDelay < m_currentDelay)
         {
             //overflow

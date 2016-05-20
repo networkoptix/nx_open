@@ -27,7 +27,8 @@ void printConnectOptions(std::ostream* const outStream)
         "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
         "                       Bytes to receive before closing connection\n"
         "  --bytes-to-send={N}  Bytes to send before closing connection\n"
-        "  --udt                Force using udt socket. Disables cloud connect\n";
+        "  --udt                Force using udt socket. Disables cloud connect\n"
+        "  --ssl                 Use SSL on top of client sockets\n";
 }
 
 int runInConnectMode(const std::multimap<QString, QString>& args)
@@ -64,14 +65,9 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     {
         SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
     }
-    else
-    {
-        SocketFactory::setCreateStreamSocketFunc(
-            [](bool /*ssl*/, SocketFactory::NatTraversalType /*ntt*/)
-            {
-                return std::make_unique<nx::network::cloud::CloudStreamSocket>();
-            });
-    }
+
+    if (args.find("ssl") != args.end())
+        SocketFactory::enforceSsl(true);
 
     SocketAddress targetAddress(target);
     std::vector<SocketAddress> targetList;
@@ -110,8 +106,13 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
     uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
     trafficLimitBytes = trafficLimitBytes ? trafficLimitBytes : kDefaultBytesToReceive;
 
+    QStringList targetStrings;
+    for (const auto t: targetList)
+        targetStrings << t.toString();
+
+    limitStringList(&targetStrings);
     std::cout
-        << lm("Target(s): %1\n").arg(containerString(targetList)).toStdString()
+        << lm("Target(s): %1\n").arg(targetStrings.join(lit(", "))).toStdString()
         << lm("Limit(type=%1): %2").arg(static_cast<int>(trafficLimitType))
            .arg(bytesToString(trafficLimitBytes))
            .toStdString()

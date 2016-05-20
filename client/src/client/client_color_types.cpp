@@ -26,7 +26,8 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     pastBookmark = QColor("#b21083dc");
     futureBookmark = QColor("#b21083dc");
-
+    pastBookmarkHover = QColor("#1c8fe7e6");
+    futureBookmarkHover = QColor("#1c8fe7e6");
     pastBookmarkBound = QColor("#1c8fe7");
     futureBookmarkBound = QColor("#1c8fe7");
 
@@ -128,6 +129,12 @@ QnHistogramColors::QnHistogramColors() {
     text = QColor(255, 255, 255);
 }
 
+QnTwoWayAudioWidgetColors::QnTwoWayAudioWidgetColors() :
+    background("#212a2f"),
+    visualizer("#cf2727")
+{
+}
+
 QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     normal = QColor(128, 128, 128, 196);
     active = normal.lighter();
@@ -166,9 +173,9 @@ QnRoutingManagementColors::QnRoutingManagementColors() {
 }
 
 QnAuditLogColors::QnAuditLogColors() {
-    httpLink = QColor(0xFF, 0xFF, 0xFF); // HTTP NavajoWhite
+    httpLink = QColor(0x2f, 0xa2, 0xdb);
 
-    unsucessLoginAction = QColor(0x99, 0x99, 0x99);
+    unsucessLoginAction = QColor(0xcf, 0x27, 0x27);
 
     loginAction = QColor(0x65, 0x99, 0x1c);
     updUsers = QColor(0x99, 0x49, 0x98); // QColor(0x02, 0x9e, 0xb0);
@@ -224,7 +231,6 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     high    = QColor(0xff5500);
 }
 
-
 QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
 {
     text    = QColor(0xff, 0xff, 0xff, 0x99);
@@ -232,6 +238,15 @@ QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
     window  = QColor(0x00, 0x4b, 0x80, 0xcc);
 }
 
+QnResourceItemColors::QnResourceItemColors()
+{
+    mainText = QColor(0x91a7b2);
+    mainTextSelected = QColor(0xe1e7eA);
+    mainTextAccented = QColor(0x2fa2db);
+    extraText = QColor(0x53707f);
+    extraTextSelected = QColor(0xa5b7c0);
+    extraTextAccented = QColor(0x117297);
+}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

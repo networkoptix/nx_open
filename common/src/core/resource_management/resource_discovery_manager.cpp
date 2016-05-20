@@ -543,7 +543,8 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera)
 {
     QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+    QAuthenticator auth = camera->getAuth();
+    auto inserted = cameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
     for (int i = 0; i < m_searchersList.size(); ++i) {
         if (m_searchersList[i]->isResourceTypeSupported(resType->getId()))
             inserted.value().searcher = m_searchersList[i];
@@ -604,7 +605,8 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
             return;
         if (!m_manualCameraMap.contains(camera->getUrl())) {
             QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            QAuthenticator auth = camera->getAuth();
+            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), auth, resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())
@@ -713,4 +715,10 @@ void QnResourceDiscoveryManager::updateSearchersUsage() {
     bool usePartialEnable = isRedundancyUsing();
     for(QnAbstractResourceSearcher *searcher: searchers)
         updateSearcherUsage(searcher, usePartialEnable);
+}
+
+void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources)
+{
+    processDiscoveredResources(resources);
+    m_resourceProcessor->processResources(resources);
 }

@@ -30,7 +30,7 @@ void QnCallCounter::incrementCallCount(QString functionName)
 
 void QnCallCounter::startReporter()
 {
-    m_thread = std::thread(
+    m_thread = nx::utils::thread(
         [this]
         {
             {

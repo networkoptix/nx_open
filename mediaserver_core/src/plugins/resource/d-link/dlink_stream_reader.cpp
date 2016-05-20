@@ -49,8 +49,8 @@ QString PlDlinkStreamReader::getRTPurl(int profileId) const
     CLHttpStatus status;
 
     QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
-
-    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, res->getAuth());
+    QAuthenticator auth = res->getAuth();
+    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, auth);
 
     if (status != CL_HTTP_SUCCESS || reply.isEmpty())
         return QString();

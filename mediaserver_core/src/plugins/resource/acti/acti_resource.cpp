@@ -68,10 +68,13 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiUrl.setUserName( auth.user() );
+    apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/cgi-bin/system") );
-    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(getAuth().user()).arg(getAuth().password()) );
+    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(auth.user()).arg(auth.password()) );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
@@ -186,7 +189,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     QList<QSize> availResolutions;
     for(const QByteArray& r: resolutions.split(','))
         result << extractResolution(r);
-    qSort(result.begin(), result.end(), resolutionGreaterThan);
+    std::sort(result.begin(), result.end(), resolutionGreaterThan);
     return result;
 }
 
@@ -345,7 +348,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         QList<QByteArray> fps = fpsList[i].split(',');
         for(const QByteArray& data: fps)
             m_availFps[i] << data.toInt();
-        qSort(m_availFps[i]);
+        std::sort(m_availFps[i].begin(), m_availFps[i].end());
     }
 
     QByteArray rtspPortString = makeActiRequest(QLatin1String("system"), QLatin1String("V2_PORT_RTSP"), status);
@@ -521,7 +524,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     }
     m_inputMonitored = false;
 
-    const QAuthenticator auth = getAuth();
+    QAuthenticator auth = getAuth();
     QUrl url = getUrl();
     url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();

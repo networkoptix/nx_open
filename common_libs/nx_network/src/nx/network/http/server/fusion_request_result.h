@@ -52,6 +52,7 @@ public:
     int errorDetail;
     QString errorText;
 
+    /** Creates OK result */
     FusionRequestResult();
     FusionRequestResult(
         FusionRequestErrorClass _errorClass,

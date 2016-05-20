@@ -8,7 +8,6 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <thread>
 #include <vector>
 
 #define QN_NO_KEYWORD_UNUSED
@@ -19,6 +18,8 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/utils/std/thread.h>
+
 
 namespace nx_http {
 
@@ -261,7 +262,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
     static const int THREADS = 10;
     static const std::chrono::seconds TEST_DURATION(15);
 
-    std::vector<std::thread> threads;
+    std::vector<nx::utils::thread> threads;
     std::vector<std::pair<bool, std::shared_ptr<nx_http::HttpClient>>> clients;
     std::mutex mtx;
     std::atomic<bool> isTerminated(false);
@@ -300,7 +301,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
         clients.emplace_back(false, std::make_shared<nx_http::HttpClient>());
 
     for (int i = 0; i < THREADS; ++i)
-        threads.emplace_back(std::thread(threadFunc));
+        threads.emplace_back(nx::utils::thread(threadFunc));
 
     const auto beginTime = std::chrono::steady_clock::now();
     while (beginTime + TEST_DURATION > std::chrono::steady_clock::now())

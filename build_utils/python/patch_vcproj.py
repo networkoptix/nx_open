@@ -16,6 +16,8 @@ namespaces_dict = {'ms' : ms_namespace}
 
 parent_map = {}
 arch = 'x64'
+qt_default_path = '%ENVIRONMENT%\\packages\\windows-{0}\\qt-5.6.0'
+qt_path = ''
 
 def indent(elem, level=0):
     i = "\n" + level*"  "
@@ -86,9 +88,13 @@ def fix_mocables(root):
         return
 
     print "Removing moc custom build steps"
-    nodesToRemove = [parent_map[node] for node in nodes]
-    for itemGroupNode in nodesToRemove:
-        root.remove(itemGroupNode)        
+    for node in nodes:
+        include = node.attrib
+        itemGroupNode = parent_map[node]
+        itemGroupNode.remove(node)
+        itemGroupNode.append(Element('ClInclude', include))
+        indent(itemGroupNode, 1)
+            
 
 def fix_qrc(root):
     """Removing additional inputs from qrc, since we rebuild it manually."""
@@ -110,6 +116,19 @@ def fix_qrc(root):
             allowed = [f for f in files if not f.endswith('.png') and not f.endswith('.ico') and not f.endswith('.qm')]
             inputNode.text = ';'.join(allowed)
 
+def add_qt_path(root):
+    """Adding runtime path to QT libs."""
+    #xpath = "./Project/PropertyGroup"
+   
+    print "Adding path to QT libs: {}".format(qt_path)
+    target = Element('PropertyGroup')
+    root.insert(3, target)
+    
+    env = Element('LocalDebuggerEnvironment')
+    env.text= 'PATH={0}\\bin$(LocalDebuggerEnvironment)'.format(qt_path)
+    target.append(env)
+    indent(target, 1)
+            
 def patch_project(project):
     print "Patching {0}...".format(project)
     tree = ET.parse(project)
@@ -121,17 +140,25 @@ def patch_project(project):
     fix_qrc(root)
     fix_mocables(root)
     add_prebuild_events(root)
+    add_qt_path(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('project', type=str, help='Project to be patched.')
     parser.add_argument('-a', '--arch', help='Target architecture.')
+    parser.add_argument('-q', '--qt-dir', help='Path to Qt.')
     args = parser.parse_args()
     
     if args.arch:
         global arch
         arch = args.arch
+    
+    global qt_path
+    if args.qt_dir:
+        qt_path = args.qt_dir.replace('/', '\\')
+    else:
+        qt_path = qt_default_path.format(arch)
     
     patch_project(args.project)
 

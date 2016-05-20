@@ -24,6 +24,7 @@
 
 class QTimer;
 
+class GraphicsLabel;
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
@@ -97,6 +98,26 @@ public:
          * Whether double clicking the time slider should start animated unzoom.
          */
         UnzoomOnDoubleClick = 0x100,
+
+        /**
+        * Whether slider should adjust the window to keep current position marker at the same pixel position.
+        */
+        StillPosition = 0x200,
+
+        /**
+        * Whether slider should hide position marker and its tooltip in live mode.
+        */
+        HideLivePosition = 0x400,
+
+        /**
+        * Whether drag-selection should be performed by left mouse button (otherwise right).
+        */
+        LeftButtonSelection = 0x800,
+
+        /**
+        * Whether drag operations at window sides should scroll the window.
+        */
+        DragScrollsWindow = 0x1000
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -130,6 +151,7 @@ public:
     void setWindowEnd(qint64 windowEnd);
 
     void setWindow(qint64 start, qint64 end, bool animate = false);
+    void shiftWindow(qint64 delta, bool animate = false);
 
     bool windowContains(qint64 position);
     void ensureWindowContains(qint64 position);
@@ -151,13 +173,17 @@ public:
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
 
-    const QString& toolTipFormat() const;
-    void setToolTipFormat(const QString& format);
+    bool isLiveSupported() const;
+    void setLiveSupported(bool value);
+
+    bool isLive() const;
 
     Q_SLOT void finishAnimations();
     Q_SLOT void hurryKineticAnimations();
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+
+    virtual bool eventFilter(QObject* target, QEvent* event) override;
 
     virtual QPointF positionFromValue(qint64 logicalValue, bool bound = true) const override;
     virtual qint64 valueFromPosition(const QPointF& position, bool bound = true) const override;
@@ -192,6 +218,8 @@ public:
 
     qreal msecsPerPixel() const;
 
+    bool positionMarkerVisible() const;
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -202,6 +230,7 @@ signals:
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
     void msecsPerPixelChanged();
+    void lineCommentChanged(int line, const QString& comment);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -223,10 +252,10 @@ protected:
     virtual void kineticMove(const QVariant& degrees) override;
     virtual void finishKinetic() override;
 
-    virtual void startDragProcess(DragInfo*) override;
+    virtual void startDragProcess(DragInfo* info) override;
     virtual void startDrag(DragInfo* info) override;
     virtual void dragMove(DragInfo* info) override;
-    virtual void finishDrag(DragInfo*) override;
+    virtual void finishDragProcess(DragInfo* info) override;
 
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint) const override;
 
@@ -357,7 +386,7 @@ private:
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
 
-    void setThumbnailSelecting(qint64 time, bool selecting);
+    qint64 setThumbnailSelecting(qint64 time, bool selecting);
 
     void setAnimationStart(qint64 start);
     void setAnimationEnd(qint64 end);
@@ -388,7 +417,6 @@ private:
 
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
-    QString m_toolTipFormat;
 
     QnLinearFunction m_unboundMapper;
     QnBoundedLinearFunction m_boundMapper;
@@ -446,6 +474,12 @@ private:
     QnBookmarksViewer* m_bookmarksViewer;
     bool m_bookmarksVisible;
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
+
+    bool m_liveSupported;
+    bool m_selectionInitiated;
+
+    GraphicsLabel* m_tooltipLine1;
+    GraphicsLabel* m_tooltipLine2;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

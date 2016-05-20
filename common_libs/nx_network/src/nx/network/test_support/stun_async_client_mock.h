@@ -24,7 +24,7 @@ public:
 
     MOCK_METHOD2(connect, void(SocketAddress, bool));
     MOCK_METHOD2(setIndicationHandler, bool(int, IndicationHandler));
-    MOCK_METHOD1(ignoreIndications, bool(int));
+    MOCK_METHOD1(addOnReconnectedHandler, void(ReconnectHandler));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));

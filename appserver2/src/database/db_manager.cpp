@@ -16,6 +16,10 @@
 #include "utils/serialization/json.h"
 #include "core/resource/user_resource.h"
 
+#include <database/migrations/business_rules_db_migration.h>
+#include <database/migrations/user_permissions_db_migration.h>
+#include <database/migrations/accessible_resources_db_migration.h>
+
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_stored_file_data.h"
@@ -74,152 +78,22 @@ static bool removeDirRecursive(const QString & dirName)
     return result;
 }
 
-template <class T>
-void assertSorted(std::vector<T> &data) {
-#ifdef _DEBUG
-    assertSorted(data, &T::id);
-#else
-    Q_UNUSED(data);
-#endif // DEBUG
-}
 
-template <class T, class Field>
-void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
-#ifdef _DEBUG
-    if (data.empty())
-        return;
-
-    QByteArray prev = (data[0].*idField).toRfc4122();
-    for (size_t i = 1; i < data.size(); ++i) {
-        QByteArray next = (data[i].*idField).toRfc4122();
-        NX_ASSERT(next >= prev);
-        prev = next;
-    }
-#else
-    Q_UNUSED(data);
-    Q_UNUSED(idField);
-#endif // DEBUG
-}
 
 /**
- * Function merges sorted query into the sorted Data list. Data list contains placeholder
- * field for the data, that is contained in the query.
- * Data elements should have 'id' field and should be sorted by it.
- * Query should have 'id' and 'parentId' fields and should be sorted by 'id'.
- */
-template <class MainData>
-void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnUuid> MainData::*subList)
+* Updaters are used to update object's fields, which are stored as a raw json string
+* Returns true if object is updated
+*/
+
+bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
 {
-    assertSorted(data);
-
-    QSqlRecord rec = query.record();
-    int idIdx = rec.indexOf("id");
-    int parentIdIdx = rec.indexOf("parentId");
-    NX_ASSERT(idIdx >=0 && parentIdIdx >= 0);
-
-    bool eof = true;
-    QnUuid id, parentId;
-    QByteArray idRfc;
-
-    auto step = [&eof, &id, &idRfc, &parentId, &query, idIdx, parentIdIdx]{
-        eof = !query.next();
-        if (eof)
-            return;
-        idRfc = query.value(idIdx).toByteArray();
-        NX_ASSERT(idRfc == id.toRfc4122() || idRfc > id.toRfc4122());
-        id = QnUuid::fromRfc4122(idRfc);
-        parentId = QnUuid::fromRfc4122(query.value(parentIdIdx).toByteArray());
-    };
-
-    step();
-    size_t i = 0;
-    while (i < data.size() && !eof) {
-        if (id == data[i].id) {
-            (data[i].*subList).push_back(parentId);
-            step();
-        } else if (idRfc > data[i].id.toRfc4122()) {
-            ++i;
-        } else {
-            step();
-        }
-    }
+    if (data.actionParams.size() <= 4) //< keep empty json
+        return false;
+    auto deserializedData = QJson::deserialized<QnBusinessActionParameters>(data.actionParams);
+    data.actionParams = QJson::serialized(deserializedData);
+    return true;
 }
 
-/**
- * Function merges two sorted lists. First of them (data) contains placeholder
- * field for the data, that is contained in the second (subData).
- * Data elements should have 'id' field and should be sorted by it.
- * SubData elements should be sorted by parentIdField.
- */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
-void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
-{
-    assertSorted(data);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-    while (i < data.size() && j < subDataList.size()) {
-        if (subDataList[j].*parentIdField == data[i].id) {
-            (data[i].*subDataListField).push_back(subDataList[j]);
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > data[i].id.toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
-}
-
-template <class MainData, class SubData, class MainOrParentType, class IdType, class SubOrParentType, class Handler>
-void mergeObjectListData(
-    std::vector<MainData>& data,
-    std::vector<SubData>& subDataList,
-    IdType MainOrParentType::*idField,
-    IdType SubOrParentType::*parentIdField,
-    Handler mergeHandler )
-{
-    assertSorted(data, idField);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-
-    while (i < data.size() && j < subDataList.size()) {
-        if (subDataList[j].*parentIdField == data[i].*idField) {
-            mergeHandler( data[i], subDataList[j] );
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > (data[i].*idField).toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
-}
-
-//!Same as above but does not require field "id" of type QnUuid
-/**
- * Function merges two sorted lists. First of them (data) contains placeholder
- * field for the data, that is contained in the second (subData).
- * Data elements MUST be sorted by \a idField.
- * SubData elements should be sorted by parentIdField.
- * Types MainOrParentType1 and MainOrParentType2 are separated to allow \a subDataListField and \a idField to be pointers to fields of related types
- */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType1, class MainOrParentType2, class IdType, class SubOrParentType>
-void mergeObjectListData(
-    std::vector<MainData>& data,
-    std::vector<SubData>& subDataList,
-    std::vector<MainSubData> MainOrParentType1::*subDataListField,
-    IdType MainOrParentType2::*idField,
-    IdType SubOrParentType::*parentIdField )
-{
-    mergeObjectListData(
-        data,
-        subDataList,
-        idField,
-        parentIdField,
-        [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
-}
 
 // --------------------------------------- QnDbTransactionExt -----------------------------------------
 
@@ -472,10 +346,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
         return false;
     }
 
-
-
-
-
     m_storageTypeId = getType( "Storage" );
     m_serverTypeId = getType( QnResourceTypePool::kServerTypeId );
     m_cameraTypeId = getType( "Camera" );
@@ -575,7 +445,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 return false;
         }
         if (m_needResyncbRules) {
-            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
+            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule, businessRuleObjectUpdater))
                 return false;
         }
         if (m_needResyncUsers) {
@@ -613,8 +483,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (iter == users.cend())
             return false;
 
-        userResource.reset(new QnUserResource());
-        fromApiToResource(*iter, userResource);
+        userResource = fromApiToResource(*iter);
         NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
     }
 
@@ -732,7 +601,7 @@ bool QnDbManager::queryObjects(ObjectListType& objects)
 }
 
 template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
+bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
     if (!queryObjects<ObjectListType>(objects))
@@ -742,6 +611,12 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
     {
         QnTransaction<ObjectType> transaction(command, object);
         transactionLog->fillPersistentInfo(transaction);
+        if (updater && updater(transaction.params))
+        {
+            if (executeTransactionInternal(transaction) != ErrorCode::ok)
+                return false;
+        }
+
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
@@ -762,7 +637,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
         return false;
-    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
+    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule, businessRuleObjectUpdater))
         return false;
     if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
@@ -1024,129 +899,6 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
     return true;
 }
 
-
-namespace oldBusinessData // TODO: #Elric #EC2 sane naming
-{
-    enum BusinessEventType
-    {
-        NotDefinedEvent,
-        Camera_Motion,
-        Camera_Input,
-        Camera_Disconnect,
-        Storage_Failure,
-        Network_Issue,
-        Camera_Ip_Conflict,
-        MediaServer_Failure,
-        MediaServer_Conflict,
-        MediaServer_Started
-    };
-
-    enum BusinessActionType
-    {
-        UndefinedAction,
-        CameraOutput,
-        Bookmark,
-        CameraRecording,
-        PanicRecording,
-        SendMail,
-        Diagnostics,
-        ShowPopup,
-        CameraOutputInstant,
-        PlaySound,
-        SayText,
-        PlaySoundRepeated
-    };
-}
-
-int EventRemapData[][2] =
-{
-    { oldBusinessData::Camera_Motion,        QnBusiness::CameraMotionEvent     },
-    { oldBusinessData::Camera_Input,         QnBusiness::CameraInputEvent      },
-    { oldBusinessData::Camera_Disconnect,    QnBusiness::CameraDisconnectEvent },
-    { oldBusinessData::Storage_Failure,      QnBusiness::StorageFailureEvent   },
-    { oldBusinessData::Network_Issue,        QnBusiness::NetworkIssueEvent     },
-    { oldBusinessData::Camera_Ip_Conflict,   QnBusiness::CameraIpConflictEvent },
-    { oldBusinessData::MediaServer_Failure,  QnBusiness::ServerFailureEvent    },
-    { oldBusinessData::MediaServer_Conflict, QnBusiness::ServerConflictEvent   },
-    { oldBusinessData::MediaServer_Started,  QnBusiness::ServerStartEvent      },
-    { -1,                                    -1                                }
-};
-
-int ActionRemapData[][2] =
-{
-    { oldBusinessData::CameraOutput,        QnBusiness::CameraOutputAction     },
-    { oldBusinessData::Bookmark,            QnBusiness::BookmarkAction         },
-    { oldBusinessData::CameraRecording,     QnBusiness::CameraRecordingAction  },
-    { oldBusinessData::PanicRecording,      QnBusiness::PanicRecordingAction   },
-    { oldBusinessData::SendMail,            QnBusiness::SendMailAction         },
-    { oldBusinessData::Diagnostics,         QnBusiness::DiagnosticsAction      },
-    { oldBusinessData::ShowPopup,           QnBusiness::ShowPopupAction        },
-    { oldBusinessData::CameraOutputInstant, QnBusiness::CameraOutputOnceAction },
-    { oldBusinessData::PlaySound,           QnBusiness::PlaySoundOnceAction    },
-    { oldBusinessData::SayText,             QnBusiness::SayTextAction          },
-    { oldBusinessData::PlaySoundRepeated,   QnBusiness::PlaySoundAction        },
-    { -1,                                   -1                                 }
-};
-
-int remapValue(int oldVal, const int remapData[][2])
-{
-    for (int i = 0; remapData[i][0] >= 0; ++i)
-    {
-        if (remapData[i][0] == oldVal)
-            return remapData[i][1];
-    }
-    return oldVal;
-}
-
-bool QnDbManager::doRemap(int id, int newVal, const QString& fieldName)
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    QString sqlText = QString(lit("UPDATE vms_businessrule set %1 = ? where id = ?")).arg(fieldName);
-    query.prepare(sqlText);
-    query.addBindValue(newVal);
-    query.addBindValue(id);
-    return query.exec();
-}
-
-struct BeRemapData
-{
-    BeRemapData(): id(0), eventType(0), actionType(0) {}
-
-    int id;
-    int eventType;
-    int actionType;
-};
-
-bool QnDbManager::migrateBusinessEvents()
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id,event_type, action_type from vms_businessrule");
-    if (!query.exec())
-        return false;
-
-    QVector<BeRemapData> oldData;
-    while (query.next())
-    {
-        BeRemapData data;
-        data.id = query.value("id").toInt();
-        data.eventType = query.value("event_type").toInt();
-        data.actionType = query.value("action_type").toInt();
-        oldData << data;
-    }
-
-    for(const BeRemapData& remapData: oldData)
-    {
-        if (!doRemap(remapData.id, remapValue(remapData.eventType, EventRemapData), "event_type"))
-            return false;
-        if (!doRemap(remapData.id, remapValue(remapData.actionType, ActionRemapData), "action_type"))
-            return false;
-    }
-
-    return true;
-}
-
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/29_update_history_guid.sql")) {
@@ -1343,7 +1095,8 @@ bool QnDbManager::fixBusinessRules()
             }
         }
     }
-    m_needResyncbRules = true;
+    if (!m_dbJustCreated)
+        m_needResyncbRules = true;
     return true;
 }
 
@@ -1485,6 +1238,31 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             m_needResyncUsers = true;
         }
     }
+    else if (updateName == lit(":/updates/50_fix_migration.sql"))
+    {
+        if (!m_dbJustCreated)
+        {
+            m_needResyncbRules = true;
+            m_needResyncUsers = true;
+        }
+    }
+    else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
+    {
+        if (!ec2::db::migrateUserPermissions(m_sdb))
+            return false;
+
+        if (!m_dbJustCreated)
+            m_needResyncUsers = true;
+    }
+    else if (updateName == lit(":/updates/55_migrate_accessible_resources.sql"))
+    {
+        if (!ec2::db::migrateAccessibleResources(m_sdb))
+            return false;
+
+        if (!m_dbJustCreated)
+            m_needResyncUsers = true;
+    }
+
     return true;
 }
 
@@ -1514,9 +1292,11 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
 
-        if (!migrateBusinessEvents())
+        if (!ec2::db::migrateBusinessEvents(m_sdb))
             return false;
-        if (!m_dbJustCreated) {
+
+        if (!m_dbJustCreated)
+        {
             m_needResyncLog = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
@@ -1644,22 +1424,6 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
     return ErrorCode::ok;
 }
 
-/*
-ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
-{
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = ?");
-    insQuery.addBindValue(resourceId);
-    if (insQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
-}
-*/
-
 qint32 QnDbManager::getResourceInternalId( const QnUuid& guid ) {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -1723,6 +1487,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         QSqlQuery authQuery(m_sdb);
         if (!prepareSQLQuery(&authQuery, authQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
+
         QnSql::bind(data, &authQuery);
         authQuery.bindValue(":internalId", internalId);
         if (!execSQLQuery(&authQuery, Q_FUNC_INFO))
@@ -1741,7 +1506,13 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         QSqlQuery profileQuery(m_sdb);
         if (!prepareSQLQuery(&profileQuery, profileQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
+
         QnSql::bind(data, &profileQuery);
+        if (data.isLdap && data.isCloud)
+        {
+            NX_LOG(lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId), cl_logWARNING);
+            profileQuery.bindValue(":isCloud", false);
+        }
 
         if (data.digest.isEmpty() && !data.isLdap)
         {
@@ -2352,11 +2123,11 @@ ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
     /* Cleanup all users, belonging to this group. */
     {
         QSqlQuery query(m_sdb);
-        const QString queryStr("UPDATE vms_userprofile SET group = NULL WHERE group = :groupId");
+        const QString queryStr("UPDATE vms_userprofile SET group_guid = NULL WHERE group_guid = ?");
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        query.bindValue(":groupId", guid.toRfc4122());
+        query.addBindValue(guid.toRfc4122());
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
@@ -3829,7 +3600,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     std::vector<ApiVideowallMatrixWithRefData> matrices;
     QnSql::fetch_many(queryMatrices, &matrices);
     mergeObjectListData(matrices, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
-    qSort(matrices.begin(), matrices.end(), [] (const ApiVideowallMatrixWithRefData& data1, const ApiVideowallMatrixWithRefData& data2) {
+    std::sort(matrices.begin(), matrices.end(), [] (const ApiVideowallMatrixWithRefData& data1, const ApiVideowallMatrixWithRefData& data2) {
         return data1.videowallGuid.toRfc4122() < data2.videowallGuid.toRfc4122();
     });
     mergeObjectListData(videowallList, matrices, &ApiVideowallData::matrices, &ApiVideowallMatrixWithRefData::videowallGuid);
@@ -3950,7 +3721,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& dumpFileSize)
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -3964,7 +3735,7 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
     //TODO #ak add license db to backup
 
     QFileInfo dumpFileInfo( dumpFilePath.path );
-    dumpFileSize = dumpFileInfo.size();
+    databaseDumpToFileData.size = dumpFileInfo.size();
 
     if( !m_sdb.open() )
     {
@@ -3989,7 +3760,7 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
 // ApiFullInfo
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& data)
 {
-    ErrorCode status;
+//    ErrorCode status;
 
 #define db_load(target)      { ErrorCode status = doQueryNoLock(dummy, target);     if (status != ErrorCode::ok) return status; }
 #define db_load_uuid(target) { ErrorCode status = doQueryNoLock(QnUuid(), target);  if (status != ErrorCode::ok) return status; }

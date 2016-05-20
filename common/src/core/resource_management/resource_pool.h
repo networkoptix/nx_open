@@ -133,6 +133,8 @@ public:
     QnResourcePtr getResourceByUniqueId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 
+    QnResourcePtr getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const;
+
     bool hasSuchResource(const QString &uniqid) const;
 
     QnResourcePtr getResourceByUrl(const QString &url) const;

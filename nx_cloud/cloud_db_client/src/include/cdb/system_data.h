@@ -179,6 +179,12 @@ public:
     std::vector<SystemAccessRoleData> accessRoles;
 };
 
+enum class SystemHealth
+{
+    offline,
+    online
+};
+
 class SystemDataEx
 :
     public SystemData
@@ -188,17 +194,20 @@ public:
     SystemAccessRole accessRole;
     /** permissions, account can share current system with */
     std::vector<SystemAccessRoleData> sharingPermissions;
+    SystemHealth stateOfHealth;
 
     SystemDataEx()
     :
-        accessRole(SystemAccessRole::none)
+        accessRole(SystemAccessRole::none),
+        stateOfHealth(SystemHealth::offline)
     {
     }
 
     SystemDataEx(SystemData systemData)
     :
         SystemData(std::move(systemData)),
-        accessRole(SystemAccessRole::none)
+        accessRole(SystemAccessRole::none),
+        stateOfHealth(SystemHealth::offline)
     {
     }
 };

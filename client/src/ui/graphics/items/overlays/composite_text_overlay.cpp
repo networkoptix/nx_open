@@ -13,7 +13,6 @@
 
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/common/search_query_strategy.h>
-#include <ui/common/search_query_strategy.h>
 
 namespace
 {

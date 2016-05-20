@@ -34,10 +34,12 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_controlConnection->setMessageHandler(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
-    m_controlConnection->socket()->registerTimer(
-        m_timeouts.maxConnectionInactivityPeriod(),
-        std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
-    m_aioTimer.bindToAioThread(m_controlConnection->socket()->getAioThread());
+    m_aioTimer.bindToAioThread(m_controlConnection->getAioThread());
+
+    //TODO #ak keep-alive timer
+    //m_controlConnection->socket()->registerTimer(
+    //    m_timeouts.maxConnectionInactivityPeriod(),
+    //    std::bind(&OutgoingTunnelConnection::onKeepAliveTimeout, this));
 
     hpm::api::UdpHolePunchingSyn syn;
     stun::Message message;

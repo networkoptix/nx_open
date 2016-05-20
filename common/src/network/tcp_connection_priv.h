@@ -24,6 +24,17 @@ static const QByteArray STATIC_UNAUTHORIZED_HTML("\
     </HTML>"
 );
 
+static const QByteArray STATIC_FORBIDDEN_HTML("\
+    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
+    <HTML>\
+    <HEAD>\
+    <TITLE>Error</TITLE>\
+    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
+    </HEAD>\
+    <BODY><H1>403 Forbidden.</H1></BODY>\
+    </HTML>"
+    );
+
 static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
     <HTML>\

@@ -1,5 +1,4 @@
-#ifndef QN_COMMON_CONFIG_H
-#define QN_COMMON_CONFIG_H
+#pragma once
 
 // -------------------------------------------------------------------------- //
 // Application globals. Do not change.
@@ -19,27 +18,10 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 // -------------------------------------------------------------------------- //
 // Library & Compiler globals. Do not change.
 // -------------------------------------------------------------------------- //
-/* Get GCC version in human-readable format. */
-#ifdef __GNUC__
-#   define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
-#endif
 
 /* Don't use deprecated Qt functions. */
 // TODO: This one causes compilation errors in QObject...
 //#define QT_NO_DEPRECATED
-
-
-/* Use variadic macros in boost even for older GCC versions. */
-#if !defined(BOOST_PP_VARIADICS) && defined(__GNUC__) && GCC_VERSION >= 40000
-#   define BOOST_PP_VARIADICS
-#endif
-
-
-/* Define override specifier. */
-#if defined(__GNUC__) && GCC_VERSION < 40700
-#   define override
-#endif
-
 
 /* Define NULL. */
 #ifdef __cplusplus
@@ -103,6 +85,3 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 #   define DEBUG_CODE(...)
 #   define RELEASE_CODE(...) __VA_ARGS__
 #endif
-
-
-#endif // QN_COMMON_CONFIG_H

@@ -21,7 +21,8 @@ public:
         SafeModeError,
         ForbiddenError,
         ConfigurationError,
-        BothSystemsBoundToCloudError,
+        DependentSystemBoundToCloudError,
+        UnconfiguredSystemError
     };
 
     explicit QnMergeSystemsTool(QObject *parent = 0);

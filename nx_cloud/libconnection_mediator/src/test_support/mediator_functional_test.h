@@ -6,7 +6,6 @@
 #ifndef NX_MEDIATOR_FUNCTIONAL_TEST_H
 #define NX_MEDIATOR_FUNCTIONAL_TEST_H
 
-#include <future>
 #include <vector>
 
 #include <QtCore/QDir>
@@ -14,8 +13,10 @@
 
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/std/thread.h>
 
 #include "../cloud_data_provider.h"
+#include "../data/listening_peer.h"
 #include "../mediator_process_public.h"
 
 #include "local_cloud_data_provider.h"
@@ -41,7 +42,8 @@ public:
 
     void addArg(const char* arg);
 
-    SocketAddress endpoint() const;
+    SocketAddress stunEndpoint() const;
+    SocketAddress httpEndpoint() const;
 
     std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
@@ -60,18 +62,22 @@ public:
         const AbstractCloudDataProvider::System& system,
         size_t count);
 
+    std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
+        getListeningPeers() const;
+
 private:
     QString m_tmpDir;
-    int m_port;
+    int m_stunPort;
+    int m_httpPort;
     std::vector<char*> m_args;
     std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;
-    std::future<int> m_mediatorProcessFuture;
-    std::promise<bool /*result*/> m_mediatorStartedPromise;
+    nx::utils::thread m_mediatorProcessThread;
+    nx::utils::promise<bool /*result*/> m_mediatorStartedPromise;
     //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
 };
 
-}   //hpm
-}   //nx
+}   // namespace hpm
+}   // namespace nx
 
 #endif  //NX_MEDIATOR_FUNCTIONAL_TEST_H

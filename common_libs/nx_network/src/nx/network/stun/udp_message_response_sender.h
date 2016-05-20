@@ -33,7 +33,7 @@ public:
         std::function<void(SystemError::ErrorCode)> handler) override;
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
-    virtual void addOnConnectionCloseHandler(std::function<void()> handler) override;
+    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual AbstractCommunicatingSocket* socket() override;
 
 private:

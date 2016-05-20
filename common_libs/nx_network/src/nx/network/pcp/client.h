@@ -32,7 +32,7 @@ public:
     Guard subscribe(const std::function<void(Mapping)>& callback);
 
 private:
-    Subscription<Mapping> m_subscription;
+    nx::utils::Subscription<Mapping> m_subscription;
 };
 
 } // namespace pcp

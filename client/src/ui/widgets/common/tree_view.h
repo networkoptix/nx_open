@@ -7,7 +7,7 @@
 /**
  * This class fixes some bugs in <tt>QTreeView</tt> related to drag and drop
  * handling when being embedded into a <tt>QGraphicsProxyWidget</tt>.
- * 
+ *
  * It also adds several features that the QTreeView is lacking.
  */
 class QnTreeView: public QTreeView {
@@ -25,7 +25,7 @@ signals:
     /**
      * This signal is emitted whenever the user presses enter on one of the
      * tree's items.
-     * 
+     *
      * \param index                     Index of the item. Is guaranteed to be valid.
      */
     void enterPressed(const QModelIndex &index);

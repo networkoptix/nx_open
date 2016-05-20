@@ -14,7 +14,7 @@
 #include <boost/optional.hpp>
 
 #include <udt/udt.h>
-#include <nx/utils/future.h>
+#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
 #include <utils/common/checked_cast.h>
@@ -429,7 +429,7 @@ AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 }
 
 template<typename InterfaceToImplement>
-aio::AbstractAioThread* UdtSocket<InterfaceToImplement>::getAioThread()
+aio::AbstractAioThread* UdtSocket<InterfaceToImplement>::getAioThread() const
 {
     return Pollable::getAioThread();
 }

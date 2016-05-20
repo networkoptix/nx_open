@@ -7,7 +7,6 @@
 
 #include <chrono>
 #include <functional>
-#include <future>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -15,38 +14,45 @@
 
 #include <common/common_globals.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/httpclient.h>
 #include <nx/network/socket.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/serialization/json.h>
 #include <utils/serialization/lexical.h>
 
+#include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"
 #include "socket_globals_holder.h"
+
 
 namespace nx {
 namespace hpm {
 
 MediatorFunctionalTest::MediatorFunctionalTest()
 :
-    m_port(0)
+    m_stunPort(0),
+    m_httpPort(0)
 {
     //starting clean test
     SocketGlobalsHolder::instance()->reinitialize();
 
-    m_port = (std::rand() % 10000) + 50000;
+    m_stunPort = (std::rand() % 10000) + 50000;
+    m_httpPort = m_stunPort+1;
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     auto b = std::back_inserter(m_args);
     *b = strdup("/path/to/bin");
     *b = strdup("-e");
-    *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
+    *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_stunPort).toLatin1().constData());
+    *b = strdup("-http/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
     *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(endpoint());
+    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
     registerCloudDataProvider(&m_cloudDataProvider);
 }
 
@@ -59,11 +65,10 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
 
 void MediatorFunctionalTest::start()
 {
-    std::promise<void> mediatorInstantiatedCreatedPromise;
+    nx::utils::promise<void> mediatorInstantiatedCreatedPromise;
     auto mediatorInstantiatedCreatedFuture = mediatorInstantiatedCreatedPromise.get_future();
 
-    m_mediatorProcessFuture = std::async(
-        std::launch::async,
+    m_mediatorProcessThread = nx::utils::thread(
         [this, &mediatorInstantiatedCreatedPromise]()->int {
             m_mediatorInstance = std::make_unique<nx::hpm::MediatorProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
@@ -101,7 +106,7 @@ bool MediatorFunctionalTest::waitUntilStarted()
 void MediatorFunctionalTest::stop()
 {
     m_mediatorInstance->pleaseStop();
-    m_mediatorProcessFuture.wait();
+    m_mediatorProcessThread.join();
     m_mediatorInstance.reset();
 }
 
@@ -118,9 +123,14 @@ void MediatorFunctionalTest::addArg(const char* arg)
     *b = strdup(arg);
 }
 
-SocketAddress MediatorFunctionalTest::endpoint() const
+SocketAddress MediatorFunctionalTest::stunEndpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_port);
+    return SocketAddress(HostAddress::localhost, m_stunPort);
+}
+
+SocketAddress MediatorFunctionalTest::httpEndpoint() const
+{
+    return SocketAddress(HostAddress::localhost, m_httpPort);
 }
 
 std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
@@ -166,7 +176,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     nx::String name)
 {
     auto server = std::make_unique<MediaServerEmulator>(
-        endpoint(),
+        stunEndpoint(),
         system,
         std::move(name));
     if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
@@ -177,7 +187,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
     const AbstractCloudDataProvider::System& system)
 {
-    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
+    auto server = std::make_unique<MediaServerEmulator>(stunEndpoint(), system);
     if (!server->start())
     {
         std::cerr<<"Failed to start server"<<std::endl;
@@ -197,7 +207,7 @@ std::unique_ptr<MediaServerEmulator>
     MediatorFunctionalTest::addRandomServerNotRegisteredOnMediator(
         const AbstractCloudDataProvider::System& system)
 {
-    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
+    auto server = std::make_unique<MediaServerEmulator>(stunEndpoint(), system);
     if (!server->start())
         return nullptr;
     return server;
@@ -209,56 +219,39 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
         size_t count)
 {
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
+    systemServers.push_back(std::make_unique<MediaServerEmulator>(stunEndpoint(), system));
+    systemServers.push_back(std::make_unique<MediaServerEmulator>(stunEndpoint(), system));
     for (auto& server: systemServers)
         if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
             return std::vector<std::unique_ptr<MediaServerEmulator>>();
     return systemServers;
 }
 
-//api::ResultCode MediatorFunctionalTest::addAccount(
-//    api::AccountData* const accountData,
-//    std::string* const password,
-//    api::AccountConfirmationCode* const activationCode)
-//{
-//    if (accountData->email.empty())
-//    {
-//        std::ostringstream ss;
-//        ss << "test_" << rand() << "@networkoptix.com";
-//        accountData->email = ss.str();
-//    }
-//
-//    if (password->empty())
-//    {
-//        std::ostringstream ss;
-//        ss << rand();
-//        *password = ss.str();
-//    }
-//
-//    if (accountData->fullName.empty())
-//        accountData->fullName = "Test Test";
-//    if (accountData->passwordHa1.empty())
-//        accountData->passwordHa1 = nx_http::calcHa1(
-//            QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
-//            //accountData->email.c_str(),
-//            moduleInfo().realm.c_str(),
-//            password->c_str()).constData();
-//    if (accountData->customization.empty())
-//        accountData->customization = QnAppInfo::customizationName();
-//
-//    auto connection = connectionFactory()->createConnection("", "");
-//
-//    //adding account
-//    api::ResultCode result = api::ResultCode::ok;
-//    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
-//        std::bind(
-//            &nx::cdb::api::AccountManager::registerNewAccount,
-//            connection->accountManager(),
-//            *accountData,
-//            std::placeholders::_1));
-//    return result;
-//}
+std::tuple<nx_http::StatusCode::Value, data::ListeningPeersBySystem>
+    MediatorFunctionalTest::getListeningPeers() const
+{
+    nx_http::HttpClient httpClient;
+    const auto urlStr =
+        lm("http://%1%2").arg(httpEndpoint().toString())
+        .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
+    if (!httpClient.doGet(QUrl(urlStr)))
+        return std::make_tuple(
+            nx_http::StatusCode::serviceUnavailable,
+            data::ListeningPeersBySystem());
+    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        return std::make_tuple(
+            static_cast<nx_http::StatusCode::Value>(
+                httpClient.response()->statusLine.statusCode),
+            data::ListeningPeersBySystem());
 
-}   //hpm
-}   //nx
+    QByteArray responseBody;
+    while (!httpClient.eof())
+        responseBody += httpClient.fetchMessageBodyBuffer();
+
+    return std::make_tuple(
+        nx_http::StatusCode::ok,
+        QJson::deserialized<data::ListeningPeersBySystem>(responseBody));
+}
+
+}   // namespace hpm
+}   // namespace nx

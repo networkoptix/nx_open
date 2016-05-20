@@ -56,6 +56,11 @@ namespace nx_http
         return m_asyncHttpClient->response();
     }
 
+    SystemError::ErrorCode HttpClient::lastSysErrorCode() const
+    {
+        return m_asyncHttpClient->lastSysErrorCode();
+    }
+
     //!
     bool HttpClient::eof() const
     {
@@ -107,6 +112,11 @@ namespace nx_http
         m_sendTimeoutMs = sendTimeoutMs;
     }
 
+    void HttpClient::setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs)
+    {
+        m_responseReadTimeoutMs = responseReadTimeoutMs;
+    }
+
     void HttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
     {
         m_messageBodyReadTimeoutMs = messageBodyReadTimeoutMs;
@@ -125,6 +135,16 @@ namespace nx_http
     void HttpClient::setUserPassword( const QString& userPassword )
     {
         m_userPassword = userPassword;
+    }
+
+    AbstractStreamSocket* HttpClient::socket()
+    {
+        return m_asyncHttpClient->socket();
+    }
+
+    QSharedPointer<AbstractStreamSocket> HttpClient::takeSocket()
+    {
+        return m_asyncHttpClient->takeSocket();
     }
 
     void HttpClient::instanciateHttpClient()
@@ -161,6 +181,8 @@ namespace nx_http
                 m_asyncHttpClient->setTotalReconnectTries(m_reconnectTries.get());
             if (m_sendTimeoutMs)
                 m_asyncHttpClient->setSendTimeoutMs(m_sendTimeoutMs.get());
+            if (m_responseReadTimeoutMs)
+                m_asyncHttpClient->setResponseReadTimeoutMs(m_responseReadTimeoutMs.get());
             if (m_messageBodyReadTimeoutMs)
                 m_asyncHttpClient->setMessageBodyReadTimeoutMs(m_messageBodyReadTimeoutMs.get());
             if (m_userAgent)

@@ -22,7 +22,7 @@
         <!--<product.title>${project.name}</product.title>      -->
         <postfix.libs/>
         <linux.arm.oslibs>${linux.oslibs}</linux.arm.oslibs>
-        <rdep.global.packages>qt boost</rdep.global.packages>
+        <rdep.global.packages>qt any/boost</rdep.global.packages>
     </properties>
 
     <build>
@@ -184,6 +184,8 @@
                                         <argument>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</argument>
                                         <argument>--arch</argument>
                                         <argument>${arch}</argument>
+                                        <argument>--qt-dir</argument>
+                                        <argument>${qt.dir}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

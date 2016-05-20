@@ -110,6 +110,11 @@ void QnSecurityCamResource::setCameraInfoSavedToDisk(const QString &storageUrl)
     SAFE(m_cameraInfoSavedToDisk[storageUrl] = true);
 }
 
+void QnSecurityCamResource::resetCameraInfoSavedToDisk(const QString &storageUrl)
+{
+    SAFE(m_cameraInfoSavedToDisk[storageUrl] = false);
+}
+
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
 }
@@ -459,6 +464,12 @@ int QnSecurityCamResource::motionSensWindowCount() const
     return val.toInt();
 }
 
+
+bool QnSecurityCamResource::hasTwoWayAudio() const
+{
+    return getCameraCapabilities().testFlag(Qn::AudioTransmitCapability);
+}
+
 bool QnSecurityCamResource::isAudioSupported() const {
     QString val = getProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME);
     if (val.toInt() > 0)
@@ -529,7 +540,7 @@ Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
 }
 
 bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabilities) const {
-    return getCameraCapabilities() & capabilities;
+    return (getCameraCapabilities() & capabilities) == capabilities;
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
@@ -1035,3 +1046,10 @@ bool QnSecurityCamResource::isIOModule() const
 {
     return m_cachedIsIOModule.get();
 }
+
+#ifdef ENABLE_DATA_PROVIDERS
+QnAudioTransmitterPtr QnSecurityCamResource::getAudioTransmitter()
+{
+    return nullptr;
+}
+#endif
