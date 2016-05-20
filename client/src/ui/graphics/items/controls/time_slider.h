@@ -400,9 +400,7 @@ private:
 
     void generateProgressPatterns();
 
-    void processBoomarksHover(QGraphicsSceneHoverEvent* event);
-
-    void updateBookmarksViewerTimestamp();
+    void updateBookmarksViewerLocation();
 
     QnBookmarksViewer* createBookmarksViewer();
 
@@ -473,7 +471,7 @@ private:
 
     QLocale m_locale;
 
-    QPointF m_currentRulerRectMousePos;
+    QPointF m_hoverMousePos;
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer* m_bookmarksViewer;
