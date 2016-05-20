@@ -75,15 +75,15 @@ private:
     QnResourceTreeModelNodePtr getSystemNode(const QString &systemName);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
+    QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
+
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
 
+    /* Remove virtual 'system' nodes that are not used anymore. */
+    void cleanupSystemNodes();
+
+    /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
-
-    void removeItemNode(const QnUuid& uuid, const QnResourcePtr& parentResource);
-
-    /** Some nodes can have deleting node set as parent, but this node will not
-     * have them as children because of their 'bastard' flag.*/
-    void deleteNode(const QnResourceTreeModelNodePtr& node);
 
     /** Fully rebuild resources tree. */
     void rebuildTree();
@@ -121,6 +121,7 @@ private:
     friend class QnResourceTreeModelNode;
 
     typedef QHash<QString, QnResourceTreeModelNodePtr> RecorderHash;
+    typedef QHash<QnUuid, QnResourceTreeModelNodePtr> ItemHash;
 
     /** Root nodes array */
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
@@ -132,7 +133,7 @@ private:
     QHash<QnResourceTreeModelNodePtr, RecorderHash> m_recorderHashByParent;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QnUuid, QnResourceTreeModelNodePtr> m_itemNodeByUuid;
+    QHash<QnResourceTreeModelNodePtr, ItemHash> m_itemNodesByParent;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
     QHash<QnResourcePtr, QList<QnResourceTreeModelNodePtr> > m_itemNodesByResource;

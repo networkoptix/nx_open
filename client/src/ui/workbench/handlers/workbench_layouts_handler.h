@@ -26,6 +26,7 @@ protected:
 
 private slots:
     void at_newUserLayoutAction_triggered();
+    void at_newGlobalLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
     void at_saveLayoutAsAction_triggered();

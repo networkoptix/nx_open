@@ -473,7 +473,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
-    m_currentRulerRectMousePos(),
+    m_hoverMousePos(-1.0, -1.0),
     m_lastLineBarValue(),
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
@@ -540,7 +540,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 #ifdef TIMELINE_BEHAVIOR_2_5
     defaultOptions |= AdjustWindowToPosition;
 #else
-    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow;
+    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow | StillBookmarksViewer;
 #endif
     setOptions(defaultOptions);
 
@@ -559,21 +559,35 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
 
 QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
 {
-    const auto bookmarksAtPositionFunc = [this](qint64 position) -> QnCameraBookmarkList
+    const auto bookmarksAtLocationFunc = [this](qint64 location) -> QnCameraBookmarkList
     {
-        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(position, m_msecsPerPixel)
+        if (m_options.testFlag(StillBookmarksViewer))
+            location = valueFromPosition(QPointF(location, 0));
+
+        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(location, m_msecsPerPixel)
             : QnCameraBookmarkList());
     };
 
-    const auto getPosFunc = [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
+    const auto getPosFunc = [this](qint64 location) -> QnBookmarksViewer::PosAndBoundsPair
     {
-        if ((timestamp < m_windowStart) || (timestamp > m_windowEnd))
-            return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
+        if (m_options.testFlag(StillBookmarksViewer))
+        {
+            if (location >= rect().width())
+                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
+        }
+        else
+        {
+            if (location < m_windowStart || location > m_windowEnd)
+                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
+        }
 
         const auto viewer = bookmarksViewer();
 
-        const auto pos = positionFromValue(timestamp);
-        const auto target = QPointF(pos.x(), lineBarRect().top());
+        qreal pos = m_options.testFlag(StillBookmarksViewer) ?
+            static_cast<qreal>(location) :
+            positionFromValue(location).x();
+
+        const auto target = QPointF(pos, lineBarRect().top());
 
         Q_D(const GraphicsSlider);
 
@@ -584,7 +598,7 @@ QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
         return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
     };
 
-    return new QnBookmarksViewer(bookmarksAtPositionFunc, getPosFunc, this);
+    return new QnBookmarksViewer(bookmarksAtLocationFunc, getPosFunc, this);
 }
 
 QnTimeSlider::~QnTimeSlider()
@@ -900,7 +914,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate)
             updateThumbnailsPeriod();
 
             m_bookmarksViewer->updateOnWindowChange();
-            updateBookmarksViewerTimestamp();
+            updateBookmarksViewerLocation();
         }
     }
 }
@@ -1967,14 +1981,14 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
     }
 }
 
-qint64 QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
+void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
 {
     if (time < 0)
-        return -1;
+        return;
 
     QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
     if (pos == m_thumbnailData.end())
-        return -1;
+        return;
 
     qint64 actualTime = pos->thumbnail.actualTime();
 
@@ -1989,7 +2003,7 @@ qint64 QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
     for (ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
         ipos->selecting = selecting;
 
-    return actualTime;
+    return;
 }
 
 void QnTimeSlider::updateThumbnailsVisibility()
@@ -2593,7 +2607,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
 
-        bool hovered = bookmarkRect.contains(m_currentRulerRectMousePos);
+        bool hovered = bookmarkRect.contains(m_hoverMousePos);
         const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
         const QColor& futureBg = hovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
 
@@ -2819,7 +2833,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent* event)
 {
     base_type::resizeEvent(event);
 
-    if (event->oldSize().width() != event->newSize().width())
+    if (event->oldSize() != event->newSize())
     {
         updateMSecsPerPixel();
         updateMinimalWindow();
@@ -2893,6 +2907,7 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverEnterEvent(event);
+    m_hoverMousePos = event->pos();
 
     unsetCursor();
 }
@@ -2900,25 +2915,26 @@ void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverLeaveEvent(event);
+    m_hoverMousePos = QPointF(-1.0, -1.0);
 
     unsetCursor();
 
     setThumbnailSelecting(m_lastHoverThumbnail, false);
     m_lastHoverThumbnail = -1;
-
-    m_currentRulerRectMousePos = QPointF();
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverMoveEvent(event);
+    m_hoverMousePos = event->pos();
 
     if (thumbnailsRect().contains(event->pos()) && thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && m_oldThumbnailData.isEmpty() && !m_thumbnailsUpdateTimer->isActive())
     {
         qint64 time = qRound(valueFromPosition(event->pos()), thumbnailsLoader()->timeStep());
 
         setThumbnailSelecting(m_lastHoverThumbnail, false);
-        m_lastHoverThumbnail = setThumbnailSelecting(time, true);
+        setThumbnailSelecting(time, true);
+        m_lastHoverThumbnail = time;
     }
     else
     {
@@ -2945,28 +2961,19 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
         }
     }
 
-    processBoomarksHover(event);
+    updateBookmarksViewerLocation();
 }
 
-void QnTimeSlider::updateBookmarksViewerTimestamp()
+void QnTimeSlider::updateBookmarksViewerLocation()
 {
-    if (!rulerRect().contains(m_currentRulerRectMousePos))
+    if (lineBarRect().contains(m_hoverMousePos))
     {
-        m_bookmarksViewer->resetBookmarks();
-        return;
-    }
+        qint64 location = m_options.testFlag(StillBookmarksViewer) ?
+            static_cast<qint64>(m_hoverMousePos.x()) :
+            valueFromPosition(m_hoverMousePos);
 
-    if (lineBarRect().contains(m_currentRulerRectMousePos))
-    {
-        const auto timestamp = valueFromPosition(m_currentRulerRectMousePos);
-        m_bookmarksViewer->setTargetTimestamp(timestamp);
+        m_bookmarksViewer->setTargetLocation(location);
     }
-}
-
-void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent* event)
-{
-    m_currentRulerRectMousePos = event->pos();
-    updateBookmarksViewerTimestamp();
 }
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)

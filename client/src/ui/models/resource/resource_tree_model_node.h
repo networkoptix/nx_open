@@ -48,8 +48,6 @@ public:
 
     ~QnResourceTreeModelNode();
 
-    void clear() ;
-
     void setResource(const QnResourcePtr &resource);
 
     void update();
@@ -57,25 +55,8 @@ public:
     void updateRecursive() ;
 
     Qn::NodeType type() const ;
-
-    const QnResourcePtr &resource() const;
-
+    QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
-
-    Qn::ResourceStatus resourceStatus() const ;
-
-    const QnUuid &uuid() const ;
-
-    State state() const ;
-
-    bool isValid() const;
-
-    void setState(State state) ;
-
-    bool isBastard() const ;
-
-    void setBastard(bool bastard);
-
 
     QList<QnResourceTreeModelNodePtr> children() const;
 
@@ -85,9 +66,8 @@ public:
 
     void setParent(const QnResourceTreeModelNodePtr& parent) ;
 
-    QModelIndex index(int col);
-
-    QModelIndex index(int row, int col);
+    QModelIndex createIndex(int row, int col);
+    QModelIndex createIndex(int col);
 
     Qt::ItemFlags flags(int column) const ;
 
@@ -98,16 +78,25 @@ public:
     bool isModified() const;
 
     void setModified(bool modified) ;
+
 protected:
     void removeChildInternal(const QnResourceTreeModelNodePtr& child) ;
     void addChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
 private:
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+
+    const QnUuid &uuid() const;
+    bool isValid() const;
+    State state() const;
+    void setState(State state);
+
     /** Recalculated 'bastard' state for the node. */
     bool calculateBastard() const;
 
-    QnResourceTreeModelNodePtr toSharedPointer() const;
+    bool isBastard() const;
+    void setBastard(bool bastard);
 
 private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit

@@ -124,6 +124,8 @@ class Rdep:
                 command.append("-e")
                 command.append(ssh)
 
+        command += additional_args
+
         command.append(source)
         if destination:
             command.append(destination)
