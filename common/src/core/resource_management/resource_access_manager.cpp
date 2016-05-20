@@ -241,31 +241,31 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
     return false;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiStorageData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
 {
-    return canCreateStorageInternal(qnResPool->getResourceById<QnUserResource>(userId), data.parentId);
+    return canCreateStorageInternal(user, data.parentId);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiLayoutData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const
 {
-    return canCreateLayoutInternal(qnResPool->getResourceById<QnUserResource>(userId), data.parentId);
+    return canCreateLayoutInternal(user, data.parentId);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiUserData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
-    return canCreateUserInternal(qnResPool->getResourceById<QnUserResource>(userId), data.permissions, data.isAdmin);
+    return canCreateUserInternal(user, data.permissions, data.isAdmin);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiVideowallData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const
 {
     Q_UNUSED(data);
-    return canCreateVideoWallInternal(qnResPool->getResourceById<QnUserResource>(userId));
+    return canCreateVideoWallInternal(user);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiWebPageData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const
 {
     Q_UNUSED(data);
-    return canCreateWebPageInternal(qnResPool->getResourceById<QnUserResource>(userId));
+    return canCreateWebPageInternal(user);
 }
 
 void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resource)

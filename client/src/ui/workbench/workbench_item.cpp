@@ -36,13 +36,14 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid,
 QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     QObject(parent),
     m_layout(NULL),
-    m_resourceUid(data.resource.path),
+    m_resourceUid(data.resource.uniqueId),  //TODO: #GDM looks like way outdated hack
     m_uuid(data.uuid),
     m_flags(0),
     m_rotation(0.0),
     m_displayInfo(false)
 {
-    if(m_resourceUid.isEmpty()) {
+    if(m_resourceUid.isEmpty())
+    {
         qnWarning("Creating a workbench item from item data with invalid unique id.");
         // TODO: #Elric fix layout item data conventions.
 
@@ -73,7 +74,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     QnLayoutItemData data;
 
     data.uuid = m_uuid;
-    data.resource.path = m_resourceUid;
+    data.resource.uniqueId = m_resourceUid;
     data.resource.id = resource ? resource->getId() : QnUuid();
     data.flags = flags();
     data.rotation = rotation();
@@ -95,8 +96,14 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
 #ifdef _DEBUG
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(resourceUid());
     QnUuid localId = resource ? resource->getId() : QnUuid();
-    if(data.resource.id != localId && data.resource.path != m_resourceUid)
-        qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
+    if(data.resource.id != localId && data.resource.uniqueId != m_resourceUid)
+        qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).",
+            resourceUid(),
+            localId.toString(),
+            data.resource.id.toString(),
+            data.resource.uniqueId,
+            m_resourceUid
+        );
 #endif
 
     bool result = true;
@@ -122,8 +129,13 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
 
 #ifdef _DEBUG
     QnUuid localId = qnResPool->getResourceByUniqueId(resourceUid())->getId();
-    if(data.resource.id != localId && data.resource.path != m_resourceUid)
-        qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
+    if(data.resource.id != localId && data.resource.uniqueId != m_resourceUid)
+        qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).",
+            resourceUid(),
+            localId.toString(),
+            data.resource.id.toString(),
+            data.resource.uniqueId,
+            m_resourceUid);
 #endif
 
     data.flags = flags();

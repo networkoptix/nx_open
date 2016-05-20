@@ -26,7 +26,8 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     pastBookmark = QColor("#b21083dc");
     futureBookmark = QColor("#b21083dc");
-
+    pastBookmarkHover = QColor("#1c8fe7e6");
+    futureBookmarkHover = QColor("#1c8fe7e6");
     pastBookmarkBound = QColor("#1c8fe7");
     futureBookmarkBound = QColor("#1c8fe7");
 

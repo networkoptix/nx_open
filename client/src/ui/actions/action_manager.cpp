@@ -860,14 +860,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
 
     factory(QnActions::WebClientAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
 
     factory(QnActions::SystemUpdateAction).
         flags(Qn::NoTarget).
@@ -947,7 +947,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
         condition(new QnConjunctionActionCondition(
-            new QnTreeNodeTypeCondition(Qn::ServersNode, this),
+            new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
             new QnForbiddenInSafeModeCondition(this),
             new QnRequiresOwnerCondition(this),
             this)

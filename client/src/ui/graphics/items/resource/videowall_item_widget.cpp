@@ -479,12 +479,11 @@ void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overla
 }
 
 
-bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
-    QnResourcePtr resource = (!data.resource.id.isNull())
-            ? qnResPool->getResourceById(data.resource.id)
-            : qnResPool->getResourceByUniqueId(data.resource.path); //TODO: #EC2
+bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data)
+{
+    QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
 
-    bool isServer = resource && (resource->flags() & Qn::server);
+    bool isServer = resource && resource->flags().testFlag(Qn::server);
 
     if (isServer && !m_widget->m_thumbs.contains(resource->getId())) {
         m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");

@@ -111,7 +111,7 @@ void QnLayoutResource::setUrl(const QString& value)
         for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
-            item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
+            item.resource.uniqueId = QnLayoutFileStorageResource::updateNovParent(value, item.resource.uniqueId);
         }
     }
 #endif
@@ -385,5 +385,5 @@ bool QnLayoutResource::isFile() const
 
 bool QnLayoutResource::isGlobal() const
 {
-    return getParentId().isNull();
+    return getParentId().isNull() && !flags().testFlag(Qn::local);
 }

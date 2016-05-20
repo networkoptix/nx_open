@@ -9,11 +9,11 @@
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>
+#include <core/resource/resource_fwd.h>
 #include <core/ptz/item_dewarping_params.h>
 #include <utils/color_space/image_correction.h>
 
 class QnWorkbenchLayout;
-class QnLayoutItemData;
 
 /**
  * Layout item. Video, image, server, or anything else.
@@ -36,7 +36,7 @@ public:
 
     /**
      * Constructor.
-     * 
+     *
      * \param data                      Item data to create an item from.
      * \param parent                    Parent of this object.
      */
@@ -83,7 +83,7 @@ public:
     }
 
     /**
-     * \returns                         Universally unique identifier of this item. 
+     * \returns                         Universally unique identifier of this item.
      */
     const QnUuid &uuid() const {
         return m_uuid;
@@ -184,17 +184,17 @@ public:
      * \param pinned                    New pinned state for this item.
      * \returns                         Whether the pinned state was successfully set.
      */
-    bool setPinned(bool pinned) { 
-        return setFlag(Qn::Pinned, pinned); 
+    bool setPinned(bool pinned) {
+        return setFlag(Qn::Pinned, pinned);
     }
 
     /**
      * Toggles the current pinned state of this item.
-     * 
+     *
      * \returns                         Whether the pinned state was successfully changed.
      */
-    bool togglePinned() { 
-        return setPinned(!isPinned()); 
+    bool togglePinned() {
+        return setPinned(!isPinned());
     }
 
     /**
@@ -205,10 +205,10 @@ public:
     }
 
     /**
-     * Note that zoom rect will be used only if an appropriate zoom link is 
+     * Note that zoom rect will be used only if an appropriate zoom link is
      * created for this item in a layout.
-     * 
-     * \param zoomRect                  New zoom rect for this item. 
+     *
+     * \param zoomRect                  New zoom rect for this item.
      */
     void setZoomRect(const QRectF &zoomRect);
 
@@ -222,7 +222,7 @@ public:
      */
     void setDewarpingParams(const QnItemDewarpingParams& params);
 
-    
+
     const ImageCorrectionParams &imageEnhancement() const {
         return m_imageEnhancement;
     }
@@ -256,9 +256,9 @@ public:
     void adjustGeometry();
 
     /**
-     * Marks this item as waiting for geometry adjustment. It will be placed 
+     * Marks this item as waiting for geometry adjustment. It will be placed
      * at the best slot that is close to given position when its layout becomes active.
-     * 
+     *
      * \param desiredPosition           Position in grid coordinates. This item
      *                                  will be placed as close to this position as possible.
      */

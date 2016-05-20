@@ -1,16 +1,16 @@
 #include "resource_search_proxy_model.h"
-#include "resource_pool_model.h"
 
-#include <utils/common/delete_later.h>
-#include <nx/network/nettools.h>
-#include <utils/common/string.h>
+#include <client/client_globals.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
-#include <client/client_globals.h>
+#include <nx/network/nettools.h>
 
-QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
+#include <utils/common/string.h>
+#include <utils/common/delete_later.h>
+
+QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent):
     QSortFilterProxyModel(parent),
     m_invalidating(false)
 {
@@ -100,7 +100,7 @@ bool QnResourceSearchProxyModel::lessThan(const QModelIndex &left, const QModelI
         QString rs = rightData.toString();
         return naturalStringLess(ls, rs);
     } else {
-        // Throw the rest situation to base class to handle 
+        // Throw the rest situation to base class to handle
         return QSortFilterProxyModel::lessThan(left,right);
     }
 }

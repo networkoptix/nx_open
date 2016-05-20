@@ -33,7 +33,8 @@ class QnVideoWallItem;
 class QnVideoWallMatrix;
 class QnVideoWallControlMessage;
 
-class QnLayoutItemData;
+struct QnLayoutItemData;
+struct QnLayoutItemResourceDescriptor;
 
 struct QnServerBackupSchedule;
 

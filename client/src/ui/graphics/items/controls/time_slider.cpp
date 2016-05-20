@@ -29,7 +29,7 @@
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
-#include <ui/graphics/items/generic/proxy_label.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
@@ -129,6 +129,12 @@ namespace {
 
     /** Padding at the left of line labels. */
     const int kLineLabelPaddingPixels = 6;
+
+    /** Minimal width of big datetime tooltips. */
+    const qreal kDateTimeTooltipMinimalWidth = 128.0;
+
+    /** Gap between position marker and tooltip tail. */
+    const qreal kToolTipMargin = 4.0;
 
     const qreal kDegreesFor2x = 180.0;
 
@@ -473,7 +479,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_bookmarksVisible(false),
     m_bookmarksHelper(nullptr),
     m_liveSupported(false),
-    m_keyboardSelectionInitiated(false)
+    m_selectionInitiated(false),
+    m_tooltipLine1(new GraphicsLabel(this)),
+    m_tooltipLine2(new GraphicsLabel(this))
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -484,6 +492,25 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastMinuteIndicatorVisible.fill(true, kMaxLines);
 
     generateProgressPatterns();
+
+    /* Create tooltip layout. */
+    QGraphicsLinearLayout* tooltipLayout = new QGraphicsLinearLayout(Qt::Vertical);
+    tooltipLayout->setContentsMargins(5.0, 4.0, 5.0, 3.0);
+    tooltipLayout->setSpacing(2.0);
+    tooltipLayout->addItem(m_tooltipLine1);
+    tooltipLayout->addItem(m_tooltipLine2);
+
+    toolTipItem()->setLayout(tooltipLayout);
+    toolTipItem()->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    setTooltipMargin(kToolTipMargin);
+
+    m_tooltipLine1->setAlignment(Qt::AlignCenter);
+    m_tooltipLine2->setAlignment(Qt::AlignCenter);
+
+    QFont font;
+    font.setPixelSize(font.pixelSize() + 2);
+    font.setBold(true);
+    m_tooltipLine2->setFont(font);
 
     /* Prepare kinetic zoom processor. */
     KineticCuttingProcessor* kineticProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
@@ -516,8 +543,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow;
 #endif
     setOptions(defaultOptions);
-
-    setToolTipFormat(lit("hh:mm:ss"));
 
     /* Run handlers. */
     updateSteps();
@@ -778,6 +803,7 @@ void QnTimeSlider::setOptions(Options options)
     {
         updateSteps();
         updateTickmarkTextSteps();
+        updateToolTipText();
     }
 }
 
@@ -969,7 +995,7 @@ void QnTimeSlider::setSelection(qint64 start, qint64 end)
 
     if (m_selectionStart != start || m_selectionEnd != end)
     {
-        m_keyboardSelectionInitiated = false;
+        m_selectionInitiated = false;
         m_selectionStart = start;
         m_selectionEnd = end;
 
@@ -987,21 +1013,7 @@ void QnTimeSlider::setSelectionValid(bool valid)
     m_selectionValid = valid;
 
     if (!m_selectionValid)
-        m_keyboardSelectionInitiated = false;
-}
-
-const QString& QnTimeSlider::toolTipFormat() const
-{
-    return m_toolTipFormat;
-}
-
-void QnTimeSlider::setToolTipFormat(const QString& format)
-{
-    if (m_toolTipFormat == format)
-        return;
-
-    m_toolTipFormat = format;
-    updateToolTipText();
+        m_selectionInitiated = false;
 }
 
 QnThumbnailsLoader* QnTimeSlider::thumbnailsLoader() const
@@ -1513,13 +1525,50 @@ void QnTimeSlider::updateToolTipText()
 
     qint64 pos = sliderPosition();
 
-    QString toolTip;
-    if (m_options.testFlag(UseUTC))
-        toolTip = m_locale.toString(QDateTime::fromMSecsSinceEpoch(pos + m_localOffset), m_toolTipFormat);
-    else
-        toolTip = m_locale.toString(msecsToTime(pos), m_toolTipFormat);
+    QString line1;
+    QString line2;
 
-    setToolTip(toolTip);
+    if (isLive())
+    {
+        line1 = tr("Live");
+    }
+    else
+    {
+        static const QString tooltipFormatDate = lit("dd MMMM yyyy");
+        static const QString tooltipFormatTime = lit("hh:mm:ss");
+        static const QString tooltipFormatTimeShort = lit("mm:ss");
+
+        if (m_options.testFlag(UseUTC))
+        {
+            QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos + m_localOffset);
+            line1 = m_locale.toString(dateTime, tooltipFormatDate);
+            line2 = m_locale.toString(dateTime, tooltipFormatTime);
+        }
+        else
+        {
+            const QString& format = maximum() >= 60ll * 60ll * 1000ll ? /* Longer than 1 hour? */
+                tooltipFormatTime :
+                tooltipFormatTimeShort;
+
+            line1 = m_locale.toString(msecsToTime(pos), format);
+        }
+    }
+
+    m_tooltipLine1->setText(line1);
+
+    if (line2.isEmpty())
+    {
+        m_tooltipLine2->setVisible(false);
+        toolTipItem()->setMinimumWidth(0.0);
+    }
+    else
+    {
+        m_tooltipLine2->setText(line2);
+        m_tooltipLine2->setVisible(true);
+
+        /* Big datetime tooltips shouldn't be narrower than some minimal value: */
+        toolTipItem()->setMinimumWidth(kDateTimeTooltipMinimalWidth);
+    }
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line)
@@ -1565,7 +1614,7 @@ void QnTimeSlider::updateTickmarkTextSteps()
 
 bool QnTimeSlider::positionMarkerVisible() const
 {
-    return !m_options.testFlag(HideLivePosition) || !isLive() || isSliderDown();
+    return !m_options.testFlag(HideLivePosition) || !isLive() || (isSliderDown() && !m_dragIsClick);
 }
 
 bool QnTimeSlider::isLiveSupported() const
@@ -1918,14 +1967,14 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
     }
 }
 
-void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
+qint64 QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
 {
     if (time < 0)
-        return;
+        return -1;
 
     QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
     if (pos == m_thumbnailData.end())
-        return;
+        return -1;
 
     qint64 actualTime = pos->thumbnail.actualTime();
 
@@ -1939,6 +1988,8 @@ void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
 
     for (ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
         ipos->selecting = selecting;
+
+    return actualTime;
 }
 
 void QnTimeSlider::updateThumbnailsVisibility()
@@ -2166,6 +2217,7 @@ void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color
     pen.setCapStyle(Qt::FlatCap);
 
     QnScopedPainterPenRollback penRollback(painter, pen);
+    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
 
     qreal x = quickPositionFromValue(pos);
     painter->drawLine(QPointF(x, rect().top()), QPointF(x, rect().bottom()));
@@ -2541,23 +2593,27 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
 
+        bool hovered = bookmarkRect.contains(m_currentRulerRectMousePos);
+        const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
+        const QColor& futureBg = hovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
+
         QBrush leftBoundBrush;
         QBrush rightBoundBrush;
         if (pos > bookmarkRect.left() && pos < bookmarkRect.right())
         {
-            painter->fillRect(bookmarkRect.x(), bookmarkRect.y(), pos - bookmarkRect.x(), bookmarkRect.height(), m_colors.pastBookmark);
-            painter->fillRect(pos, bookmarkRect.y(), bookmarkRect.right() - pos, bookmarkRect.height(), m_colors.futureBookmark);
+            painter->fillRect(bookmarkRect.x(), bookmarkRect.y(), pos - bookmarkRect.x(), bookmarkRect.height(), pastBg);
+            painter->fillRect(pos, bookmarkRect.y(), bookmarkRect.right() - pos, bookmarkRect.height(), futureBg);
             leftBoundBrush = pastBrush;
             rightBoundBrush = futureBrush;
         }
         else if (pos >= bookmarkRect.right())
         {
-            painter->fillRect(bookmarkRect, m_colors.pastBookmark);
+            painter->fillRect(bookmarkRect, pastBg);
             leftBoundBrush = rightBoundBrush = pastBrush;
         }
         else
         {
-            painter->fillRect(bookmarkRect, m_colors.futureBookmark);
+            painter->fillRect(bookmarkRect, futureBg);
             leftBoundBrush = rightBoundBrush = futureBrush;
         }
 
@@ -2763,7 +2819,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent* event)
 {
     base_type::resizeEvent(event);
 
-    if (event->oldSize().width() != event->newSize().width())
+    if (event->oldSize() != event->newSize())
     {
         updateMSecsPerPixel();
         updateMinimalWindow();
@@ -2813,7 +2869,7 @@ void QnTimeSlider::keyPressEvent(QKeyEvent* event)
             /* To handle two cases - when the first begin/end marker was either placed for the first time
              *  or when it was moved to another location before complementary end/begin marker was placed -
              *  we can do this simple check: */
-            m_keyboardSelectionInitiated = m_selectionStart == m_selectionEnd;
+            m_selectionInitiated = m_selectionStart == m_selectionEnd;
 
             /* Accept selection events. */
             event->accept();
@@ -2848,6 +2904,7 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
     unsetCursor();
 
     setThumbnailSelecting(m_lastHoverThumbnail, false);
+    m_lastHoverThumbnail = -1;
 
     m_currentRulerRectMousePos = QPointF();
 }
@@ -2856,30 +2913,36 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverMoveEvent(event);
 
-    switch(markerFromPosition(event->pos(), kHoverEffectDistance))
-    {
-    case SelectionStartMarker:
-    case SelectionEndMarker:
-        setCursor(Qt::SplitHCursor);
-        break;
-
-    default:
-        unsetCursor();
-        break;
-    }
-
     if (thumbnailsRect().contains(event->pos()) && thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && m_oldThumbnailData.isEmpty() && !m_thumbnailsUpdateTimer->isActive())
     {
         qint64 time = qRound(valueFromPosition(event->pos()), thumbnailsLoader()->timeStep());
 
         setThumbnailSelecting(m_lastHoverThumbnail, false);
-        setThumbnailSelecting(time, true);
-        m_lastHoverThumbnail = time;
+        m_lastHoverThumbnail = setThumbnailSelecting(time, true);
     }
     else
     {
         setThumbnailSelecting(m_lastHoverThumbnail, false);
         m_lastHoverThumbnail = -1;
+    }
+
+    if (m_lastHoverThumbnail != -1)
+    {
+        setCursor(Qt::PointingHandCursor);
+    }
+    else
+    {
+        switch (markerFromPosition(event->pos(), kHoverEffectDistance))
+        {
+        case SelectionStartMarker:
+        case SelectionEndMarker:
+            setCursor(Qt::SplitHCursor);
+            break;
+
+        default:
+            unsetCursor();
+            break;
+        }
     }
 
     processBoomarksHover(event);
@@ -2909,6 +2972,8 @@ void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent* event)
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     bool immediateDrag = true;
+    m_dragDelta = QPointF();
+
     switch (event->button())
     {
     case Qt::LeftButton:
@@ -2930,20 +2995,25 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
         break;
     }
 
-    if (thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && event->button() == Qt::LeftButton && thumbnailsRect().contains(event->pos()))
+    bool thumbnailHasBeenClicked(false);
+    if (thumbnailsLoader() && thumbnailsLoader()->timeStep() != 0 && thumbnailsRect().contains(event->pos()))
     {
         qint64 time = qRound(valueFromPosition(event->pos(), false), thumbnailsLoader()->timeStep());
         QMap<qint64, ThumbnailData>::const_iterator pos = m_thumbnailData.find(time);
         if (pos != m_thumbnailData.end())
         {
-            emit thumbnailClicked();
-            setSliderPosition(pos->thumbnail.actualTime(), true);
-            immediateDrag = false;
+            if (event->button() == Qt::LeftButton)
+            {
+                emit thumbnailClicked();
+                setSliderPosition(pos->thumbnail.actualTime(), true);
+            }
+
+            thumbnailHasBeenClicked = true;
         }
     }
 
-    m_dragDelta = QPointF();
-    dragProcessor()->mousePressEvent(this, event, immediateDrag);
+    if (!thumbnailHasBeenClicked)
+        dragProcessor()->mousePressEvent(this, event, immediateDrag);
 
     event->accept();
 }
@@ -2956,15 +3026,24 @@ void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+    if (dragProcessor()->isWaiting())
+    {
+        event->accept();
+        return;
+    }
+
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker && !m_keyboardSelectionInitiated)
+    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
         setSelectionValid(false);
 
     m_dragMarker = NoMarker;
 
     if (m_dragIsClick && event->button() == Qt::RightButton)
+    {
         emit customContextMenuRequested(event->pos(), event->screenPos());
+        m_selectionInitiated = m_selectionValid && m_selectionStart == m_selectionEnd;
+    }
 
     event->accept();
 }
