@@ -473,7 +473,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
-    m_hoverMousePos(),
+    m_hoverMousePos(-1.0, -1.0),
     m_lastLineBarValue(),
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
@@ -2915,7 +2915,7 @@ void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverLeaveEvent(event);
-    m_hoverMousePos = QPointF();
+    m_hoverMousePos = QPointF(-1.0, -1.0);
 
     unsetCursor();
 
