@@ -2819,7 +2819,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent* event)
 {
     base_type::resizeEvent(event);
 
-    if (event->oldSize().width() != event->newSize().width())
+    if (event->oldSize() != event->newSize())
     {
         updateMSecsPerPixel();
         updateMinimalWindow();
