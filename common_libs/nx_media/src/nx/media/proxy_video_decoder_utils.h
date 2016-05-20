@@ -21,24 +21,25 @@ class ProxyVideoDecoderFlagConfig: public nx::utils::FlagConfig
 public:
     using nx::utils::FlagConfig::FlagConfig;
 
-    NX_FLAG(1, largeOnly); //< isCompatible() will allow only width > 640.
+    NX_FLAG(0, disable, "Fully disable ProxyVideoDecoder: isCompatible() -> false.");
+    NX_FLAG(1, largeOnly, "isCompatible() will allow only width > 640.");
 
     // Debug output.
-    NX_FLAG(0, enableOutput);
-    NX_FLAG(0, enableTime);
+    NX_FLAG(0, enableOutput, "");
+    NX_FLAG(0, enableTime, "");
 
     // Choosing impl.
-    NX_FLAG(1, implDisplay); //< decodeToDisplayQueue() => displayDecoded() in frame handle().
-    NX_FLAG(0, implRgb); //< decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.
-    NX_FLAG(0, implYuvPlanar); //< decodeToYuvPlanar() -> AlignedMemVideoBuffer => Qt Shader.
-    NX_FLAG(0, implYuvNative); //< decodeToYuvNative() -> AlignedMemVideoBuffer => Plugin Shader.
-    NX_FLAG(0, implGl); //< decodeYuvPlanar() => Planar YUV Shader.
+    NX_FLAG(1, implDisplay, "decodeToDisplayQueue() => displayDecoded() in frame handle().");
+    NX_FLAG(0, implRgb, "decodeToRgb() -> AlignedMemVideoBuffer, without OpenGL.");
+    NX_FLAG(0, implYuvPlanar, "decodeToYuvPlanar() -> AlignedMemVideoBuffer => Qt Shader.");
+    NX_FLAG(0, implYuvNative, "decodeToYuvNative() -> AlignedMemVideoBuffer => Plugin Shader.");
+    NX_FLAG(0, implGl, "decodeYuvPlanar() => Planar YUV Shader.");
 
     // OpenGL impl options.
-    NX_FLAG(0, stopOnGlErrors);
-    NX_FLAG(0, outputGlCalls);
-    NX_FLAG(0, useGlGuiRendering);
-    NX_FLAG(1, useSharedGlContext);
+    NX_FLAG(0, stopOnGlErrors, "");
+    NX_FLAG(0, outputGlCalls, "");
+    NX_FLAG(0, useGlGuiRendering, "");
+    NX_FLAG(1, useSharedGlContext, "");
 };
 extern ProxyVideoDecoderFlagConfig conf;
 
@@ -54,10 +55,6 @@ std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
     const QnConstCompressedVideoDataPtr& compressedVideoData);
 
 #define PRINT qWarning().nospace() << OUTPUT_PREFIX
-
-#if !defined(OUTPUT_PREFIX)
-    #define OUTPUT_PREFIX "ProxyVideoDecoder: "
-#endif
 #define OUTPUT if (!conf.enableOutput) {} else qWarning().nospace() << OUTPUT_PREFIX
 
 long getTimeMs();

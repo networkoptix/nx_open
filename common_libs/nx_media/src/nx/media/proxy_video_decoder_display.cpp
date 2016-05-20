@@ -1,6 +1,7 @@
 #include "proxy_video_decoder_private.h"
 #if defined(ENABLE_PROXY_DECODER)
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder<display>: "
 #include "proxy_video_decoder_utils.h"
 
 namespace nx {

@@ -1,3 +1,4 @@
+#define OUTPUT_PREFIX "ProxyVideoDecoder[utils]: "
 #include "proxy_video_decoder_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
 

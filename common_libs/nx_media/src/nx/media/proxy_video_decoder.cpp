@@ -3,7 +3,9 @@
 
 #include <proxy_decoder.h>
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder: "
 #include "proxy_video_decoder_utils.h"
+
 #include "proxy_video_decoder_private.h"
 
 namespace nx {
@@ -79,6 +81,13 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
     {
         OUTPUT << "isCompatible(codec:" << codec << ", resolution" << resolution
             << ") -> false: codec != CODEC_ID_H264";
+        return false;
+    }
+
+    if (conf.disable)
+    {
+        PRINT << "isCompatible(codec:" << codec
+            << ", resolution" << resolution << ") -> false: configuration flag 'disable' is set";
         return false;
     }
 
