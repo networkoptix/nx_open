@@ -1451,10 +1451,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
 
     /* Check if remote peer has rights to receive transaction */
     auto td = getTransactionDescriptorByValue(value);
-    bool remoteHasRights = td->checkPermissions(
-        m_userAccessData.userId,
-        tranParamsId,
-        Qn::Permission::ReadPermission);
+    bool remoteHasRights = td->checkPermissions(m_userAccessData.userId, tranParamsId, Qn::Permission::ReadPermission);
     if (!remoteHasRights)
         return false;
 

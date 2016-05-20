@@ -35,10 +35,7 @@ namespace ec2
             ApiCommand::Value value;
             QByteArray data;
 
-            TranMiscData(
-                const QnUuid &paramsId,
-                ApiCommand::Value value,
-                const QByteArray &data)
+            TranMiscData(const QnUuid &paramsId, ApiCommand::Value value, const QByteArray &data)
             :
                 paramsId(paramsId),
                 value(value),
@@ -48,9 +45,7 @@ namespace ec2
 
         typedef QList<TranMiscData> TranMiscDataListType;
 
-        ErrorCode getTransactionsAfter(
-            const QnTranState& state,
-            TranMiscDataListType &result);
+        ErrorCode getTransactionsAfter(const QnTranState& state, TranMiscDataListType &result);
         QnTranState getTransactionsState();
 
         bool contains(const QnTranState& state) const;
@@ -95,8 +90,7 @@ namespace ec2
         template<typename Param>
         QnUuid transactionHash(const Param &param)
         {
-            for (auto it = detail::transactionDescriptors.get<0>().begin();
-                 it != detail::transactionDescriptors.get<0>().end(); ++it)
+            for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
             {
                 auto tdBase = (*it).get();
                 auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);

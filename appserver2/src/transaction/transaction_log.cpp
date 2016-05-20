@@ -343,9 +343,7 @@ bool QnTransactionLog::contains(const QnTranState& state) const
     return true;
 }
 
-ErrorCode QnTransactionLog::getTransactionsAfter(
-    const QnTranState& state,
-    TranMiscDataListType &result)
+ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, TranMiscDataListType &result)
 {
     QnReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
@@ -362,10 +360,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
             return ErrorCode::failure;
 
         while (query.next()) {
-            result << TranMiscData(
-                            QnUuid::fromRfc4122(query.value(3).toByteArray()),
-                            ApiCommand::Value(query.value(2).toInt()),
-                            query.value(0).toByteArray());
+            result << TranMiscData(QnUuid::fromRfc4122(query.value(3).toByteArray()), ApiCommand::Value(query.value(2).toInt()), query.value(0).toByteArray());
             tranLogSequence[key] = query.value(1).toInt();
         }
     }
@@ -391,11 +386,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
             syncMarkersTran.params.markers.push_back(record);
         }
     }
-    result << TranMiscData(
-                    QnUuid(),
-                    ApiCommand::updatePersistentSequence,
-                    QnUbjsonTransactionSerializer::instance()
-                        ->serializedTransaction(syncMarkersTran));
+    result << TranMiscData(QnUuid(), ApiCommand::updatePersistentSequence, QnUbjsonTransactionSerializer::instance()->serializedTransaction(syncMarkersTran));
 
     return ErrorCode::ok;
 }

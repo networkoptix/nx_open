@@ -645,13 +645,42 @@ public:
         return errorCode;
     }
 
+    template <typename T1>
+    ErrorCode doQuery(const T1 &t1, ApiFullInfoData &data)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, data);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        filterByPermission(m_userAccessData.userId, data.accessRights, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.allProperties, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.cameraHistory, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.cameras, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.cameraUserAttributesList, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.discoveryData, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.layouts, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.licenses, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.resourceTypes, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.resStatusList, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.rules, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.servers, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.serversUserAttributesList, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.storages, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.userGroups, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.users, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.videowalls, Qn::Permission::ReadPermission);
+        filterByPermission(m_userAccessData.userId, data.webPages, Qn::Permission::ReadPermission);
+
+        return errorCode;
+    }
+
     template<typename T1, template<typename> class Container, typename Param>
     ErrorCode doQuery(const T1 &inParam, Container<Param> &outParamContainer)
     {
         ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParamContainer);
         if (errorCode != ErrorCode::ok)
             return errorCode;
-        filterByPermission(outParamContainer, Qn::Permission::ReadPermission);
+        ec2::filterByPermission(m_userAccessData.userId, outParamContainer, Qn::Permission::ReadPermission);
         if (outParamContainer.size() == 0)
             return ErrorCode::forbidden;
         return errorCode;
@@ -720,28 +749,7 @@ private:
     {
         if (m_userAccessData == Qn::kDefaultUserAccess)
             return true;
-        return hasPermissionImpl(param, permission, 0);
-    }
-
-    template<template<typename> class Container, typename Param>
-    void filterByPermission(Container<Param> &paramContainer, Qn::Permission permission)
-    {
-        paramContainer.erase(std::remove_if(paramContainer.begin(), paramContainer.end(),
-                                            [permission] (const Param &param) {
-                                                return !hasPermission(param, permission);
-                                            }));
-    }
-
-    template<typename Param>
-    auto hasPermissionImpl(const Param& param, Qn::Permission permission, int) -> nx::utils::SfinaeCheck<decltype(param.id), bool>
-    {
         return ec2::hasPermission(m_userAccessData.userId, param, permission);
-    }
-
-    template<typename Param>
-    auto hasPermissionImpl(const Param&/*param*/, Qn::Permission /*permission*/, char) -> bool
-    {
-        return true;
     }
 
 private:
