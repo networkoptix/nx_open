@@ -96,6 +96,9 @@ int VmsGatewayProcess::executeApplication()
         initializeLogging(settings);
 
         //enabling nat traversal
+        if (!settings.general().mediatorEndpoint.isEmpty())
+            nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+                SocketAddress(settings.general().mediatorEndpoint));
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
         const auto& httpAddrToListenList = settings.general().endpointsToListen;

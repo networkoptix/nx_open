@@ -30,6 +30,8 @@ namespace
 
     const QLatin1String kGeneralChangeUser("general/changeUser");
 
+    const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
+
     //log settings
     const QLatin1String kLogLevel( "log/logLevel" );
 #ifdef _DEBUG
@@ -167,6 +169,7 @@ void Settings::loadConfiguration()
     }
 
     m_general.changeUser = m_settings.value(kGeneralChangeUser).toString();
+    m_general.mediatorEndpoint = m_settings.value(kGeneralMediatorEndpoint).toString();
 
     //log
     m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();
