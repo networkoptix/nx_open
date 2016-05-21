@@ -14,14 +14,16 @@ fi
 echo "Copy YAML config ... "
 cp ../../customizations/$CUSTOMIZATION/cloud_portal.yaml $CLOUD_PORTAL_CONF_DIR
 
+echo "Copy email logo ... "
+cp ../../customizations/$CUSTOMIZATION/email_logo.png ../notifications/static/templates/
+cp ../../customizations/$CUSTOMIZATION/front_end/styles/* ../../front_end/styles/custom
+
+
 pushd ../../front_end
 echo "Publish front_end ... "
 grunt setbranding:$CUSTOMIZATION
 grunt pub
 popd
-
-echo "Copy email logo ... "
-cp ../../customizations/$CUSTOMIZATION/email_logo.png ../notifications/static/templates/
 
 pushd ../notifications/static/templates/src
 echo "Compile templates ... "
