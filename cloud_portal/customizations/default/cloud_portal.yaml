@@ -1,17 +1,17 @@
 customization: default
 
 cloud_database:
-    host: '127.0.0.1'
-    port: 3306
-    username: root
-    password: ''
-    database: nx_cloud
+    host: '$DB_HOST'
+    port: '$DB_PORT'
+    username: '$DB_USER'
+    password: '$DB_PASSWORD'
+    database: '$DB_NAME'
 
 cloud_db:
-    url: 'http://cloud-demo.hdw.mx:3346/cdb'
+    url: 'http://$CLOUD_DB_HOST:3346/cdb'
 
 cloud_portal:
-    url: 'http://cloud-demo.hdw.mx/static/index.html#'
+    url: 'http://$CLOUD_PORTAL_HOST/static/index.html#'
 
 mail_from: 'service@networkoptix.com'
 
