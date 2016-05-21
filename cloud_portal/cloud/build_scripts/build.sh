@@ -16,7 +16,7 @@ cp ../../customizations/$CUSTOMIZATION/cloud_portal.yaml $CLOUD_PORTAL_CONF_DIR
 
 echo "Copy email logo ... "
 cp ../../customizations/$CUSTOMIZATION/email_logo.png ../notifications/static/templates/
-cp ../../customizations/$CUSTOMIZATION/front_end/styles/* ../../front_end/styles/custom
+cp ../../customizations/$CUSTOMIZATION/front_end/styles/* ../../front_end/app/styles/custom
 
 
 pushd ../../front_end
