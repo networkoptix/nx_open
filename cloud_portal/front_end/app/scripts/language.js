@@ -80,8 +80,7 @@ var L = {
     },
     system:{
         yourSystem: 'Your system',
-        confirmDisconnect: "You are going to completely disconnect your system from the cloud. Are you sure?",
-        confirmDisconnectTitle: "Disconnect system?",
+        confirmDisconnectTitle: "Disconnect system from PRODUCT_NAME?",
         confirmDisconnectAction: "Disconnect",
 
         confirmUnshareFromMe: "You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?",
@@ -92,7 +91,7 @@ var L = {
         confirmUnshareTitle: "Delete User?",
         confirmUnshareAction: "Delete",
 
-        successDisconnected: 'System {systemName} was successfully disconnected from PRODUCT_NAME',
+        successDisconnected: 'System was successfully disconnected from PRODUCT_NAME',
         successDeleted: 'System {systemName} was successfully deleted from your account',
 
         permissionsRemoved: 'Permissions were removed from {accountEmail}'

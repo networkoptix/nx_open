@@ -89,19 +89,9 @@ angular.module('cloudApp')
 
         $scope.disconnect = function(){
             if($scope.isOwner ){
-
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
-                dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
-                    then(function(){
-                        $scope.deletingSystem = process.init(function(){
-                            return cloudApi.disconnect(systemId);
-                        },{
-                            successMessage: L.system.successDisconnected.replace('{systemName}', $scope.system.info.name),
-                            errorPrefix:'Cannot delete the system:'
-                        }).then(reloadSystems);
-                        $scope.deletingSystem.run();
-                    });
-
+                // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
+                dialogs.disconnect(systemId).then(reloadSystems);
             }
         };
 

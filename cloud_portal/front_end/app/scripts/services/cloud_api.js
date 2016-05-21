@@ -172,9 +172,10 @@ angular.module('cloudApp')
                     role: Config.accessRoles.unshare
                 });
             },
-            disconnect:function(systemId){
+            disconnect:function(systemId, password){
                 return $http.post(apiBase + '/systems/disconnect', {
-                    system_id: systemId
+                    system_id: systemId,
+                    password: password
                 });
             },
             connect:function(name){

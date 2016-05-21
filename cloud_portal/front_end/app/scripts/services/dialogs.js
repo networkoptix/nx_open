@@ -111,7 +111,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             login:function(keepPage){
                 return openDialog({
                     title: L.dialogs.loginTitle,
-                    template: 'views/login.html',
+                    template: 'views/dialogs/login.html',
                     url: 'login',
                     hasFooter: false,
                     cancellable: !keepPage,
@@ -129,7 +129,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 }
                 return openDialog({
                     title:title,
-                    template: 'views/share.html',
+                    template: 'views/dialogs/share.html',
                     url: url,
                     hasFooter: false,
                     cancellable:true,
@@ -140,7 +140,20 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     }
                 }).result;
             },
-            closeMe:function($scope){
+            disconnect:function(systemId){
+                var title = L.system.confirmDisconnectTitle;
+
+                return openDialog({
+                    title:title,
+                    template: 'views/dialogs/disconnect.html',
+                    hasFooter: false,
+                    cancellable:true,
+                    params: {
+                        systemId: systemId
+                    }
+                }).result;
+            },
+            closeMe:function($scope, result){
 
                 // TODO: We must replace this hack with something more angular-way,
                 // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
@@ -152,7 +165,11 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 var dialogSettings = findSettings($scope);
 
                 if(dialogSettings && dialogSettings.params.getModalInstance){
-                    dialogSettings.params.getModalInstance().dismiss();
+                    if(result){
+                        dialogSettings.params.getModalInstance().close(result);
+                    }else{
+                        dialogSettings.params.getModalInstance().dismiss();
+                    }
                 }
             },
             getSettings:function($scope){

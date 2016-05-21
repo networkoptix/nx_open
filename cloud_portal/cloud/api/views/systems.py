@@ -52,10 +52,10 @@ def access_roles(request, system_id):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def disconnect(request):
-    require_params(request, ('system_id',))
+    require_params(request, ('system_id', 'password'))
 
     if request.user.is_authenticated():
-        cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
+        cloud_api.System.unbind(request.user.email, request.data['password'], request.data['system_id'])
         return api_success()
 
     require_params(request, ('email', 'password'))

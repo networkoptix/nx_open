@@ -8,10 +8,16 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                 process:'=',
                 buttonDisabled:'=',
                 buttonText:'=',
+                actionType:'=',
                 form:'='
             },
             link:function(scope,element,attrs){
 
+                console.log("link",scope);
+                scope.buttonClass = 'btn-primary';
+                if(scope.actionType){
+                    scope.buttonClass = 'btn-' + scope.actionType;
+                }
                 function touchForm(form){
                     angular.forEach(form.$error, function (field) {
                         angular.forEach(field, function(errorField){

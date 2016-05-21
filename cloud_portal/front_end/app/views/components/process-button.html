@@ -4,7 +4,8 @@
         </div>
     </div>
 
-    <button class="btn btn-primary"
+    <button class="btn"
+            ng-class="buttonClass"
             ng-bind-html="buttonText"
             ng-class="{processing:process.processing}"
             ng-disabled="buttonDisabled"
