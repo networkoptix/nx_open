@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>../static/scripts/language.js</name>
+    <name>../../front_end/dist/scripts/language.js</name>
     <message>
-      <location filename="../static/scripts/language.js"/>
+      <location filename="../../front_end/dist/scripts/language.js"/>
       <source>Ok</source>
       <translation> </translation>
     </message>
@@ -234,7 +234,7 @@
     </message>
     <message>
       <location/>
-      <source>System {systemName} was successfully disconnected from PRODUCT_NAME</source>
+      <source>System was successfully disconnected from PRODUCT_NAME</source>
       <translation> </translation>
     </message>
     <message>
@@ -249,9 +249,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/account.html</name>
+    <name>../../front_end/dist/views/account.html</name>
     <message>
-      <location filename="../static/views/account.html"/>
+      <location filename="../../front_end/dist/views/account.html"/>
       <source>Account</source>
       <translation> </translation>
     </message>
@@ -322,9 +322,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/activate_restore.html</name>
+    <name>../../front_end/dist/views/activate_restore.html</name>
     <message>
-      <location filename="../static/views/activate_restore.html"/>
+      <location filename="../../front_end/dist/views/activate_restore.html"/>
       <source>Your account was successfully activated.</source>
       <translation> </translation>
     </message>
@@ -410,9 +410,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/debug.html</name>
+    <name>../../front_end/dist/views/debug.html</name>
     <message>
-      <location filename="../static/views/debug.html"/>
+      <location filename="../../front_end/dist/views/debug.html"/>
       <source>Debug processes and notifications</source>
       <translation> </translation>
     </message>
@@ -463,42 +463,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/login.html</name>
+    <name>../../front_end/dist/views/register.html</name>
     <message>
-      <location filename="../static/views/login.html"/>
-      <source>Email address</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Remember me</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>I forgot my password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>validate-email</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Login&quot;</source>
-      <translation> </translation>
-    </message>
-  </context>
-  <context>
-    <name>../static/views/register.html</name>
-    <message>
-      <location filename="../static/views/register.html"/>
+      <location filename="../../front_end/dist/views/register.html"/>
       <source>Your account was successfully registered.</source>
       <translation> </translation>
     </message>
@@ -579,48 +546,15 @@
     </message>
   </context>
   <context>
-    <name>../static/views/share.html</name>
-    <message>
-      <location filename="../static/views/share.html"/>
-      <source>User</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Email</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Permissions</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Cancel</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>validate-email readonly</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>buttonText&quot;</source>
-      <translation> </translation>
-    </message>
+    <name>../../front_end/dist/views/startPage.html</name>
   </context>
   <context>
-    <name>../static/views/startPage.html</name>
+    <name>../../front_end/dist/views/static.html</name>
   </context>
   <context>
-    <name>../static/views/static.html</name>
-  </context>
-  <context>
-    <name>../static/views/system.html</name>
+    <name>../../front_end/dist/views/system.html</name>
     <message>
-      <location filename="../static/views/system.html"/>
+      <location filename="../../front_end/dist/views/system.html"/>
       <source>Share</source>
       <translation> </translation>
     </message>
@@ -721,9 +655,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/systems.html</name>
+    <name>../../front_end/dist/views/systems.html</name>
     <message>
-      <location filename="../static/views/systems.html"/>
+      <location filename="../../front_end/dist/views/systems.html"/>
       <source>Systems</source>
       <translation> </translation>
     </message>
@@ -749,9 +683,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/components/dialog.html</name>
+    <name>../../front_end/dist/views/components/dialog.html</name>
     <message>
-      <location filename="../static/views/components/dialog.html"/>
+      <location filename="../../front_end/dist/views/components/dialog.html"/>
       <source>&amp;times;</source>
       <translation> </translation>
     </message>
@@ -772,9 +706,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/components/footer.html</name>
+    <name>../../front_end/dist/views/components/footer.html</name>
     <message>
-      <location filename="../static/views/components/footer.html"/>
+      <location filename="../../front_end/dist/views/components/footer.html"/>
       <source>About</source>
       <translation> </translation>
     </message>
@@ -805,9 +739,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/components/header.html</name>
+    <name>../../front_end/dist/views/components/header.html</name>
     <message>
-      <location filename="../static/views/components/header.html"/>
+      <location filename="../../front_end/dist/views/components/header.html"/>
       <source>&amp;nbsp;</source>
       <translation> </translation>
     </message>
@@ -848,9 +782,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/components/password-input.html</name>
+    <name>../../front_end/dist/views/components/password-input.html</name>
     <message>
-      <location filename="../static/views/components/password-input.html"/>
+      <location filename="../../front_end/dist/views/components/password-input.html"/>
       <source>good</source>
       <translation> </translation>
     </message>
@@ -881,12 +815,116 @@
     </message>
   </context>
   <context>
-    <name>../static/views/components/process-button.html</name>
+    <name>../../front_end/dist/views/components/process-button.html</name>
   </context>
   <context>
-    <name>../static/views/static/about.html</name>
+    <name>../../front_end/dist/views/dialogs/disconnect.html</name>
     <message>
-      <location filename="../static/views/static/about.html"/>
+      <location filename="../../front_end/dist/views/dialogs/disconnect.html"/>
+      <source>You will be able to connect to your system only from local network. If you don't have local administator account, wou will have to create it first time when you connect to the system.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter password to continue</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password is required</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>danger</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>L.system.confirmDisconnectAction&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../../front_end/dist/views/dialogs/login.html</name>
+    <message>
+      <location filename="../../front_end/dist/views/dialogs/login.html"/>
+      <source>Email address</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Remember me</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>I forgot my password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>validate-email</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../../front_end/dist/views/dialogs/share.html</name>
+    <message>
+      <location filename="../../front_end/dist/views/dialogs/share.html"/>
+      <source>User</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Email</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Permissions</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>validate-email readonly</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>buttonText&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../../front_end/dist/views/static/about.html</name>
+    <message>
+      <location filename="../../front_end/dist/views/static/about.html"/>
       <source>About</source>
       <translation> </translation>
     </message>
@@ -902,9 +940,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/static/eula.html</name>
+    <name>../../front_end/dist/views/static/eula.html</name>
     <message>
-      <location filename="../static/views/static/eula.html"/>
+      <location filename="../../front_end/dist/views/static/eula.html"/>
       <source>Terms and conditions</source>
       <translation> </translation>
     </message>
@@ -975,9 +1013,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/static/help.html</name>
+    <name>../../front_end/dist/views/static/help.html</name>
     <message>
-      <location filename="../static/views/static/help.html"/>
+      <location filename="../../front_end/dist/views/static/help.html"/>
       <source>How to use</source>
       <translation> </translation>
     </message>
@@ -1013,9 +1051,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/static/landing.html</name>
+    <name>../../front_end/dist/views/static/landing.html</name>
     <message>
-      <location filename="../static/views/static/landing.html"/>
+      <location filename="../../front_end/dist/views/static/landing.html"/>
       <source>PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -1061,9 +1099,9 @@
     </message>
   </context>
   <context>
-    <name>../static/views/static/register-intro.html</name>
+    <name>../../front_end/dist/views/static/register-intro.html</name>
     <message>
-      <location filename="../static/views/static/register-intro.html"/>
+      <location filename="../../front_end/dist/views/static/register-intro.html"/>
       <source>Welcome to</source>
       <translation> </translation>
     </message>
