@@ -22,7 +22,7 @@ cp ../../customizations/$CUSTOMIZATION/front_end/styles/* ../../front_end/styles
 pushd ../../front_end
 echo "Publish front_end ... "
 grunt setbranding:$CUSTOMIZATION
-grunt pub
+grunt build
 popd
 
 pushd ../notifications/static/templates/src
@@ -39,4 +39,4 @@ python localize.py
 
 echo "Done!"
 
-say "Cloud portal build is finished"
+# say "Cloud portal build is finished"
