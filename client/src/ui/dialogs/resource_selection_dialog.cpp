@@ -13,7 +13,7 @@
 #include <core/resource/user_resource.h>
 
 #include <ui/common/palette.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
@@ -92,23 +92,23 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent) :
 
 void QnResourceSelectionDialog::initModel()
 {
-    QnResourcePoolModel::Scope scope;
+    QnResourceTreeModel::Scope scope;
 
     switch (m_target) {
     case UserResourceTarget:
-        scope = QnResourcePoolModel::UsersScope;
+        scope = QnResourceTreeModel::UsersScope;
         break;
     case CameraResourceTarget:
-        scope = QnResourcePoolModel::CamerasScope;
+        scope = QnResourceTreeModel::CamerasScope;
         break;
     default:
-        scope = QnResourcePoolModel::FullScope;
+        scope = QnResourceTreeModel::FullScope;
         break;
     }
 
-    m_resourceModel = new QnResourcePoolModel(scope, this);
+    m_resourceModel = new QnResourceTreeModel(scope, this);
 
-    connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
+    connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);

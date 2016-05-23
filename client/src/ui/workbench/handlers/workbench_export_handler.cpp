@@ -233,7 +233,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
 
         QnLayoutItemData result;
         result.uuid = QnUuid::createUuid();
-        result.resource.path = resource->getUniqueId();
+        result.resource.uniqueId = resource->getUniqueId();
         result.resource.id = resource->getId();
         result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
         result.combinedGeometry = QRect(0, 0, 1, 1);
@@ -575,12 +575,14 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 }
 
 
-bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout) {
+bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout)
+{
     bool hasImage = false;
     bool hasLocal = false;
 
-    foreach (const QnLayoutItemData &item, layout->getItems()) {
-        QnResourcePtr resource = qnResPool->getResourceByUniqueId(item.resource.path);
+    for (const QnLayoutItemData &item: layout->getItems())
+    {
+        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
         if( resource->getParentResource() == layout )
@@ -622,7 +624,7 @@ void QnWorkbenchExportHandler::removeLayoutFromPool(const QnLayoutResourcePtr &e
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();
-        QnResourcePtr layoutRes = qnResPool->getResourceByUniqueId(item.resource.path);
+        QnResourcePtr layoutRes = qnResPool->getResourceByDescriptor(item.resource);
         if (layoutRes)
             qnResPool->removeResource(layoutRes);
     }

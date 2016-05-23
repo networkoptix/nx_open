@@ -32,27 +32,34 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         m_permissionsCache.clear();
     });
 
-    connect(qnResPool,& QnResourcePool::resourceAdded, this, [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this] (const QnResourcePtr& resource)
     {
         if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
         {
-            connect(layout,& QnResource::parentIdChanged,           this,& QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
-            connect(layout,& QnLayoutResource::userCanEditChanged,  this,& QnResourceAccessManager::invalidateResourceCache);
-            connect(layout,& QnLayoutResource::lockedChanged,       this,& QnResourceAccessManager::invalidateResourceCache);
+            connect(layout, &QnResource::parentIdChanged,           this, &QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
+            connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(layout, &QnLayoutResource::lockedChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
         if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
         {
-            connect(user,& QnUserResource::permissionsChanged,  this,& QnResourceAccessManager::invalidateResourceCache);
-            connect(user,& QnUserResource::userGroupChanged,    this,& QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::permissionsChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
+            connect(user, &QnUserResource::userGroupChanged,    this, &QnResourceAccessManager::invalidateResourceCache);
+        }
+
+        /* Storage can be added (and permissions requested) before the server. */
+        if (const QnMediaServerResourcePtr& server = resource.dynamicCast<QnMediaServerResource>())
+        {
+            for (auto storage : server->getStorages())
+                invalidateResourceCache(storage);
         }
     });
 
-    connect(qnResPool,& QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& resource)
     {
         disconnect(resource, nullptr, this, nullptr);
     });
-    connect(qnResPool,& QnResourcePool::resourceRemoved, this,& QnResourceAccessManager::invalidateResourceCache);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceAccessManager::invalidateResourceCache);
 }
 
 void QnResourceAccessManager::resetAccessibleResources(const ec2::ApiAccessRightsDataList& accessibleResourcesList)
@@ -150,11 +157,7 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     Qn::GlobalPermissions result = user->getRawPermissions();
     QnUuid groupId = user->userGroup();
 
-    if (user->isOwner() || result.testFlag(Qn::GlobalOwnerPermission))
-    {
-        result |= Qn::GlobalOwnerPermissionsSet;
-    }
-    else if (result.testFlag(Qn::GlobalAdminPermission))
+    if (user->isOwner() || result.testFlag(Qn::GlobalAdminPermission))
     {
         result |= Qn::GlobalAdminPermissionsSet;
     }
@@ -162,8 +165,6 @@ Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserRes
     {
         result |= userGroup(groupId).permissions;   /*< If the group does not exist, permissions will be empty. */
     }
-
-    result = undeprecate(result);
 
     {
         QnMutexLocker lk(&m_mutex);
@@ -225,7 +226,7 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
     /* Check new users creating. */
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
-        return canCreateUserInternal(user, targetUser->getRawPermissions());
+        return canCreateUserInternal(user, targetUser->getRawPermissions(), targetUser->isOwner());
 
     if (QnStorageResourcePtr storage = target.dynamicCast<QnStorageResource>())
         return canCreateStorageInternal(user, storage->getParentId());
@@ -240,53 +241,31 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
     return false;
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiStorageData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
 {
-    return canCreateStorageInternal(qnResPool->getResourceById<QnUserResource>(userId), data.parentId);
+    return canCreateStorageInternal(user, data.parentId);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiLayoutData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const
 {
-    return canCreateLayoutInternal(qnResPool->getResourceById<QnUserResource>(userId), data.parentId);
+    return canCreateLayoutInternal(user, data.parentId);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiUserData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
-    return canCreateUserInternal(qnResPool->getResourceById<QnUserResource>(userId), data.permissions);
+    return canCreateUserInternal(user, data.permissions, data.isAdmin);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiVideowallData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const
 {
     Q_UNUSED(data);
-    return canCreateVideoWallInternal(qnResPool->getResourceById<QnUserResource>(userId));
+    return canCreateVideoWallInternal(user);
 }
 
-bool QnResourceAccessManager::canCreateResource(const QnUuid& userId, const ec2::ApiWebPageData& data) const
+bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const
 {
     Q_UNUSED(data);
-    return canCreateWebPageInternal(qnResPool->getResourceById<QnUserResource>(userId));
-}
-
-Qn::GlobalPermissions QnResourceAccessManager::undeprecate(Qn::GlobalPermissions permissions)
-{
-    Qn::GlobalPermissions result = permissions;
-
-    if (result.testFlag(Qn::DeprecatedEditCamerasPermission))
-    {
-        result &= ~Qn::DeprecatedEditCamerasPermission;
-        result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
-    }
-
-    if (result.testFlag(Qn::DeprecatedViewExportArchivePermission))
-    {
-        result &= ~Qn::DeprecatedViewExportArchivePermission;
-        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
-    }
-
-    if (result.testFlag(Qn::DeprecatedGlobalEditUsersPermission))
-        result &= ~Qn::DeprecatedGlobalEditUsersPermission;
-
-    return result;
+    return canCreateWebPageInternal(user);
 }
 
 void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resource)
@@ -348,7 +327,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (hasGlobalPermission(user, Qn::GlobalExportPermission))
         result |= Qn::ExportPermission;
 
-    if (hasGlobalPermission(user, Qn::GlobalPtzControlPermission))
+    if (hasGlobalPermission(user, Qn::GlobalUserInputPermission))
         result |= Qn::WritePtzPermission;
 
     if (qnCommon->isReadOnly())
@@ -380,7 +359,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(storage);
     auto server = storage->getParentServer();
-    NX_ASSERT(server);
+    if (!server)
+        return Qn::ReadPermission;  /*< Server is not added to resource pool. Really we shouldn't request storage permissions in that case. */
 
     auto serverPermissions = permissions(user, server);
     if (serverPermissions.testFlag(Qn::SavePermission))
@@ -399,7 +379,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     if (!isAccessibleResource(user, videoWall))
         return Qn::NoPermissions;
 
-    if (hasGlobalPermission(user, Qn::GlobalEditVideoWallPermission))
+    if (hasGlobalPermission(user, Qn::GlobalControlVideoWallPermission))
     {
         if (qnCommon->isReadOnly())
             return Qn::ReadPermission;
@@ -467,7 +447,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     auto base = [&]() -> Qn::Permissions
     {
         /* Owner can do anything. */
-        if (hasGlobalPermission(user, Qn::GlobalOwnerPermission))
+        if (user->isOwner())
             return Qn::FullLayoutPermissions;
 
         QnUuid ownerId = layout->getParentId();
@@ -539,7 +519,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
             return result;
 
         /* Admins can only be edited by owner, other users - by all admins. */
-        if (hasGlobalPermission(user, Qn::GlobalOwnerPermission) || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
+        if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
 
@@ -579,7 +559,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
             return Qn::GlobalAccessAllServersPermission;
 
         if (resource.dynamicCast<QnVideoWallResource>())
-            return Qn::GlobalEditVideoWallPermission;
+            return Qn::GlobalControlVideoWallPermission;
 
         /* Web Pages behave totally like cameras. */
         if (resource.dynamicCast<QnWebPageResource>())
@@ -618,15 +598,15 @@ bool QnResourceAccessManager::canCreateLayoutInternal(const QnUserResourcePtr& u
     return hasPermission(user, owner, Qn::SavePermission);
 }
 
-bool QnResourceAccessManager::canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions) const
+bool QnResourceAccessManager::canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const
 {
     /* Nobody can create owners. */
-    if (targetPermissions.testFlag(Qn::GlobalOwnerPermission))
+    if (isOwner)
         return false;
 
     /* Only owner can create admins. */
     if (targetPermissions.testFlag(Qn::GlobalAdminPermission))
-        return hasGlobalPermission(user, Qn::GlobalOwnerPermission);
+        return user->isOwner();
 
     /* Admins can create other users. */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);

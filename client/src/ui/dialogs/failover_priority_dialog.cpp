@@ -9,7 +9,7 @@
 #include <ui/delegates/failover_priority_resource_model_delegate.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 
 namespace {
 
@@ -82,7 +82,7 @@ namespace {
             return Qn::ServerSettings_Failover_Help;
         }
 
-        virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const override {
+        virtual QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const override {
             return m_customColumnDelegate;
         }
 
@@ -134,7 +134,7 @@ namespace {
         QWidget* m_buttonsPage;
 
         ButtonCallback m_callback;
-        QnResourcePoolModelCustomColumnDelegate* m_customColumnDelegate;
+        QnResourceTreeModelCustomColumnDelegate* m_customColumnDelegate;
     };
   
 }
@@ -155,7 +155,7 @@ QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/
 
 
     auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
-        connect(camera, &QnVirtualCameraResource::failoverPriorityChanged, m_customColumnDelegate, &QnResourcePoolModelCustomColumnDelegate::notifyDataChanged);
+        connect(camera, &QnVirtualCameraResource::failoverPriorityChanged, m_customColumnDelegate, &QnResourceTreeModelCustomColumnDelegate::notifyDataChanged);
     };
 
     for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true)) {

@@ -866,55 +866,58 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum GlobalPermission
     {
         /* Generic permissions. */
-        NoGlobalPermissions                     = 0x00000000,   /**< No access */
+        NoGlobalPermissions                     = 0x00000000,   /**< Only live video access. */
 
-        GlobalOwnerPermission                   = 0x00000001,   /**< Root, can edit admins. */
-        GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
-        GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
-        /* DeprecatedGlobalEditUsersPermission  = 0x00000008 */
-        /*DeprecatedEditCamerasPermission       = 0x00000010 */
-        GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
-        /*DeprecatedViewExportArchivePermission = 0x00000040 */
-        GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
-        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
-        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
-        GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
-        GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
-        /*DeprecatedPanicPermission             = 0x00001000 */
-        GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
+        /* Admin permissions. */
+        GlobalAdminPermission                   = 0x00000001,   /**< Admin, can edit other non-admins. */
+
+        /* Manager permissions. */
+        GlobalEditServersPermissions            = 0x00000002,   /**< Can edit server settings. */
+        GlobalEditCamerasPermission             = 0x00000004,   /**< Can edit camera settings. */
+        GlobalEditLayoutsPermission             = 0x00000008,   /**< Can create and edit _global_ layouts. */
+        GlobalControlVideoWallPermission        = 0x00000010,   /**< Can control videowalls */
+
+        /* Viewer permissions. */
+        GlobalViewArchivePermission             = 0x00000020,   /**< Can view archives of available cameras. */
+        GlobalExportPermission                  = 0x00000040,   /**< Can export archives of available cameras. */
+        GlobalViewBookmarksPermission           = 0x00000080,   /**< Can view bookmarks of available cameras. */
+        GlobalManageBookmarksPermission         = 0x00000100,   /**< Can modify bookmarks of available cameras. */
+
+        /* Input permissions. */
+        GlobalUserInputPermission               = 0x00000200,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
 
         /* Resources access permissions */
         GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
         GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
         GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
 
-        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
-
-        /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
-        DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */
-        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */
-        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Deprecated. Can view and export archives of available cameras. */
-        DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
 
         /* Shortcuts. */
 
-        /* Live viewer has access to all cameras by default */
-        GlobalLiveViewerPermissionSet       = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+        /* Access to all resources. */
+        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
 
-        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission,
+        /* Live viewer has access to all cameras and global layouts by default. */
+        GlobalLiveViewerPermissionSet       = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+
+        /* Viewer can additionally view archive and bookmarks and export video. */
+        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
+
+        /* Advanced viewer can manage bookmarks and use various input methods. */
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission,
+
+        GlobalManagerPermissionSet          = GlobalAccessResourcesPermissionsSet | GlobalControlVideoWallPermission |
+                                              GlobalEditServersPermissions | GlobalEditCamerasPermission| GlobalEditLayoutsPermission,
+
+        /* Admin can do everything. */
+        GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalManagerPermissionSet,
+
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalPtzControlPermission,
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalPtzControlPermission,
-
-        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-
-        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
-                                              GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessResourcesPermissionsSet  ,
-        GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
+        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,
     };
 
     Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)

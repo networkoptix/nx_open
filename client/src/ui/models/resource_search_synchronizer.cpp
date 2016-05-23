@@ -1,14 +1,17 @@
 #include "resource_search_synchronizer.h"
+
 #include <cassert>
+
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_criterion.h>
+
+#include <ui/models/resource_search_proxy_model.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_item.h>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/checked_cast.h>
-#include <core/resource/resource.h>
-#include <core/resource_management/resource_criterion.h>
-#include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_item.h>
-#include "resource_search_proxy_model.h"
-#include "resource_pool_model.h"
 
 QnResourceSearchSynchronizer::QnResourceSearchSynchronizer(QObject *parent):
     QObject(parent),
@@ -128,7 +131,7 @@ void QnResourceSearchSynchronizer::update() {
         QnWorkbenchItem *item = m_layoutItemByResource.value(resource);
         if(item == NULL)
             continue; /* Was closed by the user. */
-        
+
         m_resourceByLayoutItem.remove(item);
         m_layoutItemByResource.remove(resource);
 
@@ -181,7 +184,7 @@ void QnResourceSearchSynchronizer::enableUpdates(bool enable) {
         return;
 
     m_updatesEnabled = enable;
-    
+
     if(m_updatesEnabled && m_hasPendingUpdates)
         updateLater();
 }
@@ -200,9 +203,9 @@ void QnResourceSearchSynchronizer::at_layout_itemAdded(QnWorkbenchItem *) {
 
 void QnResourceSearchSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
     QnResourcePtr resource = m_resourceByLayoutItem.value(item);
-    if(resource.isNull()) 
+    if(resource.isNull())
         return;
-    
+
     m_resourceByLayoutItem.remove(item);
     m_layoutItemByResource.remove(resource);
 }

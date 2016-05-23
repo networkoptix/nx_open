@@ -523,8 +523,6 @@ namespace ec2
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
         bool createDatabase();
-        bool migrateBusinessEvents();
-        bool doRemap(int id, int newVal, const QString& fieldName);
 
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);

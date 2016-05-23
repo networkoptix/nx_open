@@ -121,6 +121,15 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+/** Condition class for actions, that require owner privileges. */
+class QnRequiresOwnerCondition : public QnActionCondition
+{
+public:
+    QnRequiresOwnerCondition(QObject *parent) :
+        QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 /**
  * Condition wich is a conjunction of two or more conditions.
  * It acts like logical AND, e.g. an action is enabled if the all conditions in the conjunction is true.

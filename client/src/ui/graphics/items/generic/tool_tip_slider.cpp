@@ -9,7 +9,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 
-#include "tool_tip_widget.h"
+#include "slider_tooltip_widget.h"
 
 namespace {
     const int toolTipHideDelay = 2500;
@@ -44,20 +44,19 @@ public:
     }
 };
 
-
-QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
-    base_type(Qt::Horizontal, parent)
+QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
+    base_type(Qt::Horizontal, parent),
+    m_tooltipWidgetVisibilityAnimator(new VariantAnimator(this)),
+    m_tooltipWidgetVisibility(0),
+    m_autoHideToolTip(true),
+    m_sliderUnderMouse(false),
+    m_toolTipUnderMouse(false),
+    m_pendingPositionUpdate(false),
+    m_instantPositionUpdate(false),
+    m_tooltipMargin(0)
 {
     setOrientation(Qt::Horizontal);
 
-    m_tooltipWidgetVisibility = 0.0;
-    m_autoHideToolTip = true;
-    m_sliderUnderMouse = false;
-    m_toolTipUnderMouse = false;
-    m_pendingPositionUpdate = false;
-    m_instantPositionUpdate = false;
-
-    m_tooltipWidgetVisibilityAnimator = new VariantAnimator(this);
     m_tooltipWidgetVisibilityAnimator->setSpeed(2.0);
     m_tooltipWidgetVisibilityAnimator->setAccessor(new QnToolTipSliderVisibilityAccessor());
     m_tooltipWidgetVisibilityAnimator->setTargetObject(this);
@@ -66,7 +65,7 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
     m_animationListener.reset(new QnToolTipSliderAnimationListener(this));
     registerAnimation(m_animationListener.data() );
 
-    setToolTipItem(new QnStyledTooltipWidget(this));
+    setToolTipItem(new QnSliderTooltipWidget(this));
     setAcceptHoverEvents(true);
 
     setFlag(ItemSendsScenePositionChanges, true);
@@ -74,6 +73,20 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem *parent):
 
 QnToolTipSlider::~QnToolTipSlider() {
     m_hideTimer.stop();
+}
+
+qreal QnToolTipSlider::tooltipMargin() const
+{
+    return m_tooltipMargin;
+}
+
+void QnToolTipSlider::setTooltipMargin(qreal margin)
+{
+    if (qFuzzyCompare(margin, m_tooltipMargin))
+        return;
+
+    m_tooltipMargin = margin;
+    updateToolTipPosition();
 }
 
 QnToolTipWidget *QnToolTipSlider::toolTipItem() const {
@@ -168,7 +181,7 @@ void QnToolTipSlider::updateToolTipPosition() {
     QRect handleRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, nullptr);
 
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
-    qreal y = 0;
+    qreal y = -m_tooltipMargin;
 
     toolTipItem()->pointTo(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
 }

@@ -12,7 +12,45 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>testcamera</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Test Camera</name>	
+	<name>HD Witness Test Camera</name>	
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
     <properties>
         <template>app</template>
@@ -24,7 +62,7 @@
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <rdep.packages>openssl ffmpeg</rdep.packages>
-    </properties>  
+    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

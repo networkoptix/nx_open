@@ -60,6 +60,8 @@ protected:
 private:
     QnImageButtonWidget* newActionButton(QnActions::IDType id);
 
+    bool isTimelineRelevant() const;
+
 private:
     QnImageButtonWidget* m_jumpBackwardButton;
     QnImageButtonWidget* m_stepBackwardButton;

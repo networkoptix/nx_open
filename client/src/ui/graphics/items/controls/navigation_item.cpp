@@ -6,6 +6,8 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
 
+#include <common/common_globals.h>
+
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -140,16 +142,19 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_separators->setFrameColor(palette().color(QPalette::Midlight));
     m_separators->setFrameWidth(1.0);
 
-    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged, this,
+    auto updateTimelineMode =
         [this, timelinePlaceholder]()
         {
-            bool hasArchive = navigator()->hasArchive();
-            m_timeSlider->setVisible(hasArchive);
-            m_timeScrollBar->setVisible(hasArchive);
-            timelinePlaceholder->setVisible(!hasArchive);
-            m_separators->setFrameColor(palette().color(hasArchive ? QPalette::Shadow : QPalette::Midlight));
-            m_separators->setFrameWidth(hasArchive ? 2.0 : 1.0);
-        });
+            bool isTimeline = isTimelineRelevant();
+            m_timeSlider->setVisible(isTimeline);
+            m_timeScrollBar->setVisible(isTimeline);
+            timelinePlaceholder->setVisible(!isTimeline);
+            m_separators->setFrameColor(palette().color(isTimeline ? QPalette::Shadow : QPalette::Midlight));
+            m_separators->setFrameWidth(isTimeline ? 2.0 : 1.0);
+        };
+
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,      this, updateTimelineMode);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,   this, updateTimelineMode);
 
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
@@ -554,7 +559,7 @@ bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event)
     if (event->type() == QEvent::PaletteChange)
     {
         setFrameColor(palette().color(QPalette::Midlight));
-        m_separators->setFrameColor(palette().color(navigator()->hasArchive() ? QPalette::Shadow : QPalette::Midlight));
+        m_separators->setFrameColor(palette().color(isTimelineRelevant() ? QPalette::Shadow : QPalette::Midlight));
     }
 
     return base_type::eventFilter(watched, event);
@@ -650,4 +655,20 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
     button->setDefaultAction(action(id));
     button->setCached(true);
     return button;
+}
+
+bool QnNavigationItem::isTimelineRelevant() const
+{
+    auto navigator = this->navigator();
+
+    if (!navigator || !navigator->currentWidget())
+        return false;
+
+    if (!navigator->isPlayingSupported())
+        return false;
+
+    if (navigator->hasArchive())
+        return true;
+
+    return navigator->currentWidget()->resource()->flags().testFlag(Qn::local);
 }

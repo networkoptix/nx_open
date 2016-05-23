@@ -1020,7 +1020,6 @@ void QnWorkbenchUi::setTreeOpened(bool opened, bool animate)
 
 QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry)
 {
-
     QPointF pos(
         treeGeometry.x(),
         ((!m_titleVisible || !m_titleUsed) && m_treeVisible) ? 0.0 : qMax(titleGeometry.bottom(), 0.0));
@@ -1028,7 +1027,7 @@ QRectF QnWorkbenchUi::updatedTreeGeometry(const QRectF &treeGeometry, const QRec
     QSizeF size(
         treeGeometry.width(),
         ((!m_sliderVisible && m_treeVisible)
-            ? m_controlsWidgetRect.bottom() - pos.y()
+            ? m_controlsWidgetRect.bottom()
             : qMin(sliderGeometry.y(), m_controlsWidgetRect.bottom())) - pos.y());
 
     return QRectF(pos, size);
@@ -1221,6 +1220,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
     setPaletteColor(m_treeWidget->typeComboBox(), QPalette::Base, defaultPalette.color(QPalette::Base));
 
     m_treeBackgroundItem = new QnControlBackgroundWidget(Qn::LeftBorder, m_controlsWidget);
+    m_treeBackgroundItem->setFrameBorders(Qt::RightEdge);
 
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
@@ -1717,6 +1717,7 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
 {
     /* Notifications panel. */
     m_notificationsBackgroundItem = new QnControlBackgroundWidget(Qn::RightBorder, m_controlsWidget);
+    m_notificationsBackgroundItem->setFrameBorders(Qt::LeftEdge);
 
     m_notificationsItem = new QnNotificationsCollectionWidget(m_controlsWidget, 0, context());
     m_notificationsItem->setProperty(Qn::NoHandScrollOver, true);

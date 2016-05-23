@@ -2,7 +2,7 @@
 
 #include <client/client_color_types.h>
 
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 
 #include <ui/dialogs/resource_selection_dialog.h>
 
@@ -26,7 +26,7 @@ protected:
 
 private:
     void updatePriorityForSelectedCameras(Qn::FailoverPriority priority);
-    
+
 private:
     QnFailoverPriorityResourceModelDelegate* m_customColumnDelegate;
 };

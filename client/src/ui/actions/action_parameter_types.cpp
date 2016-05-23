@@ -187,14 +187,8 @@ QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &la
             continue;
 
         QnLayoutItemData data = index.layout()->getItem(index.uuid());
-        
-        QnResourcePtr resource;
-        if(!data.resource.id.isNull()) {
-            resource = qnResPool->getResourceById(data.resource.id);
-        } else {
-            resource = qnResPool->getResourceByUniqueId(data.resource.path);
-        }
 
+        QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
         if(resource)
             result.push_back(resource);
     }
@@ -269,13 +263,13 @@ QnLayoutItemIndex QnActionParameterTypes::layoutItem(QnResourceWidget *widget) {
 
 QnLayoutItemIndexList QnActionParameterTypes::layoutItems(const QnResourceWidgetList &widgets) {
     QnLayoutItemIndexList result;
-    
+
     foreach(QnResourceWidget *widget, widgets) {
         QnLayoutItemIndex layoutItem = QnActionParameterTypes::layoutItem(widget);
         if(!layoutItem.isNull())
             result.push_back(layoutItem);
     }
-    
+
     return result;
 }
 
@@ -337,7 +331,7 @@ QnResourceWidgetList QnActionParameterTypes::widgets(const QVariant &items) {
     using namespace ParameterMetaType;
 
     switch(qn_actionMetaTypeMap()->value(items.userType())) {
-    case ResourceWidget: 
+    case ResourceWidget:
         return makeList<QnResourceWidgetList>(items.value<QnResourceWidget *>());
     case ResourceWidgetList:
         return items.value<QnResourceWidgetList>();

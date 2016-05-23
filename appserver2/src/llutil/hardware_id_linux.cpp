@@ -216,8 +216,6 @@ void mac_eth0(char  MAC_str[13], char** host)
 
 void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
-    Q_UNUSED(settings)
-
     char MAC_str[13];
     memset(MAC_str, 0, sizeof(MAC_str));
     mac_eth0( MAC_str, nullptr );
