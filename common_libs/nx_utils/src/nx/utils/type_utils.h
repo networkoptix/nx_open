@@ -78,9 +78,15 @@ static_unique_ptr_cast(
 }
 
 template<typename Object, typename Deleter>
-std::unique_ptr<Object, Deleter> uniquePtr(Object* ptr, Deleter deleter)
+std::unique_ptr<Object, Deleter> wrapUnique(Object* ptr, Deleter deleter)
 {
     return std::unique_ptr<Object, Deleter>(ptr, std::move(deleter));
+}
+
+template<typename Object, typename Deleter>
+std::shared_ptr<Object> wrapShared(Object* ptr, Deleter deleter)
+{
+    return std::shared_ptr<Object>(ptr, std::move(deleter));
 }
 
 }   //namespace utils
