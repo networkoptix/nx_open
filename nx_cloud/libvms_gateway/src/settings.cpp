@@ -163,6 +163,7 @@ void Settings::loadConfiguration()
         QString varDirName = m_settings.value("varDir", defVarDirName).toString();
         m_general.dataDir = varDirName;
 #else
+        //TODO #ak get rid of QStandardPaths::standardLocations call here since it requies QApplication instance
         const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
