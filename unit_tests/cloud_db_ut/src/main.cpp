@@ -12,6 +12,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_global.h>
+#include <utils/common/command_line_parser.h>
 
 #include "functional_tests/test_setup.h"
 
