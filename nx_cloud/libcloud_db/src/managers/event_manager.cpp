@@ -36,9 +36,18 @@ public:
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,
-            std::bind(
-                &EventManager::subscribeToEvents, eventManager,
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
+            [eventManager](
+                const nx_http::HttpServerConnection& connection,
+                const AuthorizationInfo& authzInfo,
+                nx::utils::MoveOnlyFunc<
+                    void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+                > completionHandler)
+            {
+                eventManager->subscribeToEvents(
+                    connection,
+                    authzInfo,
+                    std::move(completionHandler));
+            })
     {
     }
 };

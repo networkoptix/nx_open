@@ -23,7 +23,7 @@ class Statistics
 
 TEST_F(Statistics, listening_peer_list)
 {
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();

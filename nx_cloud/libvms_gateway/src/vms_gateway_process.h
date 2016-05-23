@@ -60,8 +60,10 @@ private:
     int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
 
-    void initializeLogging( const conf::Settings& settings );
-    void registerApiHandlers(nx_http::MessageDispatcher* const msgDispatcher);
+    void initializeLogging(const conf::Settings& settings);
+    void registerApiHandlers(
+        const conf::Settings& settings,
+        nx_http::MessageDispatcher* const msgDispatcher);
 };
 
 }   //namespace cloud

@@ -37,14 +37,13 @@ CdbFunctionalTest::CdbFunctionalTest()
     m_tmpDir = QDir::homePath() + "/cdb_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
-    auto b = std::back_inserter(m_args);
-    *b = strdup("/path/to/bin");
-    *b = strdup("-e");
-    *b = strdup("-listenOn"); *b = strdup(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
-    *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
-    *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
-    *b = strdup("-db/driverName"); *b = strdup("QSQLITE");
-    *b = strdup("-db/name"); *b = strdup(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+    addArg("/path/to/bin");
+    addArg("-e");
+    addArg("-listenOn"); addArg(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
+    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-db/driverName"); addArg("QSQLITE");
+    addArg("-db/name"); addArg(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
 
@@ -61,47 +60,9 @@ CdbFunctionalTest::~CdbFunctionalTest()
     QDir(m_tmpDir).removeRecursively();
 }
 
-void CdbFunctionalTest::start()
-{
-    std::promise<void> cdbInstantiatedCreatedPromise;
-    auto cdbInstantiatedCreatedFuture = cdbInstantiatedCreatedPromise.get_future();
-
-    m_cdbStartedPromise = std::make_unique<nx::utils::promise<bool>>();
-
-    m_cdbProcessFuture = std::async(
-        std::launch::async,
-        [this, &cdbInstantiatedCreatedPromise]()->int {
-            m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcessPublic>(
-                static_cast<int>(m_args.size()), m_args.data());
-            m_cdbInstance->setOnStartedEventHandler(
-                [this](bool result)
-                {
-                    m_cdbStartedPromise->set_value(result);
-                });
-            cdbInstantiatedCreatedPromise.set_value();
-            return m_cdbInstance->exec();
-        });
-    cdbInstantiatedCreatedFuture.wait();
-}
-
-bool CdbFunctionalTest::startAndWaitUntilStarted()
-{
-    start();
-    return waitUntilStarted();
-}
-
 bool CdbFunctionalTest::waitUntilStarted()
 {
-    static const std::chrono::seconds initializedMaxWaitTime(15);
-
-    auto cdbStartedFuture = m_cdbStartedPromise->get_future();
-    if (cdbStartedFuture.wait_for(initializedMaxWaitTime) !=
-        std::future_status::ready)
-    {
-        return false;
-    }
-
-    if (!cdbStartedFuture.get())
+    if (!utils::test::ModuleLauncher<CloudDBProcessPublic>::waitUntilStarted())
         return false;
 
     //retrieving module info
@@ -112,30 +73,7 @@ bool CdbFunctionalTest::waitUntilStarted()
             &nx::cdb::api::Connection::ping,
             connection.get(),
             std::placeholders::_1));
-    if (result != api::ResultCode::ok)
-        return false;
-
-    return true;
-}
-
-void CdbFunctionalTest::stop()
-{
-    m_cdbInstance->pleaseStop();
-    m_cdbProcessFuture.wait();
-    m_cdbInstance.reset();
-}
-
-bool CdbFunctionalTest::restart()
-{
-    stop();
-    start();
-    return waitUntilStarted();
-}
-
-void CdbFunctionalTest::addArg(const char* arg)
-{
-    auto b = std::back_inserter(m_args);
-    *b = strdup(arg);
+    return result == api::ResultCode::ok;
 }
 
 SocketAddress CdbFunctionalTest::endpoint() const

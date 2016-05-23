@@ -14,6 +14,8 @@ namespace ec2
     struct ApiLicenseData : ApiData {
         QnLatin1Array key;
         QnLatin1Array licenseBlock;
+
+        bool operator<(const ApiLicenseData& other) const;
     };
 #define ApiLicenseData_Fields (key)(licenseBlock)
 

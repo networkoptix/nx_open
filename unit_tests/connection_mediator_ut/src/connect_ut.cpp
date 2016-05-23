@@ -23,7 +23,6 @@
 #include <peer_registrator.h>
 
 #include "mediator_mocks.h"
-#include <test_support/socket_globals_holder.h>
 
 
 namespace nx {
@@ -35,7 +34,7 @@ class ConnectTest : public testing::Test
 protected:
     ConnectTest()
     {
-        SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
         m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
         listeningPeerRegistrator = std::make_unique<PeerRegistrator>(

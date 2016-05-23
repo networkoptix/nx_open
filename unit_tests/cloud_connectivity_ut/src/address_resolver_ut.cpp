@@ -17,7 +17,7 @@ class AddressResolverTest
 public:
     static void SetUpTestCase()
     {
-        s_stunClient = std::make_shared<network::test::StunAsyncClientMock>();
+        s_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         s_stunClient->emulateRequestHandler(
             stun::cc::methods::resolvePeer,
             [](
@@ -103,11 +103,11 @@ public:
 
 private:
     static std::map<QString, std::list<SocketAddress>> s_endpoints;
-    static std::shared_ptr<network::test::StunAsyncClientMock> s_stunClient;
+    static std::shared_ptr<stun::test::AsyncClientMock> s_stunClient;
 };
 
 std::map<QString, std::list<SocketAddress>> AddressResolverTest::s_endpoints;
-std::shared_ptr<network::test::StunAsyncClientMock> AddressResolverTest::s_stunClient;
+std::shared_ptr<stun::test::AsyncClientMock> AddressResolverTest::s_stunClient;
 
 static const HostAddress kAddress("ya.ru");
 static const SocketAddress kResult("10.11.12.13:12345");

@@ -31,7 +31,7 @@ TEST_F(ListeningPeer, connection_override)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
@@ -65,7 +65,7 @@ TEST_F(ListeningPeer, unknown_system_credentials)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
@@ -89,7 +89,7 @@ TEST_F(ListeningPeer, peer_disconnect)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
     auto server1 = addRandomServer(system1);
