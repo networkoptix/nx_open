@@ -30,7 +30,7 @@ namespace nx
         void resetToDefault();
         bool isDefault() const;
 
-        void saveToConfig();
+        bool saveToConfig();
         void loadFromConfig();
     private:
         QString m_value;

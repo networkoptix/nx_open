@@ -240,7 +240,11 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
         return false;
     }
 
-    systemName.saveToConfig();
+    if (!systemName.saveToConfig())
+    {
+        NX_LOG("Failed to save new system name to config");
+        return false;
+    }
     server->setSystemName(systemName.value());
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
 
@@ -342,12 +346,19 @@ QString nx::SystemName::prevValue() const
         return m_prevValue;
 }
 
-void nx::SystemName::saveToConfig()
+bool nx::SystemName::saveToConfig()
 {
+    const auto prevValueBak = m_prevValue;
     m_prevValue = m_value;
     auto settings = MSSettings::roSettings();
+    if (!settings->isWritable())
+    {
+        m_prevValue = prevValueBak;
+        return false;
+    }
     settings->setValue(SYSTEM_NAME_KEY, m_value);
     settings->setValue(PREV_SYSTEM_NAME_KEY, m_prevValue);
+    return true;
 }
 
 void nx::SystemName::loadFromConfig()
