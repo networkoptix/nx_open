@@ -46,6 +46,8 @@ FlagConfig conf("mobile_client");
 
 #include <nx/media/decoder_registrar.h>
 #include "resource_allocator.h"
+#include <plugins/storage/file_storage/qtfile_storage_resource.h>
+#include <core/resource/storage_plugin_factory.h>
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -190,6 +192,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
     initLog();
+
+    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
+
 
     QnMobileClientModule mobile_client;
     Q_UNUSED(mobile_client)

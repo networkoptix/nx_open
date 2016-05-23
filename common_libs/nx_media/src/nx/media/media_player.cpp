@@ -17,6 +17,8 @@
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 
 namespace nx {
 namespace media {
@@ -144,6 +146,7 @@ private:
     void presentNextFrame();
     qint64 getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame);
     qint64 getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame);
+    bool createArchiveReader();
     bool initDataProvider();
 
     void setState(Player::State state);
@@ -463,21 +466,46 @@ void PlayerPrivate::updateVideoQuality()
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, true, videoResolution);
 }
 
+bool PlayerPrivate::createArchiveReader()
+{
+    QString path(url.path().mid(1));
+    bool isLocalFile = url.scheme() == lit("file");
+    QnResourcePtr resource;
+    if (isLocalFile)
+    {
+        resource = QnAviResourcePtr(new QnAviResource(path));
+        resource->setStatus(Qn::Online);
+    }
+    else
+    {
+        resource = qnResPool->getResourceById(QnUuid(path));
+    }
+
+    if (!resource)
+        return false;
+
+    archiveReader.reset(new QnArchiveStreamReader(resource));
+    QnAbstractArchiveDelegate* archiveDelegate;
+    if (isLocalFile)
+        archiveDelegate = new QnAviArchiveDelegate();
+    else
+        archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    return true;
+}
+
 bool PlayerPrivate::initDataProvider()
 {
-    QnUuid id(url.path().mid(1));
-    QnResourcePtr resource = qnResPool->getResourceById(id);
-    if (!resource)
+    if (!createArchiveReader())
     {
         setMediaStatus(Player::MediaStatus::NoMedia);
         return false;
     }
 
-    archiveReader.reset(new QnArchiveStreamReader(resource));
     updateVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
-    archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
     archiveReader->addDataProcessor(dataConsumer.get());
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
@@ -489,6 +517,7 @@ bool PlayerPrivate::initDataProvider()
             setPosition(kLivePosition);
         });
 
+    auto resource = archiveReader->getResource();
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera)
     {
