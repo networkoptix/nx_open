@@ -887,10 +887,7 @@ namespace ec2
          * %param item.displayInfo Whether to display info for the layout item.
          *     %value false
          *     %value true
-         * %param editable Whether to display info for the layout item.
-         *     %value false
-         *     %value true
-         * %param locked Whether the layout item is locked.
+         * %param locked Whether the layout is locked.
          *     %value false
          *     %value true
          * %param backgroundImageFilename
@@ -955,10 +952,7 @@ namespace ec2
          * %param item.displayInfo Whether to display info for the layout item.
          *     %value false
          *     %value true
-         * %param editable Whether to display info for the layout item.
-         *     %value false
-         *     %value true
-         * %param locked Whether the layout item is locked.
+         * %param locked Whether the layout is locked.
          *     %value false
          *     %value true
          * %param backgroundImageFilename

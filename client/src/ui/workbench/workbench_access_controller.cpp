@@ -211,7 +211,6 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 
     if (const QnLayoutResourcePtr &layout = resource.dynamicCast<QnLayoutResource>())
     {
-        connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnWorkbenchAccessController::updatePermissions);
         connect(layout, &QnLayoutResource::lockedChanged,       this, &QnWorkbenchAccessController::updatePermissions);
     }
 

@@ -37,7 +37,6 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
         {
             connect(layout, &QnResource::parentIdChanged,           this, &QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
-            connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
             connect(layout, &QnLayoutResource::lockedChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
@@ -450,7 +449,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 
         QnUuid ownerId = layout->getParentId();
 
-        /* Access to global layouts. */
+        /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (ownerId.isNull())
         {
             if (!isAccessibleResource(user, layout))
@@ -487,11 +486,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         }
 
         /* User can do whatever he wants with own layouts. */
-        if (layout->userCanEdit())
-            return Qn::FullLayoutPermissions;
-
-        /* Can structurally modify but cannot save. */
-        return Qn::ModifyLayoutPermission;
+        return Qn::FullLayoutPermissions;
     };
 
     return checkLocked(checkReadOnly(base()));
