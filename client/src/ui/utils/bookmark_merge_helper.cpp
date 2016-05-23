@@ -1,6 +1,7 @@
 #include "bookmark_merge_helper.h"
 
 #include <boost/optional/optional.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 
 #include <core/resource/camera_bookmark.h>
 
@@ -146,7 +147,7 @@ QnTimelineBookmarkItemList QnBookmarkMergeHelper::bookmarks(qint64 msecsPerDp) c
     return result;
 }
 
-QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, int msecsPerDp) const
+QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, int msecsPerDp, bool onlyTopmost) const
 {
     Q_D(const QnBookmarkMergeHelper);
 
@@ -154,17 +155,39 @@ QnCameraBookmarkList QnBookmarkMergeHelper::bookmarksAtPosition(qint64 timeMs, i
 
     QnCameraBookmarkList result;
 
-    for (const BookmarkItemPtr &item: level.items) {
-        if (item->startTimeMs > timeMs || item->endTimeMs <= timeMs)
-            continue;
+    if (onlyTopmost)
+    {
+        for (const BookmarkItemPtr& item : level.items | boost::adaptors::reversed)
+        {
+            if (timeMs >= item->startTimeMs && timeMs <= item->endTimeMs)
+            {
+                for (const BookmarkItemPtr& bookmarkItem : d->bookmarksForItem(item))
+                {
+                    NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO, "Zero level item should contain real bookmarks");
+                    if (bookmarkItem->bookmark)
+                        result.append(bookmarkItem->bookmark.get());
+                }
 
-        BookmarkItemList bookmarkItems = d->bookmarksForItem(item);
-        for (const BookmarkItemPtr &bookmarkItem: bookmarkItems) {
-            NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO, "Zero level item should contain real bookmarks");
-            if (bookmarkItem->bookmark)
-                result.append(bookmarkItem->bookmark.get());
+                if (!result.isEmpty())
+                    break;
+            }
         }
+    }
+    else
+    {
+        for (const BookmarkItemPtr& item : level.items)
+        {
+            if (item->startTimeMs > timeMs || item->endTimeMs <= timeMs)
+                continue;
 
+            BookmarkItemList bookmarkItems = d->bookmarksForItem(item);
+            for (const BookmarkItemPtr& bookmarkItem : bookmarkItems)
+            {
+                NX_ASSERT(bookmarkItem->bookmark, Q_FUNC_INFO, "Zero level item should contain real bookmarks");
+                if (bookmarkItem->bookmark)
+                    result.append(bookmarkItem->bookmark.get());
+            }
+        }
     }
 
     return result;
