@@ -128,6 +128,7 @@
         <iosTarget>iphoneos</iosTarget>
         <client.binary.name>client-bin</client.binary.name>
         <template>lib</template>
+        <noQmlInQrc>false</noQmlInQrc>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
@@ -443,6 +444,7 @@
 
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
+                <module>media_db_util</module>
 
                 <module>plugins/genericrtspplugin</module>
                 <module>plugins/image_library_plugin</module>

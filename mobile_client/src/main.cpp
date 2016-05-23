@@ -1,15 +1,16 @@
-#include <time.h>
-
+#include <QtCore/QDir>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QFont>
 #include <QtGui/QOpenGLContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
+#include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
 
-#include <nx/utils/log/log.h>
+#include <time.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
 
 namespace mobile_client {
@@ -88,7 +89,16 @@ int runUi(QGuiApplication *application) {
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
-    engine.addImportPath(lit("qrc:///qml"));
+#if 1
+    QString basePath = lit("qrc:///");
+#else
+    QDir baseDir;
+    baseDir.cd(lit("../../../../mobile_client/static-resources"));
+    QString basePath = lit("file://") + baseDir.absolutePath() + lit("/");
+#endif
+    context.setLocalPrefix(basePath);
+    engine.setBaseUrl(QUrl(basePath + lit("qml/")));
+    engine.addImportPath(basePath + lit("qml"));
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
@@ -102,7 +112,7 @@ int runUi(QGuiApplication *application) {
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
-    QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
+    QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
     QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
