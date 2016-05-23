@@ -63,38 +63,4 @@
 
         <rdep.packages>openssl ffmpeg</rdep.packages>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mediaserver_core</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lnx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/lnx_streaming/pom.xml</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lnx_network</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/lnx_network/pom.xml</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lnx_utils</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/lnx_utils/pom.xml</systemPath>
-        </dependency>
-    </dependencies>    
 </project>
