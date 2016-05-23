@@ -242,7 +242,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
 
     if (!systemName.saveToConfig())
     {
-        NX_LOG("Failed to save new system name to config");
+        NX_LOG("Failed to save new system name to config", cl_logWARNING);
         return false;
     }
     server->setSystemName(systemName.value());
