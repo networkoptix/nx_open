@@ -51,7 +51,7 @@ Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourcePtr &re
     return m_dataByResource.value(resource).permissions;
 }
 
-Qn::Permissions QnWorkbenchAccessController::permissions(const QnResourceList &resources) const
+Qn::Permissions QnWorkbenchAccessController::combinedPermissions(const QnResourceList &resources) const
 {
     Qn::Permissions result = Qn::AllPermissions;
     for (const QnResourcePtr &resource : resources)

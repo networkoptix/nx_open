@@ -521,7 +521,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Context-based. */
         CurrentLayoutResourceRole,
         CurrentLayoutMediaItemsRole,
-        CurrentMediaServerResourcesRole,
 
         /* Arguments. */
         ActionIdRole,
