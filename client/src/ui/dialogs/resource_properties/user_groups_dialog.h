@@ -28,7 +28,6 @@ public:
         PermissionsPage,
         CamerasPage,
         LayoutsPage,
-        ServersPage,
 
         PageCount
     };
@@ -52,8 +51,6 @@ private:
     QnPermissionsWidget* m_permissionsPage;
     QnAccessibleResourcesWidget* m_camerasPage;
     QnAccessibleResourcesWidget* m_layoutsPage;
-    QnAccessibleResourcesWidget* m_serversPage;
-
 };
 
 

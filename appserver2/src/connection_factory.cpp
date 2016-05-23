@@ -731,9 +731,7 @@ namespace ec2
          *     %value true
  * %param permissions Combination (via "|") of the following flags:
          *     %value GlobalAdminPermission Admin, can edit other non-admins.
-         *     %value GlobalEditServersPermissions Can edit server settings.
          *     %value GlobalEditCamerasPermission Can edit camera settings.
-         *     %value GlobalEditLayoutsPermission Can create and edit global layouts.
          *     %value GlobalControlVideoWallPermission Can control videowalls.
          *     %value GlobalViewArchivePermission Can view archives of available cameras.
          *     %value GlobalExportPermission Can export archives of available cameras.
@@ -741,8 +739,6 @@ namespace ec2
          *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
          *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
          *     %value GlobalAccessAllCamerasPermission Has access to all cameras
-         *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
-         *     %value GlobalAccessAllServersPermission Has access to all servers
          * %param email User's email.
          * %param digest HA1 digest hash from user password, as per RFC 2069. When modifying an
          *     existing user, supply empty string. When creating a new user, calculate the value
@@ -787,9 +783,7 @@ namespace ec2
         * %param id Group unique id. Should be generated when creating a new group.
         * %param name Group name.
         * %param permissions Combination (via "|") of the following flags:
-        *     %value GlobalEditServersPermissions Can edit server settings.
         *     %value GlobalEditCamerasPermission Can edit camera settings.
-        *     %value GlobalEditLayoutsPermission Can create and edit global layouts.
         *     %value GlobalControlVideoWallPermission Can control videowalls.
         *     %value GlobalViewArchivePermission Can view archives of available cameras.
         *     %value GlobalExportPermission Can export archives of available cameras.
@@ -797,8 +791,6 @@ namespace ec2
         *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
         *     %value GlobalUserInputPermission Can change camera's PTZ state, use 2-way audio, I/O buttons.
         *     %value GlobalAccessAllCamerasPermission Has access to all cameras
-        *     %value GlobalAccessAllLayoutsPermission Has access to all global layouts
-        *     %value GlobalAccessAllServersPermission Has access to all servers
         * %// AbstractUserManager::saveGroup
         */
         registerUpdateFuncHandler<ApiUserGroupData>(p, ApiCommand::saveUserGroup);

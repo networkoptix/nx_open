@@ -342,16 +342,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnMediaServerResourcePtr& server) const
 {
     NX_ASSERT(server);
-
-    if (!isAccessibleResource(user, server))
-        return Qn::NoPermissions;
-
-    if (hasGlobalPermission(user, Qn::GlobalEditServersPermissions))
+    if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
     {
         if (qnCommon->isReadOnly())
             return Qn::ReadPermission;
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     }
+
+    /* All users must have at least ReadPermission to send api requests (recorded periods, bookmarks, etc). */
     return Qn::ReadPermission;
 }
 
@@ -459,7 +457,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
                 return Qn::NoPermissions;
 
             /* Global layouts editor. */
-            if (hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission))
+            if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
                 return Qn::FullLayoutPermissions;
 
             return Qn::ModifyLayoutPermission;
@@ -549,14 +547,8 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
 
     auto requiredPermission = [this, resource]()
     {
-        if (resource.dynamicCast<QnLayoutResource>())
-            return Qn::GlobalAccessAllLayoutsPermission;
-
         if (resource.dynamicCast<QnVirtualCameraResource>())
             return Qn::GlobalAccessAllCamerasPermission;
-
-        if (resource.dynamicCast<QnMediaServerResource>())
-            return Qn::GlobalAccessAllServersPermission;
 
         if (resource.dynamicCast<QnVideoWallResource>())
             return Qn::GlobalControlVideoWallPermission;
@@ -565,7 +557,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
         if (resource.dynamicCast<QnWebPageResource>())
             return Qn::GlobalAccessAllCamerasPermission;
 
-        /* Default value (e.g. for users). */
+        /* Default value (e.g. for users, servers and layouts). */
         return Qn::GlobalAdminPermission;
     };
 
@@ -586,9 +578,9 @@ bool QnResourceAccessManager::canCreateLayoutInternal(const QnUserResourcePtr& u
     if (layoutParentId == user->getId())
         return true;
 
-    /* Somebody can create global layouts. */
+    /* Only admins can create global layouts. */
     if (layoutParentId.isNull())
-        return hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission);
+        return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
     QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(layoutParentId);
     if (owner)
