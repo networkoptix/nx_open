@@ -76,7 +76,7 @@ void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered() {
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
-    menu()->trigger(QnActions::UserGroupsAction);
+    //menu()->trigger(QnActions::UserGroupsAction);
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

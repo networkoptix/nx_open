@@ -117,7 +117,12 @@ public:
         /**
         * Whether drag operations at window sides should scroll the window.
         */
-        DragScrollsWindow = 0x1000
+        DragScrollsWindow = 0x1000,
+
+        /**
+        * Whether bookmarks viewer should be anchored to timeline pixel location (otherwise - to a timestamp).
+        */
+        StillBookmarksViewer = 0x2000
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -386,7 +391,7 @@ private:
     void freezeThumbnails();
     void animateLastMinute(int deltaMSecs);
 
-    qint64 setThumbnailSelecting(qint64 time, bool selecting);
+    void setThumbnailSelecting(qint64 time, bool selecting);
 
     void setAnimationStart(qint64 start);
     void setAnimationEnd(qint64 end);
@@ -395,9 +400,7 @@ private:
 
     void generateProgressPatterns();
 
-    void processBoomarksHover(QGraphicsSceneHoverEvent* event);
-
-    void updateBookmarksViewerTimestamp();
+    void updateBookmarksViewerLocation();
 
     QnBookmarksViewer* createBookmarksViewer();
 
@@ -468,7 +471,7 @@ private:
 
     QLocale m_locale;
 
-    QPointF m_currentRulerRectMousePos;
+    QPointF m_hoverMousePos;
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer* m_bookmarksViewer;

@@ -7,12 +7,11 @@
 
 #include <client/client_globals.h>
 
-class QnActions
-{
-    Q_GADGET
-    Q_ENUMS(IDType)
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
+#endif
+QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
 
-public:
     /**
      * Enum of all menu actions.
      */
@@ -872,6 +871,11 @@ public:
          * Opens a layout creation dialog.
          */
         NewUserLayoutAction,
+
+        /**
+         * Creates a new global layout.
+         */
+        NewGlobalLayoutAction,
 
         /**
          * Sets spacing of current layout's cells to 0%.

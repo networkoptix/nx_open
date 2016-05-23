@@ -34,6 +34,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/counter.h>
+#include <utils/common/string.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
@@ -44,6 +45,7 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     m_closingLayouts(false)
 {
     connect(action(QnActions::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
+    connect(action(QnActions::NewGlobalLayoutAction),              &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newGlobalLayoutAction_triggered);
     connect(action(QnActions::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
     connect(action(QnActions::SaveLayoutAsAction),                 &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered);
     connect(action(QnActions::SaveLayoutForCurrentUserAsAction),   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
@@ -302,9 +304,11 @@ QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QD
     );
 }
 
-bool QnWorkbenchLayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts) {
-    foreach(const QnLayoutResourcePtr &layout, layouts) {
-        if (!(accessController()->permissions(layout) & Qn::RemovePermission))
+bool QnWorkbenchLayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts)
+{
+    for (const QnLayoutResourcePtr &layout: layouts)
+    {
+        if (!accessController()->hasPermissions(layout, Qn::RemovePermission))
             return false;
     }
     return true;
@@ -513,7 +517,8 @@ bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force) {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
+void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
+{
     QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
     if(user.isNull())
         return;
@@ -564,6 +569,63 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);
+    resourcePool()->addResource(layout);
+
+    snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
+
+    menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
+}
+
+void QnWorkbenchLayoutsHandler::at_newGlobalLayoutAction_triggered()
+{
+    auto globalLayouts = []
+    {
+        return qnResPool->getResources().filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
+        {
+            return layout->isGlobal();
+        });
+    };
+
+
+    QStringList usedNames;
+    for (const auto &existing: globalLayouts())
+        usedNames << existing->getName().toLower();
+
+
+    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
+    dialog->setWindowTitle(tr("New Global Layout"));
+    dialog->setText(tr("Enter the name of the global layout to create:"));
+    dialog->setName(generateUniqueString(usedNames, tr("Global Layout"), tr("Global Layout %1")));
+    dialog->setWindowModality(Qt::ApplicationModal);
+
+    QDialogButtonBox::StandardButton button;
+    do {
+        if (!dialog->exec())
+            return;
+
+        button = QDialogButtonBox::Yes;
+        const QString name = dialog->name();
+        QnLayoutResourceList existing = globalLayouts().filtered([name](const QnLayoutResourcePtr& layout)
+        {
+            return layout->getName().toLower() == name.toLower();
+        });
+
+        if (!existing.isEmpty())
+        {
+            button = askOverrideLayout(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, QDialogButtonBox::Yes);
+            if (button == QDialogButtonBox::Cancel)
+                return;
+
+            if (button == QDialogButtonBox::Yes)
+            {
+                removeLayouts(existing);
+            }
+        }
+    } while (button != QDialogButtonBox::Yes);
+
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setId(QnUuid::createUuid());
+    layout->setName(dialog->name());
     resourcePool()->addResource(layout);
 
     snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });

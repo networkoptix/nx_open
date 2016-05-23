@@ -19,8 +19,8 @@ class QnBookmarksViewer : public QGraphicsWidget, public HelpTopicQueryable
 public:
     typedef QPair<qreal, qreal> Bounds;
     typedef std::pair<QPointF, Bounds> PosAndBoundsPair;
-    typedef std::function<QnCameraBookmarkList (qint64 timestamp)> GetBookmarksFunc;
-    typedef std::function<PosAndBoundsPair (qint64 timestamp)> GetPosOnTimelineFunc;
+    typedef std::function<QnCameraBookmarkList (qint64 location)> GetBookmarksFunc;
+    typedef std::function<PosAndBoundsPair (qint64 location)> GetPosOnTimelineFunc;
 
     QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
         , const GetPosOnTimelineFunc &getPosFunc
@@ -52,8 +52,10 @@ signals:
     void playBookmark(const QnCameraBookmark &bookmark);
 
 public slots:
-    /// Set timestamp for bookmarks extraction
-    void setTargetTimestamp(qint64 timestamp);
+    /// @brief Set abstract location for bookmarks extraction
+    /// It can be for example timeline coordinate or a timestamp.
+    /// Location is interpreted by getBookmarksFunc/getPosFunc callbacks passed to the constructor.
+    void setTargetLocation(qint64 location);
 
     /// @brief updates position of bookmark(s) when timeline window changed
     void updateOnWindowChange();
