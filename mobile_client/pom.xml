@@ -19,7 +19,7 @@
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
 
-        <qt.libs>core qml quick quick-private concurrent network sql multimedia xml</qt.libs>
+        <qt.libs>core core-private qml quick quick-private concurrent network sql multimedia xml</qt.libs>
         <global.libs>-lclient.core -lnx_media -lnx_audio -lnx_streaming -lcloud_db_client -lappserver2 -lcommon -lnx_streaming -lnx_network -lcommon -lnx_utils -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
