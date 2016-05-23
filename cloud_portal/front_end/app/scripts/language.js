@@ -80,6 +80,7 @@ var L = {
     },
     system:{
         yourSystem: 'Your system',
+        mySystemSearch: 'IMeMyMine',
         confirmDisconnectTitle: "Disconnect system from PRODUCT_NAME?",
         confirmDisconnectAction: "Disconnect",
 
