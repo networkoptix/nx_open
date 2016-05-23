@@ -141,6 +141,8 @@ public:
         const std::string& systemId,
         api::SystemDataEx* const systemData);
 
+    static void setTemporaryDirectoryPath(const QString& path);
+
 private:
     QString m_tmpDir;
     int m_port;

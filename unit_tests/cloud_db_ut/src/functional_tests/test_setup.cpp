@@ -28,13 +28,19 @@
 namespace nx {
 namespace cdb {
 
+namespace {
+QString sTemporaryDirectoryPath;
+}
+
 CdbFunctionalTest::CdbFunctionalTest()
 :
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
     m_port = (std::rand() % 10000) + 50000;
-    m_tmpDir = QDir::homePath() + "/cdb_ut.data";
+    m_tmpDir =
+        (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
+        "/cdb_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     addArg("/path/to/bin");
@@ -571,6 +577,11 @@ api::ResultCode CdbFunctionalTest::fetchSystemData(
         }
     }
     return api::ResultCode::notFound;
+}
+
+void CdbFunctionalTest::setTemporaryDirectoryPath(const QString& path)
+{
+    sTemporaryDirectoryPath = path;
 }
 
 namespace api {

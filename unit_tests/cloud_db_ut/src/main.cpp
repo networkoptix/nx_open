@@ -13,6 +13,10 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_global.h>
 
+#include "functional_tests/test_setup.h"
+
+
+void parseArgs(int argc, char **argv);
 
 int main( int argc, char **argv )
 {
@@ -20,6 +24,22 @@ int main( int argc, char **argv )
 
     ::testing::InitGoogleMock(&argc, argv);
 
+    parseArgs(argc, argv);
+
     const int result = RUN_ALL_TESTS();
     return result;
+}
+
+void parseArgs(int argc, char **argv)
+{
+    std::multimap<QString, QString> args;
+    parseCmdArgs(argc, argv, &args);
+
+    const auto logIter = args.find("log");
+    if (logIter != args.end())
+        QnLog::initLog(logIter->second);
+
+    const auto tmpIter = args.find("tmp");
+    if (tmpIter != args.end())
+        nx::cdb::CdbFunctionalTest::setTemporaryDirectoryPath(tmpIter->second);
 }
