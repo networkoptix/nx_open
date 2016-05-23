@@ -53,15 +53,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>connection_mediator</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/connection_mediator/pom.xml</systemPath>
-        </dependency>        
+        </dependency>     
     </dependencies>
-
 </project>
