@@ -37,6 +37,9 @@ public:
     /** @param moduleName Is a prefix for .flag files. */
     FlagConfig(const char* moduleName);
 
+    FlagConfig(const FlagConfig&) = delete;
+    FlagConfig& operator=(const FlagConfig&) = delete;
+
     /** Called by NX_FLAG() macro; @return defaultValue. */
     bool regFlagParam(bool* pValue, bool defaultValue, const char* paramName, const char* descr);
 
