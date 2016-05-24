@@ -45,8 +45,8 @@
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
-namespace {
-
+namespace
+{
     /* Note that most numbers below are given relative to time slider size. */
 
     /* Tickmark bar. */
@@ -149,11 +149,13 @@ namespace {
     const int kBookmarkTextPadding = 6;
     const int kMinBookmarkTextCharsVisible = 6;
 
+    /** Invalid hover position. To denote it we use a position outside of client area: */
+    const QPointF kInvalidHoverPos(-1.0, -1.0);
+
     /** Width of sensitive areas at the left and right of the window.
       * When a marker is dragged to these areas it causes window scroll.
       * Has effect only with DragScrollsWindow option. */
     const qreal kWindowScrollPixelThreshold = 1.0;
-
 
     QTime msecsToTime(qint64 msecs)
     {
@@ -473,7 +475,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(kNumTickmarkLevels, this)),
     m_localOffset(0),
-    m_hoverMousePos(-1.0, -1.0),
+    m_hoverMousePos(kInvalidHoverPos),
     m_lastLineBarValue(),
     m_bookmarksViewer(createBookmarksViewer()),
     m_bookmarksVisible(false),
@@ -2925,7 +2927,7 @@ void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 {
     base_type::hoverLeaveEvent(event);
-    m_hoverMousePos = QPointF(-1.0, -1.0);
+    m_hoverMousePos = kInvalidHoverPos;
 
     unsetCursor();
 
