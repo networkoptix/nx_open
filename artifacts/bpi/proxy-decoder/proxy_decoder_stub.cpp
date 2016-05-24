@@ -174,11 +174,18 @@ void VdpauStub::display()
     static YuvNative yuvNative;
     getVideoSurfaceYuvNative(videoSurface, &yuvNative);
     memset(yuvNative.virt, 0, yuvNative.luma_size);
-    //debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
-    // Print videoSurfaceIndex in its individual position.
-    debugPrintNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight,
-        /*x*/ 12 * (videoSurfaceIndex % 4), /*y*/ 6 * (videoSurfaceIndex / 4),
-        stringFormat("%02d", videoSurface).c_str());
+
+    if (conf.enableStubSurfaceNumbers)
+    {
+        // Print videoSurfaceIndex in its individual position.
+        debugPrintNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight,
+            /*x*/ 12 * (videoSurfaceIndex % 4), /*y*/ 6 * (videoSurfaceIndex / 4),
+            stringFormat("%02d", videoSurface).c_str());
+    }
+    else
+    {
+        debugDrawCheckerboardYNative((uint8_t*) yuvNative.virt, m_frameWidth, m_frameHeight);
+    }
 
     VdpOutputSurface outputSurface = VDP_INVALID_HANDLE;
     if (conf.outputSurfaceCount == 0)
@@ -271,7 +278,8 @@ Stub::Stub(int frameWidth, int frameHeight)
     assert(frameWidth > 0);
     assert(frameHeight > 0);
 
-    OUTPUT << "Stub(frameWidth: " << frameWidth << ", frameHeight: " << frameHeight << ")";
+    OUTPUT << "Stub(frameWidth: " << frameWidth << ", frameHeight: " << frameHeight << ") "
+        << (conf.disable ? "DO NOTHING: conf.disable" : "");
 
     // Native buffer is NV12 (12 bits per pixel), arranged in 32x32 px macroblocks.
     m_nativeYuvBufferSize =
@@ -305,8 +313,11 @@ int Stub::decodeToRgb(const CompressedFrame* compressedFrame, int64_t* outPts,
 
     static int frameNumber = 0;
 
-    memset(argbBuffer, 0, argbLineSize * m_frameHeight);
-    debugDrawCheckerboardArgb(argbBuffer, argbLineSize, m_frameWidth, m_frameHeight);
+    if (!conf.disable)
+    {
+        memset(argbBuffer, 0, argbLineSize * m_frameHeight);
+        debugDrawCheckerboardArgb(argbBuffer, argbLineSize, m_frameWidth, m_frameHeight);
+    }
 
     if (outPts && compressedFrame)
         *outPts = compressedFrame->pts;
@@ -333,11 +344,14 @@ int Stub::decodeToYuvPlanar(const CompressedFrame* compressedFrame, int64_t* out
             << ", uVLineSize: " << uVLineSize << ")";
     }
 
-    memset(yBuffer, 0, yLineSize * m_frameHeight);
-    debugDrawCheckerboardY(yBuffer, yLineSize, m_frameWidth, m_frameHeight);
+    if (!conf.disable)
+    {
+        memset(yBuffer, 0, yLineSize * m_frameHeight);
+        debugDrawCheckerboardY(yBuffer, yLineSize, m_frameWidth, m_frameHeight);
 
-    memset(uBuffer, 0, uVLineSize * (m_frameHeight / 2));
-    memset(vBuffer, 0, uVLineSize * (m_frameHeight / 2));
+        memset(uBuffer, 0, uVLineSize * (m_frameHeight / 2));
+        memset(vBuffer, 0, uVLineSize * (m_frameHeight / 2));
+    }
 
     if (outPts && compressedFrame)
         *outPts = compressedFrame->pts;
@@ -352,10 +366,12 @@ int Stub::decodeToYuvNative(const CompressedFrame* compressedFrame, int64_t* out
     assert(outBuffer);
     assert(outBufferSize);
 
-    memset(m_nativeYuvBuffer, 0,
-        32 * 32 * ((m_frameWidth + 31) / 32) * ((m_frameHeight + 31) / 32));
-    debugDrawCheckerboardYNative(m_nativeYuvBuffer, m_frameWidth, m_frameHeight);
-
+    if (!conf.disable)
+    {
+        memset(m_nativeYuvBuffer, 0,
+            32 * 32 * ((m_frameWidth + 31) / 32) * ((m_frameHeight + 31) / 32));
+        debugDrawCheckerboardYNative(m_nativeYuvBuffer, m_frameWidth, m_frameHeight);
+    }
     *outBuffer = m_nativeYuvBuffer;
     *outBufferSize = m_nativeYuvBufferSize;
 
@@ -382,13 +398,19 @@ void Stub::displayDecoded(void* handle)
 {
     assert(handle == (void*) (1));
 
-    if (!m_vdpauStub)
-        m_vdpauStub.reset(new VdpauStub(m_frameWidth, m_frameHeight));
+    if (!conf.disable)
+    {
+        if (!m_vdpauStub)
+            m_vdpauStub.reset(new VdpauStub(m_frameWidth, m_frameHeight));
+    }
 
     if (conf.enableFps)
         debugShowFps(OUTPUT_PREFIX);
 
-    m_vdpauStub->display();
+    if (!conf.disable)
+    {
+        m_vdpauStub->display();
+    }
 }
 
 } // namespace

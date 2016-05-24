@@ -5,7 +5,9 @@ struct NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
 {
     using nx::utils::FlagConfig::FlagConfig;
 
-    NX_FLAG(0, enableStub, "");
+    NX_FLAG(0, disable, "Use stub implementation without any display.");
+    NX_FLAG(0, enableStub, "Use checkerboard/surface-number stub.");
+    NX_FLAG(0, enableStubSurfaceNumbers, "In 'display' mode, draw surface number instead of checkerboard.");
     NX_FLAG(0, enableFps, "");
     NX_FLAG(0, disableCscMatrix, "Avoid setting VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX.");
     NX_INT_PARAM(8, videoSurfaceCount, "1..16");
