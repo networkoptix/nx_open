@@ -59,10 +59,11 @@ const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 *
 
 QnAuthHelper::QnAuthHelper(CloudConnectionManager* const cloudConnectionManager)
 :
+    m_timeBasedNonceProvider(std::make_shared<TimeBasedNonceProvider>()),
     m_nonceProvider(
         new CdbNonceFetcher(
             cloudConnectionManager,
-            std::make_unique<TimeBasedNonceProvider>())),
+            m_timeBasedNonceProvider)),
     m_userDataProvider(
         new CloudUserAuthenticator(
             cloudConnectionManager,
@@ -279,6 +280,20 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
 
             authResult = doDigestAuth(
                 request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
+
+            // update user information if authorization by server authKey and user-name is specified
+            if (authUserId &&
+                authResult == Qn::Auth_OK &&
+                qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
+            {
+                auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
+                if (itr != request.headers.end())
+                {
+                    auto userRes = findUserByName(itr->second);
+                    if (userRes)
+                        *authUserId = userRes->getId();
+                }
+            }
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic) {
             if (usedAuthMethod)
@@ -621,7 +636,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
         QString clientGuid = lit("%1=%2").arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).arg(QnUuid::createUuid().toString());
         nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
-#endif        
+#endif
     }
     return authResult;
 }
@@ -653,9 +668,12 @@ void QnAuthHelper::addAuthHeader(
         auth.arg(realm).arg(QLatin1String(m_nonceProvider->generateNonce())).toLatin1() ) );
 }
 
-QByteArray QnAuthHelper::generateNonce() const
+QByteArray QnAuthHelper::generateNonce(NonceProvider provider) const
 {
-    return m_nonceProvider->generateNonce();
+    if (provider == NonceProvider::automatic)
+        return m_nonceProvider->generateNonce();
+    else
+        return m_timeBasedNonceProvider->generateNonce();
 }
 
 #ifndef USE_USER_RESOURCE_PROVIDER
