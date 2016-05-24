@@ -29,6 +29,8 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <utils/common/model_functions.h>
+#include "server_connector.h"
+#include <transaction/transaction_message_bus.h>
 
 namespace
 {
@@ -227,6 +229,18 @@ bool backupDatabase() {
 
     return true;
 }
+
+void resetTransactionTransportConnections()
+{
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->stop();
+
+    qnTransactionBus->dropConnections();
+
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->start();
+}
+
 
 bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime)
 {

@@ -48,7 +48,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
 
     bool wholeSystem = params.value(lit("wholeSystem"), lit("false")) != lit("false");
     const QString systemName = params.value(lit("systemName"));
-    
+
     PasswordData passwordData(params);
 
     QString errStr;
@@ -87,7 +87,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
         qnAuditManager->addAuditRecord(auditRecord);
 
         if (!wholeSystem)
-            resetConnections();
+            resetTransactionTransportConnections();
     }
 
     /* set port */
@@ -96,7 +96,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
         port = 0;   //not switching port
     }
-    
+
     /* set password */
     if (passwordData.hasPassword())
     {
@@ -177,14 +177,4 @@ int QnConfigureRestHandler::changePort(int port)
     MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
     return ResultOk;
-}
-
-void QnConfigureRestHandler::resetConnections() {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->stop();
-
-    qnTransactionBus->dropConnections();
-
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->start();
 }
