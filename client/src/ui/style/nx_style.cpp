@@ -323,11 +323,8 @@ void QnNxStyle::drawPrimitive(
                 return;
             }
 
-            QnPaletteColor base = findColor(option->palette.color(QPalette::Base));
-            qreal opacity = option->state.testFlag(State_Enabled) ? 1.0 : 0.3;
-
+            QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
-            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * opacity);
 
             if (option->state.testFlag(State_HasFocus))
             {
@@ -626,7 +623,7 @@ void QnNxStyle::drawComplexControl(
 
             if (comboBox->editable)
             {
-                proxy()->drawPrimitive(PE_FrameLineEdit, comboBox, painter, widget);
+                proxy()->drawPrimitive(PE_PanelLineEdit, comboBox, painter, widget);
 
                 QRect buttonRect = subControlRect(control, option, SC_ComboBoxArrow, widget);
 
