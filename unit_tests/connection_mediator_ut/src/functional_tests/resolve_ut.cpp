@@ -24,7 +24,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
 
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
@@ -81,7 +81,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
@@ -116,7 +116,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
@@ -140,7 +140,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
@@ -166,7 +166,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();

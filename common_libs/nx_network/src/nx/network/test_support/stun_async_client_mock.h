@@ -5,17 +5,19 @@
 #include <nx/network/stun/async_client.h>
 
 namespace nx {
-namespace network {
+namespace stun {
 namespace test {
 
-class StunAsyncClientMock: public stun::AbstractAsyncClient
+class AsyncClientMock
+:
+        public AbstractAsyncClient
 {
 public:
-    StunAsyncClientMock()
+    AsyncClientMock()
     {
-        ON_CALL(*this, setIndicationHandler(::testing::_, ::testing::_))
+        ON_CALL(*this, setIndicationHandler(::testing::_, ::testing::_, ::testing::_))
             .WillByDefault(::testing::Invoke(
-                this, &StunAsyncClientMock::setIndicationHandlerImpl));
+                this, &AsyncClientMock::setIndicationHandlerImpl));
         ON_CALL(*this, localAddress())
             .WillByDefault(::testing::Return(SocketAddress()));
         ON_CALL(*this, remoteAddress())
@@ -23,13 +25,13 @@ public:
     }
 
     MOCK_METHOD2(connect, void(SocketAddress, bool));
-    MOCK_METHOD2(setIndicationHandler, bool(int, IndicationHandler));
-    MOCK_METHOD1(addOnReconnectedHandler, void(ReconnectHandler));
+    MOCK_METHOD3(setIndicationHandler, bool(int, IndicationHandler, void*));
+    MOCK_METHOD2(addOnReconnectedHandler, void(ReconnectHandler, void*));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));
 
-    void sendRequest(stun::Message request, RequestHandler handler) override
+    void sendRequest(Message request, RequestHandler handler, void*) override
     {
         QnMutexLocker lock(&m_mutex);
         const auto it = m_requestHandlers.find(request.header.method);
@@ -39,6 +41,11 @@ public:
         const auto requestHandler = it->second; // copy
         lock.unlock();
         requestHandler(std::move(request), std::move(handler));
+    }
+
+    void cancelHandlers(void*, utils::MoveOnlyFunc<void()> handler) override
+    {
+        handler();
     }
 
     void emulateIndication(stun::Message indication)
@@ -62,7 +69,7 @@ public:
     }
 
 private:
-    bool setIndicationHandlerImpl(int type, IndicationHandler handler)
+    bool setIndicationHandlerImpl(int type, IndicationHandler handler, void*)
     {
         QnMutexLocker lock(&m_mutex);
         return m_indicationHandlers.emplace(type, std::move(handler)).second;
@@ -74,7 +81,7 @@ private:
 };
 
 } // test
-} // network
+} // stun
 } // nx
 
 #endif // STUN_ASYNC_CLIENT_MOCK_H

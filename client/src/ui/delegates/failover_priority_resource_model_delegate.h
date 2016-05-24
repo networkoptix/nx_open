@@ -4,14 +4,14 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/delegates/resource_pool_model_custom_column_delegate.h>
+#include <ui/delegates/resource_tree_model_custom_column_delegate.h>
 
 #include <nx/utils/uuid.h>
 
-class QnFailoverPriorityResourceModelDelegate: public QnResourcePoolModelCustomColumnDelegate {
+class QnFailoverPriorityResourceModelDelegate: public QnResourceTreeModelCustomColumnDelegate {
     Q_OBJECT
 
-    typedef QnResourcePoolModelCustomColumnDelegate base_type;
+    typedef QnResourceTreeModelCustomColumnDelegate base_type;
 public:
     QnFailoverPriorityResourceModelDelegate(QObject* parent = nullptr);
     virtual ~QnFailoverPriorityResourceModelDelegate();

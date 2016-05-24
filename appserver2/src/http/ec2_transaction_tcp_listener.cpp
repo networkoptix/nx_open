@@ -86,14 +86,6 @@ void QnTransactionTcpProcessor::run()
         return;
     }
 
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    if (peerType == Qn::PT_Server)
-    {
-        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
-        return;
-    }
-
-
     d->response.headers.emplace(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(

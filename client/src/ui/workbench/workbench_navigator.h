@@ -41,6 +41,7 @@ class QnResourceDisplay;
 class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
 class QnPendingOperation;
+class VariantAnimator;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -222,6 +223,16 @@ private:
     void updateSliderBookmarks();
 
     void updateHasArchiveState();
+
+    VariantAnimator* createPositionAnimator();
+    void initializePositionAnimations();
+    void stopPositionAnimations();
+
+    void timelineAdvance();
+    void timelineCorrect(qint64 toMs);
+    void timelineCatchUp(qint64 toMs);
+    bool isTimelineCatchingUp() const;
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -283,6 +294,15 @@ private:
 
     /** At least one of the synced widgets has archive. */
     bool m_hasArchive;
+
+    /** Animated timeline position. */
+    qint64 m_animatedPosition;
+
+    /** Previous media position. */
+    qint64 m_previousMediaPosition;
+
+    /** Timeline position animator. */
+    VariantAnimator* m_positionAnimator;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

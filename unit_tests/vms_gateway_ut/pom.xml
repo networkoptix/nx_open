@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>build_ut</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>../build_ut</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>vms_gateway_ut</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Cloud VMS Gateway Unit Tests</name>
+
+    <properties>
+        <guid>${vms_gateway_ut.guid}</guid>
+        <product.title>HD Cloud VMS Gateway Unit Tests</product.title>
+
+        <qt.libs>core network xml concurrent sql multimedia</qt.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lvms_gateway</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
+
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
+        <rdep.packages>gtest gmock openssl</rdep.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libvms_gateway</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

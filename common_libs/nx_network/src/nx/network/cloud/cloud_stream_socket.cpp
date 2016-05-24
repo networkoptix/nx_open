@@ -362,6 +362,7 @@ aio::AbstractAioThread* CloudStreamSocket::getAioThread() const
 void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     m_aioThreadBinder->bindToAioThread(aioThread);
+    m_socketAttributes.aioThread = aioThread;
 }
 
 void CloudStreamSocket::onAddressResolved(

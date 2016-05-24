@@ -14,13 +14,6 @@ extern "C"
     #include <libavutil/avutil.h> // TODO: remove
 }
 
-#include <utils/common/util.h>
-#include <utils/common/synctime.h>
-#include <utils/common/scoped_value_rollback.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/pending_operation.h>
-#include <utils/threaded_chunks_merge_tool.h>
-
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -34,33 +27,46 @@ extern "C"
 #include <core/resource/camera_history.h>
 #include <core/resource/storage_resource.h>
 
-#include <nx/streaming/abstract_archive_stream_reader.h>
-#include <plugins/resource/avi/avi_resource.h>
-
-#include <camera/resource_display.h>
-#include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
-#include <camera/thumbnails_loader.h>
 #include <camera/cam_display.h>
-#include <camera/client_video_camera.h>
-#include <camera/resource_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
+#include <camera/camera_data_manager.h>
+#include <camera/client_video_camera.h>
+#include <camera/loaders/caching_camera_data_loader.h>
+#include <camera/resource_display.h>
+#include <camera/thumbnails_loader.h>
+
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+
+#include <plugins/resource/avi/avi_resource.h>
+
+#include <redass/redass_controller.h>
 
 #include <server/server_storage_manager.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/animation/variant_animator.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/controls/time_scroll_bar.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
-
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+
+#include <utils/common/checked_cast.h>
+#include <utils/common/delayed.h>
+#include <utils/common/pending_operation.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/string.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/threaded_chunks_merge_tool.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -72,23 +78,21 @@ extern "C"
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
-#include "camera/thumbnails_loader.h"
-#include "nx/streaming/abstract_archive_stream_reader.h"
-#include "redass/redass_controller.h"
-
-#include <utils/common/delayed.h>
-#include <utils/common/string.h>
 
 namespace {
 
-    const int cameraHistoryRetryTimeoutMs = 5 * 1000;
+    const int kCameraHistoryRetryTimeoutMs = 5 * 1000;
 
-    const int discardCacheIntervalMs = 10 * 60 * 1000;
+    const int kDiscardCacheIntervalMs = 10 * 60 * 1000;
 
     /** Size of timeline window near live when there is no recorded periods on cameras. */
-    const int timelineWindowNearLive = 10 * 1000;
+    const int kTimelineWindowNearLive = 10 * 1000;
 
-    const int updateBookmarksInterval = 2000;
+    const int kUpdateBookmarksInterval = 2000;
+
+    const qreal kCatchUpTimeFactor = 30.0;
+
+    const qint64 kCatchUpThresholdMs = 500;
 
     enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
@@ -134,10 +138,13 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
-    m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
+    m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, kUpdateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0),
-    m_hasArchive(false)
+    m_hasArchive(false),
+    m_animatedPosition(0),
+    m_previousMediaPosition(0),
+    m_positionAnimator(nullptr)
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -151,7 +158,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
     QTimer* discardCacheTimer = new QTimer(this);
-    discardCacheTimer->setInterval(discardCacheIntervalMs);
+    discardCacheTimer->setInterval(kDiscardCacheIntervalMs);
     discardCacheTimer->setSingleShot(false);
     connect(discardCacheTimer, &QTimer::timeout, m_cameraDataManager, &QnCameraDataManager::clearCache);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
@@ -199,7 +206,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     }
 
     QTimer* updateCameraHistoryTimer = new QTimer(this);
-    updateCameraHistoryTimer->setInterval(cameraHistoryRetryTimeoutMs);
+    updateCameraHistoryTimer->setInterval(kCameraHistoryRetryTimeoutMs);
     updateCameraHistoryTimer->setSingleShot(false);
     connect(updateCameraHistoryTimer, &QTimer::timeout, this, [this] {
         QSet<QnVirtualCameraResourcePtr> localQueue = m_updateHistoryQueue;
@@ -897,70 +904,84 @@ void QnWorkbenchNavigator::updateCentralWidget() {
     updateCurrentWidget();
 }
 
-void QnWorkbenchNavigator::updateCurrentWidget() {
-    QnResourceWidget *widget = m_centralWidget;
+void QnWorkbenchNavigator::updateCurrentWidget()
+{
+    QnResourceWidget* widget = m_centralWidget;
     if (m_currentWidget == widget)
         return;
 
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
 
     emit currentWidgetAboutToBeChanged();
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
 
-    if(m_currentWidget) {
+    if (m_currentWidget)
+    {
         m_timeSlider->setThumbnailsLoader(NULL, -1);
-        if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
+        if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
+        {
             foreach(QnResourceWidget *widget, m_syncedWidgets)
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
+        }
         else
+        {
             updateItemDataFromSlider(m_currentWidget);
+        }
         disconnect(m_currentWidget->resource(), NULL, this, NULL);
         connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
-    } else {
+    }
+    else
+    {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = true;
     }
 
-    if (display() && display()->isChangingLayout()) {
+    if (display() && display()->isChangingLayout())
+    {
         // clear current widget state to avoid incorrect behavior when closing the layout
         // see: Bug #1341: Selection on timeline aren't displayed after thumbnails searching
         // see: Bug #1344: If make a THMB search from a layout with a result of THMB search, Timeline are not marked properly
         m_currentWidget = NULL;
         m_currentMediaWidget = NULL;
-    } else {
+    }
+    else
+    {
         m_currentWidget = widget;
         m_currentMediaWidget = mediaWidget;
     }
 
     if (m_currentWidget)
-    {
-        connect(m_currentWidget->resource(), &QnResource::nameChanged
-            , this, &QnWorkbenchNavigator::updateLines);
-    }
+        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
 
+    initializePositionAnimations();
 
     updateCurrentWidgetFlags();
     updateLines();
     updateCalendar();
 
-    if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget) {
+    if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget)
+    {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid |= (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
     }
+
     updateSliderFromReader(false);
     if (m_timeSlider)
         m_timeSlider->finishAnimations();
 
-    if(m_currentMediaWidget) {
-        executeDelayed([this] {
-            //TODO: #rvasilenko why should we make these delayed calls at all?
-            updatePlaying();
-            updateSpeed();
-        });
+    if(m_currentMediaWidget)
+    {
+        executeDelayed(
+            [this]()
+            {
+                //TODO: #rvasilenko why should we make these delayed calls at all?
+                updatePlaying();
+                updateSpeed();
+            });
     }
 
     updateLocalOffset();
@@ -1038,6 +1059,94 @@ void QnWorkbenchNavigator::updateSliderOptions() {
         m_timeSlider->setSelectionValid(false);
 }
 
+VariantAnimator* QnWorkbenchNavigator::createPositionAnimator()
+{
+    auto positionGetter = [this](const QObject* target) -> qint64
+    {
+        Q_UNUSED(target);
+        return m_animatedPosition;
+    };
+
+    auto positionSetter = [this](const QObject* target, const QVariant& value)
+    {
+        Q_UNUSED(target);
+        m_animatedPosition = value.value<qint64>();
+    };
+
+    VariantAnimator* animator = new VariantAnimator(this);
+    animator->setTimer(InstrumentManager::animationTimer(display()->scene()));
+    animator->setAccessor(newAccessor(positionGetter, positionSetter));
+    animator->setTargetObject(this);
+    return animator;
+}
+
+void QnWorkbenchNavigator::initializePositionAnimations()
+{
+    if (m_positionAnimator)
+        m_positionAnimator->stop();
+    else
+        m_positionAnimator = createPositionAnimator();
+}
+
+void QnWorkbenchNavigator::stopPositionAnimations()
+{
+    if (m_positionAnimator)
+        m_positionAnimator->stop();
+}
+
+/* Advance timeline forward or backward with current playback speed (when media updates are less frequent than display updates) */
+void QnWorkbenchNavigator::timelineAdvance()
+{
+    qreal speedFactor = speed();
+    if (qFuzzyIsNull(speedFactor))
+    {
+        m_positionAnimator->stop();
+        return;
+    }
+
+    const qint64 kAdvanceIntervalMs = 60LL * 1000LL; // something big; 1 minute for nicety
+
+    m_positionAnimator->setSpeed(qAbs(speedFactor) * 1000.0);
+    m_positionAnimator->animateTo(m_animatedPosition + static_cast<qint64>(speedFactor * kAdvanceIntervalMs));
+}
+
+/* Advance timeline forward or backward with speed adjusted to position deviation (this is the main animation mode) */
+void QnWorkbenchNavigator::timelineCorrect(qint64 toMs)
+{
+    qreal speedFactor = speed();
+    if (qFuzzyIsNull(speedFactor))
+    {
+        m_animatedPosition = toMs;
+        m_positionAnimator->stop();
+        return;
+    }
+
+    const qint64 kCorrectionIntervalMs = kCatchUpThresholdMs * 2;
+    qreal correctionTimeMs = kCorrectionIntervalMs * speedFactor;
+
+    qint64 delta = toMs - m_animatedPosition;
+    qreal correctionFactor = (correctionTimeMs + delta) / correctionTimeMs;
+
+    m_positionAnimator->setSpeed(qAbs(speedFactor * correctionFactor) * 1000.0);
+    m_positionAnimator->animateTo(toMs + static_cast<qint64>(correctionTimeMs));
+}
+
+/* Quickly catch timeline up with current media position */
+void QnWorkbenchNavigator::timelineCatchUp(qint64 toMs)
+{
+    const qint64 kMinCatchUpMsPerSecond = kCatchUpThresholdMs;
+    qreal catchUpMsPerSecond = qMax(qAbs(toMs - m_animatedPosition), kMinCatchUpMsPerSecond) * kCatchUpTimeFactor;
+
+    m_positionAnimator->setSpeed(catchUpMsPerSecond);
+    m_positionAnimator->animateTo(toMs);
+}
+
+bool QnWorkbenchNavigator::isTimelineCatchingUp() const
+{
+    return m_positionAnimator->isRunning() &&
+        m_positionAnimator->targetValue() == m_previousMediaPosition;
+}
+
 void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     if (!m_currentMediaWidget || !m_timeSlider)
         return;
@@ -1059,7 +1168,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
-    bool wasLive = isLive();
 
     qint64 endTimeMSec, startTimeMSec;
 
@@ -1084,7 +1192,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         } else if (noRecordedPeriodsFound) {
             /* Set to default value. */
             endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-            startTimeMSec =  endTimeMSec - timelineWindowNearLive;
+            startTimeMSec =  endTimeMSec - kTimelineWindowNearLive;
 
             /* And then try to read saved value - it was valid someday. */
             if (qnRuntime->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
@@ -1144,17 +1252,47 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         qint64 timeUSec = usecTimeForWidget(m_currentMediaWidget);
         qint64 timeMSec = usecToMsec(timeUSec);
 
-        qint64 deltaMs = timeMSec - m_timeSlider->value();
-
-        const qint64 kAnimationThresholdMs = 100;
-        qint64 threshold = qMax(kAnimationThresholdMs, static_cast<qint64>(m_timeSlider->msecsPerPixel()));
-
-        if (qAbs(deltaMs) < threshold || (wasLive && timeMSec == endTimeMSec))
-            /* Immediate setting of desired new position: */
-            m_timeSlider->setValue(timeMSec, keepInWindow);
+        if (!keepInWindow)
+        {
+            /* Position was reset: */
+            m_animatedPosition = timeMSec;
+            m_previousMediaPosition = timeMSec;
+            timelineAdvance();
+        }
         else
-            /* Logarithmic animation to desired new position: */
-            m_timeSlider->setValue(m_timeSlider->value() + deltaMs / 2, keepInWindow);
+        {
+            /* If media position was updated at this tick or timeline is catching up: */
+            if (m_previousMediaPosition != timeMSec || isTimelineCatchingUp())
+            {
+                qint64 delta = timeMSec - m_animatedPosition;
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel())
+                {
+                    /* If distance is less than 1 pixel we catch-up instantly: */
+                    m_animatedPosition = timeMSec;
+                    timelineAdvance();
+                }
+                else
+                {
+                    /* If media is live or position deviation is too big we quickly catch-up, otherwise smoothly correct: */
+                    if (timeMSec == endTimeMSec || qAbs(timeMSec - m_animatedPosition) >= qAbs(kCatchUpThresholdMs * speed()))
+                        timelineCatchUp(timeMSec);
+                    else
+                        timelineCorrect(timeMSec);
+                }
+            }
+            else
+            /* If media position was not updated at this tick: */
+            {
+                /* Advance timeline position if it's not already being advanced, corrected or caught-up.
+                 * It's easier to handle mode switches here instead of AbstractAnimator::finished signal. */
+                if (m_positionAnimator->isStopped())
+                    timelineAdvance();
+            }
+        }
+
+        m_previousMediaPosition = timeMSec;
+
+        m_timeSlider->setValue(m_animatedPosition, keepInWindow);
 
         if (timeUSec >= 0)
             updateLive();
@@ -1395,6 +1533,9 @@ void QnWorkbenchNavigator::updatePlaying() {
 
     m_lastPlaying = playing;
 
+    if (!playing)
+        stopPositionAnimations();
+
     emit playingChanged();
 }
 
@@ -1414,6 +1555,9 @@ void QnWorkbenchNavigator::updateSpeed() {
         return;
 
     m_lastSpeed = speed;
+
+    /* Stop animation now. It might be resumed with new speed at the next display update. */
+    stopPositionAnimations();
 
     emit speedChanged();
 }
@@ -1618,40 +1762,16 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr &resourc
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
-    if(!m_currentWidget)
+    if (!m_currentWidget)
         return;
 
-    if(isLive())
+    if (isLive())
         value = DATETIME_NOW;
 
-    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
-    QString tooltipFormatDate = tr("yyyy MMM dd");
-
-    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
-    QString tooltipFormatTime = tr("hh:mm:ss");
-
-    //: This is a date/time format for time slider's tooltip. Please translate it only if you're absolutely sure that you know what you're doing.
-    QString tooltipFormatTimeShort = tr("mm:ss");
-
-    //: Time slider's tooltip for position on live.
-    QString tooltipFormatLive = tr("Live");
-
-    /* Update tool tip format. */
-    if (value == DATETIME_NOW) {
-        /* Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for.
-         That's where these single quotes come from. */
-        m_timeSlider->setToolTipFormat(lit("'%1'").arg(tooltipFormatLive));
-    } else {
-        if (m_currentWidgetFlags & WidgetUsesUTC) {
-
-            m_timeSlider->setToolTipFormat(tooltipFormatDate + L'\n' + tooltipFormatTime);
-        } else {
-            if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                m_timeSlider->setToolTipFormat(tooltipFormatTime);
-            } else {
-                m_timeSlider->setToolTipFormat(tooltipFormatTimeShort);
-            }
-        }
+    if (m_animatedPosition != value)
+    {
+        stopPositionAnimations();
+        m_animatedPosition = value;
     }
 
     /* Update reader position. */

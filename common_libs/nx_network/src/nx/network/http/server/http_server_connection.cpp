@@ -63,7 +63,7 @@ namespace nx_http
         auto strongRef = shared_from_this();
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
-        nx_http::MimeProtoVersion version = request.request->requestLine.version;
+        const nx_http::MimeProtoVersion version = request.request->requestLine.version;
         auto sendResponseFunc = [this, weakThis, version](
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
@@ -94,7 +94,7 @@ namespace nx_http
             nx_http::Message response( nx_http::MessageType::response );
             response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
             return prepareAndSendResponse(
-                request.request->requestLine.version,
+                version,
                 std::move( response ),
                 nullptr );
         }

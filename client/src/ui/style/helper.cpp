@@ -42,7 +42,8 @@ namespace style
 
     int dp(qreal value)
     {
-        return dpr(value);
+        //TODO #vkutin #common Completely remove dp() when we are ABSOLUTELY sure it's not needed
+        return value; // dpr(value);
     }
 
     bool isDark(const QColor &color)

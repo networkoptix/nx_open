@@ -230,16 +230,16 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QnLayoutItemDataList& items = orderedItems;
     for (int i = 0; i < items.size(); ++i) {
         QnLayoutItemData& item = items[i];
-        QString path = item.resource.path;
+        QString path = item.resource.uniqueId;
         NX_ASSERT(!path.isEmpty(), Q_FUNC_INFO, "Resource path should not be empty. Exported file is not valid.");
         if (!path.endsWith(lit(".mkv")))
             path += lit(".mkv");
-        item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile, path);
+        item.resource.uniqueId = QnLayoutFileStorageResource::updateNovParent(xfile, path);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
         storage->setUrl(xfile);
 
-        QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
+        QnAviResourcePtr aviResource(new QnAviResource(item.resource.uniqueId));
         if (layoutWithCameras)
             aviResource->addFlags(Qn::utc | Qn::sync | Qn::periods | Qn::motion);
         aviResource->setStorage(storage);

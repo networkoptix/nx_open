@@ -2,8 +2,6 @@
 
 #include <QtWidgets/QWidget>
 
-#include <api/api_fwd.h>
-
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_advanced_param.h>
 
@@ -39,8 +37,8 @@ private:
 
     void initialize();
     void displayParams();
-    
-    void saveSingleValue(const QnCameraAdvancedParamValue &value);  
+
+    void saveSingleValue(const QnCameraAdvancedParamValue &value);
 
     bool isCameraAvailable() const;
     void updateCameraAvailability();

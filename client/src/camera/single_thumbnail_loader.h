@@ -2,8 +2,6 @@
 
 #include <QtCore/QObject>
 
-#include <api/api_fwd.h>
-
 #include <api/helpers/thumbnail_request_data.h>
 
 #include <core/resource/resource_fwd.h>

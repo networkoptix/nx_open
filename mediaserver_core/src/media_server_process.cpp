@@ -247,6 +247,7 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
+static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class MediaServerProcess;
@@ -1721,7 +1722,7 @@ void MediaServerProcess::run()
 
     nx::String sslCertData;
     QFile f(sslCertPath);
-    if (f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
+    if (!f.open(QIODevice::ReadOnly) || (sslCertData = f.readAll()).isEmpty())
     {
         f.close();
         qWarning() << "Could not find valid SSL certificate at "
@@ -1735,8 +1736,8 @@ void MediaServerProcess::run()
         }
 
         sslCertData = nx::network::SslEngine::makeCertificateAndKey(
-            qApp->applicationName().toLatin1(), "US",
-            QnAppInfo::organizationName().toLatin1());
+            QnAppInfo::productName().toUtf8(), "US",
+            QnAppInfo::organizationName().toUtf8());
 
         if (sslCertData.isEmpty())
         {
@@ -1809,8 +1810,6 @@ void MediaServerProcess::run()
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
-
-    //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     std::unique_ptr<QnStorageManager> normalStorageManager(
         new QnStorageManager(
@@ -2073,6 +2072,7 @@ void MediaServerProcess::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
     bool isNewServerInstance = false;
+    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
@@ -2081,7 +2081,8 @@ void MediaServerProcess::run()
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
-            isNewServerInstance = true;
+            if (!noSetupWizardFlag)
+                isNewServerInstance = true;
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
 

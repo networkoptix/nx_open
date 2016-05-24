@@ -110,9 +110,6 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
             requestResultCode = nx_http::FusionRequestErrorClass::ioError;
             break;
 
-        case ResultCode::notImplemented:
-        case ResultCode::unknownError:
-        case ResultCode::invalidFormat:
         default:
             requestResultCode = nx_http::FusionRequestErrorClass::internalError;
             break;

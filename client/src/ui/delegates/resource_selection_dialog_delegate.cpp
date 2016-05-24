@@ -6,7 +6,7 @@
 #include <core/resource/user_resource.h>
 
 #include <ui/help/help_topics.h>
-#include <ui/models/resource_pool_model.h>
+#include <ui/models/resource/resource_tree_model.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -36,7 +36,7 @@ bool QnResourceSelectionDialogDelegate::isValid(const QnResourcePtr &resource) c
     return true;
 }
 
-QnResourcePoolModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::customColumnDelegate() const {
+QnResourceTreeModelCustomColumnDelegate* QnResourceSelectionDialogDelegate::customColumnDelegate() const {
     return nullptr;
 }
 

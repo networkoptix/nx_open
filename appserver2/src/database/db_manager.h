@@ -516,13 +516,13 @@ namespace ec2
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
+        ErrorCode saveLicense(const ApiLicenseData& license, QSqlDatabase& database);
         ErrorCode removeLicense(const ApiLicenseData& license);
+        ErrorCode removeLicense(const ApiLicenseData& license, QSqlDatabase& database);
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
         bool createDatabase();
-        bool migrateBusinessEvents();
-        bool doRemap(int id, int newVal, const QString& fieldName);
 
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
@@ -572,7 +572,8 @@ namespace ec2
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();
         bool isTranAllowed(const QnAbstractTransaction& tran) const;
-
+        bool syncLicensesBetweenDB();
+        ErrorCode getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;

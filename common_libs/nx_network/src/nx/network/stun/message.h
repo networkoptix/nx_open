@@ -23,7 +23,7 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/log/assert.h>
 #include <utils/common/cpp14.h>
-
+#include <utils/common/systemerror.h>
 
 //!Implementation of STUN protocol (rfc5389)
 namespace nx {
@@ -304,6 +304,8 @@ public:
 
     void insertIntegrity(const String& userName, const String& key);
     bool verifyIntegrity(const String& userName, const String& key);
+
+    boost::optional<QString> hasError(SystemError::ErrorCode code) const;
 };
 
 } // namespase stun

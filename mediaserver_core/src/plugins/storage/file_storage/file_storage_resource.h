@@ -2,7 +2,6 @@
 #define _FILE_STORAGE_PROTOCOL_H__
 
 #include <atomic>
-#include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
 #include <utils/common/app_info.h>
 #include <platform/platform_abstraction.h>

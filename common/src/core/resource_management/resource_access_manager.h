@@ -6,6 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx_ec/data/api_fwd.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_group_data.h>
 
@@ -40,14 +41,14 @@ public:
     * \returns                         Global permissions of the given user,
     *                                  adjusted to take deprecation and superuser status into account.
     */
-    Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr &user) const;
+    Qn::GlobalPermissions globalPermissions(const QnUserResourcePtr& user) const;
 
     /**
     * \param user                      User to get global permissions for.
     * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
-    bool hasGlobalPermission(const QnUserResourcePtr &user, Qn::GlobalPermission requiredPermission) const;
+    bool hasGlobalPermission(const QnUserResourcePtr& user, Qn::GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -63,26 +64,47 @@ public:
     * \returns                         Whether actual permissions include required permission.
     */
     bool hasPermission(const QnUserResourcePtr& user, const QnResourcePtr& resource, Qn::Permission requiredPermission) const;
-private:
-    /**
-    * \param permissions               Permission flags containing some deprecated values.
-    * \returns                         Permission flags with deprecated values replaced with new ones.
-    */
-    static Qn::GlobalPermissions undeprecate(Qn::GlobalPermissions permissions);
 
+    /**
+    * \param user                      User that should have permissions for resource creating.
+    * \param resource                  Resource to get permissions for.
+    * \returns                         Whether user can create this resource.
+    */
+    bool canCreateResource(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
+
+    template <typename ApiDataType>
+    bool canCreateResource(const QnUserResourcePtr& user, const ApiDataType& data) const
+    {
+        /* By default we cannot create resources manually. */
+        return false;
+    }
+
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
+    bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);
 
-    Qn::Permissions calculatePermissions(const QnUserResourcePtr &user, const QnResourcePtr &target) const;
+    Qn::Permissions calculatePermissions(const QnUserResourcePtr& user, const QnResourcePtr& target) const;
 
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnVirtualCameraResourcePtr &camera)   const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnMediaServerResourcePtr &server)     const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnVideoWallResourcePtr &videoWall)    const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnWebPageResourcePtr &webPage)        const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout)          const;
-    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user, const QnUserResourcePtr &targetUser)        const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVirtualCameraResourcePtr& camera)   const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnMediaServerResourcePtr& server)     const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnStorageResourcePtr& storage)        const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnVideoWallResourcePtr& videoWall)    const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnWebPageResourcePtr& webPage)        const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnLayoutResourcePtr& layout)          const;
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr& user, const QnUserResourcePtr& targetUser)        const;
 
-    bool isAccessibleResource(const QnUserResourcePtr &user, const QnResourcePtr &resource) const;
+    bool isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const;
+
+    bool canCreateStorageInternal(const QnUserResourcePtr& user, const QnUuid& storageParentId) const;
+    bool canCreateLayoutInternal(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const;
+    bool canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateVideoWallInternal(const QnUserResourcePtr& user) const;
+    bool canCreateWebPageInternal(const QnUserResourcePtr& user) const;
 
 private:
     mutable QnMutex m_mutex;

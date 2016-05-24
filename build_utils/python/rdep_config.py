@@ -94,7 +94,7 @@ class PackageConfig(ConfigHelper):
     def __init__(self, file_name):
         ConfigHelper.__init__(self, file_name)
 
-    def get_timestamp(self, default_value = 0):
+    def get_timestamp(self, default_value = None):
         timestamp = self.get_value("General", "time", default_value)
         return None if timestamp == None else int(timestamp)
     def update_timestamp(self):

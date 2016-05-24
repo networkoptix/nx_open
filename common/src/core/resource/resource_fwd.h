@@ -15,7 +15,7 @@
  * but don't need the definitions of the actual resource classes.
  */
 
-// TODO: #Elric move out?
+// TODO: #gdm move out!
 // <--
 class QnScheduleTask;
 
@@ -33,7 +33,8 @@ class QnVideoWallItem;
 class QnVideoWallMatrix;
 class QnVideoWallControlMessage;
 
-class QnLayoutItemData;
+struct QnLayoutItemData;
+struct QnLayoutItemResourceDescriptor;
 
 struct QnServerBackupSchedule;
 
@@ -43,6 +44,9 @@ typedef std::shared_ptr<QnResourceCommand> QnResourceCommandPtr;
 struct QnCameraAdvancedParamValue;
 class QnCameraAdvancedParamValueMap;
 typedef QList<QnCameraAdvancedParamValue> QnCameraAdvancedParamValueList;
+
+class QnMediaServerConnection;
+typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
 // -->
 

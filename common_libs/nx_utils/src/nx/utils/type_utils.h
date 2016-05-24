@@ -77,6 +77,11 @@ static_unique_ptr_cast(
         static_cast<ResultType*>(sourcePtr.release()));
 }
 
+template<typename Object, typename Deleter>
+std::unique_ptr<Object, Deleter> uniquePtr(Object* ptr, Deleter deleter)
+{
+    return std::unique_ptr<Object, Deleter>(ptr, std::move(deleter));
+}
 
 }   //namespace utils
 }   //namespace nx
