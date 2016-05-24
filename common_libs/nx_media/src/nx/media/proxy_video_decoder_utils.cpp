@@ -78,7 +78,7 @@ void DebugTimer::finish(const char* tag)
     }
 }
 
-void debugShowFps()
+void debugShowFps(const char* tag)
 {
     static const int kFpsCount = 30;
     static std::deque<long> deltaList;
@@ -95,7 +95,7 @@ void debugShowFps()
         double deltaAvg = std::accumulate(deltaList.begin(), deltaList.end(), 0.0)
             / deltaList.size();
 
-        PRINT << "FPS: Avg: "
+        PRINT << "FPS [" << tag << "]: Avg: "
             << qPrintable(QString::number(1000.0 / deltaAvg, 'f', 1))
             << ", ms: " << delta << ", avg ms: " << deltaAvg;
     }

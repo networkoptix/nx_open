@@ -27,6 +27,7 @@ public:
     // Debug output.
     NX_FLAG(0, enableOutput, "");
     NX_FLAG(0, enableTime, "");
+    NX_FLAG(0, enableFps, "");
 
     // Choosing impl.
     NX_FLAG(1, implDisplay, "decodeToDisplayQueue() => displayDecoded() in frame handle().");
@@ -43,7 +44,7 @@ public:
 };
 extern ProxyVideoDecoderFlagConfig conf;
 
-void debugShowFps();
+void debugShowFps(const char* tag);
 
 /** Debug tool - implicitly unaligned pointer. */
 uint8_t* debugUnalignPtr(void* data);

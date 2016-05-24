@@ -49,7 +49,7 @@ struct NxMediaFlagConfig: public nx::utils::FlagConfig
 {
     NxMediaFlagConfig(const char* moduleName): nx::utils::FlagConfig(moduleName) { reload(); }
 
-    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:////c:/test.MP4");
+    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
 
 } conf("nx_media");
 
