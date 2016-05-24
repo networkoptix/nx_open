@@ -309,8 +309,11 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
-    case PE_PanelLineEdit:
     case PE_FrameLineEdit:
+        /* We draw panel already with frame in PE_PanelLineEdit. */
+        return;
+
+    case PE_PanelLineEdit:
         {
             if (widget && (qobject_cast<const QAbstractSpinBox *>(widget->parentWidget()) ||
                            qobject_cast<const QComboBox *>(widget->parentWidget()) ||
@@ -320,8 +323,11 @@ void QnNxStyle::drawPrimitive(
                 return;
             }
 
-            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
             QnPaletteColor base = findColor(option->palette.color(QPalette::Base));
+            qreal opacity = option->state.testFlag(State_Enabled) ? 1.0 : 0.3;
+
+            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * opacity);
 
             if (option->state.testFlag(State_HasFocus))
             {
