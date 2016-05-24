@@ -87,6 +87,10 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::CurrentSystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
         break;
+    case Qn::SeparatorNode:
+        m_displayName = QString();
+        m_name = lit("-");
+        break;
     case Qn::ServersNode:
         m_displayName = m_name = tr("Servers");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
@@ -354,13 +358,25 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return true;
 
     case Qn::OtherSystemsNode:
-        return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
+        return !isAdmin || !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
+
+    case Qn::UsersNode:
+    case Qn::ServersNode:
+        return !isAdmin;
 
     case Qn::UserDevicesNode:
         return !isLoggedIn || isAdmin;
 
     case Qn::LayoutsNode:
         return !isLoggedIn;
+
+    case Qn::EdgeNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true;
+
+        /* Only admins can see edge nodes. */
+        return !isAdmin;
 
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
@@ -419,19 +435,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
             }
         }
         return false;
-
-    case Qn::EdgeNode:
-        /* Hide resource nodes without resource. */
-        if (!m_resource)
-            return true;
-
-        /* Only admins can see edge nodes. */
-        return !isAdmin;
-
-    case Qn::UsersNode:
-    case Qn::CurrentSystemNode:
-    case Qn::ServersNode:
-        return !isAdmin;
 
     default:
         NX_ASSERT("Should never get here");
@@ -530,6 +533,12 @@ QModelIndex QnResourceTreeModelNode::createIndex(int col)
 
 Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 {
+    if (m_type == Qn::SeparatorNode)
+    {
+        /* No Editable/Selectable flags. */
+        return Qt::ItemNeverHasChildren;
+    }
+
     if (column == Qn::CheckColumn)
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
@@ -580,7 +589,8 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 
 QVariant QnResourceTreeModelNode::data(int role, int column) const
 {
-    switch(role) {
+    switch(role)
+    {
     case Qt::DisplayRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:

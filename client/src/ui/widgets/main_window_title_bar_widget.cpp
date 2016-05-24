@@ -3,7 +3,6 @@
 #include <ui/actions/actions.h>
 #include <ui/common/geometry.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/style/noptix_style.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/common/tool_button.h>

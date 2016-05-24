@@ -25,6 +25,7 @@ namespace style
         static const int kRounding;
         static const QSize kSwitchSize;
         static const int kSwitchMargin;   /**< Margin between switch subcontrol and right side of a control, eg. push button */
+        static const QSize kSeparatorSize; /**< Default separator item size. */
         static const qreal kCheckboxCornerRadius;   /**< Checkbox corner rounding radius */
     };
 

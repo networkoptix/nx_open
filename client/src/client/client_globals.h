@@ -7,19 +7,20 @@
 namespace Qn
 {
     /**
-     * Type of a node in resource tree displayed to the user.
+     * Type of a node in resource tree displayed to the user. Ordered as it should be displayed on the screen.
      */
     enum NodeType
     {
         RootNode,               /**< Root node for the tree (current system node). */
-        LocalNode,              /**< Root node for local resources. */
         CurrentSystemNode,      /**< Root node, displaying current system name. */
+        SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
         ServersNode,            /**< Root node for servers for admin user. */
-        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
-        UsersNode,              /**< Root node for user resources. */
-        WebPagesNode,           /**< Root node for web pages. */
         UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
+        WebPagesNode,           /**< Root node for web pages. */
+        UsersNode,              /**< Root node for user resources. */
+        LocalNode,              /**< Root node for local resources. */
+        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
 
         BastardNode,            /**< Root node for hidden resources. */
 

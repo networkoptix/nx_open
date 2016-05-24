@@ -83,7 +83,6 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
-#include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>

@@ -6,16 +6,18 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/resource_name.h>
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
 
 #include <ui/style/skin.h>
-#include <ui/style/noptix_style.h>
 #include <ui/style/helper.h>
+#include <ui/style/noptix_style.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
@@ -94,6 +96,21 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         return;
     }
 
+    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
+
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (nodeType == Qn::SeparatorNode)
+    {
+        painter->save();
+
+        int y = option.rect.top() + option.rect.height() / 2;
+        painter->setPen(option.palette.color(QPalette::Midlight));
+        painter->drawLine(0, y, option.rect.right(), y);
+
+        painter->restore();
+    }
+
+
     /* Select icon and text color by item state: */
     QColor mainColor, extraColor;
     QIcon::Mode iconMode;
@@ -117,8 +134,6 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         mainColor = m_colors.mainText;
         extraColor = m_colors.extraText;
     }
-
-    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
     /* Due to Qt bug, State_Editing is not set in option.state, so detect editing differently: */
     const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(option.widget);
@@ -212,12 +227,16 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (nodeType == Qn::SeparatorNode)
+        return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
+
     /* Initialize style option: */
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
     // TODO #vkutin Keep this while checkboxed items are painted by default implementation:
-    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) 
+    if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
         return base_type::sizeHint(option, index);
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
@@ -353,11 +372,19 @@ bool QnResourceItemDelegate::eventFilter(QObject* object, QEvent* event)
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModelIndex& index) const
 {
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    if (nodeType == Qn::CurrentSystemNode)
+        return ItemState::Selected;
+
     /* Fetch information from model: */
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (workbench() && resource == workbench()->context()->user())
+        return ItemState::Selected;
+
     QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
     QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
     QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+
 
     /* Determine central workbench item: */
     QnWorkbenchItem* centralItem = workbench() ? workbench()->item(Qn::CentralRole) : nullptr;

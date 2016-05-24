@@ -67,48 +67,61 @@ public:
 
 
 protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const
+    {
         Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
         Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
+        if (leftNode != rightNode)
         {
-            /* "Other Systems" must be the last element */
-            bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
-            bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
-            if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
-                return rightOtherSystems;
-        }
+            /* Root nodes are strictly ordered, but there are two types of nodes which
+             * are inserted in between: current user node and videowall node.
+             * Videowalls are pinned between Layouts and WebPages.
+             * CurrentUser is pinned between CurrentSystem and Separator.
+             */
 
-        {
-            /* Local node must be just before "other systems". */
-            bool leftLocal = leftNode == Qn::LocalNode;
-            bool rightLocal = rightNode == Qn::LocalNode;
-            if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
-                return rightLocal;
-        }
+            /* Check default behavior first. */
+            if (leftNode != Qn::ResourceNode && rightNode != Qn::ResourceNode)
+                return leftNode < rightNode;
 
-        {
-            /* WebPages node must be just before "Local". */
-            bool leftWebPages = leftNode == Qn::WebPagesNode;
-            bool rightWebPages = rightNode == Qn::WebPagesNode;
-            if(leftWebPages ^ rightWebPages) /* One of the nodes is a local node, but not both. */
-                return rightWebPages;
+            if (leftNode == Qn::ResourceNode)
+            {
+                QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
+                NX_ASSERT(leftResource);
+                if (!leftResource)
+                    return false;
+                bool isUser = leftResource->flags().testFlag(Qn::user);
+                bool isVideoWall = leftResource->flags().testFlag(Qn::videowall);
+                NX_ASSERT(isUser || isVideoWall);
+                if (isUser)
+                    return Qn::CurrentSystemNode < rightNode;
+                return Qn::LayoutsNode < rightNode;
+            }
+            NX_ASSERT(rightNode == Qn::ResourceNode);
+
+            {
+                QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
+                NX_ASSERT(rightResource);
+                if (!rightResource)
+                    return false;
+                bool isUser = rightResource->flags().testFlag(Qn::user);
+                bool isVideoWall = rightResource->flags().testFlag(Qn::videowall);
+                NX_ASSERT(isUser || isVideoWall);
+                if (isUser)
+                    return leftNode < Qn::SeparatorNode;
+                return leftNode < Qn::WebPagesNode;
+            }
+
+
         }
 
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
 
         {
-            bool leftVideoWall = leftResource.dynamicCast<QnVideoWallResource>();
-            bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
-            if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
-                return rightVideoWall;
-        }
-
-        {
             bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
             bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
-            if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+            if (leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
                 return rightIncompatible;
         }
 
@@ -129,11 +142,11 @@ protected:
         }
 
         /* We want the order to be defined even for items with the same name. */
-        if(leftResource && rightResource) {
+        if(leftResource && rightResource)
             return leftResource->getUniqueId() < rightResource->getUniqueId();
-        } else {
-            return leftResource < rightResource;
-        }
+
+        return leftResource < rightResource;
+
     }
 
     void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state) {

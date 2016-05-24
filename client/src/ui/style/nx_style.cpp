@@ -358,13 +358,14 @@ void QnNxStyle::drawPrimitive(
         if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
             /* In case of tree view: */
-            if (qobject_cast<const QTreeView*>(widget))
+            if (const QTreeView* tree = qobject_cast<const QTreeView*>(widget))
             {
                 /* Markers can be semi-transparent, so we draw all layers on top of each other. */
 
                 /* Obtain hover information: */
                 QBrush hoverBrush = option->palette.midlight();
-                bool hasHover = item->state.testFlag(State_MouseOver);
+                bool hasHover = item->state.testFlag(State_MouseOver) && item->state.testFlag(State_Enabled);
+
                 bool hoverOpaque = hasHover && isColorOpaque(hoverBrush.color());
 
                 /* Obtain selection information: */

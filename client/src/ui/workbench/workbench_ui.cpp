@@ -72,7 +72,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/style/skin.h>
-#include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 

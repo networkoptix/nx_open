@@ -74,6 +74,7 @@ namespace
             result
                 << Qn::LocalNode
                 << Qn::CurrentSystemNode
+                << Qn::SeparatorNode
                 << Qn::UsersNode
                 << Qn::ServersNode
                 << Qn::UserDevicesNode
@@ -307,6 +308,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::CurrentSystemNode:
+    case Qn::SeparatorNode:
         if (m_scope == FullScope && isAdmin)
             return rootNode;
         return bastardNode;
@@ -365,17 +367,16 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return m_rootNodes[Qn::UsersNode];
 
         if (m_scope == CamerasScope)
-            return m_rootNodes[Qn::BastardNode];
-
-        if (isAdmin)
-            return m_rootNodes[Qn::UsersNode];
+            return bastardNode;
 
         if (node->resource() == context()->user())
             return rootNode;
 
+        if (isAdmin)
+            return m_rootNodes[Qn::UsersNode];
+
         //TODO: #GDM #access remove comment when access rights check will be implemented on server
         //NX_ASSERT(false, "Non-admin user can't see other users.");
-
         return bastardNode;
     }
 
@@ -431,7 +432,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
         QnResourcePtr owner = layout->getParentResource();
         if (!owner || owner == context()->user())
-            return m_rootNodes[Qn::LayoutsNode];;
+            return m_rootNodes[Qn::LayoutsNode];
 
         if (isAdmin)
             return getResourceNode(owner);
