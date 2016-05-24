@@ -1,7 +1,5 @@
 #include "calendar_model.h"
 
-#include <QtCore/QLocale>
-
 #include "camera/camera_chunk_provider.h"
 
 namespace {
@@ -27,6 +25,7 @@ public:
     QnCalendarModelPrivate(QnCalendarModel *parent) :
         q_ptr(parent),
         populated(false),
+        mondayIsFirstDay(true),
         chunkProvider(nullptr)
     {
         QDate date = QDate::currentDate();
@@ -43,7 +42,7 @@ public:
     int year;
     int month;
 
-    QLocale locale;
+    bool mondayIsFirstDay;
 
     QnCameraChunkProvider *chunkProvider;
 
@@ -141,6 +140,28 @@ void QnCalendarModel::setMonth(int month) {
     emit monthChanged();
 }
 
+bool QnCalendarModel::mondayIsFirstDay() const {
+    Q_D(const QnCalendarModel);
+    return d->mondayIsFirstDay;
+}
+
+void QnCalendarModel::setMondayIsFirstDay(bool mondayIsFirstDay) {
+    Q_D(QnCalendarModel);
+
+    if (d->mondayIsFirstDay == mondayIsFirstDay)
+        return;
+
+    beginResetModel();
+
+    d->mondayIsFirstDay = mondayIsFirstDay;
+
+    d->populate();
+
+    endResetModel();
+
+    emit mondayIsFirstDayChanged();
+}
+
 QnCameraChunkProvider *QnCalendarModel::chunkProvider() const {
     Q_D(const QnCalendarModel);
     return d->chunkProvider;
@@ -176,34 +197,10 @@ void QnCalendarModel::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
     emit chunkProviderChanged();
 }
 
-QLocale QnCalendarModel::locale() const
-{
-    Q_D(const QnCalendarModel);
-    return d->locale;
-}
-
-void QnCalendarModel::setLocale(QLocale locale)
-{
-    Q_D(QnCalendarModel);
-
-    if (d->locale == locale)
-        return;
-
-    beginResetModel();
-
-    d->locale = locale;
-
-    d->populate();
-
-    endResetModel();
-
-    emit localeChanged();
-}
-
 QDate QnCalendarModelPrivate::firstDate(int year, int month) const {
     QDate date(year, month, 1);
     int dayOfWeek = date.dayOfWeek();
-    if (locale.firstDayOfWeek() == Qt::Monday)
+    if (mondayIsFirstDay)
         date = date.addDays(1 - dayOfWeek);
     else if (dayOfWeek < Qt::Sunday)
         date = date.addDays(-dayOfWeek);

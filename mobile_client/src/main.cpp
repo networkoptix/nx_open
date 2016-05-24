@@ -1,16 +1,15 @@
-#include <QtCore/QDir>
+#include <time.h>
+
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtGui/QFont>
 #include <QtGui/QOpenGLContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
-#include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
 
-#include <time.h>
-
 #include <nx/utils/log/log.h>
+
 #include <nx/utils/flag_config.h>
 
 namespace mobile_client {
@@ -46,8 +45,6 @@ FlagConfig conf("mobile_client");
 
 #include <nx/media/decoder_registrar.h>
 #include "resource_allocator.h"
-#include <plugins/storage/file_storage/qtfile_storage_resource.h>
-#include <core/resource/storage_plugin_factory.h>
 
 int runUi(QGuiApplication *application) {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -91,16 +88,7 @@ int runUi(QGuiApplication *application) {
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
-#if 1
-    QString basePath = lit("qrc:///");
-#else
-    QDir baseDir;
-    baseDir.cd(lit("../../../../mobile_client/static-resources"));
-    QString basePath = lit("file://") + baseDir.absolutePath() + lit("/");
-#endif
-    context.setLocalPrefix(basePath);
-    engine.setBaseUrl(QUrl(basePath + lit("qml/")));
-    engine.addImportPath(basePath + lit("qml"));
+    engine.addImportPath(lit("qrc:///qml"));
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
@@ -114,7 +102,7 @@ int runUi(QGuiApplication *application) {
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
-    QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
+    QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
@@ -192,9 +180,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
     QGuiApplication application(argc, argv);
     initLog();
-
-    QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
-
 
     QnMobileClientModule mobile_client;
     Q_UNUSED(mobile_client)
