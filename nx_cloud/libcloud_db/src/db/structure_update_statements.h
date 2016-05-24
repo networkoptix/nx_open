@@ -12,8 +12,97 @@ namespace cdb {
 namespace db {
 
 
-//!Account table
-static const char kCreateAccountData[] =
+static const char kCreateDbVersion13[] =
+"                                                                               \
+CREATE TABLE account_status(                                                    \
+    code                INTEGER PRIMARY KEY,                                    \
+    description         TEXT                                                    \
+);                                                                              \
+                                                                                \
+INSERT INTO account_status VALUES(1,'awaiting email confirmation');             \
+INSERT INTO account_status VALUES(2, 'activated');                              \
+INSERT INTO account_status VALUES(3, 'blocked');                                \
+                                                                                \
+CREATE TABLE system_status(                                                     \
+    code                INTEGER PRIMARY KEY,                                    \
+    description         TEXT                                                    \
+);                                                                              \
+                                                                                \
+INSERT INTO system_status VALUES(1,'not activated');                            \
+INSERT INTO system_status VALUES(2, 'activated');                               \
+INSERT INTO system_status VALUES(3, 'deleted');                                 \
+                                                                                \
+CREATE TABLE access_role(                                                       \
+    id                  INTEGER PRIMARY KEY,                                    \
+    description         TEXT NOT NULL                                           \
+);                                                                              \
+                                                                                \
+INSERT INTO access_role VALUES(1,'liveViewer');                                 \
+INSERT INTO access_role VALUES(2, 'viewer');                                    \
+INSERT INTO access_role VALUES(3, 'advancedViewer');                            \
+INSERT INTO access_role VALUES(4, 'localAdmin');                                \
+INSERT INTO access_role VALUES(5, 'cloudAdmin');                                \
+INSERT INTO access_role VALUES(6, 'maintenance');                               \
+INSERT INTO access_role VALUES(7, 'owner');                                     \
+                                                                                \
+CREATE TABLE account(                                                           \
+    id                  VARCHAR(64) NOT NULL PRIMARY KEY,                       \
+    email               VARCHAR(255) UNIQUE,                                    \
+    password_ha1        VARCHAR(255),                                           \
+    full_name           VARCHAR(1024),                                          \
+    status_code         INTEGER,                                                \
+    customization       VARCHAR(255),                                           \
+    FOREIGN KEY(status_code) REFERENCES account_status(code)                    \
+);                                                                              \
+                                                                                \
+CREATE TABLE email_verification(                                                \
+    account_id          VARCHAR(64) NOT NULL,                                   \
+    verification_code   TEXT NOT NULL,                                          \
+    expiration_date     DATETIME NOT NULL,                                      \
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE            \
+);                                                                              \
+                                                                                \
+CREATE TABLE system(                                                            \
+    id                          VARCHAR(64) NOT NULL PRIMARY KEY,               \
+    name                        VARCHAR(1024) NOT NULL,                         \
+    auth_key                    VARCHAR(255) NOT NULL,                          \
+    owner_account_id            VARCHAR(64) NOT NULL,                           \
+    status_code                 INTEGER NOT NULL,                               \
+    customization               VARCHAR(255),                                   \
+    expiration_utc_timestamp    INTEGER DEFAULT 0,                              \
+    FOREIGN KEY(owner_account_id) REFERENCES account(id) ON DELETE CASCADE,     \
+    FOREIGN KEY(status_code) REFERENCES system_status(code)                     \
+);                                                                              \
+                                                                                \
+CREATE TABLE system_to_account(                                                 \
+    account_id                  VARCHAR(64) NOT NULL,                           \
+    system_id                   VARCHAR(64) NOT NULL,                           \
+    access_role_id              INTEGER NOT NULL,                               \
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE,           \
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE,             \
+    FOREIGN KEY(access_role_id) REFERENCES access_role(id)                      \
+);                                                                              \
+                                                                                \
+CREATE UNIQUE INDEX system_to_account_primary ON system_to_account (account_id, system_id); \
+                                                                                \
+CREATE TABLE account_password(                                                  \
+    id                          VARCHAR(64) NOT NULL PRIMARY KEY,               \
+    account_id                  VARCHAR(64) NOT NULL,                           \
+    password_ha1                VARCHAR(255) NOT NULL,                          \
+    realm                       VARCHAR(255) NOT NULL,                          \
+    expiration_timestamp_utc    INTEGER,                                        \
+    max_use_count               INTEGER,                                        \
+    use_count                   INTEGER,                                        \
+    access_rights               TEXT,                                           \
+    is_email_code               INTEGER,                                        \
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE            \
+);                                                                              \
+";                                                                              
+
+
+
+//!Account table                                                                
+static const char kCreateAccountData[] =                                        
 "                                                                   \
 CREATE TABLE account_status (                                       \
     code                INTEGER PRIMARY KEY,                        \

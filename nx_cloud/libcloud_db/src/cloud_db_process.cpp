@@ -476,6 +476,8 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
 {
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
+    dbStructureUpdater.addFullSchemaScript(13, db::kCreateDbVersion13);
+
     dbStructureUpdater.addUpdateScript(db::kCreateAccountData);
     dbStructureUpdater.addUpdateScript(db::kCreateSystemData);
     dbStructureUpdater.addUpdateScript(db::kSystemToAccountMapping);

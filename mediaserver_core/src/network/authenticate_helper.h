@@ -75,8 +75,7 @@ public:
         const QByteArray& authRecord,
         const QByteArray& method,
         nx_http::Response& response,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr) const;
+        QnUuid* authUserId) const;
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -138,8 +137,7 @@ private:
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         bool isProxy,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr);
+        QnUuid* authUserId);
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
         const nx_http::header::Authorization& authorization,
