@@ -359,7 +359,9 @@ int Impl::doGetBuffer2(AVCodecContext* pContext, AVFrame* pFrame, int flags)
     (void) pContext;
 
     if (flags & AV_GET_BUFFER_FLAG_REF)
-    OUTPUT << "AV_GET_BUFFER_FLAG_REF is set";
+    {
+        OUTPUT << "AV_GET_BUFFER_FLAG_REF is set";
+    }
 
     vdpau_render_state* renderState = getRenderState();
     assert(renderState);

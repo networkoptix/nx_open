@@ -53,7 +53,7 @@ void debugShowFps(const char* prefix)
         double deltaAvg = std::accumulate(deltaList.begin(), deltaList.end(), 0.0)
             / deltaList.size();
 
-        fprintf(stderr, "%sFPS avg %4.1f, %4d ms, avg %4.0f ms\n",
+        fprintf(stderr, "%sFPS avg %4.1f, %4ld ms, avg %4.0f ms\n",
             prefix, 1000.0 / deltaAvg, delta, deltaAvg);
     }
     prevT = t;
@@ -238,7 +238,8 @@ std::string debugDumpRenderStateFlags(const vdpau_render_state* renderState)
 
 ProxyDecoder* ProxyDecoder::create(int frameW, int frameH)
 {
-    conf.reloadSingleFlag(&conf.enableStub);
+    conf.reload();
+    conf.skipNextReload(); //< Each of the methods below calls conf.reload().
     if (conf.enableStub)
         return createStub(frameW, frameH);
     else

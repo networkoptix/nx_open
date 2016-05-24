@@ -1,9 +1,8 @@
 #pragma once
 
 #include "flag_config.h"
-class NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
+struct NX_UTILS_API ProxyDecoderFlagConfig: public nx::utils::FlagConfig
 {
-public:
     using nx::utils::FlagConfig::FlagConfig;
 
     NX_FLAG(0, enableStub, "");
