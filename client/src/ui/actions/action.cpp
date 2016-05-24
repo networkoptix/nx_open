@@ -203,52 +203,53 @@ void QnAction::setToolTipFormat(const QString &toolTipFormat) {
     updateToolTip(true);
 }
 
-Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const {
-    if(!isVisible())
+Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const
+{
+    if (!isVisible())
         return Qn::InvisibleAction; // TODO: #Elric cheat!
 
-    if(!(this->scope() & scope) && this->scope() != scope)
+    if (!(this->scope() & scope) && this->scope() != scope)
         return Qn::InvisibleAction;
 
-    if((m_flags & Qn::DevMode) && !qnRuntime->isDevMode())
+    if (m_flags.testFlag(Qn::DevMode) && !qnRuntime->isDevMode())
         return Qn::InvisibleAction;
 
-    auto hasMode = [this](QnActionTypes::ClientMode mode) {
-        return (m_mode & mode) == mode;
-    };
+    if (m_globalPermission != Qn::NoGlobalPermissions &&
+        !accessController()->hasGlobalPermission(m_globalPermission))
+        return Qn::InvisibleAction;
 
     if (qnRuntime->isVideoWallMode() &&
-        !hasMode(QnActionTypes::VideoWallMode) )
+        !m_mode.testFlag(QnActionTypes::VideoWallMode) )
         return Qn::InvisibleAction;
 
     if (qnRuntime->isActiveXMode() &&
-        !hasMode(QnActionTypes::ActiveXMode) )
+        !m_mode.testFlag(QnActionTypes::ActiveXMode) )
         return Qn::InvisibleAction;
 
     int size = parameters.size();
 
-    if(size == 0 && !(m_flags & Qn::NoTarget))
+    if (size == 0 && !m_flags.testFlag(Qn::NoTarget))
         return Qn::InvisibleAction;
 
-    if(size == 1 && !(m_flags & Qn::SingleTarget))
+    if (size == 1 && !m_flags.testFlag(Qn::SingleTarget))
         return Qn::InvisibleAction;
 
-    if(size > 1 && !(m_flags & Qn::MultiTarget))
+    if (size > 1 && !m_flags.testFlag(Qn::MultiTarget))
         return Qn::InvisibleAction;
 
     Qn::ActionParameterType type = parameters.type();
-    if (!(this->defaultParameterTypes() & type) && size != 0)
+    if (!defaultParameterTypes().testFlag(type) && size != 0)
         return Qn::InvisibleAction;
 
     if (!m_targetPermissions.empty())
     {
-        for(auto pos = m_targetPermissions.cbegin(), end = m_targetPermissions.cend(); pos != end; pos++)
+        for (auto pos = m_targetPermissions.cbegin(); pos != m_targetPermissions.cend(); ++pos)
         {
             int key = pos.key();
             Qn::Permissions required = *pos;
 
             QnResourceList resources;
-            if(parameters.hasArgument(key))
+            if (parameters.hasArgument(key))
             {
                 resources = QnActionParameterTypes::resources(parameters.argument(key));
             }
@@ -257,23 +258,20 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 if (QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource())
                     resources.push_back(layout);
             }
-            else if (key == Qn::CurrentMediaServerResourcesRole)
-            {
-                resources = context()->resourcePool()->getResources<QnMediaServerResource>();
-            }
             else if (key == Qn::CurrentLayoutMediaItemsRole)
             {
                 const QnResourceList& resList = QnActionParameterTypes::resources(context()->display()->widgets());
-                for(const QnResourcePtr &res: resList )
+                for (const QnResourcePtr &res : resList)
                 {
-                    if( res.dynamicCast<QnMediaResource>() )
-                        resources.push_back( res );
+                    if (res.dynamicCast<QnMediaResource>())
+                        resources.push_back(res);
                 }
             }
 
             if (resources.isEmpty() && required > 0)
                 return Qn::InvisibleAction;
-            if ((accessController()->permissions(resources) & required) != required)
+
+            if ((accessController()->combinedPermissions(resources) & required) != required)
                 return Qn::InvisibleAction;
         }
     }

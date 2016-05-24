@@ -237,7 +237,6 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
     newLayout->setCellAspectRatio(layout->cellAspectRatio());
-    newLayout->setUserCanEdit(context()->user() == user);
     newLayout->setBackgroundImageFilename(layout->backgroundImageFilename());
     newLayout->setBackgroundOpacity(layout->backgroundOpacity());
     newLayout->setBackgroundSize(layout->backgroundSize());
@@ -568,7 +567,6 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     layout->setId(QnUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
-    layout->setUserCanEdit(context()->user() == user);
     resourcePool()->addResource(layout);
 
     snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });

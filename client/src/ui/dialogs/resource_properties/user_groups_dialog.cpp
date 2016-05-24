@@ -21,8 +21,7 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     m_settingsPage(new QnUserGroupSettingsWidget(m_model, this)),
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
-    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::ServersFilter, this))
+    m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this))
 {
     ui->setupUi(this);
 
@@ -30,7 +29,6 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
-    addPage(ServersPage, m_serversPage, tr("Servers"));
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);

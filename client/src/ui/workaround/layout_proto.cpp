@@ -112,7 +112,7 @@ namespace QnLayoutProto {
         } else {
             return false;
         }
-        
+
         return true;
     }
 
@@ -181,8 +181,8 @@ namespace QnLayoutProto {
                     default:
                         break; /* Ignore other fields. */
                     }
-                }                
-                
+                }
+
                 break;
             }
             case LayoutItem::ZoomLeftField:
@@ -227,7 +227,6 @@ namespace QnLayoutProto {
             return false;
 
         /* Initializing optional fields */
-        target->editable = false;
         target->locked = false;
         target->backgroundWidth = 1;
         target->backgroundHeight = 1;
@@ -276,10 +275,6 @@ namespace QnLayoutProto {
                         target->items.push_back(item);
                         break;
                                             }
-                    case Layout::UserCanEditField:
-                        if(!deserialize(record.value(), &target->editable))
-                            return false;
-                        break;
                     case Layout::LockedField:
                         if(!deserialize(record.value(), &target->locked))
                             return false;
@@ -304,7 +299,7 @@ namespace QnLayoutProto {
                         break; /* Ignore other fields. */
                     }
                 }
-                
+
                 break;
             }
             default:

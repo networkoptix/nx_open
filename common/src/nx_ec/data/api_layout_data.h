@@ -8,7 +8,7 @@
 namespace ec2
 {
 
-    struct ApiLayoutItemData: ApiData 
+    struct ApiLayoutItemData: ApiData
     {
         ApiLayoutItemData();
 
@@ -46,14 +46,13 @@ namespace ec2
         float horizontalSpacing;
         float verticalSpacing;
         std::vector<ApiLayoutItemData> items;
-        bool   editable;
-        bool   locked; 
+        bool   locked;
         QString backgroundImageFilename;
         qint32  backgroundWidth;
         qint32  backgroundHeight;
         float backgroundOpacity;
     };
-#define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(editable)(locked) \
+#define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)
 
 }

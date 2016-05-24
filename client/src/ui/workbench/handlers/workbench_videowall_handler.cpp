@@ -422,7 +422,6 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
         return;
 
     layout->setCellSpacing(QSizeF(0.0, 0.0));
-    layout->setUserCanEdit(true);
 
     auto reset = [this](const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout) {
         updateItemsLayout(items, layout->getId());

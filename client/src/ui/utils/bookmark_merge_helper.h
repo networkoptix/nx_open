@@ -15,7 +15,7 @@ public:
     void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
     QnTimelineBookmarkItemList bookmarks(qint64 msecsPerDp = 0) const;
-    QnCameraBookmarkList bookmarksAtPosition(qint64 timeMs, int msecsPerDp = 0) const;
+    QnCameraBookmarkList bookmarksAtPosition(qint64 timeMs, int msecsPerDp = 0, bool onlyTopmost = true) const;
 
     void addBookmark(const QnCameraBookmark &bookmark);
     void removeBookmark(const QnCameraBookmark &bookmark);

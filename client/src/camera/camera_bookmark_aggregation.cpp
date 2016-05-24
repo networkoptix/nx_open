@@ -11,8 +11,8 @@ QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkL
 bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 {
 #ifdef _DEBUG
-    /* C++ asserts are required for unit tests to work correctly. */
-    NX_ASSERT(!bookmark.isNull());
+    /* C++ asserts are required for unit tests to work correctly. Do not replace by NX_ASSERT, it won't matter under define. */
+    assert(!bookmark.isNull());
 #endif
     QN_LOG_TIME(Q_FUNC_INFO);
 
