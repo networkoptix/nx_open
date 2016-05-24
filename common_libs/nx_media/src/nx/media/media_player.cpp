@@ -19,6 +19,7 @@
 #include "audio_output.h"
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
+#include <nx/utils/flag_config.h>
 
 namespace nx {
 namespace media {
@@ -44,6 +45,13 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
+struct NxMediaFlagConfig: public nx::utils::FlagConfig
+{
+    NxMediaFlagConfig(const char* moduleName): nx::utils::FlagConfig(moduleName) { reload(); }
+
+    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:////c:/test.MP4");
+
+} conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -596,11 +604,11 @@ void Player::setPosition(qint64 value)
 {
     Q_D(Player);
     d->lastSeekTimeMs = value;
-
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
         d->positionMs = value;
+
     d->setLiveMode(value == kLivePosition);
 
     d->at_hurryUp(); //< renew receiving frames
@@ -656,6 +664,14 @@ void Player::stop()
 void Player::setSource(const QUrl& url)
 {
     Q_D(Player);
+
+    if (*conf.substitutePlayerUrl)
+    {
+        QUrl url(conf.substitutePlayerUrl);
+        stop();
+        d->url = url;
+        return;
+    }
 
     if (url == d->url)
         return;
