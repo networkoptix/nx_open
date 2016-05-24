@@ -234,6 +234,11 @@
     </message>
     <message>
       <location/>
+      <source>IMeMyMine</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>System was successfully disconnected from PRODUCT_NAME</source>
       <translation> </translation>
     </message>
@@ -663,6 +668,11 @@
     </message>
     <message>
       <location/>
+      <source>systems</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Please, connect any systems to your cloud email first.</source>
       <translation> </translation>
     </message>
@@ -674,6 +684,11 @@
     <message>
       <location/>
       <source>Open in VMS_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Search systems</source>
       <translation> </translation>
     </message>
     <message>
