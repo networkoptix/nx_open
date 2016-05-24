@@ -29,7 +29,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::CamerasFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_serversPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::ServersFilter, this)),
     m_editGroupsButton(new QPushButton(tr("Edit User Groups..."), this))
 {
     ui->setupUi(this);
@@ -39,7 +38,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
-    addPage(ServersPage, m_serversPage, tr("Servers"));
 
     connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
     connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnUserSettingsDialog::updateControlsVisibility);
@@ -239,11 +237,6 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(PermissionsPage, customAccessRights);
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
-
-    bool serverPagesVisible = customAccessRights
-        && m_permissionsPage->selectedPermissions().testFlag(Qn::GlobalEditServersPermissions);
-
-    setPageVisible(ServersPage,     serverPagesVisible);
 
     m_editGroupsButton->setVisible(settingsPageVisible);
 

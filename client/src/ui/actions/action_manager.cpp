@@ -643,7 +643,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(QnActions::NewGlobalLayoutAction).
             flags(Qn::Main | Qn::Tree).
-            requiredGlobalPermission(Qn::GlobalEditLayoutsPermission).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
             text(tr("Global Layout")).
             pulledText(tr("New Global Layout")).
             condition(new QnConjunctionActionCondition(
@@ -1571,7 +1571,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredGlobalPermission(Qn::GlobalEditServersPermissions).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

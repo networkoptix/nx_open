@@ -521,7 +521,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Context-based. */
         CurrentLayoutResourceRole,
         CurrentLayoutMediaItemsRole,
-        CurrentMediaServerResourcesRole,
 
         /* Arguments. */
         ActionIdRole,
@@ -872,33 +871,26 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalAdminPermission                   = 0x00000001,   /**< Admin, can edit other non-admins. */
 
         /* Manager permissions. */
-        GlobalEditServersPermissions            = 0x00000002,   /**< Can edit server settings. */
-        GlobalEditCamerasPermission             = 0x00000004,   /**< Can edit camera settings. */
-        GlobalEditLayoutsPermission             = 0x00000008,   /**< Can create and edit _global_ layouts. */
-        GlobalControlVideoWallPermission        = 0x00000010,   /**< Can control videowalls */
+        GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
+        GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls */
 
         /* Viewer permissions. */
-        GlobalViewArchivePermission             = 0x00000020,   /**< Can view archives of available cameras. */
-        GlobalExportPermission                  = 0x00000040,   /**< Can export archives of available cameras. */
-        GlobalViewBookmarksPermission           = 0x00000080,   /**< Can view bookmarks of available cameras. */
-        GlobalManageBookmarksPermission         = 0x00000100,   /**< Can modify bookmarks of available cameras. */
+        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
+        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
+        GlobalViewBookmarksPermission           = 0x00000400,   /**< Can view bookmarks of available cameras. */
+        GlobalManageBookmarksPermission         = 0x00000800,   /**< Can modify bookmarks of available cameras. */
 
         /* Input permissions. */
-        GlobalUserInputPermission               = 0x00000200,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
+        GlobalUserInputPermission               = 0x00010000,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
 
         /* Resources access permissions */
-        GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
-        GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
-        GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
+        GlobalAccessAllCamerasPermission        = 0x01000000,   /**< Has access to all cameras. */
 
 
         /* Shortcuts. */
 
-        /* Access to all resources. */
-        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
-
         /* Live viewer has access to all cameras and global layouts by default. */
-        GlobalLiveViewerPermissionSet       = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+        GlobalLiveViewerPermissionSet       = GlobalAccessAllCamerasPermission,
 
         /* Viewer can additionally view archive and bookmarks and export video. */
         GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
@@ -906,12 +898,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         /* Advanced viewer can manage bookmarks and use various input methods. */
         GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission,
 
-        GlobalManagerPermissionSet          = GlobalAccessResourcesPermissionsSet | GlobalControlVideoWallPermission |
-                                              GlobalEditServersPermissions | GlobalEditCamerasPermission| GlobalEditLayoutsPermission,
+        /* Camera and videowall manager. */
+        GlobalManagerPermissionSet          = GlobalAccessAllCamerasPermission | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
 
         /* Admin can do everything. */
         GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalManagerPermissionSet,
-
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
         GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission,

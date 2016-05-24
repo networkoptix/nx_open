@@ -312,31 +312,23 @@ void QnNxStyle::drawPrimitive(
                 return;
             }
 
-            painter->save();
+            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+            QnPaletteColor base = findColor(option->palette.color(QPalette::Base));
 
-            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Base));
-
-            QPen pen(mainColor.darker(3));
-            painter->setPen(pen);
-
-            QColor base = mainColor.darker(2);
-            if (option->state & State_MouseOver)
-                base = mainColor.darker(3);
-
-            painter->setBrush(base);
-            painter->setRenderHint(QPainter::Antialiasing);
-
-            painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
-
-            if (option->state & State_HasFocus)
+            if (option->state.testFlag(State_HasFocus))
             {
+                QnScopedPainterPenRollback penRollback(painter, base.darker(3).color());
+                QnScopedPainterBrushRollback brushRollback(painter, base.darker(1).color());
+                painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
                 painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
-                                  option->rect.right() - 1, option->rect.top() + 1);
-                painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
-                                  option->rect.left() + 1, option->rect.bottom() - 1);
+                    option->rect.right() - 1, option->rect.top() + 1);
             }
-
-            painter->restore();
+            else
+            {
+                QnScopedPainterPenRollback penRollback(painter, base.darker(1).color());
+                QnScopedPainterBrushRollback brushRollback(painter, base.color());
+                painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
+            }
         }
         return;
 
@@ -2332,8 +2324,17 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (qobject_cast<QLineEdit*>(widget) ||
-        qobject_cast<QComboBox*>(widget) ||
+    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
+    {
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QFont font = widget->font();
+            font.setPixelSize(dp(14));
+            widget->setFont(font);
+        }
+    }
+
+    if (qobject_cast<QComboBox*>(widget) ||
         qobject_cast<QSpinBox*>(widget) ||
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
@@ -2375,6 +2376,7 @@ void QnNxStyle::unpolish(QWidget *widget)
 {
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QHeaderView*>(widget) ||
+        qobject_cast<QLineEdit*>(widget) ||
         qobject_cast<QTabBar*>(widget))
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())

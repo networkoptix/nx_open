@@ -62,7 +62,6 @@ protected:
         layout->setId(QnUuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);
-        layout->setUserCanEdit(userCanEdit);
 
         if (!parentId.isNull())
             layout->setParentId(parentId);

@@ -2002,8 +2002,6 @@ void QnTimeSlider::setThumbnailSelecting(qint64 time, bool selecting)
 
     for (ipos = pos + 1; ipos != m_thumbnailData.end() && ipos->thumbnail.actualTime() == actualTime; ipos++)
         ipos->selecting = selecting;
-
-    return;
 }
 
 void QnTimeSlider::updateThumbnailsVisibility()
@@ -2596,6 +2594,18 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
     QFont font(m_pixmapCache->defaultFont());
     font.setWeight(kBookmarkFontWeight);
 
+    qint64 hoverValue = valueFromPosition(m_hoverMousePos, false);
+    int hoveredBookmarkItem = -1;
+
+    /* Find the topmost (the latest) hovered bookmark: */
+    for (int i = 0; i < bookmarks.size(); ++i)
+    {
+        const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
+        if (hoverValue >= bookmarkItem.startTimeMs() && hoverValue <= bookmarkItem.endTimeMs())
+            hoveredBookmarkItem = i;
+    }
+
+    /* Draw bookmarks: */
     for (int i = 0; i < bookmarks.size(); ++i)
     {
         const QnTimelineBookmarkItem& bookmarkItem = bookmarks[i];
@@ -2607,7 +2617,7 @@ void QnTimeSlider::drawBookmarks(QPainter* painter, const QRectF& rect)
         bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
         bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
 
-        bool hovered = bookmarkRect.contains(m_hoverMousePos);
+        bool hovered = i == hoveredBookmarkItem;
         const QColor& pastBg = hovered ? m_colors.pastBookmarkHover : m_colors.pastBookmark;
         const QColor& futureBg = hovered ? m_colors.futureBookmarkHover : m_colors.futureBookmark;
 
