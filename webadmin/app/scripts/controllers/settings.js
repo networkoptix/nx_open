@@ -186,7 +186,7 @@ angular.module('webadminApp')
         mediaserver.getMediaServers().then(function(data){
 
             $scope.singleServer = data.data.length==1;
-            $scope.disconnectCaption = $scope.singleServer? 'Disconnect Server And Create New System': 'Reset System';
+            $scope.disconnectCaption = $scope.singleServer? 'Reset System': 'Disconnect Server And Create New System';
 
             $scope.mediaServers = _.sortBy(data.data,function(server){
                 // Set active state for server
