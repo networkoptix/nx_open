@@ -7,12 +7,12 @@
 
 #include "framed_widget.h"
 
-class QnProxyLabel;
+class GraphicsLabel;
 
 /**
  * A generic balloon tool tip widget. It works just like any other normal widget,
  * and almost anything can be placed on it in a layout.
- * 
+ *
  * Use <tt>setContentsMargins</tt> to change tool tip's content margins and rounding radius.
  */
 class QnToolTipWidget: public QnFramedWidget {
@@ -34,7 +34,7 @@ public:
     void setTailPos(const QPointF &tailPos);
 
     /**
-     * \returns                         Widget's side to which balloon's tail is attached, or zero if 
+     * \returns                         Widget's side to which balloon's tail is attached, or zero if
      *                                  there is no tail.
      */
     Qn::Border tailBorder() const;
@@ -51,15 +51,15 @@ public:
 
     /**
      * Moves the tooltip item so that its tail points to the given position.
-     * 
+     *
      * \param pos                       Position for the tooltip to point to, in parent coordinates.
      */
     void pointTo(const QPointF &pos);
 
     /**
      * A convenience accessor for tool tips that contain a text label (<tt>QnProxyLabel</tt>).
-     * 
-     * \return                          Text of this tool tip's label, or <tt>null</tt> string if 
+     *
+     * \return                          Text of this tool tip's label, or <tt>null</tt> string if
      *                                  this widget does not contain a label.
      */
     QString text() const;
@@ -68,13 +68,13 @@ public:
      * A convenience accessor that ensures that this tool tip contains a text label (<tt>QnProxyLabel</tt>)
      * and sets this label's text. Note that if some other widgets are placed on this tool tip, they
      * will be destroyed.
-     * 
+     *
      * \param text                      New text for this tool tip's label.
      */
     void setText(const QString &text);
 
     /**
-     * \returns                         Whether this tool tip is resized automatically to match 
+     * \returns                         Whether this tool tip is resized automatically to match
      *                                  the preferred size of its contents.
      */
     bool isAutoSize() const;
@@ -101,7 +101,7 @@ protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
 private:
-    QnProxyLabel *label() const;
+    GraphicsLabel* label() const;
 
     void invalidateShape();
     void ensureShape() const;

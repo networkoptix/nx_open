@@ -559,7 +559,7 @@ namespace ec2
 
     void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran) {
         Q_UNUSED(tran)
-            sender->setReadSync(true);
+        sender->setReadSync(true);
     }
 
     void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran) {

@@ -19,7 +19,7 @@ namespace Ui {
     class ResourceSelectionDialog;
 }
 
-class QnResourcePoolModel;
+class QnResourceTreeModel;
 class QnCameraThumbnailManager;
 
 class QnResourceSelectionDialog : public QnWorkbenchStateDependentButtonBoxDialog {
@@ -57,7 +57,7 @@ private:
     void initModel();
 private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
-    QnResourcePoolModel *m_resourceModel;
+    QnResourceTreeModel *m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
     SelectionTarget m_target;
 

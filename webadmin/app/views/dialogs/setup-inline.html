@@ -36,8 +36,37 @@
         </div>
     </form>
     <p class="vertical-bottom">
+        <a href="" ng-click="next('advanced')">Advanced system settings</a><br>
         <a href="" ng-click="skip()">Merge server with existing system</a>
     </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('advanced')">
+    <h2>Advanced system settings</h2>
+    <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
+                <label>
+                    <input type="checkbox"
+                           id="{{setting}}"
+                           ng-model="systemSettings[setting]"> {{Config.settingsConfig[setting].label}}
+                </label>
+            </div>
+
+            <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
+                   for="{{setting}}" >{{Config.settingsConfig[setting].label}}</label>
+            <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                   id="{{setting}}"
+                   placeholder="{{}}"
+                   ng-model="systemSettings[setting]"
+                   class="form-control input-sm"/>
+            <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                   id="{{setting}}"
+                   ng-model="systemSettings[setting]"
+                   class="form-control input-sm"/>
+        </div>
+    </form>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
@@ -116,8 +145,8 @@
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
     <h2>Connect server to existing system</h2>
-    <form class="master-controls wide" name="forms.remoteSystemForm" novalidate disable-autocomplete>
-        <div class="form-group text-left" validate-field>
+    <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
 
             <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
                    typeahead="system as system.visibleName for system in discoveredUrls | filter: {visibleName: $viewValue} | limitTo:8"

@@ -117,6 +117,13 @@ Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParamet
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnRequiresOwnerCondition::check(const QnActionParameters &parameters)
+{
+    if (context()->user() && context()->user()->isOwner())
+        return Qn::EnabledAction;
+    return Qn::InvisibleAction;
+}
+
 QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
     QnActionCondition(parent),
     m_conditions(conditions)
@@ -983,7 +990,7 @@ Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnAction
     if (layout->isFile())
         return Qn::InvisibleAction;
 
-    if (accessController()->hasGlobalPermission(Qn::GlobalEditVideoWallPermission))
+    if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
         return Qn::EnabledAction;
 
     return Qn::InvisibleAction;

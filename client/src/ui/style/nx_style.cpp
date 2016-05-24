@@ -2035,7 +2035,7 @@ int QnNxStyle::pixelMetric(
     switch (metric)
     {
     case PM_ButtonMargin:
-        return dp(10);
+        return dp(16);
 
     case PM_ButtonShiftVertical:
     case PM_ButtonShiftHorizontal:

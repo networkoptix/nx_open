@@ -30,7 +30,7 @@ class QnClickableProxyLabel;
 class HoverFocusProcessor;
 
 class QnResourceCriterion;
-class QnResourcePoolModel;
+class QnResourceTreeModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
@@ -171,7 +171,7 @@ private:
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
-    QnResourcePoolModel* m_resourceModel;
+    QnResourceTreeModel* m_resourceModel;
     QnResourceBrowserToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
 

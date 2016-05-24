@@ -452,21 +452,6 @@ void QnTransactionTransport::removeEventHandler( int eventHandlerID )
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
-QSharedPointer<AbstractStreamSocket> QnTransactionTransport::getSocket() const
-{
-    if( m_connectionType == ConnectionType::bidirectional )
-    {
-        return m_incomingDataSocket;
-    }
-    else
-    {
-        if( m_peerRole == prOriginating )
-            return m_incomingDataSocket;
-        else
-            return m_outgoingDataSocket;
-    }
-}
-
 void QnTransactionTransport::close()
 {
     setState(State::Closed);    //changing state before freeing socket so that everyone
@@ -1390,7 +1375,7 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
     if (m_state == ReadyForStreaming) {
         // allow to send system command immediately, without tranSyncRequest
-        return ApiCommand::isSystem(command) ? true : m_writeSync;
+        return (command != ApiCommand::NotDefined && ApiCommand::isSystem(command)) ? true : m_writeSync;
     }
     else {
         return false;
@@ -1401,7 +1386,7 @@ bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const
 {
     if (m_state == ReadyForStreaming) {
         // allow to read system command immediately, without tranSyncRequest
-        return ApiCommand::isSystem(command) ? true : m_readSync;
+        return (command != ApiCommand::NotDefined && ApiCommand::isSystem(command)) ? true : m_readSync;
     }
     else {
         return false;

@@ -62,7 +62,7 @@
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>            
+            <systemPath>${root.dir}/axclient/pom.xml</systemPath>            
         </dependency>					
     </dependencies>		
 

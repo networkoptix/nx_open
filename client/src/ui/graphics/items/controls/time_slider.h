@@ -24,6 +24,7 @@
 
 class QTimer;
 
+class GraphicsLabel;
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
@@ -116,7 +117,12 @@ public:
         /**
         * Whether drag operations at window sides should scroll the window.
         */
-        DragScrollsWindow = 0x1000
+        DragScrollsWindow = 0x1000,
+
+        /**
+        * Whether bookmarks viewer should be anchored to timeline pixel location (otherwise - to a timestamp).
+        */
+        StillBookmarksViewer = 0x2000
     };
     Q_DECLARE_FLAGS(Options, Option);
 
@@ -172,9 +178,6 @@ public:
     bool isSelectionValid() const;
     void setSelectionValid(bool valid);
 
-    const QString& toolTipFormat() const;
-    void setToolTipFormat(const QString& format);
-
     bool isLiveSupported() const;
     void setLiveSupported(bool value);
 
@@ -222,8 +225,6 @@ public:
 
     bool positionMarkerVisible() const;
 
-    bool archiveAvailable() const;
-
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -235,7 +236,6 @@ signals:
     void thumbnailClicked();
     void msecsPerPixelChanged();
     void lineCommentChanged(int line, const QString& comment);
-    void archiveAvailabilityChanged(bool hasArchive);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -400,9 +400,7 @@ private:
 
     void generateProgressPatterns();
 
-    void processBoomarksHover(QGraphicsSceneHoverEvent* event);
-
-    void updateBookmarksViewerTimestamp();
+    void updateBookmarksViewerLocation();
 
     QnBookmarksViewer* createBookmarksViewer();
 
@@ -422,7 +420,6 @@ private:
 
     qint64 m_oldMinimum, m_oldMaximum;
     Options m_options;
-    QString m_toolTipFormat;
 
     QnLinearFunction m_unboundMapper;
     QnBoundedLinearFunction m_boundMapper;
@@ -474,7 +471,7 @@ private:
 
     QLocale m_locale;
 
-    QPointF m_currentRulerRectMousePos;
+    QPointF m_hoverMousePos;
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer* m_bookmarksViewer;
@@ -482,6 +479,10 @@ private:
     QnBookmarkMergeHelperPtr m_bookmarksHelper;
 
     bool m_liveSupported;
+    bool m_selectionInitiated;
+
+    GraphicsLabel* m_tooltipLine1;
+    GraphicsLabel* m_tooltipLine2;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

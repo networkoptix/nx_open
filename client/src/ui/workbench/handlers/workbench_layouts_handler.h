@@ -3,7 +3,6 @@
 
 #include <QtCore/QObject>
 
-#include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -27,6 +26,7 @@ protected:
 
 private slots:
     void at_newUserLayoutAction_triggered();
+    void at_newGlobalLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
     void at_saveLayoutAsAction_triggered();

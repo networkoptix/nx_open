@@ -241,7 +241,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
         for (const QnLayoutResourcePtr& layoutResource : layouts) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
             for (const QnLayoutItemData& data: layoutResource->getItems())
-                if (data.resource.id == otherResource->getId() || data.resource.path == otherResource->getUniqueId())
+                if (data.resource.id == otherResource->getId() || data.resource.uniqueId == otherResource->getUniqueId())
                     layoutResource->removeItem(data);
 
         TRACE("RESOURCE REMOVED" << otherResource->metaObject()->className() << otherResource->getName());
@@ -419,6 +419,16 @@ QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString &uniqueID) con
     QnMutexLocker locker( &m_resourcesMtx );
     auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&uniqueID](const QnResourcePtr &resource) { return resource->getUniqueId() == uniqueID; });
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
+}
+
+QnResourcePtr QnResourcePool::getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const
+{
+    QnResourcePtr result;
+    if (!descriptor.id.isNull())
+        result = getResourceById(descriptor.id);
+    if (!result)
+        result = getResourceByUniqueId(descriptor.uniqueId);
+    return result;
 }
 
 void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)

@@ -7,7 +7,6 @@
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-#include <api/api_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -63,13 +62,13 @@ private slots:
     void at_splashItem_destroyed();
 
     void at_modeButton_clicked();
-    
+
     void at_zoomInButton_pressed();
     void at_zoomInButton_released();
     void at_zoomOutButton_pressed();
     void at_zoomOutButton_released();
     void at_zoomButton_activated(qreal speed);
-    
+
     void at_focusInButton_pressed();
     void at_focusInButton_released();
     void at_focusOutButton_pressed();

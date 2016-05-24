@@ -294,8 +294,8 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
         case QnMergeSystemsTool::ConfigurationError:
             message = tr("Cloud not configure remote system.");
             break;
-        case QnMergeSystemsTool::BothSystemsBoundToCloudError:
-            message = tr("Both systems are bound to the cloud.");
+        case QnMergeSystemsTool::DependentSystemBoundToCloudError:
+            message = tr("System being merged cannot be bound to the cloud.");
             break;
         case QnMergeSystemsTool::UnconfiguredSystemError:
             message = tr("System name is not configured yet.");

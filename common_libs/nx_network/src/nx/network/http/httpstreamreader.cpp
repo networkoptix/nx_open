@@ -346,9 +346,8 @@ namespace nx_http
         }
         else if( m_httpMessage.type == MessageType::response )
         {
-            if( m_httpMessage.response->statusLine.statusCode == nx_http::StatusCode::noContent )
+            if( !StatusCode::isMessageBodyAllowed(m_httpMessage.response->statusLine.statusCode) )
             {
-                //response with "204 No Content" status code cannot have Message-Body
                 m_contentLength = 0;
                 return true;
             }

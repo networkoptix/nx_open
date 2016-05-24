@@ -125,7 +125,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &modu
 {
     const auto systemIt = getSystemItByServer(moduleInformation.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
-    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
+    //NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
         return;
 

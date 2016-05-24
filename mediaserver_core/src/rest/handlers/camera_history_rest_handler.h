@@ -5,7 +5,7 @@
 
 #include "rest/server/request_handler.h"
 #include "rest/server/fusion_rest_handler.h"
-#include "recording/time_period_list.h"
+#include <recording/time_period_list.h>
 #include "core/resource/resource_fwd.h"
 #include "multiserver_chunks_rest_handler.h"
 #include "nx_ec/data/api_camera_history_data.h"

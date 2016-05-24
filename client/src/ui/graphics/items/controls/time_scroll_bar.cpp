@@ -87,8 +87,6 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* _
 
     painter->fillRect(handleRect, handleColor);
 
-    antialiasingRollback.rollback();
-
     /* Draw indicator. */
     if (m_indicatorVisible && m_indicatorPosition >= minimum() && indicatorPosition() <= maximum() + pageStep())
     {

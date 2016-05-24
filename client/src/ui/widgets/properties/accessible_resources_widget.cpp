@@ -66,8 +66,6 @@ namespace
 
     };
 
-    const int kRowSpacing = 4;
-
     const QString kDummyResourceId(lit("dummy_resource"));
 }
 
@@ -77,8 +75,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     m_permissionsModel(permissionsModel),
     m_filter(filter),
     m_resourcesModel(new QnResourceListModel()),
-    m_controlsModel(new QnResourceListModel()),
-    m_viewModel(new QnResourcesListSortModel())
+    m_controlsModel(new QnResourceListModel())
 {
     ui->setupUi(this);
 
@@ -94,70 +91,20 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
         break;
     }
 
-    auto createDummyResource = [](QnResourceAccessFilter::Filter filter) -> QnResourcePtr
-    {
-        switch (filter)
-        {
-        case QnResourceAccessFilter::CamerasFilter:
-        {
-            QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
-            dummy->setName(tr("All Cameras"));
-            return dummy;
-        }
-        case QnResourceAccessFilter::LayoutsFilter:
-        {
-            QnLayoutResourcePtr dummy(new QnLayoutResource());
-            dummy->setName(tr("All Global Layouts"));
-            return dummy;
-        }
-        case QnResourceAccessFilter::ServersFilter:
-        {
-            QnMediaServerResourcePtr dummy(new QnMediaServerResource());
-            dummy->setName(tr("All Servers"));
-            return dummy;
-        }
-        default:
-            NX_ASSERT(false);
-            break;
-        }
-        return QnResourcePtr();
-    };
+    initControlsModel();
+    initResourcesModel();
 
-    auto dummy = createDummyResource(m_filter);
-    if (dummy)
-    {
-        /* Create separate dummy resource for each filter, but once per application run. */
-        dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
-        m_controlsModel->setResources(QnResourceList() << dummy);
-    }
+    QnResourcesListSortModel* viewModel = new QnResourcesListSortModel(this);
+    viewModel->setSourceModel(m_resourcesModel.data());
+    viewModel->setDynamicSortFilter(true);
+    viewModel->setSortRole(Qt::DisplayRole);
+    viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    viewModel->sort(Qn::NameColumn);
 
-    m_controlsModel->setCheckable(true);
-    m_controlsModel->setStatusIgnored(true);
-
-    m_resourcesModel->setCheckable(true);
-    m_resourcesModel->setStatusIgnored(true);
-    m_resourcesModel->setResources(QnResourceAccessFilter::filteredResources(m_filter, qnResPool->getResources()));
-
-    connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
-    {
-        if (roles.contains(Qt::CheckStateRole)
-            && topLeft.column() <= QnResourceListModel::CheckColumn
-            && bottomRight.column() >= QnResourceListModel::CheckColumn
-            )
-            emit hasChangesChanged();
-    });
-
-    m_viewModel->setSourceModel(m_resourcesModel.data());
-    m_viewModel->setDynamicSortFilter(true);
-    m_viewModel->setSortRole(Qt::DisplayRole);
-    m_viewModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    m_viewModel->sort(Qn::NameColumn);
-
-    ui->resourcesTreeView->setModel(m_viewModel.data());
+    ui->resourcesTreeView->setModel(viewModel);
     ui->controlsTreeView->setModel(m_controlsModel.data());
 
     auto itemDelegate = new QnResourceItemDelegate(this);
-    itemDelegate->setSpacing(kRowSpacing);
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
     {
@@ -169,49 +116,19 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
 
-    auto updateThumbnail = [this](const QModelIndex& index)
-    {
-        QModelIndex baseIndex = index.column() == QnResourceListModel::NameColumn
-            ? index
-            : index.sibling(index.row(), QnResourceListModel::NameColumn);
-
-        QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
-        ui->nameLabel->setText(toolTip);
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-        {
-            ui->previewWidget->setTargetResource(camera->getId());
-            ui->previewWidget->show();
-        }
-        else
-        {
-            ui->previewWidget->hide();
-        }
-    };
-
     ui->resourcesTreeView->setMouseTracking(true);
-    ui->resourcesTreeView->setEnabled(false);
+    ui->resourcesTreeView->setEnabled(true);
 
-    connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, updateThumbnail);
-
-    connect(m_controlsModel.data(), &QnResourceListModel::dataChanged, this, [this](const QModelIndex& index)
-    {
-        QModelIndex checkedIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
-        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-        ui->resourcesTreeView->setEnabled(!checked);
-        emit hasChangesChanged();
-    });
-
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this](const QModelIndex& index)
+    connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
+    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this, viewModel](const QModelIndex& index)
     {
         QModelIndex checkedIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
         int inverted = checked ? Qt::Unchecked : Qt::Checked;
-        m_viewModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
+        viewModel->setData(checkedIdx, inverted, Qt::CheckStateRole);
     });
 
-    updateThumbnail(QModelIndex());
+    updateThumbnail();
 }
 
 QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
@@ -255,5 +172,100 @@ void QnAccessibleResourcesWidget::applyChanges()
     else
         permissions &= ~QnResourceAccessFilter::accessPermission(m_filter);
     m_permissionsModel->setRawPermissions(permissions);
+}
+
+void QnAccessibleResourcesWidget::initControlsModel()
+{
+    auto createDummyResource = [this]() -> QnResourcePtr
+    {
+        switch (m_filter)
+        {
+        case QnResourceAccessFilter::CamerasFilter:
+        {
+            QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+            dummy->setName(tr("All Cameras"));
+            return dummy;
+        }
+        case QnResourceAccessFilter::LayoutsFilter:
+        {
+            QnLayoutResourcePtr dummy(new QnLayoutResource());
+            dummy->setName(tr("All Global Layouts"));
+            return dummy;
+        }
+        case QnResourceAccessFilter::ServersFilter:
+        {
+            QnMediaServerResourcePtr dummy(new QnMediaServerResource());
+            dummy->setName(tr("All Servers"));
+            return dummy;
+        }
+        default:
+            NX_ASSERT(false);
+            break;
+        }
+        return QnResourcePtr();
+    };
+
+    auto dummy = createDummyResource();
+    if (dummy)
+    {
+        /* Create separate dummy resource for each filter, but once per application run. */
+        dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
+        m_controlsModel->setResources(QnResourceList() << dummy);
+    }
+
+    m_controlsModel->setCheckable(true);
+    m_controlsModel->setStatusIgnored(true);
+
+    connect(m_controlsModel.data(), &QnResourceListModel::dataChanged, this, [this](const QModelIndex& index)
+    {
+        QModelIndex checkedIdx = index.sibling(index.row(), QnResourceListModel::CheckColumn);
+        bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+        ui->resourcesTreeView->setEnabled(!checked);
+        emit hasChangesChanged();
+    });
+}
+
+void QnAccessibleResourcesWidget::initResourcesModel()
+{
+    m_resourcesModel->setCheckable(true);
+    m_resourcesModel->setStatusIgnored(true);
+    m_resourcesModel->setResources(QnResourceAccessFilter::filteredResources(m_filter, qnResPool->getResources()));
+
+    connect(m_resourcesModel.data(), &QAbstractItemModel::dataChanged, this, [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+    {
+        if (roles.contains(Qt::CheckStateRole)
+            && topLeft.column() <= QnResourceListModel::CheckColumn
+            && bottomRight.column() >= QnResourceListModel::CheckColumn
+            )
+            emit hasChangesChanged();
+    });
+}
+
+void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
+{
+    if (!index.isValid())
+    {
+        ui->nameLabel->setText(QString());
+        ui->previewWidget->hide();
+        return;
+    }
+
+    QModelIndex baseIndex = index.column() == QnResourceListModel::NameColumn
+        ? index
+        : index.sibling(index.row(), QnResourceListModel::NameColumn);
+
+    QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
+    ui->nameLabel->setText(toolTip);
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        ui->previewWidget->setTargetResource(camera->getId());
+        ui->previewWidget->show();
+    }
+    else
+    {
+        ui->previewWidget->hide();
+    }
 }
 

@@ -11,6 +11,7 @@ translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
 translations=['${translation1}', '${translation2}', '${translation3}', '${translation4}', '${translation5}', '${translation6}', '${translation7}', '${translation8}', '${translation9}', '${translation10}',
               '${translation11}','${translation12}','${translation13}','${translation14}','${translation15}','${translation16}','${translation17}','${translation18}','${translation19}','${translation20}']
+qml_files = [ ".qml", ".js", "qmldir" ]
 os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
 os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
@@ -131,6 +132,8 @@ if __name__ == '__main__':
                         os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
 
     exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
+    if "${noQmlInQrc}" == "true":
+        exceptions += qml_files
     genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], exceptions)
     if os.path.exists('${project.build.directory}/additional-resources'):
         genqrc('build/${project.artifactId}_additional.qrc', '/', ['${project.build.directory}/additional-resources'], exceptions)
@@ -149,6 +152,8 @@ if __name__ == '__main__':
         gentext(f, '${project.build.sourceDirectory}', ['.cpp', '.c'], 'SOURCES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
+        if "${noQmlInQrc}" == "true":
+            gentext(f, '${project.basedir}/static-resources', qml_files, 'OTHER_FILES += ')
         gen_includepath(f, '${libdir}/include')
         f.close()
 
