@@ -69,6 +69,7 @@ DBResult DBStructureUpdater::updateDbInternal( QSqlDatabase* const dbConnection 
     //absense of table db_version_data is normal: DB is just empty
     if( fetchDbVersionQuery.exec() && fetchDbVersionQuery.next() )
         dbVersion = fetchDbVersionQuery.value(lit("db_version")).toUInt();
+    fetchDbVersionQuery.finish();
 
     //applying scripts missing in current DB
     for( ;

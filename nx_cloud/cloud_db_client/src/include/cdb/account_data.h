@@ -12,8 +12,6 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/uuid.h>
-
 
 namespace nx {
 namespace cdb {
@@ -30,7 +28,7 @@ enum class AccountStatus
 class AccountData
 {
 public:
-    QnUuid id;
+    std::string id;
     //!User email. Used as unique user id
     std::string email;
     //!Hex representation of HA1 (see rfc2617) digest of user's password. Realm is usually VMS
