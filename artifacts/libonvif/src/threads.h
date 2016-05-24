@@ -67,11 +67,15 @@ The threads.h and threads.c code define the following portable API:
 - MUTEX_LOCK(m)          acquire lock (MUTEX_TYPE*)m
 - MUTEX_UNLOCK(m)        release lock (MUTEX_TYPE*)m
 
-- COND_TYPE		 portable condition variable type
+- COND_TYPE	             portable condition variable type
 - COND_SETUP(c)          setup condition variable (COND_TYPE*)c
 - COND_CLEANUP(c)        cleanup condition variable (COND_TYPE*)c
 - COND_SIGNAL(c)         signal condition variable (COND_TYPE*)c
 - COND_WAIT(c,m)         wait on variable (COND_TYPE*)c in mutex (MUTEX_TYPE*)m
+
+- ONCE_TYPE              portable once type
+- ONCE_INITIALIZER       global initializer value for once
+- ONCE(x,f)              executes once just once
 
 */
 
@@ -102,7 +106,7 @@ The threads.h and threads.c code define the following portable API:
 # define THREAD_TYPE		HANDLE
 # define THREAD_ID		GetCurrentThreadId()
 # define THREAD_CREATE(x,y,z)	*(x) = (HANDLE)_beginthread((y), 8*4096, (z))
-# define THREAD_DETACH(x)	
+# define THREAD_DETACH(x)
 # define THREAD_JOIN(x)		WaitForSingleObject((x), INFINITE)
 # define THREAD_EXIT		_endthread()
 # define THREAD_CANCEL(x)       TerminateThread(x, 0)
@@ -121,6 +125,12 @@ typedef struct
   CRITICAL_SECTION waiters_count_lock_;
   HANDLE signal_event_;
 } COND_TYPE;
+# define ONCE_INITIALIZER { 0, MUTEX_INITIALIZER }
+# define ONCE(x,f) emulate_pthread_once(&(x), f)
+typedef struct
+{ UINT state_;
+  MUTEX_TYPE mutex_;
+} ONCE_TYPE;
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -129,6 +139,7 @@ int emulate_pthread_cond_init(COND_TYPE*);
 int emulate_pthread_cond_destroy(COND_TYPE*);
 int emulate_pthread_cond_signal(COND_TYPE*);
 int emulate_pthread_cond_wait(COND_TYPE*, MUTEX_TYPE*);
+int emulate_pthread_once(ONCE_TYPE*, void (*)(void));
 #ifdef __cplusplus
 }
 #endif
@@ -156,6 +167,9 @@ int emulate_pthread_cond_wait(COND_TYPE*, MUTEX_TYPE*);
 # define COND_CLEANUP(x)	pthread_cond_destroy(&(x))
 # define COND_SIGNAL(x)		pthread_cond_signal(&(x))
 # define COND_WAIT(x,y)		pthread_cond_wait(&(x), &(y))
+# define ONCE_TYPE          pthread_once_t
+# define ONCE_INITIALIZER   PTHREAD_ONCE_INIT
+# define ONCE(x,f)          pthread_once(&(x), f)
 #else
 # error "No POSIX threads detected: we need thread and mutex operations. See for example OpenSSL /threads/th-lock.c on how to implement mutex on your platform"
 #endif

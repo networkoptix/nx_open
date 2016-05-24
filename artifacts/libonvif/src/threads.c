@@ -128,8 +128,21 @@ int emulate_pthread_cond_wait(COND_TYPE *cv, MUTEX_TYPE *cs)
   return result;
 }
 
+int emulate_pthread_once(ONCE_TYPE* once, void (*init_routine)(void))
+{
+    MUTEX_LOCK(once->mutex_);
+    if (!once->state_)
+    {
+        init_routine();
+        once->state_ = 1;
+    }
+
+    MUTEX_UNLOCK(once->mutex_);
+    return 0;
+}
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif 
+#endif

@@ -104,7 +104,7 @@ key applied to the SHA1 digest of the serialized object:
     else if (soap_smd_end(soap, sig, &siglen))
       soap_print_fault(soap, stderr);
     else
-      ... // sig contains RSA-SHA1 signature of length siglen 
+      ... // sig contains RSA-SHA1 signature of length siglen
     EVP_PKEY_free(key);
 @endcode
 
@@ -135,7 +135,7 @@ SOAP_SMD_PASSTHRU flag with the algorithm selection as follows:
     else if (soap_smd_end(soap, sig, &siglen))
       soap_print_fault(soap, stderr);
     else
-      ... // sig contains RSA-SHA1 signature of length siglen 
+      ... // sig contains RSA-SHA1 signature of length siglen
     close(soap->sendfd);
     EVP_PKEY_free(key);
 @endcode
@@ -262,6 +262,7 @@ the digest or signature produced.
 */
 
 #include "smdevp.h"
+#include "threads.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -384,6 +385,14 @@ soap_smd_end(struct soap *soap, char *buf, int *len)
   return err;
 }
 
+#ifdef WITH_OPENSSL
+static ONCE_TYPE soap_OpenSSL_once = ONCE_INITIALIZER;
+static void soap_OpenSSL_init()
+{ OpenSSL_add_all_digests();
+  OpenSSL_add_all_algorithms();
+}
+#endif
+
 /**
 @fn int soap_smd_init(struct soap *soap, struct soap_smd_data *data, int alg, const void *key, int keylen)
 @brief Initiates a (signed) digest computation.
@@ -396,15 +405,10 @@ soap_smd_end(struct soap *soap, char *buf, int *len)
 */
 int
 soap_smd_init(struct soap *soap, struct soap_smd_data *data, int alg, const void *key, int keylen)
-{ static int done = 0;
-  int err = 1;
+{ int err = 1;
 #ifdef WITH_OPENSSL
   /* OpenSSL: make sure we have the digest algorithms, need to call just once */
-  if (!done)
-  { done = 1;
-    OpenSSL_add_all_digests();
-    OpenSSL_add_all_algorithms();
-  }
+  ONCE(soap_OpenSSL_once, &soap_OpenSSL_init);
 #endif
   /* the algorithm to use */
   data->alg = alg;
