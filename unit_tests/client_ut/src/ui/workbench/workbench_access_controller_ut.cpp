@@ -506,7 +506,9 @@ TEST_F(QnWorkbenchAccessControllerTest, checkNonOwnRemoteAdminsLayoutAsAdmin)
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
 
     Qn::Permissions desired = Qn::ModifyLayoutPermission;
-    Qn::Permissions forbidden = Qn::FullLayoutPermissions &~ Qn::ModifyLayoutPermission;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
+    forbidden &= ~desired;
+
     checkPermissions(layout, desired, forbidden);
 }
 
