@@ -253,20 +253,22 @@ angular.module('webadminApp')
                     oldPassword:oldPassword
                 });
             },
-            setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName){
+            setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName, systemSettings){
                 return wrapPost(proxy + '/web/api/setupCloudSystem',{
                     systemName: systemName,
                     cloudSystemID: systemId,
                     cloudAuthKey: authKey,
-                    cloudAccountName: cloudAccountName
+                    cloudAccountName: cloudAccountName,
+                    systemSettings: systemSettings
                 });
             },
 
-            setupLocalSystem:function(systemName, adminAccount, adminPassword){
+            setupLocalSystem:function(systemName, adminAccount, adminPassword, systemSettings){
                 return wrapPost(proxy + '/web/api/setupLocalSystem',{
                     systemName: systemName,
                     adminAccount: adminAccount,
-                    password: adminPassword
+                    password: adminPassword,
+                    systemSettings: systemSettings
                 });
             },
 

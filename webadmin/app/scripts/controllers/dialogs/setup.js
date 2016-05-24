@@ -416,7 +416,9 @@ angular.module('webadminApp')
                     mediaserver.setupCloudSystem($scope.settings.systemName,
                         message.data.id,
                         message.data.authKey,
-                        $scope.settings.cloudEmail).then(function(r){
+                        $scope.settings.cloudEmail,
+                        $scope.systemSettings
+                    ).then(function(r){
                             if(r.data.error !== 0 && r.data.error !=='0') {
                                 errorHandler(r.data);
                                 return;
@@ -457,7 +459,11 @@ angular.module('webadminApp')
             }
 
             $log.log("Request /api/setupLocalSystem on cloud portal ...");
-            mediaserver.setupLocalSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
+            mediaserver.setupLocalSystem($scope.settings.systemName,
+                $scope.settings.localLogin,
+                $scope.settings.localPassword,
+                $scope.systemSettings
+            ).then(function(r){
                 if(r.data.error !== 0 && r.data.error !=='0') {
                     offlineErrorHandler(r);
                     return;
@@ -549,6 +555,30 @@ angular.module('webadminApp')
         }
 
 
+        mediaserver.systemSettings().then(function(r){
+            var systemSettings = r.data.reply.settings;
+            $scope.systemSettings = {};
+
+            for(var settingName in $scope.Config.settingsConfig){
+                if(!$scope.Config.settingsConfig[settingName].setupWizard){
+                    continue;
+                }
+                $scope.systemSettings[settingName] = systemSettings[settingName];
+
+                if($scope.Config.settingsConfig[settingName].type === 'number'){
+                    $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
+                }
+                if($scope.systemSettings[settingName] === 'true'){
+                    $scope.systemSettings[settingName] = true;
+                }
+                if($scope.systemSettings[settingName] === 'false'){
+                    $scope.systemSettings[settingName] = false;
+                }
+                $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+            }
+        });
+
+
         /* Wizard workflow */
 
         $scope.wizardFlow = {
@@ -576,6 +606,10 @@ angular.module('webadminApp')
                 valid: function(){
                     return required($scope.settings.systemName);
                 }
+            },
+            advanced:{
+                back: 'systemName',
+                next: 'systemName'
             },
             noInternetOnServer:{
                 retry:function(){
