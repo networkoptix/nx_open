@@ -13,6 +13,7 @@ namespace style
         static const int kMenuItemTextLeftPadding;
         static const int kArrowSize;
         static const int kCrossSize;
+        static const int kSpinButtonWidth;
         static const int kCheckIndicatorSize;
         static const int kExclusiveIndicatorSize;
         static const int kMenuCheckSize;

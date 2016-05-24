@@ -644,10 +644,10 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(QnActions::NewGlobalLayoutAction).
             flags(Qn::Main | Qn::Tree).
             requiredGlobalPermission(Qn::GlobalAdminPermission).
-            text(tr("Global Layout")).
-            pulledText(tr("New Global Layout")).
+            text(tr("Shared Layout")).
+            pulledText(tr("New Shared Layout")).
             condition(new QnConjunctionActionCondition(
-                new QnTreeNodeTypeCondition(Qn::GlobalLayoutsNode, this),
+                new QnTreeNodeTypeCondition(Qn::LayoutsNode, this),
                 new QnForbiddenInSafeModeCondition(this),
                 this)
             ).

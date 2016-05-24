@@ -138,6 +138,13 @@ namespace
     {
         return color.alpha() == 255;
     }
+
+    /* Checks whether a widget is in-place line edit in an item view: */
+    bool isItemViewEdit(const QWidget* widget)
+    {
+        return qobject_cast<const QLineEdit*>(widget) && widget->parentWidget() &&
+               qobject_cast<const QAbstractItemView *>(widget->parentWidget()->parentWidget());
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -302,18 +309,25 @@ void QnNxStyle::drawPrimitive(
         }
         return;
 
-    case PE_PanelLineEdit:
     case PE_FrameLineEdit:
+        /* We draw panel already with frame in PE_PanelLineEdit. */
+        return;
+
+    case PE_PanelLineEdit:
         {
-            if (widget && (qobject_cast<const QSpinBox *>(widget->parentWidget()) ||
-                           qobject_cast<const QComboBox *>(widget->parentWidget())))
+            if (widget && (qobject_cast<const QAbstractSpinBox *>(widget->parentWidget()) ||
+                           qobject_cast<const QComboBox *>(widget->parentWidget()) ||
+                           isItemViewEdit(widget)))
             {
                 // Do not draw panel for the internal line edit of certain widgets.
                 return;
             }
 
-            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
             QnPaletteColor base = findColor(option->palette.color(QPalette::Base));
+            qreal opacity = option->state.testFlag(State_Enabled) ? 1.0 : 0.3;
+
+            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * opacity);
 
             if (option->state.testFlag(State_HasFocus))
             {
@@ -921,12 +935,8 @@ void QnNxStyle::drawComplexControl(
         break;
 
     case CC_SpinBox:
-        if (const QStyleOptionSpinBox *spinBox =
-                qstyleoption_cast<const QStyleOptionSpinBox*>(option))
+        if (const QStyleOptionSpinBox* spinBox = qstyleoption_cast<const QStyleOptionSpinBox*>(option))
         {
-            if (option->subControls & SC_SpinBoxFrame)
-                proxy()->drawPrimitive(PE_PanelLineEdit, option, painter, widget);
-
             auto drawArrowButton = [&](QStyle::SubControl subControl)
             {
                 QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
@@ -935,7 +945,7 @@ void QnNxStyle::drawComplexControl(
                 QColor buttonColor;
 
                 bool up = (subControl == SC_SpinBoxUp);
-                bool enabled = spinBox->stepEnabled.testFlag(up ? QSpinBox::StepUpEnabled : QSpinBox::StepDownEnabled);
+                bool enabled = spinBox->state.testFlag(QStyle::State_Enabled) && spinBox->stepEnabled.testFlag(up ? QSpinBox::StepUpEnabled : QSpinBox::StepDownEnabled);
 
                 if (enabled && spinBox->activeSubControls.testFlag(subControl))
                 {
@@ -950,14 +960,17 @@ void QnNxStyle::drawComplexControl(
 
                 drawArrow(up ? Up : Down,
                           painter,
-                          subControlRect(control, option, subControl, widget),
+                          buttonRect,
                           option->palette.color(enabled ? QPalette::Active : QPalette::Disabled, QPalette::Text));
             };
 
-            if (option->subControls.testFlag(SC_SpinBoxUp))
+            if (spinBox->subControls.testFlag(SC_SpinBoxFrame) && spinBox->frame)
+                drawPrimitive(PE_PanelLineEdit, spinBox, painter, widget);
+
+            if (spinBox->subControls.testFlag(SC_SpinBoxUp))
                 drawArrowButton(SC_SpinBoxUp);
 
-            if (option->subControls.testFlag(SC_SpinBoxDown))
+            if (spinBox->subControls.testFlag(SC_SpinBoxDown))
                 drawArrowButton(SC_SpinBoxDown);
 
             return;
@@ -1675,28 +1688,27 @@ QRect QnNxStyle::subControlRect(
         break;
 
     case CC_SpinBox:
-        if (const QStyleOptionSpinBox *spinBox =
-                qstyleoption_cast<const QStyleOptionSpinBox*>(option))
+        if (const QStyleOptionSpinBox* spinBox = qstyleoption_cast<const QStyleOptionSpinBox*>(option))
         {
+            int frame = spinBox->frame && spinBox->subControls.testFlag(SC_SpinBoxFrame) ? 1 : 0;
+            QRect contentsRect = spinBox->rect.adjusted(frame, frame, -frame, -frame);
+
             switch (subControl)
             {
             case SC_SpinBoxEditField:
-                {
-                    int frameWidth = pixelMetric(PM_SpinBoxFrameWidth, option, widget);
-                    int buttonWidth = subControlRect(control, option, SC_SpinBoxDown, widget).width();
-                    rect = spinBox->rect;
-                    rect.setRight(rect.right() - buttonWidth);
-                    rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
-                }
-                break;
+                return visualRect(spinBox->direction, contentsRect,
+                    contentsRect.adjusted(0, 0, -Metrics::kSpinButtonWidth, 0));
 
             case SC_SpinBoxDown:
-            case SC_SpinBoxUp:
-                rect.adjust(0, 0, 0, 1);
-                break;
+                return alignedRect(spinBox->direction, Qt::AlignRight | Qt::AlignBottom,
+                    QSize(Metrics::kSpinButtonWidth, contentsRect.height() / 2), contentsRect);
 
-            default:
-                break;
+            case SC_SpinBoxUp:
+                return alignedRect(spinBox->direction, Qt::AlignRight | Qt::AlignTop,
+                    QSize(Metrics::kSpinButtonWidth, contentsRect.height() / 2), contentsRect);
+
+            case SC_SpinBoxFrame:
+                return spinBox->rect;
             }
         }
         break;
@@ -2148,8 +2160,9 @@ QSize QnNxStyle::sizeFromContents(
                 return QSize(width, height);
             }
         }
-        /* Default processing for normal spin boxes: */
-        break;
+
+        /* Ðrocessing for normal spin boxes: */
+        return size + QSize(Metrics::kStandardPadding * 2 + Metrics::kSpinButtonWidth, 0);
     }
 
     case CT_ComboBox:
@@ -2326,7 +2339,7 @@ void QnNxStyle::polish(QWidget *widget)
 
     if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
     {
-        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
         {
             QFont font = widget->font();
             font.setPixelSize(dp(14));
