@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout, dialogs) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
 
 
         mediaserver.getUser().then(function(user){
@@ -186,7 +186,7 @@ angular.module('webadminApp')
         mediaserver.getMediaServers().then(function(data){
 
             $scope.singleServer = data.data.length==1;
-            $scope.disconnectCaption = $scope.singleServer? 'Disconnect Server And Create New System': 'Reset System';
+            $scope.disconnectCaption = $scope.singleServer? 'Reset System': 'Disconnect Server And Create New System';
 
             $scope.mediaServers = _.sortBy(data.data,function(server){
                 // Set active state for server
@@ -208,6 +208,21 @@ angular.module('webadminApp')
         },function(){
             $scope.cloudSystemID = null;
             $scope.cloudAccountName = null;
+
+            mediaserver.checkInternet().then(function (hasInternetOnServer) {
+                $scope.hasInternetOnServer = hasInternetOnServer;
+            });
+
+            cloudAPI.checkConnection().then(function () {
+                $scope.hasInternetOnClient = true;
+            }, function (error) {
+                $scope.hasInternetOnClient = false;
+                if (error.data && error.data.resultCode) {
+                    $scope.settings.internetError = formatError(error.data.resultCode);
+                } else {
+                    $scope.settings.internetError = "Couldn't check cloud connection";
+                }
+            });
         });
 
 
@@ -245,6 +260,7 @@ angular.module('webadminApp')
             //Open Connect Dialog
             openCloudDialog(true);
         };
+
 
 
     });

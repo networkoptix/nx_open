@@ -14,7 +14,9 @@
 
         <div class="col-md-offset-3 col-md-9" ng-if="!cloudSystemID">
             <alert type="warning">This system is not linked to {{Config.cloud.productName}} <a ng-href="{{Config.cloud.portalUrl}}" ng-click="openLink()" target="_blank">Learn more about {{Config.cloud.productName}}</a></alert>
-            <button class="btn btn-default" ng-click="connectToCloud()">Connect to {{Config.cloud.productName}}</button>
+            <alert type="error" ng-if="!hasInternetOnServer">Connect your server to internet to setup {{Config.cloud.productName}}</alert>
+            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">You need internet connetion on your computer to connect your system to {{Config.cloud.productName}}</alert>
+            <button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
             <a class="btn btn-default" ng-href="{{Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create {{Config.cloud.productName}} Account</a>
         </div>
     </div>

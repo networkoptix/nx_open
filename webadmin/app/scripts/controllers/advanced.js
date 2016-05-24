@@ -16,43 +16,13 @@ angular.module('webadminApp')
             }
         });
 
-        $scope.settingsConfig = {
-            auditTrailEnabled: {label:'Audit trail enabled', type:'checkbox'},
-            cameraSettingsOptimization: {label:'Camera settings optimization', type:'checkbox'},
-            disabledVendors: {label:'Disabled vendors', type:'text'},
-            ec2AliveUpdateIntervalSec: {label:'System alive update interval', type:'number'},
-            ec2ConnectionKeepAliveTimeoutSec: {label:'Connection keep alive timeout', type:'number'},
-            ec2KeepAliveProbeCount: {label:'Connection keep alive probes', type:'number'},
-            emailFrom: {label:'Email from', type:'text'},
-            emailSignature: {label:'Email signature', type:'text'},
-            emailSupportEmail: {label:'Support Email', type:'text'},
-            ldapAdminDn: {label:'LDAP admin DN', type:'text'},
-            ldapAdminPassword: {label:'LDAP admin password', type:'text'},
-            ldapSearchBase: {label:'LDAP search base', type:'text'},
-            ldapSearchFilter: {label:'LDAP search filter', type:'text'},
-            ldapUri: {label:'LDAP URI', type:'text'},
-            serverAutoDiscoveryEnabled: {label:'Server auto discovery enabled', type:'checkbox'},
-            smtpConnectionType: {label:'SMTP connection type', type:'text'},
-            smtpHost: {label:'SMTP host', type:'text'},
-            smtpPort: {label:'SMTP port', type:'number'},
-            smtpSimple: {label:'SMTP simple', type:'checkbox'},
-            smtpTimeout: {label:'SMTP timeout', type:'number'},
-            smptPassword: {label:'SMTP password', type:'text'},
-            smtpUser: {label:'SMTP user', type:'text'},
-            updateNotificationsEnabled: {label:'Update notifications enabled', type:'checkbox'},
-            arecontRtspEnabled: {label:'Arecont RTSP Enabled', type:'checkbox'},
-
-            backupNewCamerasByDefault: {label:'Backup new cameras by default',type:'checkbox'},
-            statisticsAllowed: {label:'Send statistics',type:'checkbox'},
-            backupQualities: {label:'Backup qualities',type:'text'},
-            serverDiscoveryPingTimeoutSec:{label:'Server discovery timeout',type:'number'}
-        };
+        $scope.Config = Config;
 
         mediaserver.systemSettings().then(function(r){
             $scope.systemSettings = r.data.reply.settings;
 
             for(var settingName in $scope.systemSettings){
-                if(!$scope.settingsConfig[settingName]){
+                if(!$scope.Config.settingsConfig[settingName]){
                     var type = 'text';
                     if( $scope.systemSettings[settingName] === true ||
                         $scope.systemSettings[settingName] === false ||
@@ -60,10 +30,10 @@ angular.module('webadminApp')
                         $scope.systemSettings[settingName] === 'false' ){
                         type = 'checkbox';
                     }
-                    $scope.settingsConfig[settingName] = {label:settingName,type:type};
+                    $scope.Config.settingsConfig[settingName] = {label:settingName,type:type};
                 }
 
-                if($scope.settingsConfig[settingName].type === 'number'){
+                if($scope.Config.settingsConfig[settingName].type === 'number'){
                     $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
                 }
                 if($scope.systemSettings[settingName] === 'true'){
@@ -73,7 +43,7 @@ angular.module('webadminApp')
                     $scope.systemSettings[settingName] = false;
                 }
 
-                $scope.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+                $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
             }
         });
 
@@ -81,7 +51,7 @@ angular.module('webadminApp')
             var changedSettings = {};
             var hasChanges = false;
             for(var settingName in $scope.systemSettings){
-                if($scope.settingsConfig[settingName].oldValue !== $scope.systemSettings[settingName]){
+                if($scope.Config.settingsConfig[settingName].oldValue !== $scope.systemSettings[settingName]){
                     changedSettings[settingName] = $scope.systemSettings[settingName];
                     hasChanges = true;
                 }
@@ -89,9 +59,6 @@ angular.module('webadminApp')
             if(hasChanges){
                 mediaserver.systemSettings(changedSettings).then(function(r){
                     if(typeof(r.error) !== 'undefined' && r.error !== '0') {
-
-                        console.log(r);
-
                         var errorToShow = r.errorString;
                         dialogs.alert('Error: ' + errorToShow);
                     }
@@ -99,7 +66,6 @@ angular.module('webadminApp')
                         dialogs.alert('Settings saved');
                     }
                 },function(error){
-                    console.log(error);
                     dialogs.alert('Error: Couldn\'t save settings');
                 });
             }
