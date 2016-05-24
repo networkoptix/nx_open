@@ -413,7 +413,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (m_scope != FullScope)
             return bastardNode;
-        return m_rootNodes[Qn::GlobalLayoutsNode];
+        return m_rootNodes[Qn::RootNode];
     }
 
     if (node->resourceFlags().testFlag(Qn::web_page))
