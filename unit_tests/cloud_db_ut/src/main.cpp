@@ -43,4 +43,34 @@ void parseArgs(int argc, char **argv)
     const auto tmpIter = args.find("tmp");
     if (tmpIter != args.end())
         nx::cdb::CdbFunctionalTest::setTemporaryDirectoryPath(tmpIter->second);
+
+    //reading db connection options
+    nx::db::ConnectionOptions connectionOptions;
+
+    const auto dbDriverNameIter = args.find("db/driverName");
+    if (dbDriverNameIter != args.end())
+        connectionOptions.driverName = dbDriverNameIter->second;
+    const auto dbHostNameIter = args.find("db/hostName");
+    if (dbHostNameIter != args.end())
+        connectionOptions.hostName = dbHostNameIter->second;
+    const auto dbPortIter = args.find("db/port");
+    if (dbPortIter != args.end())
+        connectionOptions.port = dbPortIter->second.toInt();
+    const auto dbNameIter = args.find("db/name");
+    if (dbNameIter != args.end())
+        connectionOptions.dbName = dbNameIter->second;
+    const auto dbUserNameIter = args.find("db/userName");
+    if (dbUserNameIter != args.end())
+        connectionOptions.userName = dbUserNameIter->second;
+    const auto dbPasswordIter = args.find("db/password");
+    if (dbPasswordIter != args.end())
+        connectionOptions.password = dbPasswordIter->second;
+    const auto dbConnectOptionsIter = args.find("db/connectOptions");
+    if (dbConnectOptionsIter != args.end())
+        connectionOptions.connectOptions = dbConnectOptionsIter->second;
+    const auto dbMaxConnectionsIter = args.find("db/maxConnections");
+    if (dbMaxConnectionsIter != args.end())
+        connectionOptions.maxConnectionCount = dbMaxConnectionsIter->second.toInt();
+
+    nx::cdb::CdbFunctionalTest::setDbConnectionOptions(std::move(connectionOptions));
 }

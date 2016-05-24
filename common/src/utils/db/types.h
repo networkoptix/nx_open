@@ -35,9 +35,8 @@ public:
 
     ConnectionOptions()
     :
-        driverName( lit("QMYSQL") ),
-        port( 0 ),
-        maxConnectionCount( 1 )
+        port(0),
+        maxConnectionCount(1)
     {
     }
 };
