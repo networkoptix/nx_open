@@ -88,7 +88,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         return false;
 
 
-    if (!qnGlobalSettings->isStatisticsAllowed())
+    if (!qnGlobalSettings->isStatisticsAllowed()
+        || qnGlobalSettings->isNewSystem())
     {
         NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
         return false;
