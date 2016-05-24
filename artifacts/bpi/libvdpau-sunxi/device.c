@@ -23,11 +23,14 @@
 #include <cedrus/cedrus.h>
 #include "vdpau_private.h"
 
+// First entry point into this library.
 VdpStatus vdp_device_create_x11(Display *display,
                                 int screen,
                                 VdpDevice *device,
                                 VdpGetProcAddress **get_proc_address)
 {
+	conf_reload();
+
 	if (!device || !get_proc_address)
 		return VDP_STATUS_INVALID_POINTER;
 

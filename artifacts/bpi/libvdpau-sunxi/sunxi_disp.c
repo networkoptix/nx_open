@@ -282,6 +282,10 @@ static int sunxi_disp_set_video_layer(struct sunxi_disp *sunxi_disp, int x, int 
 		disp->video_info.scn_win.height -= scn_clip;
 	}
 
+	// TODO: Consider sleeping only if this point is executed too soon.
+	if (conf.surfaceSleepUs > 0)
+		usleep(conf.surfaceSleepUs);
+
 	if (conf.enableSetFb)
 	{
 		// TODO: Rewrite via storing and comparing prev video_info.

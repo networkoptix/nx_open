@@ -3,6 +3,7 @@ SRC = vdpau_private.c device.c presentation_queue.c surface_output.c surface_vid
 	surface_bitmap.c video_mixer.c decoder.c handles.c \
 	h264.c mpeg12.c mpeg4.c rgba.c tiled_yuv.S h265.c sunxi_disp.c \
 	sunxi_disp2.c sunxi_disp1_5.c rgba_g2d.c rgba_pixman.c
+SRC_CPP = flag_config.cpp conf.cpp
 CFLAGS ?= -Wall -O3
 LDFLAGS ?=
 #LIBS = -lrt -lm -lX11 -lpthread -lcedrus
@@ -10,14 +11,15 @@ LIBS = -lrt -lm -lpthread -lcedrus
 CC ?= cc
 
 CFLAGS += -std=gnu99 $(shell pkg-config --cflags pixman-1)
+CXXFLAGS += -fPIC -std=c++11
 LIBS += $(shell pkg-config --libs pixman-1)
 
 DEP_CFLAGS = -MD -MP -MQ $@
-LIB_CFLAGS = -fpic -fvisibility=hidden
+LIB_CFLAGS = -fPIC -fvisibility=hidden
 LIB_LDFLAGS = -shared -Wl,-soname,$(TARGET)
 
-OBJ = $(addsuffix .o,$(basename $(SRC)))
-DEP = $(addsuffix .d,$(basename $(SRC)))
+OBJ = $(addsuffix .o,$(basename $(SRC))) $(addsuffix .o,$(basename $(SRC_CPP)))
+DEP = $(addsuffix .d,$(basename $(SRC))) $(addsuffix .d,$(basename $(SRC_CPP)))
 
 #MODULEDIR = $(shell pkg-config --variable=moduledir vdpau)
 
@@ -25,18 +27,16 @@ ifeq ($(MODULEDIR),)
 MODULEDIR=/usr/lib/arm-linux-gnueabihf/vdpau
 endif
 
-.PHONY: clean all install uninstall
+.PHONY: clean all install uninstall build
 
 CONF_DEFINES = -DNX_UTILS_API='__attribute__ ((visibility ("hidden")))'
 
-all: $(TARGET)
-$(TARGET): $(OBJ) conf
-	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(OBJ) conf.o flag_config.o $(LIBS) -o $@
+all: install
+build: $(TARGET)
 
-conf:
-	g++ $(CONF_DEFINES) -fPIC -std=c++11 -c flag_config.cpp -o flag_config.o
-	g++ $(CONF_DEFINES) -fPIC -std=c++11 -c conf.cpp -o conf.o
-	
+$(TARGET): $(OBJ)
+	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(OBJ) $(LIBS) -o $@
+
 clean:
 	rm -f $(OBJ)
 	rm -f $(DEP)
@@ -50,6 +50,9 @@ uninstall:
 	rm -f $(DESTDIR)$(MODULEDIR)/$(basename $(TARGET))
 	rm -f $(DESTDIR)$(MODULEDIR)/$(TARGET)
 
+%.o: %.cpp
+	$(CXX) $(DEP_CFLAGS) $(CONF_DEFINES) $(CXXFLAGS) -c $< -o $@
+  
 %.o: %.c
 	$(CC) $(DEP_CFLAGS) $(LIB_CFLAGS) $(CFLAGS) $(CONF_DEFINES) -c $< -o $@
 

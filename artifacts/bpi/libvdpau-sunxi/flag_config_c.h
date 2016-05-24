@@ -18,6 +18,7 @@ conf.h:
 { \
      NX_FLAG(0, myFlag, "Description"); \
      NX_INT_PARAM(7, myInt, "Description"); \
+     NX_STRING_PARAM("default value", myStr, "Description"); \
 }
 
 #include "flag_config_c.h"
@@ -28,9 +29,11 @@ conf.h:
 
 #define NX_FLAG(DEFAULT, NAME, DESCR) bool NAME
 #define NX_INT_PARAM(DEFAULT, NAME, DESCR) int NAME
+#define NX_STRING_PARAM(DEFAULT, NAME, DESCR) const char* NAME
 struct Conf CONFIG_BODY;
 #undef NX_FLAG
 #undef NX_INT_PARAM
+#undef NX_STRING_PARAM
 
 #if defined(__cplusplus) //< Included from conf.cpp
 
@@ -44,6 +47,8 @@ struct Conf CONFIG_BODY;
     #define NX_FLAG(DEFAULT, NAME, DESCR) regFlagParam(&pConf->NAME, (DEFAULT), #NAME, (DESCR))
     #undef NX_INT_PARAM
     #define NX_INT_PARAM(DEFAULT, NAME, DESCR) regIntParam(&pConf->NAME, (DEFAULT), #NAME, (DESCR))
+    #undef NX_STRING_PARAM
+    #define NX_STRING_PARAM(DEFAULT, NAME, DESCR) regStringParam(&pConf->NAME, (DEFAULT), #NAME, (DESCR))
 
     namespace {
 
@@ -61,7 +66,7 @@ struct Conf CONFIG_BODY;
 
     extern "C" {
         NX_UTILS_API void conf_reload() { cppConf.reload(); }
-        NX_UTILS_API void conf_reloadSingleFlag(bool* pValue) { cppConf.reloadSingleFlag(pValue); }
+        NX_UTILS_API void conf_skipNextReload() { cppConf.skipNextReload(); }
         NX_UTILS_API const char* conf_tempPath() { return cppConf.tempPath(); }
         NX_UTILS_API const char* conf_moduleName() { return cppConf.moduleName(); }
     } // extern "C"
@@ -71,7 +76,7 @@ struct Conf CONFIG_BODY;
     extern NX_UTILS_API struct Conf conf;
 
     NX_UTILS_API void conf_reload();
-    NX_UTILS_API void conf_reloadSingleFlag(bool* pValue);
+    NX_UTILS_API void conf_skipNextReload();
     NX_UTILS_API const char* conf_tempPath();
     NX_UTILS_API const char* conf_moduleName();
 
