@@ -160,23 +160,27 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
 
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
     const int size = Metrics::kCheckIndicatorSize - dp(5);
-    QRectF rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
-    RectCoordinates rc(rect);
+    QRect rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
 
+    QRectF aaAlignedRect(rect);
+    aaAlignedRect.adjust(0.5, 0.5, 0.5, 0.5);
+
+    RectCoordinates rc(rect);
     if (option->state.testFlag(QStyle::State_On))
     {
+        QRect clipRect(rect.adjusted(0, 0, 1, 1));
+        QRect excludeRect(clipRect);
+        excludeRect.setHeight(excludeRect.height() / 2);
+        excludeRect.setLeft(excludeRect.right() - excludeRect.width() / 5);
+        {
+            QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(clipRect).subtracted(excludeRect));
+            painter->drawRoundedRect(aaAlignedRect, Metrics::kCheckboxCornerRadius, Metrics::kCheckboxCornerRadius);
+        }
+
         QPainterPath path;
-        path.moveTo(rc.x(0.8), rc.y(0.0));
-        path.lineTo(rc.x(0.0), rc.y(0.0));
-        path.lineTo(rc.x(0.0), rc.y(1.0));
-        path.lineTo(rc.x(1.0), rc.y(1.0));
-        path.lineTo(rc.x(1.0), rc.y(0.5));
-
-        painter->drawPath(path);
-
-        path = QPainterPath();
         path.moveTo(rc.x(0.25), rc.y(0.38));
         path.lineTo(rc.x(0.55), rc.y(0.70));
         path.lineTo(rc.x(1.12), rc.y(0.13));
@@ -184,17 +188,15 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
         pen.setWidthF(dp(2));
         painter->setPen(pen);
 
-        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-
         painter->drawPath(path);
     }
     else
     {
-        painter->drawRect(rect);
+        painter->drawRoundedRect(aaAlignedRect, Metrics::kCheckboxCornerRadius, Metrics::kCheckboxCornerRadius);
 
         if (option->state.testFlag(QStyle::State_NoChange))
         {
-            pen.setWidth(2);
+            pen.setWidthF(dp(2));
             painter->setPen(pen);
             painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.9), rc.y(0.5)));
         }

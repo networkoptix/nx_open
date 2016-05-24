@@ -22,6 +22,7 @@ namespace style
     const int Metrics::kRounding = dp(1);
     const QSize Metrics::kSwitchSize(dp(30), dp(15));
     const int Metrics::kSwitchMargin = dp(4);
+    const qreal Metrics::kCheckboxCornerRadius = dp(0.2); // for lightly antialiased corners
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char *Properties::kAccentStyleProperty = "_qn_accentStyle";

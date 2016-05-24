@@ -2133,6 +2133,18 @@ QSize QnNxStyle::sizeFromContents(
 {
     switch (type)
     {
+    case CT_CheckBox:
+        return QSize(
+            size.width() + proxy()->pixelMetric(PM_IndicatorWidth, option, widget) +
+                           proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget),
+            qMax(size.height(), proxy()->pixelMetric(PM_IndicatorHeight, option, widget)));
+
+    case CT_RadioButton:
+        return QSize(
+            size.width() + proxy()->pixelMetric(PM_ExclusiveIndicatorWidth, option, widget) +
+                           proxy()->pixelMetric(PM_RadioButtonLabelSpacing, option, widget),
+            qMax(size.height(), proxy()->pixelMetric(PM_ExclusiveIndicatorHeight, option, widget)));
+
     case CT_PushButton:
         {
             QSize switchSize;
