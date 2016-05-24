@@ -22,7 +22,7 @@ static bool fileExists(const char* filename)
 
 static void skipSpaces(const char** const pp)
 {
-    while (isspace(**pp) || !isprint(**pp))
+    while (**pp != '\0' && (isspace(**pp) || !isprint(**pp)))
         ++(*pp);
 }
 
@@ -37,25 +37,18 @@ static bool parseNameValue(const char* const s, std::string* outName, std::strin
     skipSpaces(&p);
     *outName = "";
     while (*p != '\0' && *p != '=' && *p != '#' && !isspace(*p) && isprint(*p))
-    {
-        *outName += *p;
-        ++p;
-    }
-    if (*p == '#' || *p == '\0') //< Comment or empty line.
+        *outName += *(p++);
+    if (*p == '\0' || *p == '#') //< Empty or comment line.
         return true;
     skipSpaces(&p);
 
-    if (*p != '=')
+    if (*(p++) != '=')
         return false;
-    ++p;
     skipSpaces(&p);
 
     *outValue = "";
     while (*p != '\0')
-    {
-        *outValue += *p;
-        ++p;
-    }
+        *outValue += *(p++);
 
     // Trim trailing spaces in value.
     int i = outValue->size() - 1;
