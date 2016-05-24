@@ -19,8 +19,7 @@ namespace Qn
         UsersNode,              /**< Root node for user resources. */
         WebPagesNode,           /**< Root node for web pages. */
         UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
-        UserLayoutsNode,        /**< Root node for layouts for non-admin user. */
-        GlobalLayoutsNode,      /**< Root node for global layouts. */
+        LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
 
         BastardNode,            /**< Root node for hidden resources. */
 

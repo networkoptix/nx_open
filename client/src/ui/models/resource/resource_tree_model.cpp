@@ -77,8 +77,7 @@ namespace
                 << Qn::UsersNode
                 << Qn::ServersNode
                 << Qn::UserDevicesNode
-                << Qn::UserLayoutsNode
-                << Qn::GlobalLayoutsNode
+                << Qn::LayoutsNode
                 << Qn::WebPagesNode
                 << Qn::OtherSystemsNode
                 << Qn::RootNode
@@ -312,7 +311,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
             return rootNode;
         return bastardNode;
 
-    case Qn::GlobalLayoutsNode:
+    case Qn::LayoutsNode:
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
@@ -323,7 +322,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::UserDevicesNode:
-    case Qn::UserLayoutsNode:
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
             return getResourceNode(context()->user());
         return bastardNode;
@@ -429,17 +427,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return m_rootNodes[Qn::LocalNode];
 
         if (layout->isGlobal())
-            return m_rootNodes[Qn::GlobalLayoutsNode];
+            return m_rootNodes[Qn::LayoutsNode];
 
         QnResourcePtr owner = layout->getParentResource();
-        if (!owner)
-            return bastardNode;
+        if (!owner || owner == context()->user())
+            return m_rootNodes[Qn::LayoutsNode];;
 
         if (isAdmin)
             return getResourceNode(owner);
-
-        if (owner == context()->user())
-            return m_rootNodes[Qn::UserLayoutsNode];
 
         return bastardNode;
     }

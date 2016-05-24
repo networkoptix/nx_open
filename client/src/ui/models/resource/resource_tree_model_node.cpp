@@ -82,10 +82,10 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         break;
     case Qn::LocalNode:
         m_displayName = m_name = tr("Local");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::LocalServer);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::LocalResources);
         break;
     case Qn::CurrentSystemNode:
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
         break;
     case Qn::ServersNode:
         m_displayName = m_name = tr("Servers");
@@ -108,15 +108,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
             tr("Devices"),
             tr("Cameras")
         );
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Camera);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
         break;
-    case Qn::UserLayoutsNode:
+    case Qn::LayoutsNode:
         m_displayName = m_name = tr("Layouts");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Layout);
-        break;
-    case Qn::GlobalLayoutsNode:
-        m_displayName = m_name = tr("Global Layouts");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Layout);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
         break;
     case Qn::RecorderNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
@@ -363,10 +359,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
     case Qn::UserDevicesNode:
         return !isLoggedIn || isAdmin;
 
-    case Qn::UserLayoutsNode:
-        return !isLoggedIn || isAdmin;
-
-    case Qn::GlobalLayoutsNode:
+    case Qn::LayoutsNode:
         return !isLoggedIn;
 
     case Qn::ResourceNode:
