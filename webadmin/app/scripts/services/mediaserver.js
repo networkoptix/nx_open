@@ -253,20 +253,22 @@ angular.module('webadminApp')
                     oldPassword:oldPassword
                 });
             },
-            setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName){
+            setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName, systemSettings){
                 return wrapPost(proxy + '/web/api/setupCloudSystem',{
                     systemName: systemName,
                     cloudSystemID: systemId,
                     cloudAuthKey: authKey,
-                    cloudAccountName: cloudAccountName
+                    cloudAccountName: cloudAccountName,
+                    systemSettings: systemSettings
                 });
             },
 
-            setupLocalSystem:function(systemName, adminAccount, adminPassword){
+            setupLocalSystem:function(systemName, adminAccount, adminPassword, systemSettings){
                 return wrapPost(proxy + '/web/api/setupLocalSystem',{
                     systemName: systemName,
                     adminAccount: adminAccount,
-                    password: adminPassword
+                    password: adminPassword,
+                    systemSettings: systemSettings
                 });
             },
 
@@ -445,6 +447,16 @@ angular.module('webadminApp')
                     });
                 });
 
+                return deferred.promise;
+            },
+            checkInternet:function(reload){
+                var deferred = $q.defer();
+                this.getModuleInformation(reload).then(function(r){
+                    var serverInfo = r.data.reply;
+                    deferred.resolve(serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
+                },function(error){
+                    deferred.resolve(false);
+                });
                 return deferred.promise;
             }
         };

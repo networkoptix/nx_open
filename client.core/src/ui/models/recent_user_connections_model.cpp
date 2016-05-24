@@ -72,12 +72,21 @@ bool QnRecentUserConnectionsModel::hasConnections() const
     return !m_data.isEmpty();
 }
 
+QString QnRecentUserConnectionsModel::firstUser() const
+{
+    if (!hasConnections())
+        return QString();
+
+    return m_data.first().userName;
+}
+
 void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataList &newData)
 {
     if (m_data == newData)
         return;
 
     const bool hadConnections = hasConnections();
+    const bool firstDataChanged = !m_data.isEmpty() && !newData.isEmpty() && m_data.first() != newData.first();
 
     auto itCurrent = m_data.begin();
     for (auto &newDataValue : newData)
@@ -123,6 +132,9 @@ void QnRecentUserConnectionsModel::updateData(const QnUserRecentConnectionDataLi
 
     if (hadConnections != hasConnections())
         emit hasConnectionsChanged();
+
+    if (firstDataChanged)
+        emit firstUserChanged();
 }
 
 int QnRecentUserConnectionsModel::rowCount(const QModelIndex &parent) const

@@ -39,7 +39,7 @@ namespace
             result
             << Qn::OtherSystemsNode
             << Qn::WebPagesNode
-            << Qn::UserServersNode
+            << Qn::ServersNode
             << Qn::UserDevicesNode
             << Qn::RecorderNode
             << Qn::SystemNode;
@@ -82,9 +82,13 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         break;
     case Qn::LocalNode:
         m_displayName = m_name = tr("Local");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::LocalServer);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::LocalResources);
         break;
     case Qn::CurrentSystemNode:
+        m_icon = qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
+        break;
+    case Qn::ServersNode:
+        m_displayName = m_name = tr("Servers");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
     case Qn::OtherSystemsNode:
@@ -104,19 +108,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
             tr("Devices"),
             tr("Cameras")
         );
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Camera);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Cameras);
         break;
-    case Qn::UserLayoutsNode:
+    case Qn::LayoutsNode:
         m_displayName = m_name = tr("Layouts");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Layout);
-        break;
-    case Qn::GlobalLayoutsNode:
-        m_displayName = m_name = tr("Global Layouts");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Layout);
-        break;
-    case Qn::UserServersNode:
-        m_displayName = m_name = tr("Servers");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Layouts);
         break;
     case Qn::RecorderNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
@@ -338,7 +334,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
     if (nodeRequiresChildren(m_type) && m_children.isEmpty())
         return true;
 
-
     /* Here we can narrow nodes visibility, based on permissions, if needed. */
     bool isLoggedIn = !context()->user().isNull();
     bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
@@ -362,13 +357,9 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
 
     case Qn::UserDevicesNode:
-    case Qn::UserServersNode:
         return !isLoggedIn || isAdmin;
 
-    case Qn::UserLayoutsNode:
-        return !isLoggedIn || isAdmin;
-
-    case Qn::GlobalLayoutsNode:
+    case Qn::LayoutsNode:
         return !isLoggedIn;
 
     case Qn::ResourceNode:
@@ -435,12 +426,12 @@ bool QnResourceTreeModelNode::calculateBastard() const
             return true;
 
         /* Only admins can see edge nodes. */
-        return !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+        return !isAdmin;
 
     case Qn::UsersNode:
     case Qn::CurrentSystemNode:
-        return !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-        return !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    case Qn::ServersNode:
+        return !isAdmin;
 
     default:
         NX_ASSERT("Should never get here");

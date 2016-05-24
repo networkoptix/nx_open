@@ -10,6 +10,7 @@ namespace style
     const int Metrics::kMenuItemTextLeftPadding = dp(28);
     const int Metrics::kArrowSize = dp(8);
     const int Metrics::kCrossSize = dp(8);
+    const int Metrics::kSpinButtonWidth = dp(16);
     const int Metrics::kCheckIndicatorSize = dp(16);
     const int Metrics::kExclusiveIndicatorSize = dp(16);
     const int Metrics::kMenuCheckSize = dp(16);
@@ -42,7 +43,8 @@ namespace style
 
     int dp(qreal value)
     {
-        return dpr(value);
+        //TODO #vkutin #common Completely remove dp() when we are ABSOLUTELY sure it's not needed
+        return value; // dpr(value);
     }
 
     bool isDark(const QColor &color)

@@ -398,7 +398,6 @@ void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
 
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.horizontalSpacing, src.verticalSpacing);
-    dst->setUserCanEdit(src.editable);
     dst->setLocked(src.locked);
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
@@ -420,7 +419,6 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst)
     dst.cellAspectRatio = src->cellAspectRatio();
     dst.horizontalSpacing = src->cellSpacing().width();
     dst.verticalSpacing = src->cellSpacing().height();
-    dst.editable = src->userCanEdit();
     dst.locked = src->locked();
     dst.backgroundImageFilename = src->backgroundImageFilename();
     dst.backgroundWidth = src->backgroundSize().width();

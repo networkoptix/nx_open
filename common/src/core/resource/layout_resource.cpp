@@ -12,7 +12,6 @@ QnLayoutResource::QnLayoutResource():
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0),
-    m_userCanEdit(false),
     m_backgroundSize(1, 1),
     m_backgroundOpacity(0.7),
     m_locked(false)
@@ -44,7 +43,6 @@ QnLayoutResourcePtr QnLayoutResource::clone() const {
     result->setBackgroundImageFilename(m_backgroundImageFilename);
     result->setBackgroundOpacity(m_backgroundOpacity);
     result->setBackgroundSize(m_backgroundSize);
-    result->setUserCanEdit(m_userCanEdit);
 
     QnLayoutItemDataList items = m_itemByUuid.values();
     QHash<QnUuid, QnUuid> newUuidByOldUuid;
@@ -131,7 +129,6 @@ void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&
         setItemsUnderLock(localOther->m_itemByUuid);
         m_cellAspectRatio = localOther->m_cellAspectRatio;
         m_cellSpacing = localOther->m_cellSpacing;
-        m_userCanEdit = localOther->m_userCanEdit;
         m_backgroundImageFilename = localOther->m_backgroundImageFilename;
         m_backgroundSize = localOther->m_backgroundSize;
         m_backgroundOpacity = localOther->m_backgroundOpacity;
@@ -293,25 +290,6 @@ void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
 void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
     setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
 }
-
-/********* User Can Edit property **********/
-bool QnLayoutResource::userCanEdit() const {
-    QnMutexLocker locker( &m_mutex );
-    return m_userCanEdit;
-}
-
-void QnLayoutResource::setUserCanEdit(bool value) {
-    {
-        QnMutexLocker locker( &m_mutex );
-        if(m_userCanEdit == value)
-            return;
-        m_userCanEdit = value;
-    }
-
-    emit userCanEditChanged(::toSharedPointer(this));
-}
-
-
 
 /********* Background size property **********/
 QSize QnLayoutResource::backgroundSize() const {

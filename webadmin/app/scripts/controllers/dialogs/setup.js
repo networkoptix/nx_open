@@ -101,30 +101,22 @@ angular.module('webadminApp')
                 return;
             }
 
-            mediaserver.getModuleInformation(reload).then(function(r){
-                $scope.serverInfo = r.data.reply;
-                $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
-
-                $log.log("internet on server: " + $scope.hasInternetOnServer + ", flags: " + $scope.serverInfo.serverFlags);
-            },function(error){
-                $scope.hasInternetOnServer = false ;
-                logMediaserverError(error, "Failed to check internet on server:");
+            mediaserver.checkInternet().then(function(hasInternetOnServer){
+                $log.log("internet on server: " + $scope.hasInternetOnServer);
+                $scope.hasInternetOnServer = hasInternetOnServer;
             });
 
-            cloudAPI.ping().then(function(message){
-                if(message.data.resultCode && message.data.resultCode !== 'ok'){
-                    $scope.settings.internetError = formatError(error.data.resultCode);
-                    $scope.hasInternetOnClient = false;
-                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
-                    return;
-                }
+            cloudAPI.checkConnection().then(function(){
                 $scope.hasInternetOnClient = true;
-                $log.log("internet on client: " + $scope.hasInternetOnClient);
             },function(error){
                 $scope.hasInternetOnClient = false;
-                logMediaserverError(error, "Failed to check internet on client:");
+                if(error.data && error.data.resultCode){
+                    $scope.settings.internetError = formatError(error.data.resultCode);
+                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
+                }else{
+                    logMediaserverError(error, "Failed to check internet on client:");
+                }
             });
-
         }
 
         /* Common helpers: error handling, check current system, error handler */
@@ -424,7 +416,9 @@ angular.module('webadminApp')
                     mediaserver.setupCloudSystem($scope.settings.systemName,
                         message.data.id,
                         message.data.authKey,
-                        $scope.settings.cloudEmail).then(function(r){
+                        $scope.settings.cloudEmail,
+                        $scope.systemSettings
+                    ).then(function(r){
                             if(r.data.error !== 0 && r.data.error !=='0') {
                                 errorHandler(r.data);
                                 return;
@@ -465,7 +459,11 @@ angular.module('webadminApp')
             }
 
             $log.log("Request /api/setupLocalSystem on cloud portal ...");
-            mediaserver.setupLocalSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
+            mediaserver.setupLocalSystem($scope.settings.systemName,
+                $scope.settings.localLogin,
+                $scope.settings.localPassword,
+                $scope.systemSettings
+            ).then(function(r){
                 if(r.data.error !== 0 && r.data.error !=='0') {
                     offlineErrorHandler(r);
                     return;
@@ -557,6 +555,30 @@ angular.module('webadminApp')
         }
 
 
+        mediaserver.systemSettings().then(function(r){
+            var systemSettings = r.data.reply.settings;
+            $scope.systemSettings = {};
+
+            for(var settingName in $scope.Config.settingsConfig){
+                if(!$scope.Config.settingsConfig[settingName].setupWizard){
+                    continue;
+                }
+                $scope.systemSettings[settingName] = systemSettings[settingName];
+
+                if($scope.Config.settingsConfig[settingName].type === 'number'){
+                    $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
+                }
+                if($scope.systemSettings[settingName] === 'true'){
+                    $scope.systemSettings[settingName] = true;
+                }
+                if($scope.systemSettings[settingName] === 'false'){
+                    $scope.systemSettings[settingName] = false;
+                }
+                $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+            }
+        });
+
+
         /* Wizard workflow */
 
         $scope.wizardFlow = {
@@ -584,6 +606,10 @@ angular.module('webadminApp')
                 valid: function(){
                     return required($scope.settings.systemName);
                 }
+            },
+            advanced:{
+                back: 'systemName',
+                next: 'systemName'
             },
             noInternetOnServer:{
                 retry:function(){

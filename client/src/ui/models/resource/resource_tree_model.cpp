@@ -57,7 +57,7 @@ namespace
         switch (scope)
         {
         case QnResourceTreeModel::CamerasScope:
-            return Qn::CurrentSystemNode;
+            return Qn::ServersNode;
         case QnResourceTreeModel::UsersScope:
             return Qn::UsersNode;
         default:
@@ -73,12 +73,11 @@ namespace
         {
             result
                 << Qn::LocalNode
-                << Qn::UsersNode
-                << Qn::UserDevicesNode
-                << Qn::UserLayoutsNode
-                << Qn::UserServersNode
-                << Qn::GlobalLayoutsNode
                 << Qn::CurrentSystemNode
+                << Qn::UsersNode
+                << Qn::ServersNode
+                << Qn::UserDevicesNode
+                << Qn::LayoutsNode
                 << Qn::WebPagesNode
                 << Qn::OtherSystemsNode
                 << Qn::RootNode
@@ -216,8 +215,6 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
 
     /* Make sure resources without parent will never be visible. */
     auto bastardNode = m_rootNodes[Qn::BastardNode];
-    if (node == bastardNode)
-        bastardNode = QnResourceTreeModelNodePtr();
 
     m_allNodes.removeOne(node);
     m_recorderHashByParent.remove(node);
@@ -231,10 +228,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
 
     /* Recursively remove all child nodes. */
     for (auto child : children)
-    {
-        child->setParent(bastardNode);
         removeNode(child);
-    }
 
     /* Remove node from all hashes. */
     m_recorderHashByParent.remove(node);
@@ -271,7 +265,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         break;
     }
 
-
+    node->setParent(QnResourceTreeModelNodePtr());
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceTreeModelNodePtr& node)
@@ -305,14 +299,19 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
             return rootNode;
         return bastardNode;
 
-    case Qn::CurrentSystemNode:
+    case Qn::ServersNode:
         if (m_scope == CamerasScope)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
         if (m_scope == FullScope && isAdmin)
             return rootNode;
         return bastardNode;
 
-    case Qn::GlobalLayoutsNode:
+    case Qn::CurrentSystemNode:
+        if (m_scope == FullScope && isAdmin)
+            return rootNode;
+        return bastardNode;
+
+    case Qn::LayoutsNode:
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
@@ -323,8 +322,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::UserDevicesNode:
-    case Qn::UserLayoutsNode:
-    case Qn::UserServersNode:
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
             return getResourceNode(context()->user());
         return bastardNode;
@@ -339,7 +336,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case Qn::EdgeNode:
         /* Only admins can see edge nodes. */
         if (m_scope != UsersScope && isAdmin)
-            return m_rootNodes[Qn::CurrentSystemNode];
+            return m_rootNodes[Qn::ServersNode];
         return bastardNode;
 
     case Qn::ResourceNode:
@@ -392,9 +389,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (!QnMediaServerResource::isFakeServer(node->resource()))
         {
             if (isAdmin)
-                return m_rootNodes[Qn::CurrentSystemNode];
+                return m_rootNodes[Qn::ServersNode];
 
-            return m_rootNodes[Qn::UserServersNode];
+            return bastardNode;
         }
 
         /* Fake servers from other systems. */
@@ -404,7 +401,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
         QString systemName = server->getSystemName();
         if (systemName == qnCommon->localSystemName())
-            return m_rootNodes[Qn::CurrentSystemNode];
+            return m_rootNodes[Qn::ServersNode];
 
         return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : getSystemNode(systemName);
 
@@ -414,7 +411,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (m_scope != FullScope)
             return bastardNode;
-        return m_rootNodes[Qn::GlobalLayoutsNode];
+        return m_rootNodes[Qn::RootNode];
     }
 
     if (node->resourceFlags().testFlag(Qn::web_page))
@@ -426,21 +423,18 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
     if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
     {
-        if (layout->flags().testFlag(Qn::local_layout))
+        if (layout->isFile())
             return m_rootNodes[Qn::LocalNode];
 
         if (layout->isGlobal())
-            return m_rootNodes[Qn::GlobalLayoutsNode];
+            return m_rootNodes[Qn::LayoutsNode];
 
         QnResourcePtr owner = layout->getParentResource();
-        if (!owner)
-            return bastardNode;
+        if (!owner || owner == context()->user())
+            return m_rootNodes[Qn::LayoutsNode];;
 
         if (isAdmin)
             return getResourceNode(owner);
-
-        if (owner == context()->user())
-            return m_rootNodes[Qn::UserLayoutsNode];
 
         return bastardNode;
     }
@@ -487,6 +481,22 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 void QnResourceTreeModel::updateNodeParent(const QnResourceTreeModelNodePtr& node)
 {
     node->setParent(expectedParent(node));
+}
+
+void QnResourceTreeModel::cleanupSystemNodes()
+{
+    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+    for (auto node : m_allNodes)
+    {
+        if (node->type() != Qn::SystemNode)
+            continue;
+
+        if (node->children().isEmpty())
+            nodesToDelete << node;
+    }
+
+    for (auto node : nodesToDelete)
+        removeNode(node);
 }
 
 bool QnResourceTreeModel::isUrlsShown()
@@ -863,7 +873,6 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (server)
     {
-        m_rootNodes[Qn::OtherSystemsNode]->update();
         for (const QnResourcePtr &camera : qnResPool->getResourcesByParentId(server->getId()))
         {
             if (m_resourceNodeByResource.contains(camera))
@@ -910,6 +919,9 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
     m_itemNodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
+
+    if (QnMediaServerResource::isFakeServer(resource))
+        cleanupSystemNodes();
 }
 
 
@@ -1076,7 +1088,7 @@ void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     auto node = getResourceNode(resource);
     updateNodeParent(node);
-    m_rootNodes[Qn::OtherSystemsNode]->update();
+    cleanupSystemNodes();
 }
 
 void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resource)

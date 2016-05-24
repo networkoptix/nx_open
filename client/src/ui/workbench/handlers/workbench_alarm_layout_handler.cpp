@@ -55,7 +55,6 @@ namespace {
             setName(tr("Alarms"));
             setCellSpacing(0.1, 0.1);
             setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));
-            setUserCanEdit(true);
         }
     };
 

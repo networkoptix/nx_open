@@ -20,11 +20,19 @@ public:
     enum KeyPart
     {
         Unknown,
-        LocalServer,
+        LocalResources,
+        CurrentSystem,
+
         Server,
         Servers,
+
         Layout,
+        SharedLayout,
+        Layouts,
+
         Camera,
+        Cameras,
+
         Recorder,
         Image,
         Media,

@@ -632,13 +632,26 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::TitleBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
-    factory.beginSubMenu(); {
+    factory.beginSubMenu();
+    {
         factory(QnActions::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
             requiredTargetPermissions(Qn::WritePermission). //TODO: #GDM #access check canCreateResource
             text(tr("Layout...")).
             pulledText(tr("New Layout...")).
             condition(hasFlags(Qn::user));
+
+        factory(QnActions::NewGlobalLayoutAction).
+            flags(Qn::Main | Qn::Tree).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
+            text(tr("Shared Layout")).
+            pulledText(tr("New Shared Layout")).
+            condition(new QnConjunctionActionCondition(
+                new QnTreeNodeTypeCondition(Qn::LayoutsNode, this),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+            ).
+            autoRepeat(false);
 
         factory(QnActions::OpenNewTabAction).
             flags(Qn::Main | Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::GlobalHotkey).
@@ -694,7 +707,8 @@ QnActionManager::QnActionManager(QObject *parent):
                 ).
             autoRepeat(false);
 
-    } factory.endSubMenu();
+    }
+    factory.endSubMenu();
 
     factory(QnActions::OpenCurrentUserLayoutMenu).
         flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
@@ -1557,7 +1571,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredGlobalPermission(Qn::GlobalEditServersPermissions).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

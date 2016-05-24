@@ -79,6 +79,9 @@ private:
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
 
+    /* Remove virtual 'system' nodes that are not used anymore. */
+    void cleanupSystemNodes();
+
     /** Cleanup all node references. */
     void removeNode(const QnResourceTreeModelNodePtr& node);
 

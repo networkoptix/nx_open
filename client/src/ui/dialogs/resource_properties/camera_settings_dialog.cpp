@@ -167,17 +167,20 @@ void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton b
     }
 }
 
-void QnCameraSettingsDialog::at_diagnoseButton_clicked() {
+void QnCameraSettingsDialog::at_diagnoseButton_clicked()
+{
     menu()->trigger(QnActions::CameraIssuesAction, m_settingsWidget->cameras());
 }
 
-void QnCameraSettingsDialog::at_rulesButton_clicked() {
+void QnCameraSettingsDialog::at_rulesButton_clicked()
+{
     menu()->trigger(QnActions::CameraBusinessRulesAction, m_settingsWidget->cameras());
 }
 
-void QnCameraSettingsDialog::updateReadOnly() {
-    Qn::Permissions permissions = accessController()->permissions(m_settingsWidget->cameras());
-    m_settingsWidget->setReadOnly(!(permissions & Qn::WritePermission));
+void QnCameraSettingsDialog::updateReadOnly()
+{
+    Qn::Permissions permissions = accessController()->combinedPermissions(m_settingsWidget->cameras());
+    m_settingsWidget->setReadOnly(!permissions.testFlag(Qn::WritePermission));
 }
 
 void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &cameras, bool force /* = false*/) {
