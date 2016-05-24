@@ -460,7 +460,7 @@ TEST_F( QnWorkbenchAccessControllerTest, checkLockedRemoteLayoutAsViewerSafeMode
 }
 
 /************************************************************************/
-/* Checking non-own remote layouts                              */
+/* Checking non-own remote layouts                                      */
 /************************************************************************/
 /** Check permissions for another viewer's layout when the user is logged in as viewer. */
 TEST_F(QnWorkbenchAccessControllerTest, checkNonOwnRemoteViewersLayoutAsViewer)
@@ -521,6 +521,45 @@ TEST_F(QnWorkbenchAccessControllerTest, checkNonOwnRemoteAdminsLayoutAsOwner)
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
 
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = 0;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/************************************************************************/
+/* Checking shared layouts                                              */
+/************************************************************************/
+/** Check permissions for shared layout when the user is logged in as viewer. */
+TEST_F(QnWorkbenchAccessControllerTest, checkSharedLayoutAsViewer)
+{
+    loginAs(Qn::GlobalLiveViewerPermissionSet);
+
+    auto layout = createLayout(Qn::remote);
+    layout->setParentId(QnUuid());
+    qnResPool->addResource(layout);
+
+    ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
+    ASSERT_TRUE(layout->isGlobal());
+
+    /* By default user has no access to shared layouts. */
+    Qn::Permissions desired = 0;
+    Qn::Permissions forbidden = Qn::FullLayoutPermissions;
+    checkPermissions(layout, desired, forbidden);
+}
+
+/** Check permissions for shared layout when the user is logged in as admin. */
+TEST_F(QnWorkbenchAccessControllerTest, checkSharedLayoutAsAdmin)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto layout = createLayout(Qn::remote);
+    layout->setParentId(QnUuid());
+    qnResPool->addResource(layout);
+
+    ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
+    ASSERT_TRUE(layout->isGlobal());
+
+    /* Admin has full access to shared layouts. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = 0;
     checkPermissions(layout, desired, forbidden);
