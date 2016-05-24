@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout, dialogs) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,cloudAPI,$location,$timeout, dialogs) {
 
 
         mediaserver.getUser().then(function(user){
@@ -208,6 +208,21 @@ angular.module('webadminApp')
         },function(){
             $scope.cloudSystemID = null;
             $scope.cloudAccountName = null;
+
+            mediaserver.checkInternet().then(function (hasInternetOnServer) {
+                $scope.hasInternetOnServer = hasInternetOnServer;
+            });
+
+            cloudAPI.checkConnection().then(function () {
+                $scope.hasInternetOnClient = true;
+            }, function (error) {
+                $scope.hasInternetOnClient = false;
+                if (error.data && error.data.resultCode) {
+                    $scope.settings.internetError = formatError(error.data.resultCode);
+                } else {
+                    $scope.settings.internetError = "Couldn't check cloud connection";
+                }
+            });
         });
 
 
@@ -245,6 +260,7 @@ angular.module('webadminApp')
             //Open Connect Dialog
             openCloudDialog(true);
         };
+
 
 
     });

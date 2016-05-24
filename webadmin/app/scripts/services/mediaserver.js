@@ -446,6 +446,16 @@ angular.module('webadminApp')
                 });
 
                 return deferred.promise;
+            },
+            checkInternet:function(reload){
+                var deferred = $q.defer();
+                this.getModuleInformation(reload).then(function(r){
+                    var serverInfo = r.data.reply;
+                    deferred.resolve(serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
+                },function(error){
+                    deferred.resolve(false);
+                });
+                return deferred.promise;
             }
         };
     });

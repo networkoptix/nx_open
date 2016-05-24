@@ -101,30 +101,22 @@ angular.module('webadminApp')
                 return;
             }
 
-            mediaserver.getModuleInformation(reload).then(function(r){
-                $scope.serverInfo = r.data.reply;
-                $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
-
-                $log.log("internet on server: " + $scope.hasInternetOnServer + ", flags: " + $scope.serverInfo.serverFlags);
-            },function(error){
-                $scope.hasInternetOnServer = false ;
-                logMediaserverError(error, "Failed to check internet on server:");
+            mediaserver.checkInternet().then(function(hasInternetOnServer){
+                $log.log("internet on server: " + $scope.hasInternetOnServer);
+                $scope.hasInternetOnServer = hasInternetOnServer;
             });
 
-            cloudAPI.ping().then(function(message){
-                if(message.data.resultCode && message.data.resultCode !== 'ok'){
-                    $scope.settings.internetError = formatError(error.data.resultCode);
-                    $scope.hasInternetOnClient = false;
-                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
-                    return;
-                }
+            cloudAPI.checkConnection().then(function(){
                 $scope.hasInternetOnClient = true;
-                $log.log("internet on client: " + $scope.hasInternetOnClient);
             },function(error){
                 $scope.hasInternetOnClient = false;
-                logMediaserverError(error, "Failed to check internet on client:");
+                if(error.data && error.data.resultCode){
+                    $scope.settings.internetError = formatError(error.data.resultCode);
+                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
+                }else{
+                    logMediaserverError(error, "Failed to check internet on client:");
+                }
             });
-
         }
 
         /* Common helpers: error handling, check current system, error handler */
