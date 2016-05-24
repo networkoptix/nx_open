@@ -57,7 +57,7 @@ namespace
         switch (scope)
         {
         case QnResourceTreeModel::CamerasScope:
-            return Qn::CurrentSystemNode;
+            return Qn::ServersNode;
         case QnResourceTreeModel::UsersScope:
             return Qn::UsersNode;
         default:
@@ -73,12 +73,12 @@ namespace
         {
             result
                 << Qn::LocalNode
+                << Qn::CurrentSystemNode
                 << Qn::UsersNode
+                << Qn::ServersNode
                 << Qn::UserDevicesNode
                 << Qn::UserLayoutsNode
-                << Qn::UserServersNode
                 << Qn::GlobalLayoutsNode
-                << Qn::CurrentSystemNode
                 << Qn::WebPagesNode
                 << Qn::OtherSystemsNode
                 << Qn::RootNode
@@ -300,9 +300,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
             return rootNode;
         return bastardNode;
 
-    case Qn::CurrentSystemNode:
+    case Qn::ServersNode:
         if (m_scope == CamerasScope)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
+        if (m_scope == FullScope && isAdmin)
+            return rootNode;
+        return bastardNode;
+
+    case Qn::CurrentSystemNode:
         if (m_scope == FullScope && isAdmin)
             return rootNode;
         return bastardNode;
@@ -319,7 +324,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
 
     case Qn::UserDevicesNode:
     case Qn::UserLayoutsNode:
-    case Qn::UserServersNode:
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
             return getResourceNode(context()->user());
         return bastardNode;
@@ -334,7 +338,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case Qn::EdgeNode:
         /* Only admins can see edge nodes. */
         if (m_scope != UsersScope && isAdmin)
-            return m_rootNodes[Qn::CurrentSystemNode];
+            return m_rootNodes[Qn::ServersNode];
         return bastardNode;
 
     case Qn::ResourceNode:
@@ -387,9 +391,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (!QnMediaServerResource::isFakeServer(node->resource()))
         {
             if (isAdmin)
-                return m_rootNodes[Qn::CurrentSystemNode];
+                return m_rootNodes[Qn::ServersNode];
 
-            return m_rootNodes[Qn::UserServersNode];
+            return bastardNode;
         }
 
         /* Fake servers from other systems. */
@@ -399,7 +403,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
         QString systemName = server->getSystemName();
         if (systemName == qnCommon->localSystemName())
-            return m_rootNodes[Qn::CurrentSystemNode];
+            return m_rootNodes[Qn::ServersNode];
 
         return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : getSystemNode(systemName);
 
