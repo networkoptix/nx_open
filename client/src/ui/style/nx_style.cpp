@@ -138,6 +138,13 @@ namespace
     {
         return color.alpha() == 255;
     }
+
+    /* Checks whether a widget is in-place line edit in an item view: */
+    bool isItemViewEdit(const QWidget* widget)
+    {
+        return qobject_cast<const QLineEdit*>(widget) && widget->parentWidget() &&
+               qobject_cast<const QAbstractItemView *>(widget->parentWidget()->parentWidget());
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -306,7 +313,8 @@ void QnNxStyle::drawPrimitive(
     case PE_FrameLineEdit:
         {
             if (widget && (qobject_cast<const QAbstractSpinBox *>(widget->parentWidget()) ||
-                           qobject_cast<const QComboBox *>(widget->parentWidget())))
+                           qobject_cast<const QComboBox *>(widget->parentWidget()) ||
+                           isItemViewEdit(widget)))
             {
                 // Do not draw panel for the internal line edit of certain widgets.
                 return;
@@ -2325,7 +2333,7 @@ void QnNxStyle::polish(QWidget *widget)
 
     if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
     {
-        if (!widget->property(Properties::kDontPolishFontProperty).toBool())
+        if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
         {
             QFont font = widget->font();
             font.setPixelSize(dp(14));
