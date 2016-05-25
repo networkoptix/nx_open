@@ -73,7 +73,7 @@ private:
     QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
     QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
-    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnResourcePtr& sharedLayout);
+    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
@@ -82,6 +82,7 @@ private:
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
 
     void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
+    void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
 
     /* Remove virtual 'system' nodes that are not used anymore. */
     void cleanupSystemNodes();
@@ -127,6 +128,8 @@ private slots:
     void at_user_enabledChanged(const QnResourcePtr &resource);
 
     void at_serverAutoDiscoveryEnabledChanged();
+
+    void at_accessibleResourcesChanged(const QnUuid& userId);
 
 private:
     friend class QnResourceTreeModelNode;

@@ -110,7 +110,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
-    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnResourceTreeModel::at_accessibleResourcesChanged);
 
     rebuildTree();
 
@@ -205,8 +206,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSystemNode(const QString &
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnResourcePtr& sharedLayout)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout)
 {
+    NX_ASSERT(sharedLayout->isShared());
+
     ResourceHash& layouts = m_sharedLayoutNodesByParent[parentNode];
     auto pos = layouts.find(sharedLayout);
     if (pos == layouts.end())
@@ -217,6 +220,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnR
         pos = layouts.insert(sharedLayout, node);
         m_nodesByResource[sharedLayout].push_back(*pos);
         m_allNodes.append(*pos);
+
+        for (auto item : sharedLayout->getItems())
+        {
+            auto itemNode = ensureItemNode(*pos, item.uuid);
+            updateNodeResource(itemNode, qnResPool->getResourceByDescriptor(item.resource));
+        }
     }
     return *pos;
 }
@@ -531,13 +540,22 @@ void QnResourceTreeModel::updateNodeResource(const QnResourceTreeModelNodePtr& n
 
 void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& layout)
 {
-    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+    QnUserResourceList usersToUpdate;
 
-    /* Here we should add or update shared layout nodes in all users. */
+    /* Here we should add or update shared layout nodes in all existing in the tree users. */
     for (auto iter = m_resourceNodeByResource.cbegin(); iter != m_resourceNodeByResource.cend(); ++iter)
     {
         QnResourcePtr resource = iter.key();
         if (!resource->flags().testFlag(Qn::user))
+            continue;
+
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        NX_ASSERT(user);
+        if (!user)
+            continue;
+
+        /* User is already removed, we still haven't deleted node from the nodes list. */
+        if (!user->resourcePool())
             continue;
 
         auto parentNode = *iter;
@@ -546,13 +564,54 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
         auto sharedLayoutNodes = m_sharedLayoutNodesByParent[parentNode].values();
 
         /* No shared layouts nodes must exist under current user node. */
-        if (resource == context()->user())
+        if (user == context()->user())
         {
-            nodesToDelete << sharedLayoutNodes;
+            usersToUpdate << user;
             continue;
         }
 
-        auto accessibleResources = qnResourceAccessManager->accessibleResources(resource->getId());
+        /* Add node if required. */
+        if (qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission))
+        {
+            usersToUpdate << user;
+            continue;
+        }
+
+        /* Check if we need to remove node */
+        for (auto childNode : sharedLayoutNodes)
+        {
+            if (childNode->resource() != layout)
+                continue;
+
+            usersToUpdate << user;
+            break;
+        }
+    }
+
+    for (const auto& user : usersToUpdate)
+        updateSharedLayoutNodesForUser(user);
+}
+
+void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr& user)
+{
+    auto iter = m_resourceNodeByResource.find(user);
+    if (iter == m_resourceNodeByResource.end())
+        return;
+
+    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+    auto parentNode = *iter;
+
+    /* Copy of the list before all changes. */
+    auto sharedLayoutNodes = m_sharedLayoutNodesByParent[parentNode].values();
+
+    /* No shared layouts nodes must exist under current user node. */
+    if (user == context()->user())
+    {
+        nodesToDelete << sharedLayoutNodes;
+    }
+    else
+    {
+        auto accessibleResources = qnResourceAccessManager->accessibleResources(user->getId());
 
         /* Add new shared layouts and forcibly update them. */
         for (const QnUuid& id : accessibleResources)
@@ -578,7 +637,6 @@ void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& lay
 
     for (auto node : nodesToDelete)
         removeNode(node);
-
 }
 
 void QnResourceTreeModel::cleanupSystemNodes()
@@ -954,9 +1012,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (user)
     {
-        for (const QnUuid& resourceId : qnResourceAccessManager->accessibleResources(user->getId()))
-            if (auto sharedLayout = qnResPool->getResourceById<QnLayoutResource>(resourceId))
-                updateSharedLayoutNodes(sharedLayout);
+          updateSharedLayoutNodesForUser(user);
     }
 }
 
@@ -1141,9 +1197,8 @@ void QnResourceTreeModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout,
             continue;
 
         auto node = ensureItemNode(parentNode, item.uuid);
-        NX_ASSERT(!node->resource());   /* Make sure item is just created. */
         QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
-        updateNodeResource(node, resource);
+        updateNodeResource(node, resource); /* In case item is just created. */
     }
 
 }
@@ -1264,4 +1319,13 @@ void QnResourceTreeModel::at_user_enabledChanged(const QnResourcePtr &resource)
 void QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged()
 {
     m_rootNodes[Qn::OtherSystemsNode]->update();
+}
+
+void QnResourceTreeModel::at_accessibleResourcesChanged(const QnUuid& userId)
+{
+    auto user = qnResPool->getResourceById<QnUserResource>(userId);
+    if (context()->user() == user)
+        rebuildTree();
+    else
+        updateSharedLayoutNodesForUser(user);
 }
