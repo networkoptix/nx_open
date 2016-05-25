@@ -347,7 +347,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
     if (businessAction->actionType() == QnBusiness::PlaySoundAction) {
-        QString soundUrl = businessAction->getParams().soundUrl;
+        QString soundUrl = businessAction->getParams().url;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
     }

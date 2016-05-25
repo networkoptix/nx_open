@@ -10,7 +10,7 @@ namespace
 
 QnBusinessActionParameters::QnBusinessActionParameters()
     : actionResourceId()
-    , soundUrl()
+    , url()
     , emailAddress()
     , userGroup(QnBusiness::EveryOne)
     , fps(10)

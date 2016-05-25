@@ -85,7 +85,8 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initInternal()
         enableOnvifSecondStream();
         return CameraDiagnostics::UnknownErrorResult();
     }
-        
+    disableB2FramesForActiDW();
+
     const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
 
     return result;
@@ -103,6 +104,19 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
 
     setStatus(Qn::Offline);
     // camera rebooting ....
+}
+
+bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool isRebrendedActiCamera = resourceData.value<bool>(lit("isRebrendedActiCamera"), false);
+    if (!isRebrendedActiCamera)
+        return true;
+
+    CLSimpleHTTPClient http(getHostAddress(), HTTP_PORT, getNetworkTimeout(), QAuthenticator());
+    auto result = http.doGET(QString("/cgi-bin/system?User=%1&pwd=%2&RTP_B2=1").arg(getAuth().user()).arg(getAuth().password()));
+    qDebug() << "disable RTP B2 frames for camera" << getHostAddress() << "result=" << result;
+    return result == CL_HTTP_SUCCESS;
 }
 
 QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal() 

@@ -71,7 +71,7 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionParamsField) {
-        m_filename = model()->actionParams().soundUrl;
+        m_filename = model()->actionParams().url;
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
         ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
     }
@@ -86,7 +86,7 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
         return;
 
     QnBusinessActionParameters params;
-    params.soundUrl = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
+    params.url = soundModel->filenameByRow(ui->pathComboBox->currentIndex());
     model()->setActionParams(params);
 }
 
