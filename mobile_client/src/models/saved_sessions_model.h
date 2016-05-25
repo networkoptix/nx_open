@@ -27,11 +27,6 @@ public slots:
             const QString &password,
             const QString &systemName,
             bool moveTop = false);
-    QString updateSession(
-            const QString &sessionId,
-            const QUrl &url,
-            const QString &systemName,
-            bool moveTop = false);
     void deleteSession(const QString &id);
 
 private:

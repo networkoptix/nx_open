@@ -61,6 +61,9 @@ namespace nx
 */
 bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime);
 
+void resetTransactionTransportConnections();
+
+
 struct PasswordData
 {
     PasswordData() {}
