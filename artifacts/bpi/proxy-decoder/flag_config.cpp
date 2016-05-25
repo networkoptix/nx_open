@@ -427,8 +427,10 @@ bool FlagConfig::Impl::parseIniFile()
         {
             for (const auto& param: m_params)
             {
-                if (strlen(param->descr) > 0)
-                    file << "# " << param->descr << "\n";
+                std::string descr = param->descr;
+                if (descr.size() > 0)
+                    descr += " ";
+                file << "# " << descr << "Default: " << param->defaultValueStr() << "\n";
                 file << param->name << "=" << param->defaultValueStr() << "\n";
                 file << "\n";
             }

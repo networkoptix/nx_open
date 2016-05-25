@@ -183,7 +183,6 @@ typedef struct
 	#define VDPAU_DBG(format, ...)
 	#define VDPAU_DBG_ONCE(format, ...)
 	#define LL
-    #define LOG(format, ...)
 #endif // DEBUG
 
 #define EXPORT __attribute__ ((visibility ("default")))
