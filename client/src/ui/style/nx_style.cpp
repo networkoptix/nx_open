@@ -2167,7 +2167,7 @@ QSize QnNxStyle::sizeFromContents(
             }
         }
 
-        /* Ðrocessing for normal spin boxes: */
+        /* Processing for normal spin boxes: */
         return size + QSize(Metrics::kStandardPadding * 2 + Metrics::kSpinButtonWidth, 0);
     }
 
