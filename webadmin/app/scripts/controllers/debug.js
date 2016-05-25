@@ -129,7 +129,8 @@ angular.module('webadminApp')
 
         function randomEvent(){
             $scope.session.event.event_type = randomElement(Config.debugEvents.events).event;
-            $scope.session.event.eventResourceId = randomElement($scope.resources).id;
+            $scope.session.eventResource = randomElement($scope.resources);
+            $scope.session.event.eventResourceId = $scope.session.eventResource.id;
             $scope.session.event.state = randomElement(Config.debugEvents.states);
             $scope.session.event.reasonCode = randomElement(Config.debugEvents.reasons);
             $scope.session.event.inputPortId = rand(8);
