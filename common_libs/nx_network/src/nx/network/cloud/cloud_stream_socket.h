@@ -95,6 +95,9 @@ private:
         //const SocketAddress& originalAddress,
         std::vector<AddressEntry> dnsEntries,
         int port);
+    SystemError::ErrorCode applyRealNonBlockingMode(
+        AbstractStreamSocket* streamSocket);
+    void directConnectDone(SystemError::ErrorCode errorCode);
     void onCloudConnectDone(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
