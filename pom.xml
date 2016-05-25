@@ -707,6 +707,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>media_db_util</module>
+                <module>testcamera</module>                
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
                 <module>debsetup/client-deb</module>
