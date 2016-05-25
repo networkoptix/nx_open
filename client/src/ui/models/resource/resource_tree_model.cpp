@@ -335,14 +335,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
 
     case Qn::UserDevicesNode:
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
-            return getResourceNode(context()->user());
+            return rootNode;
         return bastardNode;
 
     case Qn::WebPagesNode:
-        if (m_scope == FullScope && isAdmin)
+        if (m_scope == FullScope && isLoggedIn)
             return rootNode;
-        if (m_scope == FullScope && isLoggedIn && !isAdmin)
-            return getResourceNode(context()->user());
         return bastardNode;
 
     case Qn::EdgeNode:
