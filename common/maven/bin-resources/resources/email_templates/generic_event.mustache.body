@@ -1,8 +1,8 @@
-<h1>{{event}}: {{source}}</h1>
+<h1>{{event}} from {{source}}</h1>
 
 <div class="description">
     {{#caption}}
-        <h2>Event: {{caption}}</h2>
+        <h2>{{caption}}</h2>
     {{/caption}}
     {{#description}}
         <p> {{description}}</p>
@@ -10,7 +10,7 @@
 </div>
 
 <div class="date">
-    <h3>Date(s) when the event is occured:</h3>
+    <p>Date(s) when the event is occured:</p>
     {{#aggregated}}
     <table class="details">
         <tr>

@@ -5,10 +5,19 @@ h1{
     line-height:30px;
     margin:0px;
 }
+h2{
+    font-size:16px;
+    font-weight:bold;
+    line-height:30px;
+    margin:0px;
+}
 p{
     font-size:15px;
     line-height:20px;
-    margin-top:5px;
+    margin:0px;
+}
+td{
+    text-align: left;
 }
 
 .logo{
@@ -116,6 +125,8 @@ p{
 .description{
     width:100%;
     background-color: #F8F9FA;
+    padding: 20px 10px;
+    margin-top:15px;
 }
 
 .error{

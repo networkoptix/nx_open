@@ -1,6 +1,7 @@
 
 import cssutils
 import logging
+import os
 from inlinestyler.utils import inline_css
 
 import inlinestyler
@@ -11,9 +12,9 @@ cssutils.log.setLevel(logging.ERROR)
 containter_text = open('container.mustache.template').read()
 containter_text = containter_text.replace('{{>style_css}}', open('style.css').read())
 
-for f in ('camera_input', 'camera_ip_conflict', 'camera_motion', 'mediaserver_conflict', 'generic_event',
-        'mediaserver_failure', 'mediaserver_started', 'storage_failure', 'license_issue',
-        'camera_disconnect', 'network_issue'):
-    newf = open(f + '.mustache', 'w')
-    text = containter_text.replace('{{>body}}', open(f + '.mustache.body').read())
-    print >> newf, inline_css(text).encode('utf-8','replace')
+for file in os.listdir("."):
+    if file.endswith(".mustache.body"):
+        f = file.replace('.mustache.body', '')
+        newf = open(f + '.mustache', 'w')
+        text = containter_text.replace('{{>body}}', open(f + '.mustache.body').read())
+        print >> newf, inline_css(text).encode('utf-8','replace')

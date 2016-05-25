@@ -37,9 +37,9 @@
                 </table>
             </div>
             {{/systemName}}
-            {{^system}}
+            {{^systemName}}
             <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
-            {{/system}}
+            {{/systemName}}
         </td>
         <td class="side-spacer"></td>
     </tr>

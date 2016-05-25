@@ -1,4 +1,4 @@
-<h1>{{event}}: {{source}}</h1>
+<h1>{{event}} on {{source}}</h1>
 <p>Not enough licenses</p>
 <p>Camera recording was forcibly stopped on cameras:</p>
 <table class="description">
