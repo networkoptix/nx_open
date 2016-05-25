@@ -76,7 +76,7 @@ void QnNxStylePrivate::drawSwitch(
     Q_UNUSED(widget)
 
     const bool checked = option->state.testFlag(QStyle::State_On);
-    const bool standalone = option->state.testFlag(QStyle::State_Item);
+    const bool standalone = !qstyleoption_cast<const QStyleOptionButton*>(option);
 
     QColor fillColorOn;     // On: background
     QColor fillColorOff;    // Off: background
@@ -168,7 +168,7 @@ void QnNxStylePrivate::drawSwitch(
         int x = indicatorsRect.left() + indicatorsRect.height() / 2 + dp(1);
         int h = indicatorsRect.height() - dp(3);
         int y = rect.center().y() - h / 2;
-        painter->drawLine(x, y, x, y + h);
+        painter->drawLine(x, y, x, y + h + 1);
     }
 }
 

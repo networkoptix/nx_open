@@ -918,7 +918,6 @@ void QnNxStyle::drawComplexControl(
             {
                 QStyleOption opt = *option;
                 opt.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget);
-                opt.state |= State_Item;
                 drawSwitch(painter, &opt, widget);
             }
 
