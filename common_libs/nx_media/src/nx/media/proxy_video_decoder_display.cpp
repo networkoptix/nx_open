@@ -71,6 +71,10 @@ public:
             {
                 owner->displayDecodedFrame(m_frameHandle);
             }
+            else
+            {
+                OUTPUT << "VideoBuffer::handle(): already destroyed";
+            }
         }
         return 0;
     }
@@ -118,19 +122,27 @@ void Impl::displayDecodedFrame(void* frameHandle)
 {
     if (conf.displayAsync)
     {
+        auto selfPtr = std::weak_ptr<Impl>(std::dynamic_pointer_cast<Impl>(sharedPtrToThis()));
         allocator().execAtGlThreadAsync(
-            [this, frameHandle]()
+            [selfPtr, frameHandle]()
             {
-                if (conf.displayAsyncGlFinish)
+                if (auto self = selfPtr.lock())
                 {
-                    GL_GET_FUNCS(QOpenGLContext::currentContext());
-                    GL(funcs->glFlush());
-                    GL(funcs->glFinish());
-                }
+                    if (conf.displayAsyncGlFinish)
+                    {
+                        GL_GET_FUNCS(QOpenGLContext::currentContext());
+                        GL(funcs->glFlush());
+                        GL(funcs->glFinish());
+                    }
 
-                if (conf.displayAsyncSleepMs > 0)
-                    usleep(conf.displayAsyncSleepMs * 1000);
-                proxyDecoder().displayDecoded(frameHandle);
+                    if (conf.displayAsyncSleepMs > 0)
+                        usleep(conf.displayAsyncSleepMs * 1000);
+                    self->proxyDecoder().displayDecoded(frameHandle);
+                }
+                else
+                {
+                    OUTPUT << "displayDecodedFrame() execAtGlThreadAsync: already destroyed";
+                }
             });
     }
     else
