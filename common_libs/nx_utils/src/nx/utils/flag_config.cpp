@@ -1,5 +1,7 @@
 #include "flag_config.h"
 
+#if !defined(Q_OS_ANDROID)
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -553,3 +555,70 @@ void FlagConfig::skipNextReload()
 
 } // namespace utils
 } // namespace nx
+
+//-------------------------------------------------------------------------------------------------
+#else // Q_OS_ANDROID
+
+// Stub implementation which never changes hard-coded defaults.
+// NOTE: Android NDK does not support std::to_string
+
+namespace nx {
+namespace utils {
+
+struct FlagConfig::Impl
+{
+    const char* moduleName;
+};
+
+FlagConfig::FlagConfig(const char* moduleName)
+:
+    d(new Impl())
+{
+    d->moduleName = moduleName;
+}
+
+FlagConfig::~FlagConfig()
+{
+    delete d;
+}
+
+const char* FlagConfig::tempPath() const
+{
+    return "/tmp";
+}
+
+const char* FlagConfig::moduleName() const
+{
+    return d->moduleName;
+}
+
+bool FlagConfig::regFlagParam(
+    bool* pValue, bool defaultValue, const char* paramName, const char* descr)
+{
+    return defaultValue;
+}
+
+int FlagConfig::regIntParam(
+    int* pValue, int defaultValue, const char* paramName, const char* descr)
+{
+    return defaultValue;
+}
+
+const char* FlagConfig::regStringParam(
+    const char** pValue, const char* defaultValue, const char* paramName, const char* descr)
+{
+    return defaultValue;
+}
+
+void FlagConfig::reload()
+{
+}
+
+void FlagConfig::skipNextReload()
+{
+}
+
+} // namespace utils
+} // namespace nx
+
+#endif // Q_OS_ANDROID
