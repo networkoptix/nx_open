@@ -96,7 +96,7 @@ void TemporaryAccountPasswordManager::createTemporaryPassword(
     std::function<void(api::ResultCode)> completionHandler)
 {
     TemporaryAccountPasswordEx tmpPasswordDataInternal(std::move(tmpPasswordData));
-    tmpPasswordDataInternal.id = QnUuid::createUuid();
+    tmpPasswordDataInternal.id = QnUuid::createUuid().toSimpleString().toStdString();
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<TemporaryAccountPasswordEx>(
@@ -115,12 +115,12 @@ bool TemporaryAccountPasswordManager::checkTemporaryPasswordForExpiration(
         (passwordIter->second.expirationTimestampUtc > 0 &&
             passwordIter->second.expirationTimestampUtc <= ::time(NULL)))
     {
-        QnUuid tmpPasswordID = passwordIter->second.id;
+        std::string tmpPasswordID = passwordIter->second.id;
         m_accountPassword.erase(passwordIter);
 
         //removing password from DB
         using namespace std::placeholders;
-        m_dbManager->executeUpdate<QnUuid>(
+        m_dbManager->executeUpdate<std::string>(
             std::bind(&TemporaryAccountPasswordManager::deleteTempPassword, this, _1, _2),
             std::move(tmpPasswordID),
             std::bind(&TemporaryAccountPasswordManager::tempPasswordDeleted, this,
@@ -236,7 +236,7 @@ void TemporaryAccountPasswordManager::tempPasswordAddedToDb(
 
 nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
     QSqlDatabase* const connection,
-    QnUuid tempPasswordID)
+    std::string tempPasswordID)
 {
     QSqlQuery deleteTempPassword(*connection);
     deleteTempPassword.prepare("DELETE FROM account_password WHERE id=:id");
@@ -254,7 +254,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
 void TemporaryAccountPasswordManager::tempPasswordDeleted(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
-    QnUuid /*tempPasswordID*/,
+    std::string /*tempPasswordID*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (completionHandler)

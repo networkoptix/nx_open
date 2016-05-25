@@ -477,13 +477,6 @@
                 <module>client</module>
                 <module>client.bin</module>
                 <module>common_libs/nx_audio</module>
-                <module>nx_cloud/cloud_db</module>
-                <module>nx_cloud/connection_mediator</module>
-                <module>nx_cloud/cloud_connect_test_util</module>
-                <module>nx_cloud/libcloud_db</module>
-                <module>nx_cloud/libconnection_mediator</module>
-                <module>nx_cloud/libvms_gateway</module>
-                <module>nx_cloud/vms_gateway</module>
             </modules>
         </profile>
         <profile>
@@ -556,6 +549,14 @@
                 </property>
             </activation>
             <modules>
+                <module>nx_cloud/cloud_db</module>
+                <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
@@ -700,6 +701,14 @@
                 </property>
             </activation>
             <modules>
+                <module>nx_cloud/cloud_db</module>
+                <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
                 <module>debsetup/connection_mediator-deb</module>

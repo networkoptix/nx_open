@@ -1696,6 +1696,11 @@ QHostAddress MediaServerProcess::getPublicAddress()
     return m_ipDiscovery->publicIP();
 }
 
+void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGuidList)
+{
+    m_hardwareGuidList = hardwareGuidList;
+}
+
 void MediaServerProcess::run()
 {
     QnCallCountStart(std::chrono::milliseconds(5000));
@@ -1919,7 +1924,7 @@ void MediaServerProcess::run()
     }
 #endif
 
-    runtimeData.hardwareIds = LLUtil::getAllHardwareIds().toVector();
+    runtimeData.hardwareIds = m_hardwareGuidList;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
@@ -2714,6 +2719,7 @@ protected:
 
         LLUtil::initHardwareId(MSSettings::roSettings());
         updateGuidIfNeeded();
+        m_main->setHardwareGuidList(LLUtil::getAllHardwareIds().toVector());
 
         QnUuid guid = serverGuid();
         if (guid.isNull())

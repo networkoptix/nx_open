@@ -25,6 +25,8 @@ public:
     std::list<SocketAddress> endpointsToListen;
     QString dataDir;
     QString changeUser;
+    /** if empty, default address is used */
+    QString mediatorEndpoint;
 };
 
 class Logging

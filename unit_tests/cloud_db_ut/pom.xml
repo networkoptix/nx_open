@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libcoud_db</artifactId>
+            <artifactId>libcloud_db</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>

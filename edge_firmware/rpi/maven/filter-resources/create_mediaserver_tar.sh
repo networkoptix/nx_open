@@ -124,7 +124,7 @@ done
 popd
 
 #copying qt libs
-QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 for var in $QTLIBS
 do
     qtlib=libQt5$var.so

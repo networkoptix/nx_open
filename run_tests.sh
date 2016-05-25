@@ -14,7 +14,14 @@ if [ $run_tests == "true" ]; then
     mkdir -p ../devtools 
     cd ../devtools 
     hg pul || hg clone ssh://hg@hdw.mx/devtools .
-    hg up stable_tests
+    hg up stable_tests --clean
+    rm ../devtools/testing/testconf_local.py
+    echo "BOX_NAMES = {" >> ../devtools/testing/testconf_local.py
+    echo "    \"Box1\": \"box1j\"," >> ../devtools/testing/testconf_local.py
+    echo "    \"Box2\": \"box2j\"," >> ../devtools/testing/testconf_local.py
+    echo "    \"Nat\": \"natj\"," >> ../devtools/testing/testconf_local.py
+    echo "    \"Behind\": \"behindj\"," >> ../devtools/testing/testconf_local.py
+    echo "}" >> ../devtools/testing/testconf_local.py
     ERRORLEVEL=$?
     if [[ $ERRORLEVEL -ne 0 ]]; then echo $ERRORLEVEL && exit $ERRORLEVEL; fi
     cd testing

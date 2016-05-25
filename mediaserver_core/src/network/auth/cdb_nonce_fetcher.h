@@ -44,7 +44,7 @@ public:
     */
     CdbNonceFetcher(
         CloudConnectionManager* const cloudConnectionManager,
-        std::unique_ptr<AbstractNonceProvider> defaultGenerator);
+        std::shared_ptr<AbstractNonceProvider> defaultGenerator);
     ~CdbNonceFetcher();
 
     virtual QByteArray generateNonce() override;
@@ -70,7 +70,7 @@ private:
 
     mutable QnMutex m_mutex;
     CloudConnectionManager* const m_cloudConnectionManager;
-    std::unique_ptr<AbstractNonceProvider> m_defaultGenerator;
+    std::shared_ptr<AbstractNonceProvider> m_defaultGenerator;
     bool m_boundToCloud;
     //map<cdb_nonce, valid_time>
     mutable std::deque<NonceCtx> m_cdbNonceQueue;

@@ -308,6 +308,16 @@ bool QnAviArchiveDelegate::reopen()
     return true;
 }
 
+class InitFfmpegLib
+{
+public:
+
+    InitFfmpegLib()
+    {
+        av_register_all();
+    }
+};
+
 bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
@@ -315,6 +325,8 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
     m_resource = resource;
     if (m_formatContext == 0)
     {
+        static InitFfmpegLib init;
+
         m_eofReached = false;
         QString url = m_resource->getUrl();
         if (m_storage == 0) {
@@ -337,7 +349,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
             m_resource->setStatus(Qn::Offline); // mark local resource as unaccessible
             return false;
         }
-        
+
         getVideoLayout();
     }
     m_resource->setStatus(Qn::Online);
@@ -359,7 +371,7 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
 
 void QnAviArchiveDelegate::close()
 {
-    if (m_formatContext) 
+    if (m_formatContext)
         avformat_close_input(&m_formatContext);
 
     if (m_ioContext)
@@ -367,7 +379,7 @@ void QnAviArchiveDelegate::close()
         QnFfmpegHelper::closeFfmpegIOContext(m_ioContext);
         m_ioContext = 0;
     }
-    
+
     m_contexts.clear();
     m_formatContext = 0;
     m_initialized = false;
@@ -501,7 +513,7 @@ bool QnAviArchiveDelegate::findStreams()
             m_streamsFound = avformat_find_stream_info(m_formatContext, nullptr) >= 0;
         }
 
-        if (m_streamsFound) 
+        if (m_streamsFound)
         {
             m_duration = m_formatContext->duration;
             initLayoutStreams();
@@ -620,7 +632,7 @@ bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout
         }
         if (i == 0) {
             layout->setSize(QSize(params[0].toInt(), params[1].toInt()));
-        } 
+        }
         else {
             layout->setChannel(params[0].toInt(), params[1].toInt(), i-1);
         }
@@ -694,9 +706,9 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         case SoftwareTag:   return "encoded_by"; // "ITCH";
         case SignatureTag:  return "copyright"; // "ICOP";
         case DewarpingTag:  return "title";
-        case CustomTag:     return "IENG"; //IENG 
+        case CustomTag:     return "IENG"; //IENG
         }
-    } 
+    }
     else {
         switch(tag)
         {

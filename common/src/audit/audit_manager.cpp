@@ -50,9 +50,7 @@ QnAuditManager* QnAuditManager::instance()
 QnAuditManager::QnAuditManager()
 {
     m_sessionCleanupTimer.restart();
-    m_enabled = qnGlobalSettings->isInitialized() ?
-        qnGlobalSettings->isAuditTrailEnabled()
-        : false;
+    m_enabled = qnGlobalSettings->isAuditTrailEnabled();
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::auditTrailEnableChanged, this,
         [this]() {
             setEnabled(QnGlobalSettings::instance()->isAuditTrailEnabled());

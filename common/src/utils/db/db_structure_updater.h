@@ -31,12 +31,23 @@ class DBStructureUpdater
 public:
     DBStructureUpdater(AsyncSqlQueryExecutor* const);
 
-    void addUpdateScript(const QByteArray& updateScript);
+    /** Used to aggregate update scripts.
+        if not set, initial version is considered to be zero.
+        \warning DB of version less than initial will fail to be upgraded!
+    */
+    void setInitialVersion(unsigned int version);
+    /** First script corresponds to version set with \a DBStructureUpdater::setInitialVersion. */
+    void addUpdateScript(QByteArray updateScript);
+    void addFullSchemaScript(
+        unsigned int version,
+        QByteArray createSchemaScript);
 
     bool updateStructSync();
 
 private:
     AsyncSqlQueryExecutor* const m_dbManager;
+    unsigned int m_initialVersion;
+    std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<QByteArray> m_updateScripts;
     nx::utils::promise<DBResult> m_dbUpdatePromise;
 

@@ -46,6 +46,15 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
+    // change system name first to detatch from other servers
+    nx::SystemName systemName;
+    systemName.resetToDefault();
+    if (!changeSystemName(systemName, 0, 0, true))
+    {
+        result.setError(QnRestResult::CantProcessRequest, lit("Internal server error.  Can't change system name."));
+        return nx_http::StatusCode::internalServerError;
+    }
+
     QString errString;
     if (!changeAdminPassword(passwordData, &errString)) {
         result.setError(QnJsonRestResult::CantProcessRequest, errString);
@@ -62,14 +71,6 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
         return nx_http::StatusCode::ok;
     }
     qnCommon->updateModuleInformation();
-
-    nx::SystemName systemName;
-    systemName.resetToDefault();
-    if (!changeSystemName(systemName, 0, 0))
-    {
-        result.setError(QnRestResult::CantProcessRequest, lit("Internal server error.  Can't change system name."));
-        return nx_http::StatusCode::internalServerError;
-    }
 
     return nx_http::StatusCode::ok;
 }

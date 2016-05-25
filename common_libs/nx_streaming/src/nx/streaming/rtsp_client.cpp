@@ -99,16 +99,19 @@ QnRtspIoDevice::~QnRtspIoDevice()
 
 qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
 {
-
-    int readed;
+    int bytesRead;
     if (m_tcpMode)
-        readed = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
+    {
+        bytesRead = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
+    }
     else
-        readed = m_mediaSocket->recv(data, maxSize);
+    {
+        bytesRead = m_mediaSocket->recv(data, maxSize);
+    }
     m_owner->sendKeepAliveIfNeeded();
     if (!m_tcpMode)
         processRtcpData();
-    return readed;
+    return bytesRead;
 }
 
 AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
@@ -135,8 +138,8 @@ void QnRtspIoDevice::processRtcpData()
     while( m_rtcpSocket->hasData() )
     {
         SocketAddress senderEndpoint;
-        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
-        if (readed > 0)
+        int bytesRead = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
+        if (bytesRead > 0)
         {
             if (!m_rtcpSocket->isConnected())
             {
@@ -146,7 +149,7 @@ void QnRtspIoDevice::processRtcpData()
                 }
             }
             bool gotValue = false;
-            QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, readed, &gotValue);
+            QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, bytesRead, &gotValue);
             if (gotValue)
                 m_statistic = stats;
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
@@ -1406,10 +1409,10 @@ void QnRtspClient::sendBynaryResponse(quint8* buffer, int size)
 bool QnRtspClient::processTextResponseInsideBinData()
 {
     // have text response or part of text response.
-    int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
-    if (readed <= 0)
+    int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+    if (bytesRead <= 0)
         return false;
-    m_responseBufferLen += readed;
+    m_responseBufferLen += bytesRead;
 
     quint8* curPtr = m_responseBuffer;
     quint8* bEnd = m_responseBuffer+m_responseBufferLen;
@@ -1433,10 +1436,10 @@ int QnRtspClient::readBinaryResponce(quint8* data, int maxDataSize)
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
-            if (readed <= 0)
-                return readed;
-            m_responseBufferLen += readed;
+            int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
+            if (bytesRead <= 0)
+                return bytesRead;
+            m_responseBufferLen += bytesRead;
         }
         if (m_responseBuffer[0] == '$')
             break;
@@ -1456,11 +1459,11 @@ int QnRtspClient::readBinaryResponce(quint8* data, int maxDataSize)
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = readSocketWithBuffering(data, dataRestLen, true);
-        if (readed <= 0)
-            return readed;
-        dataRestLen -= readed;
-        data += readed;
+        int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        if (bytesRead <= 0)
+            return bytesRead;
+        dataRestLen -= bytesRead;
+        data += bytesRead;
     }
     return dataLen;
 }
@@ -1482,10 +1485,10 @@ int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
-            if (readed <= 0)
-                return readed;
-            m_responseBufferLen += readed;
+            int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
+            if (bytesRead <= 0)
+                return bytesRead;
+            m_responseBufferLen += bytesRead;
         }
         if (m_responseBuffer[0] == '$')
             break;
@@ -1507,11 +1510,11 @@ int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int
 
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = readSocketWithBuffering(data, dataRestLen, true);
-        if (readed <= 0)
-            return readed;
-        dataRestLen -= readed;
-        data += readed;
+        int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        if (bytesRead <= 0)
+            return bytesRead;
+        dataRestLen -= bytesRead;
+        data += bytesRead;
     }
 
     demuxedData[channelNumber]->finishWriting(dataLen);
@@ -1526,10 +1529,10 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
         if (needMoreData) {
-            int readed = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
-            if (readed <= 0)
+            int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+            if (bytesRead <= 0)
             {
-                if( readed == 0 )
+                if( bytesRead == 0 )
                 {
                     NX_LOG( lit("RTSP connection to %1 has been unexpectedly closed").
                         arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
@@ -1541,14 +1544,14 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
                 }
                 return false;	//error occured or connection closed
             }
-            m_responseBufferLen += readed;
+            m_responseBufferLen += bytesRead;
         }
         if (m_responseBuffer[0] == '$') {
             // binary data
             quint8 tmpData[1024*64];
-            int readed = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
+            int bytesRead = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
             int oldIgnoreDataSize = ignoreDataSize;
-            ignoreDataSize += readed;
+            ignoreDataSize += bytesRead;
             if (oldIgnoreDataSize / 64000 != ignoreDataSize/64000)
                 QnSleep::msleep(1);
             needMoreData = m_responseBufferLen == 0;

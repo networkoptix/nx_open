@@ -21,7 +21,7 @@
         <product.title>HD Cloud VMS Gateway Unit Tests</product.title>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lvms_gateway</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lvms_gateway -lconnection_mediator -lcloud_db_client</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -36,6 +36,22 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libconnection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libconnection_mediator/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloud_db_client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

@@ -63,7 +63,8 @@ public:
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
-    QByteArray generateNonce() const;
+    enum class NonceProvider { automatic, local };
+    QByteArray generateNonce(NonceProvider provider = NonceProvider::local) const;
 
     Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
@@ -74,8 +75,7 @@ public:
         const QByteArray& authRecord,
         const QByteArray& method,
         nx_http::Response& response,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr) const;
+        QnUuid* authUserId) const;
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -137,8 +137,7 @@ private:
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         bool isProxy,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr);
+        QnUuid* authUserId);
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
         const nx_http::header::Authorization& authorization,
@@ -152,6 +151,7 @@ private:
 #endif
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
+    std::shared_ptr<AbstractNonceProvider> m_timeBasedNonceProvider;
     std::unique_ptr<AbstractNonceProvider> m_nonceProvider;
     std::unique_ptr<AbstractUserDataProvider> m_userDataProvider;
 

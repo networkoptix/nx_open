@@ -158,8 +158,12 @@ QString QnAppInfo::updateGeneratorUrl() {
     return QStringLiteral("${update.generator.url}");
 }
 
-QString QnAppInfo::cloudPortalUrl() {
+QString QnAppInfo::defaultCloudPortalUrl() {
     return QStringLiteral("${cloud.portalUrl}");
+}
+
+QString QnAppInfo::defaultCloudModulesXmlUrl() {
+    return QStringLiteral("${cloud.modulesXmlUrl}");
 }
 
 QString QnAppInfo::cloudName() {
