@@ -9,7 +9,28 @@ angular.module('webadminApp')
             }
         });
 
+        $scope.Config = Config;
         $scope.session = $sessionStorage;
+        $scope.resources = [];
+
+        mediaserver.getMediaServers().then(function(result){
+            $scope.resources =  $scope.resources.concat(result.data);
+        });
+        mediaserver.getCameras().then(function(result){
+            $scope.resources =  $scope.resources.concat(result.data);
+        });
+        $scope.filterResources = function(filter){
+            console.log(filter,!filter || filter === '' || filter === ' ');
+            var filtered = _.filter($scope.resources,function(resource){
+                return !filter || filter === '' || resource.name.toLowerCase().indexOf(filter.trim().toLowerCase())>=0;
+            });
+            console.log($scope.resources,filtered);
+            return filtered;
+
+        };
+        $scope.getId = function(resource){
+            return resource.id;
+        }
 
         if(!$scope.session.method){
             $scope.session.method = {
@@ -72,6 +93,32 @@ angular.module('webadminApp')
                 $scope.result.status = error.status +  ':  ' + error.statusText;
                 $scope.result.result =   'Error: ' + JSON.stringify(error.data, null,  '\t ');
             });
+        };
+
+        $scope.session.event = {};
+        $scope.generateEvent = function(){
+            $scope.session.event.eventResourceId = $scope.session.eventResource.id;
+            mediaserver.createEvent($scope.session.event).then(function(success){
+
+                $scope.eventsLog = $scope.eventsLog || [];
+                $scope.eventsLog.push({
+                    event: $scope.session.event.event_type,
+                    result: success.data
+                });
+            },function(error){
+                $scope.eventsLog = $scope.eventsLog || [];
+                $scope.eventsLog.push({
+                    event: $scope.session.event.event_type,
+                    result: error
+                });
+            });
+        };
+        $scope.generatingEvents = false;
+        $scope.startGeneratingEvents = function(){
+            $scope.generatingEvents = true;
+        };
+        $scope.stopGeneratingEvents = function(){
+            $scope.generatingEvents = false;
         };
 
 
