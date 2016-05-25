@@ -46,7 +46,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -270,9 +270,10 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
             }
         };
 
-        return nx_http::downloadFileAsync(
+        nx_http::downloadFileAsync(
             url,
             callback );
+        return true;
     }
     else
     {
@@ -288,11 +289,12 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
             }
         };
 
-        return uploadDataAsync(url,
+        nx_http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             kExecHttpActionContentType,
             nx_http::HttpHeaders(),
             callback);
+        return true;
     }
 }
 
@@ -742,7 +744,7 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources()))
         unfiltered << user->getEmail();
 
     auto recipientsFilter = [](const QString& email)

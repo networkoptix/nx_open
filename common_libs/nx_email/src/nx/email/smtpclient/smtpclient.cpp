@@ -104,8 +104,9 @@ void SmtpClient::setConnectionType(ConnectionType ct)
     this->connectionType = ct;
 
     m_lineSpliter.reset();
-    m_socket.reset(SocketFactory::createStreamSocket(
-        connectionType == SslConnection || connectionType == TlsConnection));
+    m_socket = SocketFactory::createStreamSocket(
+        connectionType == SslConnection ||
+        connectionType == TlsConnection);
 }
 
 const QString& SmtpClient::getHost() const

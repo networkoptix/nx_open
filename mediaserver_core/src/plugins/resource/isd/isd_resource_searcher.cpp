@@ -280,7 +280,7 @@ QString extractWord(int index, const QByteArray& rawData)
     for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-    
+
         if (net_res->getMAC().toString() == smac)
         {
             return local_result; // already found;
@@ -324,7 +324,7 @@ bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName) const
 
 void QnPlISDResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const SocketAddress& /*deviceEndpoint*/,
+    const SocketAddress& deviceEndpoint,
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
     QnResourceList& result )
@@ -356,7 +356,7 @@ void QnPlISDResourceSearcher::processPacket(
         for (const auto& creds: possibleCreds)
         {
             QAuthenticator auth = creds.toAuthenticator();
-            QUrl url(lit("//") + host.toString());
+            QUrl url(lit("//") + deviceEndpoint.address.toString());
             if (testCredentials(url, auth))
             {
                 cameraAuth = auth;
