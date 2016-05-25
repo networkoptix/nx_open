@@ -20,7 +20,8 @@ namespace style
     const int Metrics::kViewRowHeight = dp(24);
     const int Metrics::kSortIndicatorSize = dp(14);
     const int Metrics::kRounding = dp(1);
-    const QSize Metrics::kSwitchSize(dp(30), dp(15));
+    const QSize Metrics::kButtonSwitchSize(dp(33), dp(17));
+    const QSize Metrics::kStandaloneSwitchSize(dp(30), dp(15));
     const int Metrics::kSwitchMargin = dp(4);
     const QSize Metrics::kSeparatorSize(dp(10), dp(8));
     const qreal Metrics::kCheckboxCornerRadius = dp(0.2); // for lightly antialiased corners

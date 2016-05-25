@@ -16,6 +16,8 @@ void QnSwitchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
         initStyleOption(&opt, index);
 
         nxStyle->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
+
+        opt.state |= QStyle::State_Item;
         nxStyle->drawSwitch(painter, &opt, opt.widget);
     }
     else
@@ -26,10 +28,8 @@ void QnSwitchItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
 QSize QnSwitchItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    Q_UNUSED(option)
-    Q_UNUSED(index)
-
-    return style::Metrics::kSwitchSize;
+    QN_UNUSED(option, index);
+    return style::Metrics::kStandaloneSwitchSize + QSize(style::Metrics::kSwitchMargin * 2, 0);
 }
 
 void QnSwitchItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const

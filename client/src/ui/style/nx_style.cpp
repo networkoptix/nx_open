@@ -176,7 +176,6 @@ const QnGenericPalette &QnNxStyle::genericPalette() const
     return d->palette;
 }
 
-
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
     Q_D(const QnNxStyle);
@@ -920,8 +919,7 @@ void QnNxStyle::drawComplexControl(
                 QStyleOption opt = *option;
                 opt.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget);
                 opt.state |= State_Item;
-
-                d->drawSwitch(painter, &opt, widget);
+                drawSwitch(painter, &opt, widget);
             }
 
             painter->restore();
@@ -1544,7 +1542,7 @@ void QnNxStyle::drawControl(
             if (isCheckableButton(option))
             {
                 /* Calculate minimal label width: */
-                const QStyleOptionButton* buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
+                auto buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
                 int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
                 if (!buttonOption->icon.isNull())
                     minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
@@ -1557,8 +1555,9 @@ void QnNxStyle::drawControl(
                 base_type::drawControl(element, &newOpt, painter, widget);
 
                 /* Draw switch right-aligned: */
-                newOpt.rect.setWidth(Metrics::kSwitchSize.width());
+                newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
                 newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
                 drawSwitch(painter, &newOpt, widget);
                 return;
             }
@@ -1773,7 +1772,7 @@ QRect QnNxStyle::subControlRect(
                     QRect boundRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
                     boundRect.setRight(option->rect.right());
                     rect = alignedRect(Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
-                                       Metrics::kSwitchSize, boundRect);
+                                       Metrics::kStandaloneSwitchSize, boundRect);
                 }
                 break;
 
@@ -1966,7 +1965,7 @@ QRect QnNxStyle::subElementRect(
         {
             /* Switch: */
             if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
-                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
+                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kStandaloneSwitchSize, option->rect);
         }
         /* FALL THROUGH */
     case SE_ItemViewItemText:
@@ -2145,7 +2144,7 @@ QSize QnNxStyle::sizeFromContents(
         {
             QSize switchSize;
             if (isCheckableButton(option))
-                switchSize = Metrics::kSwitchSize + QSize(Metrics::kSwitchMargin, 0);
+                switchSize = Metrics::kButtonSwitchSize + QSize(Metrics::kSwitchMargin, 0);
 
             return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + switchSize.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
                 qMax(qMax(size.height(), switchSize.height()), Metrics::kButtonHeight));
