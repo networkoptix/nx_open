@@ -242,7 +242,7 @@ void resetTransactionTransportConnections()
 }
 
 
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime)
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections)
 {
     if (qnCommon->localSystemName() == systemName.value())
         return true;
@@ -259,6 +259,9 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
         NX_LOG("Failed to save new system name to config", cl_logWARNING);
         return false;
     }
+    if (resetConnections)
+        resetTransactionTransportConnections();
+
     server->setSystemName(systemName.value());
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
 

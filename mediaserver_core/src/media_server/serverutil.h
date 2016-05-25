@@ -59,7 +59,7 @@ namespace nx
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime);
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections);
 
 void resetTransactionTransportConnections();
 

@@ -49,13 +49,11 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, QnJsonRest
     // change system name first to detatch from other servers
     nx::SystemName systemName;
     systemName.resetToDefault();
-    if (!changeSystemName(systemName, 0, 0))
+    if (!changeSystemName(systemName, 0, 0, true))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error.  Can't change system name."));
         return nx_http::StatusCode::internalServerError;
     }
-    resetTransactionTransportConnections();
-
 
     QString errString;
     if (!changeAdminPassword(passwordData, &errString)) {

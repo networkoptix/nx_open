@@ -72,7 +72,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
             return CODE_OK;
         }
 
-        if (!changeSystemName(systemName, sysIdTime, tranLogTime))
+        if (!changeSystemName(systemName, sysIdTime, tranLogTime, !wholeSystem))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;
@@ -85,9 +85,6 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
         QString description = lit("%1 -> %2").arg(oldSystemName).arg(systemName);
         auditRecord.addParam("description", description.toUtf8());
         qnAuditManager->addAuditRecord(auditRecord);
-
-        if (!wholeSystem)
-            resetTransactionTransportConnections();
     }
 
     /* set port */
