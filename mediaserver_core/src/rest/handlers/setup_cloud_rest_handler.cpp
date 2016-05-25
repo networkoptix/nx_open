@@ -77,7 +77,7 @@ int QnSetupCloudSystemRestHandler::execute(SetupRemoveSystemData data, QnJsonRes
     if (result.error != QnJsonRestResult::NoError)
         return httpResult;
 
-    changeSystemName(newSystemName, 0, 0);
+    changeSystemName(newSystemName, 0, 0, true);
     qnGlobalSettings->setNewSystem(false);
     if (qnGlobalSettings->synchronizeNowSync())
         qnCommon->updateModuleInformation();

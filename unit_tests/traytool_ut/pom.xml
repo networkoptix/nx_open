@@ -32,4 +32,14 @@
         <path>${env.PATH}</path>
         <rdep.packages>gtest quazip</rdep.packages>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>traytool</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/traytool/pom.xml</systemPath>
+        </dependency>
+    </dependencies>    
 </project>

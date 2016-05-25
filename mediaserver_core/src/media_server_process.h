@@ -49,6 +49,8 @@ public:
 
     /** Entry point */
     static int main(int argc, char* argv[]);
+
+    void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
 signals:
     void started();
 public slots:
@@ -116,6 +118,7 @@ private:
     bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
+    QVector<QString> m_hardwareGuidList;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

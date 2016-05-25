@@ -1,3 +1,5 @@
+#include <QtCore/QMutexLocker>
+
 #include "resource_allocator.h"
 
 ResourceAllocator::ResourceAllocator(QQuickWindow *window):

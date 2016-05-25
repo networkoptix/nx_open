@@ -407,15 +407,15 @@ bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManage
             std::chrono::seconds(DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC));
     }
 
-    if (!configureDB(dbManager))
-    {
-        NX_LOG("Failed to tune DB", cl_logALWAYS);
-        return false;
-    }
-
     if (!updateDB(dbManager))
     {
         NX_LOG("Could not update DB to current vesion", cl_logALWAYS);
+        return false;
+    }
+
+    if (!configureDB(dbManager))
+    {
+        NX_LOG("Failed to tune DB", cl_logALWAYS);
         return false;
     }
 
@@ -452,6 +452,15 @@ bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager
                 return nx::db::DBResult::ioError;
             }
 
+            //QSqlQuery setLockingModeQuery(*connection);
+            //setLockingModeQuery.prepare("PRAGMA locking_mode = NORMAL");
+            //if (!setLockingModeQuery.exec())
+            //{
+            //    NX_LOG(lit("sqlite configure. Failed to set locking mode. %1").
+            //        arg(connection->lastError().text()), cl_logWARNING);
+            //    return nx::db::DBResult::ioError;
+            //}
+
             return nx::db::DBResult::ok;
         },
         [&](nx::db::DBResult dbResult) {
@@ -467,6 +476,8 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
 {
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
+    dbStructureUpdater.addFullSchemaScript(13, db::kCreateDbVersion13);
+
     dbStructureUpdater.addUpdateScript(db::kCreateAccountData);
     dbStructureUpdater.addUpdateScript(db::kCreateSystemData);
     dbStructureUpdater.addUpdateScript(db::kSystemToAccountMapping);
@@ -478,6 +489,7 @@ bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kChangeSystemIdTypeToString);
     dbStructureUpdater.addUpdateScript(db::kAddDeletedSystemState);
     dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
+    dbStructureUpdater.addUpdateScript(db::kReplaceBlobWithVarchar);
     return dbStructureUpdater.updateStructSync();
 }
 

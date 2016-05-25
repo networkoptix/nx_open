@@ -33,4 +33,14 @@
         <path>${env.PATH}</path>
         <rdep.packages>gtest ffmpeg</rdep.packages>
     </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>image_library_plugin</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/plugins/image_library_plugin/pom.xml</systemPath>
+        </dependency>
+    </dependencies>    
 </project>

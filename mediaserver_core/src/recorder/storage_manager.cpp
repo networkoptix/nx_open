@@ -783,7 +783,9 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     m_archiveRebuildInfo = data;
 }
 
-void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ArchiveCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const
+void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo,
+                                      ArchiveCameraDataList &archiveCameraList,
+                                      const QnStorageResourcePtr &storage) const
 {
     ArchiveCameraData newCamera;
     newCamera.coreData.physicalId = fileInfo.fileName();
@@ -817,19 +819,21 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         line = QString(infoFile->readLine()).trimmed();
         if (line.isEmpty() || !line.contains("="))
             continue;
-        auto keyValue = line.split(lit("="));
-        NX_ASSERT(keyValue.size() == 2);
 
-        if (keyValue[0].contains(kArchiveCameraNameKey))
-            newCamera.coreData.name = keyValue[1];
-        else if (keyValue[0].contains(kArchiveCameraModelKey))
-            newCamera.coreData.model = keyValue[1];
-        else if (keyValue[0].contains(kArchiveCameraGroupIdKey))
-            newCamera.coreData.groupId= keyValue[1];
-        else if (keyValue[0].contains(kArchiveCameraGroupNameKey))
-            newCamera.coreData.groupName = keyValue[1];
+        std::pair<QString, QString> keyValue;
+        keyValue.first = line.section(lit("="), 0, 0);
+        keyValue.second = line.section(lit("="), 1);
+
+        if (keyValue.first.contains(kArchiveCameraNameKey))
+            newCamera.coreData.name = keyValue.second;
+        else if (keyValue.first.contains(kArchiveCameraModelKey))
+            newCamera.coreData.model = keyValue.second;
+        else if (keyValue.first.contains(kArchiveCameraGroupIdKey))
+            newCamera.coreData.groupId= keyValue.second;
+        else if (keyValue.first.contains(kArchiveCameraGroupNameKey))
+            newCamera.coreData.groupName = keyValue.second;
         else
-            newCamera.properties.emplace_back(cameraGuid, keyValue[0], keyValue[1]);
+            newCamera.properties.emplace_back(cameraGuid, keyValue.first, keyValue.second);
     }
 
     archiveCameraList.push_back(newCamera);

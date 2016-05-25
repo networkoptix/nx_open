@@ -3,7 +3,9 @@
 
 #include <proxy_decoder.h>
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder: "
 #include "proxy_video_decoder_utils.h"
+
 #include "proxy_video_decoder_private.h"
 
 namespace nx {
@@ -75,21 +77,36 @@ ProxyVideoDecoder::~ProxyVideoDecoder()
 
 bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
 {
+    static bool calledOnce = false;
+    if (!calledOnce)
+    {
+        calledOnce = true;
+        conf.reload();
+        conf.skipNextReload();
+    }
+
     if (codec != CODEC_ID_H264)
     {
-        OUTPUT << "isCompatible(codec:" << codec << ", resolution" << resolution
+        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
             << ") -> false: codec != CODEC_ID_H264";
+        return false;
+    }
+
+    if (conf.disable)
+    {
+        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+            << ") -> false: conf.disable is set";
         return false;
     }
 
     if (conf.largeOnly && resolution.width() <= 640)
     {
-        PRINT << "isCompatible(codec:" << codec
-            << ", resolution" << resolution << ") -> false: configuration flag 'largeOnly' is set";
+        PRINT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+            << ") -> false: conf.largeOnly' is set";
         return false;
     }
 
-    OUTPUT << "isCompatible(codec:" << codec << ", resolution" << resolution << ") -> true";
+    OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution << ") -> true";
     return true;
 }
 
