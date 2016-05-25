@@ -98,33 +98,39 @@ namespace nx_http
 
     void AsyncHttpClient::terminate()
     {
-        {
-            QnMutexLocker lk( &m_mutex );
-            if( m_terminated )
-                return;
-            m_terminated = true;
-        }
-        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
-        if( m_socket )
-            m_socket->pleaseStopSync();
-        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+        pleaseStopSync();
     }
+
+    //TODO #ak move pleaseStop and pleaseStopSync to some common base class
 
     void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
         m_aioThreadBinder.post(
             [this, completionHandler = std::move(completionHandler)]() mutable
             {
-                {
-                    QnMutexLocker lk(&m_mutex);
-                    m_terminated = true;
-                }
-                //after we set m_terminated to true with m_mutex locked socket event 
-                    //processing is stopped and m_socket cannot change its value
-                if (m_socket)
-                    m_socket->pleaseStopSync();
+                stopWhileInAioThread();
                 completionHandler();
             });
+    }
+
+    void AsyncHttpClient::pleaseStopSync()
+    {
+        if (m_aioThreadBinder.inSelfAioThread())
+            stopWhileInAioThread();
+        else
+            QnStoppableAsync::pleaseStopSync();
+    }
+
+    void AsyncHttpClient::stopWhileInAioThread()
+    {
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_terminated = true;
+        }
+        //after we set m_terminated to true with m_mutex locked socket event 
+        //processing is stopped and m_socket cannot change its value
+        if (m_socket)
+            m_socket->pleaseStopSync();
     }
 
     nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const

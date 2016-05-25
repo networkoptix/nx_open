@@ -99,6 +99,7 @@ namespace nx_http
         virtual void terminate();
 
         virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+        virtual void pleaseStopSync() override;
 
         virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
         virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -275,6 +276,7 @@ namespace nx_http
         void doSomeCustomLogic(
             const nx_http::Response& response,
             Request* const request );
+        void stopWhileInAioThread();
 
         AsyncHttpClient( const AsyncHttpClient& );
         AsyncHttpClient& operator=( const AsyncHttpClient& );
