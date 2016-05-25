@@ -610,13 +610,12 @@ void QnNxStyle::drawComplexControl(
         QPainter *painter,
         const QWidget *widget) const
 {
-    Q_D(const QnNxStyle);
-
     switch (control)
     {
     case CC_ComboBox:
         if (const QStyleOptionComboBox* comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
         {
+            bool listOpened = comboBox->state.testFlag(State_On);
             if (comboBox->editable)
             {
                 proxy()->drawPrimitive(PE_PanelLineEdit, comboBox, painter, widget);
@@ -626,16 +625,12 @@ void QnNxStyle::drawComplexControl(
                 QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Shadow));
                 QnPaletteColor buttonColor;
 
-                if (!comboBox->state.testFlag(State_On))
+                if (!listOpened)
                 {
-                    if (comboBox->state.testFlag(State_Sunken))
-                    {
-                        buttonColor = mainColor.lighter(1);
-                    }
-                    else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
-                    {
+                    if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
                         buttonColor = mainColor.lighter(2);
-                    }
+                    else if (comboBox->state.testFlag(State_Sunken))
+                        buttonColor = mainColor.lighter(1);
                 }
 
                 if (buttonColor.isValid())
@@ -661,7 +656,7 @@ void QnNxStyle::drawComplexControl(
             if (comboBox->subControls.testFlag(SC_ComboBoxArrow))
             {
                 QRectF rect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxArrow, widget);
-                drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
+                drawArrow(listOpened ? Up : Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
 
             return;
