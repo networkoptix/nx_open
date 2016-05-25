@@ -322,23 +322,28 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
     return resource ? checkOne(resource) : false;
 }
 
+Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters &parameters)
+{
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    if (nodeType == Qn::SharedLayoutNode)
+        return Qn::InvisibleAction;
 
-Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
-    for(const QnResourcePtr &resource: resources) {
-        if(!resource)
+    for (const QnResourcePtr &resource : parameters.resources())
+    {
+        if (!resource)
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
+        if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::user) || resource->hasFlags(Qn::videowall))
+        if (resource->hasFlags(Qn::user) || resource->hasFlags(Qn::videowall))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::live_cam))
+        if (resource->hasFlags(Qn::live_cam))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
-            if(resource->getStatus() == Qn::Offline)
+        if (resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
+            if (resource->getStatus() == Qn::Offline)
                 continue; /* Can remove only if offline. */
 
         if (resource->hasFlags(Qn::web_page))
@@ -349,7 +354,6 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 
     return Qn::EnabledAction;
 }
-
 
 Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters)
 {

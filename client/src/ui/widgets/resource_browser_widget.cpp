@@ -27,6 +27,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/layout_item_index.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 #include <core/resource/resource_property.h>
@@ -378,6 +379,7 @@ QnResourceList QnResourceBrowserWidget::selectedResources() const {
             }
             break;
         case Qn::ResourceNode:
+        case Qn::SharedLayoutNode:
         case Qn::EdgeNode:
             {
                 QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -533,10 +535,23 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget) {
     updateToolTipPosition();
 }
 
-QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const {
+QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
+{
     QItemSelectionModel* selectionModel = currentSelectionModel();
-    QVariant data = selectionModel->currentIndex().data(Qn::NodeTypeRole);
-    return QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, data); // TODO: #Elric just pass all the data through?
+    Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    auto result = QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, nodeType);
+
+    /* For working with shared layout links we must know owning user resource. */
+    if (nodeType == Qn::SharedLayoutNode)
+    {
+        QModelIndex parentIndex = selectionModel->currentIndex().parent();
+        QnUserResourcePtr user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
+        NX_ASSERT(user);
+        result.setArgument(Qn::UserResourceRole, user);
+    }
+
+    return result; // TODO: #Elric just pass all the data through?
 }
 
 void QnResourceBrowserWidget::updateFilter(bool force) {

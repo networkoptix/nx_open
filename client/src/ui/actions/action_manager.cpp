@@ -1402,6 +1402,14 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
+    factory(QnActions::StopSharingLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Stop Sharing Layout")).
+        shortcut(lit("Del")).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::SharedLayoutNode, this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).

@@ -55,6 +55,7 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(QnActions::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(QnActions::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
     connect(action(QnActions::ShareLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered);
+    connect(action(QnActions::StopSharingLayoutAction),            &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered);
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                             &QnWorkbench::layoutsChanged,  this,   &QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged, Qt::QueuedConnection);
@@ -653,6 +654,25 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
     saveLayout(layout);
 
     accessible << layout->getId();
+    qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
+
+}
+
+void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
+{
+    auto params = menu()->currentParameters(sender());
+    auto layouts = params.resources().filtered<QnLayoutResource>();
+    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    NX_ASSERT(user);
+    if (!user)
+        return;
+
+    auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
+    for (const auto& layout : layouts)
+    {
+        NX_ASSERT(!layout->isFile());
+        accessible.remove(layout->getId());
+    }
     qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
 
 }

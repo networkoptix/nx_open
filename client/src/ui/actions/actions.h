@@ -490,12 +490,20 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         SaveLayoutAsAction,
 
         /**
-         * Shared selected layout with another user.
+         * Shares selected layout with another user.
          *
          * Parameters:
          * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
          */
         ShareLayoutAction,
+
+        /**
+         * Stops sharing selected layout from the selected user.
+         *
+         * Parameters:
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to stop sharing layout with.
+         */
+        StopSharingLayoutAction,
 
         /**
          * Saves selected layout under another name in current user's layouts list.
