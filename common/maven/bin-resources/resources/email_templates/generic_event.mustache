@@ -32,9 +32,9 @@
                 </table>
             </div>
             {{/systemName}}
-            {{^system}}
+            {{^systemName}}
             <a href="{{config.portal_url}}"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
-            {{/system}}
+            {{/systemName}}
         </td>
         <td class="side-spacer" style="padding: 20px"></td>
     </tr>
@@ -42,11 +42,11 @@
     <tr>
         <td></td>
         <td class="content" bgcolor="white" width="800" style="width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
-            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}: {{source}}</h1>
+            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}} from {{source}}</h1>
 
-<div class="description" style="padding: 0 20px;width: 100%;background-color: #F8F9FA">
+<div class="description" style="padding: 20px 10px;width: 100%;background-color: #F8F9FA">
     {{#caption}}
-        <h2>Event: {{caption}}</h2>
+        <h2 style="font-size: 16px;font-weight: bold">{{caption}}</h2>
     {{/caption}}
     {{#description}}
         <p style="font-size: 15px;line-height: 20px;margin-top: 5px"> {{description}}</p>
@@ -54,7 +54,7 @@
 </div>
 
 <div class="date" style="padding: 0 20px">
-    <h3>Date(s) when the event is occured:</h3>
+    <p style="font-size: 15px;line-height: 20px;margin-top: 5px">Date(s) when the event is occured:</p>
     {{#aggregated}}
     <table class="details" style="color: #263137">
         <tr>

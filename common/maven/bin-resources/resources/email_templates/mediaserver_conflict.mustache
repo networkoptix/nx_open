@@ -32,9 +32,9 @@
                 </table>
             </div>
             {{/systemName}}
-            {{^system}}
+            {{^systemName}}
             <a href="{{config.portal_url}}"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
-            {{/system}}
+            {{/systemName}}
         </td>
         <td class="side-spacer" style="padding: 20px"></td>
     </tr>
@@ -42,10 +42,10 @@
     <tr>
         <td></td>
         <td class="content" bgcolor="white" width="800" style="width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
-            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}}: {{source}}</h1>
+            <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}} on {{source}}</h1>
 
 {{#aggregated}}
-<table class="description" style="color: #263137;padding: 0 20px;width: 100%;background-color: #F8F9FA">
+<table class="description" style="color: #263137;padding: 20px 10px;width: 100%;background-color: #F8F9FA">
     <thead>
     <tr>
         <th>#</th>
