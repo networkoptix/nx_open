@@ -77,6 +77,7 @@ namespace nx_http
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
         AbstractStreamSocket* socket();
+        /** Returns socket in blocking mode */
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
     private:
