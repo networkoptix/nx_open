@@ -616,37 +616,36 @@ void QnNxStyle::drawComplexControl(
     switch (control)
     {
     case CC_ComboBox:
-        if (const QStyleOptionComboBox *comboBox =
-             qstyleoption_cast<const QStyleOptionComboBox *>(option))
+        if (const QStyleOptionComboBox* comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
         {
-            painter->save();
-
             if (comboBox->editable)
             {
                 proxy()->drawPrimitive(PE_PanelLineEdit, comboBox, painter, widget);
 
                 QRect buttonRect = subControlRect(control, option, SC_ComboBoxArrow, widget);
 
-                QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Button));
+                QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Shadow));
                 QnPaletteColor buttonColor;
 
-                if (comboBox->state.testFlag(State_On))
+                if (!comboBox->state.testFlag(State_On))
                 {
-                    buttonColor = mainColor.darker(1);
-                }
-                else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
-                {
-                    buttonColor = mainColor.lighter(1);
+                    if (comboBox->state.testFlag(State_Sunken))
+                    {
+                        buttonColor = mainColor.lighter(1);
+                    }
+                    else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
+                    {
+                        buttonColor = mainColor.lighter(2);
+                    }
                 }
 
                 if (buttonColor.isValid())
                 {
-                    painter->setBrush(QBrush(buttonColor));
-                    painter->setPen(Qt::NoPen);
-                    painter->setRenderHint(QPainter::Antialiasing);
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+                    QnScopedPainterBrushRollback brushRollback(painter, buttonColor.color());
+                    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
                     painter->drawRoundedRect(buttonRect, 2, 2);
                     painter->drawRect(buttonRect.adjusted(0, 0, -buttonRect.width() / 2, 0));
-                    painter->setRenderHint(QPainter::Antialiasing, false);
                 }
             }
             else
@@ -666,7 +665,6 @@ void QnNxStyle::drawComplexControl(
                 drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
 
-            painter->restore();
             return;
         }
         break;
@@ -1667,7 +1665,7 @@ QRect QnNxStyle::subControlRect(
             case SC_ComboBoxArrow:
                 rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
                              comboBox->rect.height(), comboBox->rect.height());
-                rect.adjust(0, 1, 0, -1);
+                rect.adjust(1, 1, 0, -1);
                 break;
 
             case SC_ComboBoxEditField:
