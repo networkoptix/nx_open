@@ -88,6 +88,13 @@ private:
     /** Fully rebuild resources tree. */
     void rebuildTree();
 
+    /**
+     * @brief                       Handle drag-n-drop result.
+     * @param sourceResources       What is dragged
+     * @param targetResource        On what drop was done.
+     * @param mimeData              Full drag-n-drop data.
+     */
+    void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData);
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);

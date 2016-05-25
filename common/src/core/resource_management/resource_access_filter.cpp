@@ -27,7 +27,7 @@ QnResourceList QnResourceAccessFilter::filteredResources(Filter filter, const Qn
     case QnResourceAccessFilter::LayoutsFilter:
         return source.filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
         {
-            return layout->isGlobal() && !layout->isFile();
+            return /*layout->isShared() && */!layout->isFile(); //TODO: #GDM #access user should not see own layouts here, admin should
         });
     }
     return QnResourceList();

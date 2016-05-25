@@ -436,7 +436,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (layout->isFile())
             return m_rootNodes[Qn::LocalResourcesNode];
 
-        if (layout->isGlobal())
+        if (layout->isShared())
             return m_rootNodes[Qn::LayoutsNode];
 
         QnResourcePtr owner = layout->getParentResource();
@@ -729,7 +729,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         return false;
 
     /* Check if the action is supported. */
-    if (!(action & supportedDropActions()))
+    if (!supportedDropActions().testFlag(action))
         return false;
 
     /* Check if the format is supported. */
@@ -737,7 +737,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         return base_type::dropMimeData(mimeData, action, row, column, parent);
 
     /* Decode. */
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
+    QnResourceList sourceResources = QnWorkbenchResource::deserializeResources(mimeData);
 
     /* Check where we're dropping it. */
     auto node = this->node(parent);
@@ -745,64 +745,24 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
     if (node->type() == Qn::ItemNode)
         node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
 
-    if (node->parent() && (node->parent()->resourceFlags() & Qn::server))
+    if (node->parent() && (node->parent()->resourceFlags().testFlag(Qn::server)))
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
+
+    /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
         QnActionParameters parameters;
         if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
             parameters = QnActionParameters(qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
         else
-            parameters = QnActionParameters(resources);
+            parameters = QnActionParameters(sourceResources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
     }
-    else if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
+    else
     {
-        QnResourceList medias;
-        for (const QnResourcePtr& res : resources)
-        {
-            if (res.dynamicCast<QnMediaResource>())
-                medias.push_back(res);
-        }
-
-        menu()->trigger(QnActions::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
-    }
-    else if (QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>())
-    {
-        for (const QnResourcePtr &resource : resources)
-        {
-            if (resource->getParentId() == user->getId())
-                continue; /* Dropping resource into its owner does nothing. */
-
-            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-            if (!layout)
-                continue; /* Can drop only layout resources on user. */
-
-            menu()->trigger(
-                QnActions::SaveLayoutAsAction,
-                QnActionParameters(layout).
-                withArgument(Qn::UserResourceRole, user).
-                withArgument(Qn::ResourceNameRole, layout->getName())
-            );
-        }
-
-
-    }
-    else if (QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>())
-    {
-        if (QnMediaServerResource::isFakeServer(server))
-            return true;
-
-        if (mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1"))
-        {
-            /* Allow drop of non-layout item data, from tree only. */
-
-            QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
-            if (!cameras.empty())
-                menu()->trigger(QnActions::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
-        }
+        handleDrop(sourceResources, node->resource(), mimeData);
     }
 
     return true;
@@ -950,6 +910,74 @@ void QnResourceTreeModel::rebuildTree()
 
     for (auto node : m_resourceNodeByResource)
         updateNodeParent(node);
+}
+
+void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)
+{
+    if (sourceResources.isEmpty() || !targetResource)
+        return;
+
+    /*
+    * Drop on layout can work in two ways:
+    * - we can add media resources to layout
+    * - we can drop the whole layout to share it to user (if dropping on owned layout).
+    */
+    if (QnLayoutResourcePtr layout = targetResource.dynamicCast<QnLayoutResource>())
+    {
+        QnResourceList medias;
+        for (const QnResourcePtr& res : sourceResources)
+        {
+            if (res.dynamicCast<QnMediaResource>())
+                medias.push_back(res);
+        }
+        if (!medias.isEmpty())
+            menu()->trigger(
+                QnActions::OpenInLayoutAction,
+                QnActionParameters(medias).
+                withArgument(Qn::LayoutResourceRole, layout)
+            );
+
+        if (!layout->isShared())
+            handleDrop(sourceResources.filtered<QnLayoutResource>(), layout->getParentResource(), mimeData);
+    }
+
+    /* Drop layout on user means sharing this layout. */
+    else if (QnUserResourcePtr targetUser = targetResource.dynamicCast<QnUserResource>())
+    {
+        for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())
+        {
+            if (sourceLayout->getParentId() == targetUser->getId())
+                continue; /* Dropping resource into its owner does nothing. */
+
+            if (sourceLayout->isFile())
+                continue;
+
+            menu()->trigger(
+                QnActions::ShareLayoutAction,
+                QnActionParameters(sourceLayout).
+                withArgument(Qn::UserResourceRole, targetUser)
+            );
+        }
+    }
+
+    /* Drop camera on server allows to move servers between cameras. */
+    else if (QnMediaServerResourcePtr server = targetResource.dynamicCast<QnMediaServerResource>())
+    {
+        if (QnMediaServerResource::isFakeServer(server))
+            return;
+
+        /* Do not allow to drop camera items from layouts. */
+        if (mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) != QByteArray("1"))
+            return;
+
+        QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
+        if (!cameras.empty())
+            menu()->trigger(
+                QnActions::MoveCameraAction,
+                QnActionParameters(cameras).
+                withArgument(Qn::MediaServerResourceRole, server)
+            );
+    }
 }
 
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)
