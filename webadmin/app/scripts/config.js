@@ -132,8 +132,8 @@ var Config = {
         ],
         states: [
             '',
-            'InactiveState',
-            'ActiveState'
+            'Inactive',
+            'Active'
         ]
     }
 };

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs) {
+    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout) {
 
         mediaserver.getUser().then(function(user){
             if(!user.isOwner){
@@ -30,7 +30,7 @@ angular.module('webadminApp')
         };
         $scope.getId = function(resource){
             return resource.id;
-        }
+        };
 
         if(!$scope.session.method){
             $scope.session.method = {
@@ -98,12 +98,18 @@ angular.module('webadminApp')
         $scope.session.event = {};
         $scope.generateEvent = function(){
             $scope.session.event.eventResourceId = $scope.session.eventResource.id;
-            mediaserver.createEvent($scope.session.event).then(function(success){
-
+            if($scope.session.event.state == ''){
+                delete $scope.session.event.state;
+            }
+            return mediaserver.createEvent($scope.session.event).then(function(success){
+                var result = "ok";
+                if(success.data.error !=="0"){
+                    result = success.data.errorString +" (" + success.data.error +") state:" + $scope.session.event.state;
+                }
                 $scope.eventsLog = $scope.eventsLog || [];
                 $scope.eventsLog.push({
                     event: $scope.session.event.event_type,
-                    result: success.data
+                    result: result
                 });
             },function(error){
                 $scope.eventsLog = $scope.eventsLog || [];
@@ -113,9 +119,38 @@ angular.module('webadminApp')
                 });
             });
         };
+
+        function rand(limit){
+            return Math.floor(Math.random()*limit);
+        }
+        function randomElement(array){
+            return array[rand(array.length)];
+        }
+
+        function randomEvent(){
+            $scope.session.event.event_type = randomElement(Config.debugEvents.events).event;
+            $scope.session.event.eventResourceId = randomElement($scope.resources).id;
+            $scope.session.event.state = randomElement(Config.debugEvents.states);
+            $scope.session.event.reasonCode = randomElement(Config.debugEvents.reasons);
+            $scope.session.event.inputPortId = rand(8);
+            $scope.session.event.source = "Source " + rand(1000);
+            $scope.session.event.caption = "Caption " + rand(1000);
+            $scope.session.event.description = "Description " + rand(1000);
+        }
+        function eventGenerator(){
+            $timeout(function(){
+                if(!$scope.generatingEvents){
+                    return;
+                }
+                randomEvent();
+                $scope.generateEvent().then(eventGenerator,eventGenerator);
+            },1000);
+        }
+
         $scope.generatingEvents = false;
         $scope.startGeneratingEvents = function(){
             $scope.generatingEvents = true;
+            eventGenerator();
         };
         $scope.stopGeneratingEvents = function(){
             $scope.generatingEvents = false;
