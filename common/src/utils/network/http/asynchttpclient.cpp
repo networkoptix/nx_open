@@ -608,8 +608,6 @@ namespace nx_http
 
         if( m_socket )
         {
-            m_socket->cancelAsyncIO();  //TODO #ak remove in VMS-896
-
             if( !m_connectionClosed &&
                 canUseExistingConnection &&
                 (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
