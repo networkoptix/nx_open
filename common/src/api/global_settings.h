@@ -107,6 +107,9 @@ public:
     std::chrono::seconds serverDiscoveryPingTimeout() const;
     void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
 
+    QString cloudPortalUrl() const;
+    void setCloudPortalUrl(const QString&);
+
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
     bool takeCameraOwnershipWithoutLock() const;
@@ -223,6 +226,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_takeCameraOwnershipWithoutLock;
 
     // set of cloud adaptors
+    QnResourcePropertyAdaptor<QString>* m_cloudPortalUrlAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudAccountNameAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudSystemIDAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudAuthKeyAdaptor;
