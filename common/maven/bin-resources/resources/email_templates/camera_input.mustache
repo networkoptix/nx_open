@@ -10,21 +10,21 @@
 <table class="container" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8" style="color: #263137"><!-- background-color -->
     <tbody>
     <tr>
-        <td class="side-spacer" style="padding: 20px"></td>
-        <td class="header" style="width: 800px;padding-top: 30px;padding-bottom: 10px;height: 40px">
+        <td class="side-spacer" style="text-align: left;padding: 20px"></td>
+        <td class="header" style="text-align: left;width: 800px;padding-top: 30px;padding-bottom: 10px;height: 40px">
             {{#systemName}}
             <div class="system-info" style="display: inline-block;border: 1px solid #E1E7EA;border-radius: 2px;padding: 10px">
                 <table style="color: #263137">
                     <tbody>
                     <tr>
-                        <td style="vertical-align: top"><img class="icon" src="cid:home" style="width: 20px;height: 20px;padding-right: 10px" /></td>
-                        <td style="vertical-align: top"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{systemName}}</div>
+                        <td style="text-align: left;vertical-align: top"><img class="icon" src="cid:home" style="width: 20px;height: 20px;padding-right: 10px" /></td>
+                        <td style="text-align: left;vertical-align: top"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{systemName}}</div>
                             {{#systemSignature}}<div class="hint" style="font-size: 12px;line-height: 20px">{{systemSignature}}</div>{{/systemSignature}}</td>
                     </tr>
                     {{#cloud}}
                     <tr class="cloud-info">
-                        <td style="vertical-align: top;padding-top: 5px"><img class="icon" src="cid:home" style="width: 20px;height: 20px;padding-right: 10px" /></td>
-                        <td style="vertical-align: top;padding-top: 5px"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{cloud.ownerName}}</div>
+                        <td style="text-align: left;vertical-align: top;padding-top: 5px"><img class="icon" src="cid:home" style="width: 20px;height: 20px;padding-right: 10px" /></td>
+                        <td style="text-align: left;vertical-align: top;padding-top: 5px"><div class="name" style="font-size: 14px;font-weight: bold;line-height: 20px">{{cloud.ownerName}}</div>
                             <div class="hint" style="font-size: 12px;line-height: 20px">{{cloud.ownerEmail}}</div></td>
                     </tr>
                     {{/cloud}}
@@ -36,15 +36,15 @@
             <a href="{{config.portal_url}}"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
             {{/systemName}}
         </td>
-        <td class="side-spacer" style="padding: 20px"></td>
+        <td class="side-spacer" style="text-align: left;padding: 20px"></td>
     </tr>
 
     <tr>
-        <td></td>
-        <td class="content" bgcolor="white" width="800" style="width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
+        <td style="text-align: left"></td>
+        <td class="content" bgcolor="white" width="800" style="text-align: left;width: 800px;padding: 15px 0;border: 1px solid #E1E7EA;border-radius: 2px">
             <h1 style="font-size: 20px;font-weight: normal;line-height: 30px;margin: 0;padding: 0 20px">{{event}} on {{source}}</h1>
 
-<table class="description" style="color: #263137;padding: 20px 10px;width: 100%;background-color: #F8F9FA">
+<table class="description" style="color: #263137;padding: 20px 10px;width: 100%;background-color: #F8F9FA;margin-top: 15px">
     <thead>
         <tr>
             <th>#</th>
@@ -55,40 +55,40 @@
     <tbody>
     {{#aggregated}}
         <tr>
-            <td>{{number}}</td>
-            <td>{{inputPort}}</td>
-            <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
+            <td style="text-align: left">{{number}}</td>
+            <td style="text-align: left">{{inputPort}}</td>
+            <td style="text-align: left">{{timestampDate}} <b>{{timestampTime}}</b></td>
         </tr>
     {{/aggregated}}
     </tbody>
 </table>
 
         </td>
-        <td></td>
+        <td style="text-align: left"></td>
     </tr>
 
     <tr>
-        <td></td>
-        <td class="footer" style="width: 800px;padding-top: 20px;padding-bottom: 30px">
+        <td style="text-align: left"></td>
+        <td class="footer" style="text-align: left;width: 800px;padding-top: 20px;padding-bottom: 30px">
             <table border="0" cellspacing="0" cellpadding="0" style="color: #263137">
                 <tbody>
                 <tr>
                     {{#system}}
-                    <td class="right-border" style="border-right: 1px solid #E1E7EA;padding-right: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                    <td class="right-border" style="text-align: left;border-right: 1px solid #E1E7EA;padding-right: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
                         <a href="{{config.portal_url}}"><img class="logo" src="cid:logo" style="max-width: 100px;max-height: 40px" /></a>
                     </td>
-                    <td class="left-border right-border" style="border-right: 1px solid #E1E7EA;padding-right: 20px;padding-left: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                    <td class="left-border right-border" style="text-align: left;border-right: 1px solid #E1E7EA;padding-right: 20px;padding-left: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
                         <b>Website</b><br />
                         <a href="{{companyUrl}}">{{companyUrl}}</a>
                     </td>
                     {{/system}}
                     {{^system}}
-                    <td class="right-border" style="border-right: 1px solid #E1E7EA;padding-right: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                    <td class="right-border" style="text-align: left;border-right: 1px solid #E1E7EA;padding-right: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
                         <b>Website</b><br />
                         <a href="{{companyUrl}}">{{companyUrl}}</a>
                     </td>
                     {{/system}}
-                    <td class="left-border" style="padding-left: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
+                    <td class="left-border" style="text-align: left;padding-left: 20px;font-size: 12px;height: 40px;vertical-align: middle;color: #53707F">
                         <b>Support</b><br />
                         <a href="{{supportLink}}">{{supportLinkText}}</a>
                     </td>
@@ -96,7 +96,7 @@
                 </tbody>
             </table>
         </td>
-        <td></td>
+        <td style="text-align: left"></td>
     </tr>
     </tbody>
 </table>
