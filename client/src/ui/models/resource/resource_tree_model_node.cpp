@@ -150,7 +150,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode);
+    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode || nodeType == Qn::SharedLayoutNode);
     m_state = Invalid;
     m_status = Qn::Offline;
     setResource(resource);
@@ -162,7 +162,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, uuid)
 {
-    NX_ASSERT(nodeType == Qn::ItemNode || nodeType == Qn::VideoWallItemNode || nodeType == Qn::VideoWallMatrixNode);
+    NX_ASSERT(nodeType == Qn::LayoutItemNode || nodeType == Qn::VideoWallItemNode || nodeType == Qn::VideoWallMatrixNode);
     m_state = Invalid;
     m_status = Qn::Offline;
 }
@@ -173,10 +173,12 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
     NX_ASSERT(
-        m_type == Qn::ItemNode ||
+        m_type == Qn::LayoutItemNode ||
         m_type == Qn::ResourceNode ||
         m_type == Qn::VideoWallItemNode ||
-        m_type == Qn::EdgeNode);
+        m_type == Qn::EdgeNode ||
+        m_type == Qn::SharedLayoutNode
+    );
 
     if (m_resource == resource)
         return;
@@ -188,7 +190,10 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 void QnResourceTreeModelNode::update()
 {
     /* Update stored fields. */
-    if (m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode)
+    if (m_type == Qn::ResourceNode ||
+        m_type == Qn::LayoutItemNode ||
+        m_type == Qn::EdgeNode ||
+        m_type == Qn::SharedLayoutNode)
     {
         if(m_resource.isNull())
         {
@@ -346,7 +351,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
     switch (m_type)
     {
     /* Hide non-readable resources. */
-    case Qn::ItemNode:
+    case Qn::LayoutItemNode:
         return !m_resource || !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
     /* These will be hidden or displayed together with videowall. */
@@ -378,6 +383,17 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         /* Only admins can see edge nodes. */
         return !isAdmin;
+
+    case Qn::SharedLayoutNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true;
+
+        /* Hide non-readable resources. */
+        if (!accessController()->hasPermissions(m_resource, Qn::ReadPermission))
+            return true;
+
+        return false;
 
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
@@ -574,7 +590,8 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
-    case Qn::ItemNode:
+    case Qn::LayoutItemNode:
+    case Qn::SharedLayoutNode:
         if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;
@@ -624,7 +641,7 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
         break;
     case Qn::ItemUuidRole:
         if (
-            m_type == Qn::ItemNode
+            m_type == Qn::LayoutItemNode
             || m_type == Qn::VideoWallItemNode
             || m_type == Qn::VideoWallMatrixNode
             )

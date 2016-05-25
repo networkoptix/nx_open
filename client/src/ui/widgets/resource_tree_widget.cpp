@@ -95,6 +95,11 @@ private:
         if (isVideoWall)
             return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
 
+        /* Comparison between layouts and shared layouts. */
+        bool isLayout = resource->flags().testFlag(Qn::layout);
+        if (isLayout)
+            return nodeType;
+
         /* We should get here only when comparing local resources node with resources when we are not logged in. */
         bool isLocal = resource->flags().testFlag(Qn::local);
         if (isLocal)
