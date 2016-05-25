@@ -27,8 +27,6 @@
     <build>
         <directory>target</directory>
         <plugins>      
-
-
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>2.5</version>
@@ -51,10 +49,6 @@
                             <filesets>
                                 <fileset>
                                     <directory>${libdir}</directory>
-                                    <includes>
-                                        <include>donotrebuild</include>
-                                    </includes>
-
                                 </fileset>                                                                  
                             </filesets>
                             <skip>${clean-skip}</skip>							
