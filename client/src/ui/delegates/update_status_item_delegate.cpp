@@ -4,7 +4,6 @@
 #include <QtWidgets/QApplication>
 
 #include <ui/models/server_updates_model.h>
-#include <ui/style/noptix_style.h>
 
 namespace {
     const int defaultWidth = 200;

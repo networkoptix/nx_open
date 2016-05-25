@@ -2558,7 +2558,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     {
         qint32 resource_ptr_id = getResourceInternalId(resourceId);
         if (resource_ptr_id <= 0)
-            return ErrorCode::dbError;
+            continue;   /* Just skip invalid id's. */
         newAccessibleResources << resource_ptr_id;
     }
 

@@ -74,6 +74,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui(new Ui::AccessibleResourcesWidget()),
     m_permissionsModel(permissionsModel),
     m_filter(filter),
+    m_controlsVisible(filter == QnResourceAccessFilter::CamerasFilter), /*< Show 'All' checkbox only for cameras. */
     m_resourcesModel(new QnResourceListModel()),
     m_controlsModel(new QnResourceListModel())
 {
@@ -100,7 +101,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     ui->resourcesTreeView->setModel(viewModel);
     ui->controlsTreeView->setModel(m_controlsModel.data());
-    ui->controlsTreeView->setVisible(!m_controlsModel->resources().isEmpty());
+    ui->controlsTreeView->setVisible(m_controlsVisible);
+    ui->controlsTreeView->setEnabled(m_controlsVisible);
+    ui->line->setVisible(m_controlsVisible);
 
     auto itemDelegate = new QnResourceItemDelegate(this);
 
@@ -115,7 +118,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     setupTreeView(ui->controlsTreeView);
 
     ui->resourcesTreeView->setMouseTracking(true);
-    ui->resourcesTreeView->setEnabled(true);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this, viewModel](const QModelIndex& index)
@@ -136,7 +138,7 @@ QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
 
 bool QnAccessibleResourcesWidget::hasChanges() const
 {
-    if (m_filter == QnResourceAccessFilter::CamerasFilter)
+    if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
         if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission) != checkedAll)
@@ -148,7 +150,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    if (m_filter == QnResourceAccessFilter::CamerasFilter)
+    if (m_controlsVisible)
     {
         QSet<QnUuid> checkedControls;
         if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission))
@@ -168,7 +170,7 @@ void QnAccessibleResourcesWidget::applyChanges()
     accessibleResources.unite(newFiltered);
     m_permissionsModel->setAccessibleResources(accessibleResources);
 
-    if (m_filter == QnResourceAccessFilter::CamerasFilter)
+    if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
         Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
@@ -182,30 +184,14 @@ void QnAccessibleResourcesWidget::applyChanges()
 
 void QnAccessibleResourcesWidget::initControlsModel()
 {
-    auto createDummyResource = [this]() -> QnResourcePtr
-    {
-        switch (m_filter)
-        {
-        case QnResourceAccessFilter::CamerasFilter:
-        {
-            QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
-            dummy->setName(tr("All Cameras"));
-            return dummy;
-        }
-        default:
-            break;
-        }
-        return QnResourcePtr();
-    };
+    if (!m_controlsVisible)
+        return;
 
-    auto dummy = createDummyResource();
-    if (dummy)
-    {
-        /* Create separate dummy resource for each filter, but once per application run. */
-        dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
-        m_controlsModel->setResources(QnResourceList() << dummy);
-    }
-
+    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+    dummy->setName(tr("All Cameras"));
+    /* Create separate dummy resource id for each filter, but once per application run. */
+    dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
+    m_controlsModel->setResources(QnResourceList() << dummy);
     m_controlsModel->setCheckable(true);
     m_controlsModel->setStatusIgnored(true);
 

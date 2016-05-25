@@ -176,7 +176,6 @@ const QnGenericPalette &QnNxStyle::genericPalette() const
     return d->palette;
 }
 
-
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
     Q_D(const QnNxStyle);
@@ -323,11 +322,8 @@ void QnNxStyle::drawPrimitive(
                 return;
             }
 
-            QnPaletteColor base = findColor(option->palette.color(QPalette::Base));
-            qreal opacity = option->state.testFlag(State_Enabled) ? 1.0 : 0.3;
-
+            QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
-            QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * opacity);
 
             if (option->state.testFlag(State_HasFocus))
             {
@@ -358,13 +354,14 @@ void QnNxStyle::drawPrimitive(
         if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem *>(option))
         {
             /* In case of tree view: */
-            if (qobject_cast<const QTreeView*>(widget))
+            if (const QTreeView* tree = qobject_cast<const QTreeView*>(widget))
             {
                 /* Markers can be semi-transparent, so we draw all layers on top of each other. */
 
                 /* Obtain hover information: */
                 QBrush hoverBrush = option->palette.midlight();
-                bool hasHover = item->state.testFlag(State_MouseOver);
+                bool hasHover = item->state.testFlag(State_MouseOver) && item->state.testFlag(State_Enabled);
+
                 bool hoverOpaque = hasHover && isColorOpaque(hoverBrush.color());
 
                 /* Obtain selection information: */
@@ -618,37 +615,36 @@ void QnNxStyle::drawComplexControl(
     switch (control)
     {
     case CC_ComboBox:
-        if (const QStyleOptionComboBox *comboBox =
-             qstyleoption_cast<const QStyleOptionComboBox *>(option))
+        if (const QStyleOptionComboBox* comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
         {
-            painter->save();
-
             if (comboBox->editable)
             {
-                proxy()->drawPrimitive(PE_FrameLineEdit, comboBox, painter, widget);
+                proxy()->drawPrimitive(PE_PanelLineEdit, comboBox, painter, widget);
 
                 QRect buttonRect = subControlRect(control, option, SC_ComboBoxArrow, widget);
 
-                QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Button));
+                QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Shadow));
                 QnPaletteColor buttonColor;
 
-                if (comboBox->state.testFlag(State_On))
+                if (!comboBox->state.testFlag(State_On))
                 {
-                    buttonColor = mainColor.darker(1);
-                }
-                else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
-                {
-                    buttonColor = mainColor.lighter(1);
+                    if (comboBox->state.testFlag(State_Sunken))
+                    {
+                        buttonColor = mainColor.lighter(1);
+                    }
+                    else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
+                    {
+                        buttonColor = mainColor.lighter(2);
+                    }
                 }
 
                 if (buttonColor.isValid())
                 {
-                    painter->setBrush(QBrush(buttonColor));
-                    painter->setPen(Qt::NoPen);
-                    painter->setRenderHint(QPainter::Antialiasing);
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+                    QnScopedPainterBrushRollback brushRollback(painter, buttonColor.color());
+                    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
                     painter->drawRoundedRect(buttonRect, 2, 2);
                     painter->drawRect(buttonRect.adjusted(0, 0, -buttonRect.width() / 2, 0));
-                    painter->setRenderHint(QPainter::Antialiasing, false);
                 }
             }
             else
@@ -668,7 +664,6 @@ void QnNxStyle::drawComplexControl(
                 drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
 
-            painter->restore();
             return;
         }
         break;
@@ -923,9 +918,7 @@ void QnNxStyle::drawComplexControl(
             {
                 QStyleOption opt = *option;
                 opt.rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxCheckBox, widget);
-                opt.state |= State_Item;
-
-                d->drawSwitch(painter, &opt, widget);
+                drawSwitch(painter, &opt, widget);
             }
 
             painter->restore();
@@ -1548,7 +1541,7 @@ void QnNxStyle::drawControl(
             if (isCheckableButton(option))
             {
                 /* Calculate minimal label width: */
-                const QStyleOptionButton* buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
+                auto buttonOption = static_cast<const QStyleOptionButton*>(option); /* isCheckableButton()==true guarantees type safety */
                 int minLabelWidth = 2 * pixelMetric(PM_ButtonMargin, option, widget);
                 if (!buttonOption->icon.isNull())
                     minLabelWidth += buttonOption->iconSize.width() + 4; /* 4 is hard-coded in Qt */
@@ -1561,8 +1554,9 @@ void QnNxStyle::drawControl(
                 base_type::drawControl(element, &newOpt, painter, widget);
 
                 /* Draw switch right-aligned: */
-                newOpt.rect.setWidth(Metrics::kSwitchSize.width());
+                newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
                 newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
+                newOpt.rect.setBottom(newOpt.rect.bottom() - 1); // shadow compensation
                 drawSwitch(painter, &newOpt, widget);
                 return;
             }
@@ -1669,7 +1663,7 @@ QRect QnNxStyle::subControlRect(
             case SC_ComboBoxArrow:
                 rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
                              comboBox->rect.height(), comboBox->rect.height());
-                rect.adjust(0, 1, 0, -1);
+                rect.adjust(1, 1, 0, -1);
                 break;
 
             case SC_ComboBoxEditField:
@@ -1777,7 +1771,7 @@ QRect QnNxStyle::subControlRect(
                     QRect boundRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
                     boundRect.setRight(option->rect.right());
                     rect = alignedRect(Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
-                                       Metrics::kSwitchSize, boundRect);
+                                       Metrics::kStandaloneSwitchSize, boundRect);
                 }
                 break;
 
@@ -1970,7 +1964,7 @@ QRect QnNxStyle::subElementRect(
         {
             /* Switch: */
             if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
-                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
+                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kStandaloneSwitchSize, option->rect);
         }
         /* FALL THROUGH */
     case SE_ItemViewItemText:
@@ -2133,11 +2127,23 @@ QSize QnNxStyle::sizeFromContents(
 {
     switch (type)
     {
+    case CT_CheckBox:
+        return QSize(
+            size.width() + proxy()->pixelMetric(PM_IndicatorWidth, option, widget) +
+                           proxy()->pixelMetric(PM_CheckBoxLabelSpacing, option, widget),
+            qMax(size.height(), proxy()->pixelMetric(PM_IndicatorHeight, option, widget)));
+
+    case CT_RadioButton:
+        return QSize(
+            size.width() + proxy()->pixelMetric(PM_ExclusiveIndicatorWidth, option, widget) +
+                           proxy()->pixelMetric(PM_RadioButtonLabelSpacing, option, widget),
+            qMax(size.height(), proxy()->pixelMetric(PM_ExclusiveIndicatorHeight, option, widget)));
+
     case CT_PushButton:
         {
             QSize switchSize;
             if (isCheckableButton(option))
-                switchSize = Metrics::kSwitchSize + QSize(Metrics::kSwitchMargin, 0);
+                switchSize = Metrics::kButtonSwitchSize + QSize(Metrics::kSwitchMargin, 0);
 
             return QSize(qMax(Metrics::kMinimumButtonWidth, size.width() + switchSize.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)),
                 qMax(qMax(size.height(), switchSize.height()), Metrics::kButtonHeight));
@@ -2161,7 +2167,7 @@ QSize QnNxStyle::sizeFromContents(
             }
         }
 
-        /* Ðrocessing for normal spin boxes: */
+        /* Processing for normal spin boxes: */
         return size + QSize(Metrics::kStandardPadding * 2 + Metrics::kSpinButtonWidth, 0);
     }
 
