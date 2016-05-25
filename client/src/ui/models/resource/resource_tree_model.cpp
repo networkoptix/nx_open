@@ -72,7 +72,6 @@ namespace
         if (result.isEmpty())
         {
             result
-                << Qn::LocalNode
                 << Qn::CurrentSystemNode
                 << Qn::SeparatorNode
                 << Qn::UsersNode
@@ -80,6 +79,8 @@ namespace
                 << Qn::UserDevicesNode
                 << Qn::LayoutsNode
                 << Qn::WebPagesNode
+                << Qn::LocalResourcesNode
+                << Qn::LocalSeparatorNode
                 << Qn::OtherSystemsNode
                 << Qn::RootNode
                 << Qn::BastardNode;
@@ -288,7 +289,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case Qn::BastardNode:
         return QnResourceTreeModelNodePtr();
 
-    case Qn::LocalNode:
+    case Qn::LocalResourcesNode:
         if (m_scope != FullScope)
             return bastardNode;
         return rootNode;
@@ -308,8 +309,17 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::CurrentSystemNode:
+        if (m_scope == FullScope && isLoggedIn)
+            return rootNode;
+        return bastardNode;
+
     case Qn::SeparatorNode:
-        if (m_scope == FullScope && isAdmin)
+        if (m_scope == FullScope && isLoggedIn)
+            return rootNode;
+        return bastardNode;
+
+    case Qn::LocalSeparatorNode:
+        if (m_scope == FullScope && !isLoggedIn)
             return rootNode;
         return bastardNode;
 
@@ -354,6 +364,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node)
 {
+    bool isLoggedIn = !context()->user().isNull();
     auto rootNode = m_rootNodes[Qn::RootNode];
     auto bastardNode = m_rootNodes[Qn::BastardNode];
     bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
@@ -425,7 +436,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
     {
         if (layout->isFile())
-            return m_rootNodes[Qn::LocalNode];
+            return m_rootNodes[Qn::LocalResourcesNode];
 
         if (layout->isGlobal())
             return m_rootNodes[Qn::LayoutsNode];
@@ -449,7 +460,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (!parentResource || parentResource->flags().testFlag(Qn::local_server))
     {
         if (node->resourceFlags().testFlag(Qn::local))
-            return m_rootNodes[Qn::LocalNode];
+        {
+            if (isLoggedIn)
+                return m_rootNodes[Qn::LocalResourcesNode];
+            return rootNode;
+        }
         return bastardNode;
     }
 

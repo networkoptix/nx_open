@@ -99,17 +99,12 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (nodeType == Qn::SeparatorNode)
+    if (Qn::isSeparatorNode(nodeType))
     {
-        painter->save();
-
         int y = option.rect.top() + option.rect.height() / 2;
-        painter->setPen(option.palette.color(QPalette::Midlight));
+        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
         painter->drawLine(0, y, option.rect.right(), y);
-
-        painter->restore();
     }
-
 
     /* Select icon and text color by item state: */
     QColor mainColor, extraColor;
@@ -228,7 +223,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
 {
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (nodeType == Qn::SeparatorNode)
+    if (Qn::isSeparatorNode(nodeType))
         return style::Metrics::kSeparatorSize + QSize(0, m_rowSpacing);
 
     /* Initialize style option: */

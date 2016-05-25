@@ -29,7 +29,8 @@
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
-class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel {
+class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
+{
     typedef QnResourceSearchProxyModel base_type;
 
 public:
@@ -38,31 +39,69 @@ public:
         m_filterEnabled(false)
     {}
 
-    bool isFilterEnabled() {
+    bool isFilterEnabled()
+    {
         return m_filterEnabled;
     }
 
-    void setFilterEnabled(bool enabled) {
+    void setFilterEnabled(bool enabled)
+    {
         if (m_filterEnabled == enabled)
             return;
         m_filterEnabled = enabled;
         invalidateFilter();
     }
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
-        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole) {
-            Qt::CheckState checkState = (Qt::CheckState) value.toInt();
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override
+    {
+        if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole)
+        {
+            Qt::CheckState checkState = static_cast<Qt::CheckState>(value.toInt());
             emit beforeRecursiveOperation();
             setCheckStateRecursive(index, checkState);
             setCheckStateRecursiveUp(index, checkState);
             emit afterRecursiveOperation();
             return true;
-        } else
-            return base_type::setData(index, value, role);
+        }
+        return base_type::setData(index, value, role);
     }
 
-    Qt::DropActions supportedDropActions() const override {
+    Qt::DropActions supportedDropActions() const override
+    {
         return sourceModel()->supportedDropActions();
+    }
+
+private:
+    /**
+     * Helper function to list nodes in the correct order.
+     * Root nodes are strictly ordered, but there are two types of nodes which
+     * are inserted in between: current user node and videowall node.
+     * Videowalls are pinned between Layouts and WebPages.
+     * CurrentUser is pinned between CurrentSystem and Separator.
+     * Also when we are not logged in, LocalResources node is displayed on top.
+     */
+    qreal nodeOrder(const QModelIndex &index) const
+    {
+        Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        if (nodeType != Qn::ResourceNode)
+            return nodeType;
+
+        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        bool isUser = resource->flags().testFlag(Qn::user);
+        if (isUser)
+            return 0.5 * (Qn::CurrentSystemNode + Qn::SeparatorNode);
+
+        bool isVideoWall = resource->flags().testFlag(Qn::videowall);
+        if (isVideoWall)
+            return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
+
+        /* We should get here only when comparing local resources node with resources when we are not logged in. */
+        bool isLocal = resource->flags().testFlag(Qn::local);
+        if (isLocal)
+            return Qn::LocalSeparatorNode + 1;
+
+        NX_ASSERT(false, "Should never get here");
+        return nodeType;
     }
 
 
@@ -74,45 +113,14 @@ protected:
 
         if (leftNode != rightNode)
         {
-            /* Root nodes are strictly ordered, but there are two types of nodes which
-             * are inserted in between: current user node and videowall node.
-             * Videowalls are pinned between Layouts and WebPages.
-             * CurrentUser is pinned between CurrentSystem and Separator.
-             */
-
             /* Check default behavior first. */
             if (leftNode != Qn::ResourceNode && rightNode != Qn::ResourceNode)
                 return leftNode < rightNode;
 
-            if (leftNode == Qn::ResourceNode)
-            {
-                QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
-                NX_ASSERT(leftResource);
-                if (!leftResource)
-                    return false;
-                bool isUser = leftResource->flags().testFlag(Qn::user);
-                bool isVideoWall = leftResource->flags().testFlag(Qn::videowall);
-                NX_ASSERT(isUser || isVideoWall);
-                if (isUser)
-                    return Qn::CurrentSystemNode < rightNode;
-                return Qn::LayoutsNode < rightNode;
-            }
-            NX_ASSERT(rightNode == Qn::ResourceNode);
-
-            {
-                QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
-                NX_ASSERT(rightResource);
-                if (!rightResource)
-                    return false;
-                bool isUser = rightResource->flags().testFlag(Qn::user);
-                bool isVideoWall = rightResource->flags().testFlag(Qn::videowall);
-                NX_ASSERT(isUser || isVideoWall);
-                if (isUser)
-                    return leftNode < Qn::SeparatorNode;
-                return leftNode < Qn::WebPagesNode;
-            }
-
-
+            qreal leftOrder = nodeOrder(left);
+            qreal rightOrder = nodeOrder(right);
+            if (!qFuzzyEquals(leftOrder, rightOrder))
+                return leftOrder < rightOrder;
         }
 
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -172,7 +180,8 @@ protected:
         setCheckStateRecursiveUp(root, state);
     }
 
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override {
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override
+    {
         if (!m_filterEnabled)
             return true;
 

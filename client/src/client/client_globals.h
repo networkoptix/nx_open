@@ -19,7 +19,8 @@ namespace Qn
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
-        LocalNode,              /**< Root node for local resources. */
+        LocalResourcesNode,     /**< Root node for local resources. */
+        LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
         OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
 
         BastardNode,            /**< Root node for hidden resources. */
@@ -36,6 +37,8 @@ namespace Qn
 
         NodeTypeCount
     };
+
+    inline bool isSeparatorNode(NodeType t) { return t == SeparatorNode || t == LocalSeparatorNode;  }
 
     /**
      * Role of an item on the scene.

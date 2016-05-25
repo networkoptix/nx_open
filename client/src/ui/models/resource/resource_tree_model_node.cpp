@@ -80,7 +80,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_displayName = m_name = lit("Invalid Resources");
         m_bastard = true; /* This node is always hidden. */
         break;
-    case Qn::LocalNode:
+    case Qn::LocalResourcesNode:
         m_displayName = m_name = tr("Local");
         m_icon = qnResIconCache->icon(QnResourceIconCache::LocalResources);
         break;
@@ -88,6 +88,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         m_icon = qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
         break;
     case Qn::SeparatorNode:
+    case Qn::LocalSeparatorNode:
         m_displayName = QString();
         m_name = lit("-");
         break;
@@ -533,7 +534,7 @@ QModelIndex QnResourceTreeModelNode::createIndex(int col)
 
 Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 {
-    if (m_type == Qn::SeparatorNode)
+    if (Qn::isSeparatorNode(m_type))
     {
         /* No Editable/Selectable flags. */
         return Qt::ItemNeverHasChildren;
@@ -640,7 +641,7 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
         if (m_type == Qn::UsersNode)
             return Qn::MainWindow_Tree_Users_Help;
 
-        if (m_type == Qn::LocalNode)
+        if (m_type == Qn::LocalResourcesNode)
             return Qn::MainWindow_Tree_Local_Help;
 
         if (m_type == Qn::RecorderNode)
