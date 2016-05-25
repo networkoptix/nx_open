@@ -7,6 +7,7 @@ namespace Qn
 {
     //dynamic parameters of resource
 
+    static const QString POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME = lit("possibleDefaultCredentials");
     static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
     static const QString DTS_PARAM_NAME = lit("dts");
     static const QString ANALOG_PARAM_NAME = lit("analog");

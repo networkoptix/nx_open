@@ -17,17 +17,29 @@
     
     "version": "1.0",
     "data": [
+
         {
             "keys": [
-                "ActiveCam|*"
+                "DW|*","ISD|*"
             ],
-            "forceONVIF": true
-        },
-		{
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "admin"
+                }
+            ]
+        },       
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
+        },
+		{
+            "keys": [
+                "ActiveCam|*"
+            ],
+            "forceONVIF": true
         },
         {
             "keys": [
@@ -114,9 +126,14 @@
         },
         {
             "keys": [
-                "ISD|XPM-FL72-48MP"
+                "ISD|XPM-FL72-48MP",
+                "DW|XPM-FL72-48MP",
+                "DW|DWC-PZV2M72T",
+                "DigitalWatchdog|DWC-PZV2M72T"
             ],
-            "isDW": true
+            "isDW": true,
+            "showUrl": true,
+            "urlLocalePath": "priv/cam.html"
         },
         {
             "keys": [

@@ -47,6 +47,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
+#include <utils/network/http/asynchttpclient.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -85,6 +86,8 @@ namespace {
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
+
+    static const QByteArray kExecHttpActionContentType("text/plain");
 };
 
 struct QnEmailAttachmentData {
@@ -218,6 +221,9 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::ExecutePtzPresetAction:
             result = executePtzAction(action);
             break;
+        case QnBusiness::ExecHttpRequestAction:
+            result = executeHttpRequestAction(action);
+			break;
         default:
             break;
         }
@@ -244,6 +250,51 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     mediaServer->setPanicMode(val);
     propertyDictionary->saveParams(mediaServer->getId());
     return true;
+}
+
+bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBusinessActionPtr& action)
+{
+    QUrl url(action->getParams().url);
+
+    if (action->getParams().text.isEmpty())
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                    << "osErrorCode:" << osErrorCode
+                    << "HTTP result:" << statusCode
+                    << "message:" << messageBody;
+            }
+        };
+
+        return nx_http::downloadFileAsync(
+            url,
+            callback );
+    }
+    else
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                           << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                           << "osErrorCode:" << osErrorCode
+                           << "HTTP result:" << statusCode;
+            }
+        };
+
+        return uploadDataAsync(url,
+            action->getParams().text.toUtf8(),
+            kExecHttpActionContentType,
+            nx_http::HttpHeaders(),
+            callback);
+    }
 }
 
 bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)

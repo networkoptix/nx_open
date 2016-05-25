@@ -114,7 +114,8 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
         registerFloatParameter(lit("iwbYbGain"),    wb->YbGain,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WhiteBalance->CbGain; });
     }
 
-    registerEnumParameter(lit("iIrCut"),                                        [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->IrCutFilter); });
+    if(!ranges->IrCutFilterModes.empty())
+        registerEnumParameter(lit("iIrCut"),                                    [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->IrCutFilter); });
 
     registerFloatParameter(lit("iBri"),             ranges->Brightness,         [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Brightness; });
     registerFloatParameter(lit("iCS"),              ranges->ColorSaturation,    [](ImagingSettingsResp* settings){ return settings->ImagingSettings->ColorSaturation; });
