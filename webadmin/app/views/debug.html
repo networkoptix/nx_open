@@ -126,7 +126,7 @@
             <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> random events</button>
 
             <p>Events Log:</p>
-            <pre><div ng-repeat="event in eventsLog">{{event.event}}: {{event.result}}</div></pre>
+            <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
         </div>
     </div>
 </div>

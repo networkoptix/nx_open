@@ -103,18 +103,21 @@ angular.module('webadminApp')
             }
             return mediaserver.createEvent($scope.session.event).then(function(success){
                 var result = "ok";
+                var source =  $scope.session.event.event_type == 'UserDefinedEvent'? $scope.session.event.source : $scope.session.eventResource.name;
                 if(success.data.error !=="0"){
                     result = success.data.errorString +" (" + success.data.error +") state:" + $scope.session.event.state;
                 }
                 $scope.eventsLog = $scope.eventsLog || [];
                 $scope.eventsLog.push({
                     event: $scope.session.event.event_type,
+                    source: source,
                     result: result
                 });
             },function(error){
                 $scope.eventsLog = $scope.eventsLog || [];
                 $scope.eventsLog.push({
                     event: $scope.session.event.event_type,
+                    source: source,
                     result: error
                 });
             });
@@ -127,8 +130,13 @@ angular.module('webadminApp')
             return array[rand(array.length)];
         }
 
+        var nextCounter = 0;
+        function nextElement(array){
+            return array[nextCounter++ % array.length];
+        }
+
         function randomEvent(){
-            $scope.session.event.event_type = randomElement(Config.debugEvents.events).event;
+            $scope.session.event.event_type = nextElement(Config.debugEvents.events).event;
             $scope.session.eventResource = randomElement($scope.resources);
             $scope.session.event.eventResourceId = $scope.session.eventResource.id;
             $scope.session.event.state = randomElement(Config.debugEvents.states);
