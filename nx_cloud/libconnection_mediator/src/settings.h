@@ -25,7 +25,6 @@ namespace conf {
 class General
 {
 public:
-    QString configFilePath;
     QString systemUserToRunUnder;
     QString dataDir;
 };

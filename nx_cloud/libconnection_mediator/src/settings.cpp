@@ -22,13 +22,10 @@
 namespace
 {
     //General settings
-    const QLatin1String kConfigFilePath("general/configFile");
-    const QLatin1String kDefaultConfigFilePath("");
-
     const QLatin1String kSystemUserToRunUnder("general/systemUserToRunUnder");
     const QLatin1String kDefaultSystemUserToRunUnder("");
 
-    const QLatin1String kDataDir("dataDir");
+    const QLatin1String kDataDir("general/dataDir");
     const QLatin1String kDefaultDataDir("");
 
     //log settings
@@ -162,9 +159,6 @@ void Settings::loadConfiguration()
 {
     using namespace std::chrono;
 
-    m_general.configFilePath = m_settings.value(
-        kConfigFilePath,
-        kDefaultConfigFilePath).toString();
     m_general.systemUserToRunUnder = m_settings.value(
         kSystemUserToRunUnder,
         kDefaultSystemUserToRunUnder).toString();
