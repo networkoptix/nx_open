@@ -1,8 +1,27 @@
-#include "proxy_video_decoder_gl_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
+
+#define OUTPUT_PREFIX "ProxyVideoDecoder[gl_utils]: "
+#include "proxy_video_decoder_utils.h"
+
+#include "proxy_video_decoder_gl_utils.h" //< Should be included after proxy_video_decoder_utils.h
 
 namespace nx {
 namespace media {
+
+namespace {
+
+static const char* glFramebufferStatusStr(GLenum status)
+{
+    switch (status)
+    {
+        case GL_FRAMEBUFFER_COMPLETE: return "GL_FRAMEBUFFER_COMPLETE";
+        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS: return "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
+        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+        case GL_FRAMEBUFFER_UNSUPPORTED: return "GL_FRAMEBUFFER_UNSUPPORTED";
+        default: return nullptr;
+    }
+}
 
 static const char* glErrorStr(GLenum err)
 {
@@ -19,6 +38,19 @@ static const char* glErrorStr(GLenum err)
         default: return nullptr;
     }
 }
+
+static void dumpPrecision(const char*tag, GLenum shaderType, GLenum precisionType)
+{
+    int range[2];
+    int precision;
+
+    glGetShaderPrecisionFormat(shaderType, precisionType, range, &precision);
+
+    qWarning().nospace() << tag << " range 2^" << range[0] << "..2^" << range[1]
+        << ", precision 2^" << precision;
+}
+
+} // namespace
 
 void checkGlError(QOpenGLFunctions* funcs, const char* tag)
 {
@@ -59,19 +91,6 @@ void outputGlFbo(const char* tag)
         GLint curFbo = 0;
         GL(funcs->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &curFbo));
         OUTPUT << tag << ": current FBO ==" << curFbo;
-    }
-}
-
-static const char* glFramebufferStatusStr(GLenum status)
-{
-    switch (status)
-    {
-        case GL_FRAMEBUFFER_COMPLETE: return "GL_FRAMEBUFFER_COMPLETE";
-        case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: return "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-        case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS: return "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS";
-        case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: return "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-        case GL_FRAMEBUFFER_UNSUPPORTED: return "GL_FRAMEBUFFER_UNSUPPORTED";
-        default: return nullptr;
     }
 }
 
@@ -221,21 +240,6 @@ void debugTestImageExtension(QOpenGLTexture& yTex)
     // Abort.
     NX_CRITICAL(false);
 }
-
-namespace {
-
-static void dumpPrecision(const char*tag, GLenum shaderType, GLenum precisionType)
-{
-    int range[2];
-    int precision;
-
-    glGetShaderPrecisionFormat(shaderType, precisionType, range, &precision);
-
-    qWarning().nospace() << tag << " range 2^" << range[0] << "..2^" << range[1]
-        << ", precision 2^" << precision;
-}
-
-} // namespace
 
 void debugDumpGlPrecisions()
 {

@@ -36,6 +36,11 @@ public:
     NX_FLAG(0, implYuvNative, "decodeToYuvNative() -> AlignedMemVideoBuffer => Plugin Shader.");
     NX_FLAG(0, implGl, "decodeYuvPlanar() => Planar YUV Shader.");
 
+    // Display impl options.
+    NX_FLAG(1, displayAsync, "Delay displaying up to beforeSynchronizing/frameSwapped.");
+    NX_INT_PARAM(15, displayAsyncSleepMs, "Delay before displaying frame in displayAsync mode.");
+    NX_FLAG(1, displayAsyncGlFinish, "Perform glFlush() and glFinish() in displayAsync mode.");
+
     // OpenGL impl options.
     NX_FLAG(0, stopOnGlErrors, "");
     NX_FLAG(0, outputGlCalls, "");

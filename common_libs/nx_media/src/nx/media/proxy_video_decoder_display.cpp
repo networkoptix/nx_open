@@ -4,6 +4,8 @@
 #define OUTPUT_PREFIX "ProxyVideoDecoder<display>: "
 #include "proxy_video_decoder_utils.h"
 
+#include "proxy_video_decoder_gl_utils.h"
+
 namespace nx {
 namespace media {
 
@@ -114,7 +116,27 @@ int Impl::decode(
 
 void Impl::displayDecodedFrame(void* frameHandle)
 {
-    proxyDecoder().displayDecoded(frameHandle);
+    if (conf.displayAsync)
+    {
+        allocator().execAtGlThreadAsync(
+            [this, frameHandle]()
+            {
+                if (conf.displayAsyncGlFinish)
+                {
+                    GL_GET_FUNCS(QOpenGLContext::currentContext());
+                    GL(funcs->glFlush());
+                    GL(funcs->glFinish());
+                }
+
+                if (conf.displayAsyncSleepMs > 0)
+                    usleep(conf.displayAsyncSleepMs * 1000);
+                proxyDecoder().displayDecoded(frameHandle);
+            });
+    }
+    else
+    {
+        proxyDecoder().displayDecoded(frameHandle);
+    }
 }
 
 } // namespace

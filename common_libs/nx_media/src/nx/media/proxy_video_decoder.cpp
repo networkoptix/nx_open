@@ -58,9 +58,8 @@ ProxyVideoDecoder::ProxyVideoDecoder(
     static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
         "ProxyVideoDecoder: Insufficient padding size");
 
-    // TODO: Consider moving this check to isCompatible().
-    // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
-    NX_ASSERT(resolution.width() % 2 == 0 || resolution.height() % 2 == 0);
+    // Checked by isCompatible().
+    NX_CRITICAL(resolution.width() % 2 == 0 && resolution.height() % 2 == 0);
 
     conf.reload();
 
@@ -83,6 +82,14 @@ bool ProxyVideoDecoder::isCompatible(const CodecID codec, const QSize& resolutio
         calledOnce = true;
         conf.reload();
         conf.skipNextReload();
+    }
+
+    // Odd frame dimensions are not tested and can be unsupported due to UV having half-res.
+    if (resolution.width() % 2 != 0 || resolution.height() % 2 != 0)
+    {
+        OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
+                << ") -> false: only even width and height is supported";
+        return false;
     }
 
     if (codec != CODEC_ID_H264)

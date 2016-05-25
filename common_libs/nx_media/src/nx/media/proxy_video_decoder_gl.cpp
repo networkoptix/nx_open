@@ -4,6 +4,9 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLShaderProgram>
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder<gl>: "
+#include "proxy_video_decoder_utils.h"
+
 #include "proxy_video_decoder_gl_utils.h"
 
 namespace nx {
@@ -498,7 +501,6 @@ int Impl::decode(
 #endif // 0
 
             textureBuffer = new TextureBuffer(FboPtr(nullptr), sharedPtrToThis(), yuvBuffer);
-
             outDecodedFrame->reset(new QVideoFrame(
                 textureBuffer, frameSize(), QVideoFrame::Format_BGR32));
 

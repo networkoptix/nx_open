@@ -47,9 +47,10 @@ static const int kDefaultMaxTextureSize = 2048;
 
 struct NxMediaFlagConfig: public nx::utils::FlagConfig
 {
-    NxMediaFlagConfig(const char* moduleName): nx::utils::FlagConfig(moduleName) { reload(); }
+    using nx::utils::FlagConfig::FlagConfig;
 
     NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
+    NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
 
 } conf("nx_media");
 
@@ -416,11 +417,11 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
         liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
     bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
 
-    // TODO mike: REMOVE
-#if 0
-    if (frameDelayMs < 0)
-        qWarning() << "pts: " << pts << ", ptsDelta: " << ptsDelta << ", frameDelayMs: " << frameDelayMs;
-#endif // 0
+    if (conf.outputFrameDelays)
+    {
+        if (frameDelayMs < 0)
+            qWarning() << "pts: " << pts << ", ptsDelta: " << ptsDelta << ", frameDelayMs: " << frameDelayMs;
+    }
 
     if (liveMode)
     {
@@ -563,6 +564,7 @@ Player::Player(QObject *parent)
     QObject(parent),
     d_ptr(new PlayerPrivate(this))
 {
+    conf.reload();
 }
 
 Player::~Player()
