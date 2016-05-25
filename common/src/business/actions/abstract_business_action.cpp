@@ -48,6 +48,7 @@ namespace QnBusiness {
         case ExecutePtzPresetAction:
         case ShowTextOverlayAction:
         case ShowOnAlarmLayoutAction:
+        case ExecHttpRequestAction:
             return false;
 
         case SendMailAction:
