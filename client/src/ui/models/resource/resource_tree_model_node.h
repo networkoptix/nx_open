@@ -44,7 +44,7 @@ public:
     /**
      * Constructor for item nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::ItemNode);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
 
     ~QnResourceTreeModelNode();
 

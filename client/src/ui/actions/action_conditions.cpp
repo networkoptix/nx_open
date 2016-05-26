@@ -322,23 +322,28 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
     return resource ? checkOne(resource) : false;
 }
 
+Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParameters &parameters)
+{
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    if (nodeType == Qn::SharedLayoutNode)
+        return Qn::InvisibleAction;
 
-Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
-    for(const QnResourcePtr &resource: resources) {
-        if(!resource)
+    for (const QnResourcePtr &resource : parameters.resources())
+    {
+        if (!resource)
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
+        if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::user) || resource->hasFlags(Qn::videowall))
+        if (resource->hasFlags(Qn::user) || resource->hasFlags(Qn::videowall))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::live_cam))
+        if (resource->hasFlags(Qn::live_cam))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
-            if(resource->getStatus() == Qn::Offline)
+        if (resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
+            if (resource->getStatus() == Qn::Offline)
                 continue; /* Can remove only if offline. */
 
         if (resource->hasFlags(Qn::web_page))
@@ -350,34 +355,36 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
     return Qn::EnabledAction;
 }
 
-
-Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters)
+{
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
 
-    switch (nodeType) {
+    switch (nodeType)
+    {
     case Qn::ResourceNode:
-        {
-            if (parameters.resources().size() != 1)
-                return Qn::InvisibleAction;
+    case Qn::SharedLayoutNode:
+    {
+        if (parameters.resources().size() != 1)
+            return Qn::InvisibleAction;
 
-            QnResourcePtr target = parameters.resource();
-            if (!target)
-                return Qn::InvisibleAction;
+        QnResourcePtr target = parameters.resource();
+        if (!target)
+            return Qn::InvisibleAction;
 
-            /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
-            if (target->hasFlags(Qn::user))
-                return Qn::InvisibleAction;
+        /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
+        if (target->hasFlags(Qn::user))
+            return Qn::InvisibleAction;
 
-            /* Edge servers renaming is forbidden. */
-            if (QnMediaServerResource::isEdgeServer(target))
-                return Qn::InvisibleAction;
+        /* Edge servers renaming is forbidden. */
+        if (QnMediaServerResource::isEdgeServer(target))
+            return Qn::InvisibleAction;
 
-            /* Incompatible resources cannot be renamed */
-            if (QnMediaServerResource::isFakeServer(target))
-                return Qn::InvisibleAction;
+        /* Incompatible resources cannot be renamed */
+        if (QnMediaServerResource::isFakeServer(target))
+            return Qn::InvisibleAction;
 
-            return Qn::EnabledAction;
-                          }
+        return Qn::EnabledAction;
+    }
     case Qn::EdgeNode:
     case Qn::RecorderNode:
         return Qn::EnabledAction;

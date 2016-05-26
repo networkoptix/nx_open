@@ -34,6 +34,7 @@ private:
     bool openProxyDstConnection();
     QUrl getDefaultProxyUrl();
     bool updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute);
+    bool replaceAuthHeader();
 private:
     Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
 };

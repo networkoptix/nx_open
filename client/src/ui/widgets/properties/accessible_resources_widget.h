@@ -38,6 +38,7 @@ private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
     QnAbstractPermissionsModel* const m_permissionsModel;
     const QnResourceAccessFilter::Filter m_filter;
+    const bool m_controlsVisible;   /*< Should the controls widget be visible and active. */
 
     QScopedPointer<QnResourceListModel> m_resourcesModel;
     QScopedPointer<QnResourceListModel> m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */

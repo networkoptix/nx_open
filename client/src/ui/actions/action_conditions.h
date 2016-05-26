@@ -293,7 +293,7 @@ class QnResourceRemovalActionCondition: public QnActionCondition
 public:
     QnResourceRemovalActionCondition(QObject *parent): QnActionCondition(parent) {}
 
-    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 

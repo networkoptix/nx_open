@@ -11,8 +11,8 @@ StackView
     {
         id: d
 
-        property real scaleInXHint: -1
-        property real scaleInYHint: -1
+        property real scaleInXHint
+        property real scaleInYHint
         property real maxShift: 80
 
         function transitionFinished(properties)
@@ -45,7 +45,43 @@ StackView
         }
     }
 
-    replaceEnter: Transition
+    function setFadeTransition()
+    {
+        pushEnter = fadeInTransition
+        pushExit = fadeOutTransition
+        popEnter = justShowTransition
+        popExit = fadeOutTransition
+    }
+
+    function setScaleTransition(xHint, yHint)
+    {
+        d.scaleInXHint = (xHint == undefined) ? -1 : xHint
+        d.scaleInYHint = (yHint == undefined) ? -1 : yHint
+        pushEnter = scaleInTransition
+        pushExit = null
+        popEnter = justShowTransition
+        popExit = scaleOutTransition
+    }
+
+    Transition
+    {
+        id: justShowTransition
+
+        NumberAnimation
+        {
+            property: "opacity"
+            to: 1
+            duration: 0
+        }
+        NumberAnimation
+        {
+            property: "x"
+            to: 0
+            duration: 0
+        }
+    }
+
+    Transition
     {
         id: fadeInTransition
 
@@ -71,7 +107,7 @@ StackView
         }
     }
 
-    replaceExit: Transition
+    Transition
     {
         id: fadeOutTransition
 
@@ -84,7 +120,7 @@ StackView
         }
     }
 
-    pushEnter: Transition
+    Transition
     {
         id: scaleInTransition
 
@@ -121,27 +157,7 @@ StackView
         }
     }
 
-    pushExit: null
-
-    popEnter: Transition
-    {
-        id: justShowTransition
-
-        NumberAnimation
-        {
-            property: "opacity"
-            to: 1
-            duration: 0
-        }
-        NumberAnimation
-        {
-            property: "x"
-            to: 0
-            duration: 0
-        }
-    }
-
-    popExit: Transition
+    Transition
     {
         id: scaleOutTransition
 
@@ -160,11 +176,5 @@ StackView
             duration: stackView.transitionDuration
             easing.type: Easing.OutCubic
         }
-    }
-
-    function setScaleTransitionHint(xHint, yHint)
-    {
-        d.scaleInXHint = (xHint == undefined) ? -1 : xHint
-        d.scaleInYHint = (yHint == undefined) ? -1 : yHint
     }
 }

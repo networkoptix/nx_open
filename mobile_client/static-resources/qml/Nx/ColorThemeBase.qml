@@ -84,9 +84,4 @@ QtObject
 
     property color windowBackground: base5
     property color windowText: contrast13
-
-    function transparent(color, alpha)
-    {
-        return Qt.rgba(color.r, color.g, color.b, alpha)
-    }
 }

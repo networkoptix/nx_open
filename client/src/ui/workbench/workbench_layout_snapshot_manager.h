@@ -50,12 +50,13 @@ public:
         return flags(resource).testFlag(Qn::ResourceIsLocal);
     }
 
-    bool isSaveable(const QnLayoutResourcePtr &resource) const {
+    bool isSaveable(const QnLayoutResourcePtr &resource) const
+    {
         Qn::ResourceSavingFlags flags = this->flags(resource);
-        if(flags.testFlag(Qn::ResourceIsBeingSaved))
+        if (flags.testFlag(Qn::ResourceIsBeingSaved))
             return false;
 
-        if(flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
+        if (flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
             return true;
 
         return false;

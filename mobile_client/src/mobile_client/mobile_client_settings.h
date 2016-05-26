@@ -1,30 +1,24 @@
-#pragma once
+#ifndef MOBILE_CLIENT_SETTINGS_H
+#define MOBILE_CLIENT_SETTINGS_H
 
 #include <utils/common/property_storage.h>
 #include <nx/utils/singleton.h>
 #include <mobile_client/mobile_client_meta_types.h>
 
-class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings>
-{
+class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings> {
     Q_OBJECT
     typedef QnPropertyStorage base_type;
 
 public:
-    enum Variable
-    {
-        SettingsVersion,
-
-        LastUsedSystemId,
-        LastUsedUrl,
-        CamerasAspectRatios,
-        LastUsedQuality,
-        LiteMode,
-
-        // Depracated properties
+    enum Variable {
         SavedSessions,
-        IsSettingsMigrated,
         LastUsedSessionId,
-
+        SessionSettings,
+        CamerasAspectRatios,
+        ShowOfflineCameras,
+        LastUsedQuality,
+        IsSettingsMigrated,
+        LiteMode,
         VariableCount
     };
 
@@ -45,17 +39,14 @@ protected:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VariableCount)
-        QN_DECLARE_RW_PROPERTY(int,                         settingsVersion,            setSettingsVersion,         SettingsVersion,            0)
-        QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSystemId,           setLastUsedSystemId,        LastUsedSystemId,           QString())
-        QN_DECLARE_RW_PROPERTY(QUrl,                        lastUsedUrl,                setLastUsedUrl,             LastUsedUrl,                QUrl())
         QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
-        QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
-        QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
-        QN_DECLARE_RW_PROPERTY(int,                         liteMode,                   setLiteMode,                LiteMode,                   (int)LiteModeType::LiteModeAuto)
-
-        // Deprecated properties
         QN_DECLARE_RW_PROPERTY(QString,                     lastUsedSessionId,          setLastUsedSessionId,       LastUsedSessionId,          QString())
+        QN_DECLARE_RW_PROPERTY(QVariantMap,                 sessionSettings,            setSessionSettings,         SessionSettings,            QVariantMap())
+        QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
+        QN_DECLARE_RW_PROPERTY(bool,                        showOfflineCameras,         setShowOfflineCameras,      ShowOfflineCameras,         true)
+        QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
         QN_DECLARE_RW_PROPERTY(bool,                        isSettingsMigrated,         setSettingsMigrated,        IsSettingsMigrated,         false)
+        QN_DECLARE_RW_PROPERTY(int,                         liteMode,                   setLiteMode,                LiteMode,                   (int)LiteModeType::LiteModeAuto)
     QN_END_PROPERTY_STORAGE()
 
 private:
@@ -64,3 +55,5 @@ private:
 };
 
 #define qnSettings (QnMobileClientSettings::instance())
+
+#endif // MOBILE_CLIENT_SETTINGS_H

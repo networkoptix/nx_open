@@ -289,7 +289,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
 /* Users block                                                          */
 /************************************************************************/
 
-void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges) {
+void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges)
+{
     if (!applyChanges)
         return;
 
@@ -332,6 +333,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         emit saveChangesFailed(QnResourceList() << user);
     } );
 
+    //TODO: #GDM #access #low code duplication with saceAccessibleResources, arch change is required
     auto accessibleResources = qnResourceAccessManager->accessibleResources(userId);
     ec2::ApiAccessRightsData accessRights;
     accessRights.userId = userId;
@@ -339,7 +341,7 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         accessRights.resourceIds.push_back(id);
 
     connection->getUserManager()->setAccessRights(accessRights, this,
-        [this, user, sessionGuid, accessibleResources](int reqID, ec2::ErrorCode errorCode)
+        [this, user, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);
 
@@ -351,9 +353,43 @@ void QnResourcesChangesManager::saveUser(const QnUserResourcePtr &user, UserChan
         if (qnCommon->runningInstanceGUID() != sessionGuid)
             return;
 
-        qnResourceAccessManager->setAccessibleResources(user->getId(), accessibleResources);
+        qnResourceAccessManager->setAccessibleResources(user->getId(), accessibleResourcesBackup);
 
         emit saveChangesFailed(QnResourceList() << user);
+    });
+}
+
+void QnResourcesChangesManager::saveAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& accessibleResources)
+{
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    auto sessionGuid = qnCommon->runningInstanceGUID();
+    auto accessibleResourcesBackup = qnResourceAccessManager->accessibleResources(userId);
+    if (accessibleResourcesBackup == accessibleResources)
+        return;
+
+    qnResourceAccessManager->setAccessibleResources(userId, accessibleResources);
+
+    ec2::ApiAccessRightsData accessRights;
+    accessRights.userId = userId;
+    for (const auto &id : accessibleResources)
+        accessRights.resourceIds.push_back(id);
+    connection->getUserManager()->setAccessRights(accessRights, this,
+        [this,userId, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
+    {
+        QN_UNUSED(reqID);
+
+        /* Check if all OK */
+        if (errorCode == ec2::ErrorCode::ok)
+            return;
+
+        /* Check if we have already changed session. */
+        if (qnCommon->runningInstanceGUID() != sessionGuid)
+            return;
+
+        qnResourceAccessManager->setAccessibleResources(userId, accessibleResourcesBackup);
     });
 }
 
