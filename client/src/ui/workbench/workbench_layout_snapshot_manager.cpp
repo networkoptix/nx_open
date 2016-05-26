@@ -39,15 +39,8 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
         at_resourcePool_resourceAdded(layout);
 }
 
-QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
-    disconnect(qnResPool, nullptr, this, nullptr);
-
-    for(const QnLayoutResourcePtr &layout: qnResPool->getResources<QnLayoutResource>())
-        at_resourcePool_resourceRemoved(layout);
-
-    m_storage->clear();
-    m_flagsByLayout.clear();
-}
+QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
+{}
 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
     if(!resource) {
