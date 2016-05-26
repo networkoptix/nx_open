@@ -58,7 +58,7 @@
             <table border="0" cellspacing="0" cellpadding="0">
                 <tbody>
                 <tr>
-                    {{#system}}
+                    {{#systemName}}
                     <td class="right-border">
                         <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
                     </td>
@@ -66,13 +66,13 @@
                         <b>Website</b><br>
                         <a href="{{companyUrl}}">{{companyUrl}}</a>
                     </td>
-                    {{/system}}
-                    {{^system}}
+                    {{/systemName}}
+                    {{^systemName}}
                     <td class="right-border">
                         <b>Website</b><br>
                         <a href="{{companyUrl}}">{{companyUrl}}</a>
                     </td>
-                    {{/system}}
+                    {{/systemName}}
                     <td class="left-border">
                         <b>Support</b><br>
                         <a href="{{supportLink}}">{{supportLinkText}}</a>
