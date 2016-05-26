@@ -1,4 +1,7 @@
 #include "axis_audio_transmitter.h"
+#include <network/router.h>
+#include <http/custom_headers.h>
+#include <common/common_module.h>
 
 namespace
 {
@@ -145,6 +148,23 @@ void QnAxisAudioTransmitter::prepare()
 bool QnAxisAudioTransmitter::startTransmission()
 {
     QUrl url(m_resource->getUrl());
+
+    QnResourcePtr mServer = m_resource->getParentServer();
+    if (!mServer)
+        return false;
+    if (mServer->getId() != qnCommon->moduleGUID())
+    {
+        // proxy request to foreign camera
+        auto route = QnRouter::instance()->routeTo(mServer->getId());
+        if (route.addr.isNull())
+            return false;
+
+        m_httpClient->addAdditionalHeader(Qn::CAMERA_GUID_HEADER_NAME, m_resource->getId().toByteArray());
+
+        url.setHost(route.addr.address.toString());
+        url.setPort(route.addr.port);
+    }
+
     auto auth = m_resource->getAuth();
 
     m_httpClient->setUserName(auth.user());
@@ -168,7 +188,7 @@ bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
         return true; //< always return true. It means skip input data.
 
     QnAbstractMediaDataPtr transcoded;
-    do 
+    do
     {
         m_transcoder->transcodePacket(data, &transcoded);
         data.reset();
