@@ -31,6 +31,8 @@ describe('Cloud disconnect', function () {
     it("System is in cloud - we see cloud account and Disconnect button ",function(){
         p.cloudDialogCloseButton.click();
         expect(p.cloudSection.getText()).toContain('This system is linked to Nx Cloud account');
+        expect(p.goToCloudAccButton.getAttribute('href')).toContain('http://');
+        expect(p.goToCloudAccButton.getAttribute('href')).toContain('?from=webadmin&context=settings');
         p.disconnectFromCloudButton.click();
     });
 

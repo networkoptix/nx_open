@@ -2,15 +2,22 @@
 
 var Page = function () {
 
+    this.activeSystem = 'http://10.0.3.161:7001';
+    this.incompatibleSystem = 'http://10.0.3.160:7001';
+    this.password = 'admin';
+
     this.get = function () {
         browser.get('/#/settings');
     };
     this.mergeButton = element(by.buttonText("Merge Systems"));
     this.mergeDialog = element(by.id("mergeDialog"));
 
+    this.dialogCloseButton = this.mergeDialog.element(by.css('.close'));
+
     this.systemSuggestionsList =  element(by.id("discoveredUrls"));
     this.urlInput = element(by.model("settings.url"));
     this.passwordInput = element(by.model("settings.password"));
+    this.currentPasswordInput = element(by.model("settings.currentPassword"));
 
     this.findSystemButton = element(by.buttonText("Find system"));
     this.mergeSystemsButton = element(by.id("merge-systems-button"));
