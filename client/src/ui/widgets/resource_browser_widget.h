@@ -125,8 +125,6 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
 
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
     virtual QString toolTipAt(const QPointF& pos) const override;
     virtual bool showOwnTooltip(const QPointF& pos) override;
 

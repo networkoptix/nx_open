@@ -328,13 +328,25 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParam
     if (nodeType == Qn::SharedLayoutNode)
         return Qn::InvisibleAction;
 
+    QnUserResourcePtr owner = parameters.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    bool ownResources = owner && owner == context()->user();
+
     for (const QnResourcePtr &resource : parameters.resources())
     {
         if (!resource)
             continue; /* OK to remove. */
 
         if (resource->hasFlags(Qn::layout) && !resource->hasFlags(Qn::local))
+        {
+            if (ownResources)
+                continue; /* OK to remove. */
+
+            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+            if (layout->isShared())
+                return Qn::InvisibleAction; /*< We cannot delete shared links on another user, they will be unshared instead. */
+
             continue; /* OK to remove. */
+        }
 
         if (resource->hasFlags(Qn::user) || resource->hasFlags(Qn::videowall))
             continue; /* OK to remove. */
