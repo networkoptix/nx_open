@@ -502,35 +502,46 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(targetUser);
 
+    auto checkReadOnly = [this](Qn::Permissions permissions)
+    {
+        if (!qnCommon->isReadOnly())
+            return permissions;
+        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+    };
+
+    auto checkUserType = [targetUser](Qn::Permissions permissions)
+    {
+        switch (targetUser->userType())
+        {
+        case QnUserType::Ldap:
+            return permissions &~ (Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+        case QnUserType::Cloud:
+            return permissions &~ (Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+        default:
+            break;
+        }
+        return permissions;
+    };
+
     Qn::Permissions result = Qn::NoPermissions;
     if (targetUser == user)
     {
-        if (qnCommon->isReadOnly())
-            return result | Qn::ReadPermission;
-
-        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
+        result |= Qn::ReadPermission | Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
     }
-
-    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalAdminPermission))
+    else
     {
-        result |= Qn::ReadPermission;
-        if (qnCommon->isReadOnly())
-            return result;
+        if (hasGlobalPermission(user, Qn::GlobalViewLogsPermission))
+            result |= Qn::ReadPermission;
 
-        /* Admins can only be edited by owner, other users - by all admins. */
-        if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
-            result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
+        if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
+        {
+            /* Admins can only be edited by owner, other users - by all admins. */
+            if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
+                result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
+        }
     }
 
-    /* Nobody can edit LDAP-provided parameters. */
-    if (targetUser->isLdap())
-    {
-        result &= ~Qn::WriteNamePermission;
-        result &= ~Qn::WritePasswordPermission;
-        result &= ~Qn::WriteEmailPermission;
-    }
-
-    return result;
+    return checkReadOnly(checkUserType(result));
 }
 
 bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const

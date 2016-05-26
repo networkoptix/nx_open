@@ -511,7 +511,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget
             | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         icon(qnSkin->icon("events/log.png")).
         shortcut(lit("Ctrl+L")).
         text(tr("Event Log..."));
@@ -899,7 +899,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenAuditLogAction).
         flags(Qn::Main).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         text(tr("Audit Trail..."));
 
     factory(QnActions::OpenBookmarksSearchAction).
@@ -1472,7 +1472,7 @@ QnActionManager::QnActionManager(QObject *parent):
                 tr("Check Camera Issues..."),       tr("Check Cameras Issues..."),
                 tr("Check I/O Module Issues..."),    tr("Check I/O Modules Issues...")
             ), this)).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
             new QnPreviewSearchModeCondition(true, this),

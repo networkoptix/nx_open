@@ -38,6 +38,7 @@ public:
 
 protected:
     void setVisible(bool value) override;
+    virtual void retranslateUi() override;
 
 private slots:
     void updateData();
@@ -67,7 +68,6 @@ private:
      */
     void query(qint64 fromMsec, qint64 toMsec, QnBusiness::EventType eventType, QnBusiness::ActionType actionType);
 
-    void retranslateUi();
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;
