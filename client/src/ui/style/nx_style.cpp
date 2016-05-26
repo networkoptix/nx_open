@@ -2058,13 +2058,18 @@ int QnNxStyle::pixelMetric(
         return dp(6);
 
     case PM_LayoutTopMargin:
+        return Metrics::kDefaultLayoutMargins.top();
     case PM_LayoutBottomMargin:
+        return Metrics::kDefaultLayoutMargins.bottom();
     case PM_LayoutLeftMargin:
+        return Metrics::kDefaultLayoutMargins.left();
     case PM_LayoutRightMargin:
-        return dp(16);
+        return Metrics::kDefaultLayoutMargins.right();
+
     case PM_LayoutHorizontalSpacing:
+        return Metrics::kDefaultLayoutSpacing.width();
     case PM_LayoutVerticalSpacing:
-        return dp(8);
+        return Metrics::kDefaultLayoutSpacing.height();
 
     case PM_MenuVMargin:
         return dp(2);
