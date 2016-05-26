@@ -42,8 +42,8 @@ namespace
     const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
     const QLatin1String kDefaultRunWithCloud("true");
 
-    const QLatin1String kCdbAddress("cloud_db/address");
-    const QLatin1String kDefaultCdbAddress("");
+    const QLatin1String kCdbEndpoint("cloud_db/endpoint");
+    const QLatin1String kDefaultCdbEndpoint("");
 
     const QLatin1String kCdbUser("cloud_db/user");
     const QLatin1String kDefaultCdbUser("connection_mediator");
@@ -171,7 +171,7 @@ void Settings::loadConfiguration()
     m_logging.logDir = m_settings.value(kLogDir, kDefaultLogDir).toString();
 
     m_cloudDB.runWithCloud = m_settings.value(kRunWithCloud, kDefaultRunWithCloud).toBool();
-    m_cloudDB.address = m_settings.value(kCdbAddress, kDefaultCdbAddress).toString();
+    m_cloudDB.endpoint = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
     m_cloudDB.user = m_settings.value(kCdbUser, kDefaultCdbUser).toString();
     m_cloudDB.password = m_settings.value(kCdbPassword, kDefaultCdbPassword).toString();
     m_cloudDB.updateInterval = duration_cast<seconds>(
