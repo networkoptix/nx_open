@@ -236,7 +236,7 @@ int QnSessionManager::sendAsyncRequest(
         }
         else if (proxy.type() != QNetworkProxy::NoProxy)
         {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented!");
+            NX_ASSERT(0, Q_FUNC_INFO, "Not implemented!");
             return -1;
         }
     }
