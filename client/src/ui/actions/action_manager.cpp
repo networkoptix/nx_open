@@ -641,18 +641,6 @@ QnActionManager::QnActionManager(QObject *parent):
             pulledText(tr("New Layout...")).
             condition(hasFlags(Qn::user));
 
-        factory(QnActions::NewGlobalLayoutAction).
-            flags(Qn::Main | Qn::Tree).
-            requiredGlobalPermission(Qn::GlobalEditLayoutsPermission).
-            text(tr("Global Layout")).
-            pulledText(tr("New Global Layout")).
-            condition(new QnConjunctionActionCondition(
-                new QnTreeNodeTypeCondition(Qn::GlobalLayoutsNode, this),
-                new QnForbiddenInSafeModeCondition(this),
-                this)
-            ).
-            autoRepeat(false);
-
         factory(QnActions::OpenNewTabAction).
             flags(Qn::Main | Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::GlobalHotkey).
             mode(QnActionTypes::DesktopMode).
@@ -768,6 +756,14 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+Alt+S"), QnActionBuilder::Windows, true).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
+
+    factory(QnActions::ShareLayoutAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        text(lit("Share_Layout_with")).
+        autoRepeat(false).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        condition(new QnForbiddenInSafeModeCondition(this));
 
     factory(QnActions::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
@@ -1406,6 +1402,14 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
+    factory(QnActions::StopSharingLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Stop Sharing Layout")).
+        shortcut(lit("Del")).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::SharedLayoutNode, this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -1571,7 +1575,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredGlobalPermission(Qn::GlobalEditServersPermissions).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),

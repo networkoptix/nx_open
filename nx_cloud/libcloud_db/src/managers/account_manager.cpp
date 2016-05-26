@@ -126,7 +126,7 @@ void AccountManager::addAccount(
             data::AccountConfirmationCode());
     }
 
-    accountData.id = QnUuid::createUuid();
+    accountData.id = QnUuid::createUuid().toSimpleString().toStdString();
 
     //fetching request source
     bool requestSourceSecured = false;

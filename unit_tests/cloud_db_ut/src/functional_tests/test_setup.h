@@ -16,6 +16,7 @@
 
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
+#include <utils/db/types.h>
 
 #include <cdb/connection.h>
 #include <cloud_db_process_public.h>
@@ -140,6 +141,10 @@ public:
         const std::string& accountPassword,
         const std::string& systemId,
         api::SystemDataEx* const systemData);
+
+    static void setTemporaryDirectoryPath(const QString& path);
+    static void setDbConnectionOptions(
+        const nx::db::ConnectionOptions& connectionOptions);
 
 private:
     QString m_tmpDir;

@@ -37,11 +37,7 @@ private:
     void updateLogin();
     void updatePassword();
     void updateEmail();
-
-private:
     void updateControlsAccess();
-
-
     bool validMode() const;
 private:
     QScopedPointer<Ui::UserSettingsWidget> ui;

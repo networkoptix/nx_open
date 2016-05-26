@@ -74,6 +74,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     ui(new Ui::AccessibleResourcesWidget()),
     m_permissionsModel(permissionsModel),
     m_filter(filter),
+    m_controlsVisible(filter == QnResourceAccessFilter::CamerasFilter), /*< Show 'All' checkbox only for cameras. */
     m_resourcesModel(new QnResourceListModel()),
     m_controlsModel(new QnResourceListModel())
 {
@@ -83,9 +84,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     {
     case QnResourceAccessFilter::LayoutsFilter:
         ui->descriptionLabel->setText(tr("Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts."));
-        break;
-    case QnResourceAccessFilter::ServersFilter:
-        ui->descriptionLabel->setText(tr("Giving access to some server you give access to view server statistics."));
         break;
     default:
         break;
@@ -103,6 +101,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
 
     ui->resourcesTreeView->setModel(viewModel);
     ui->controlsTreeView->setModel(m_controlsModel.data());
+    ui->controlsTreeView->setVisible(m_controlsVisible);
+    ui->controlsTreeView->setEnabled(m_controlsVisible);
+    ui->line->setVisible(m_controlsVisible);
 
     auto itemDelegate = new QnResourceItemDelegate(this);
 
@@ -117,7 +118,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(QnAbstractPermissionsMo
     setupTreeView(ui->controlsTreeView);
 
     ui->resourcesTreeView->setMouseTracking(true);
-    ui->resourcesTreeView->setEnabled(true);
 
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, [this, viewModel](const QModelIndex& index)
@@ -138,21 +138,26 @@ QnAccessibleResourcesWidget::~QnAccessibleResourcesWidget()
 
 bool QnAccessibleResourcesWidget::hasChanges() const
 {
-    bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-
-    if (m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)) != checkedAll)
-        return true;
+    if (m_controlsVisible)
+    {
+        bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
+        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission) != checkedAll)
+            return true;
+    }
 
     return m_resourcesModel->checkedResources() != QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources());
 }
 
 void QnAccessibleResourcesWidget::loadDataToUi()
 {
-    QSet<QnUuid> checkedControls; //= m_controlsModel->resources()
-    if (m_permissionsModel->rawPermissions().testFlag(QnResourceAccessFilter::accessPermission(m_filter)))
-        for (const auto& resource : m_controlsModel->resources())
-            checkedControls << resource->getId();
-    m_controlsModel->setCheckedResources(checkedControls);
+    if (m_controlsVisible)
+    {
+        QSet<QnUuid> checkedControls;
+        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllCamerasPermission))
+            for (const auto& resource : m_controlsModel->resources())
+                checkedControls << resource->getId();   /*< Really we are checking the only dummy resource. */
+        m_controlsModel->setCheckedResources(checkedControls);
+    }
     m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources()));
 }
 
@@ -165,54 +170,28 @@ void QnAccessibleResourcesWidget::applyChanges()
     accessibleResources.unite(newFiltered);
     m_permissionsModel->setAccessibleResources(accessibleResources);
 
-    bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-    Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
-    if (checkedAll)
-        permissions |= QnResourceAccessFilter::accessPermission(m_filter);
-    else
-        permissions &= ~QnResourceAccessFilter::accessPermission(m_filter);
-    m_permissionsModel->setRawPermissions(permissions);
+    if (m_controlsVisible)
+    {
+        bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
+        Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
+        if (checkedAll)
+            permissions |= Qn::GlobalAccessAllCamerasPermission;
+        else
+            permissions &= ~Qn::GlobalAccessAllCamerasPermission;
+        m_permissionsModel->setRawPermissions(permissions);
+    }
 }
 
 void QnAccessibleResourcesWidget::initControlsModel()
 {
-    auto createDummyResource = [this]() -> QnResourcePtr
-    {
-        switch (m_filter)
-        {
-        case QnResourceAccessFilter::CamerasFilter:
-        {
-            QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
-            dummy->setName(tr("All Cameras"));
-            return dummy;
-        }
-        case QnResourceAccessFilter::LayoutsFilter:
-        {
-            QnLayoutResourcePtr dummy(new QnLayoutResource());
-            dummy->setName(tr("All Global Layouts"));
-            return dummy;
-        }
-        case QnResourceAccessFilter::ServersFilter:
-        {
-            QnMediaServerResourcePtr dummy(new QnMediaServerResource());
-            dummy->setName(tr("All Servers"));
-            return dummy;
-        }
-        default:
-            NX_ASSERT(false);
-            break;
-        }
-        return QnResourcePtr();
-    };
+    if (!m_controlsVisible)
+        return;
 
-    auto dummy = createDummyResource();
-    if (dummy)
-    {
-        /* Create separate dummy resource for each filter, but once per application run. */
-        dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
-        m_controlsModel->setResources(QnResourceList() << dummy);
-    }
-
+    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+    dummy->setName(tr("All Cameras"));
+    /* Create separate dummy resource id for each filter, but once per application run. */
+    dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
+    m_controlsModel->setResources(QnResourceList() << dummy);
     m_controlsModel->setCheckable(true);
     m_controlsModel->setStatusIgnored(true);
 

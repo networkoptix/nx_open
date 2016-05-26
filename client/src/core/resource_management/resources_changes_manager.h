@@ -58,6 +58,9 @@ public:
     /** Apply changes to the given user. */
     void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges);
 
+    /** Save accessible resources for the given user */
+    void saveAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& accessibleResources);
+
     void saveUserGroup(const ec2::ApiUserGroupData& userGroup);
     void removeUserGroup(const QnUuid& groupId);
 

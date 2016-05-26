@@ -144,7 +144,10 @@ namespace nx_http
 
     QSharedPointer<AbstractStreamSocket> HttpClient::takeSocket()
     {
-        return m_asyncHttpClient->takeSocket();
+        auto sock = m_asyncHttpClient->takeSocket();
+        if (!sock->setNonBlockingMode(false))
+            return QSharedPointer<AbstractStreamSocket>();
+        return sock;
     }
 
     void HttpClient::instanciateHttpClient()

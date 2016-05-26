@@ -31,7 +31,7 @@ class TemporaryAccountPasswordEx
     public data::TemporaryAccountPassword
 {
 public:
-    QnUuid id;
+    std::string id;
     std::string accessRightsStr;
 
     TemporaryAccountPasswordEx() {}
@@ -101,11 +101,11 @@ private:
 
     nx::db::DBResult deleteTempPassword(
         QSqlDatabase* const connection,
-        QnUuid tempPasswordID);
+        std::string tempPasswordID);
     void tempPasswordDeleted(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult resultCode,
-        QnUuid tempPasswordID,
+        std::string tempPasswordID,
         std::function<void(api::ResultCode)> completionHandler);
    
 };

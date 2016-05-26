@@ -22,10 +22,10 @@ namespace {
 
 CdbNonceFetcher::CdbNonceFetcher(
     CloudConnectionManager* const cloudConnectionManager,
-    std::unique_ptr<AbstractNonceProvider> defaultGenerator)
+    std::shared_ptr<AbstractNonceProvider> defaultGenerator)
 :
     m_cloudConnectionManager(cloudConnectionManager),
-    m_defaultGenerator(std::move(defaultGenerator)),
+    m_defaultGenerator(defaultGenerator),
     m_boundToCloud(false),
     m_randomEngine(m_rd()),
     m_nonceTrailerRandomGenerator('a', 'z')

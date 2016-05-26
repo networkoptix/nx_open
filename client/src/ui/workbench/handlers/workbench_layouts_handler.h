@@ -26,7 +26,6 @@ protected:
 
 private slots:
     void at_newUserLayoutAction_triggered();
-    void at_newGlobalLayoutAction_triggered();
     void at_saveLayoutAction_triggered();
     void at_saveCurrentLayoutAction_triggered();
     void at_saveLayoutAsAction_triggered();
@@ -34,6 +33,8 @@ private slots:
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
+    void at_shareLayoutAction_triggered();
+    void at_stopSharingLayoutAction_triggered();
 
     void at_workbench_layoutsChanged();
 

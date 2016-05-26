@@ -109,7 +109,6 @@ extern "C"
 #include "text_to_wav.h"
 
 #include "common/common_module.h"
-#include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>

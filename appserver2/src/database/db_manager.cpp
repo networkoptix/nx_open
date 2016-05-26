@@ -1311,6 +1311,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncUsers = true;
     }
+    else if (updateName == lit(":/updates/56_remove_layout_editable.sql"))
+    {
+        if (!m_dbJustCreated)
+            m_needResyncLayout = true;
+    }
 
     return true;
 }
@@ -1699,27 +1704,29 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
 ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_layout \
-        (user_can_edit, cell_spacing_height, locked, \
-        cell_aspect_ratio, background_width, \
-        background_image_filename, background_height, \
-        cell_spacing_width, background_opacity, resource_ptr_id) \
-        \
-        VALUES (:editable, :verticalSpacing, :locked, \
-        :cellAspectRatio, :backgroundWidth, \
-        :backgroundImageFilename, :backgroundHeight, \
-        :horizontalSpacing, :backgroundOpacity, :internalId)\
-    ");
+    QString queryStr(R"(
+        INSERT OR REPLACE
+        INTO vms_layout
+        (
+        cell_spacing_height, locked,
+        cell_aspect_ratio, background_width,
+        background_image_filename, background_height,
+        cell_spacing_width, background_opacity, resource_ptr_id
+        ) VALUES (
+        :verticalSpacing, :locked,
+        :cellAspectRatio, :backgroundWidth,
+        :backgroundImageFilename, :backgroundHeight,
+        :horizontalSpacing, :backgroundOpacity, :internalId
+        )
+    )");
+    if (!prepareSQLQuery(&insQuery, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
-    if (insQuery.exec()) {
+    if (execSQLQuery(&insQuery, Q_FUNC_INFO))
         return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
+    return ErrorCode::dbError;
 }
 
 ErrorCode QnDbManager::removeStorage(const QnUuid& guid)
@@ -2551,7 +2558,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     {
         qint32 resource_ptr_id = getResourceInternalId(resourceId);
         if (resource_ptr_id <= 0)
-            return ErrorCode::dbError;
+            continue;   /* Just skip invalid id's. */
         newAccessibleResources << resource_ptr_id;
     }
 
@@ -2959,35 +2966,38 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
     QSqlQuery query(m_sdb);
     QString filter; // todo: add data filtering by user here
     query.setForwardOnly(true);
-    query.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        l.user_can_edit as editable, l.cell_spacing_height as verticalSpacing, l.locked, \
-        l.cell_aspect_ratio as cellAspectRatio, l.background_width as backgroundWidth, \
-        l.background_image_filename as backgroundImageFilename, l.background_height as backgroundHeight, \
-        l.cell_spacing_width as horizontalSpacing, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id \
-        FROM vms_layout l \
-        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid\
-    ").arg(filter));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    QString queryStr(R"(
+        SELECT
+        r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
+        l.cell_spacing_height as verticalSpacing, l.locked,
+        l.cell_aspect_ratio as cellAspectRatio, l.background_width as backgroundWidth,
+        l.background_image_filename as backgroundImageFilename, l.background_height as backgroundHeight,
+        l.cell_spacing_width as horizontalSpacing, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id
+        FROM vms_layout l
+        JOIN vms_resource r on r.id = l.resource_ptr_id ORDER BY r.guid
+    )");
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     QSqlQuery queryItems(m_sdb);
     queryItems.setForwardOnly(true);
-    queryItems.prepare("\
-        SELECT r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_guid as resourceId, \
-        li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop, \
-        li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id, \
-        li.dewarping_params as dewarpingParams, li.left, li.display_info as displayInfo \
-        FROM vms_layoutitem li \
-        JOIN vms_resource r on r.id = li.layout_id order by r.guid\
-    ");
-
-    if (!queryItems.exec()) {
-        qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
+    QString queryItemsStr(R"(
+        SELECT
+        r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_guid as resourceId,
+        li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop,
+        li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id,
+        li.dewarping_params as dewarpingParams, li.left, li.display_info as displayInfo
+        FROM vms_layoutitem li
+        JOIN vms_resource r on r.id = li.layout_id order by r.guid
+    )");
+    if (!prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    }
+
+    if (!execSQLQuery(&queryItems, Q_FUNC_INFO))
+        return ErrorCode::dbError;
 
     QnSql::fetch_many(query, &layouts);
     std::vector<ApiLayoutItemWithRefData> items;
@@ -3835,9 +3845,14 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataLis
 
 ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license)
 {
+    QnDbTransactionLocker lockStatic(&m_tranStatic);
     auto result = saveLicense(license, m_sdbStatic);
     if (result == ErrorCode::ok)
+    {
         result = saveLicense(license, m_sdb);
+        if (result == ErrorCode::ok)
+            lockStatic.commit();
+    }
     return result;
 }
 
@@ -3858,9 +3873,14 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license, QSqlDatabase& 
 
 ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license)
 {
+    QnDbTransactionLocker lockStatic(&m_tranStatic);
     auto result = removeLicense(license, m_sdbStatic);
     if (result == ErrorCode::ok)
+    {
         result = removeLicense(license, m_sdb);
+        if (result == ErrorCode::ok)
+            lockStatic.commit();
+    }
     return result;
 }
 

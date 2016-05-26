@@ -46,13 +46,17 @@ namespace gateway {
 
 VmsGatewayProcess::VmsGatewayProcess( int argc, char **argv )
 :
+#ifdef USE_QAPPLICATION
     QtService<QtSingleCoreApplication>(argc, argv, QnLibVmsGatewayAppInfo::applicationName()),
+#endif
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
     m_timerID( -1 )
 {
+#ifdef USE_QAPPLICATION
     setServiceDescription(QnLibVmsGatewayAppInfo::applicationDisplayName());
+#endif
 
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
@@ -60,9 +64,15 @@ VmsGatewayProcess::VmsGatewayProcess( int argc, char **argv )
 
 void VmsGatewayProcess::pleaseStop()
 {
+#ifdef USE_QAPPLICATION
     m_terminated = true;
     if (application())
         application()->quit();
+#else
+    QnMutexLocker lk(&m_mutex);
+    m_terminated = true;
+    m_cond.wakeAll();
+#endif
 }
 
 void VmsGatewayProcess::setOnStartedEventHandler(
@@ -71,7 +81,11 @@ void VmsGatewayProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
+#ifdef USE_QAPPLICATION
 int VmsGatewayProcess::executeApplication()
+#else
+int VmsGatewayProcess::exec()
+#endif
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -96,6 +110,9 @@ int VmsGatewayProcess::executeApplication()
         initializeLogging(settings);
 
         //enabling nat traversal
+        if (!settings.general().mediatorEndpoint.isEmpty())
+            nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+                SocketAddress(settings.general().mediatorEndpoint));
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
@@ -146,27 +163,36 @@ int VmsGatewayProcess::executeApplication()
         if (!multiAddressHttpServer.listen())
             return 5;
 
+#ifdef USE_QAPPLICATION
         application()->installEventFilter(this);
+#endif
         if (m_terminated)
             return 0;
 
         NX_LOG(lit("%1 has been started")
             .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()),
             cl_logALWAYS);
-        std::cout << QnLibVmsGatewayAppInfo::applicationDisplayName().toStdString()
-            << " has been started" << std::endl;
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
+#ifdef USE_QAPPLICATION
         //starting timer to check for m_terminated again after event loop start
         m_timerID = application()->startTimer(0);
 
         //TODO #ak remove qt event loop
         //application's main loop
         const int result = application()->exec();
+        return result
+#else
+        {
+            QnMutexLocker lk(&m_mutex);
+            while (!m_terminated)
+                m_cond.wait(lk.mutex());
+        }
 
-        return result;
+        return 0;
+#endif
     }
     catch (const std::exception& e)
     {
@@ -175,6 +201,7 @@ int VmsGatewayProcess::executeApplication()
     }
 }
 
+#ifdef USE_QAPPLICATION
 void VmsGatewayProcess::start()
 {
     QtSingleCoreApplication* application = this->application();
@@ -205,6 +232,7 @@ bool VmsGatewayProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
         application()->quit();
     return false;
 }
+#endif
 
 void VmsGatewayProcess::initializeLogging(const conf::Settings& settings)
 {

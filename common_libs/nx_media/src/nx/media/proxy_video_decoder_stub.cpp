@@ -27,6 +27,8 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
+    Q_UNUSED(compressedVideoData);
+
     static int frameNumber = 0;
 
     NX_CRITICAL(outDecodedFrame);

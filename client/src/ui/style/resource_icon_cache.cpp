@@ -33,11 +33,15 @@ namespace
 QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
 {
     m_cache.insert(Unknown,                 QIcon());
-    m_cache.insert(LocalServer,             loadIcon(lit("tree/local.png")));
+    m_cache.insert(LocalResources,          loadIcon(lit("tree/local.png")));
+    m_cache.insert(CurrentSystem,           loadIcon(lit("tree/system.png")));
     m_cache.insert(Server,                  loadIcon(lit("tree/server.png")));
-    m_cache.insert(Servers,                 loadIcon(lit("tree/system.png")));
+    m_cache.insert(Servers,                 loadIcon(lit("tree/servers.png")));
     m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
+    m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
+    m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
     m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
+    m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
     m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
     m_cache.insert(Recorder,                loadIcon(lit("tree/encoder.png")));
     m_cache.insert(Image,                   loadIcon(lit("tree/snapshot.png")));
@@ -144,7 +148,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Qn::ResourceFlags flags = resource->flags();
     if (flags.testFlag(Qn::local_server))
-        key = LocalServer;
+        key = LocalResources;
     else if (flags.testFlag(Qn::server))
         key = Server;
     else if (flags.testFlag(Qn::layout))
@@ -172,6 +176,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;
+        else if (layout->isShared())
+            key = SharedLayout;
         else
             status = layout->locked() ? Locked : Unknown;
     }

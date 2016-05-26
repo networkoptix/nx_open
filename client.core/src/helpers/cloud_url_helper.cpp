@@ -1,28 +1,28 @@
 #include "cloud_url_helper.h"
 
-#include <utils/common/app_info.h>
+#include "api/global_settings.h"
 
 QUrl QnCloudUrlHelper::mainUrl()
 {
-    return QUrl(QnAppInfo::cloudPortalUrl());
+    return QUrl(QnGlobalSettings::instance()->cloudPortalUrl());
 }
 
 QUrl QnCloudUrlHelper::aboutUrl()
 {
-    return QUrl(QnAppInfo::cloudPortalUrl() + lit("/static/index.html#/about/cloud"));
+    return QUrl(QnGlobalSettings::instance()->cloudPortalUrl() + lit("/static/index.html#/about/cloud"));
 }
 
 QUrl QnCloudUrlHelper::accountManagementUrl()
 {
-    return QUrl(QnAppInfo::cloudPortalUrl() + lit("/static/index.html#/account"));
+    return QUrl(QnGlobalSettings::instance()->cloudPortalUrl() + lit("/static/index.html#/account"));
 }
 
 QUrl QnCloudUrlHelper::createAccountUrl()
 {
-    return QUrl(QnAppInfo::cloudPortalUrl() + lit("/static/index.html#/register"));
+    return QUrl(QnGlobalSettings::instance()->cloudPortalUrl() + lit("/static/index.html#/register"));
 }
 
 QUrl QnCloudUrlHelper::restorePasswordUrl()
 {
-    return QUrl(QnAppInfo::cloudPortalUrl() + lit("/static/index.html#/restore_password"));
+    return QUrl(QnGlobalSettings::instance()->cloudPortalUrl() + lit("/static/index.html#/restore_password"));
 }

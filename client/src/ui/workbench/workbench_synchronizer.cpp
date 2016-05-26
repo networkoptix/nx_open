@@ -41,8 +41,9 @@ QnWorkbenchSynchronizer::~QnWorkbenchSynchronizer() {
         delete workbench()->layouts().back();
 }
 
-void QnWorkbenchSynchronizer::submit() {
-    if(!m_submit)
+void QnWorkbenchSynchronizer::submit()
+{
+    if (!m_submit)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
@@ -51,10 +52,11 @@ void QnWorkbenchSynchronizer::submit() {
      *
      * New layout may have been added, and in this case we need to create a new
      * resource for it. */
-    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
+    foreach(QnWorkbenchLayout *layout, workbench()->layouts())
+    {
         QnLayoutResourcePtr resource = layout->resource();
 
-        if(resource.isNull())
+        if (resource.isNull())
         {
             /* This actually is a newly created layout. */
             resource = QnLayoutResourcePtr(new QnLayoutResource());
@@ -65,10 +67,8 @@ void QnWorkbenchSynchronizer::submit() {
             synchronizer->setAutoDeleting(true);
             synchronizer->submit();
 
-            if(context()->user()) {
+            if (context()->user())
                 resource->setParentId(context()->user()->getId());
-                resource->setUserCanEdit(true);
-            }
 
             resourcePool()->addResource(resource);
         }

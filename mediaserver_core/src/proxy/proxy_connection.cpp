@@ -31,6 +31,7 @@
 
 #include "http/custom_headers.h"
 #include "api/global_settings.h"
+#include <nx/network/http/auth_tools.h>
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
@@ -180,6 +181,53 @@ QUrl QnProxyConnectionProcessor::getDefaultProxyUrl()
     return QUrl(lit("http://localhost:%1").arg(d->owner->getPort()));
 }
 
+/**
+* Server nonce could be local since v.3.0. It cause authentication issue while proxing request.
+* This function replace user information to the serverAuth key credentials to guarantee
+* success authentication on the other server.
+*/
+bool QnProxyConnectionProcessor::replaceAuthHeader()
+{
+    Q_D(QnProxyConnectionProcessor);
+
+    nx_http::header::DigestAuthorization originalAuthHeader;
+    if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, "Authorization")))
+        return false;
+
+    if (auto ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
+    {
+        // it's already authorized request.
+        // Update authorization using local system user related to current server
+        QString userName = ownServer->getId().toString();
+        QString password = ownServer->getAuthKey();
+
+        nx_http::header::WWWAuthenticate wwwAuthenticateHeader;
+        nx_http::header::DigestAuthorization digestAuthorizationHeader;
+        wwwAuthenticateHeader.authScheme = nx_http::header::AuthScheme::digest;
+        wwwAuthenticateHeader.params["nonce"] = QnAuthHelper::instance()->generateNonce(QnAuthHelper::NonceProvider::local);
+        wwwAuthenticateHeader.params["realm"] = QnAppInfo::realm().toUtf8();
+
+        if (!nx_http::calcDigestResponse(
+            d->request.requestLine.method,
+            userName.toUtf8(),
+            password.toUtf8(),
+            boost::none,
+            d->request.requestLine.url.path().toUtf8(),
+            wwwAuthenticateHeader,
+            &digestAuthorizationHeader))
+        {
+            return false;
+        }
+
+        nx_http::HttpHeader authHeader(nx_http::header::Authorization::NAME, digestAuthorizationHeader.serialized());
+        nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalAuthHeader.digest->userid);
+        nx_http::insertOrReplaceHeader(&d->request.headers, authHeader);
+        nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
+    }
+
+    return true;
+}
+
 bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
@@ -270,6 +318,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
         dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
     else
         dstRoute.addr = SocketAddress(dstUrl.host(), dstUrl.port(80));
+
+    if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())
+    {
+        if (!replaceAuthHeader())
+            return false;
+    }
 
     if (!dstRoute.addr.isNull())
     {

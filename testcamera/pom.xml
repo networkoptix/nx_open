@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>testcamera</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Test Camera</name>
+	<name>HD Witness Test Camera</name>	
 
     <dependencies>
         <dependency>

@@ -23,37 +23,11 @@
         <module>common_ut</module>
         <module>nx_network_ut</module>
         <module>mediaserver_core_ut</module>
-        <!-- Client_ut should be rewritten -->
-        <!-- <module>client_ut</module> -->
+        <module>client_ut</module>
         <module>cloud_db_ut</module>
         <module>connection_mediator_ut</module>
         <module>appserver2_ut</module>
         <module>cloud_connectivity_ut</module>
         <module>utils_ut</module>
-    </modules>       
-    <!-- The following section is to rebuild the required artifact as lib. As soon as everything will be built as lib, this may be deleted -->
-<!--    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>            
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-        <profile>
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os> 
-            </activation>
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>
-    </profiles> -->       
+    </modules>         
 </project>

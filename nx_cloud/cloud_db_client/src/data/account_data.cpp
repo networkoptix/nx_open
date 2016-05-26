@@ -36,7 +36,7 @@ MAKE_FIELD_NAME_STR_CONST(AccountData, statusCode)
 
 bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountData* const accountData )
 {
-    accountData->id = QnUuid(urlQuery.queryItemValue(AccountData_id_field));
+    accountData->id = urlQuery.queryItemValue(AccountData_id_field).toStdString();
     accountData->email = urlQuery.queryItemValue(AccountData_email_field).toStdString();
     accountData->passwordHa1 = urlQuery.queryItemValue(AccountData_passwordHa1_field).toStdString();
     accountData->fullName = urlQuery.queryItemValue(AccountData_fullName_field).toStdString();
@@ -58,7 +58,7 @@ void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
         AccountData_id_field,
-        data.id.toString());
+        QString::fromStdString(data.id));
     urlQuery->addQueryItem(
         AccountData_email_field,
         QString::fromStdString(data.email));

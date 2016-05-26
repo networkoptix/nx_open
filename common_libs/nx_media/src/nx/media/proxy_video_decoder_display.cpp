@@ -1,6 +1,7 @@
 #include "proxy_video_decoder_private.h"
 #if defined(ENABLE_PROXY_DECODER)
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder<display>: "
 #include "proxy_video_decoder_utils.h"
 
 namespace nx {
@@ -82,6 +83,9 @@ int Impl::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)
 {
+    if (conf.enableFps)
+        debugShowFps("decode");
+    TIME_BEGIN(decode);
     NX_CRITICAL(outDecodedFrame);
     outDecodedFrame->reset();
 
@@ -90,15 +94,21 @@ int Impl::decode(
     int64_t outPts = 0;
     // Perform actual decoding from QnCompressedVideoData to display.
     int result = proxyDecoder().decodeToDisplayQueue(compressedFrame.get(), &outPts, &frameHandle);
-    if (result <= 0) //< "Buffering".
-        return result;
-    if (!frameHandle)
-        return 0;
-
-    QAbstractVideoBuffer* videoBuffer = new VideoBuffer(frameHandle, sharedPtrToThis());
-    outDecodedFrame->reset(new QVideoFrame(videoBuffer, frameSize(), QVideoFrame::Format_BGR32));
-    (*outDecodedFrame)->setStartTime(outPts);
-
+    if (result > 0) //< Not "Buffering".
+    {
+        if (frameHandle)
+        {
+            QAbstractVideoBuffer* videoBuffer = new VideoBuffer(frameHandle, sharedPtrToThis());
+            outDecodedFrame->reset(
+                new QVideoFrame(videoBuffer, frameSize(), QVideoFrame::Format_BGR32));
+            (*outDecodedFrame)->setStartTime(outPts);
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    TIME_END(decode);
     return result;
 }
 

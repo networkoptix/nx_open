@@ -108,7 +108,7 @@
                 "buttonText":       "light4",
                 "base":             "dark7",
                 "window":           "dark7",
-                "shadow":           "dark4",
+                "shadow":           "dark5",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast",
                 "link":             "blue10",
@@ -129,7 +129,7 @@
                 "buttonText":       "light4.setAlpha(75)",
                 "base":             "dark7.setAlpha(75)",
                 "window":           "dark7",
-                "shadow":           "dark4.setAlpha(75)",
+                "shadow":           "dark5.setAlpha(75)",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast.setAlpha(75)",
                 "link":             "blue10.setAlpha(75)",
@@ -170,6 +170,15 @@
         "palette": {
             "default": {
                 "midlight":         "dark13"
+            }
+        }
+    },
+
+    "QAbstractSpinBox": {
+        "palette": {
+            "default": {
+                "base":             "dark5",
+                "button":           "dark8"
             }
         }
     },
