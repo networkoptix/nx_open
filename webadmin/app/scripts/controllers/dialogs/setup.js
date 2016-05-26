@@ -554,31 +554,6 @@ angular.module('webadminApp')
             return !!val && (!val.trim || val.trim() != '');
         }
 
-
-        mediaserver.systemSettings().then(function(r){
-            var systemSettings = r.data.reply.settings;
-            $scope.systemSettings = {};
-
-            for(var settingName in $scope.Config.settingsConfig){
-                if(!$scope.Config.settingsConfig[settingName].setupWizard){
-                    continue;
-                }
-                $scope.systemSettings[settingName] = systemSettings[settingName];
-
-                if($scope.Config.settingsConfig[settingName].type === 'number'){
-                    $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
-                }
-                if($scope.systemSettings[settingName] === 'true'){
-                    $scope.systemSettings[settingName] = true;
-                }
-                if($scope.systemSettings[settingName] === 'false'){
-                    $scope.systemSettings[settingName] = false;
-                }
-                $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
-            }
-        });
-
-
         /* Wizard workflow */
 
         $scope.wizardFlow = {
@@ -707,9 +682,34 @@ angular.module('webadminApp')
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
 
+        function getAdvancedSettings(){
+            mediaserver.systemSettings().then(function(r){
+                var systemSettings = r.data.reply.settings;
+                $scope.systemSettings = {};
+
+                for(var settingName in $scope.Config.settingsConfig){
+                    if(!$scope.Config.settingsConfig[settingName].setupWizard){
+                        continue;
+                    }
+                    $scope.systemSettings[settingName] = systemSettings[settingName];
+
+                    if($scope.Config.settingsConfig[settingName].type === 'number'){
+                        $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
+                    }
+                    if($scope.systemSettings[settingName] === 'true'){
+                        $scope.systemSettings[settingName] = true;
+                    }
+                    if($scope.systemSettings[settingName] === 'false'){
+                        $scope.systemSettings[settingName] = false;
+                    }
+                    $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+                }
+            });
+        }
         function initWizard(){
             $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
+                getAdvancedSettings();
                 discoverSystems();
             },function(error){
                 $log.log("Couldn't run setup wizard: auth failed");
