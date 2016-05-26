@@ -276,8 +276,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         server                      = 0x400,        /**< Server resource. */
         remote                      = 0x800,        /**< Remote (on-server) resource. */
 
-        user                        = 0x2000,       /**< User resource. */
         layout                      = 0x1000,       /**< Layout resource. */
+        user                        = 0x2000,       /**< User resource. */
         utc                         = 0x4000,       /**< Resource uses UTC-based timing. */
         periods                     = 0x8000,       /**< Resource has recorded periods. */
 

@@ -113,14 +113,14 @@ private:
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const
     {
-        Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        Qn::NodeType leftNodeType = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        Qn::NodeType rightNodeType = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        if (leftNode != rightNode)
+        if (leftNodeType != rightNodeType)
         {
             /* Check default behavior first. */
-            if (leftNode != Qn::ResourceNode && rightNode != Qn::ResourceNode)
-                return leftNode < rightNode;
+            if (leftNodeType != Qn::ResourceNode && rightNodeType != Qn::ResourceNode)
+                return leftNodeType < rightNodeType;
 
             qreal leftOrder = nodeOrder(left);
             qreal rightOrder = nodeOrder(right);
@@ -140,9 +140,9 @@ protected:
 
         {
             // checking pairs of VideoWallItemNode + VideoWallMatrixNode
-            if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
-                && leftNode != rightNode)
-                return rightNode == Qn::VideoWallItemNode;
+            if ((leftNodeType == Qn::VideoWallItemNode || rightNodeType == Qn::VideoWallItemNode)
+                && leftNodeType != rightNodeType)
+                return rightNodeType == Qn::VideoWallItemNode;
         }
 
         {
