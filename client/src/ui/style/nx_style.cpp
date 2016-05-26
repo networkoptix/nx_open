@@ -2061,7 +2061,7 @@ int QnNxStyle::pixelMetric(
     case PM_LayoutBottomMargin:
     case PM_LayoutLeftMargin:
     case PM_LayoutRightMargin:
-        return dp(0);
+        return dp(16);
     case PM_LayoutHorizontalSpacing:
     case PM_LayoutVerticalSpacing:
         return dp(8);
