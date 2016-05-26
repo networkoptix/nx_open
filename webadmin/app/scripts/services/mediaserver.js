@@ -435,7 +435,6 @@ angular.module('webadminApp')
 
                 this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    console.log($location.path());
                     if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly &&
                         $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
                         $location.path('/setup');
