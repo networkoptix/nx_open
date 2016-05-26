@@ -24,8 +24,8 @@
             <id>localrepository</id>
             <url>file://${root.dir}</url>
         </repository>
-    </repositories>
-
+    </repositories>    
+    
     <properties>
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
@@ -53,7 +53,7 @@
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
-
+        
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
@@ -82,7 +82,7 @@
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
-
+        
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
@@ -378,7 +378,7 @@
                 <!--module>storage_plugins/ftpstorageplugin</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
-                <module>common_libs/nxemail</module>
+                <module>common_libs/nxemail</module>                
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
                 <!--<module>mediaproxy</module> -->
@@ -772,7 +772,7 @@
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
             </modules>
-        </profile>
+        </profile>        
         <profile>
             <id>linux-x64</id>
             <activation>
@@ -790,7 +790,6 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
-                <onvif.version>2.1.2-io2-SNAPSHOT</onvif.version>
             </properties>
         </profile>
         <profile>
@@ -872,7 +871,7 @@
             <properties>
                 <compile.option2>-angle</compile.option2>
             </properties>
-        </profile>
+        </profile> 
 
         <!-- Mobile client profiles -->
         <profile>
@@ -882,12 +881,12 @@
                 <property>
                     <name>newmobile</name>
                     <value>true</value>
-                </property>
+                </property>               
             </activation>
             <properties>
                 <qt.version>5.5.1-SNAPSHOT</qt.version>
                 <compile.options/>
-            </properties>
+            </properties>            
             <modules>
                 <module>client.core</module>
                 <module>mobile_client</module>
@@ -903,7 +902,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/android.skip</missing>
-                </file>
+                </file>                
             </activation>
             <build>
                 <directory>target</directory>
@@ -935,7 +934,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/mobile.skip</missing>
-                </file>
+                </file>                
             </activation>
             <properties>
                 <qt.classifier>${platform}-${arch}-release</qt.classifier>
@@ -955,7 +954,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/ios.skip</missing>
-                </file>
+                </file>                
             </activation>
             <build>
                 <directory>target</directory>
@@ -984,11 +983,11 @@
                 <property>
                     <name>test</name>
                     <value>true</value>
-                </property>
+                </property>                
             </activation>
             <modules>
                 <module>unit_tests</module>
             </modules>
-        </profile>
+        </profile>        
     </profiles>
 </project>
