@@ -606,39 +606,43 @@ namespace nx_http
         m_url = url;
         const SocketAddress remoteEndpoint( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT) );
 
-        if( m_socket )
+        canUseExistingConnection =
+            m_socket &&
+            !m_connectionClosed &&
+            canUseExistingConnection &&
+            (m_remoteEndpoint == remoteEndpoint);
+
+        if (!canUseExistingConnection)
         {
-            if( !m_connectionClosed &&
-                canUseExistingConnection &&
-                (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
-            {
-                ++m_awaitedMessageNumber;   //current message will be skipped
-
-                serializeRequest();
-                m_state = sSendingRequest;
-
-                if( !m_socket->sendAsync(
-                        m_requestBuffer,
-                        std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
-                {
-                    NX_LOG( lit("Failed to init async socket call (connecting to %1) to aio service. %2").
-                        arg(remoteEndpoint.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                    m_socket.clear();
-                    return false;
-                }
-                return true;
-            }
-            else
-            {
-                m_socket.clear();
-            }
+            m_httpStreamReader.resetState();
+            m_awaitedMessageNumber = 0;
         }
 
-        //resetting parser state only if establishing new tcp connection
-        m_httpStreamReader.resetState();
-        m_awaitedMessageNumber = 0;
+        if (!m_socket)
+            return initiateTcpConnection();
 
-        return initiateTcpConnection();
+        m_socket->dispatch(
+            [this, canUseExistingConnection]()
+            {
+                if (canUseExistingConnection)
+                {
+                    Q_ASSERT(m_socket);
+                    ++m_awaitedMessageNumber;   //current message will be skipped
+
+                    serializeRequest();
+                    m_state = sSendingRequest;
+
+                    m_socket->sendAsync(
+                        m_requestBuffer,
+                        std::bind(&AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2));
+                    return;
+                }
+
+                m_socket.clear();
+                initiateTcpConnection();
+            });
+
+        return true;
     }
 
     bool AsyncHttpClient::initiateTcpConnection()
