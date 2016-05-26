@@ -69,9 +69,9 @@ angular.module('webadminApp')
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
             if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
+                nativeClientObject.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
             }else{
-                window.open(Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
+                window.open(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
             }
             $scope.next('cloudLogin');
         };
@@ -356,8 +356,8 @@ angular.module('webadminApp')
             }
             $scope.settings.cloudError = false;
             if(debugMode){
-                $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
-                $scope.portalShortLink = Config.cloud.portalShortLink;
+                $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
+                $scope.portalShortLink = Config.cloud.portalUrl;
                 $scope.next('cloudSuccess');
                 return;
             }
@@ -410,7 +410,7 @@ angular.module('webadminApp')
                     //2. Save settings to local server
                     $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
-                    $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
+                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
 
                     $log.log("Request /api/setupCloudSystem on mediaserver ...");
                     mediaserver.setupCloudSystem($scope.settings.systemName,
@@ -685,6 +685,9 @@ angular.module('webadminApp')
         function getAdvancedSettings(){
             mediaserver.systemSettings().then(function(r){
                 var systemSettings = r.data.reply.settings;
+                if(r.data.reply.settings.cloudPortalUrl){
+                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
+                }
                 $scope.systemSettings = {};
 
                 for(var settingName in $scope.Config.settingsConfig){
