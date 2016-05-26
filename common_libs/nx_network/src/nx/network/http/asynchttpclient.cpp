@@ -331,9 +331,7 @@ namespace nx_http
             m_remoteEndpoint = SocketAddress( m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT) );
             serializeRequest();
             m_state = sSendingRequest;
-            lk.unlock();
             emit tcpConnectionEstablished( sharedThis );
-            lk.relock();
             using namespace std::placeholders;
             m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) );
             return;
@@ -348,9 +346,7 @@ namespace nx_http
         }
 
         m_state = sFailed;
-        lk.unlock();
         emit done( sharedThis );
-        lk.relock();
     }
 
     void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
@@ -375,9 +371,7 @@ namespace nx_http
             NX_LOGX( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
-            lk.unlock();
             emit done( sharedThis );
-            lk.relock();
             return;
         }
 
@@ -399,9 +393,7 @@ namespace nx_http
         {
             NX_LOGX( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
             m_state = sFailed;
-            lk.unlock();
             emit done( sharedThis );
-            lk.relock();
             return;
         }
 
@@ -432,9 +424,7 @@ namespace nx_http
                 ? sDone
                 : sFailed;
             m_lastSysErrorCode = errorCode;
-            lk.unlock();
             emit done( sharedThis );
-            lk.relock();
             return;
         }
 
@@ -447,9 +437,7 @@ namespace nx_http
 
                 if( m_state == sFailed )
                 {
-                    lk.unlock();
                     emit done( sharedThis );
-                    lk.relock();
                     break;
                 }
 
@@ -465,9 +453,7 @@ namespace nx_http
                         NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).
                             arg( m_url.toString() ).arg(SystemError::connectionReset), cl_logDEBUG1 );
                         m_state = sFailed;
-                        lk.unlock();
                         emit done( sharedThis );
-                        lk.relock();
                         return;
                     }
                     m_socket->readSomeAsync(
@@ -482,9 +468,7 @@ namespace nx_http
                     NX_LOGX( lit( "Unexpectedly received request from %1:%2 while expecting response! Ignoring..." ).
                         arg( m_url.host() ).arg( m_url.port() ), cl_logDEBUG1 );
                     m_state = sFailed;
-                    lk.unlock();
                     emit done( sharedThis );
-                    lk.relock();
                     return;
                 }
 
@@ -519,9 +503,7 @@ namespace nx_http
 
                 m_state = sResponseReceived;
                 const auto requestSequenceBak = m_requestSequence;
-                lk.unlock();
                 emit responseReceived( sharedThis );
-                lk.relock();
                 if( m_terminated ||
                     (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
                 {
@@ -533,9 +515,7 @@ namespace nx_http
                 {
                     //no message body: done
                     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
-                    lk.unlock();
                     emit done( sharedThis );
-                    lk.relock();
                     return;
                 }
 
@@ -545,9 +525,7 @@ namespace nx_http
                 if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
                     m_state == sReadingMessageBody )                    //client wants to read message body
                 {
-                    lk.unlock();
                     emit someMessageBodyAvailable( sharedThis );
-                    lk.relock();
                     if( m_terminated )
                         return;
                     if (m_forcedEof)
@@ -567,9 +545,7 @@ namespace nx_http
                     {
                         NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
-                        lk.unlock();
                         emit done( sharedThis );
-                        lk.relock();
                         return;
                     }
                     m_socket->readSomeAsync(
@@ -582,9 +558,7 @@ namespace nx_http
                 NX_ASSERT( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
 
                 m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
-                lk.unlock();
                 emit done( sharedThis );
-                lk.relock();
                 break;
             }
 
@@ -594,9 +568,7 @@ namespace nx_http
                 //TODO #ak reconnect in case of error
                 if( bytesParsed > 0 )
                 {
-                    lk.unlock();
                     emit someMessageBodyAvailable( sharedThis );
-                    lk.relock();
                     if( m_terminated )
                         break;
                     if (m_forcedEof)
@@ -615,9 +587,7 @@ namespace nx_http
                     return;
                 }
 
-                lk.unlock();
                 emit done( sharedThis );
-                lk.relock();
                 break;
             }
 
