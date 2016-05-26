@@ -52,10 +52,7 @@ namespace nx_http
         m_awaitedMessageNumber( 0 ),
         m_lastSysErrorCode(SystemError::noError),
         m_requestSequence( 0 ),
-        m_bodySource(nullptr),
-        m_waitForResponseAfterStreaming(true),
-        m_bodyDeliveryPaused(true),
-        m_messageBodyStreamingMode(false)
+        m_precalculatedAuthorizationDisabled( false )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -116,82 +113,6 @@ namespace nx_http
         return m_lastSysErrorCode;
     }
 
-
-    void AsyncHttpClient::sendDataPortion(SystemError::ErrorCode errorCode, BufferType dataChunk)
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (errorCode != SystemError::noError)
-        {
-            m_state = sFailed;
-            lock.unlock();
-            emit done(shared_from_this());
-            lock.relock();
-            return;
-        }
-
-        // data has been exhausted
-        if (errorCode == SystemError::noError && dataChunk.isEmpty())
-        {
-
-            if (!m_waitForResponseAfterStreaming)
-            {
-                m_state = sDone;
-                lock.unlock();
-                emit done(shared_from_this());
-                lock.relock();
-
-            }
-            else
-            {
-                m_bodyDeliveryPaused = true;
-                m_state = sReceivingResponse;
-            }
-
-            return;
-        }
-
-        if (m_bodyDeliveryPaused)
-            return;
-
-        if(m_terminated)
-            return;
-
-        m_currentDataChunk = dataChunk;
-        using namespace std::placeholders;
-        m_socket->sendAsync(
-            m_currentDataChunk,
-            std::bind(&AsyncHttpClient::dataPortionHasBeenSent, this, _1, _2));
-
-    }
-
-    void AsyncHttpClient::dataPortionHasBeenSent(SystemError::ErrorCode errorCode, size_t bytesSent)
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (errorCode != SystemError::noError )
-        {
-            m_state = sFailed;
-            lock.unlock();
-            emit done(shared_from_this());
-            lock.relock();
-            return;
-        }
-
-        if(m_terminated)
-            return;
-
-        using namespace std::placeholders;
-        m_bodySource->readAsync(std::bind(&AsyncHttpClient::sendDataPortion, this, _1, _2));
-    }
-
-    void AsyncHttpClient::startBodyStreaming()
-    {
-        if(m_terminated)
-            return;
-
-        using namespace std::placeholders;
-        m_bodySource->readAsync(std::bind(&AsyncHttpClient::sendDataPortion, this, _1, _2));
-    }
-
     //!Start request to \a url
     /*!
         \return true, if socket is created and async connect is started. false otherwise
@@ -211,7 +132,8 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        nx_http::StringType messageBody)
+        nx_http::StringType messageBody,
+        bool includeContentLength)
     {
         if( !url.isValid() )
             return false;
@@ -220,44 +142,12 @@ namespace nx_http
         m_url = url;
         composeRequest( nx_http::Method::POST );
         m_request.headers.insert( make_pair("Content-Type", contentType) );
-        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        if (includeContentLength)
+            m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = std::move(messageBody);
         return initiateHttpMessageDelivery( url );
-    }
-
-    bool AsyncHttpClient::doPost(
-        const QUrl &url,
-        std::shared_ptr<AbstractMsgBodySource> body,
-        bool waitForResponse)
-    {
-        if(!url.isValid())
-            return false;
-
-        if (!body)
-            return false;
-
-        resetDataBeforeNewRequest();
-
-        m_url = url;
-        m_bodySource = body;
-        m_messageBodyStreamingMode = true;
-        m_waitForResponseAfterStreaming = waitForResponse;
-
-        composeRequest(nx_http::Method::POST);
-        m_request.headers.insert(make_pair("Content-Type", body->mimeType()));
-
-        auto contentLength = body->contentLength();
-        if(contentLength)
-        {
-            m_request.headers.insert(make_pair(
-                "Content-Length",
-                StringType::number(static_cast<quint64>(contentLength.get()))));
-        }
-
-        m_request.headers.insert(make_pair("Content-Encoding", "identity"));
-        return initiateHttpMessageDelivery(url);
     }
 
     bool AsyncHttpClient::doPut(
@@ -361,6 +251,11 @@ namespace nx_http
     void AsyncHttpClient::setUserPassword( const QString& userPassword )
     {
         m_userPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
+    {
+        m_precalculatedAuthorizationDisabled = val;
     }
 
     void AsyncHttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
@@ -472,29 +367,27 @@ namespace nx_http
         }
 
         NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
-        m_state = m_messageBodyStreamingMode ? sStreamingBody : sReceivingResponse;
-        auto timeout = m_messageBodyStreamingMode ? 0 : m_responseReadTimeoutMs;
-        m_responseBuffer.resize( 0 );
-        if( !m_socket->setRecvTimeout( timeout ) ||
-            !m_socket->readSomeAsync(
-                &m_responseBuffer,
-                std::bind(
-                    &AsyncHttpClient::onSomeBytesReadAsync, this,
-                    sock, _1, _2 ) ) )
+
+        const auto requestSequenceBak = m_requestSequence;
+        lk.unlock();
+        emit requestHasBeenSent(sharedThis, m_authorizationTried);
+        lk.relock();
+        if (m_terminated || //user cancelled futher action
+            (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
         {
-            NX_LOG( lit( "Error reading (1) http response from %1. %2" )
-                    .arg( m_url.toString() )
-                    .arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            return;
+        }
+
+        m_state = sReceivingResponse;
+        m_responseBuffer.resize( 0 );
+        if( !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) ||
+            !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+        {
+            NX_LOG( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
             m_state = sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
-        }
-
-        if (m_state == sStreamingBody)
-        {
-            m_bodyDeliveryPaused = false;
-            startBodyStreaming();
         }
     }
 
@@ -514,10 +407,7 @@ namespace nx_http
         {
             if( reconnectIfAppropriate() )
                 return;
-            NX_LOG(lit("Error reading (state %1) http response from %2. %3")
-                .arg( m_state )
-                .arg( m_url.toString() )
-                .arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            NX_LOG(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
             m_state =
                 ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
@@ -532,7 +422,6 @@ namespace nx_http
 
         switch( m_state )
         {
-            case sStreamingBody:
             case sReceivingResponse:
             {
                 readAndParseHttp( bytesRead );
@@ -588,7 +477,6 @@ namespace nx_http
                 const Response* response = m_httpStreamReader.message().response;
                 if( response->statusLine.statusCode == StatusCode::unauthorized )
                 {
-                    m_bodyDeliveryPaused = true;
                     //TODO #ak following block should be moved somewhere
                     if( !m_ha1RecalcTried &&
                         response->headers.find( Qn::REALM_HEADER_NAME ) != response->headers.cend() )
@@ -603,13 +491,6 @@ namespace nx_http
                         if( resendRequestWithAuthorization( *response ) )
                             return;
                     }
-                }
-
-                if (m_state == sStreamingBody)
-                {
-                    m_bodyDeliveryPaused = false;
-                    startBodyStreaming();
-                    return;
                 }
 
                 const bool messageHasMessageBody =
@@ -727,8 +608,6 @@ namespace nx_http
         m_authorizationTried = false;
         m_ha1RecalcTried = false;
         m_request = nx_http::Request();
-        m_bodyDeliveryPaused = true;
-        m_messageBodyStreamingMode = false;
     }
 
     bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
@@ -748,8 +627,6 @@ namespace nx_http
 
         if( m_socket )
         {
-            m_socket->cancelAsyncIO();  //TODO #ak remove in VMS-896
-
             if( !m_connectionClosed &&
                 canUseExistingConnection &&
                 (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
@@ -906,6 +783,9 @@ namespace nx_http
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
+
+        if (m_precalculatedAuthorizationDisabled)
+            return;
 
         //if that url has already been authenticated, adding same authentication info to the request
         //first request per tcp-connection always uses authentication
@@ -1069,6 +949,7 @@ namespace nx_http
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
         Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
+
         HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find( "WWW-Authenticate" );
         if( wwwAuthenticateIter == response.headers.end() )
             return false;
@@ -1239,8 +1120,6 @@ namespace nx_http
                 return "failed";
             case sDone:
                 return "done";
-            case sStreamingBody:
-                return "streamingBody";
             default:
                 return "unknown";
         }

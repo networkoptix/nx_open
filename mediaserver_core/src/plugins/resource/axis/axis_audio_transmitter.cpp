@@ -1,4 +1,8 @@
 #include "axis_audio_transmitter.h"
+#include <network/router.h>
+#include <http/custom_headers.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 
 namespace
 {
@@ -20,17 +24,39 @@ namespace
 }
 
 
-QnAxisAudioMsgBodySource::QnAxisAudioMsgBodySource() :
-    m_waitingForNextData(false)
+QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
+    QnAbstractAudioTransmitter(),
+    m_resource(res),
+    m_httpClient(nx_http::AsyncHttpClient::create()),
+    m_ableToSendData(false)
 {
+
 }
 
-void QnAxisAudioMsgBodySource::setOutputFormat(const QnAudioFormat& format)
+QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
 {
+    m_httpClient->terminate();
+    stop();
+}
+
+
+void QnAxisAudioTransmitter::pleaseStop()
+{
+    base_type::pleaseStop();
+
+    m_httpClient->terminate();
+    m_dataTransmissionStarted = false;
+    m_ableToSendData = false;
+}
+
+
+void QnAxisAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
+{
+    QnMutexLocker lock(&m_mutex);
     m_outputFormat = format;
 }
 
-nx_http::StringType QnAxisAudioMsgBodySource::mimeType() const
+nx_http::StringType QnAxisAudioTransmitter::mimeType() const
 {
     if (m_outputFormat.codec() == "MULAW")
     {
@@ -55,59 +81,7 @@ nx_http::StringType QnAxisAudioMsgBodySource::mimeType() const
     }
 }
 
-boost::optional<uint64_t> QnAxisAudioMsgBodySource::contentLength() const
-{
-    return boost::optional<uint64_t>(kAxisBodySourceContentLength);
-}
 
-bool  QnAxisAudioMsgBodySource::isWaitingForData() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_waitingForNextData;
-}
-
-void QnAxisAudioMsgBodySource::putData(const nx_http::BufferType& data)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_callback(SystemError::noError, data);
-    m_waitingForNextData = false;
-}
-
-void QnAxisAudioMsgBodySource::readAsync(ReadCallbackType completionHandler)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_waitingForNextData = true;
-    m_callback = completionHandler;
-}
-
-
-
-
-
-
-
-QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res) :
-    QnAbstractAudioTransmitter(),
-    m_resource(res),
-    m_bodySource(new QnAxisAudioMsgBodySource()),
-    m_httpClient(nx_http::AsyncHttpClient::create())
-{
-}
-
-QnAxisAudioTransmitter::~QnAxisAudioTransmitter()
-{
-    m_httpClient->terminate();
-    stop();
-}
-
-
-void QnAxisAudioTransmitter::pleaseStop()
-{
-    base_type::pleaseStop();
-
-    m_httpClient->terminate();
-    m_dataTransmissionStarted = false;
-}
 
 bool QnAxisAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 {
@@ -115,16 +89,6 @@ bool QnAxisAudioTransmitter::isCompatible(const QnAudioFormat& format) const
         format.codec() == "AAC" ||
         //format.codec() == "G726" ||
         format.codec() == "MULAW";
-}
-
-void QnAxisAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_bodySource->setOutputFormat(format);
-    m_outputFormat = format;
-    m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(format.codec())));
-    if (format.sampleRate() > 0)
-        m_transcoder->setSampleRate(format.sampleRate());
 }
 
 bool QnAxisAudioTransmitter::isInitialized() const
@@ -139,24 +103,104 @@ void QnAxisAudioTransmitter::prepare()
     m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec())));
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
     m_dataTransmissionStarted = false;
+    m_ableToSendData = false;
+    m_httpClient->terminate();
+    m_httpClient.reset();
+}
+
+void QnAxisAudioTransmitter::at_requestHeadersHasBeenSent(
+    nx_http::AsyncHttpClientPtr http,
+    bool isRetryAfterUnauthorizedResponse)
+{
+    if (isRetryAfterUnauthorizedResponse)
+        m_ableToSendData = true;
 }
 
 
 bool QnAxisAudioTransmitter::startTransmission()
 {
+    m_ableToSendData = false;
+
     QUrl url(m_resource->getUrl());
+
+    QnResourcePtr mServer = m_resource->getParentServer();
+
+    if (!mServer)
+        return false;
+
+    if (!m_httpClient)
+        m_httpClient = nx_http::AsyncHttpClient::create();
+
+    if(m_socket)
+    {
+        m_socket->cancelAsyncIO();
+        m_socket.clear();
+    }
+
+    if (mServer->getId() != qnCommon->moduleGUID())
+    {
+        // proxy request to foreign camera
+        auto route = QnRouter::instance()->routeTo(mServer->getId());
+        if (route.addr.isNull())
+            return false;
+
+        m_httpClient->addAdditionalHeader(
+            Qn::CAMERA_GUID_HEADER_NAME,
+            m_resource->getId().toByteArray());
+
+        url.setHost(route.addr.address.toString());
+        url.setPort(route.addr.port);
+    }
+
     auto auth = m_resource->getAuth();
 
     m_httpClient->setUserName(auth.user());
     m_httpClient->setUserPassword(auth.password());
-    m_transcodedBuffer.truncate(0);
+    m_httpClient->setDisablePrecalculatedAuthorization(true);
+
+    QObject::connect(
+        m_httpClient.get(),
+        &nx_http::AsyncHttpClient::requestHasBeenSent,
+        this,
+        &QnAxisAudioTransmitter::at_requestHeadersHasBeenSent,
+        Qt::DirectConnection);
 
     url.setScheme(lit("http"));
     if (url.host().isEmpty())
         url.setHost(m_resource->getHostAddress());
 
     url.setPath(kAxisAudioTransmitUrl);
-    return m_dataTransmissionStarted = m_httpClient->doPost(url, m_bodySource);
+
+    nx_http::StringType contentType(mimeType());
+    nx_http::StringType contentBody;
+
+    return m_dataTransmissionStarted = m_httpClient
+        ->doPost(
+            url,
+            contentType,
+            contentBody,
+            true);
+}
+
+bool QnAxisAudioTransmitter::sendData(
+    QSharedPointer<AbstractStreamSocket> socket,
+    const char* buffer,
+    size_t size)
+{
+    size_t bytesSent = 0;
+
+    char* currentPos = const_cast<char*>(buffer);
+
+    while ( bytesSent < size )
+    {
+        auto res = socket->send(currentPos, size - bytesSent);
+        if(res > 0)
+            bytesSent += res;
+        else
+            return false;
+    }
+
+    return true;
 }
 
 bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
@@ -167,26 +211,37 @@ bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
     if (!m_transcoder->isOpened() && !m_transcoder->open(data->context))
         return true; //< always return true. It means skip input data.
 
+    if(!m_ableToSendData)
+        return true;
+
+    if (!m_socket)
+        m_socket = m_httpClient->takeSocket();
+
+    if(!m_socket)
+        return true;
+
+    m_socket->cancelAsyncIO();
+
     QnAbstractMediaDataPtr transcoded;
-    do 
+    do
     {
         m_transcoder->transcodePacket(data, &transcoded);
         data.reset();
 
-        if (!transcoded)
+        if (!m_needStop && transcoded)
         {
-            if(
-                !m_needStop &&
-                m_bodySource->isWaitingForData() &&
-                !m_transcodedBuffer.isEmpty())
+            auto res = sendData(
+                m_socket,
+                transcoded->data(),
+                transcoded->dataSize());
+
+            if (!res)
             {
-                m_bodySource->putData(m_transcodedBuffer);
-                m_transcodedBuffer.truncate(0);
+                m_ableToSendData = false;
+                m_dataTransmissionStarted = false;
+                m_socket.clear();
+                break;
             }
-        }
-        else
-        {
-            m_transcodedBuffer.append(transcoded->data(), transcoded->dataSize());
         }
 
     } while (!m_needStop && transcoded);

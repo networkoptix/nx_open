@@ -11,8 +11,6 @@
 namespace nx_http
 {
 
-    typedef bool (nx_http::AsyncHttpClient::* FinitePostBodyFunc)(const QUrl&, const nx_http::StringType&, nx_http::StringType);
-
     HttpClient::HttpClient()
     :
         m_done( false ),
@@ -49,11 +47,12 @@ namespace nx_http
 
 
         return doRequest(std::bind(
-            static_cast<FinitePostBodyFunc>(&nx_http::AsyncHttpClient::doPost),
+            &nx_http::AsyncHttpClient::doPost,
             _1,
             url,
             contentType,
-            std::move(messageBody)));
+            std::move(messageBody),
+            true));
     }
 
     const Response* HttpClient::response() const
