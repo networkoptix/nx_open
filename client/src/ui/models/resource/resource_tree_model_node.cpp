@@ -79,6 +79,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::BastardNode:
         m_displayName = m_name = lit("Invalid Resources");
         m_bastard = true; /* This node is always hidden. */
+        m_state = Invalid;
         break;
     case Qn::LocalResourcesNode:
         m_displayName = m_name = tr("Local");
@@ -352,7 +353,15 @@ bool QnResourceTreeModelNode::calculateBastard() const
     {
     /* Hide non-readable resources. */
     case Qn::LayoutItemNode:
-        return !m_resource || !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true;
+
+        /* Only admin can see items under shared layout links. */
+        if (m_parent && m_parent->type() == Qn::SharedLayoutNode)
+            return !isAdmin;
+
+        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
     /* These will be hidden or displayed together with videowall. */
     case Qn::VideoWallItemNode:
@@ -389,11 +398,8 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (!m_resource)
             return true;
 
-        /* Hide non-readable resources. */
-        if (!accessController()->hasPermissions(m_resource, Qn::ReadPermission))
-            return true;
-
-        return false;
+        /* Only admins can see shared layout links. */
+        return !isAdmin;
 
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
@@ -473,16 +479,12 @@ void QnResourceTreeModelNode::setBastard(bool bastard)
 
     if (!m_parent)
         return;
+    setState(m_parent->state());
 
     if (m_bastard)
-    {
         m_parent->removeChildInternal(toSharedPointer());
-    }
     else
-    {
-        setState(m_parent->state());
         m_parent->addChildInternal(toSharedPointer());
-    }
 }
 
 QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::children() const
@@ -512,9 +514,9 @@ void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent
 
     if (m_parent)
     {
+        setState(m_parent->state());
         if (!m_bastard)
         {
-            setState(m_parent->state());
             m_parent->addChildInternal(toSharedPointer());
 
             if (m_type == Qn::VideoWallItemNode)
