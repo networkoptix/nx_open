@@ -50,6 +50,8 @@
 #include <providers/speach_synthesis_data_provider.h>
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -265,9 +267,14 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
 
     if (action->actionType() == QnBusiness::PlaySoundOnceAction)
     {
+        auto url = lit("dbfile://notifications/") + params.soundUrl;
 
-        const auto cyclesCount = 1;
-        QnAbstractStreamDataProviderPtr provider(new QnStoredFileDataProvider(params.soundUrl, cyclesCount));
+        QnAviResourcePtr resource(new QnAviResource(url));
+        resource->setStatus(Qn::Online);
+        QnAbstractStreamDataProviderPtr provider(
+            resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+
+        provider.dynamicCast<QnAbstractArchiveReader>()->setCycleMode(false);
 
         for (const auto& t: transmitters)
             t->subscribe(provider, QnDataProviderInfo::kSingleNotificationPriority);

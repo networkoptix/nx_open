@@ -46,7 +46,7 @@ void QnAbstractAudioTransmitter::run()
         {
             m_transmittedPacketCount++;
             m_transmittedPacketDuration +=
-                std::dynamic_pointer_cast<QnCompressedAudioData>(data)->getDuration();
+                std::dynamic_pointer_cast<QnCompressedAudioData>(data)->getDurationMs();
             makeRealTimeDelay();
         }
     }

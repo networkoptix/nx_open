@@ -5,6 +5,8 @@
 #include <camera/camera_pool.h>
 #include <providers/stored_file_data_provider.h>
 #include <business/actions/abstract_business_action.h>
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 namespace
 {
@@ -95,16 +97,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
 
 QString QnAudioStreamerPool::calcActionUniqueKey(const QnAbstractBusinessActionPtr &action) const
 {
-    auto actionKey = action->getExternalUniqKey();
-    auto targets = action->getParams().additionalResources;
-
-    if(!targets.empty())
-    {
-        for(const auto& resId: targets)
-            actionKey += resId.toString() + lit("_");
-    }
-
-    return actionKey;
+    return action->getBusinessRuleId().toString();
 }
 
 QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const QnAbstractBusinessActionPtr &action)
@@ -119,7 +112,16 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
 
     QnAbstractStreamDataProviderPtr provider;
     if (type == QnBusiness::PlaySoundAction)
-        provider.reset(new QnStoredFileDataProvider(params.soundUrl));
+    {
+        const auto filePath = lit("dbfile://notifications/") + params.soundUrl;
+        QnAviResourcePtr resource(new QnAviResource(filePath));
+        resource->setStatus(Qn::Online);
+        provider.reset(resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+    }
+    else
+    {
+        return QnAbstractStreamDataProviderPtr();
+    }
 
     m_actionDataProviders[actionKey] = provider;
 

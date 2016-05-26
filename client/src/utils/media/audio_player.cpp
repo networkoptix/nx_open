@@ -14,8 +14,7 @@
 #include <utils/common/util.h>
 #include <nx_speach_synthesizer/text_to_wav.h>
 #include <core/resource/local_audio_file_resource.h>
-
-#include "../../camera/audio_stream_display.h"
+#include <camera/audio_stream_display.h>
 
 AudioPlayer::AudioPlayer( const QString& filePath )
 :

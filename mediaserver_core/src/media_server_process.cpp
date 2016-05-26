@@ -91,6 +91,7 @@
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <plugins/storage/file_storage/db_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <recorder/file_deletor.h>
@@ -435,7 +436,9 @@ void ffmpegInit()
     }
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("dbfile", QnDbStorageResource::instance, false);
 }
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
