@@ -1,13 +1,7 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
-// TODO: #Elric implement this ifdef on utils/media/audioformat.h level.
-#ifndef Q_OS_WIN
-#   include <utils/media/audioformat.h>
-#else
-#   include <QtMultimedia/QAudioFormat>
-#   define QnAudioFormat QAudioFormat
-#endif
+#include <utils/media/audioformat.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
 

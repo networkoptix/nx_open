@@ -38,6 +38,9 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
+
+#ifdef CUSTOM_AUDIO_FORMAT_CLASS
+
 #include <QtCore/QDebug>
 #include "audioformat.h"
 
@@ -383,3 +386,4 @@ QnAudioFormat::SampleType QnAudioFormat::sampleType() const
 
 QT_END_NAMESPACE
 
+#endif // CUSTOM_AUDIO_FORMAT_CLASS
