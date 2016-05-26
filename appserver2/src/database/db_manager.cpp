@@ -2590,22 +2590,54 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     QSet<qint32> resourcesToRemove = accessibleResources - newAccessibleResources;
     if (!resourcesToRemove.empty())
     {
-        QSqlQuery removeQuery(m_sdb);
-        removeQuery.prepare(R"(
-            DELETE FROM vms_access_rights
-            WHERE guid = :userOrGroupId
-            AND resource_ptr_id IN (:resources);
-        )");
-        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
-
         QStringList values;
         for (const qint32& resource_ptr_id : resourcesToRemove)
             values << QString::number(resource_ptr_id);
+        QString resourcesToRemoveIds = values.join(L',');
 
-        removeQuery.bindValue(":resources", values.join(L','));
+        QSqlQuery removeQuery(m_sdb);
+        QString removeQueryStr
+        (R"(
+            DELETE FROM vms_access_rights
+            WHERE guid = :userOrGroupId
+            AND resource_ptr_id IN (%1);
+        )");
+        /* We cannot bind this value via QSql as it puts numbers to braces */
+        removeQueryStr = removeQueryStr.arg(resourcesToRemoveIds);
+
+        if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
         if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
+
+    /* This whole function should be optimized out in release */
+    auto validate = [this, data, newAccessibleResources]()
+    {
+        ApiAccessRightsDataList allAccessRights;
+        if (doQueryNoLock(nullptr, allAccessRights) != ErrorCode::ok)
+            return false;
+
+        for (auto updated: allAccessRights)
+        {
+            if (updated.userId != data.userId)
+                continue;
+            QSet<qint32> accessible;
+            for (const QnUuid& id : updated.resourceIds)
+            {
+                qint32 resource_ptr_id = getResourceInternalId(id);
+                if (resource_ptr_id <= 0)
+                    return false;
+                accessible << resource_ptr_id;
+            }
+            return accessible == newAccessibleResources;
+        }
+        return newAccessibleResources.isEmpty();
+    };
+    NX_ASSERT(validate());
+
     return ErrorCode::ok;
 }
 
