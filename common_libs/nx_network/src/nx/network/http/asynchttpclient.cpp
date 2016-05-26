@@ -74,25 +74,21 @@ namespace nx_http
         terminate();
     }
 
-    AbstractStreamSocket* AsyncHttpClient::socket()
+    const std::unique_ptr<AbstractStreamSocket>& AsyncHttpClient::socket()
     {
-        return m_socket.data();
+        return m_socket;
     }
 
-    QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
+    std::unique_ptr<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
-        QSharedPointer<AbstractStreamSocket> result = m_socket;
+        NX_ASSERT(m_aioThreadBinder.inSelfAioThread());
 
-        {
-            QnMutexLocker lk( &m_mutex );
-            m_terminated = true;
-        }
-        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
-        if( result )
-            result->pleaseStopSync();
-        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+        m_terminated = true;
 
-        m_socket.clear();
+        std::unique_ptr<AbstractStreamSocket> result;
+        result.swap(m_socket);
+        if (result)
+            result->cancelIOSync(nx::network::aio::etNone);
         return result;
     }
 
@@ -123,12 +119,7 @@ namespace nx_http
 
     void AsyncHttpClient::stopWhileInAioThread()
     {
-        {
-            QnMutexLocker lk(&m_mutex);
-            m_terminated = true;
-        }
-        //after we set m_terminated to true with m_mutex locked socket event 
-        //processing is stopped and m_socket cannot change its value
+        m_terminated = true;
         if (m_socket)
             m_socket->pleaseStopSync();
     }
@@ -271,7 +262,6 @@ namespace nx_http
 
     quint64 AsyncHttpClient::totalBytesRead() const
     {
-        QnMutexLocker lk( &m_mutex );
         return m_totalBytesRead;
     }
 
@@ -324,11 +314,10 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        NX_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.get() );
 
         if( m_state != sWaitingConnectToHost )
         {
@@ -368,11 +357,10 @@ namespace nx_http
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        NX_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.get() );
 
         if( m_state != sSendingRequest )
         {
@@ -428,11 +416,10 @@ namespace nx_http
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
-        QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
 
-        NX_ASSERT( sock == m_socket.data() );
+        NX_ASSERT( sock == m_socket.get() );
 
         if( errorCode != SystemError::noError )
         {
@@ -665,33 +652,39 @@ namespace nx_http
         m_url = url;
         const SocketAddress remoteEndpoint( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT) );
 
-        if( m_socket )
+        canUseExistingConnection = 
+            m_socket &&
+            !m_connectionClosed &&
+            canUseExistingConnection &&
+            (m_remoteEndpoint == remoteEndpoint);
+
+        if (!canUseExistingConnection)
         {
-            if( !m_connectionClosed &&
-                canUseExistingConnection &&
-                (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
-            {
-                ++m_awaitedMessageNumber;   //current message will be skipped
-
-                serializeRequest();
-                m_state = sSendingRequest;
-
-                m_socket->sendAsync(
-                    m_requestBuffer,
-                    std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ));
-                return;
-            }
-            else
-            {
-                m_socket.clear();
-            }
+            m_httpStreamReader.resetState();
+            m_awaitedMessageNumber = 0;
         }
 
-        //resetting parser state only if establishing new tcp connection
-        m_httpStreamReader.resetState();
-        m_awaitedMessageNumber = 0;
+        dispatch(
+            [this, canUseExistingConnection]()
+            {
+                if (canUseExistingConnection)
+                {
+                    NX_ASSERT(m_socket);
+                    ++m_awaitedMessageNumber;   //current message will be skipped
 
-        initiateTcpConnection();
+                    serializeRequest();
+                    m_state = sSendingRequest;
+
+                    m_socket->sendAsync(
+                        m_requestBuffer,
+                        std::bind(&AsyncHttpClient::asyncSendDone, this, m_socket.get(), _1, _2));
+                    return;
+                }
+
+                m_socket.reset();
+
+                initiateTcpConnection();
+            });
     }
 
     void AsyncHttpClient::initiateTcpConnection()
@@ -700,9 +693,7 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = QSharedPointer<AbstractStreamSocket>(
-            SocketFactory::createStreamSocket(m_url.scheme() == lit("https"))
-            .release());
+        m_socket = SocketFactory::createStreamSocket(m_url.scheme() == lit("https"));
         m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
@@ -712,7 +703,7 @@ namespace nx_http
             m_socket->post(std::bind(
                 &AsyncHttpClient::asyncConnectDone,
                 this,
-                m_socket.data(),
+                m_socket.get(),
                 SystemError::getLastOSErrorCode()));
             return;
         }
@@ -722,7 +713,7 @@ namespace nx_http
         //starting async connect
         m_socket->connectAsync(
             remoteAddress,
-            std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) );
+            std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.get(), std::placeholders::_1 ) );
     }
 
     size_t AsyncHttpClient::readAndParseHttp( size_t bytesRead )

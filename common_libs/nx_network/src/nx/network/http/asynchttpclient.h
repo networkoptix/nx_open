@@ -10,7 +10,6 @@
 #include <map>
 #include <memory>
 
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
@@ -172,9 +171,11 @@ namespace nx_http
         */
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
 
-        AbstractStreamSocket* socket();
-        /** Returns socket in non-blocking mode */
-        QSharedPointer<AbstractStreamSocket> takeSocket();
+        const std::unique_ptr<AbstractStreamSocket>& socket();
+        /** Returns socket in non-blocking mode.
+            \note Can be called within object's aio thread only
+        */
+        std::unique_ptr<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
         void addRequestHeaders(const HttpHeaders& headers);
@@ -222,7 +223,7 @@ namespace nx_http
     private:
         State m_state;
         Request m_request;
-        QSharedPointer<AbstractStreamSocket> m_socket;
+        std::unique_ptr<AbstractStreamSocket> m_socket;
         bool m_connectionClosed;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
@@ -235,7 +236,6 @@ namespace nx_http
         bool m_authorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
-        mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         unsigned int m_sendTimeoutMs;
