@@ -19,30 +19,11 @@ var Config = {
         clientSetupContext: '?from=client&context=setup',
         webadminContext:'?from=webadmin&context=settings',
 
-
-        portalShortLink:'cloud-demo.hdw.mx',
-        apiUrl: 'http://cloud-demo.hdw.mx/api',
-        portalWhiteList:'http://cloud-demo.hdw.mx/**',
         portalUrl: 'http://cloud-demo.hdw.mx',
-        portalRegisterUrl: 'http://cloud-demo.hdw.mx/static/index.html#/register',
-
-        portalSystemUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}',
-        portalConnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/connect/{systemName}',
-        portalDisconnectUrl: 'http://cloud-demo.hdw.mx/static/index.html#/systems/{systemId}/disconnect'
+        apiUrl: '/api',
+        portalRegisterUrl: '/static/index.html#/register',
+        portalSystemUrl: '/static/index.html#/systems/{systemId}'
     },
-
-    cloudLocalhost:{
-        portalWhiteList:'http://localhost:8000/**',
-        portalUrl: 'http://localhost:8000',
-        portalRegisterUrl: 'http://localhost:8000/static/index.html#/register',
-
-        portalSystemUrl: 'http://localhost:8000/static/index.html#/systems/{systemId}?inline',
-        portalConnectUrl: 'http://localhost:8000/static/index.html#/systems/connect/{systemName}?inline',
-        portalDisconnectUrl: 'http://localhost:8000/static/index.html#/systems/{systemId}/disconnect?inline'
-    },
-
-
-
 
     demo:'/~ebalashov/webclient/api',
     demoMedia:'//10.0.2.186:7001',

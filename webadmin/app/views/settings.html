@@ -17,7 +17,7 @@
             <alert type="error" ng-if="!hasInternetOnServer">Connect your server to internet to setup {{Config.cloud.productName}}</alert>
             <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">You need internet connetion on your computer to connect your system to {{Config.cloud.productName}}</alert>
             <button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
-            <a class="btn btn-default" ng-href="{{Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create {{Config.cloud.productName}} Account</a>
+            <a class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank">Create {{Config.cloud.productName}} Account</a>
         </div>
     </div>
     <div class="row" ng-hide="settings.ecDbReadOnly">
