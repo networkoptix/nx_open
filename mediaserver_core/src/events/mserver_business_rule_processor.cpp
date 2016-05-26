@@ -68,6 +68,8 @@ namespace {
     static const QString tpUrlInt(lit("urlint"));
     static const QString tpUrlExt(lit("urlext"));
     static const QString tpTimestamp(lit("timestamp"));
+	static const QString tpTimestampDate(lit("timestampDate"));
+	static const QString tpTimestampTime(lit("timestampTime"));
     static const QString tpReason(lit("reason"));
     static const QString tpAggregated(lit("aggregated"));
     static const QString tpInputPort(lit("inputPort"));
@@ -616,6 +618,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     }
 
     detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
+	detailsMap[tpTimestampDate] = QnBusinessStringsHelper::eventTimestampDate(params);
+	detailsMap[tpTimestampTime] = QnBusinessStringsHelper::eventTimestampTime(params);
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {

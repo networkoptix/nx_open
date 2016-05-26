@@ -318,6 +318,17 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
             .arg(time.date().toString());
 }
 
+QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) {
+	quint64 ts = params.eventTimestampUsec;
+	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+	return time.date().toString();
+}
+QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) {
+	quint64 ts = params.eventTimestampUsec;
+	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+	return time.time().toString();
+}
+
 QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params) {
     QnUuid id = params.eventResourceId;
     return !id.isNull()

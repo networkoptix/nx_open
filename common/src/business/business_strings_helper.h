@@ -62,6 +62,9 @@ public:
     static QString eventReason(const QnBusinessEventParameters& params);
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
+	static QString eventTimestampTime(const QnBusinessEventParameters &params);
+	static QString eventTimestampDate(const QnBusinessEventParameters &params);
+
     static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
 
     static QString getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp = false);
