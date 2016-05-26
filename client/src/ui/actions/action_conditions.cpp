@@ -726,11 +726,19 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
 Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout = context()->workbench()->currentLayout()->resource();
     bool isExportedLayout = layout->isFile();
+    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
-    foreach (const QnResourcePtr &resource, resources) {
+    for (const QnResourcePtr& resource : resources)
+    {
+        bool isServer = resource->hasFlags(Qn::server);
+        if (isServer && !isAdmin)
+            return Qn::InvisibleAction;
+    }
+
+    foreach (const QnResourcePtr &resource, resources)
+    {
         //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
-
         if (isServer && QnMediaServerResource::isFakeServer(resource))
             continue;
 
@@ -742,15 +750,26 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
 
         bool allowed = nonVideo || isMediaResource;
         bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
-        if(allowed && !forbidden)
+        if (allowed && !forbidden)
             return Qn::EnabledAction;
     }
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources) {
+Qn::ActionVisibility QnOpenInNewEntityActionCondition::check(const QnResourceList &resources)
+{
+    bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+
+    for (const QnResourcePtr& resource : resources)
+    {
+        bool isServer = resource->hasFlags(Qn::server);
+        if (isServer && !isAdmin)
+            return Qn::InvisibleAction;
+    }
+
     //TODO: #GDM #Common refactor duplicated code VMS-1725
-    foreach(const QnResourcePtr &resource, resources) {
+    foreach(const QnResourcePtr &resource, resources)
+    {
         if (resource->hasFlags(Qn::desktop_camera))
             continue;
 

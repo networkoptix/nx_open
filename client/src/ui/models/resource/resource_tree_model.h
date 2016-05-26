@@ -84,6 +84,8 @@ private:
     void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
     void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
 
+    Qn::NodeType rootNodeTypeForScope() const;
+
     /* Remove virtual 'system' nodes that are not used anymore. */
     void cleanupSystemNodes();
 
