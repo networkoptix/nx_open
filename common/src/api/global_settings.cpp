@@ -72,6 +72,9 @@ namespace {
     const bool kArecontRtspEnabledDefault = false;
     const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
     const int kProxyConnectTimeoutDefault = 5;
+
+    const QString kTakeCameraOwnershipWithoutLock(lit("takeCameraOwnershipWithoutLock"));
+    const int kTakeCameraOwnershipWithoutLockDefault = false;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
@@ -198,6 +201,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         kProxyConnectTimeoutDefault,
         this);
     ec2Adaptors << m_proxyConnectTimeoutAdaptor;
+    m_takeCameraOwnershipWithoutLock = new QnLexicalResourcePropertyAdaptor<bool>(
+        kTakeCameraOwnershipWithoutLock,
+        kTakeCameraOwnershipWithoutLockDefault,
+        this);
+    ec2Adaptors << m_takeCameraOwnershipWithoutLock;
 
     for(auto adaptor: ec2Adaptors)
         connect(
@@ -471,6 +479,11 @@ void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
 {
     return std::chrono::seconds(m_proxyConnectTimeoutAdaptor->value());
+}
+
+bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
+{
+    return m_takeCameraOwnershipWithoutLock->value();
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

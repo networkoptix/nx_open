@@ -20,12 +20,12 @@ public:
     */
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
     virtual void doResourceDiscoverIteration() override;
+
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
 protected:
     virtual bool processDiscoveredResources(QnResourceList& resources) override;
-
 private:
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
@@ -42,7 +42,7 @@ private:
     QMap<QString, int> m_disconnectSended;
     QTime netStateTime;
     CLNetState netState;
-    
+
     QMap<QnUuid, QnSecurityCamResourcePtr> m_tmpForeignResources;
     int m_foreignResourcesRetryCount;
 };

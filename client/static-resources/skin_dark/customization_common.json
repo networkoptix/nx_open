@@ -234,6 +234,19 @@
             "idLabel": "#575757"
         }
     },
+    
+    "QnTwoWayAudioWidget": {
+        "palette": {
+            "default": {
+            "window": "#00000080",
+            "windowText": "#ffffff"
+            }
+        },
+        "colors": {
+            "background": "#212a2f",
+            "visualizer": "#cf2727"
+        }
+    },
 
     "QnStyledTooltipWidget": {
         "windowColor": "QColor(0, 0, 0, 255)",

@@ -8,6 +8,7 @@
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
 #include "utils/network/http/asynchttpclient.h"
+#include <rest/server/json_rest_result.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -33,6 +34,8 @@ namespace rest
         struct EmptyResponseType {};
         typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
 
+        typedef Result<QnJsonRestResult>::type GetCallback; /**< Default callback type for GET requests without result data. */
+
         /*
         * Load information about cross-server archive
         * !Returns value > 0 on success or <= 0 if it isn't started.
@@ -43,6 +46,8 @@ namespace rest
 
 
         Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
+
+        Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
             , QThread *targetThread = nullptr);
@@ -102,7 +107,7 @@ namespace rest
         Request prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType = nx_http::StringType(), const nx_http::StringType& messageBody = nx_http::StringType());
 
         typedef std::function<void (Handle, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
-        Handle sendRequest(const Request& request, HttpCompletionFunc callback);
+        Handle sendRequest(const Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
     private:
         QnUuid m_serverId;
         QMap<Handle, nx_http::AsyncHttpClientPtr> m_runningRequests;

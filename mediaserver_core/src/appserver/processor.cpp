@@ -12,6 +12,7 @@
 #include <core/resource_management/resource_properties.h>
 
 #include "api/common_message_processor.h"
+#include "api/global_settings.h"
 #include "mutex/camera_data_handler.h"
 #include "mutex/distributed_mutex_manager.h"
 #include "nx_ec/data/api_camera_attributes_data.h"
@@ -21,6 +22,7 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "utils/license_usage_helper.h"
 #include "media_server/settings.h"
+
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
@@ -75,7 +77,10 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    bool takeCameraWithoutLock = ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy();
+    const bool takeCameraWithoutLock =
+        (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
+        QnGlobalSettings::instance()->takeCameraOwnershipWithoutLock() ||
+        cameraResource->hasFlags(Qn::desktop_camera);
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
@@ -140,7 +145,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
-void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
+void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
 {
     if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
         return;   //ignoring newly discovered camera
@@ -158,11 +163,11 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
     propertyDictionary->saveParams( cameraResource->getId() );
     QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
-    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId()) 
+    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId())
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
 
-    if (!existCamRes && m_defaultUserAttrs) 
+    if (!existCamRes && m_defaultUserAttrs)
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
         if (!userAttrCopy->scheduleDisabled) {

@@ -182,6 +182,13 @@ namespace nx_http
         return BufferNpos;
     }
 
+    template<class MessageType, class MessageLineType>
+    bool parseRequestOrResponse(
+        const ConstBufferRefType& data,
+        MessageType* message,
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict = false);
+
 
     //!Parses \a data and saves header name and data to \a *headerName and \a *headerValue
     bool parseHeader(
@@ -271,7 +278,6 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
-        nx::Buffer urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
@@ -327,6 +333,8 @@ namespace nx_http
         BufferType toMultipartString(const ConstBufferRefType& boundary) const;
     };
 
+
+
     namespace MessageType
     {
         enum Value
@@ -381,7 +389,8 @@ namespace nx_http
             {
                 none,
                 basic,
-                digest
+                digest,
+                automatic
             };
 
             const char* toString( Value val );

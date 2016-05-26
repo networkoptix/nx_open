@@ -41,7 +41,8 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     QnStatisticValuesHash result;
 
     const auto availableUsers = qnResPool->getResources<QnUserResource>();
-    Q_ASSERT_X(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
+    if (availableUsers.isEmpty())
+        return QnStatisticValuesHash();
 
     // Adds number of each permission
     typedef QHash<QString, int> PermissionCountHash;

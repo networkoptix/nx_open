@@ -52,7 +52,7 @@ public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*);
 
 protected:
-    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) override;
+    virtual int executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) override final;
     virtual int executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& srcBodyContentType, QByteArray &result, 
                             QByteArray &contentType, const QnRestConnectionProcessor*) override;
 
