@@ -262,7 +262,6 @@ the digest or signature produced.
 */
 
 #include "smdevp.h"
-#include "threads.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -385,14 +384,6 @@ soap_smd_end(struct soap *soap, char *buf, int *len)
   return err;
 }
 
-#ifdef WITH_OPENSSL
-static ONCE_TYPE soap_OpenSSL_once = ONCE_INITIALIZER;
-static void soap_OpenSSL_init()
-{ OpenSSL_add_all_digests();
-  OpenSSL_add_all_algorithms();
-}
-#endif
-
 /**
 @fn int soap_smd_init(struct soap *soap, struct soap_smd_data *data, int alg, const void *key, int keylen)
 @brief Initiates a (signed) digest computation.
@@ -408,7 +399,7 @@ soap_smd_init(struct soap *soap, struct soap_smd_data *data, int alg, const void
 { int err = 1;
 #ifdef WITH_OPENSSL
   /* OpenSSL: make sure we have the digest algorithms, need to call just once */
-  ONCE(soap_OpenSSL_once, &soap_OpenSSL_init);
+  soap_ssl_init();
 #endif
   /* the algorithm to use */
   data->alg = alg;

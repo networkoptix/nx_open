@@ -62,6 +62,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 #endif
 
 #include "stdsoap2.h"
+#include "threads.h"
 
 #ifndef WIN32
 #ifndef HAVE_POLL
@@ -180,7 +181,6 @@ static int soap_getgziphdr(struct soap*);
 # ifndef SOAP_SSL_RSA_BITS
 #  define SOAP_SSL_RSA_BITS 2048
 # endif
-static int soap_ssl_init_done = 0;
 static int ssl_auth_init(struct soap*);
 static int ssl_verify_callback(int, X509_STORE_CTX*);
 static int ssl_verify_callback_allow_expired_certificate(int, X509_STORE_CTX*);
@@ -191,7 +191,6 @@ static int ssl_password(char*, int, int, void *);
 # ifndef SOAP_SSL_RSA_BITS
 #  define SOAP_SSL_RSA_BITS 2048
 # endif
-static int soap_ssl_init_done = 0;
 static const char *ssl_verify(struct soap *soap, const char *host);
 # if defined(HAVE_PTHREAD_H)
 #  include <pthread.h>
@@ -2964,8 +2963,7 @@ int
 SOAP_FMAC2
 soap_rand()
 { unsigned char buf[4];
-  if (!soap_ssl_init_done)
-    soap_ssl_init();
+  soap_ssl_init();
   RAND_pseudo_bytes(buf, 4);
   return *(int*)buf;
 }
@@ -3075,40 +3073,44 @@ soap_ssl_client_context(struct soap *soap, unsigned short flags, const char *key
 /******************************************************************************/
 #if defined(WITH_OPENSSL) || defined(WITH_GNUTLS)
 #ifndef PALM_2
+static ONCE_TYPE soap_ssl_init_once = ONCE_INITIALIZER;
+
+static void soap_ssl_init_impl()
+{
+#ifdef WITH_OPENSSL
+  SSL_library_init();
+  OpenSSL_add_all_digests();
+  OpenSSL_add_all_algorithms(); /* 2.8.1 change (wsseapi.c) */
+#ifndef WITH_LEAN
+  SSL_load_error_strings();
+#endif
+  if (!RAND_load_file("/dev/urandom", 1024))
+  { char buf[1024];
+    RAND_seed(buf, sizeof(buf));
+    while (!RAND_status())
+    { int r = rand();
+      RAND_seed(&r, sizeof(int));
+    }
+  }
+#endif
+#ifdef WITH_GNUTLS
+# if defined(HAVE_PTHREAD_H)
+  gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
+# elif defined(HAVE_PTH_H)
+  gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pth);
+# endif
+  gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+  gcry_control(GCRYCTL_DISABLE_SECMEM, 0);
+  gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0); /* libgcrypt init done */
+  gnutls_global_init();
+#endif
+}
+
 SOAP_FMAC1
 void
 SOAP_FMAC2
 soap_ssl_init()
-{ /* Note: for MT systems, the main program MUST call soap_ssl_init() before any threads are started */
-  if (!soap_ssl_init_done)
-  { soap_ssl_init_done = 1;
-#ifdef WITH_OPENSSL
-    SSL_library_init();
-    OpenSSL_add_all_algorithms(); /* 2.8.1 change (wsseapi.c) */
-#ifndef WITH_LEAN
-    SSL_load_error_strings();
-#endif
-    if (!RAND_load_file("/dev/urandom", 1024))
-    { char buf[1024];
-      RAND_seed(buf, sizeof(buf));
-      while (!RAND_status())
-      { int r = rand();
-        RAND_seed(&r, sizeof(int));
-      }
-    }
-#endif
-#ifdef WITH_GNUTLS
-# if defined(HAVE_PTHREAD_H)
-    gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
-# elif defined(HAVE_PTH_H)
-    gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pth);
-# endif
-    gcry_control(GCRYCTL_ENABLE_QUICK_RANDOM, 0);
-    gcry_control(GCRYCTL_DISABLE_SECMEM, 0);
-    gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0); /* libgcrypt init done */
-    gnutls_global_init();
-#endif
-  }
+{ ONCE(soap_ssl_init_once, &soap_ssl_init_impl);
 }
 #endif
 #endif
@@ -3162,8 +3164,7 @@ ssl_auth_init(struct soap *soap)
 #ifdef WITH_OPENSSL
   long flags;
   int mode;
-  if (!soap_ssl_init_done)
-    soap_ssl_init();
+  soap_ssl_init();
   ERR_clear_error();
   if (!soap->ctx)
   { if (!(soap->ctx = SSL_CTX_new(SSLv23_method())))
@@ -3270,8 +3271,7 @@ ssl_auth_init(struct soap *soap)
 #endif
 #ifdef WITH_GNUTLS
   int ret;
-  if (!soap_ssl_init_done)
-    soap_ssl_init();
+  soap_ssl_init();
   if (!soap->xcred)
   { gnutls_certificate_allocate_credentials(&soap->xcred);
     if (soap->cafile)
@@ -5628,13 +5628,13 @@ http_post(struct soap *soap, const char *endpoint, const char *host, int port, c
 { register const char *s;
   register int err;
   switch (soap->status)
-  { case SOAP_GET: 
+  { case SOAP_GET:
       s = "GET";
       break;
-    case SOAP_PUT: 
+    case SOAP_PUT:
       s = "PUT";
       break;
-    case SOAP_DEL: 
+    case SOAP_DEL:
       s = "DELETE";
       break;
     case SOAP_CONNECT:
@@ -8812,8 +8812,7 @@ soap_versioning(soap_init)(struct soap *soap, soap_mode imode, soap_mode omode)
   soap_init_pht(soap);
 #endif
 #ifdef WITH_OPENSSL
-  if (!soap_ssl_init_done)
-    soap_ssl_init();
+  soap_ssl_init();
   soap->fsslauth = ssl_auth_init;
   soap->fsslverify = ssl_verify_callback;
   soap->bio = NULL;
@@ -8830,8 +8829,7 @@ soap_versioning(soap_init)(struct soap *soap, soap_mode imode, soap_mode omode)
   soap->randfile = NULL;
 #endif
 #ifdef WITH_GNUTLS
-  if (!soap_ssl_init_done)
-    soap_ssl_init();
+  soap_ssl_init();
   soap->fsslauth = ssl_auth_init;
   soap->fsslverify = NULL;
   soap->xcred = NULL;
@@ -15199,7 +15197,7 @@ soap_ntlm_handshake(struct soap *soap, int command, const char *endpoint, const 
   const char *userid = (soap->proxy_userid ? soap->proxy_userid : soap->userid);
   const char *passwd = (soap->proxy_passwd ? soap->proxy_passwd : soap->passwd);
   if (soap->ntlm_challenge && userid && passwd && soap->authrealm)
-  { tSmbNtlmAuthRequest req;  
+  { tSmbNtlmAuthRequest req;
     tSmbNtlmAuthResponse res;
     tSmbNtlmAuthChallenge ch;
     short k = soap->keep_alive;

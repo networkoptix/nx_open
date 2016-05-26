@@ -470,14 +470,14 @@ the callback produce a certificate:
         case SOAP_SMD_VRFY_RSA_SHA1:
           if (uid)
           { // Lookup uid to retrieve the X509 certificate to verify the signature
-            const X509 *cert = ...; 
+            const X509 *cert = ...;
             return (const void*)cert;
           }
           return NULL; // no certificate: fail
         case SOAP_SMD_HMAC_SHA1:
           if (uid)
           { // Lookup uid to retrieve the HMAC key to verify the signature
-            const void *key = ...; 
+            const void *key = ...;
 	    *keylen = ...;
             return key;
           }
@@ -957,14 +957,14 @@ Here is an example of a token handler callback:
         case SOAP_SMD_VRFY_RSA_SHA1:
           if (uid)
           { // Lookup uid to retrieve the X509 certificate to verify the signature
-            const X509 *cert = ...; 
+            const X509 *cert = ...;
             return (const void*)cert;
           }
           return NULL; // no certificate: fail
         case SOAP_SMD_HMAC_SHA1:
           if (uid)
           { // Lookup uid to retrieve the HMAC key to verify the signature
-            const void *key = ...; 
+            const void *key = ...;
 	    *keylen = ...;
             return key;
           }
@@ -1540,7 +1540,7 @@ soap_wsse_add_Signature(struct soap *soap)
   { security->ds__Signature = (ds__SignatureType*)soap_malloc(soap, sizeof(ds__SignatureType));
     if (!security->ds__Signature)
       return NULL;
-    soap_default_ds__SignatureType(soap, security->ds__Signature); 
+    soap_default_ds__SignatureType(soap, security->ds__Signature);
   }
   return security->ds__Signature;
 }
@@ -1815,7 +1815,7 @@ soap_wsse_verify_Password(struct soap *soap, const char *password)
         { /* authorize if HA1 and HA2 identical and not replay attack */
           if (!soap_wsse_session_verify(soap, HA1, token->wsu__Created, token->Nonce))
             return SOAP_OK;
-          return soap->error; 
+          return soap->error;
         }
       }
     }
@@ -2093,7 +2093,7 @@ soap_wsse_add_SignedInfo(struct soap *soap)
 
 This function can be called to add more references to the wsse:SignedInfo
 element. A maximum number of SOAP_WSSE_MAX_REF references can be added. The
-digest method is always SHA1. 
+digest method is always SHA1.
 Note: XPath transforms cannot be specified in this release.
 */
 int
@@ -2174,7 +2174,7 @@ soap_wsse_add_SignedInfo_SignatureMethod(struct soap *soap, const char *method, 
   soap_default_ds__CanonicalizationMethodType(soap, signedInfo->CanonicalizationMethod);
   if (canonical)
   { signedInfo->CanonicalizationMethod->Algorithm = (char*)c14n_URI;
-    /* 
+    /*
     signedInfo->CanonicalizationMethod->c14n__InclusiveNamespaces = (_c14n__InclusiveNamespaces*)soap_malloc(soap, sizeof(_c14n__InclusiveNamespaces));
     soap_default__c14n__InclusiveNamespaces(soap, signedInfo->CanonicalizationMethod->c14n__InclusiveNamespaces);
     signedInfo->CanonicalizationMethod->c14n__InclusiveNamespaces->PrefixList = "SOAP-ENV wsse";
@@ -2936,7 +2936,7 @@ soap_wsse_add_EncryptedKey(struct soap *soap, const char *URI, X509 *cert, const
 @fn xenc__EncryptedKeyType* soap_wsse_add_EncryptedKey_encrypt_only(struct soap *soap, const char *URI, X509 *cert, const char *subjectkeyid, const char *tags)
 @brief Adds EncryptedKey header element and initiates encryption of the given
 XML elements specified in the tags string. Should be used in combination with
-soap_wsse_set_wsu_id to set wsu:Id for given XML element tags. 
+soap_wsse_set_wsu_id to set wsu:Id for given XML element tags.
 @param soap context
 @param[in] URI a unique identifier for the key, required for interoperability
 @param[in] cert the X509 certificate with public key or NULL
@@ -2983,17 +2983,17 @@ soap_wsse_add_EncryptedKey_encrypt_only(struct soap *soap, const char *URI, X509
   if (!security->xenc__EncryptedKey)
     if (!(security->xenc__EncryptedKey = (xenc__EncryptedKeyType*)soap_malloc(soap, sizeof(xenc__EncryptedKeyType))))
       return soap->error = SOAP_EOM;
-  soap_default_xenc__EncryptedKeyType(soap, security->xenc__EncryptedKey); 
+  soap_default_xenc__EncryptedKeyType(soap, security->xenc__EncryptedKey);
   security->xenc__EncryptedKey->Id = soap_strdup(soap, URI);
   if (!(security->xenc__EncryptedKey->EncryptionMethod = (xenc__EncryptionMethodType*)soap_malloc(soap, sizeof(struct xenc__EncryptionMethodType))))
     return soap->error = SOAP_EOM;
-  soap_default_xenc__EncryptionMethodType(soap, security->xenc__EncryptedKey->EncryptionMethod); 
+  soap_default_xenc__EncryptionMethodType(soap, security->xenc__EncryptedKey->EncryptionMethod);
   /* RSA Version 1.5 (only alternative is RSA-OAEP) */
   security->xenc__EncryptedKey->EncryptionMethod->Algorithm = (char*)xenc_rsa15URI;
   /* KeyInfo */
   if (!(security->xenc__EncryptedKey->ds__KeyInfo = (_ds__KeyInfo*)soap_malloc(soap, sizeof(_ds__KeyInfo))))
     return soap->error = SOAP_EOM;
-  soap_default__ds__KeyInfo(soap, security->xenc__EncryptedKey->ds__KeyInfo); 
+  soap_default__ds__KeyInfo(soap, security->xenc__EncryptedKey->ds__KeyInfo);
   /* allocate SecurityTokenReference */
   if (!(security->xenc__EncryptedKey->ds__KeyInfo->wsse__SecurityTokenReference = (_wsse__SecurityTokenReference*)soap_malloc(soap, sizeof(_wsse__SecurityTokenReference))))
     return soap->error = SOAP_EOM;
@@ -3027,7 +3027,7 @@ soap_wsse_add_EncryptedKey_encrypt_only(struct soap *soap, const char *URI, X509
   /* CipherData */
   if (!(security->xenc__EncryptedKey->CipherData = (xenc__CipherDataType*)soap_malloc(soap, sizeof(struct xenc__CipherDataType))))
     return soap->error = SOAP_EOM;
-  soap_default_xenc__CipherDataType(soap, security->xenc__EncryptedKey->CipherData); 
+  soap_default_xenc__CipherDataType(soap, security->xenc__EncryptedKey->CipherData);
   /* get the public key */
   pubk = X509_get_pubkey(cert);
   if (!pubk)
@@ -3222,7 +3222,7 @@ soap_wsse_add_EncryptedKey_DataReferenceURI(struct soap *soap, const char *URI)
   if (!security->xenc__EncryptedKey)
   { if (!(security->xenc__EncryptedKey = (xenc__EncryptedKeyType*)soap_malloc(soap, sizeof(xenc__EncryptedKeyType))))
       return soap->error = SOAP_EOM;
-    soap_default_xenc__EncryptedKeyType(soap, security->xenc__EncryptedKey); 
+    soap_default_xenc__EncryptedKeyType(soap, security->xenc__EncryptedKey);
   }
   if (!security->xenc__EncryptedKey->ReferenceList)
   { security->xenc__EncryptedKey->ReferenceList = (struct _xenc__ReferenceList*)soap_malloc(soap, sizeof(struct _xenc__ReferenceList));
@@ -3562,8 +3562,7 @@ calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])
 */
 int
 soap_wsse(struct soap *soap, struct soap_plugin *p, void *arg)
-{ static int done = 0;
-  DBGFUN("soap_wsse");
+{ DBGFUN("soap_wsse");
   p->id = soap_wsse_id;
   p->data = (void*)SOAP_MALLOC(soap, sizeof(struct soap_wsse_data));
   p->fcopy = soap_wsse_copy;
@@ -3573,35 +3572,6 @@ soap_wsse(struct soap *soap, struct soap_plugin *p, void *arg)
     { SOAP_FREE(soap, p->data);
       return SOAP_EOM;
     }
-  }
-  if (!done)
-  {
-#if 0
-#ifdef WIN32
-    /* now uses CreateMutex() for static lock initialization */
-    static volatile long spinlock = 0;
-    DWORD s = 0;
-    /* Initialize soap_wsse_session_lock with a spinlock */
-    while (InterlockedExchange(&spinlock, 1) == 1)
-    { Sleep(s);
-      s = !s;
-    }
-    if (!done)
-      MUTEX_SETUP(soap_wsse_session_lock);
-    done = 1;
-    spinlock = 0;
-#else
-    done = 1;
-#endif
-#endif
-#ifdef WITH_OPENSSL
-    /* moved to stdsoap2.c
-    MUTEX_LOCK(soap_wsse_session_lock);
-    OpenSSL_add_all_digests();
-    OpenSSL_add_all_algorithms();
-    MUTEX_UNLOCK(soap_wsse_session_lock);
-    */
-#endif
   }
   return SOAP_OK;
 }
@@ -3856,7 +3826,7 @@ soap_wsse_verify_auto(struct soap *soap, int alg, const void *key, size_t keylen
   data->vrfy_keylen = keylen;
   if (soap->fpreparefinalrecv != soap_wsse_preparefinalrecv)
   { data->fpreparefinalrecv = soap->fpreparefinalrecv;
-    soap->fpreparefinalrecv = soap_wsse_preparefinalrecv; 
+    soap->fpreparefinalrecv = soap_wsse_preparefinalrecv;
   }
   return soap_wsse_verify_init(soap);
 }
@@ -4157,7 +4127,7 @@ function should be used just once. The algorithm should be
 SOAP_MEC_ENV_DEC_DES_CBC for public key encryption/decryption and
 SOAP_MEC_DEC_DES_CBC for symmetric shared secret keys.
 @param soap context
-@param[in] alg the decryption algorithm, 
+@param[in] alg the decryption algorithm,
 @param[in] key a persistent decryption key for the algorithm, a private RSA key or a
 shared secret key
 @param[in] keylen use 0 for public-key encryption/decryption
@@ -4436,7 +4406,7 @@ soap_wsse_element_begin_out(struct soap *soap, const char *tag)
     char *URI = NULL;
     if (security && security->xenc__EncryptedKey && security->xenc__EncryptedKey->Id)
     { const char *Id = security->xenc__EncryptedKey->Id;
-      URI = (char*)soap_malloc(soap, strlen(Id) + 1);  
+      URI = (char*)soap_malloc(soap, strlen(Id) + 1);
       *URI = '#';
       strcpy(URI + 1, Id);
     }
@@ -4450,7 +4420,7 @@ soap_wsse_element_begin_out(struct soap *soap, const char *tag)
     char *URI = NULL;
     if (security && security->xenc__EncryptedKey && security->xenc__EncryptedKey->Id)
     { const char *Id = security->xenc__EncryptedKey->Id;
-      URI = (char*)soap_malloc(soap, strlen(Id) + 1);  
+      URI = (char*)soap_malloc(soap, strlen(Id) + 1);
       *URI = '#';
       strcpy(URI + 1, Id);
     }
