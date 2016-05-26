@@ -1051,28 +1051,28 @@ String SslEngine::makeCertificateAndKey(
     const auto data = SslStaticData::instance();
     const int serialNumber = qrand();
 
-    auto number = utils::uniquePtr(BN_new(), &BN_free);
+    auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
     {
         NX_LOG("SSL cant generate big number", cl_logWARNING);
         return String();
     }
 
-    auto rsa = utils::uniquePtr(RSA_new(), &RSA_free);
+    auto rsa = utils::wrapUnique(RSA_new(), &RSA_free);
     if (!rsa || !RSA_generate_key_ex(rsa.get(), kRsaLength, number.get(), NULL))
     {
         NX_LOG("SSL cant generate RSA", cl_logWARNING);
         return String();
     }
 
-    auto pkey = utils::uniquePtr(EVP_PKEY_new(), &EVP_PKEY_free);
+    auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
     if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
     {
         NX_LOG("SSL cant generate PKEY", cl_logWARNING);
         return String();
     }
 
-    auto x509 = utils::uniquePtr(X509_new(), &X509_free);
+    auto x509 = utils::wrapUnique(X509_new(), &X509_free);
     if (!x509
         || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
         || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
@@ -1101,7 +1101,7 @@ String SslEngine::makeCertificateAndKey(
     }
 
     char writeBuffer[kBufferSize] = { 0 };
-    const auto bio = utils::uniquePtr(BIO_new(BIO_s_mem()), BIO_free);
+    const auto bio = utils::wrapUnique(BIO_new(BIO_s_mem()), BIO_free);
     if (!bio
         || !PEM_write_bio_PrivateKey(bio.get(), pkey.get(), 0, 0, 0, 0, 0)
         || !PEM_write_bio_X509(bio.get(), x509.get())
@@ -1119,11 +1119,11 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
     Buffer certBytes(certData);
     const auto data = SslStaticData::instance();
     {
-        auto bio = utils::uniquePtr(
+        auto bio = utils::wrapUnique(
             BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
             &BIO_free);
 
-        auto x509 = utils::uniquePtr(
+        auto x509 = utils::wrapUnique(
             PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
 
         if (!x509)
@@ -1140,7 +1140,7 @@ bool SslEngine::useCertificateAndPkey(const String& certData)
     }
 
     {
-        auto bio = utils::uniquePtr(
+        auto bio = utils::wrapUnique(
             BIO_new_mem_buf(static_cast<void*>(certBytes.data()), certBytes.size()),
             &BIO_free);
 

@@ -13,7 +13,7 @@ class QnCalendarModel : public QAbstractListModel
 
     Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged)
     Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged)
-    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(bool mondayIsFirstDay READ mondayIsFirstDay WRITE setMondayIsFirstDay NOTIFY mondayIsFirstDayChanged)
     Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
 public:
@@ -38,8 +38,8 @@ public:
     int month() const;
     void setMonth(int month);
 
-    QLocale locale() const;
-    void setLocale(QLocale locale);
+    bool mondayIsFirstDay() const;
+    void setMondayIsFirstDay(bool mondayIsFirstDay);
 
     QnCameraChunkProvider *chunkProvider() const;
     void setChunkProvider(QnCameraChunkProvider *chunkProvider);
@@ -49,7 +49,6 @@ signals:
     void monthChanged();
     void mondayIsFirstDayChanged();
     void chunkProviderChanged();
-    void localeChanged();
 
 private:
     Q_DECLARE_PRIVATE(QnCalendarModel)

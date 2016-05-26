@@ -76,22 +76,39 @@ void QnNxStylePrivate::drawSwitch(
     Q_UNUSED(widget)
 
     const bool checked = option->state.testFlag(QStyle::State_On);
-    const bool standalone = option->state.testFlag(QStyle::State_Item);
+    const bool standalone = !qstyleoption_cast<const QStyleOptionButton*>(option);
 
-    int colorShift = 0;
-    if (option->state.testFlag(QStyle::State_Sunken))
-    {
-        colorShift = -1;
-    }
-    else if (option->state.testFlag(QStyle::State_MouseOver) ||
-             option->state.testFlag(QStyle::State_HasFocus))
-    {
-        colorShift = 1;
-    }
+    QColor fillColorOn;     // On: background
+    QColor fillColorOff;    // Off: background
+    QColor frameColorOn;    // On: frame
+    QColor frameColorOff;   // Off: frame
+    QColor signColorOn;     // On: "1" indicator
+    QColor signColorOff;    // Off: "0" indicator
 
-    QnPaletteColor backgroundColor = findColor(option->palette.button().color()).lighter(colorShift);
-    QnPaletteColor gripColor = findColor(option->palette.window().color());
-    QnPaletteColor highlightColor = mainColor(QnNxStyle::Colors::kGreen).lighter(colorShift);
+    QnPaletteColor mainGreen = mainColor(QnNxStyle::Colors::kGreen);
+    QnPaletteColor mainDark  = mainColor(QnNxStyle::Colors::kBase);
+
+    if (standalone)
+    {
+        bool hovered = option->state.testFlag(QStyle::State_MouseOver) ||
+                       option->state.testFlag(QStyle::State_HasFocus);
+
+        fillColorOff  = mainDark .lighter(hovered ?  7 :  6);
+        fillColorOn   = mainGreen.lighter(hovered ?  1 :  0);
+        frameColorOff = fillColorOff;
+        frameColorOn  = fillColorOn;
+        signColorOff  = mainDark.lighter(10);
+        signColorOn   = mainGreen.lighter(hovered ? 3 : 2);
+    }
+    else
+    {
+        fillColorOff  = mainDark .lighter(1);
+        fillColorOn   = mainGreen;
+        frameColorOff = mainDark.color();
+        frameColorOn  = fillColorOn;
+        signColorOff  = mainDark .lighter(3);
+        signColorOn   = mainGreen.lighter(2);
+    }
 
     bool drawTop = true;
     bool drawBottom = true;
@@ -105,49 +122,54 @@ void QnNxStylePrivate::drawSwitch(
     else if (qFuzzyEquals(animationProgress, 1.0))
         drawBottom = false;
 
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
+    QnScopedPainterClipPathRollback clipRollback(painter);
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
 
-    QRectF rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kSwitchSize, option->rect);
+    QSize switchSize = standalone ? Metrics::kStandaloneSwitchSize : Metrics::kButtonSwitchSize;
+
+    QRectF rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, switchSize, option->rect);
     rect = QnGeometry::eroded(rect, 0.5);
 
-    QRectF indicatorsRect = QnGeometry::eroded(rect, dp(3));
+    QRectF indicatorsRect = QnGeometry::eroded(rect, 3.5);
+
+    /* Set clip path with excluded grip circle: */
+    QRectF gripRect = QnGeometry::eroded(rect, dp(1));
+    gripRect.moveLeft(gripRect.left() + (gripRect.width() - gripRect.height()) * animationProgress);
+    gripRect.setWidth(gripRect.height());
+    QPainterPath wholeRect;
+    wholeRect.addRect(option->rect);
+    QPainterPath gripCircle;
+    gripCircle.addEllipse(QnGeometry::dilated(gripRect, 0.5));
+    painter->setClipPath(wholeRect.subtracted(gripCircle));
 
     if (drawBottom)
     {
-        painter->setPen(standalone ? backgroundColor : backgroundColor.darker(1));
-        painter->setBrush(backgroundColor.color());
+        painter->setPen(QPen(frameColorOff, 0));
+        painter->setBrush(fillColorOff);
         painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
 
         QRectF zeroRect = indicatorsRect;
         zeroRect.setLeft(indicatorsRect.right() - indicatorsRect.height());
 
-        painter->setPen(QPen(backgroundColor.lighter(2).color(), dp(2)));
+        painter->setPen(QPen(signColorOff, dp(2)));
         painter->drawRoundedRect(zeroRect, zeroRect.width() / 2, zeroRect.height() / 2);
     }
 
     if (drawTop)
     {
-        painter->setPen(highlightColor);
-        painter->setBrush(highlightColor.color());
+        painter->setPen(QPen(frameColorOn, 0));
+        painter->setBrush(fillColorOn);
         painter->drawRoundedRect(rect, rect.height() / 2.0, rect.height() / 2.0);
 
-        painter->setPen(QPen(highlightColor.lighter(2).color(), dp(2)));
+        painter->setPen(QPen(signColorOn, dp(2)));
 
         int x = indicatorsRect.left() + indicatorsRect.height() / 2 + dp(1);
         int h = indicatorsRect.height() - dp(3);
         int y = rect.center().y() - h / 2;
-        painter->drawLine(x, y, x, y + h);
+        painter->drawLine(x, y, x, y + h + 1);
     }
-
-    QRectF handleRect = QnGeometry::eroded(rect, dp(1));
-    handleRect.moveLeft(handleRect.left() + (handleRect.width() - handleRect.height()) * animationProgress);
-    handleRect.setWidth(handleRect.height());
-
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(gripColor.color());
-    painter->drawRoundedRect(handleRect, handleRect.width() / 2, handleRect.height() / 2);
 }
 
 void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *option, const QWidget *widget) const
@@ -160,23 +182,27 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
 
     QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
     const int size = Metrics::kCheckIndicatorSize - dp(5);
-    QRectF rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
-    RectCoordinates rc(rect);
+    QRect rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
 
+    QRectF aaAlignedRect(rect);
+    aaAlignedRect.adjust(0.5, 0.5, 0.5, 0.5);
+
+    RectCoordinates rc(rect);
     if (option->state.testFlag(QStyle::State_On))
     {
+        QRect clipRect(rect.adjusted(0, 0, 1, 1));
+        QRect excludeRect(clipRect);
+        excludeRect.setHeight(excludeRect.height() / 2);
+        excludeRect.setLeft(excludeRect.right() - excludeRect.width() / 5);
+        {
+            QnScopedPainterClipRegionRollback clipRollback(painter, QRegion(clipRect).subtracted(excludeRect));
+            painter->drawRoundedRect(aaAlignedRect, Metrics::kCheckboxCornerRadius, Metrics::kCheckboxCornerRadius);
+        }
+
         QPainterPath path;
-        path.moveTo(rc.x(0.8), rc.y(0.0));
-        path.lineTo(rc.x(0.0), rc.y(0.0));
-        path.lineTo(rc.x(0.0), rc.y(1.0));
-        path.lineTo(rc.x(1.0), rc.y(1.0));
-        path.lineTo(rc.x(1.0), rc.y(0.5));
-
-        painter->drawPath(path);
-
-        path = QPainterPath();
         path.moveTo(rc.x(0.25), rc.y(0.38));
         path.lineTo(rc.x(0.55), rc.y(0.70));
         path.lineTo(rc.x(1.12), rc.y(0.13));
@@ -184,17 +210,15 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
         pen.setWidthF(dp(2));
         painter->setPen(pen);
 
-        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-
         painter->drawPath(path);
     }
     else
     {
-        painter->drawRect(rect);
+        painter->drawRoundedRect(aaAlignedRect, Metrics::kCheckboxCornerRadius, Metrics::kCheckboxCornerRadius);
 
         if (option->state.testFlag(QStyle::State_NoChange))
         {
-            pen.setWidth(2);
+            pen.setWidthF(dp(2));
             painter->setPen(pen);
             painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.9), rc.y(0.5)));
         }

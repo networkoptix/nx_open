@@ -490,6 +490,22 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
         SaveLayoutAsAction,
 
         /**
+         * Shares selected layout with another user.
+         *
+         * Parameters:
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
+         */
+        ShareLayoutAction,
+
+        /**
+         * Stops sharing selected layout from the selected user.
+         *
+         * Parameters:
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to stop sharing layout with.
+         */
+        StopSharingLayoutAction,
+
+        /**
          * Saves selected layout under another name in current user's layouts list.
          *
          * Parameters:
@@ -871,11 +887,6 @@ QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
          * Opens a layout creation dialog.
          */
         NewUserLayoutAction,
-
-        /**
-         * Creates a new global layout.
-         */
-        NewGlobalLayoutAction,
 
         /**
          * Sets spacing of current layout's cells to 0%.

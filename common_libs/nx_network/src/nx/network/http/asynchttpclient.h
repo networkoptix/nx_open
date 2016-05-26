@@ -172,6 +172,7 @@ namespace nx_http
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
 
         AbstractStreamSocket* socket();
+        /** Returns socket in non-blocking mode */
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );

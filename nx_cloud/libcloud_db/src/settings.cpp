@@ -61,9 +61,12 @@ namespace
     const QLatin1String kChangeUser( "changeUser" );
 
     //notification settings
+    const QLatin1String kNotificationServiceEndpoint("notification/serviceEndpoint");
+
     const QLatin1String kNotificationEnabled("notification/enabled");
     const bool kDefaultNotificationEnabled = true;
 
+    //account manager
     const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeout");
     const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout = std::chrono::hours(24);
 
@@ -257,6 +260,9 @@ void Settings::loadConfiguration()
     m_changeUser = m_settings.value( kChangeUser ).toString();
 
     //email
+    m_notification.serviceEndpoint = 
+        m_settings.value(kNotificationServiceEndpoint).toString();
+
     m_notification.enabled =
         m_settings.value(
             kNotificationEnabled,

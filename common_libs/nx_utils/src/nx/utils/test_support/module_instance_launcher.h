@@ -55,7 +55,7 @@ public:
         moduleInstantiatedCreatedFuture.wait();
     }
 
-    bool startAndWaitUntilStarted()
+    virtual bool startAndWaitUntilStarted()
     {
         start();
         return waitUntilStarted();

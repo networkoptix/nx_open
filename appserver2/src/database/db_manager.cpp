@@ -2558,7 +2558,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     {
         qint32 resource_ptr_id = getResourceInternalId(resourceId);
         if (resource_ptr_id <= 0)
-            return ErrorCode::dbError;
+            continue;   /* Just skip invalid id's. */
         newAccessibleResources << resource_ptr_id;
     }
 
@@ -3845,9 +3845,14 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataLis
 
 ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license)
 {
+    QnDbTransactionLocker lockStatic(&m_tranStatic);
     auto result = saveLicense(license, m_sdbStatic);
     if (result == ErrorCode::ok)
+    {
         result = saveLicense(license, m_sdb);
+        if (result == ErrorCode::ok)
+            lockStatic.commit();
+    }
     return result;
 }
 
@@ -3868,9 +3873,14 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license, QSqlDatabase& 
 
 ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license)
 {
+    QnDbTransactionLocker lockStatic(&m_tranStatic);
     auto result = removeLicense(license, m_sdbStatic);
     if (result == ErrorCode::ok)
+    {
         result = removeLicense(license, m_sdb);
+        if (result == ErrorCode::ok)
+            lockStatic.commit();
+    }
     return result;
 }
 

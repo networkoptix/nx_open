@@ -165,7 +165,8 @@ namespace ec2
             }
         }
 
-        if (!qnGlobalSettings->isStatisticsAllowed())
+        if (!qnGlobalSettings->isStatisticsAllowed()
+            || qnGlobalSettings->isNewSystem())
         {
             NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"), cl_logINFO);
 

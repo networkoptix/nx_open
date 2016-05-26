@@ -120,16 +120,22 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) 
 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_accessibleResources[userId] = resources;
-
-    for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
     {
-        if (iter.key().userId == userId)
-            iter = m_permissionsCache.erase(iter);
-        else
-            ++iter;
+        QnMutexLocker lk(&m_mutex);
+        if (m_accessibleResources[userId] == resources)
+            return;
+
+        m_accessibleResources[userId] = resources;
+
+        for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
+        {
+            if (iter.key().userId == userId)
+                iter = m_permissionsCache.erase(iter);
+            else
+                ++iter;
+        }
     }
+    emit accessibleResourcesChanged(userId);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
