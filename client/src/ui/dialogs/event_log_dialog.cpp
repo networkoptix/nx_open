@@ -32,6 +32,7 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/event_processors.h>
@@ -146,12 +147,12 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->eventComboBox,      QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->actionComboBox,     QnComboboxCurrentIndexChanged,      this,   &QnEventLogDialog::updateData);
     connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnEventLogDialog::updateData);
-    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          this->context()->action(QnActions::BusinessEventsAction), &QAction::trigger);
+    connect(ui->eventRulesButton,   &QAbstractButton::clicked,          context()->action(QnActions::BusinessEventsAction), &QAction::trigger);
 
     connect(ui->cameraButton,       &QAbstractButton::clicked,          this,   &QnEventLogDialog::at_cameraButton_clicked);
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
+    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
 
     ui->mainGridLayout->activate();
     updateHeaderWidth();
@@ -306,6 +307,8 @@ void QnEventLogDialog::retranslateUi()
         const QString actionName = QnBusinessStringsHelper::actionName(type);
         item->setText(actionName);
     }
+
+    ui->eventRulesButton->setVisible(menu()->canTrigger(QnActions::BusinessEventsAction));
 }
 
 void QnEventLogDialog::updateHeaderWidth()
@@ -483,13 +486,26 @@ void QnEventLogDialog::at_filterAction_triggered()
 
 void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 {
+    auto hasAccess = [this](const QnResourcePtr& resource)
+    {
+        if (!resource)
+            return false;
+
+        if (resource.dynamicCast<QnMediaResource>())
+            return accessController()->hasPermissions(resource, Qn::ReadPermission);
+
+        /* Only admins should see context menu on servers and users. */
+        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    };
+
     QMenu* menu = 0;
     QModelIndex idx = ui->gridEvents->currentIndex();
     if (idx.isValid())
     {
         QnResourcePtr resource = m_model->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
-        if (resource) {
+        if (resource && hasAccess(resource))
+        {
             QnActionParameters parameters(resource);
             parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
 

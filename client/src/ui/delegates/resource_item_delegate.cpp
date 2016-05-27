@@ -1,4 +1,4 @@
-#include "resource_item_delegate.h"
+﻿#include "resource_item_delegate.h"
 
 #include <QtWidgets/QApplication>
 
@@ -145,13 +145,13 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     if (option.features.testFlag(QStyleOptionViewItem::HasDecoration))
         option.icon.paint(painter, iconRect, option.decorationAlignment, iconMode, QIcon::On);
 
-    /* Get resource from the model: */
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    bool extraResourceInfo = qnSettings->isIpShownInTree() && !resource.isNull();
-
     /* Draw text: */
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay) && !editing)
     {
+        QString baseName;
+        QString extInfo;
+        getDisplayInfo(index, baseName, extInfo);
+
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
 
@@ -159,38 +159,25 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
         textRect.adjust(textPadding, 0, -textPadding, 0);
 
-        if (extraResourceInfo)
+        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width(), textFlags);
+
+        QRect actualRect;
+        painter->drawText(textRect, textFlags, elidedName, &actualRect);
+
+        if (elidedName == baseName && !extInfo.isEmpty())
         {
-            /* Two-component text from resource information: */
-            QString name, host;
-            getResourceDisplayInformation(resource, name, host);
+            option.font.setWeight(QFont::Normal);
+            QFontMetrics extraMetrics(option.font);
 
-            QRect actualRect;
-            QString elidedName = option.fontMetrics.elidedText(name, option.textElideMode, textRect.width(), textFlags);
+            /* If name was empty, actualRect will be invalid: */
+            int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
-            painter->drawText(textRect, textFlags, elidedName, &actualRect);
+            textRect.setLeft(startPos + textPadding * 2);
+            QString elidedHost = extraMetrics.elidedText(extInfo, option.textElideMode, textRect.width(), textFlags);
 
-            if (elidedName == name && !host.isEmpty())
-            {
-                option.font.setWeight(QFont::Normal);
-                QFontMetrics extraMetrics(option.font);
-
-                /* If name was empty, actualRect will be invalid: */
-                int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
-
-                textRect.setLeft(startPos + textPadding*2);
-                QString elidedHost = extraMetrics.elidedText(host, option.textElideMode, textRect.width(), textFlags);
-
-                painter->setFont(option.font);
-                painter->setPen(extraColor);
-                painter->drawText(textRect, textFlags, elidedHost);
-            }
-        }
-        else
-        {
-            /* One-component text directly from style option: */
-            QString elidedText = option.fontMetrics.elidedText(option.text, option.textElideMode, textRect.width(), textFlags);
-            painter->drawText(textRect, textFlags, elidedText);
+            painter->setFont(option.font);
+            painter->setPen(extraColor);
+            painter->drawText(textRect, textFlags, elidedHost);
         }
     }
 
@@ -200,6 +187,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     bool recording = false;
     bool scheduled = false;
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
     {
         if (resource->getStatus() == Qn::Recording && resource.dynamicCast<QnVirtualCameraResource>())
@@ -216,7 +204,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     /* Draw "problems" icon: */
     extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
     if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
-        if (camera->statusFlags() & Qn::CSF_HasIssuesFlag)
+        if (camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
             m_buggyIcon.paint(painter, extraIconRect);
 }
 
@@ -247,9 +235,9 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     /* Adjust size to text: */
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
     {
-        /* Get resource from model: */
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        bool extraResourceInfo = qnSettings->isIpShownInTree() && !resource.isNull();
+        QString baseName;
+        QString extInfo;
+        getDisplayInfo(index, baseName, extInfo);
 
         const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
         int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
@@ -257,25 +245,15 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         /* Adjust height to text: */
         height = qMax(height, option.fontMetrics.height());
 
-        if (extraResourceInfo)
+        /* Width of the main text: */
+        width += option.fontMetrics.width(baseName, -1, kTextFlags);
+
+        if (!extInfo.isEmpty())
         {
-            /* Two-component text from resource information: */
-            QString name, host;
-            getResourceDisplayInformation(resource, name, host);
-
-            /* Width of the main text: */
-            width += option.fontMetrics.width(name, -1, kTextFlags);
-
+            /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-
-            /* Width of the extra text: */
-            width += option.fontMetrics.width(host, -1, kTextFlags) + leftRightPadding;
-        }
-        else
-        {
-            /* One-component text directly from style option: */
-            width += option.fontMetrics.width(option.text, -1, kTextFlags);
+            width += option.fontMetrics.width(extInfo, -1, kTextFlags) + leftRightPadding;
         }
 
         /* Add paddings: */
@@ -408,4 +386,34 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
 
     /* Normal item: */
     return ItemState::Normal;
+}
+
+void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
+{
+    const QString customExtInfoTemplate = lit(" - %1");
+
+    baseName = index.data(Qt::DisplayRole).toString();
+    extInfo = QString();
+
+    /* Two-component text from resource information: */
+    bool showExtraInfo = qnSettings->extraInfoInTree();
+    if (!showExtraInfo)
+        return;
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (!resource)
+        return;
+
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    if (nodeType == Qn::VideoWallItemNode)
+    {
+        extInfo = customExtInfoTemplate.arg(resource->getName());
+    }
+    else
+    {
+        getResourceDisplayInformation(resource, baseName, extInfo);
+        if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
+            extInfo = customExtInfoTemplate.arg(extInfo);
+    }
 }

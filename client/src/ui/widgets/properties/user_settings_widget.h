@@ -28,15 +28,15 @@ public:
     virtual bool hasChanges() const override;
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
+    virtual bool canApplyChanges() const override;
 
     QnUuid selectedUserGroup() const;
     Qn::GlobalPermissions selectedPermissions() const;
 
     void updateAccessRightsPresets();
 private:
-    void updateLogin();
-    void updatePassword();
-    void updateEmail();
+    void setupInputFields();
+
     void updateControlsAccess();
     bool validMode() const;
 private:

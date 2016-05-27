@@ -15,7 +15,6 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <common/common_meta_types.h>
@@ -220,12 +219,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
+
 
     /* Run handlers. */
     updateFilter();
 
-    at_showUrlsInTree_changed();
     at_workbench_currentLayoutChanged();
 }
 
@@ -362,14 +360,18 @@ QModelIndex QnResourceBrowserWidget::itemIndexAt(const QPoint& pos) const {
     return treeView->indexAt(childPos);
 }
 
-QnResourceList QnResourceBrowserWidget::selectedResources() const {
+QnResourceList QnResourceBrowserWidget::selectedResources() const
+{
     QnResourceList result;
 
-    foreach (const QModelIndex& index, currentSelectionModel()->selectedRows()) {
+    for (const QModelIndex& index: currentSelectionModel()->selectedRows())
+    {
         Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        switch (nodeType) {
-        case Qn::RecorderNode: {
+        switch (nodeType)
+        {
+        case Qn::RecorderNode:
+        {
                 for (int i = 0; i < index.model()->rowCount(index); i++) {
                     QModelIndex subIndex = index.model()->index(i, 0, index);
                     QnResourcePtr resource = subIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -448,25 +450,6 @@ Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }
 
-QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
-    if(scope != Qn::TreeScope)
-        return QVariant();
-
-    QItemSelectionModel* selectionModel = currentSelectionModel();
-
-    Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if(nodeType == Qn::VideoWallItemNode)
-        return QVariant::fromValue(selectedVideoWallItems());
-
-    if (nodeType == Qn::VideoWallMatrixNode)
-        return QVariant::fromValue(selectedVideoWallMatrices());
-
-    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-        return QVariant::fromValue(selectedLayoutItems());
-
-    return QVariant::fromValue(selectedResources());
-}
-
 QString QnResourceBrowserWidget::toolTipAt(const QPointF& pos) const {
     Q_UNUSED(pos)
     //default tooltip should not be displayed anyway
@@ -537,19 +520,44 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget) {
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
 {
+    auto currentTarget = [this, scope]
+    {
+        if (scope != Qn::TreeScope)
+            return QnActionParameters();
+
+        QItemSelectionModel* selectionModel = currentSelectionModel();
+
+        Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        if (nodeType == Qn::VideoWallItemNode)
+            return QnActionParameters(selectedVideoWallItems());
+
+        if (nodeType == Qn::VideoWallMatrixNode)
+            return QnActionParameters(selectedVideoWallMatrices());
+
+        if (!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
+            return QnActionParameters(selectedLayoutItems());
+
+         QnActionParameters result(selectedResources());
+
+         /* For working with shared layout links we must know owning user resource. */
+         QModelIndex parentIndex = selectionModel->currentIndex().parent();
+         Qn::NodeType parentNodeType = parentIndex.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+         /* We can select several layouts and some other resources in any part of tree - in this case just do not set anything. */
+         QnUserResourcePtr user = parentNodeType == Qn::ResourceNode
+             ? parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>()
+             : parentNodeType == Qn::LayoutsNode
+             ? context()->user()
+             : QnUserResourcePtr();
+
+         result.setArgument(Qn::UserResourceRole, user);
+         return result;
+    };
+
     QItemSelectionModel* selectionModel = currentSelectionModel();
     Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-    auto result = QnActionParameters(currentTarget(scope)).withArgument(Qn::NodeTypeRole, nodeType);
-
-    /* For working with shared layout links we must know owning user resource. */
-    if (nodeType == Qn::SharedLayoutNode)
-    {
-        QModelIndex parentIndex = selectionModel->currentIndex().parent();
-        QnUserResourcePtr user = parentIndex.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
-        NX_ASSERT(user);
-        result.setArgument(Qn::UserResourceRole, user);
-    }
+    auto result = currentTarget().withArgument(Qn::NodeTypeRole, nodeType);
 
     return result; // TODO: #Elric just pass all the data through?
 }
@@ -788,12 +796,6 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     }
 
     emit currentTabChanged();
-}
-
-void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
-    bool urlsShown = qnSettings->isIpShownInTree();
-
-    m_resourceModel->setUrlsShown(urlsShown);
 }
 
 void QnResourceBrowserWidget::at_thumbnailReady(QnUuid resourceId, const QPixmap& pixmap) {

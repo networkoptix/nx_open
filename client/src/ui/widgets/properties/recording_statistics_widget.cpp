@@ -244,7 +244,7 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     connect(ui->extraSizeSpinBox,   QnDoubleSpinBoxValueChanged,            this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
     connect(m_model,                &QnRecordingStatsModel::colorsChanged,  this,   &QnRecordingStatisticsWidget::updateColors);
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested,this,   &QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested);
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE),
+    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE),
                                     &QnPropertyNotifier::valueChanged,      ui->gridEvents, &QAbstractItemView::reset);
     connect(m_selectAllAction,      &QAction::triggered,                    ui->gridEvents, &QTableView::selectAll);
 
@@ -555,7 +555,7 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
         {
             forecastData.totalSpace += cameraStats.recordedBytes; //<< there are no storages for virtual camera called 'foreign cameras'
         }
-        else 
+        else
         {
             for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
             {
