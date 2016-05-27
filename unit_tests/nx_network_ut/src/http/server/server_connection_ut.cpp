@@ -12,20 +12,21 @@
 #include <QString>
 
 #include <nx/network/aio/timer.h>
-#include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/http/server/abstract_http_request_handler.h>
 #include <utils/common/cpp14.h>
 
 
 namespace nx_http {
 
-class AsyncServerConnectionTest
+class HttpAsyncServerConnectionTest
 :
     public ::testing::Test
 {
 public:
-    AsyncServerConnectionTest()
+    HttpAsyncServerConnectionTest()
     :
         m_testHttpServer( std::make_unique<TestHttpServer>() )
     {
@@ -75,7 +76,7 @@ private:
 const QString TestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcessed )
+TEST_F( HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcessed )
 {
     m_testHttpServer->registerRequestProcessor<TestHandler>(
         TestHandler::PATH,
@@ -129,16 +130,16 @@ public:
             nx_http::getHeaderValue( request.headers, "Seq" ) );
         completionHandler(
             nx_http::StatusCode::ok,
-            std::unique_ptr<nx_http::AbstractMsgBodySource>() );
+            std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla"));
     }
 };
 
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
+TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest )
 {
-    static const int REQUESTS_TO_SEND = 10;
+    static const int REQUESTS_TO_SEND = 100;
 
     m_testHttpServer->registerRequestProcessor<PipeliningTestHandler>(
         PipeliningTestHandler::PATH,
@@ -174,7 +175,7 @@ TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
     nx_http::HttpStreamReader httpMsgReader;
 
     nx::Buffer readBuf;
-    readBuf.resize( 4096 );
+    readBuf.resize(4 * 1024 * 1024);
     int dataSize = 0;
     ASSERT_TRUE(sock->setRecvTimeout(500));
     while (msgCounter > 0)
