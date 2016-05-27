@@ -39,13 +39,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui->groupInputField->setTitle(tr("Group"));
 
     ui->emailInputField->setTitle(tr("Email"));
-    ui->emailInputField->setValidator([](const QString& text)
-    {
-        if (!text.trimmed().isEmpty() && !QnEmailAddress::isValid(text))
-            return QnInputField::ValidateResult(false, tr("Invalid email address."));
-
-        return QnInputField::ValidateResult(true, QString());
-    });
+    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     connect(ui->emailInputField, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
 
