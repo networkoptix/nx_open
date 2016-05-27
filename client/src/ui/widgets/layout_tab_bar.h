@@ -11,7 +11,8 @@ class QnWorkbenchContext;
 class QnWorkbenchLayout;
 class QnWorkbench;
 
-class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnLayoutTabBar: public QTabBar, public QnWorkbenchContextAware, public QnActionTargetProvider
+{
     Q_OBJECT
     typedef QTabBar base_type;
 
@@ -21,6 +22,7 @@ public:
     virtual ~QnLayoutTabBar();
 
     virtual Qn::ActionScope currentScope() const override;
+    virtual QnActionParameters currentParameters(Qn::ActionScope scope) const override;
 
 signals:
     void closeRequested(QnWorkbenchLayout *layout);
@@ -39,8 +41,6 @@ protected:
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
     QString layoutText(QnWorkbenchLayout *layout) const;
     QIcon layoutIcon(QnWorkbenchLayout *layout) const;
 
@@ -52,12 +52,12 @@ private slots:
     void at_tabCloseRequested(int index);
     void at_currentChanged(int index);
     void at_tabMoved(int from, int to);
-    
+
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource);
-    
+
     void at_workbench_layoutsChanged();
     void at_workbench_currentLayoutChanged();
-    
+
 private:
     void checkInvariants() const;
     void submitCurrentLayout();

@@ -61,9 +61,6 @@ public:
 
     QnResourcePtr resource(const QModelIndex &index) const;
 
-    bool isUrlsShown();
-    void setUrlsShown(bool urlsShown);
-
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 private:
@@ -83,6 +80,8 @@ private:
 
     void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
     void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
+
+    Qn::NodeType rootNodeTypeForScope() const;
 
     /* Remove virtual 'system' nodes that are not used anymore. */
     void cleanupSystemNodes();
@@ -165,9 +164,6 @@ private:
 
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
-
-    /** Whether item urls should be shown. */
-    bool m_urlsShown;
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;

@@ -743,6 +743,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
     dst->setEmail(src.email);
     dst->setHash(src.hash);
     dst->setUserGroup(src.groupId);
+    dst->setFullName(src.fullName);
 
     dst->setRawPermissions(src.permissions);
     dst->setDigest(src.digest);
@@ -765,6 +766,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
     dst.realm = src->getRealm();
     dst.isCloud = userType == QnUserType::Cloud;
     dst.groupId = src->userGroup();
+    dst.fullName = src->fullName();
 }
 
 template<class List>

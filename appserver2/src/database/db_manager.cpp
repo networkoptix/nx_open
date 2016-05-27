@@ -1528,9 +1528,9 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         const QString profileQueryStr = R"(
             INSERT OR REPLACE
             INTO vms_userprofile
-            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud)
+            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud, full_name)
             VALUES
-            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :groupId, :isCloud)
+            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :groupId, :isCloud, :fullName)
         )";
 
         QSqlQuery profileQuery(m_sdb);
@@ -2131,10 +2131,6 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
 
     ErrorCode err = ErrorCode::ok;
 
-    //err = deleteAddParams(internalId);
-    //if (err != ErrorCode::ok)
-    //    return err;
-
     err = deleteUserProfileTable(internalId);
     if (err != ErrorCode::ok)
         return err;
@@ -2144,6 +2140,11 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
         return err;
 
     err = deleteRecordFromResourceTable(internalId);
+    if (err != ErrorCode::ok)
+        return err;
+
+    /* Cleanup user shared resources. */
+    err = cleanAccessRights(guid);
     if (err != ErrorCode::ok)
         return err;
 
@@ -2163,6 +2164,11 @@ ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
+
+    /* Cleanup group shared resources. */
+    auto err = cleanAccessRights(guid);
+    if (err != ErrorCode::ok)
+        return err;
 
     return deleteTableRecord(guid, "vms_user_groups", "id");
 }
@@ -2590,25 +2596,76 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     QSet<qint32> resourcesToRemove = accessibleResources - newAccessibleResources;
     if (!resourcesToRemove.empty())
     {
-        QSqlQuery removeQuery(m_sdb);
-        removeQuery.prepare(R"(
-            DELETE FROM vms_access_rights
-            WHERE guid = :userOrGroupId
-            AND resource_ptr_id IN (:resources);
-        )");
-        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
-
         QStringList values;
         for (const qint32& resource_ptr_id : resourcesToRemove)
             values << QString::number(resource_ptr_id);
+        QString resourcesToRemoveIds = values.join(L',');
 
-        removeQuery.bindValue(":resources", values.join(L','));
+        QSqlQuery removeQuery(m_sdb);
+        QString removeQueryStr
+        (R"(
+            DELETE FROM vms_access_rights
+            WHERE guid = :userOrGroupId
+            AND resource_ptr_id IN (%1);
+        )");
+        /* We cannot bind this value via QSql as it puts numbers to braces */
+        removeQueryStr = removeQueryStr.arg(resourcesToRemoveIds);
+
+        if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
         if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
+
+    /* This whole function should be optimized out in release */
+    auto validate = [this, data, newAccessibleResources]()
+    {
+        ApiAccessRightsDataList allAccessRights;
+        if (doQueryNoLock(nullptr, allAccessRights) != ErrorCode::ok)
+            return false;
+
+        for (auto updated: allAccessRights)
+        {
+            if (updated.userId != data.userId)
+                continue;
+            QSet<qint32> accessible;
+            for (const QnUuid& id : updated.resourceIds)
+            {
+                qint32 resource_ptr_id = getResourceInternalId(id);
+                if (resource_ptr_id <= 0)
+                    return false;
+                accessible << resource_ptr_id;
+            }
+            return accessible == newAccessibleResources;
+        }
+        return newAccessibleResources.isEmpty();
+    };
+    NX_ASSERT(validate());
+
     return ErrorCode::ok;
 }
 
+
+ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrGroupId)
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr
+    (R"(
+        DELETE FROM vms_access_rights
+        WHERE guid = :userOrGroupId;
+     )");
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    query.bindValue(":userOrGroupId", userOrGroupId.toRfc4122());
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
@@ -3408,7 +3465,7 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDat
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
         u.is_superuser as isAdmin, u.email,
         p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions,
-        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud, p.full_name as fullName
         FROM vms_resource r
         JOIN auth_user u on u.id = r.id
         JOIN vms_userprofile p on p.user_id = u.id

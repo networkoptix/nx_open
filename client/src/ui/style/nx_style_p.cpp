@@ -104,7 +104,7 @@ void QnNxStylePrivate::drawSwitch(
     {
         fillColorOff  = mainDark .lighter(1);
         fillColorOn   = mainGreen;
-        frameColorOff = mainDark.color();
+        frameColorOff = mainDark;
         frameColorOn  = fillColorOn;
         signColorOff  = mainDark .lighter(3);
         signColorOn   = mainGreen.lighter(2);

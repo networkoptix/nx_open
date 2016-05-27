@@ -58,7 +58,7 @@ QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 void QnLookAndFeelPreferencesWidget::applyChanges()
 {
     qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
-    qnSettings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
+    qnSettings->setExtraInfoInTree(ui->showIpInTreeCheckBox->isChecked());
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
 
@@ -80,7 +80,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     ui->skinComboBox->setCurrentIndex(m_oldSkin);
 
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
-    ui->showIpInTreeCheckBox->setChecked(qnSettings->isIpShownInTree());
+    ui->showIpInTreeCheckBox->setChecked(qnSettings->extraInfoInTree());
 
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
 

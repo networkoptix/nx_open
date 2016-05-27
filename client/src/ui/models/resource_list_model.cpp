@@ -73,14 +73,15 @@ void QnResourceListModel::setResources(const QnResourceList &resources)
     beginResetModel();
 
     foreach(const QnResourcePtr &resource, m_resources)
-        disconnect(resource.data(), NULL, this, NULL);
+        disconnect(resource, nullptr, this, nullptr);
 
     m_resources = resources;
 
-    foreach(const QnResourcePtr &resource, m_resources) {
-        connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-        connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-        connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    for (const QnResourcePtr &resource : m_resources)
+    {
+        connect(resource, &QnResource::nameChanged,    this, &QnResourceListModel::at_resource_resourceChanged);
+        connect(resource, &QnResource::statusChanged,  this, &QnResourceListModel::at_resource_resourceChanged);
+        connect(resource, &QnResource::resourceChanged,this, &QnResourceListModel::at_resource_resourceChanged);
     }
 
     endResetModel();
@@ -88,16 +89,14 @@ void QnResourceListModel::setResources(const QnResourceList &resources)
 
 void QnResourceListModel::addResource(const QnResourcePtr &resource)
 {
-    foreach(const QnResourcePtr &r, m_resources) // TODO: #Elric checking for duplicates does not belong here. Makes no sense!
-        if (r->getId() == resource->getId())
-            return;
+    NX_ASSERT(m_resources.indexOf(resource) < 0);
 
     int row = m_resources.size();
     beginInsertRows(QModelIndex(), row, row);
 
-    connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    connect(resource, &QnResource::nameChanged,     this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource, &QnResource::statusChanged,   this, &QnResourceListModel::at_resource_resourceChanged);
+    connect(resource, &QnResource::resourceChanged, this, &QnResourceListModel::at_resource_resourceChanged);
     m_resources << resource;
 
     endInsertRows();
@@ -108,14 +107,8 @@ void QnResourceListModel::removeResource(const QnResourcePtr &resource)
     if (!resource)
         return;
 
-    int row;
-
-    for (row = 0; row < m_resources.size(); ++row) {
-        if (m_resources[row]->getId() == resource->getId()) // TODO: #Elric check by pointer, not id. Makes no sense.
-            break;
-    }
-
-    if (row == m_resources.size())
+    int row = m_resources.indexOf(resource);
+    if (row < 0)
         return;
 
     beginRemoveRows(QModelIndex(), row, row);
@@ -172,7 +165,7 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
         return result;
 
     const QnResourcePtr &resource = m_resources[index.row()];
-    if(!resource)
+    if (!resource)
         return result;
 
     return result | Qt::ItemIsEditable;

@@ -23,12 +23,15 @@
 #include <QtWidgets/QProxyStyle>
 #include <private/qfont_p.h>
 
+#include <ui/delegates/styled_combo_box_delegate.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace style;
 
 namespace
 {
+    const char* kComboBoxDelegateClass = "_qn_comboBoxDelegateClass";
+
     void drawArrow(Direction direction,
                    QPainter *painter,
                    const QRectF &rect,
@@ -610,13 +613,12 @@ void QnNxStyle::drawComplexControl(
         QPainter *painter,
         const QWidget *widget) const
 {
-    Q_D(const QnNxStyle);
-
     switch (control)
     {
     case CC_ComboBox:
         if (const QStyleOptionComboBox* comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
         {
+            bool listOpened = comboBox->state.testFlag(State_On);
             if (comboBox->editable)
             {
                 proxy()->drawPrimitive(PE_PanelLineEdit, comboBox, painter, widget);
@@ -626,17 +628,10 @@ void QnNxStyle::drawComplexControl(
                 QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Shadow));
                 QnPaletteColor buttonColor;
 
-                if (!comboBox->state.testFlag(State_On))
-                {
-                    if (comboBox->state.testFlag(State_Sunken))
-                    {
-                        buttonColor = mainColor.lighter(1);
-                    }
-                    else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
-                    {
+                if (listOpened || comboBox->state.testFlag(State_Sunken))
+                    buttonColor = mainColor.lighter(1);
+                else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
                         buttonColor = mainColor.lighter(2);
-                    }
-                }
 
                 if (buttonColor.isValid())
                 {
@@ -661,7 +656,7 @@ void QnNxStyle::drawComplexControl(
             if (comboBox->subControls.testFlag(SC_ComboBoxArrow))
             {
                 QRectF rect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxArrow, widget);
-                drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
+                drawArrow(listOpened ? Up : Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
 
             return;
@@ -2044,6 +2039,11 @@ int QnNxStyle::pixelMetric(
     case PM_DefaultFrameWidth:
         return 0;
 
+    case PM_DefaultTopLevelMargin:
+        return Metrics::kDefaultTopLevelMargin;
+    case PM_DefaultChildMargin:
+        return Metrics::kDefaultChildMargin;
+
     case PM_ExclusiveIndicatorWidth:
     case PM_ExclusiveIndicatorHeight:
         return Metrics::kExclusiveIndicatorSize;
@@ -2062,14 +2062,10 @@ int QnNxStyle::pixelMetric(
     case PM_HeaderMargin:
         return dp(6);
 
-    case PM_LayoutTopMargin:
-    case PM_LayoutBottomMargin:
-    case PM_LayoutLeftMargin:
-    case PM_LayoutRightMargin:
-        return dp(0);
     case PM_LayoutHorizontalSpacing:
+        return Metrics::kDefaultLayoutSpacing.width();
     case PM_LayoutVerticalSpacing:
-        return dp(8);
+        return Metrics::kDefaultLayoutSpacing.height();
 
     case PM_MenuVMargin:
         return dp(2);
@@ -2353,8 +2349,21 @@ void QnNxStyle::polish(QWidget *widget)
         }
     }
 
-    if (qobject_cast<QComboBox*>(widget) ||
-        qobject_cast<QSpinBox*>(widget) ||
+    if (auto comboBox = qobject_cast<QComboBox*>(widget))
+    {
+        comboBox->setAttribute(Qt::WA_Hover);
+
+        static const QByteArray kDefaultDelegateClassName("QComboBoxDelegate");
+
+        QAbstractItemDelegate* oldDelegate = comboBox->itemDelegate();
+        if (oldDelegate && oldDelegate->metaObject()->className() == kDefaultDelegateClassName)
+        {
+            comboBox->setProperty(kComboBoxDelegateClass, QVariant::fromValue(const_cast<void*>(static_cast<const void*>(oldDelegate->metaObject()))));
+            comboBox->setItemDelegate(new QnStyledComboBoxDelegate());
+        }
+    }
+
+    if (qobject_cast<QSpinBox*>(widget) ||
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QGroupBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||
@@ -2400,6 +2409,15 @@ void QnNxStyle::unpolish(QWidget *widget)
     {
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
             widget->setFont(qApp->font());
+    }
+
+    if (auto comboBox = qobject_cast<QComboBox*>(widget))
+    {
+        if (auto delegateClass = static_cast<const QMetaObject*>(comboBox->property(kComboBoxDelegateClass).value<void*>()))
+        {
+            comboBox->setProperty(kComboBoxDelegateClass, QVariant::fromValue<void*>(nullptr));
+            comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
+        }
     }
 
     base_type::unpolish(widget);

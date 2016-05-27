@@ -6,6 +6,8 @@
 
 #include <common/common_module.h>
 
+#include <client/client_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/resource.h>
@@ -48,19 +50,6 @@ namespace
         return false;
     }
 
-    Qn::NodeType rootNodeTypeForScope(QnResourceTreeModel::Scope scope)
-    {
-        switch (scope)
-        {
-        case QnResourceTreeModel::CamerasScope:
-            return Qn::ServersNode;
-        case QnResourceTreeModel::UsersScope:
-            return Qn::UsersNode;
-        default:
-            return Qn::RootNode;
-        }
-    }
-
     /** Set of top-level node types */
     QList<Qn::NodeType> rootNodeTypes()
     {
@@ -92,7 +81,6 @@ namespace
 QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_urlsShown(true),
     m_scope(scope)
 {
     /* Create top-level nodes. */
@@ -111,6 +99,11 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
     connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
+    {
+        Q_UNUSED(value);
+        m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
+    });
     connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnResourceTreeModel::at_accessibleResourcesChanged);
 
     rebuildTree();
@@ -133,7 +126,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex &index) c
 {
     /* Root node. */
     if (!index.isValid())
-        return m_rootNodes[rootNodeTypeForScope(m_scope)];
+        return m_rootNodes[rootNodeTypeForScope()];
 
     return static_cast<QnResourceTreeModelNode *>(index.internalPointer())->toSharedPointer();
 }
@@ -330,7 +323,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::ServersNode:
-        if (m_scope == CamerasScope)
+        if (m_scope == CamerasScope && isAdmin)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
         if (m_scope == FullScope && isAdmin)
             return rootNode;
@@ -362,6 +355,8 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::UserDevicesNode:
+        if (m_scope == CamerasScope && !isAdmin)
+            return QnResourceTreeModelNodePtr(); /*< Be the root node in this scope. */
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
             return rootNode;
         return bastardNode;
@@ -639,6 +634,21 @@ void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr
         removeNode(node);
 }
 
+Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
+{
+    switch (m_scope)
+    {
+    case QnResourceTreeModel::CamerasScope:
+        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+            ? Qn::ServersNode
+            : Qn::UserDevicesNode;
+    case QnResourceTreeModel::UsersScope:
+        return Qn::UsersNode;
+    default:
+        return Qn::RootNode;
+    }
+}
+
 void QnResourceTreeModel::cleanupSystemNodes()
 {
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
@@ -653,22 +663,6 @@ void QnResourceTreeModel::cleanupSystemNodes()
 
     for (auto node : nodesToDelete)
         removeNode(node);
-}
-
-bool QnResourceTreeModel::isUrlsShown()
-{
-    return m_urlsShown;
-}
-
-void QnResourceTreeModel::setUrlsShown(bool urlsShown)
-{
-    if (urlsShown == m_urlsShown)
-        return;
-
-    m_urlsShown = urlsShown;
-
-    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
-    m_rootNodes[rootNodeType]->updateRecursive();
 }
 
 QnResourceTreeModelCustomColumnDelegate* QnResourceTreeModel::customColumnDelegate() const {
@@ -687,7 +681,7 @@ void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColum
     auto notifyCustomColumnChanged = [this]()
     {
         //TODO: #GDM update only custom column and changed rows
-        Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+        Qn::NodeType rootNodeType = rootNodeTypeForScope();
         m_rootNodes[rootNodeType]->updateRecursive();
     };
 
