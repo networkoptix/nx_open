@@ -15,7 +15,6 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
-#include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <common/common_meta_types.h>
@@ -220,12 +219,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
+
 
     /* Run handlers. */
     updateFilter();
 
-    at_showUrlsInTree_changed();
     at_workbench_currentLayoutChanged();
 }
 
@@ -798,12 +796,6 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     }
 
     emit currentTabChanged();
-}
-
-void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
-    bool urlsShown = qnSettings->isIpShownInTree();
-
-    m_resourceModel->setUrlsShown(urlsShown);
 }
 
 void QnResourceBrowserWidget::at_thumbnailReady(QnUuid resourceId, const QPixmap& pixmap) {

@@ -840,6 +840,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
+        WriteFullNamePermission         = WritePasswordPermission,
         FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
                                             WritePasswordPermission | WriteAccessRightsPermission,
 

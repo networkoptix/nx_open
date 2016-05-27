@@ -4,18 +4,15 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
 namespace
 {
-    void getResourceDisplayInformation(const QnResourcePtr& resource, bool queryHost, QString& name, QString& host)
+    void getResourceDisplayInformation(const QnResourcePtr& resource, bool queryHost, QString& name, QString& extInfo)
     {
         if (!resource)
-        {
-            name = QString();
-            host = QString();
             return;
-        }
 
         name = resource->getName();
         Qn::ResourceFlags flags = resource->flags();
@@ -24,10 +21,15 @@ namespace
             if (QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
                 name = camera->getUserDefinedName();
 
-        if (queryHost && ((flags & Qn::network) || (flags & Qn::server && flags & Qn::remote)))
-            host = extractHost(resource->getUrl());
-        else
-            host = QString();
+        if (queryHost && (flags.testFlag(Qn::network) || flags.testFlag(Qn::remote_server)))
+        {
+            extInfo = extractHost(resource->getUrl());
+        }
+        else if (flags.testFlag(Qn::user))
+        {
+            if (const QnUserResourcePtr& user = resource.dynamicCast<QnUserResource>())
+                extInfo = user->fullName();
+        }
     }
 };
 
@@ -47,9 +49,9 @@ QString extractHost(const QString& url)
     return url.mid(startPos, endPos - startPos);
 }
 
-void getResourceDisplayInformation(const QnResourcePtr& resource, QString& name, QString& host)
+void getResourceDisplayInformation(const QnResourcePtr& resource, QString& name, QString& extInfo)
 {
-    getResourceDisplayInformation(resource, true, name, host);
+    getResourceDisplayInformation(resource, true, name, extInfo);
 }
 
 QString getFullResourceName(const QnResourcePtr& resource, bool showIp)
@@ -57,11 +59,11 @@ QString getFullResourceName(const QnResourcePtr& resource, bool showIp)
     if (!resource)
         return QString();
 
-    QString baseName, host;
-    getResourceDisplayInformation(resource, showIp, baseName, host);
+    QString baseName, extInfo;
+    getResourceDisplayInformation(resource, showIp, baseName, extInfo);
 
-    if (!host.isEmpty())
-        return QString(lit("%1 (%2)")).arg(baseName, host);
+    if (!extInfo.isEmpty())
+        return QString(lit("%1 (%2)")).arg(baseName, extInfo);
 
     return baseName;
 }

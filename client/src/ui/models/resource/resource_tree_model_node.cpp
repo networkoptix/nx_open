@@ -245,15 +245,7 @@ void QnResourceTreeModelNode::update()
                 }
             }
 
-            if (m_resource.isNull())
-            {
-                m_displayName = m_name = item.name;
-            }
-            else
-            {
-                m_name = item.name;
-                m_displayName = QString(lit("%1 <%2>")).arg(item.name).arg(m_resource->getName());
-            }
+            m_displayName = m_name = item.name;
         }
         else
         {

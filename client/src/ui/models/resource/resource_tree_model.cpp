@@ -6,6 +6,8 @@
 
 #include <common/common_module.h>
 
+#include <client/client_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/resource.h>
@@ -79,7 +81,6 @@ namespace
 QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_urlsShown(true),
     m_scope(scope)
 {
     /* Create top-level nodes. */
@@ -98,6 +99,11 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
     connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
+    {
+        Q_UNUSED(value);
+        m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
+    });
     connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnResourceTreeModel::at_accessibleResourcesChanged);
 
     rebuildTree();
@@ -657,22 +663,6 @@ void QnResourceTreeModel::cleanupSystemNodes()
 
     for (auto node : nodesToDelete)
         removeNode(node);
-}
-
-bool QnResourceTreeModel::isUrlsShown()
-{
-    return m_urlsShown;
-}
-
-void QnResourceTreeModel::setUrlsShown(bool urlsShown)
-{
-    if (urlsShown == m_urlsShown)
-        return;
-
-    m_urlsShown = urlsShown;
-
-    Qn::NodeType rootNodeType = rootNodeTypeForScope();
-    m_rootNodes[rootNodeType]->updateRecursive();
 }
 
 QnResourceTreeModelCustomColumnDelegate* QnResourceTreeModel::customColumnDelegate() const {

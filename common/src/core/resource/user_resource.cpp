@@ -16,6 +16,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_userGroup(),
     m_isOwner(false),
 	m_isEnabled(true),
+    m_fullName(),
     m_passwordExpirationTimestamp(0)
 {
     addFlags(Qn::user | Qn::remote);
@@ -35,6 +36,7 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_isOwner(right.m_isOwner),
     m_isEnabled(right.m_isEnabled),
     m_email(right.m_email),
+    m_fullName(right.m_fullName),
     m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
 {
 }
@@ -267,6 +269,23 @@ void QnUserResource::setEmail(const QString& email)
     emit emailChanged(::toSharedPointer(this));
 }
 
+QString QnUserResource::fullName() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_fullName;
+}
+
+void QnUserResource::setFullName(const QString& value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (value.trimmed() == m_fullName)
+            return;
+        m_fullName = value.trimmed();
+    }
+    emit fullNameChanged(::toSharedPointer(this));
+}
+
 void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     base_type::updateInner(other, modifiedFields);
@@ -322,6 +341,12 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         {
             m_email = localOther->m_email;
             modifiedFields << "emailChanged";
+        }
+
+        if (m_fullName != localOther->m_fullName)
+        {
+            m_fullName = localOther->m_fullName;
+            modifiedFields << "fullNameChanged";
         }
 
 		if (m_realm != localOther->m_realm)

@@ -159,8 +159,6 @@ private slots:
     void at_layout_itemAdded(QnWorkbenchItem* item);
     void at_layout_itemRemoved(QnWorkbenchItem* item);
 
-    void at_showUrlsInTree_changed();
-
     void at_thumbnailReady(QnUuid resourceId, const QPixmap& pixmap);
     void at_thumbnailClicked();
 private:

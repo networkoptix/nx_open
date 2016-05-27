@@ -102,6 +102,11 @@ bool QnUserSettingsWidget::hasChanges() const
         if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
 
+    if (permissions.testFlag(Qn::WriteFullNamePermission))
+        if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
+            return true;
+
+
     return false;
 }
 
@@ -115,6 +120,7 @@ void QnUserSettingsWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->emailInputField->setText(m_model->user()->getEmail());
+    ui->nameInputField->setText(m_model->user()->fullName());
     ui->passwordInputField->clear();
     ui->confirmPasswordInputField->clear();
     ui->enabledButton->setChecked(m_model->user()->isEnabled());
@@ -154,7 +160,10 @@ void QnUserSettingsWidget::applyChanges()
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        m_model->user()->setEmail(ui->emailInputField->text());
+        m_model->user()->setEmail(ui->emailInputField->text().trimmed());
+
+    if (permissions.testFlag(Qn::WriteFullNamePermission))
+        m_model->user()->setFullName(ui->nameInputField->text().trimmed());
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
         m_model->user()->setEnabled(ui->enabledButton->isChecked());
@@ -260,6 +269,7 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->passwordInputField->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
     ui->confirmPasswordInputField->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
     ui->emailInputField->setReadOnly(!permissions.testFlag(Qn::WriteEmailPermission));
+    ui->nameInputField->setReadOnly(!permissions.testFlag(Qn::WriteFullNamePermission));
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 
