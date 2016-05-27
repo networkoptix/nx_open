@@ -9,11 +9,7 @@ angular.module('webadminApp', [
     'tc.chartjs',
     'ngStorage',
     'typeahead-focus'
-]).config(function($sceDelegateProvider) {
-    $sceDelegateProvider.resourceUrlWhitelist([
-        'self',
-        Config.cloud.portalWhiteList]);
-}).config(function ($routeProvider) {
+]).config(function ($routeProvider) {
 
     var universalResolves = {
         currentUser: ['mediaserver',function(mediaserver){
