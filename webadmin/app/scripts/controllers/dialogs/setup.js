@@ -485,7 +485,9 @@ angular.module('webadminApp')
                 window.close();
             }else{
                 $location.path('/settings');
-                window.location.reload();
+                setTimeout(function(){
+                    window.location.reload();
+                })
             }
         };
 
@@ -723,7 +725,9 @@ angular.module('webadminApp')
                 }else {
                     $log.log("Reload page to try again");
                     $location.search("retry","true");
-                    window.location.reload();
+                    setTimeout(function(){
+                        window.location.reload();
+                    });
                 }
             });
         }

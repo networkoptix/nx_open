@@ -107,8 +107,9 @@ angular.module('webadminApp')
                         return;
                     }
                 }
-                dialogs.alert('Merge succeed.');
-                window.location.reload();
+                dialogs.alert('Merge succeed.').then(function(){
+                    window.location.reload();
+                });
             });
         };
 

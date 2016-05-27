@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/common/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource_properties/user_settings_model.h>
@@ -33,17 +34,9 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui->setupUi(this);
 
     setHelpTopic(ui->groupLabel, ui->groupComboBox, Qn::UserSettings_UserRoles_Help);
-//    setHelpTopic(ui->accessRightsGroupbox, Qn::UserSettings_UserRoles_Help);
+    setHelpTopic(ui->groupComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
-    connect(ui->loginEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updateLogin);
-    connect(ui->loginEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updatePassword);
-    connect(ui->passwordEdit,           &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updatePassword);
-    connect(ui->confirmPasswordEdit,    &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::updateEmail);
-    connect(ui->emailEdit,              &QLineEdit::textChanged,        this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->enabledButton,          &QPushButton::clicked,          this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
     connect(ui->groupComboBox,          QnComboboxCurrentIndexChanged,  this,   [this]()
@@ -52,7 +45,18 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
         ui->permissionsLabel->setText(tr("TODO: #GDM #FIXME"));
     });
 
-    //setWarningStyle(ui->hintLabel);
+    setupInputFields();
+
+    QnAligner* aligner = new QnAligner(this);
+    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+
+    aligner->addWidgets({
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->passwordInputField,
+        ui->confirmPasswordInputField,
+        ui->emailInputField
+    });
 }
 
 QnUserSettingsWidget::~QnUserSettingsWidget()
@@ -69,10 +73,10 @@ bool QnUserSettingsWidget::hasChanges() const
     Qn::Permissions permissions = accessController()->permissions(m_model->user());
 
     if (permissions.testFlag(Qn::WriteNamePermission))
-        if (m_model->user()->getName() != ui->loginEdit->text().trimmed())
+        if (m_model->user()->getName() != ui->loginInputField->text().trimmed())
             return true;
 
-    if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->passwordEdit->text().isEmpty()) //TODO: #GDM #access implement correct check
+    if (permissions.testFlag(Qn::WritePasswordPermission) && !ui->passwordInputField->text().isEmpty()) //TODO: #GDM #access implement correct check
         return true;
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
@@ -95,8 +99,13 @@ bool QnUserSettingsWidget::hasChanges() const
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        if (m_model->user()->getEmail() != ui->emailEdit->text())
+        if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
+
+    if (permissions.testFlag(Qn::WriteFullNamePermission))
+        if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
+            return true;
+
 
     return false;
 }
@@ -109,18 +118,13 @@ void QnUserSettingsWidget::loadDataToUi()
     updateAccessRightsPresets();
     updateControlsAccess();
 
-    ui->loginEdit->setText(m_model->user()->getName());
-    ui->emailEdit->setText(m_model->user()->getEmail());
-    ui->passwordEdit->clear();
-    ui->confirmPasswordEdit->clear();
+    ui->loginInputField->setText(m_model->user()->getName());
+    ui->emailInputField->setText(m_model->user()->getEmail());
+    ui->nameInputField->setText(m_model->user()->fullName());
+    ui->passwordInputField->clear();
+    ui->confirmPasswordInputField->clear();
     ui->enabledButton->setChecked(m_model->user()->isEnabled());
-
-
     ui->permissionsLabel->setText(m_model->permissionsDescription());
-
-    updateLogin();
-    updatePassword();
-    updateEmail();
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -134,10 +138,10 @@ void QnUserSettingsWidget::applyChanges()
     Qn::Permissions permissions = accessController()->permissions(m_model->user());
 
     if (permissions.testFlag(Qn::WriteNamePermission))
-        m_model->user()->setName(ui->loginEdit->text().trimmed());
+        m_model->user()->setName(ui->loginInputField->text().trimmed());
 
     //empty text means 'no change'
-    const QString newPassword = ui->passwordEdit->text().trimmed();
+    const QString newPassword = ui->passwordInputField->text().trimmed();
     if (permissions.testFlag(Qn::WritePasswordPermission) && !newPassword.isEmpty()) //TODO: #GDM #access implement correct check
     {
         m_model->user()->setPassword(newPassword);
@@ -156,93 +160,103 @@ void QnUserSettingsWidget::applyChanges()
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        m_model->user()->setEmail(ui->emailEdit->text());
+        m_model->user()->setEmail(ui->emailInputField->text().trimmed());
+
+    if (permissions.testFlag(Qn::WriteFullNamePermission))
+        m_model->user()->setFullName(ui->nameInputField->text().trimmed());
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
         m_model->user()->setEnabled(ui->enabledButton->isChecked());
 }
 
-void QnUserSettingsWidget::updateLogin()
+bool QnUserSettingsWidget::canApplyChanges() const
 {
-    QString proposedLogin = ui->loginEdit->text().trimmed().toLower();
+    if (!validMode())
+        return true;
 
-    bool valid = true;
-    QString hint;
-    if (proposedLogin.isEmpty())
+    for (auto field : {
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->passwordInputField,
+        ui->confirmPasswordInputField,
+        ui->emailInputField
+    })
+        if (!field->isValid())
+            return false;
+
+    return true;
+}
+
+void QnUserSettingsWidget::setupInputFields()
+{
+    ui->loginInputField->setTitle(tr("Login"));
+    ui->loginInputField->setValidator([this](const QString& text)
     {
-        hint = tr("Login cannot be empty.");
-        valid = false;
-    }
-    else
-    {
+        if (text.isEmpty())
+            return Qn::ValidationResult(tr("Login cannot be empty."));
+
         for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
         {
             if (user == m_model->user())
                 continue;
 
-            if (user->getName().toLower() != proposedLogin)
+            if (user->getName().toLower() != text.toLower())
                 continue;
 
-            hint = tr("User with specified login already exists.");
-            valid = false;
-            break;
+            return Qn::ValidationResult(tr("User with specified login already exists."));
         }
-    }
 
-    QPalette palette = this->palette();
-    if (!valid)
-        setWarningStyle(&palette);
+        /* Check if we must update password for the other user. */
+        if (m_model->mode() == QnUserSettingsModel::OtherSettings)
+            ui->passwordInputField->validate();
 
-    ui->loginLabel->setPalette(palette);
-    ui->loginEdit->setPalette(palette);
+        return Qn::kValidResult;
+    });
 
-    /* Show warning message if we have renamed an existing user */
-    if (m_model->mode() == QnUserSettingsModel::OtherSettings)
-        updatePassword();
-}
+    ui->nameInputField->setTitle(tr("Name"));
 
-void QnUserSettingsWidget::updatePassword()
-{
-    bool valid = true;
-    QString hint;
+    ui->emailInputField->setTitle(tr("Email"));
+    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
-    /* Show warning message if we have renamed an existing user.. */
-    if (m_model->mode() == QnUserSettingsModel::OtherSettings && ui->loginEdit->text().trimmed() != m_model->user()->getName())
+    ui->passwordInputField->setTitle(tr("Password"));
+    ui->passwordInputField->setEchoMode(QLineEdit::Password);
+    ui->passwordInputField->setValidator([this](const QString& text)
     {
-        /* ..and have not entered new password. */
-        if (ui->passwordEdit->text().isEmpty())
-        {
-            hint = tr("User has been renamed. Password must be updated.");
-            valid = false;
-        }
-    }
+        /* Show warning message if admin has renamed an existing user and has not entered new password. */
+        if (m_model->mode() == QnUserSettingsModel::OtherSettings
+            && ui->loginInputField->text().trimmed() != m_model->user()->getName()
+            && text.isEmpty()
+            )
+            return Qn::ValidationResult(tr("User has been renamed. Password must be updated."));
 
-    /* Show warning if have not entered password for the new user. */
-    if (m_model->mode() == QnUserSettingsModel::NewUser && ui->passwordEdit->text().isEmpty())
+        /* Show warning if have not entered password for the new user. */
+        if (m_model->mode() == QnUserSettingsModel::NewUser && text.isEmpty())
+            return Qn::ValidationResult(tr("Password cannot be empty."));
+
+        return Qn::kValidResult;
+    });
+
+    ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
+    ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
+    ui->confirmPasswordInputField->setValidator([this](const QString& text)
     {
-        hint = tr("Password cannot be empty.");
-        valid = false;
-    }
+        if (ui->passwordInputField->text().isEmpty())
+            return Qn::kValidResult;
 
-}
+        if (ui->passwordInputField->text() != text)
+            return Qn::ValidationResult(tr("Passwords do not match."));
 
-void QnUserSettingsWidget::updateEmail()
-{
-    bool valid = true;
-    QString hint;
+        return Qn::kValidResult;
+    });
 
-    if (!ui->emailEdit->text().trimmed().isEmpty() && !QnEmailAddress::isValid(ui->emailEdit->text()))
-    {
-        hint = tr("Invalid email address.");
-        valid = false;
-    }
-
-    QPalette palette = this->palette();
-    if (!valid)
-        setWarningStyle(&palette);
-
-    ui->emailLabel->setPalette(palette);
-    ui->emailEdit->setPalette(palette);
+    for (auto field : {
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->passwordInputField,
+        ui->confirmPasswordInputField,
+        ui->emailInputField
+    })
+        connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
 }
 
 void QnUserSettingsWidget::updateControlsAccess()
@@ -251,14 +265,11 @@ void QnUserSettingsWidget::updateControlsAccess()
         ? accessController()->permissions(m_model->user())
         : Qn::NoPermissions;
 
-    ui->loginEdit->setReadOnly(!permissions.testFlag(Qn::WriteNamePermission));
-    ui->passwordLabel->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-    ui->passwordEdit->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-    ui->confirmPasswordEdit->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-    ui->confirmPasswordLabel->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
-
-    ui->emailEdit->setReadOnly(!permissions.testFlag(Qn::WriteEmailPermission));
-
+    ui->loginInputField->setReadOnly(!permissions.testFlag(Qn::WriteNamePermission));
+    ui->passwordInputField->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
+    ui->confirmPasswordInputField->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
+    ui->emailInputField->setReadOnly(!permissions.testFlag(Qn::WriteEmailPermission));
+    ui->nameInputField->setReadOnly(!permissions.testFlag(Qn::WriteFullNamePermission));
     ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 

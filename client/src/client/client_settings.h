@@ -84,7 +84,9 @@ public:
         SETTINGS_URL,
 
         TOUR_CYCLE_TIME,
-        IP_SHOWN_IN_TREE,
+
+        /** Show extra information in tree - ip addresses, user name, videowall screen layouts. */
+        EXT_INFO_IN_TREE,
 
         TIME_MODE,
 
@@ -220,7 +222,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
-        QN_DECLARE_RW_PROPERTY(bool,                        isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
+        QN_DECLARE_RW_PROPERTY(bool,                        extraInfoInTree,        setExtraInfoInTree,         EXT_INFO_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
         QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneSettings,           setPaneSettings,            WORKBENCH_PANES,            Qn::defaultPaneSettings())

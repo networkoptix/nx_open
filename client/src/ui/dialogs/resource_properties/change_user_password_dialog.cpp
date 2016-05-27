@@ -19,9 +19,9 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->newPasswordInputField->setValidator([](const QString& text)
     {
         if (text.trimmed() != text)
-            return QnInputField::ValidateResult(false, tr("Avoid leading and trailing spaces."));
+            return Qn::ValidationResult(tr("Avoid leading and trailing spaces."));
 
-        return QnInputField::ValidateResult(true, QString());
+        return Qn::kValidResult;
     });
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
@@ -29,12 +29,12 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->confirmPasswordInputField->setValidator([this](const QString& text)
     {
         if (ui->newPasswordInputField->text().isEmpty())
-            return QnInputField::ValidateResult(true, QString());
+            return Qn::kValidResult;
 
         if (ui->newPasswordInputField->text() != text)
-            return QnInputField::ValidateResult(false, tr("Passwords do not match."));
+            return Qn::ValidationResult(tr("Passwords do not match."));
 
-        return QnInputField::ValidateResult(true, QString());
+        return Qn::kValidResult;
     });
 
     ui->currentPasswordInputField->setTitle(tr("Current Password"));
@@ -42,15 +42,15 @@ QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     ui->currentPasswordInputField->setValidator([this](const QString& text)
     {
         if (ui->newPasswordInputField->text().isEmpty())
-            return QnInputField::ValidateResult(true, QString());
+            return Qn::kValidResult;
 
         if (text.isEmpty())
-            return QnInputField::ValidateResult(false, tr("To modify your password, please enter the existing one."));
+            return Qn::ValidationResult(tr("To modify your password, please enter the existing one."));
 
         if (!context()->user()->checkPassword(text))
-            return QnInputField::ValidateResult(false, tr("Invalid current password."));
+            return Qn::ValidationResult(tr("Invalid current password."));
 
-        return QnInputField::ValidateResult(true, QString());
+        return Qn::kValidResult;
     });
 
     QnAligner* aligner = new QnAligner(this);

@@ -10,8 +10,9 @@
 
 #include <utils/common/string.h>
 
-QString getResourceName(const QnResourcePtr &resource) {
-    return getFullResourceName(resource, qnSettings->isIpShownInTree());
+QString getResourceName(const QnResourcePtr &resource)
+{
+    return getFullResourceName(resource, qnSettings->extraInfoInTree());
 }
 
 QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate) {

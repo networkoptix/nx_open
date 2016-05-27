@@ -52,6 +52,7 @@ private:
 
     ItemState itemState(const QModelIndex& index) const;
 
+    void getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const;
 private:
     QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon;

@@ -145,6 +145,8 @@ void QnNoptixStyle::polish(QApplication *application) {
     font.setFamily(lit("Roboto"));
     application->setFont(font);
 
+    application->setEffectEnabled(Qt::UI_AnimateCombo, false);
+
     m_customizer->customize(application);
 }
 
