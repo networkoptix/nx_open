@@ -103,28 +103,14 @@
           <widget class="QComboBox" name="typeComboBox"/>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalSearchLayout">
-           <property name="spacing">
-            <number>3</number>
+          <widget class="QLineEdit" name="filterLineEdit">
+           <property name="placeholderText">
+            <string>Search</string>
            </property>
-           <item>
-            <widget class="QLineEdit" name="filterLineEdit">
-             <property name="placeholderText">
-              <string>Search</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="clearFilterButton">
-             <property name="toolTip">
-              <string>Reset Filter</string>
-             </property>
-             <property name="text">
-              <string>X</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
