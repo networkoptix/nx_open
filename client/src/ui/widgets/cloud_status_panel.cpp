@@ -11,7 +11,6 @@ class QnCloudStatusPanelPrivate : public QObject
 {
     QnCloudStatusPanel *q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusPanel)
-
 public:
     QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent);
 
@@ -65,7 +64,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
 
     cloudMenu->addAction(q->action(QnActions::OpenCloudMainUrl));
     cloudMenu->setWindowFlags(cloudMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    systemsMenu = cloudMenu->addMenu(tr("Connect to System..."));
+    systemsMenu = cloudMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
     cloudMenu->addSeparator();
     cloudMenu->addAction(q->action(QnActions::OpenCloudManagementUrl));
     cloudMenu->addAction(q->action(QnActions::LogoutFromCloud));
@@ -83,7 +82,7 @@ void QnCloudStatusPanelPrivate::updateUi()
     const bool isLogged = (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Online);
     if (!isLogged)
     {
-        q->setText(tr("Login to cloud..."));
+        q->setText(QnCloudStatusPanel::tr("Login to cloud..."));
         q->setIcon(offlineIcon);
         q->setMenu(nullptr);
         connect(q, &QnCloudStatusPanel::clicked, q->action(QnActions::LoginToCloud), &QAction::trigger);

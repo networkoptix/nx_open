@@ -44,7 +44,7 @@ namespace {
             case Qt::DisplayRole:
             case Qt::ToolTipRole:
                 if (section == 0)
-                    return tr("Server");
+                    return QnRoutingManagementWidget::tr("Server");
                 break;
 
             default:
