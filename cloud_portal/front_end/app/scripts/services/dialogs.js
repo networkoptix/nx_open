@@ -2,8 +2,8 @@
 
 
 angular.module('cloudApp').run(['$http','$templateCache', function($http,$templateCache) {
-        $http.get('views/login.html', {cache: $templateCache});
-        $http.get('views/share.html', {cache: $templateCache});
+        $http.get('views/dialogs/login.html', {cache: $templateCache});
+        $http.get('views/dialogs/share.html', {cache: $templateCache});
         $http.get('views/components/dialog.html', {cache: $templateCache});
     }])
     .factory('dialogs', ['$http', '$uibModal', '$q', '$location', 'ngToast', function ($http, $uibModal, $q, $location, ngToast) {

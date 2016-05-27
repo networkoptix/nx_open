@@ -7,6 +7,9 @@ angular.module('cloudApp')
         $scope.Config = Config;
         $scope.L = L;
         $scope.buttonText = L.sharing.shareConfirmButton;
+        $scope.model = {
+            password:''
+        }
 
         var dialogSettings = dialogs.getSettings($scope);
 
@@ -16,8 +19,8 @@ angular.module('cloudApp')
             dialogs.closeMe($scope);
         }
 
-        $scope.deletingSystem = process.init(function(){
-            return cloudApi.disconnect(systemId, password);
+        $scope.disconnecting = process.init(function(){
+            return cloudApi.disconnect(systemId, $scope.model.password);
         },{
             successMessage: L.system.successDisconnected,
             errorPrefix:'Cannot delete the system:'
