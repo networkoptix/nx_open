@@ -62,6 +62,13 @@ int main()
         return -2;
     }
 
+    EGLint minInterval(-1), maxInterval(-1);
+    eglGetConfigAttrib(display, configs[0], EGL_MIN_SWAP_INTERVAL, &minInterval);
+    eglGetConfigAttrib(display, configs[0], EGL_MAX_SWAP_INTERVAL, &maxInterval);
+
+    cout << "Min swap interval: " << minInterval << endl;
+    cout << "Max swap interval: " << maxInterval << endl;
+
     EGLContext context = EGL_NO_CONTEXT;
     for (int ver = 10; ver > 0; --ver)
     {
