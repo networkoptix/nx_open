@@ -1,5 +1,6 @@
 #include "nx_style.h"
 #include "nx_style_p.h"
+#include "skin.h"
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
@@ -325,6 +326,8 @@ void QnNxStyle::drawPrimitive(
                 return;
             }
 
+            QRect rect = widget ? widget->rect() : option->rect;
+
             QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
@@ -332,15 +335,14 @@ void QnNxStyle::drawPrimitive(
             {
                 QnScopedPainterPenRollback penRollback(painter, base.darker(3).color());
                 QnScopedPainterBrushRollback brushRollback(painter, base.darker(1).color());
-                painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
-                painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
-                    option->rect.right() - 1, option->rect.top() + 1);
+                painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
+                painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right() - 1, rect.top() + 1);
             }
             else
             {
                 QnScopedPainterPenRollback penRollback(painter, base.darker(1).color());
                 QnScopedPainterBrushRollback brushRollback(painter, base.color());
-                painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
+                painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
             }
         }
         return;
@@ -2020,101 +2022,6 @@ QRect QnNxStyle::subElementRect(
     return base_type::subElementRect(subElement, option, widget);
 }
 
-int QnNxStyle::pixelMetric(
-        PixelMetric metric,
-        const QStyleOption *option,
-        const QWidget *widget) const
-{
-    switch (metric)
-    {
-    case PM_ButtonMargin:
-        return dp(16);
-
-    case PM_ButtonShiftVertical:
-    case PM_ButtonShiftHorizontal:
-    case PM_TabBarTabShiftVertical:
-    case PM_TabBarTabShiftHorizontal:
-        return 0;
-
-    case PM_DefaultFrameWidth:
-        return 0;
-
-    case PM_DefaultTopLevelMargin:
-        return Metrics::kDefaultTopLevelMargin;
-    case PM_DefaultChildMargin:
-        return Metrics::kDefaultChildMargin;
-
-    case PM_ExclusiveIndicatorWidth:
-    case PM_ExclusiveIndicatorHeight:
-        return Metrics::kExclusiveIndicatorSize;
-    case PM_IndicatorWidth:
-    case PM_IndicatorHeight:
-        return Metrics::kCheckIndicatorSize;
-
-    case PM_FocusFrameHMargin:
-    case PM_FocusFrameVMargin:
-        return dp(1);
-
-    case PM_HeaderDefaultSectionSizeVertical:
-        return Metrics::kViewRowHeight;
-    case PM_HeaderMarkSize:
-        return Metrics::kSortIndicatorSize;
-    case PM_HeaderMargin:
-        return dp(6);
-
-    case PM_LayoutHorizontalSpacing:
-        return Metrics::kDefaultLayoutSpacing.width();
-    case PM_LayoutVerticalSpacing:
-        return Metrics::kDefaultLayoutSpacing.height();
-
-    case PM_MenuVMargin:
-        return dp(2);
-    case PM_SubMenuOverlap:
-        return 0;
-
-    case PM_SliderControlThickness:
-        return dp(16);
-    case PM_SliderThickness:
-        return dp(18);
-    case PM_SliderLength:
-        if (option && option->styleObject)
-        {
-            bool ok(false);
-            int result = option->styleObject->property(Properties::kSliderLength).toInt(&ok);
-            if (ok && result >= 0)
-                return result;
-        }
-        return dp(16);
-
-    case PM_ScrollBarExtent:
-        return dp(8);
-    case PM_ScrollBarSliderMin:
-        return dp(8);
-
-    case PM_SplitterWidth:
-        return dp(1);
-
-    case PM_TabBarTabHSpace:
-    case PM_TabBarTabVSpace:
-        return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
-
-    case PM_ToolBarIconSize:
-        return dp(32); // TODO #vkutin Remove dp() from all places where it's not needed
-
-    case PM_TabCloseIndicatorWidth:
-    case PM_TabCloseIndicatorHeight:
-        return dp(24);
-
-    case PM_TabBarScrollButtonWidth:
-        return std::min(dp(36), widget->height() + 1);
-
-    default:
-        break;
-    }
-
-    return base_type::pixelMetric(metric, option, widget);
-}
-
 QSize QnNxStyle::sizeFromContents(
         ContentsType type,
         const QStyleOption *option,
@@ -2258,6 +2165,101 @@ QSize QnNxStyle::sizeFromContents(
     return base_type::sizeFromContents(type, option, size, widget);
 }
 
+int QnNxStyle::pixelMetric(
+        PixelMetric metric,
+        const QStyleOption *option,
+        const QWidget *widget) const
+{
+    switch (metric)
+    {
+    case PM_ButtonMargin:
+        return dp(16);
+
+    case PM_ButtonShiftVertical:
+    case PM_ButtonShiftHorizontal:
+    case PM_TabBarTabShiftVertical:
+    case PM_TabBarTabShiftHorizontal:
+        return 0;
+
+    case PM_DefaultFrameWidth:
+        return 0;
+
+    case PM_DefaultTopLevelMargin:
+        return Metrics::kDefaultTopLevelMargin;
+    case PM_DefaultChildMargin:
+        return Metrics::kDefaultChildMargin;
+
+    case PM_ExclusiveIndicatorWidth:
+    case PM_ExclusiveIndicatorHeight:
+        return Metrics::kExclusiveIndicatorSize;
+    case PM_IndicatorWidth:
+    case PM_IndicatorHeight:
+        return Metrics::kCheckIndicatorSize;
+
+    case PM_FocusFrameHMargin:
+    case PM_FocusFrameVMargin:
+        return dp(1);
+
+    case PM_HeaderDefaultSectionSizeVertical:
+        return Metrics::kViewRowHeight;
+    case PM_HeaderMarkSize:
+        return Metrics::kSortIndicatorSize;
+    case PM_HeaderMargin:
+        return dp(6);
+
+    case PM_LayoutHorizontalSpacing:
+        return Metrics::kDefaultLayoutSpacing.width();
+    case PM_LayoutVerticalSpacing:
+        return Metrics::kDefaultLayoutSpacing.height();
+
+    case PM_MenuVMargin:
+        return dp(2);
+    case PM_SubMenuOverlap:
+        return 0;
+
+    case PM_SliderControlThickness:
+        return dp(16);
+    case PM_SliderThickness:
+        return dp(18);
+    case PM_SliderLength:
+        if (option && option->styleObject)
+        {
+            bool ok(false);
+            int result = option->styleObject->property(Properties::kSliderLength).toInt(&ok);
+            if (ok && result >= 0)
+                return result;
+        }
+        return dp(16);
+
+    case PM_ScrollBarExtent:
+        return dp(8);
+    case PM_ScrollBarSliderMin:
+        return dp(8);
+
+    case PM_SplitterWidth:
+        return dp(1);
+
+    case PM_TabBarTabHSpace:
+    case PM_TabBarTabVSpace:
+        return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
+
+    case PM_ToolBarIconSize:
+        return dp(32); // TODO #vkutin Remove dp() from all places where it's not needed
+
+    case PM_TabCloseIndicatorWidth:
+    case PM_TabCloseIndicatorHeight:
+        return dp(24);
+
+    case PM_TabBarScrollButtonWidth:
+        return std::min(dp(36), widget->height() + 1);
+
+    default:
+        break;
+    }
+
+    return base_type::pixelMetric(metric, option, widget);
+}
+
 int QnNxStyle::styleHint(
         StyleHint sh,
         const QStyleOption *option,
@@ -2309,6 +2311,20 @@ int QnNxStyle::styleHint(
     }
 
     return base_type::styleHint(sh, option, widget, shret);
+}
+
+QPixmap QnNxStyle::standardPixmap(StandardPixmap iconId, const QStyleOption* option, const QWidget* widget) const
+{
+    switch (iconId)
+    {
+    case SP_LineEditClearButton:
+        return qnSkin->icon("tree/clear.png").pixmap(
+            option ? option->rect.height() :
+            widget ? widget->height() :
+            Metrics::kButtonHeight);
+    }
+
+    return base_type::standardPixmap(iconId, option, widget);
 }
 
 void QnNxStyle::polish(QWidget *widget)
