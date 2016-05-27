@@ -248,8 +248,12 @@ void QnAccessibleResourcesWidget::initResourcesModel()
             if (resource->hasFlags(Qn::desktop_camera))
                 return false;
             return (resource->hasFlags(Qn::web_page) || resource->hasFlags(Qn::server_live_cam));
+
         case QnResourceAccessFilter::LayoutsFilter:
         {
+            if (!context()->user())
+                return false;
+
             if (!resource->hasFlags(Qn::layout))
                 return false;
 
