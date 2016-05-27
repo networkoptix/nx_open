@@ -2039,6 +2039,11 @@ int QnNxStyle::pixelMetric(
     case PM_DefaultFrameWidth:
         return 0;
 
+    case PM_DefaultTopLevelMargin:
+        return Metrics::kDefaultTopLevelMargin;
+    case PM_DefaultChildMargin:
+        return Metrics::kDefaultChildMargin;
+
     case PM_ExclusiveIndicatorWidth:
     case PM_ExclusiveIndicatorHeight:
         return Metrics::kExclusiveIndicatorSize;
@@ -2056,15 +2061,6 @@ int QnNxStyle::pixelMetric(
         return Metrics::kSortIndicatorSize;
     case PM_HeaderMargin:
         return dp(6);
-
-    case PM_LayoutTopMargin:
-        return Metrics::kDefaultLayoutMargins.top();
-    case PM_LayoutBottomMargin:
-        return Metrics::kDefaultLayoutMargins.bottom();
-    case PM_LayoutLeftMargin:
-        return Metrics::kDefaultLayoutMargins.left();
-    case PM_LayoutRightMargin:
-        return Metrics::kDefaultLayoutMargins.right();
 
     case PM_LayoutHorizontalSpacing:
         return Metrics::kDefaultLayoutSpacing.width();

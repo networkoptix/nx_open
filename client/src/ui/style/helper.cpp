@@ -25,7 +25,8 @@ namespace style
     const int Metrics::kSwitchMargin = dp(4);
     const QSize Metrics::kSeparatorSize(dp(10), dp(8));
     const qreal Metrics::kCheckboxCornerRadius = dp(0.2); // for lightly antialiased corners
-    const QMargins Metrics::kDefaultLayoutMargins(dp(16), dp(16), dp(16), dp(16));
+    const int Metrics::kDefaultTopLevelMargin = dp(16);
+    const int Metrics::kDefaultChildMargin = 0;
     const QSize Metrics::kDefaultLayoutSpacing(dp(8), dp(8));
 
     const char *Properties::kHoveredRowProperty = "_qn_hoveredRow";
