@@ -25,6 +25,8 @@
 #include <private/qfont_p.h>
 
 #include <ui/delegates/styled_combo_box_delegate.h>
+#include <ui/dialogs/common/generic_tabbed_dialog.h>
+#include <ui/widgets/common/abstract_preferences_widget.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace style;
@@ -328,19 +330,24 @@ void QnNxStyle::drawPrimitive(
 
             QRect rect = widget ? widget->rect() : option->rect;
 
+            bool valid = true; //TODO: #vkutin Implement validity check
+
             QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
             if (option->state.testFlag(State_HasFocus))
             {
-                QnScopedPainterPenRollback penRollback(painter, base.darker(3).color());
+                QnPaletteColor frameColor = valid ? base.darker(3) : mainColor(Colors::kRed);
+                QnScopedPainterPenRollback penRollback(painter, frameColor.color());
                 QnScopedPainterBrushRollback brushRollback(painter, base.darker(1).color());
                 painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
-                painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right() - 1, rect.top() + 1);
+                if (valid)
+                    painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right(), rect.top() + 1);
             }
             else
             {
-                QnScopedPainterPenRollback penRollback(painter, base.darker(1).color());
+                QnPaletteColor frameColor = valid ? base.darker(1) : mainColor(Colors::kRed);
+                QnScopedPainterPenRollback penRollback(painter, frameColor.color());
                 QnScopedPainterBrushRollback brushRollback(painter, base.color());
                 painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
             }
@@ -1860,10 +1867,17 @@ QRect QnNxStyle::subElementRect(
         break;
 
     case SE_PushButtonLayoutItem:
-        if (qobject_cast<const QDialogButtonBox *>(widget))
+        if (auto buttonBox = qobject_cast<const QDialogButtonBox *>(widget))
         {
-            const int shift = dp(16);
-            return option->rect.adjusted(-shift, -shift, shift, shift);
+            if (const QWidget* parentWidget = buttonBox->parentWidget())
+            {
+                if (parentWidget->isTopLevel() && parentWidget->layout())
+                {
+                    QMargins margins = parentWidget->layout()->contentsMargins();
+                    if (margins.isNull() && buttonBox->contentsMargins().isNull())
+                        return QnGeometry::dilated(option->rect, Metrics::kDefaultTopLevelMargin);
+                }
+            }
         }
         break;
 
@@ -2207,10 +2221,20 @@ int QnNxStyle::pixelMetric(
     case PM_HeaderMargin:
         return dp(6);
 
+    case PM_LayoutBottomMargin:
+    case PM_LayoutLeftMargin:
+    case PM_LayoutRightMargin:
+    case PM_LayoutTopMargin:
+        if (qobject_cast<const QnAbstractPreferencesWidget*>(widget))
+            return proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+        if (qobject_cast<const QnGenericTabbedDialog*>(widget))
+            return 0;
+        return base_type::pixelMetric(metric, option, widget);
+
     case PM_LayoutHorizontalSpacing:
         return Metrics::kDefaultLayoutSpacing.width();
     case PM_LayoutVerticalSpacing:
-        return Metrics::kDefaultLayoutSpacing.height();
+        return (qobject_cast<const QnGenericTabbedDialog*>(widget) == nullptr) ? Metrics::kDefaultLayoutSpacing.height() : 0;
 
     case PM_MenuVMargin:
         return dp(2);
