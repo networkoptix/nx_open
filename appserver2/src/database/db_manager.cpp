@@ -2131,10 +2131,6 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
 
     ErrorCode err = ErrorCode::ok;
 
-    //err = deleteAddParams(internalId);
-    //if (err != ErrorCode::ok)
-    //    return err;
-
     err = deleteUserProfileTable(internalId);
     if (err != ErrorCode::ok)
         return err;
@@ -2144,6 +2140,11 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
         return err;
 
     err = deleteRecordFromResourceTable(internalId);
+    if (err != ErrorCode::ok)
+        return err;
+
+    /* Cleanup user shared resources. */
+    err = cleanAccessRights(guid);
     if (err != ErrorCode::ok)
         return err;
 
@@ -2163,6 +2164,11 @@ ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
+
+    /* Cleanup group shared resources. */
+    auto err = cleanAccessRights(guid);
+    if (err != ErrorCode::ok)
+        return err;
 
     return deleteTableRecord(guid, "vms_user_groups", "id");
 }
@@ -2641,6 +2647,25 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     return ErrorCode::ok;
 }
 
+
+ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrGroupId)
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr
+    (R"(
+        DELETE FROM vms_access_rights
+        WHERE guid = :userOrGroupId;
+     )");
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    query.bindValue(":userOrGroupId", userOrGroupId.toRfc4122());
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {

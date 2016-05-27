@@ -30,6 +30,18 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
     addPage(CamerasPage, m_camerasPage, tr("Cameras"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
+    for (auto page : allPages())
+    {
+        /* Changes are locally stored in model. */
+        connect(page.widget, &QnAbstractPreferencesWidget::hasChangesChanged, this, [this, page]
+        {
+            if (!page.widget->hasChanges())
+                return;
+            page.widget->applyChanges();
+            updateButtonBox();
+        });
+    }
+
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
@@ -59,9 +71,9 @@ QnUserGroupsDialog::QnUserGroupsDialog(QWidget* parent):
         if (m_model->selectedGroup() == groupId)
             return;
 
-        /* Changes are locally stored in model. */
-        for (auto page : allPages())
-            page.widget->applyChanges();
+
+//         for (auto page : allPages())
+//             page.widget->applyChanges();
         m_model->selectGroup(groupId);
         loadDataToUi();
     });
@@ -96,10 +108,13 @@ bool QnUserGroupsDialog::hasChanges() const
     {
         auto existing = qnResourceAccessManager->userGroup(group.id);
 
-        if (existing == group)
-            continue;
+        if (existing != group)
+            return true;
 
-        return true;
+        if (qnResourceAccessManager->accessibleResources(group.id) != m_model->accessibleResources(group.id))
+            return true;
+
+        continue;
     }
 
     return false;
@@ -115,10 +130,10 @@ void QnUserGroupsDialog::applyChanges()
         groupsLeft << group.id;
         auto existing = qnResourceAccessManager->userGroup(group.id);
 
-        if (existing == group)
-            continue;
+        if (existing != group)
+            qnResourcesChangesManager->saveUserGroup(group);
 
-        qnResourcesChangesManager->saveUserGroup(group);
+        qnResourcesChangesManager->saveAccessibleResources(group.id, m_model->accessibleResources(group.id));
     }
 
     for (const auto& group : qnResourceAccessManager->userGroups())
