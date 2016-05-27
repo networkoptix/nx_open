@@ -18,9 +18,9 @@ mail_from: 'service@networkoptix.com'
 mail_prefix: '[DW_PORTAL]'
 
 smtp:
-    host: 'smtp.gmail.com'
-    user: 'service@networkoptix.com'
-    password: 'kbnUk06boqBkwU'
+    host: 'email-smtp.us-east-1.amazonaws.com'
+    user: 'AlYDnddPk8mWorQFVogh8sqkQX6Nv01JwxxfMoYJAFeC'
+    password: 'AKIAJ6MLW7ZT7WXXXOIA'
     port: 587
     tls: on
 

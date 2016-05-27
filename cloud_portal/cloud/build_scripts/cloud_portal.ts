@@ -836,7 +836,7 @@
     <name>../../front_end/dist/views/dialogs/disconnect.html</name>
     <message>
       <location filename="../../front_end/dist/views/dialogs/disconnect.html"/>
-      <source>You will be able to connect to your system only from local network. If you don't have local administator account, wou will have to create it first time when you connect to the system.</source>
+      <source>You will be able to connect to your system only from local network. If you don't have local administator account, you will have to create it first time when you connect to the system.</source>
       <translation> </translation>
     </message>
     <message>
