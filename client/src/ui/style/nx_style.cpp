@@ -1875,7 +1875,10 @@ QRect QnNxStyle::subElementRect(
                 {
                     QMargins margins = parentWidget->layout()->contentsMargins();
                     if (margins.isNull() && buttonBox->contentsMargins().isNull())
-                        return QnGeometry::dilated(option->rect, Metrics::kDefaultTopLevelMargin);
+                    {
+                        int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+                        return QnGeometry::dilated(option->rect, margin);
+                    }
                 }
             }
         }
