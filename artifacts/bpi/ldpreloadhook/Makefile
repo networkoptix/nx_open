@@ -1,10 +1,8 @@
 all:
-	gcc -Wall -Wextra -Wwrite-strings -fPIC -c -o hook.o hook.c
-	gcc -Wall -Wextra -Wwrite-strings -shared -o hook.so hook.o -ldl
-
-android:
-	NDK_ARCH=arm ndk-gcc -Wall -Wextra -Wwrite-strings -fPIC -c -o hook.o hook.c
-	NDK_ARCH=arm ndk-gcc -Wall -Wextra -Wwrite-strings -shared -o hook.so hook.o -ldl
+	gcc -std=gnu99 -Wall -Wextra -Wwrite-strings -fPIC -c -o hook.o hook.c
+	gcc -std=gnu99 -Wall -Wextra -Wwrite-strings -fPIC -c -o dev_fb.o dev_fb.c
+	gcc -std=gnu99 -Wall -Wextra -Wwrite-strings -fPIC -c -o handle_fb_disp.o handle_fb_disp.c
+	gcc -Wwrite-strings -shared -o ldpreloadhook.so hook.o dev_fb.o handle_fb_disp.o -lpthread -ldl
 
 clean:
 	rm -f *.so *.o
