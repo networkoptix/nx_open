@@ -30,7 +30,7 @@ namespace {
     };
 }
 
-int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -84,7 +84,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
         QString description = lit("%1 -> %2").arg(oldSystemName).arg(systemName);
         auditRecord.addParam("description", description.toUtf8());
         qnAuditManager->addAuditRecord(auditRecord);
-        
+
         if (!wholeSystem)
             resetConnections();
     }
@@ -122,7 +122,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     return CODE_OK;
 }
 
-void QnConfigureRestHandler::afterExecute(const QString& /*path*/, const QnRequestParamList& /*params*/,
+void QnConfigureRestHandler::afterExecute(const nx_http::Request& /*request*/, const QnRequestParamList& /*params*/,
                                           const QByteArray& /*body*/, const QnRestConnectionProcessor* /*owner*/)
 {
     /*
@@ -233,7 +233,7 @@ int QnConfigureRestHandler::changePort(int port) {
         if (!socket.bind(port, bindMode))
             return ResultFail;
     }
-    
+
     QnMediaServerResourcePtr savedServer;
     QUrl url = server->getUrl();
     url.setPort(port);

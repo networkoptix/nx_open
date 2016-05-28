@@ -10,7 +10,7 @@ class QnExecScript: public QnJsonRestHandler
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
-    void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
+    void afterExecute(const nx_http::Request& request, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
 };
 
 #endif // QN_EXEC_SCRIPT_REST_HANDLER_H

@@ -206,4 +206,9 @@ namespace nx_http
     {
         //TODO/IMPL
     }
+
+    QSharedPointer<AbstractStreamSocket> HttpClient::takeSocket()
+    {
+        return m_asyncHttpClient->takeSocket();
+    }
 }

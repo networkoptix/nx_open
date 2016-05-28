@@ -68,6 +68,7 @@ namespace nx_http
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
 
+        QSharedPointer<AbstractStreamSocket> takeSocket();
     private:
         nx_http::AsyncHttpClientPtr m_asyncHttpClient;
         QnWaitCondition m_cond;

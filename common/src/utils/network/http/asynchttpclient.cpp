@@ -975,7 +975,7 @@ namespace nx_http
         const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
 
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
+        Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized || response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired );
 
         HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find(authenticateHeaderName);
         if( wwwAuthenticateIter == response.headers.end() )

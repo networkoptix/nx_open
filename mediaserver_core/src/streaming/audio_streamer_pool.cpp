@@ -7,6 +7,10 @@
 #include <business/actions/abstract_business_action.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
+#include <utils/network/http/asynchttpclient.h>
+#include <2wayaudio/proxy_audio_transmitter.h>
+#include <common/common_module.h>
+#include "core/resource/media_server_resource.h"
 
 namespace
 {
@@ -14,7 +18,7 @@ namespace
     {
         static QnMutex internalMutex;
         static QMap<QnUuid, std::shared_ptr<QnMutex>> locks;
-        
+
         QnMutexLocker lock(&internalMutex);
         std::shared_ptr<QnMutex>& value = locks[key];
         if (value == nullptr)
@@ -51,7 +55,7 @@ QnAudioStreamerPool::QnAudioStreamerPool()
 
 }
 
-bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error)
+bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error, const QnRequestParams &params)
 {
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
@@ -77,7 +81,26 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         return false;
     }
 
-    QnAudioTransmitterPtr transmitter = resource->getAudioTransmitter();
+    QnMediaServerResourcePtr mServer = resource->getParentServer();
+    if(!mServer)
+    {
+        error = lit("Internal server error: can't find camera's server");
+        return false;
+    }
+
+    QnAudioTransmitterPtr transmitter;
+    if (mServer->getId() == qnCommon->moduleGUID())
+    {
+        transmitter = resource->getAudioTransmitter();
+    }
+    else
+    {
+        auto& proxyTransmitter = m_proxyTransmitters[resource->getId()];
+        if (!proxyTransmitter)
+            proxyTransmitter.reset(new QnProxyAudioTransmitter(resource, params));
+        transmitter = proxyTransmitter;
+    }
+
     if (!transmitter)
     {
         error = lit("Camera '%1' does not support 2-way audio.")
@@ -91,6 +114,34 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         transmitter->subscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
     else
         transmitter->unsubscribe(desktopDataProvider.dynamicCast<QnAbstractStreamDataProvider>());
+
+    return true;
+}
+
+bool QnAudioStreamerPool::startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider, const QnUuid& resourceId, Action action, QString &error)
+{
+    auto resource = getTransmitDestination(resourceId);
+    if (!resource)
+    {
+        error = lit("Can't find camera with id '%1'")
+            .arg(resourceId.toString());
+        return false;
+    }
+
+    QnAudioTransmitterPtr transmitter = resource->getAudioTransmitter();
+    if (!transmitter)
+    {
+        error = lit("Camera '%1' does not support 2-way audio.")
+            .arg(resourceId.toString());
+        return false;
+    }
+
+    // This lock avoid to start and stop same transmitter in the same time
+    QnMutexLocker lock(getLock(resourceId));
+    if (action == Action::Start)
+        transmitter->subscribe(desktopDataProvider);
+    else
+        transmitter->unsubscribe(desktopDataProvider);
 
     return true;
 }

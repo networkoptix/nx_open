@@ -1,6 +1,10 @@
 #include "audio_transmission_rest_handler.h"
 #include <streaming/audio_streamer_pool.h>
 #include <utils/network/http/httptypes.h>
+#include <rest/server/rest_connection_processor.h>
+#include <core/dataprovider/spush_media_stream_provider.h>
+#include <network/ffmpeg_rtp_parser.h>
+#include <2wayaudio/proxy_audio_transmitter.h>
 
 namespace
 {
@@ -9,6 +13,19 @@ namespace
     const QString kActionParamName("action");
     const QString kStartStreamAction("start");
     const QString kStopStreamAction("stop");
+
+    bool readBytes(QSharedPointer<AbstractStreamSocket> socket, quint8* dst, int size)
+    {
+        while (size > 0)
+        {
+            int readed = socket->recv(dst, size);
+            if (readed < 1)
+                return false;
+            dst += readed;
+            size -= readed;
+        }
+        return true;
+    }
 }
 
 int QnAudioTransmissionRestHandler::executeGet(
@@ -28,17 +45,126 @@ int QnAudioTransmissionRestHandler::executeGet(
 
     auto clientId = params[kClientIdParamName];
     auto resourceId = params[kResourceIdParamName];
-    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction) 
-        ? QnAudioStreamerPool::Action::Start 
+    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
+        ? QnAudioStreamerPool::Action::Start
         : QnAudioStreamerPool::Action::Stop;
 
-    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(clientId, resourceId, action, errorStr))
+    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(clientId, resourceId, action, errorStr, params))
         result.setError(QnJsonRestResult::CantProcessRequest, errorStr);
     return nx_http::StatusCode::ok;
 }
 
+class QnProxyDesktopDataProvider: public CLServerPushStreamReader
+{
+public:
+    QnProxyDesktopDataProvider(QSharedPointer<AbstractStreamSocket> socket):
+        CLServerPushStreamReader(QnResourcePtr()),
+        m_socket(socket)
+    {
+        m_recvBuffer = new quint8[65536];
+    }
+
+    ~QnProxyDesktopDataProvider()
+    {
+        delete [] m_recvBuffer;
+    }
+private:
+    quint8* m_recvBuffer;
+    QnFfmpegRtpParser m_parser;
+protected:
+
+    virtual void closeStream()  override
+    {
+        m_socket->close();
+    }
+    virtual bool isStreamOpened() const
+    {
+        return m_socket->isConnected();
+    }
+
+    virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override
+    {
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    virtual QnAbstractMediaDataPtr getNextData() override
+    {
+        while (!m_needStop && m_socket->isConnected())
+        {
+            if (!readBytes(m_socket, m_recvBuffer, 2))
+            {
+                m_socket->close();
+                break;
+            }
+
+            int packetSize = (m_recvBuffer[0] << 8) + m_recvBuffer[1];
+            if (!readBytes(m_socket, m_recvBuffer, packetSize))
+            {
+                m_socket->close();
+                break;
+            }
+
+            bool gotData;
+            m_parser.processData(m_recvBuffer, 0, packetSize, RtspStatistic(), gotData);
+            if (gotData)
+                return m_parser.nextData();
+        }
+        return QnAbstractMediaDataPtr();
+    }
+private:
+    QSharedPointer<AbstractStreamSocket> m_socket;
+};
+
+
+
+bool QnAudioTransmissionRestHandler::readHttpHeaders(QSharedPointer<AbstractStreamSocket> socket)
+{
+    int toRead = QnProxyAudioTransmitter::kFixedPostRequest.size();
+    QByteArray buffer;
+    buffer.resize(toRead);
+    return readBytes(socket, (quint8*) buffer.data(), toRead);
+}
+
+void QnAudioTransmissionRestHandler::afterExecute(const nx_http::Request& request, const QnRequestParamList &_params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+{
+    if (request.requestLine.method != "POST")
+        return;
+
+    QnRequestParams params;
+    for(const QnRequestParam &param: _params)
+        params.insertMulti(param.first, param.second);
+
+    QnJsonRestResult reply;
+    if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
+        return;
+
+    auto resourceId = params[kResourceIdParamName];
+    QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
+        ? QnAudioStreamerPool::Action::Start
+        : QnAudioStreamerPool::Action::Stop;
+
+    // process 2-nd POST request with unlimited length
+
+    QSharedPointer<AbstractStreamSocket> tcpSocket = const_cast<QnRestConnectionProcessor*>(owner)->takeSocket();
+    if (!readHttpHeaders(tcpSocket))
+        return;
+
+    QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider(new QnProxyDesktopDataProvider(tcpSocket));
+    QString errString;
+    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(desktopDataProvider, resourceId, action, errString))
+        qWarning() << "Cant start audio uploading to camera" << resourceId << errString;
+}
+
+int QnAudioTransmissionRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+{
+    QString errorStr;
+    if (!validateParams(params, errorStr))
+        result.setError(QnJsonRestResult::InvalidParameter, errorStr);
+    return nx_http::StatusCode::ok;
+}
+
 bool QnAudioTransmissionRestHandler::validateParams(const QnRequestParams &params, QString& error) const
-{    
+{
     bool ok = true;
     if (!params.contains(kClientIdParamName))
     {

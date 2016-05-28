@@ -14,7 +14,7 @@ private:
     bool m_modified;
 
     bool checkData(const QnNetworkAddressEntryList& newSettings, QString* errString);
-    virtual void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
+    virtual void afterExecute(const nx_http::Request& request, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
 };
 
 #endif // IFCONFIG_REST_HANDLER_H

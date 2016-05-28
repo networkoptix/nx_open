@@ -22,13 +22,13 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
         result.setError(QnRestResult::InvalidParameter, lit( "Script '%1' is missing at the server").arg(scriptName));
         return nx_http::StatusCode::ok;
     }
-    
+
     QStringList args;
     for (auto itr = params.begin(); itr != params.end(); ++itr)
         args << lit("%1=%2").arg(itr.key()).arg(itr.value());
-    
+
     QRegExp regExpr(allowedParamChars);
-    for (const auto& arg: args) 
+    for (const auto& arg: args)
     {
         if (!regExpr.exactMatch(arg)) {
             result.setError(QnRestResult::InvalidParameter, "Script params contain forbidden characters");
@@ -39,13 +39,13 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
     return nx_http::StatusCode::ok;
 }
 
-void QnExecScript::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+void QnExecScript::afterExecute(const nx_http::Request& request, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(owner);
     QnJsonRestResult reply;
     if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;
-
+    QString path = request.requestLine.url.path();
     QString scriptName = QFileInfo(path).fileName();
     QString fileName = getDataDirectory() + "/scripts/" + scriptName;
 

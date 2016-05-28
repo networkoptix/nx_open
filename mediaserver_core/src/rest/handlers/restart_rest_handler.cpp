@@ -13,9 +13,9 @@ int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParams 
     return CODE_OK;
 }
 
-void QnRestartRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor*)
+void QnRestartRestHandler::afterExecute(const nx_http::Request& request, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path)
+    Q_UNUSED(request)
     Q_UNUSED(params)
     Q_UNUSED(body)
 

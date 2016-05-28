@@ -7,7 +7,7 @@ class QnRestartRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *) override;
-    virtual void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
+    virtual void afterExecute(const nx_http::Request& request, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
 
 };
 
