@@ -184,6 +184,12 @@ QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventP
     return result.isNull() ? params.resourceName : result;
 }
 
+QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventParameters& params)
+{
+	QString result = getResourceIP(eventSource(params));
+	return result.isNull() ? params.resourceName : result;
+}
+
 QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, bool useIp, bool useHtml) {
 
     QString delimiter = useHtml

@@ -65,9 +65,11 @@ namespace {
     static const QString tpProductName(lit("productName"));
     static const QString tpEvent(lit("event"));
     static const QString tpSource(lit("source"));
+	static const QString tpSourceIP(lit("sourceIp"));
     static const QString tpUrlInt(lit("urlint"));
     static const QString tpUrlExt(lit("urlext"));
-    static const QString tpTimestamp(lit("timestamp"));
+	static const QString tpCount(lit("count"));
+	static const QString tpTimestamp(lit("timestamp"));
 	static const QString tpTimestampDate(lit("timestampDate"));
 	static const QString tpTimestampTime(lit("timestampTime"));
     static const QString tpReason(lit("reason"));
@@ -421,6 +423,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams());
+	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
@@ -617,6 +620,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
             : (QVariantList() << eventDetailsMap(action, aggregationData, useIp, false));
     }
 
+	detailsMap[tpCount] = QString::number(aggregationCount);
     detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
 	detailsMap[tpTimestampDate] = QnBusinessStringsHelper::eventTimestampDate(params);
 	detailsMap[tpTimestampTime] = QnBusinessStringsHelper::eventTimestampTime(params);

@@ -67,7 +67,9 @@ public:
 
     static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
 
-    static QString getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp = false);
+  
+	static QString getResoureNameFromParams(const QnBusinessEventParameters& params, bool useIp = false);
+	static QString getResoureIPFromParams(const QnBusinessEventParameters& params);
 };
 
 #endif // __BUSINESS_STRINGS_HELPER_H__

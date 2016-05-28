@@ -54,6 +54,17 @@ void getResourceDisplayInformation(const QnResourcePtr& resource, QString& name,
     getResourceDisplayInformation(resource, true, name, extInfo);
 }
 
+QString getResourceIP(const QnResourcePtr& resource)
+{
+	if (!resource)
+		return QString();
+
+	QString baseName, extInfo;
+	getResourceDisplayInformation(resource, true, baseName, extInfo);
+
+	return extInfo;
+}
+
 QString getFullResourceName(const QnResourcePtr& resource, bool showIp)
 {
     if (!resource)
