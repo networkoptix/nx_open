@@ -5,6 +5,7 @@
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <network/ffmpeg_rtp_parser.h>
 #include <2wayaudio/proxy_audio_transmitter.h>
+#include <utils/common/from_this_to_shared.h>
 
 namespace
 {
@@ -27,6 +28,10 @@ namespace
         return true;
     }
 }
+
+QMutex QnAudioTransmissionRestHandler::m_mutex;
+QMap<QString, QSharedPointer<QnProxyDesktopDataProvider>> QnAudioTransmissionRestHandler::m_proxyProviders;
+
 
 int QnAudioTransmissionRestHandler::executeGet(
     const QString &path,
@@ -54,31 +59,43 @@ int QnAudioTransmissionRestHandler::executeGet(
     return nx_http::StatusCode::ok;
 }
 
-class QnProxyDesktopDataProvider: public CLServerPushStreamReader
+class QnProxyDesktopDataProvider:
+    public CLServerPushStreamReader
 {
+private:
+    quint8* m_recvBuffer;
+    QnFfmpegRtpParser m_parser;
+
 public:
-    QnProxyDesktopDataProvider(QSharedPointer<AbstractStreamSocket> socket):
-        CLServerPushStreamReader(QnResourcePtr()),
-        m_socket(socket)
+    QnProxyDesktopDataProvider():
+        CLServerPushStreamReader(QnResourcePtr())
     {
         m_recvBuffer = new quint8[65536];
     }
 
-    ~QnProxyDesktopDataProvider()
+    virtual ~QnProxyDesktopDataProvider()
     {
+        stop();
         delete [] m_recvBuffer;
     }
-private:
-    quint8* m_recvBuffer;
-    QnFfmpegRtpParser m_parser;
+
+    void setSocket(const QSharedPointer<AbstractStreamSocket>& socket)
+    {
+        QMutexLocker lock(&m_mutex);
+        m_socket = socket;
+    }
+
 protected:
 
     virtual void closeStream()  override
     {
+        QMutexLocker lock(&m_mutex);
         m_socket->close();
     }
+
     virtual bool isStreamOpened() const
     {
+        QMutexLocker lock(&m_mutex);
         return m_socket->isConnected();
     }
 
@@ -89,6 +106,7 @@ protected:
 
     virtual QnAbstractMediaDataPtr getNextData() override
     {
+        QMutexLocker lock(&m_mutex);
         while (!m_needStop && m_socket->isConnected())
         {
             if (!readBytes(m_socket, m_recvBuffer, 2))
@@ -113,6 +131,7 @@ protected:
     }
 private:
     QSharedPointer<AbstractStreamSocket> m_socket;
+    mutable QMutex m_mutex;
 };
 
 
@@ -138,6 +157,8 @@ void QnAudioTransmissionRestHandler::afterExecute(const nx_http::Request& reques
     if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;
 
+    const QnUuid clientId = params[kClientIdParamName];
+
     auto resourceId = params[kResourceIdParamName];
     QnAudioStreamerPool::Action action = (params[kActionParamName] == kStartStreamAction)
         ? QnAudioStreamerPool::Action::Start
@@ -149,7 +170,18 @@ void QnAudioTransmissionRestHandler::afterExecute(const nx_http::Request& reques
     if (!readHttpHeaders(tcpSocket))
         return;
 
-    QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider(new QnProxyDesktopDataProvider(tcpSocket));
+    //QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider(new QnProxyDesktopDataProvider(tcpSocket));
+    QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider;
+    {
+        QMutexLocker lock(&m_mutex);
+        QString key = clientId.toString() + resourceId;
+        auto itr = m_proxyProviders.find(key);
+        if (itr == m_proxyProviders.end())
+            itr = m_proxyProviders.insert(key, QSharedPointer<QnProxyDesktopDataProvider>(new QnProxyDesktopDataProvider()));
+        desktopDataProvider = itr.value();
+        desktopDataProvider->setSocket(tcpSocket);
+    }
+
     QString errString;
     if (!QnAudioStreamerPool::instance()->startStopStreamToResource(desktopDataProvider, resourceId, action, errString))
         qWarning() << "Cant start audio uploading to camera" << resourceId << errString;

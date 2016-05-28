@@ -3,6 +3,8 @@
 #include <rest/server/json_rest_handler.h>
 #include <utils/network/abstract_socket.h>
 
+class QnProxyDesktopDataProvider;
+
 class QnAudioTransmissionRestHandler : public QnJsonRestHandler
 {
 
@@ -20,6 +22,9 @@ private:
     bool readHttpHeaders(QSharedPointer<AbstractStreamSocket> socket);
 private:
     bool validateParams(const QnRequestParams& params, QString& error) const;
+private:
+    static QMutex m_mutex;
+    static QMap<QString, QSharedPointer<QnProxyDesktopDataProvider>> m_proxyProviders;
 
 };
 
