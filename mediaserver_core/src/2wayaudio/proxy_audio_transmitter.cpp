@@ -12,6 +12,8 @@
 
 namespace
 {
+    static const int kRequestTimeout = 1000 * 3;
+
     QUrlQuery toUrlQuery(const QnRequestParams& params)
     {
         QUrlQuery result;
@@ -66,13 +68,17 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
         httpClient.addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, m_camera->getParentId().toByteArray());
 
         QUrl url;
+        url.setScheme("http");
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);
-        url.setUserName(currentServer->getId().toByteArray());
-        url.setPassword(currentServer->getAuthKey());
-        url.setPath("api/transmitAudio");
+        url.setPath("/api/transmitAudio");
         url.setQuery(toUrlQuery(m_params));
 
+        url.setUserName(currentServer->getId().toByteArray());
+        url.setPassword(currentServer->getAuthKey());
+
+        httpClient.setResponseReadTimeoutMs(kRequestTimeout);
+        httpClient.setSendTimeoutMs(kRequestTimeout);
         if (!httpClient.doPost(url, "text/plain", QByteArray()))
             return false;
         if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)

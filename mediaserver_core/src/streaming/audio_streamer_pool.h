@@ -31,7 +31,7 @@ private:
 private:
     QnMutex m_prolongedProvidersMutex;
     QMap<QString, QnAbstractStreamDataProviderPtr> m_actionDataProviders;
-    QMap<QnUuid, std::shared_ptr<QnAbstractAudioTransmitter>> m_proxyTransmitters;
+    QMap<QString, std::shared_ptr<QnAbstractAudioTransmitter>> m_proxyTransmitters;
 
 };
 

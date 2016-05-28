@@ -95,7 +95,8 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     }
     else
     {
-        auto& proxyTransmitter = m_proxyTransmitters[resource->getId()];
+        QString key = clientId.toString() + resourceId.toString();
+        auto& proxyTransmitter = m_proxyTransmitters[key];
         if (!proxyTransmitter)
             proxyTransmitter.reset(new QnProxyAudioTransmitter(resource, params));
         transmitter = proxyTransmitter;
