@@ -10,8 +10,8 @@
 <tbody>
     {{#aggregated}}
         <tr>
-            <td class="error">{{reason}}</td>
-            <td>{{timestampDate}} <b>{{timestampTime}}</td>
+            <td>{{reason}}</td>
+            <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
         </tr>
     {{/aggregated}}
 </tbody>

@@ -9,10 +9,10 @@
                 <img src="{{sourceIcon}}">
             </td>
             <td >
-                <b>{{sourceName}}</b> ({{sourceIp}})
+                <b>{{source}}</b> ({{sourceIp}})
             </td>
             {{#reason}}
-                <td class="error">{{reason}}</td>
+                <td>{{reason}}</td>
             {{/reason}}
         </tr>
     {{/aggregated}}

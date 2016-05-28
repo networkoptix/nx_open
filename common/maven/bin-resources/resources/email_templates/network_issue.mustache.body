@@ -7,11 +7,11 @@
 				<img src="{{sourceIcon}}">
 			</td>
 			<td>
-				<b>{{sourceName}}</b><br>
+				<b>{{source}}</b><br>
 				({{sourceIp}})
 			</td>
 			{{#aggregated}}
-				<td class="error">{{reason}}</td>
+				<td>{{reason}}</td>
 				<td>{{timestampDate}}<br><b>{{timestampTime}}</b></td>
 			{{/aggregated}}
 		</tr>

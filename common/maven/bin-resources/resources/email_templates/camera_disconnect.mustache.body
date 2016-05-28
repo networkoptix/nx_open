@@ -7,7 +7,7 @@
 				<img src="{{sourceIcon}}">
 			</td>
             <td >
-                <b>{{sourceName}}</b> ({{sourceIp}})
+                <b>{{source}}</b> ({{sourceIp}})
             </td>
             <td>
                 {{#aggregated}}
@@ -18,4 +18,3 @@
     {{/aggregated}}
 </tbody>
 </table>
-
