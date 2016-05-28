@@ -359,21 +359,25 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
         switch (column)
         {
         case QnAuditLogModel::TimestampColumn:
-            paintDateTime(painter, option, record->createdTimeSec);
+            paintDateTime(style, painter, option, record->createdTimeSec);
+            paintFocusRect(style, painter, option);
             return;
 
         case QnAuditLogModel::EndTimestampColumn:
             if (record->eventType == Qn::AR_UnauthorizedLogin || record->rangeEndSec == 0)
                 break;
-            paintDateTime(painter, option, record->rangeEndSec);
+            paintDateTime(style, painter, option, record->rangeEndSec);
+            paintFocusRect(style, painter, option);
             return;
 
         case QnAuditLogModel::DescriptionColumn:
-            paintDescription(painter, option, index, record);
+            paintDescription(style, painter, option, index, record);
+            paintFocusRect(style, painter, option);
             return;
 
         case QnAuditLogModel::UserActivityColumn:
-            paintUserActivity(painter, option, index);
+            paintUserActivity(style, painter, option, index);
+            paintFocusRect(style, painter, option);
             return;
         }
     }
@@ -383,10 +387,9 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
 }
 
 /* Mixed character style date & time drawing: */
-void QnAuditItemDelegate::paintDateTime(QPainter* painter, const QStyleOptionViewItem& option, int dateTimeSecs) const
+void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, int dateTimeSecs) const
 {
     /* Paint item hover and/or selection: */
-    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
     if (dateTimeSecs == 0)
@@ -414,10 +417,9 @@ void QnAuditItemDelegate::paintDateTime(QPainter* painter, const QStyleOptionVie
 }
 
 /* Description column complex drawing: */
-void QnAuditItemDelegate::paintDescription(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const
+void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const
 {
     /* Paint first line hover and/or selection: */
-    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
     QnScopedPainterFontRollback fontRollback(painter);
@@ -548,10 +550,9 @@ void QnAuditItemDelegate::paintDescription(QPainter* painter, const QStyleOption
 }
 
 /* User activity bar chart & label drawing: */
-void QnAuditItemDelegate::paintUserActivity(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void QnAuditItemDelegate::paintUserActivity(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     /* Paint item hover and/or selection: */
-    QStyle* style = option.widget ? option.widget->style() : QApplication::style();
     style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, option.widget);
 
     /* Obtain values: */
@@ -571,4 +572,16 @@ void QnAuditItemDelegate::paintUserActivity(QPainter* painter, const QStyleOptio
         QRect labelRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
         painter->drawText(labelRect, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString());
     }
+}
+
+/* Focus rectangle: */
+void QnAuditItemDelegate::paintFocusRect(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const
+{
+    if (!option.state.testFlag(QStyle::State_HasFocus))
+        return;
+
+    QStyleOptionFocusRect frameOption;
+    frameOption.QStyleOption::operator=(option);
+    frameOption.rect = style->subElementRect(QStyle::SE_ItemViewItemFocusRect, &option, option.widget);
+    style->drawPrimitive(QStyle::PE_FrameFocusRect, &frameOption, painter, option.widget);
 }

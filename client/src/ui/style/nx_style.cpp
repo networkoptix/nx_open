@@ -35,6 +35,8 @@ namespace
 {
     const char* kComboBoxDelegateClass = "_qn_comboBoxDelegateClass";
 
+    const QSize kSwitchFocusFrameMargins = QSize(4, 4); // 2 at left, 2 at right, 2 at top, 2 at bottom
+
     void drawArrow(Direction direction,
                    QPainter *painter,
                    const QRectF &rect,
@@ -211,13 +213,27 @@ void QnNxStyle::drawPrimitive(
     switch (element)
     {
     case PE_FrameFocusRect:
-        return;
+        {
+            if (!option->state.testFlag(State_Enabled))
+                return;
+
+            QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ? 
+                                        option->palette.color(QPalette::HighlightedText) : 
+                                        option->palette.color(QPalette::Highlight);
+            color.setAlphaF(0.5);
+
+            QnScopedPainterPenRollback penRollback(painter, QPen(color, 0, Qt::DotLine));
+            QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+            QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+
+            painter->drawRoundedRect(QnGeometry::eroded(QRectF(option->rect), 0.5), 1.0, 1.0);
+            return;
+        }
 
     case PE_PanelButtonCommand:
         {
             const bool pressed = option->state.testFlag(State_Sunken);
-            const bool hovered = option->state.testFlag(State_MouseOver) ||
-                                 option->state.testFlag(State_HasFocus);
+            const bool hovered = option->state.testFlag(State_MouseOver);
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
@@ -264,8 +280,7 @@ void QnNxStyle::drawPrimitive(
             }
 
             const bool pressed = option->state.testFlag(State_Sunken);
-            const bool hovered = option->state.testFlag(State_MouseOver) ||
-                                 option->state.testFlag(State_HasFocus);
+            const bool hovered = option->state.testFlag(State_MouseOver);
 
             QRect rect = option->rect;
 
@@ -640,7 +655,7 @@ void QnNxStyle::drawComplexControl(
                 if (listOpened || comboBox->state.testFlag(State_Sunken))
                     buttonColor = mainColor.lighter(1);
                 else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
-                        buttonColor = mainColor.lighter(2);
+                    buttonColor = mainColor.lighter(2);
 
                 if (buttonColor.isValid())
                 {
@@ -657,9 +672,18 @@ void QnNxStyle::drawComplexControl(
                 buttonOption.QStyleOption::operator=(*comboBox);
                 buttonOption.rect = comboBox->rect;
                 buttonOption.state = comboBox->state & (State_Enabled | State_MouseOver | State_HasFocus | State_KeyboardFocusChange);
-                if (comboBox->state & State_On)
+                if (comboBox->state.testFlag(State_On))
                     buttonOption.state |= State_Sunken;
+
                 proxy()->drawPrimitive(PE_PanelButtonCommand, &buttonOption, painter, widget);
+
+                if (comboBox->state.testFlag(State_HasFocus))
+                {
+                    QStyleOptionFocusRect focusOption;
+                    focusOption.QStyleOption::operator=(buttonOption);
+                    focusOption.rect = subElementRect(SE_PushButtonFocusRect, &buttonOption, widget);
+                    proxy()->drawPrimitive(PE_FrameFocusRect, &focusOption, painter, widget);
+                }
             }
 
             if (comboBox->subControls.testFlag(SC_ComboBoxArrow))
@@ -673,14 +697,13 @@ void QnNxStyle::drawComplexControl(
         break;
 
     case CC_Slider:
-        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (const QStyleOptionSlider* slider = qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
             QRectF grooveRect = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
             QRectF handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
             const bool horizontal = slider->orientation == Qt::Horizontal;
-            const bool hovered = slider->state.testFlag(State_MouseOver) ||
-                                 option->state.testFlag(State_HasFocus);
+            const bool hovered = slider->state.testFlag(State_MouseOver);
 
             QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
             QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
@@ -816,6 +839,13 @@ void QnNxStyle::drawComplexControl(
 
                 QnScopedPainterAntialiasingRollback rollback(painter, true);
                 painter->drawEllipse(handleRect.adjusted(1, 1, -1, -1));
+            }
+
+            if (option->state.testFlag(State_HasFocus))
+            {
+                QStyleOptionFocusRect focusOption;
+                focusOption.QStyleOption::operator=(*option);
+                proxy()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, painter, widget);
             }
 
             return;
@@ -1124,6 +1154,34 @@ void QnNxStyle::drawControl(
         }
         break;
 
+    //TODO: #vkutin Make whole-row-select focus markers
+    //case CE_ItemViewItem:
+    //    if (auto viewOption = qstyleoption_cast<const QStyleOptionViewItem*>(option))
+    //    {
+    //        if (auto itemView = qobject_cast<const QAbstractItemView*>(widget))
+    //        {
+    //            if (itemView->hasFocus() && viewOption->index.isValid())
+    //            {
+    //                QStyleOptionViewItem optionCopy(*viewOption);
+    //                switch (itemView->selectionBehavior())
+    //                {
+    //                case QAbstractItemView::SelectRows:
+    //                    if (itemView->selectionModel()->currentIndex().row() == viewOption->index.row())
+    //                        optionCopy.state |= State_HasFocus;
+    //                    break;
+
+    //                case QAbstractItemView::SelectColumns:
+    //                    if (itemView->selectionModel()->currentIndex().column() == viewOption->index.column())
+    //                        optionCopy.state |= State_HasFocus;
+    //                    break;
+    //                }
+
+    //                return base_type::drawControl(CE_ItemViewItem, &optionCopy, painter, widget);
+    //            }
+    //        }
+    //    }
+    //    break;
+
     case CE_TabBarTabShape:
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab*>(option))
@@ -1184,8 +1242,7 @@ void QnNxStyle::drawControl(
         break;
 
     case CE_TabBarTabLabel:
-        if (const QStyleOptionTab *tab =
-                qstyleoption_cast<const QStyleOptionTab*>(option))
+        if (const QStyleOptionTab* tab = qstyleoption_cast<const QStyleOptionTab*>(option))
         {
             TabShape shape = tabShape(widget);
             int textFlags = Qt::TextHideMnemonic;
@@ -1263,7 +1320,7 @@ void QnNxStyle::drawControl(
         if (const QStyleOptionHeader *header =
                 qstyleoption_cast<const QStyleOptionHeader*>(option))
         {
-            if (header->state.testFlag(State_MouseOver) || header->state.testFlag(State_HasFocus))
+            if (header->state.testFlag(State_MouseOver))
             {
                 QColor color = findColor(header->palette.midlight().color());
                 painter->fillRect(header->rect, color);
@@ -1775,7 +1832,7 @@ QRect QnNxStyle::subControlRect(
                     QRect boundRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
                     boundRect.setRight(option->rect.right());
                     rect = alignedRect(Qt::LeftToRight, Qt::AlignRight | Qt::AlignVCenter,
-                                       Metrics::kStandaloneSwitchSize, boundRect);
+                                       Metrics::kStandaloneSwitchSize + kSwitchFocusFrameMargins, boundRect);
                 }
                 break;
 
@@ -1885,7 +1942,7 @@ QRect QnNxStyle::subElementRect(
         break;
 
     case SE_PushButtonFocusRect:
-        return option->rect;
+        return QnGeometry::eroded(option->rect, 1);
 
     case SE_ProgressBarGroove:
         if (const QStyleOptionProgressBar *progressBar =
@@ -1978,11 +2035,10 @@ QRect QnNxStyle::subElementRect(
         {
             /* Switch: */
             if (item->state.testFlag(State_On) || item->state.testFlag(State_Off))
-                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kStandaloneSwitchSize, option->rect);
+                return alignedRect(Qt::LeftToRight, Qt::AlignCenter, Metrics::kStandaloneSwitchSize + kSwitchFocusFrameMargins, option->rect);
         }
         /* FALL THROUGH */
     case SE_ItemViewItemText:
-    case SE_ItemViewItemFocusRect:
     case SE_ItemViewItemDecoration:
         if (const QStyleOptionViewItem* item = qstyleoption_cast<const QStyleOptionViewItem*>(option))
         {
@@ -1993,6 +2049,28 @@ QRect QnNxStyle::subElementRect(
             return base_type::subElementRect(subElement, &newOpt, widget);
         }
         break;
+
+    case SE_ItemViewItemFocusRect:
+        //TODO: #vkutin Make whole-row-select focus markers
+        //if (auto itemView = qobject_cast<const QAbstractItemView*>(widget))
+        //{
+        //    QRect rect = option->rect;
+        //    switch (itemView->selectionBehavior())
+        //    {
+        //    case QAbstractItemView::SelectRows:
+        //        rect.setLeft(0);
+        //        rect.setRight(itemView->viewport()->width() - 1);
+        //        break;
+
+        //    case QAbstractItemView::SelectColumns:
+        //        rect.setTop(0);
+        //        rect.setBottom(itemView->viewport()->height() - 1);
+        //        break;
+        //    }
+
+        //    return rect;
+        //}
+        return option->rect;
 
     case SE_HeaderArrow:
         if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader *>(option))
@@ -2247,7 +2325,7 @@ int QnNxStyle::pixelMetric(
     case PM_SliderControlThickness:
         return dp(16);
     case PM_SliderThickness:
-        return dp(18);
+        return dp(20);
     case PM_SliderLength:
         if (option && option->styleObject)
         {
@@ -2271,7 +2349,7 @@ int QnNxStyle::pixelMetric(
         return tabShape(widget) == TabShape::Rectangular ? dp(8) : dp(20);
 
     case PM_ToolBarIconSize:
-        return dp(32); // TODO #vkutin Remove dp() from all places where it's not needed
+        return dp(32);
 
     case PM_TabCloseIndicatorWidth:
     case PM_TabCloseIndicatorHeight:
