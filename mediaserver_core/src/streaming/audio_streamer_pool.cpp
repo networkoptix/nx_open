@@ -8,7 +8,7 @@
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/archive/archive_stream_reader.h>
 #include <utils/network/http/asynchttpclient.h>
-#include <2wayaudio/proxy_audio_transmitter.h>
+#include <proxy/2wayaudio/proxy_audio_transmitter.h>
 #include <common/common_module.h>
 #include "core/resource/media_server_resource.h"
 
