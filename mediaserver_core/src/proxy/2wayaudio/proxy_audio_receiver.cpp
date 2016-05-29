@@ -1,12 +1,13 @@
-#include "2wayaudio_proxy_receiver.h"
+#include "proxy_audio_receiver.h"
+#include "proxy_audio_transmitter.h"
+
 #include "network/universal_request_processor_p.h"
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
-#include <rest/handlers/audio_transmission_rest_handler.h>
-#include <2wayaudio/proxy_audio_transmitter.h>
 #include <network/ffmpeg_rtp_parser.h>
 #include <streaming/audio_streamer_pool.h>
 #include <utils/common/from_this_to_shared.h>
+#include <rest/handlers/audio_transmission_rest_handler.h>
 
 namespace
 {
@@ -41,9 +42,9 @@ namespace
     static QMap<QString, QSharedPointer<QnProxyDesktopDataProvider>> m_proxyProviders;
 }
 
-struct QnTwoWayAudioProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate
+struct QnAudioProxyReceiverPrivate: public QnTCPConnectionProcessorPrivate
 {
-    QnTwoWayAudioProxyReceiverConnectionPrivate():
+    QnAudioProxyReceiverPrivate():
         QnTCPConnectionProcessorPrivate(),
         takeSocketOwnership(false)
     {
@@ -132,17 +133,17 @@ private:
     QnUuid m_cameraId;
 };
 
-QnTwoWayAudioProxyReceiverConnection::QnTwoWayAudioProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
+QnAudioProxyReceiver::QnAudioProxyReceiver(QSharedPointer<AbstractStreamSocket> socket,
                                                      QnHttpConnectionListener* owner):
-    QnTCPConnectionProcessor(new QnTwoWayAudioProxyReceiverConnectionPrivate, socket)
+    QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket)
 {
-    Q_D(QnTwoWayAudioProxyReceiverConnection);
-    setObjectName( lit("QnTwoWayAudioProxyReceiverConnection") );
+    Q_D(QnAudioProxyReceiver);
+    setObjectName( lit("QnAudioProxyReceiver") );
 }
 
-void QnTwoWayAudioProxyReceiverConnection::run()
+void QnAudioProxyReceiver::run()
 {
-    Q_D(QnTwoWayAudioProxyReceiverConnection);
+    Q_D(QnAudioProxyReceiver);
 
     parseRequest();
 
@@ -172,7 +173,6 @@ void QnTwoWayAudioProxyReceiverConnection::run()
     if (!readHttpHeaders(d->socket))
         return;
 
-    //QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider(new QnProxyDesktopDataProvider(tcpSocket));
     QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider;
     {
         QMutexLocker lock(&m_mutex);
@@ -196,8 +196,8 @@ void QnTwoWayAudioProxyReceiverConnection::run()
     }
 }
 
-bool QnTwoWayAudioProxyReceiverConnection::isTakeSockOwnership() const
+bool QnAudioProxyReceiver::isTakeSockOwnership() const
 {
-    Q_D(const QnTwoWayAudioProxyReceiverConnection);
+    Q_D(const QnAudioProxyReceiver);
     return d->takeSocketOwnership;
 }

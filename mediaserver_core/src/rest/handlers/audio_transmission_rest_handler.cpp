@@ -3,7 +3,7 @@
 #include <utils/network/http/httptypes.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
-#include <2wayaudio/proxy_audio_transmitter.h>
+#include <proxy/2wayaudio/proxy_audio_transmitter.h>
 
 namespace
 {
