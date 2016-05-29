@@ -1,9 +1,6 @@
 #include "audio_transmission_rest_handler.h"
 #include <streaming/audio_streamer_pool.h>
-#include <utils/network/http/httptypes.h>
 #include <rest/server/rest_connection_processor.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
-#include <proxy/2wayaudio/proxy_audio_transmitter.h>
 
 namespace
 {
