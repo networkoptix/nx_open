@@ -130,6 +130,7 @@ void QnAbstractAudioTransmitter::subscribe(
     {
         if(m_dataProviderInfo == providerInfo)
         {
+            providerInfo.provider->startIfNotRunning();
             return;
         }
         else if(m_dataProviderInfo < providerInfo)

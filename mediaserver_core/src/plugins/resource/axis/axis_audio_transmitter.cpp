@@ -104,8 +104,11 @@ void QnAxisAudioTransmitter::prepare()
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
     m_dataTransmissionStarted = false;
     m_ableToSendData = false;
-    m_httpClient->terminate();
-    m_httpClient.reset();
+    if (m_httpClient)
+    {
+        m_httpClient->terminate();
+        m_httpClient.reset();
+    }
 }
 
 void QnAxisAudioTransmitter::at_requestHeadersHasBeenSent(

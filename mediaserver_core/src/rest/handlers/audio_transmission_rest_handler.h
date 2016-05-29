@@ -15,16 +15,9 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor*) override;
 
-    virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-
-    virtual void afterExecute(const nx_http::Request& request, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
+    static bool validateParams(const QnRequestParams& params, QString& error);
 private:
     bool readHttpHeaders(QSharedPointer<AbstractStreamSocket> socket);
 private:
-    bool validateParams(const QnRequestParams& params, QString& error) const;
-private:
-    static QMutex m_mutex;
-    static QMap<QString, QSharedPointer<QnProxyDesktopDataProvider>> m_proxyProviders;
-
 };
 
