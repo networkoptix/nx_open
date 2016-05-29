@@ -6,7 +6,6 @@
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <common/common_module.h>
-#include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <network/router.h>
 
 
@@ -31,7 +30,8 @@ const QByteArray QnProxyAudioTransmitter::kFixedPostRequest(
 QnProxyAudioTransmitter::QnProxyAudioTransmitter(const QnResourcePtr& camera, const QnRequestParams &params):
     m_camera(camera),
     m_initialized(false),
-    m_params(params)
+    m_params(params),
+    m_sequence(0)
 {
     m_initialized = true;
 }
@@ -51,6 +51,8 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
 {
     if (!m_socket)
     {
+        m_serializer.reset(new QnRtspFfmpegEncoder());
+
         QnMediaServerResourcePtr mServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
             return false;
@@ -72,7 +74,7 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
         url.setScheme("http");
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);
-        url.setPath("/api/transmitAudio");
+        url.setPath("/proxy-2wayaudio");
         url.setQuery(toUrlQuery(m_params));
 
         url.setUserName(currentServer->getId().toByteArray());
@@ -91,25 +93,31 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
         m_socket->send(kFixedPostRequest);
     }
 
-    QnRtspFfmpegEncoder serializer;
-    serializer.setDataPacket(data);
+    m_serializer->setDataPacket(data);
     QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
+    static AVRational r = {1, 1000000};
+    AVRational time_base = {1, (int) m_serializer->getFrequency() };
 
-    while(!m_needStop && m_socket->isConnected() && serializer.getNextPacket(sendBuffer))
+    sendBuffer.resize(4); // reserve space for RTP TCP header
+    while(!m_needStop && m_serializer->getNextPacket(sendBuffer))
     {
-        quint8 header[2];
-        header[0] = sendBuffer.size() >> 8;
-        header[1] = (quint8) sendBuffer.size();
-        m_socket->send((const char*) &header, 2);
 
-        m_socket->send(sendBuffer);
+        const qint64 packetTime = av_rescale_q(data->timestamp, r, time_base);
+        QnRtspEncoder::buildRTPHeader(sendBuffer.data() + 4, m_serializer->getSSRC(), m_serializer->getRtpMarker(), packetTime, m_serializer->getPayloadtype(), m_sequence++);
+
+        sendBuffer.data()[0] = '$';
+        sendBuffer.data()[1] = 0;
+        quint16* lenPtr = (quint16*) (sendBuffer.data() + 2);
+        *lenPtr = htons(sendBuffer.size() - 4);
+
+        if (m_socket->send(sendBuffer) != sendBuffer.size())
+            m_needStop = true;
+
         sendBuffer.clear();
+        sendBuffer.resize(4); // reserve space for RTP TCP header
     }
-    if (!m_socket->isConnected())
-    {
+    if (m_needStop)
         m_socket.reset();
-        m_needStop = true;
-    }
 
     return true;
 }

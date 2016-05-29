@@ -6,6 +6,7 @@
 #include <utils/network/http/httpclient.h>
 #include <utils/common/request_param.h>
 #include <utils/network/abstract_socket.h>
+#include <rtsp/rtsp_ffmpeg_encoder.h>
 
 class QnProxyAudioTransmitter : public QnAbstractAudioTransmitter
 {
@@ -31,6 +32,8 @@ private:
     bool m_initialized;
     QSharedPointer<AbstractStreamSocket> m_socket;
     const QnRequestParams m_params;
+    int m_sequence;
+    std::unique_ptr<QnRtspFfmpegEncoder> m_serializer;
 };
 
 #endif // #ifdef ENABLE_DATA_PROVIDERS
