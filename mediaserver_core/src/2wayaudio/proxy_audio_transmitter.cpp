@@ -66,6 +66,7 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
 
         nx_http::HttpClient httpClient;
         httpClient.addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, m_camera->getParentId().toByteArray());
+        httpClient.addAdditionalHeader("Connection", "Keep-Alive");
 
         QUrl url;
         url.setScheme("http");
@@ -103,6 +104,11 @@ bool QnProxyAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data
 
         m_socket->send(sendBuffer);
         sendBuffer.clear();
+    }
+    if (!m_socket->isConnected())
+    {
+        m_socket.reset();
+        m_needStop = true;
     }
 
     return true;

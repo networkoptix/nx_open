@@ -299,7 +299,7 @@ void QnTwoWayAudioWidgetPrivate::stopStreaming()
     if (!camera)
         return;
 
-    auto server = camera->getParentServer();
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
     if (!server || server->getStatus() != Qn::Online)
         return;
 
