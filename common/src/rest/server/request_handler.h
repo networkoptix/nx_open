@@ -10,7 +10,6 @@
 
 #include "utils/common/request_param.h"
 #include "utils/common/string.h"
-#include <utils/network/http/httptypes.h>
 
 
 class TCPSocket;
@@ -28,7 +27,7 @@ enum class RestPermissions {
 
 /**
  * QnRestRequestHandler must be thread-safe.
- *
+ *  
  * Single handler instance receives all requests, each request in different thread.
  */
 class QnRestRequestHandler: public QObject {
@@ -51,7 +50,7 @@ public:
                             const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
                             QByteArray& resultContentType, const QnRestConnectionProcessor*) = 0;
 
-    virtual void afterExecute(const nx_http::Request& /*request*/, const QnRequestParamList& /*params*/,
+    virtual void afterExecute(const QString& /*path*/, const QnRequestParamList& /*params*/,
                               const QByteArray& /*body*/, const QnRestConnectionProcessor* /*owner*/) {}
 
     friend class QnRestProcessorPool;
@@ -78,7 +77,7 @@ public:
     QnRestGUIRequestHandler();
     virtual ~QnRestGUIRequestHandler();
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
                             QByteArray& contentType, const QnRestConnectionProcessor*) override;
 protected:
     virtual int executeGetGUI(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;

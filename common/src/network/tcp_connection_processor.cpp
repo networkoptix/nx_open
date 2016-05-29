@@ -107,7 +107,7 @@ int QnTCPConnectionProcessor::isFullMessage(
         *fullMessageSize = expectedSize;
     if (expectedSize > message.size())
         return 0;
-    else
+    else 
         return expectedSize;
 }
 
@@ -306,14 +306,6 @@ QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
     return d->socket;
 }
 
-QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
-{
-    Q_D(QnTCPConnectionProcessor);
-    QSharedPointer<AbstractStreamSocket> result = d->socket;
-    d->socket.clear();
-    return result;
-}
-
 int QnTCPConnectionProcessor::getSocketTimeout()
 {
     Q_D(QnTCPConnectionProcessor);
@@ -341,7 +333,7 @@ bool QnTCPConnectionProcessor::readRequest()
     {
         int readed;
         readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-        if (readed > 0)
+        if (readed > 0) 
         {
             //globalTimeout.restart();
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
@@ -382,7 +374,7 @@ bool QnTCPConnectionProcessor::readSingleRequest()
 
     if( !d->clientRequest.isEmpty() )   //TODO #ak it is more reliable to check for the first call of this method
     {
-        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest
+        //due to bug in QnTCPConnectionProcessor::readRequest() d->clientRequest 
         //    can contain multiple interleaved requests.
         //    Have to parse them!
         assert( d->interleavedMessageData.isEmpty() );
@@ -480,7 +472,7 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket.clear();
+    d->socket.clear();    
 }
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
