@@ -1,5 +1,6 @@
 #include "nx_style.h"
 #include "nx_style_p.h"
+#include "globals.h"
 #include "skin.h"
 
 #include <QtCore/QtMath>
@@ -349,11 +350,10 @@ void QnNxStyle::drawPrimitive(
             QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
-            QnPaletteColor frameColor;
-            QnPaletteColor brushColor;
+            QColor frameColor;
+            QColor brushColor;
 
             bool focused = option->state.testFlag(State_HasFocus);
-
             bool readOnly = false;
             bool valid = true;
 
@@ -387,12 +387,12 @@ void QnNxStyle::drawPrimitive(
             else
             {
                 /* Valid or not valid not focused input: */
-                frameColor = valid ? base.darker(1) : mainColor(Colors::kRed);
+                frameColor = valid ? base.darker(1).color() : qnGlobals->errorTextColor();
                 brushColor = base;
             }
 
-            QnScopedPainterPenRollback penRollback(painter, frameColor.color());
-            QnScopedPainterBrushRollback brushRollback(painter, brushColor.color());
+            QnScopedPainterPenRollback penRollback(painter, frameColor);
+            QnScopedPainterBrushRollback brushRollback(painter, brushColor);
 
             painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
             if (focused)
