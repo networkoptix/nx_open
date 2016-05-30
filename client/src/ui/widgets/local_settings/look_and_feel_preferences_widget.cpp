@@ -33,7 +33,6 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     ui(new Ui::LookAndFeelPreferencesWidget),
     m_updating(false),
     m_oldLanguage(0),
-    m_oldSkin(0),
     m_oldTimeMode(Qn::ServerTimeMode)
 {
     ui->setupUi(this);
@@ -46,7 +45,6 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 
     setupLanguageUi();
-    setupSkinUi();
     setupTimeModeUi();
     setupBackgroundUi();
 }
@@ -63,7 +61,6 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
         : Qn::RI_NameOnly
     );
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
-    qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
 
     QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
     if(!translation.isEmpty())
@@ -80,9 +77,6 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
 void QnLookAndFeelPreferencesWidget::loadDataToUi()
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-
-    m_oldSkin = ui->skinComboBox->findData(qnSettings->clientSkin());
-    ui->skinComboBox->setCurrentIndex(m_oldSkin);
 
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->extraInfoInTree() != Qn::RI_NameOnly);
@@ -140,8 +134,7 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
 bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return m_oldLanguage == ui->languageComboBox->currentIndex()
-        && m_oldSkin == ui->skinComboBox->currentIndex();
+    return m_oldLanguage == ui->languageComboBox->currentIndex();
 }
 
 bool QnLookAndFeelPreferencesWidget::canDiscardChanges() const
@@ -220,18 +213,6 @@ void QnLookAndFeelPreferencesWidget::setupLanguageUi()
 
     connect(ui->languageComboBox, QnComboboxCurrentIndexChanged,  this,   [this](int index) {
         ui->languageWarningLabel->setVisible(m_oldLanguage != index);
-    });
-}
-
-void QnLookAndFeelPreferencesWidget::setupSkinUi()
-{
-    ui->skinComboBox->addItem(tr("Dark"), Qn::DarkSkin);
-    ui->skinComboBox->addItem(tr("Light"), Qn::LightSkin);
-    setWarningStyle(ui->skinWarningLabel);
-    ui->skinWarningLabel->setVisible(false);
-
-    connect(ui->skinComboBox, QnComboboxCurrentIndexChanged,  this,   [this](int index) {
-        ui->skinWarningLabel->setVisible(m_oldSkin != index);
     });
 }
 

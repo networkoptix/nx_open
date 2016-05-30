@@ -342,12 +342,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         ? lit(":")
         : startupParams.dynamicCustomizationPath;
 
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin
-        ? skinRoot + lit("/skin_light")
-        : skinRoot + lit("/skin_dark");
+    QString customizationPath = skinRoot + lit("/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
 #else
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    QString customizationPath = lit(":/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
