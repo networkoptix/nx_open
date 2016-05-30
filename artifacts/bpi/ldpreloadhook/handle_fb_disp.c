@@ -15,6 +15,7 @@ static int performIoctl(
 {
     /*unused*/ (void) filename;
 
+    // ATTENTION: This code may deadlock if a signal handler will call ioctl() within this thread.
     if (pthread_mutex_trylock(&lock) != 0)
     {
         // Mutex was already locked by another thread.
