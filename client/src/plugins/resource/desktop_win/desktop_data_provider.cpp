@@ -258,7 +258,7 @@ QnDesktopDataProvider::QnDesktopDataProvider (
                    QWidget* glWidget,
                    const QPixmap& logo
                    ):
-    QnAbstractMediaStreamDataProvider(res),
+    QnDesktopDataProviderBase(res),
     m_videoBuf(0),
     m_videoBufSize(0),
     m_videoCodecCtx(0),
@@ -789,18 +789,6 @@ void QnDesktopDataProvider::closeStream()
         delete audioChannel;
     m_audioInfo.clear();
 }
-
-class QnDesktopDataProvider::QnDesktopAudioLayout: public QnResourceAudioLayout
-{
-public:
-    QnDesktopAudioLayout(): QnResourceAudioLayout(), m_channels(0) {}
-    virtual int channelCount() const override { return m_channels; }
-    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return m_audioTrack; }
-    void setAudioTrackInfo(const AudioTrack& info) { m_audioTrack = info; m_channels = 1;}
-private:
-    AudioTrack m_audioTrack;
-    int m_channels;
-};
 
 QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
 {

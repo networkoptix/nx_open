@@ -10,12 +10,13 @@ class QnDesktopResourceSearcherImpl
 {
 
 public:
-    QnDesktopResourceSearcherImpl();
+    QnDesktopResourceSearcherImpl(QGLWidget* mainWidget);
     ~QnDesktopResourceSearcherImpl();
     QnResourceList findResources();
 
 private:
     IDirect3D9 *m_pD3D;
     QGLWidget* m_mainWidget;
-}
+};
+
 #endif

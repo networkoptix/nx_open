@@ -636,10 +636,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     //restoring default message handler
     qInstallMessageHandler( defaultMsgHandler );
 
-#ifdef Q_OS_WIN
-    QnDesktopResourceSearcher::initStaticInstance( NULL );
-#endif
-
     return result;
 }
 

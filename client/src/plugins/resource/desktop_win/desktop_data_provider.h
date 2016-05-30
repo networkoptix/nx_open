@@ -131,13 +131,11 @@ private:
     QString m_lastErrorStr;
     bool m_capturingStopped;
     const QPixmap m_logo;
-    //QSet<void*> m_needKeyData;
     qint64 m_initTime;
     mutable QnMutex m_startMutex;
     bool m_started;
     bool m_isInitialized;
 
-    class QnDesktopAudioLayout;
     QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);

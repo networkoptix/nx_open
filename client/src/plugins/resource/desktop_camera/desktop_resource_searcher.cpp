@@ -9,7 +9,7 @@ namespace {
     const QString kManufacture = lit("Network Optix");
 }
 
-QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget) :
+QnDesktopResourceSearcher::QnDesktopResourceSearcher(QGLWidget* mainWidget):
     m_impl(new QnDesktopResourceSearcherImpl(mainWidget))
 {
 }

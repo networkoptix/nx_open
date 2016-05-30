@@ -10,7 +10,7 @@
 #include "plugins/resource/desktop_camera/desktop_camera_connection.h"
 #include "plugins/resource/desktop_camera/desktop_resource_base.h"
 
-#if defined(_WIN32)
+#if defined(Q_OS_WIN)
 
 class QnDesktopDataProvider;
 class QGLWidget;

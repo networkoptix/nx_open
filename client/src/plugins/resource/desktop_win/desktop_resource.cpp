@@ -1,6 +1,7 @@
 #include "desktop_resource.h"
 
 #if defined(Q_OS_WIN)
+
 #include "plugins/resource/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resource/media_server_resource.h"
@@ -8,7 +9,8 @@
 
 //static QnWinDesktopResource* instance = 0;
 
-QnWinDesktopResource::QnWinDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource()
+QnWinDesktopResource::QnWinDesktopResource(QGLWidget* mainWindow):
+    QnDesktopResource()
 {
     m_mainWidget = mainWindow;
     addFlags(Qn::local_live_cam | Qn::desktop_camera);
@@ -44,7 +46,7 @@ QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal(Q
 
 void QnWinDesktopResource::createSharedDataProvider()
 {
-    if (m_desktopDataProvider) 
+    if (m_desktopDataProvider)
     {
         if (m_desktopDataProvider->readyToStop())
             delete m_desktopDataProvider; // stop and destroy old instance
