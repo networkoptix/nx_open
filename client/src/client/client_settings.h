@@ -76,9 +76,6 @@ public:
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
-        /** Do not show save confirmation when closing unsaved layouts. */
-        IGNORE_UNSAVED_LAYOUTS,
-
         SHOWCASE_URL,
         SHOWCASE_ENABLED,
 
@@ -215,7 +212,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
-        QN_DECLARE_RW_PROPERTY(bool,                        ignoreUnsavedLayouts,   setIgnoreUnsavedLayouts,    IGNORE_UNSAVED_LAYOUTS,     false)
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)

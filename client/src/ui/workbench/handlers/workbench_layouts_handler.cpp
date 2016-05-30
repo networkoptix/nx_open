@@ -354,101 +354,39 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layout
     return closeLayouts(resources, waitForReply, force);
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply, bool force) {
+bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply, bool force)
+{
     QN_SCOPED_VALUE_ROLLBACK(&m_closingLayouts, true);
 
     if(resources.empty())
         return true;
 
-    bool needToAsk = false;
-    bool ignoreAll = qnSettings->ignoreUnsavedLayouts();
     QnLayoutResourceList saveableResources, rollbackResources;
-    if (!force) {
-        foreach(const QnLayoutResourcePtr &resource, resources) {
-            Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+    if (!force)
+    {
+        for (const QnLayoutResourcePtr &resource : resources)
+        {
+            bool changed = snapshotManager()->flags(resource).testFlag(Qn::ResourceIsChanged);
+            if (!changed)
+                continue;
 
-            bool changed = flags & Qn::ResourceIsChanged;
-            bool saveable = accessController()->permissions(resource) & Qn::SavePermission;
-
-            needToAsk |= (changed && saveable);
-
-            if(changed) {
-                if(saveable) {
-                    saveableResources.push_back(resource);
-                } else {
-                    rollbackResources.push_back(resource);
-                }
-            }
+            bool saveable = accessController()->hasPermissions(resource, Qn::SavePermission);
+            if (saveable)
+                saveableResources.push_back(resource);
+            else
+                rollbackResources.push_back(resource);
         }
     }
 
-    bool closeAll = true;
-    bool saveAll = false;
-    if(needToAsk && !ignoreAll) {
-        QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
-        dialog->setResources(saveableResources);
-        dialog->setWindowTitle(tr("Close Layouts"));
-        dialog->setText(tr("The following %n layout(s) are not saved. Do you want to save them?", "", saveableResources.size()));
-        dialog->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel);
-        dialog->setReadOnly(false);
-        dialog->showIgnoreCheckbox();
-        setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
-        dialog->exec();
-        QDialogButtonBox::StandardButton button = dialog->clickedButton();
 
-        switch (button) {
-        case QDialogButtonBox::NoButton:
-        case QDialogButtonBox::Cancel:
-            closeAll = false;
-            saveAll = false;
-            break;
-        case QDialogButtonBox::No:
-            closeAll = true;
-            saveAll = false;
-            qnSettings->setIgnoreUnsavedLayouts(dialog->isIgnoreCheckboxChecked());
-            break;
-        default: /* QDialogButtonBox::Yes */
-            closeAll = true;
-            saveAll = true;
-            qnSettings->setIgnoreUnsavedLayouts(dialog->isIgnoreCheckboxChecked());
-            break;
-        }
-    }
-
-    if(closeAll) {
-        if(!saveAll) {
-            rollbackResources.append(saveableResources);
-            saveableResources.clear();
-        }
-
-        if(!waitForReply || saveableResources.empty()) {
-            closeLayouts(resources, rollbackResources, saveableResources, NULL, NULL);
-            return true;
-        } else {
-            QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
-            dialog->setWindowTitle(tr("Saving Layouts"));
-            dialog->setText(tr("The following %n layout(s) are being saved.", "", saveableResources.size()));
-            dialog->setBottomText(tr("Please wait."));
-            dialog->setStandardButtons(0);
-            dialog->setResources(QnResourceList(saveableResources));
-
-            QScopedPointer<QnMultiEventEater> eventEater(new QnMultiEventEater(Qn::IgnoreEvent));
-            eventEater->addEventType(QEvent::KeyPress);
-            eventEater->addEventType(QEvent::KeyRelease); /* So that ESC doesn't close the dialog. */
-            eventEater->addEventType(QEvent::Close);
-            dialog->installEventFilter(eventEater.data());
-
-            closeLayouts(resources, rollbackResources, saveableResources, dialog.data(), SLOT(accept()));
-            dialog->exec();
-
-            return true;
-        }
-    } else {
-        return false;
-    }
+    rollbackResources.append(saveableResources);
+    saveableResources.clear();
+    closeLayouts(resources, rollbackResources, saveableResources);
+    return true;
 }
 
-void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot) {
+void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources)
+{
     if(!saveResources.empty()) {
         QnLayoutResourceList fileResources, normalResources, videowallReviewResources;
         foreach(const QnLayoutResourcePtr &resource, saveResources) {
@@ -467,8 +405,6 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         }
 
         QnCounter *counter = new QnCounter(0, this);
-        if (target && slot)
-            connect(counter, SIGNAL(reachedZero()), target, slot);
         connect(counter, SIGNAL(reachedZero()), counter, SLOT(deleteLater()));
 
         if(!normalResources.isEmpty())

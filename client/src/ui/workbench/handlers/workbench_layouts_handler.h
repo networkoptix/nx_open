@@ -66,7 +66,7 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot);
+    void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false, bool force = false);
 
