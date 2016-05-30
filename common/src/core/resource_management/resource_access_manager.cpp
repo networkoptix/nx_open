@@ -530,11 +530,10 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
     }
     else
     {
-        if (hasGlobalPermission(user, Qn::GlobalViewLogsPermission))
-            result |= Qn::ReadPermission;
-
         if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
         {
+            result |= Qn::ReadPermission;
+
             /* Admins can only be edited by owner, other users - by all admins. */
             if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
                 result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;

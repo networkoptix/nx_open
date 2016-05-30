@@ -898,7 +898,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenAuditLogAction).
         flags(Qn::Main).
-        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Audit Trail..."));
 
     factory(QnActions::OpenBookmarksSearchAction).
