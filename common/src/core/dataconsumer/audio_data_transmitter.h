@@ -95,7 +95,6 @@ private:
     QElapsedTimer m_elapsedTimer;
     quint64 m_transmittedPacketCount;
     quint64 m_transmittedPacketDuration;
-
 };
 
 #endif // #ifdef ENABLE_DATA_PROVIDERS

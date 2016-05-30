@@ -44,7 +44,7 @@ QnMediaContextPtr QnSpeachSynthesisDataProvider::initializeAudioContext()
     ctx->sample_fmt = CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(format);
     ctx->sample_rate = format.sampleRate();
     ctx->frame_size = kDefaultDataChunkSize / 2;
-    ctx->channels = format.channels();
+    ctx->channels = format.channelCount();
 
     return QnMediaContextPtr(new QnMediaContext(ctx));
 }

@@ -125,8 +125,10 @@ namespace nx_http
         void setSubsequentReconnectTries( int reconnectTries );
         void setTotalReconnectTries( int reconnectTries );
         void setUserAgent( const QString& userAgent );
-        void setUserName( const QString& userAgent );
-        void setUserPassword( const QString& userAgent );
+        void setUserName( const QString& userName);
+        void setUserPassword( const QString& userPassword );
+        void setProxyUserName( const QString& userName );
+        void setProxyUserPassword( const QString& userPassword );
 
         //!If set to \a true client will not try to add Authorization header to the first request. \a false by default
         void setDisablePrecalculatedAuthorization(bool val);
@@ -238,7 +240,10 @@ namespace nx_http
         QString m_userAgent;
         QString m_userName;
         QString m_userPassword;
+        QString m_proxyUserName;
+        QString m_proxyUserPassword;
         bool m_authorizationTried;
+        bool m_proxyAuthorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
         mutable QnMutex m_mutex;
@@ -276,7 +281,9 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::Response& response );
+        bool resendRequestWithAuthorization(
+            const nx_http::Response& response,
+            bool isProxy = false);
         void doSomeCustomLogic(
             const nx_http::Response& response,
             Request* const request );

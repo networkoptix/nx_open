@@ -227,6 +227,7 @@
 #include <database/server_db.h>
 #include <nx_speach_synthesizer/text_to_wav.h>
 #include <streaming/audio_streamer_pool.h>
+#include <proxy/2wayaudio/proxy_audio_receiver.h>
 
 #ifdef __arm__
 #include "nx1/info.h"
@@ -1519,6 +1520,7 @@ bool MediaServerProcess::initTcpListener()
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
+    m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
