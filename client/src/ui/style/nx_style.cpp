@@ -217,8 +217,8 @@ void QnNxStyle::drawPrimitive(
             if (!option->state.testFlag(State_Enabled))
                 return;
 
-            QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ? 
-                                        option->palette.color(QPalette::HighlightedText) : 
+            QColor color = widget && widget->property(Properties::kAccentStyleProperty).toBool() ?
+                                        option->palette.color(QPalette::HighlightedText) :
                                         option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
@@ -1154,34 +1154,6 @@ void QnNxStyle::drawControl(
         }
         break;
 
-    //TODO: #vkutin Make whole-row-select focus markers
-    //case CE_ItemViewItem:
-    //    if (auto viewOption = qstyleoption_cast<const QStyleOptionViewItem*>(option))
-    //    {
-    //        if (auto itemView = qobject_cast<const QAbstractItemView*>(widget))
-    //        {
-    //            if (itemView->hasFocus() && viewOption->index.isValid())
-    //            {
-    //                QStyleOptionViewItem optionCopy(*viewOption);
-    //                switch (itemView->selectionBehavior())
-    //                {
-    //                case QAbstractItemView::SelectRows:
-    //                    if (itemView->selectionModel()->currentIndex().row() == viewOption->index.row())
-    //                        optionCopy.state |= State_HasFocus;
-    //                    break;
-
-    //                case QAbstractItemView::SelectColumns:
-    //                    if (itemView->selectionModel()->currentIndex().column() == viewOption->index.column())
-    //                        optionCopy.state |= State_HasFocus;
-    //                    break;
-    //                }
-
-    //                return base_type::drawControl(CE_ItemViewItem, &optionCopy, painter, widget);
-    //            }
-    //        }
-    //    }
-    //    break;
-
     case CE_TabBarTabShape:
         if (const QStyleOptionTab *tab =
                 qstyleoption_cast<const QStyleOptionTab*>(option))
@@ -2051,25 +2023,6 @@ QRect QnNxStyle::subElementRect(
         break;
 
     case SE_ItemViewItemFocusRect:
-        //TODO: #vkutin Make whole-row-select focus markers
-        //if (auto itemView = qobject_cast<const QAbstractItemView*>(widget))
-        //{
-        //    QRect rect = option->rect;
-        //    switch (itemView->selectionBehavior())
-        //    {
-        //    case QAbstractItemView::SelectRows:
-        //        rect.setLeft(0);
-        //        rect.setRight(itemView->viewport()->width() - 1);
-        //        break;
-
-        //    case QAbstractItemView::SelectColumns:
-        //        rect.setTop(0);
-        //        rect.setBottom(itemView->viewport()->height() - 1);
-        //        break;
-        //    }
-
-        //    return rect;
-        //}
         return option->rect;
 
     case SE_HeaderArrow:
