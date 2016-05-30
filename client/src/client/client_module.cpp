@@ -44,6 +44,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
+#include <utils/media/ffmpeg_initializer.h>
 #include <utils/media/voice_spectrum_analyzer.h>
 
 #include <statistics/statistics_manager.h>
@@ -131,6 +132,7 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
     QnCommonModule *common = new QnCommonModule(this);
 
+    common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
     common->store<QnTranslationManager>(translationManager.release());
     common->store<QnCoreSettings>(new QnCoreSettings());
     common->store<QnClientRuntimeSettings>(new QnClientRuntimeSettings());
@@ -180,7 +182,8 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
 }
 
-QnClientModule::~QnClientModule() {
+QnClientModule::~QnClientModule()
+{
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 
     QApplication::setOrganizationName(QString());

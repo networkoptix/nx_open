@@ -35,12 +35,6 @@
 #include <QScopedPointer>
 #include <QtSingleApplication>
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
-    #include <libavformat/avio.h>
-}
-
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -150,25 +144,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
     cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
 }
 
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QnMutex** qMutex = (QnMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
+
 
 void ffmpegInit()
 {
@@ -674,16 +650,7 @@ int main(int argc, char **argv)
     mac_restoreFileAccess();
 #endif
 
-    //avcodec_init();
-    av_register_all();
-    if (av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
     int result = runApplication(application.data(), argc, argv);
-
-    av_lockmgr_register(NULL);
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();
