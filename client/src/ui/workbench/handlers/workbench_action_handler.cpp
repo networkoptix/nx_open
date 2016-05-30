@@ -30,7 +30,6 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -91,8 +90,6 @@
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
-
-#include <ui/common/ui_resource_name.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -218,7 +215,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(QnActions::OpenAnyNumberOfLayoutsAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsAction_triggered()));
     connect(action(QnActions::OpenLayoutsInNewWindowAction),           SIGNAL(triggered()),    this,   SLOT(at_openLayoutsInNewWindowAction_triggered()));
     connect(action(QnActions::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
-    connect(action(QnActions::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(QnActions::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
 
     connect(action(QnActions::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
@@ -774,15 +770,6 @@ void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openCurrentLayoutInNewWindowAction_triggered() {
     menu()->trigger(QnActions::OpenLayoutsInNewWindowAction, workbench()->currentLayout()->resource());
-}
-
-void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
-
-    workbench()->addLayout(layout);
-    workbench()->setCurrentLayout(layout);
 }
 
 void QnWorkbenchActionHandler::at_openNewWindowAction_triggered() {

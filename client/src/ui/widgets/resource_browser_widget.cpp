@@ -20,7 +20,6 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>

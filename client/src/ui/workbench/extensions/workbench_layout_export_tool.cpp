@@ -10,7 +10,7 @@
 #include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/layout_resource.h>
@@ -445,7 +445,7 @@ void QnLayoutExportTool::at_camera_exportFinished(
                     tr("Could not export camera %1."),
                     tr("Could not export I/O module %1.")
                 ), camRes
-            ).arg(getShortResourceName(camRes));
+            ).arg(QnResourceDisplayInfo(camRes).toString(Qn::RI_NameOnly));
         finishExport(false);
     } else {
         exportNextCamera();

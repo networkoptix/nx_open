@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_access_manager.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -20,7 +21,6 @@
 #include <api/global_settings.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/resource_icon_cache.h>
@@ -211,7 +211,7 @@ void QnResourceTreeModelNode::update()
             m_status = m_resource->getStatus();
             m_searchString = m_resource->toSearchString();
             m_icon = qnResIconCache->icon(m_resource);
-            m_displayName = getResourceName(m_resource);
+            m_displayName = QnResourceDisplayInfo(m_resource).toString(Qn::RI_NameOnly);
         }
     }
     else if (m_type == Qn::VideoWallItemNode)

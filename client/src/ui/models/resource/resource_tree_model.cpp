@@ -27,7 +27,6 @@
 #include <api/global_settings.h>
 
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/resource_icon_cache.h>

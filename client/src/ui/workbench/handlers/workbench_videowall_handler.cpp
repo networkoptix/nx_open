@@ -21,7 +21,6 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_type.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -52,7 +51,6 @@
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>

@@ -58,13 +58,18 @@ QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 void QnLookAndFeelPreferencesWidget::applyChanges()
 {
     qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
-    qnSettings->setExtraInfoInTree(ui->showIpInTreeCheckBox->isChecked());
+    qnSettings->setExtraInfoInTree(ui->showIpInTreeCheckBox->isChecked()
+        ? Qn::RI_FullInfo
+        : Qn::RI_NameOnly
+    );
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
     qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
 
     QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
-    if(!translation.isEmpty()) {
-        if(!translation.filePaths().isEmpty()) {
+    if(!translation.isEmpty())
+    {
+        if(!translation.filePaths().isEmpty())
+        {
             QString currentTranslationPath = qnSettings->translationPath();
             if(!translation.filePaths().contains(currentTranslationPath))
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
@@ -80,7 +85,7 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     ui->skinComboBox->setCurrentIndex(m_oldSkin);
 
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
-    ui->showIpInTreeCheckBox->setChecked(qnSettings->extraInfoInTree());
+    ui->showIpInTreeCheckBox->setChecked(qnSettings->extraInfoInTree() != Qn::RI_NameOnly);
 
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
 

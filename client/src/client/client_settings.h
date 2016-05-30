@@ -1,5 +1,4 @@
-#ifndef QN_CLIENT_SETTINGS_H
-#define QN_CLIENT_SETTINGS_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -7,6 +6,8 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
+
+#include <core/resource/resource_display_info.h>
 
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>
@@ -222,7 +223,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
         QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
-        QN_DECLARE_RW_PROPERTY(bool,                        extraInfoInTree,        setExtraInfoInTree,         EXT_INFO_IN_TREE,           true)
+        QN_DECLARE_RW_PROPERTY(Qn::ResourceInfoLevel,       extraInfoInTree,        setExtraInfoInTree,         EXT_INFO_IN_TREE,           Qn::RI_FullInfo)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
         QN_DECLARE_R_PROPERTY (bool,                        createFullCrashDump,                                CREATE_FULL_CRASH_DUMP,     false)
         QN_DECLARE_RW_PROPERTY(QnPaneSettingsMap,           paneSettings,           setPaneSettings,            WORKBENCH_PANES,            Qn::defaultPaneSettings())
@@ -263,5 +264,3 @@ private:
 
 
 #define qnSettings (QnClientSettings::instance())
-
-#endif // QN_CLIENT_SETTINGS_H

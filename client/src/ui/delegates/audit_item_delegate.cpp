@@ -3,8 +3,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
+
 #include <ui/models/audit/audit_log_model.h>
 #include <ui/style/helper.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -540,7 +542,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
             }
 
             /* Draw camera name: */
-            QString name = getResourceName(camera);
+            QString name = QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
             QString elidedName = smallFontMetrics.elidedText(name, option.textElideMode, nameRect.width(), kTextFlags);
             painter->drawText(nameRect, kTextFlags, elidedName);
             nameRect.moveTop(nameRect.top() + smallRowHeight);

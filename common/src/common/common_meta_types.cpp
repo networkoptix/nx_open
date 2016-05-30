@@ -101,6 +101,7 @@ namespace {
 }
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK,
@@ -246,6 +247,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
     qRegisterMetaType<Qn::RebuildState>();
+
+    qRegisterMetaType<Qn::ResourceInfoLevel>();
+    qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
 
     qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnModuleInformationWithAddresses>();

@@ -3,7 +3,6 @@
 
 #include <utils/common/model_functions.h>
 
-#include <core/resource/resource_name.h>
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -14,13 +13,6 @@ namespace
 {
     const auto kPermissionsTag = lit("curr_perm");
     const auto kPermissionCountTagTemplate = lit("perm_cnt_%1");
-
-    QString extractUserName(const QnResourcePtr &resource)
-    {
-        if (!resource.dynamicCast<QnUserResource>())
-            return QString();
-        return getShortResourceName(resource);
-    }
 }
 
 QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)

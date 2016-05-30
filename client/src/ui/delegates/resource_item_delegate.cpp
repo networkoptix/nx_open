@@ -7,7 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
@@ -393,11 +393,10 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     const QString customExtInfoTemplate = lit(" - %1");
 
     baseName = index.data(Qt::DisplayRole).toString();
-    extInfo = QString();
 
     /* Two-component text from resource information: */
-    bool showExtraInfo = qnSettings->extraInfoInTree();
-    if (!showExtraInfo)
+    auto showExtraInfo = qnSettings->extraInfoInTree();
+    if (showExtraInfo == Qn::RI_NameOnly)
         return;
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -412,7 +411,9 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     }
     else
     {
-        getResourceDisplayInformation(resource, baseName, extInfo);
+        QnResourceDisplayInfo info(resource);
+        extInfo = info.extraInfo();
+
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
             extInfo = customExtInfoTemplate.arg(extInfo);
     }

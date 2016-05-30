@@ -20,7 +20,6 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -40,6 +39,18 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
+namespace
+{
+    QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate) {
+        QStringList usedNames;
+        QnUuid parentId = user ? user->getId() : QnUuid();
+        for(const QnLayoutResourcePtr &resource: qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
+            usedNames.push_back(resource->getName().toLower());
+
+        return generateUniqueString(usedNames, defaultName, nameTemplate);
+    }
+}
+
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
@@ -56,6 +67,7 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(QnActions::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
     connect(action(QnActions::ShareLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered);
     connect(action(QnActions::StopSharingLayoutAction),            &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered);
+    connect(action(QnActions::OpenNewTabAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered);
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                             &QnWorkbench::layoutsChanged,  this,   &QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged, Qt::QueuedConnection);
@@ -675,6 +687,16 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     }
     qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
 
+}
+
+void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
+{
+    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+
+    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
+
+    workbench()->addLayout(layout);
+    workbench()->setCurrentLayout(layout);
 }
 
 void QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged() {

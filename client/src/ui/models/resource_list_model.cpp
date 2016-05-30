@@ -1,11 +1,11 @@
 #include "resource_list_model.h"
 
 #include <client/client_globals.h>
+#include <client/client_settings.h>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/checked_cast.h>
@@ -191,12 +191,12 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
         if (column == NameColumn)
-            return getResourceName(resource);
+            return QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
         break;
 
     case Qt::EditRole:
         if (column == NameColumn)
-            return getFullResourceName(resource, false);
+            return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
         break;
 
     case Qt::DecorationRole:

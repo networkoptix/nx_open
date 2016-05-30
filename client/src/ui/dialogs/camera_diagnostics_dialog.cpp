@@ -8,12 +8,13 @@
 #include <utils/common/delete_later.h>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/resource_display_info.h>
+
+#include <client/client_settings.h>
 
 #include <camera/camera_diagnose_tool.h>
 
-#include <ui/common/ui_resource_name.h>
 #include <ui/style/globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -94,11 +95,12 @@ void QnCameraDiagnosticsDialog::stop() {
     updateOkButtonEnabled();
 }
 
-void QnCameraDiagnosticsDialog::retranslateUi() {
+void QnCameraDiagnosticsDialog::retranslateUi()
+{
 
     ui->retranslateUi(this);
 
-    if(!m_resource)
+    if (!m_resource)
     {
         ui->titleLabel->clear();
         return;
@@ -110,7 +112,7 @@ void QnCameraDiagnosticsDialog::retranslateUi() {
             tr("Diagnostics for camera %1"),
             tr("Diagnostics for I/O module %1")
         ), m_resource)
-    .arg(getResourceName(m_resource)));
+    .arg(QnResourceDisplayInfo(m_resource).toString(qnSettings->extraInfoInTree())));
 
 
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(

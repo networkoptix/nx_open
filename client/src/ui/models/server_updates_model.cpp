@@ -2,10 +2,11 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
+
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
@@ -25,7 +26,7 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
     case Qt::ToolTipRole:
         switch (column) {
         case NameColumn:
-            return getResourceName(m_server);
+            return QnResourceDisplayInfo(m_server).toString(qnSettings->extraInfoInTree());
         case VersionColumn:
             return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
         default:
