@@ -194,7 +194,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         name;
 
     resource->setTypeId(rt);
-    resource->setVendor(vendor);
+    resource->setVendor("ISD");
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
