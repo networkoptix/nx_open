@@ -1,6 +1,6 @@
 #include "flag_config.h"
 
-#if !defined(Q_OS_ANDROID)
+#if !(defined(ANDROID) || defined(__ANDROID__))
 
 #include <string>
 #include <vector>
@@ -557,7 +557,7 @@ void FlagConfig::skipNextReload()
 } // namespace nx
 
 //-------------------------------------------------------------------------------------------------
-#else // Q_OS_ANDROID
+#else // ANDROID || __ANDROID__
 
 // Stub implementation which never changes hard-coded defaults.
 // NOTE: Android NDK does not support std::to_string
@@ -621,4 +621,4 @@ void FlagConfig::skipNextReload()
 } // namespace utils
 } // namespace nx
 
-#endif // Q_OS_ANDROID
+#endif // ANDROID || __ANDROID__
