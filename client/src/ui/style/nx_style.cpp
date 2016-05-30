@@ -347,25 +347,48 @@ void QnNxStyle::drawPrimitive(
 
             bool valid = true; //TODO: #vkutin Implement validity check
 
+            bool readOnly = false;
+            if (option->state.testFlag(State_Enabled))
+            {
+                if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
+                    readOnly = lineEdit->isReadOnly();
+            }
+
             QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
-            if (option->state.testFlag(State_HasFocus))
+            QnPaletteColor frameColor;
+            QnPaletteColor brushColor;
+            bool drawShadow = false;
+
+            if (readOnly)
             {
-                QnPaletteColor frameColor = valid ? base.darker(3) : mainColor(Colors::kRed);
-                QnScopedPainterPenRollback penRollback(painter, frameColor.color());
-                QnScopedPainterBrushRollback brushRollback(painter, base.darker(1).color());
-                painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
-                if (valid)
-                    painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right(), rect.top() + 1);
+                /* Read-only input: */
+                frameColor = base;
+                brushColor = base;
+                frameColor.setAlphaF(0.4);
+                brushColor.setAlphaF(0.2);
+            }
+            else if (option->state.testFlag(State_HasFocus))
+            {
+                /* Valid or not valid focused input: */
+                frameColor = valid ? base.darker(3) : mainColor(Colors::kRed);
+                brushColor = base.darker(1);
+                drawShadow = valid;
             }
             else
             {
-                QnPaletteColor frameColor = valid ? base.darker(1) : mainColor(Colors::kRed);
-                QnScopedPainterPenRollback penRollback(painter, frameColor.color());
-                QnScopedPainterBrushRollback brushRollback(painter, base.color());
-                painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
+                /* Valid or not valid not focused input: */
+                frameColor = valid ? base.darker(1) : mainColor(Colors::kRed);
+                brushColor = base;
             }
+
+            QnScopedPainterPenRollback penRollback(painter, frameColor.color());
+            QnScopedPainterBrushRollback brushRollback(painter, brushColor.color());
+
+            painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
+            if (drawShadow)
+                painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right(), rect.top() + 1);
         }
         return;
 
