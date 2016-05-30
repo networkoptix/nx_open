@@ -1,6 +1,5 @@
-#include "preferences_dialog.h"
-#include "ui_preferences_dialog.h"
-
+#include "local_settings_dialog.h"
+#include "ui_local_settings_dialog.h"
 
 #include <client/client_settings.h>
 
@@ -18,10 +17,10 @@
 
 #include <ui/workbench/workbench_context.h>
 
-QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
+QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::PreferencesDialog()),
+    ui(new Ui::LocalSettingsDialog()),
     m_generalWidget(new QnGeneralPreferencesWidget(this)),
     m_lookAndFeelWidget(new QnLookAndFeelPreferencesWidget(this))
 {
@@ -35,26 +34,25 @@ QnPreferencesDialog::QnPreferencesDialog(QWidget *parent):
 
     addPage(NotificationsPage, new QnPopupSettingsWidget(this), tr("Notifications"));
 
-    if (qnSettings->isWritable()) {
-        ui->readOnlyWarningLabel->hide();
-    } else {
-        setWarningStyle(ui->readOnlyWarningLabel);
-        ui->readOnlyWarningLabel->setText(
+    setWarningStyle(ui->readOnlyWarningLabel);
+    ui->readOnlyWarningLabel->setVisible(!qnSettings->isWritable());
+    ui->readOnlyWarningLabel->setText(
 #ifdef Q_OS_LINUX
-            tr("Settings file is read-only. Please contact your system administrator.") + L'\n' + tr("All changes will be lost after program exit.")
+        tr("Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.")
 #else
-            tr("Settings cannot be saved. Please contact your system administrator.") + L'\n' + tr("All changes will be lost after program exit.")
+        tr("Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.")
 #endif
-        );
-    }
+    );
 
     loadDataToUi();
 }
 
-QnPreferencesDialog::~QnPreferencesDialog() {}
+QnLocalSettingsDialog::~QnLocalSettingsDialog() {}
 
-void QnPreferencesDialog::applyChanges()
+void QnLocalSettingsDialog::applyChanges()
 {
+    bool restartQueued = false;
+
     // TODO: #dklychkov remove this define if the way to restart the app will be found
 #ifndef Q_OS_MACX
     if (m_generalWidget->isRestartRequired() || m_lookAndFeelWidget->isRestartRequired())
@@ -70,10 +68,7 @@ void QnPreferencesDialog::applyChanges()
         case QDialogButtonBox::Cancel:
             return;
         case QDialogButtonBox::Yes:
-            /* The slot must be connected as QueuedConnection because it must start the new instance
-            * after the settings have been saved. Settings saving will be performed just after this (confirm)
-            * without returning to the event loop. */
-            menu()->trigger(QnActions::QueueAppRestartAction);
+            restartQueued = true;
             break;
         default:
             break;
@@ -84,5 +79,8 @@ void QnPreferencesDialog::applyChanges()
     base_type::applyChanges();
     if (qnSettings->isWritable())
         qnSettings->save();
+
+    if (restartQueued)
+        menu()->trigger(QnActions::QueueAppRestartAction);
 }
 

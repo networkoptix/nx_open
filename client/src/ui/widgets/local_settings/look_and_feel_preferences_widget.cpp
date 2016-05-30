@@ -134,7 +134,7 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
 bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return m_oldLanguage == ui->languageComboBox->currentIndex();
+    return m_oldLanguage != ui->languageComboBox->currentIndex();
 }
 
 bool QnLookAndFeelPreferencesWidget::canDiscardChanges() const
