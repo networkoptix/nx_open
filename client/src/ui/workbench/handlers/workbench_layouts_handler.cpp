@@ -11,6 +11,8 @@
 #include <core/resource/videowall_resource.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_management/resources_changes_manager.h>
 
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -45,7 +47,6 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     m_closingLayouts(false)
 {
     connect(action(QnActions::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
-    connect(action(QnActions::NewGlobalLayoutAction),              &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newGlobalLayoutAction_triggered);
     connect(action(QnActions::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
     connect(action(QnActions::SaveLayoutAsAction),                 &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered);
     connect(action(QnActions::SaveLayoutForCurrentUserAsAction),   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
@@ -53,6 +54,8 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(QnActions::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(QnActions::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(QnActions::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+    connect(action(QnActions::ShareLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered);
+    connect(action(QnActions::StopSharingLayoutAction),            &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered);
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                             &QnWorkbench::layoutsChanged,  this,   &QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged, Qt::QueuedConnection);
@@ -92,21 +95,25 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
         snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
 }
 
-void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
-    if(!layout)
+void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
+{
+    if (!layout)
         return;
 
-    if(!snapshotManager()->isSaveable(layout))
+    if (!snapshotManager()->isSaveable(layout))
         return;
 
-    if(!(accessController()->permissions(layout) & Qn::SavePermission))
+    if (!accessController()->hasPermissions(layout, Qn::SavePermission))
         return;
 
-    if (layout->isFile()) {
-        bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
+    if (layout->isFile())
+    {
+        bool isReadOnly = !accessController()->hasPermissions(layout, Qn::WritePermission);
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
-    } else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+    }
+    else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+    {
         //TODO: #GDM #VW #LOW refactor common code to common place
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
@@ -116,7 +123,9 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
         }))
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
-    } else {
+    }
+    else
+    {
         //TODO: #GDM #Common check existing layouts.
         //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
         snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
@@ -574,64 +583,8 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
 }
 
-void QnWorkbenchLayoutsHandler::at_newGlobalLayoutAction_triggered()
+void QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered()
 {
-    auto globalLayouts = []
-    {
-        return qnResPool->getResources().filtered<QnLayoutResource>([](const QnLayoutResourcePtr& layout)
-        {
-            return layout->isGlobal();
-        });
-    };
-
-
-    QStringList usedNames;
-    for (const auto &existing: globalLayouts())
-        usedNames << existing->getName().toLower();
-
-
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
-    dialog->setWindowTitle(tr("New Global Layout"));
-    dialog->setText(tr("Enter the name of the global layout to create:"));
-    dialog->setName(generateUniqueString(usedNames, tr("Global Layout"), tr("Global Layout %1")));
-    dialog->setWindowModality(Qt::ApplicationModal);
-
-    QDialogButtonBox::StandardButton button;
-    do {
-        if (!dialog->exec())
-            return;
-
-        button = QDialogButtonBox::Yes;
-        const QString name = dialog->name();
-        QnLayoutResourceList existing = globalLayouts().filtered([name](const QnLayoutResourcePtr& layout)
-        {
-            return layout->getName().toLower() == name.toLower();
-        });
-
-        if (!existing.isEmpty())
-        {
-            button = askOverrideLayout(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel, QDialogButtonBox::Yes);
-            if (button == QDialogButtonBox::Cancel)
-                return;
-
-            if (button == QDialogButtonBox::Yes)
-            {
-                removeLayouts(existing);
-            }
-        }
-    } while (button != QDialogButtonBox::Yes);
-
-    QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
-    layout->setName(dialog->name());
-    resourcePool()->addResource(layout);
-
-    snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) {at_layout_saved(success, layout); });
-
-    menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
-}
-
-void QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered() {
     saveLayout(menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>());
 }
 
@@ -676,6 +629,52 @@ void QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered() {
         layoutsToClose.removeOne(layout);
 
     closeLayouts(layoutsToClose);
+}
+
+void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
+{
+    auto params = menu()->currentParameters(sender());
+    auto layout = params.resource().dynamicCast<QnLayoutResource>();
+    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+
+    NX_ASSERT(layout);
+    NX_ASSERT(user);
+    if (!layout || !user)
+        return;
+
+    NX_ASSERT(!layout->isFile());
+    auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
+    if (accessible.contains(layout->getId()))
+        return;
+
+    if (!layout->isShared())
+        layout->setParentId(QnUuid());
+
+    /* If layout is changed, it will automatically be saved here. */
+    saveLayout(layout);
+
+    accessible << layout->getId();
+    qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
+
+}
+
+void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
+{
+    auto params = menu()->currentParameters(sender());
+    auto layouts = params.resources().filtered<QnLayoutResource>();
+    auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
+    NX_ASSERT(user);
+    if (!user)
+        return;
+
+    auto accessible = qnResourceAccessManager->accessibleResources(user->getId());
+    for (const auto& layout : layouts)
+    {
+        NX_ASSERT(!layout->isFile());
+        accessible.remove(layout->getId());
+    }
+    qnResourcesChangesManager->saveAccessibleResources(user->getId(), accessible);
+
 }
 
 void QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged() {

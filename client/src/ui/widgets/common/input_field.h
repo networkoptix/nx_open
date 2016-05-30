@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <ui/utils/validators.h>
+
 class QnInputFieldPrivate;
 class AbstractAccessor;
 
@@ -37,14 +39,11 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool value);
 
+    void validate();
     void clear();
 
-    /** Validate input function. Returns tuple of validness and hint. */
-    typedef std::tuple<bool, QString> ValidateResult;
-    typedef std::function<ValidateResult (const QString&)> ValidateFunction;
-
     bool isValid() const;
-    void setValidator(ValidateFunction validator);
+    void setValidator(Qn::TextValidateFunction validator);
 
     static AbstractAccessor* createLabelWidthAccessor();
 

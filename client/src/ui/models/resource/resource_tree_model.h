@@ -61,23 +61,27 @@ public:
 
     QnResourcePtr resource(const QModelIndex &index) const;
 
-    bool isUrlsShown();
-    void setUrlsShown(bool urlsShown);
-
     QnResourceTreeModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourceTreeModelCustomColumnDelegate *columnDelegate);
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
-    QnResourceTreeModelNodePtr getResourceNode(const QnResourcePtr& resource);
-    QnResourceTreeModelNodePtr getItemNode(const QnUuid& uuid, const QnResourcePtr& parentResource, Qn::NodeType nodeType = Qn::ItemNode);
-    QnResourceTreeModelNodePtr getRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
-    QnResourceTreeModelNodePtr getSystemNode(const QString &systemName);
+    QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
+    QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
+    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString &groupId, const QString &groupName);
+    QnResourceTreeModelNodePtr ensureSystemNode(const QString &systemName);
+    QnResourceTreeModelNodePtr ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
     QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
+    void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
+
+    void updateSharedLayoutNodes(const QnLayoutResourcePtr& layout);
+    void updateSharedLayoutNodesForUser(const QnUserResourcePtr& user);
+
+    Qn::NodeType rootNodeTypeForScope() const;
 
     /* Remove virtual 'system' nodes that are not used anymore. */
     void cleanupSystemNodes();
@@ -88,6 +92,13 @@ private:
     /** Fully rebuild resources tree. */
     void rebuildTree();
 
+    /**
+     * @brief                       Handle drag-n-drop result.
+     * @param sourceResources       What is dragged
+     * @param targetResource        On what drop was done.
+     * @param mimeData              Full drag-n-drop data.
+     */
+    void handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData);
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -117,38 +128,42 @@ private slots:
 
     void at_serverAutoDiscoveryEnabledChanged();
 
+    void at_accessibleResourcesChanged(const QnUuid& userId);
+
 private:
     friend class QnResourceTreeModelNode;
 
     typedef QHash<QString, QnResourceTreeModelNodePtr> RecorderHash;
     typedef QHash<QnUuid, QnResourceTreeModelNodePtr> ItemHash;
+    typedef QHash<QnResourcePtr, QnResourceTreeModelNodePtr> ResourceHash;
+    typedef QList<QnResourceTreeModelNodePtr> NodeList;
 
     /** Root nodes array */
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
 
-    /** Mapping for resource nodes, by resource. */
+    /** Mapping for resource nodes by resource. */
     QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_resourceNodeByResource;
 
-    /** Mapping for recorder nodes, by parent node. */
+    /** Mapping for recorder nodes by parent node. */
     QHash<QnResourceTreeModelNodePtr, RecorderHash> m_recorderHashByParent;
 
-    /** Mapping for item nodes, by item id. */
+    /** Mapping for item nodes by parent node. */
     QHash<QnResourceTreeModelNodePtr, ItemHash> m_itemNodesByParent;
 
-    /** Mapping for item nodes, by resource id. Is managed by nodes. */
-    QHash<QnResourcePtr, QList<QnResourceTreeModelNodePtr> > m_itemNodesByResource;
+    /** Mapping for all nodes by resource (for quick update). */
+    QHash<QnResourcePtr, NodeList> m_nodesByResource;
 
     /** Mapping for system nodes, by system name. */
     QHash<QString, QnResourceTreeModelNodePtr> m_systemNodeBySystemName;
+
+    /** Mapping of shared layouts links by parent node (user's) */
+    QHash<QnResourceTreeModelNodePtr, ResourceHash> m_sharedLayoutNodesByParent;
 
     /** Full list of all created nodes. */
     QList<QnResourceTreeModelNodePtr> m_allNodes;
 
     /** Delegate for custom column data. */
     QPointer<QnResourceTreeModelCustomColumnDelegate> m_customColumnDelegate;
-
-    /** Whether item urls should be shown. */
-    bool m_urlsShown;
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;

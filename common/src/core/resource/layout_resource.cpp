@@ -361,7 +361,7 @@ bool QnLayoutResource::isFile() const
     return flags().testFlag(Qn::url) && !getUrl().isEmpty();
 }
 
-bool QnLayoutResource::isGlobal() const
+bool QnLayoutResource::isShared() const
 {
-    return getParentId().isNull() && !flags().testFlag(Qn::local);
+    return getParentId().isNull() && !hasFlags(Qn::local);
 }

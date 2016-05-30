@@ -148,8 +148,6 @@ public slots:
 protected:
     virtual void tick(int deltaMSecs) override;
 
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX);
     void updateViewportMargins();
 

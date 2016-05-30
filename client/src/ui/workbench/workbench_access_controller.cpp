@@ -36,6 +36,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
 
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnWorkbenchAccessController::recalculateAllPermissions);
+    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnWorkbenchAccessController::at_accessibleResourcesChanged);
 
     recalculateAllPermissions();
 }
@@ -229,4 +230,10 @@ void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResour
 
     setPermissionsInternal(resource, Qn::NoPermissions); /* So that the signal is emitted. */
     m_dataByResource.remove(resource);
+}
+
+void QnWorkbenchAccessController::at_accessibleResourcesChanged(const QnUuid& userId)
+{
+    if (m_user && m_user->getId() == userId)
+        recalculateAllPermissions();
 }

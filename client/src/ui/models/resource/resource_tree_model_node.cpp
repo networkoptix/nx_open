@@ -79,13 +79,19 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::BastardNode:
         m_displayName = m_name = lit("Invalid Resources");
         m_bastard = true; /* This node is always hidden. */
+        m_state = Invalid;
         break;
-    case Qn::LocalNode:
+    case Qn::LocalResourcesNode:
         m_displayName = m_name = tr("Local");
         m_icon = qnResIconCache->icon(QnResourceIconCache::LocalResources);
         break;
     case Qn::CurrentSystemNode:
         m_icon = qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
+        break;
+    case Qn::SeparatorNode:
+    case Qn::LocalSeparatorNode:
+        m_displayName = QString();
+        m_name = lit("-");
         break;
     case Qn::ServersNode:
         m_displayName = m_name = tr("Servers");
@@ -145,7 +151,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType)
 {
-    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode);
+    NX_ASSERT(nodeType == Qn::ResourceNode || nodeType == Qn::EdgeNode || nodeType == Qn::SharedLayoutNode);
     m_state = Invalid;
     m_status = Qn::Offline;
     setResource(resource);
@@ -157,7 +163,7 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType):
     QnResourceTreeModelNode(model, nodeType, uuid)
 {
-    NX_ASSERT(nodeType == Qn::ItemNode || nodeType == Qn::VideoWallItemNode || nodeType == Qn::VideoWallMatrixNode);
+    NX_ASSERT(nodeType == Qn::LayoutItemNode || nodeType == Qn::VideoWallItemNode || nodeType == Qn::VideoWallMatrixNode);
     m_state = Invalid;
     m_status = Qn::Offline;
 }
@@ -168,10 +174,12 @@ QnResourceTreeModelNode::~QnResourceTreeModelNode()
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
     NX_ASSERT(
-        m_type == Qn::ItemNode ||
+        m_type == Qn::LayoutItemNode ||
         m_type == Qn::ResourceNode ||
         m_type == Qn::VideoWallItemNode ||
-        m_type == Qn::EdgeNode);
+        m_type == Qn::EdgeNode ||
+        m_type == Qn::SharedLayoutNode
+    );
 
     if (m_resource == resource)
         return;
@@ -183,7 +191,10 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 void QnResourceTreeModelNode::update()
 {
     /* Update stored fields. */
-    if (m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode)
+    if (m_type == Qn::ResourceNode ||
+        m_type == Qn::LayoutItemNode ||
+        m_type == Qn::EdgeNode ||
+        m_type == Qn::SharedLayoutNode)
     {
         if(m_resource.isNull())
         {
@@ -234,15 +245,7 @@ void QnResourceTreeModelNode::update()
                 }
             }
 
-            if (m_resource.isNull())
-            {
-                m_displayName = m_name = item.name;
-            }
-            else
-            {
-                m_name = item.name;
-                m_displayName = QString(lit("%1 <%2>")).arg(item.name).arg(m_resource->getName());
-            }
+            m_displayName = m_name = item.name;
         }
         else
         {
@@ -341,8 +344,16 @@ bool QnResourceTreeModelNode::calculateBastard() const
     switch (m_type)
     {
     /* Hide non-readable resources. */
-    case Qn::ItemNode:
-        return !m_resource || !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
+    case Qn::LayoutItemNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true;
+
+        /* Only admin can see items under shared layout links. */
+        if (m_parent && m_parent->type() == Qn::SharedLayoutNode)
+            return !isAdmin;
+
+        return !accessController()->hasPermissions(m_resource, Qn::ReadPermission);
 
     /* These will be hidden or displayed together with videowall. */
     case Qn::VideoWallItemNode:
@@ -354,13 +365,33 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return true;
 
     case Qn::OtherSystemsNode:
-        return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
+        return !isAdmin || !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled();
+
+    case Qn::UsersNode:
+    case Qn::ServersNode:
+        return !isAdmin;
 
     case Qn::UserDevicesNode:
         return !isLoggedIn || isAdmin;
 
     case Qn::LayoutsNode:
         return !isLoggedIn;
+
+    case Qn::EdgeNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true;
+
+        /* Only admins can see edge nodes. */
+        return !isAdmin;
+
+    case Qn::SharedLayoutNode:
+        /* Hide resource nodes without resource. */
+        if (!m_resource)
+            return true;
+
+        /* Only admins can see shared layout links. */
+        return !isAdmin;
 
     case Qn::ResourceNode:
         /* Hide resource nodes without resource. */
@@ -420,19 +451,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
         }
         return false;
 
-    case Qn::EdgeNode:
-        /* Hide resource nodes without resource. */
-        if (!m_resource)
-            return true;
-
-        /* Only admins can see edge nodes. */
-        return !isAdmin;
-
-    case Qn::UsersNode:
-    case Qn::CurrentSystemNode:
-    case Qn::ServersNode:
-        return !isAdmin;
-
     default:
         NX_ASSERT("Should never get here");
         return false;
@@ -453,16 +471,12 @@ void QnResourceTreeModelNode::setBastard(bool bastard)
 
     if (!m_parent)
         return;
+    setState(m_parent->state());
 
     if (m_bastard)
-    {
         m_parent->removeChildInternal(toSharedPointer());
-    }
     else
-    {
-        setState(m_parent->state());
         m_parent->addChildInternal(toSharedPointer());
-    }
 }
 
 QList<QnResourceTreeModelNodePtr> QnResourceTreeModelNode::children() const
@@ -492,9 +506,9 @@ void QnResourceTreeModelNode::setParent(const QnResourceTreeModelNodePtr& parent
 
     if (m_parent)
     {
+        setState(m_parent->state());
         if (!m_bastard)
         {
-            setState(m_parent->state());
             m_parent->addChildInternal(toSharedPointer());
 
             if (m_type == Qn::VideoWallItemNode)
@@ -530,6 +544,12 @@ QModelIndex QnResourceTreeModelNode::createIndex(int col)
 
 Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 {
+    if (Qn::isSeparatorNode(m_type))
+    {
+        /* No Editable/Selectable flags. */
+        return Qt::ItemNeverHasChildren;
+    }
+
     if (column == Qn::CheckColumn)
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
@@ -564,7 +584,8 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
-    case Qn::ItemNode:
+    case Qn::LayoutItemNode:
+    case Qn::SharedLayoutNode:
         if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;
@@ -580,7 +601,8 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
 
 QVariant QnResourceTreeModelNode::data(int role, int column) const
 {
-    switch(role) {
+    switch(role)
+    {
     case Qt::DisplayRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
@@ -613,7 +635,7 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
         break;
     case Qn::ItemUuidRole:
         if (
-            m_type == Qn::ItemNode
+            m_type == Qn::LayoutItemNode
             || m_type == Qn::VideoWallItemNode
             || m_type == Qn::VideoWallMatrixNode
             )
@@ -630,7 +652,7 @@ QVariant QnResourceTreeModelNode::data(int role, int column) const
         if (m_type == Qn::UsersNode)
             return Qn::MainWindow_Tree_Users_Help;
 
-        if (m_type == Qn::LocalNode)
+        if (m_type == Qn::LocalResourcesNode)
             return Qn::MainWindow_Tree_Local_Help;
 
         if (m_type == Qn::RecorderNode)

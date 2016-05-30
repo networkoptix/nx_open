@@ -39,13 +39,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui->groupInputField->setTitle(tr("Group"));
 
     ui->emailInputField->setTitle(tr("Email"));
-    ui->emailInputField->setValidator([](const QString& text)
-    {
-        if (!text.trimmed().isEmpty() && !QnEmailAddress::isValid(text))
-            return QnInputField::ValidateResult(false, tr("Invalid email address."));
-
-        return QnInputField::ValidateResult(true, QString());
-    });
+    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     connect(ui->emailInputField, &QnInputField::textChanged, this, &QnUserProfileWidget::hasChangesChanged);
 
@@ -96,6 +90,10 @@ bool QnUserProfileWidget::hasChanges() const
         if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
 
+    if (permissions.testFlag(Qn::WriteFullNamePermission))
+        if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
+            return true;
+
     return false;
 }
 
@@ -107,6 +105,7 @@ void QnUserProfileWidget::loadDataToUi()
     updateControlsAccess();
 
     ui->loginInputField->setText(m_model->user()->getName());
+    ui->nameInputField->setText(m_model->user()->fullName());
     ui->groupInputField->setText(m_model->groupName());
     ui->permissionsLabel->setText(m_model->permissionsDescription());
     ui->emailInputField->setText(m_model->user()->getEmail());
@@ -158,7 +157,10 @@ void QnUserProfileWidget::applyChanges()
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
-        m_model->user()->setEmail(ui->emailInputField->text());
+        m_model->user()->setEmail(ui->emailInputField->text().trimmed());
+
+    if (permissions.testFlag(Qn::WriteFullNamePermission))
+        m_model->user()->setFullName(ui->nameInputField->text().trimmed());
 }
 
 bool QnUserProfileWidget::canApplyChanges() const
@@ -181,6 +183,7 @@ void QnUserProfileWidget::updateControlsAccess()
     ui->changePasswordWidget->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
 
     ::setReadOnly(ui->emailInputField, !permissions.testFlag(Qn::WriteEmailPermission));
+    ::setReadOnly(ui->nameInputField, !permissions.testFlag(Qn::WriteFullNamePermission));
 }
 
 bool QnUserProfileWidget::validMode() const

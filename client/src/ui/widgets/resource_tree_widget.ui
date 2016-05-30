@@ -94,9 +94,6 @@
      <property name="autoExpandDelay">
       <number>500</number>
      </property>
-     <property name="uniformRowHeights">
-      <bool>true</bool>
-     </property>
      <property name="sortingEnabled">
       <bool>false</bool>
      </property>

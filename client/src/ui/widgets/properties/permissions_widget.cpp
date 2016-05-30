@@ -31,6 +31,7 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     /* Manager permissions. */
     createCheckBox(Qn::GlobalEditCamerasPermission,         tr("Can edit camera settings"));
     createCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Can control videowalls"));
+    createCheckBox(Qn::GlobalViewLogsPermission,            tr("Can view audit trail and event log"));
 
     /* Viewer permissions. */
     createCheckBox(Qn::GlobalViewArchivePermission,         tr("Can view archives of available cameras"));

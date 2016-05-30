@@ -541,7 +541,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkSharedLayoutAsViewer)
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
-    ASSERT_TRUE(layout->isGlobal());
+    ASSERT_TRUE(layout->isShared());
 
     /* By default user has no access to shared layouts. */
     Qn::Permissions desired = 0;
@@ -559,7 +559,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkSharedLayoutAsAdmin)
     qnResPool->addResource(layout);
 
     ASSERT_FALSE(m_context->snapshotManager()->isLocal(layout));
-    ASSERT_TRUE(layout->isGlobal());
+    ASSERT_TRUE(layout->isShared());
 
     /* Admin has full access to shared layouts. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;

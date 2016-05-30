@@ -36,13 +36,12 @@ public:
             return;
 
         auto result = validator(input->text());
-        bool isValid = std::get<0>(result);
-        QString hintText = std::get<1>(result);
+        QString hintText = result.errorMessage;
 
         hint->setText(hintText);
         hint->setVisible(!hintText.isEmpty());
         QPalette palette = parent->palette();
-        if (!isValid)
+        if (result.state == QValidator::Invalid)
             setWarningStyle(&palette);
         input->setPalette(palette);
         hint->setPalette(palette);
@@ -52,7 +51,7 @@ public:
     QLabel* title;
     QLabel* hint;
     QLineEdit* input;
-    QnInputField::ValidateFunction validator;
+    Qn::TextValidateFunction validator;
     QMetaObject::Connection validatorConnection;
 
 };
@@ -90,6 +89,7 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     grid->addWidget(d->title, 0, 0, 1, 1, Qt::AlignRight);
     grid->addWidget(d->input, 0, 1, 1, 1);
     grid->addWidget(d->hint,  1, 1, 1, 1);
+    grid->setMargin(0);
 
     d->title->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
     d->title->setVisible(false);
@@ -168,6 +168,12 @@ void QnInputField::setReadOnly(bool value)
     d->input->setReadOnly(value);
 }
 
+void QnInputField::validate()
+{
+    Q_D(QnInputField);
+    d->validate();
+}
+
 void QnInputField::clear()
 {
     Q_D(QnInputField);
@@ -181,10 +187,10 @@ bool QnInputField::isValid() const
     if (!d->validator)
         return true;
 
-    return std::get<0>(d->validator(d->input->text()));
+    return d->validator(d->input->text()).state == QValidator::Acceptable;
 }
 
-void QnInputField::setValidator(ValidateFunction validator)
+void QnInputField::setValidator(Qn::TextValidateFunction validator)
 {
     Q_D(QnInputField);
     disconnect(d->validatorConnection);
