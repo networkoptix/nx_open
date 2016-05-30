@@ -18,7 +18,7 @@
     <widget class="QGroupBox" name="daysGroupBox">
      <layout class="QVBoxLayout" name="weekDaysLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="daysLabel">
         <property name="text">
          <string>Execute backup on the following days:</string>
         </property>
@@ -34,7 +34,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
       <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="finishLabel">
         <property name="text">
          <string>Finish:</string>
         </property>
@@ -51,7 +51,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="startLabel">
         <property name="text">
          <string>Start:</string>
         </property>
@@ -126,6 +126,16 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="warningLabel">
+     <property name="text">
+      <string>Bitrate limitation could lead to backup failure.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item>
