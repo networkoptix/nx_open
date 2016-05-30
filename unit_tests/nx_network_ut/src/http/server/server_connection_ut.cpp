@@ -209,4 +209,45 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest )
     ASSERT_EQ( 0, msgCounter);
 }
 
+TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
+{
+    static const char testData[] = 
+        "GET /cdb/event/subscribe HTTP/1.1\r\n"
+        "Date: Fri, 20 May 2016 05:43:16 -0700\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Nx Witness/3.0.0.12042 (Network Optix) Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)\r\n"
+        "Authorization: Digest nonce=\"15511187291719590911\", realm=\"VMS\", "
+            "response=\"68cc3d8c30c7bff77a623b36e7210bb3\", uri=\"/cdb/event/subscribe\", username=\"df6a3827-56c7-4ff8-b38e-67993983d5d8\"\r\n"
+        "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
+        "Accept-Encoding: gzip\r\n"
+        "\r\n"
+        "GET /cdb/event/subscribe HTTP/1.1\r\n"
+        "Date: Fri, 20 May 2016 05:43:19 -0700\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Nx Witness/3.0.0.12042 (Network Optix) Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)\r\n"
+        "Authorization: Digest nonce=\"15511187291719590911\", realm=\"VMS\", "
+            "response=\"68cc3d8c30c7bff77a623b36e72190bb3\", uri=\"/cdb/event/subscribe\", username=\"df6a3827-56c7-4ff8-b38e-67993983d5d8\"\r\n"
+        "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
+        "Accept-Encoding: gzip\r\n"
+        "\r\n"
+        "GET /cdb/event/subscribe HTTP/1.1\r\n"
+        "Date: Fri, 20 May 2016 05:43:22 -0700\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Nx Witness/3.0.0.12042 (Network Optix) Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)\r\n"
+        "Authorization: Digest nonce=\"15511187291719590911\", realm=\"VMS\", "
+            "response=\"68cc3d8c30c7bff77a623b36e7210bb3\", uri=\"/cdb/event/subscribe\", username=\"df6a3827-56c7-4ff8-b38e-67993983d5d8\"\r\n"
+        "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
+        "Accept-Encoding: gzip\r\n";
+
+
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
+
+    nx::network::TCPSocket sock;
+    ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
+    ASSERT_EQ(sizeof(testData) - 1, sock.send(testData, sizeof(testData)-1));
+}
+
 }

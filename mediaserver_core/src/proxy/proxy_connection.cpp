@@ -190,8 +190,16 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
 {
     Q_D(QnProxyConnectionProcessor);
 
+    QByteArray authHeaderName;
+    if (d->request.headers.find(nx_http::header::Authorization::NAME) != d->request.headers.end())
+        authHeaderName = nx_http::header::Authorization::NAME;
+    else if(d->request.headers.find("Proxy-Authorization") != d->request.headers.end())
+        authHeaderName = QByteArray("Proxy-Authorization");
+    else
+        return false;
+
     nx_http::header::DigestAuthorization originalAuthHeader;
-    if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, "Authorization")))
+    if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
 
     if (auto ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
@@ -219,7 +227,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
             return false;
         }
 
-        nx_http::HttpHeader authHeader(nx_http::header::Authorization::NAME, digestAuthorizationHeader.serialized());
+        nx_http::HttpHeader authHeader(authHeaderName, digestAuthorizationHeader.serialized());
         nx_http::HttpHeader userNameHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, originalAuthHeader.digest->userid);
         nx_http::insertOrReplaceHeader(&d->request.headers, authHeader);
         nx_http::insertOrReplaceHeader(&d->request.headers, userNameHeader);
