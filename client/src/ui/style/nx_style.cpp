@@ -27,6 +27,7 @@
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/dialogs/common/generic_tabbed_dialog.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/widgets/common/input_field.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace style;
@@ -345,21 +346,29 @@ void QnNxStyle::drawPrimitive(
 
             QRect rect = widget ? widget->rect() : option->rect;
 
-            bool valid = true; //TODO: #vkutin Implement validity check
-
-            bool readOnly = false;
-            if (option->state.testFlag(State_Enabled))
-            {
-                if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
-                    readOnly = lineEdit->isReadOnly();
-            }
-
             QnPaletteColor base = findColor(option->palette.color(QPalette::Shadow));
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
             QnPaletteColor frameColor;
             QnPaletteColor brushColor;
-            bool drawShadow = false;
+
+            bool focused = option->state.testFlag(State_HasFocus);
+
+            bool readOnly = false;
+            bool valid = true;
+
+            if (option->state.testFlag(State_Enabled))
+            {
+                if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
+                {
+                    readOnly = lineEdit->isReadOnly();
+
+                    if (auto inputField = qobject_cast<const QnInputField*>(lineEdit->parent()))
+                        valid = inputField->isValid();
+                    else
+                        valid = lineEdit->hasAcceptableInput();
+                }
+            }
 
             if (readOnly)
             {
@@ -369,12 +378,11 @@ void QnNxStyle::drawPrimitive(
                 frameColor.setAlphaF(0.4);
                 brushColor.setAlphaF(0.2);
             }
-            else if (option->state.testFlag(State_HasFocus))
+            else if (focused)
             {
-                /* Valid or not valid focused input: */
-                frameColor = valid ? base.darker(3) : mainColor(Colors::kRed);
+                /* Focused input is always drawn as valid: */
+                frameColor = base.darker(3);
                 brushColor = base.darker(1);
-                drawShadow = valid;
             }
             else
             {
@@ -387,8 +395,8 @@ void QnNxStyle::drawPrimitive(
             QnScopedPainterBrushRollback brushRollback(painter, brushColor.color());
 
             painter->drawRoundedRect(QRectF(rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
-            if (drawShadow)
-                painter->drawLine(rect.left() + 1, rect.top() + 1, rect.right(), rect.top() + 1);
+            if (focused)
+                painter->drawLine(rect.left() + 1, rect.top() + 1.5, rect.right(), rect.top() + 1.5);
         }
         return;
 
