@@ -654,7 +654,7 @@ int main(int argc, char **argv)
 #ifdef Q_OS_MAC
     mac_setLimits();
 #endif
-
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
