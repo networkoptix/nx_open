@@ -142,6 +142,20 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
 {
     NX_ASSERT(nodeType == Qn::SystemNode || nodeType == Qn::RecorderNode);
     m_displayName = m_name = name;
+    if (m_displayName.isEmpty())
+    {
+        switch (nodeType)
+        {
+        case Qn::RecorderNode:
+            NX_ASSERT(false); //We should never get recorder node with empty name; groupId is used instead
+            break;
+        case Qn::SystemNode:
+            m_displayName = tr("<Unnamed system>");
+            break;
+        default:
+            break;
+        }
+    }
     m_state = Invalid;
 }
 

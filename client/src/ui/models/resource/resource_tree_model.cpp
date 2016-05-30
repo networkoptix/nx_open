@@ -436,7 +436,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (systemName == qnCommon->localSystemName())
             return m_rootNodes[Qn::ServersNode];
 
-        return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : ensureSystemNode(systemName);
+        return ensureSystemNode(systemName);
 
     }
 
