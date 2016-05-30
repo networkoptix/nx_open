@@ -11,6 +11,13 @@ class QnAxisAudioTransmitter : public QnAbstractAudioTransmitter
 {
     typedef QnAbstractAudioTransmitter base_type;
 
+    enum class TransmitterState
+    {
+        WaitingForConnection,
+        ReadyForTransmission,
+        Failed
+    };
+
     Q_OBJECT
 public:
     QnAxisAudioTransmitter(QnSecurityCamResource* res);
@@ -29,6 +36,8 @@ public slots:
         nx_http::AsyncHttpClientPtr http,
         bool isRetryAfterUnauthorizedResponse);
 
+    void handleStreamErrors(nx_http::AsyncHttpClientPtr http);
+
 protected:
     virtual void pleaseStop() override;
 
@@ -46,8 +55,10 @@ private:
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
     QnAudioFormat m_outputFormat;
     nx_http::AsyncHttpClientPtr m_httpClient;
-    std::atomic<bool> m_ableToSendData;
     QSharedPointer<AbstractStreamSocket> m_socket;
 
-    bool m_dataTransmissionStarted;
+    bool m_noAuth;
+
+    TransmitterState m_state;
+    QnWaitCondition m_wait;
 };

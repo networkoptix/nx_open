@@ -9,7 +9,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#include <plugins/resource/desktop_win/desktop_resource.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include "client/client_runtime_settings.h"
 
 QnWorkbenchDesktopCameraWatcher::QnWorkbenchDesktopCameraWatcher(QObject *parent):

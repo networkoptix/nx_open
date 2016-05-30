@@ -65,9 +65,9 @@ extern "C"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
-#ifdef Q_OS_WIN
-    #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
-#endif
+
+#include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
+
 #include "utils/common/util.h"
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
@@ -565,12 +565,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     /* Initialize desktop camera searcher. */
-#ifdef Q_OS_WIN
-    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
-    QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
-    QnDesktopResourceSearcher::instance().setLocal(true);
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnDesktopResourceSearcher::instance());
-#endif
+    QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget*>(mainWindow->viewport()));
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&desktopSearcher);
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();

@@ -42,6 +42,8 @@ public:
     QString secondaryAudioDeviceName() const;
     void setSecondaryAudioDeviceName(const QString &name);
 
+    void setAudioOnlyMode(bool mode);
+
     virtual void applyChanges() override;
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
@@ -63,6 +65,7 @@ private:
     QScopedPointer<Ui::RecordingSettings> ui;
     QnVideoRecorderSettings *m_settings;
     QnDwm* m_dwm;
+    bool m_isAudioOnly;
 };
 
 #endif // VIDEORECORDINGDIALOG_H
