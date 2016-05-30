@@ -159,7 +159,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
 
         /**
          * Parameters:
-         * - soundUrl (string, required)               - url of sound, contains path to sound on the Server.
+         * - url (string, required)                    - url of sound, contains path to sound on the Server.
          */
         PlaySoundAction         = 9,
         PlaySoundOnceAction     = 10,
@@ -190,6 +190,14 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
          * - users                                      - list of users, which will receive this alarm notification
          */
         ShowOnAlarmLayoutAction = 14,
+
+        /**
+         * Send HTTP request as an action.
+         * Parameters:
+         * - url                                        - full HTTP url to execute. username/password are stored as part of the URL
+         * - text                                       - HTTP message body for POST method
+         */
+        ExecHttpRequestAction = 15
 
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)

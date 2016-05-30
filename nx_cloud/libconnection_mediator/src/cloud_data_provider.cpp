@@ -93,13 +93,13 @@ static nx::cdb::api::ConnectionFactory* makeConnectionFactory( const std::string
             const auto host = address.substr( 0, colon );
             const auto port = std::stoi( address.substr( colon + 1 ) );
 
-            factory->setCloudEndpoint( address, port );
+            factory->setCloudEndpoint(host, port);
             NX_LOG( lm("nx::cdb::api::ConnectionFactory set address %1:%2")
                     .arg(host).arg(port), cl_logALWAYS );
         }
         else
         {
-            NX_LOG( lm("nx::cdb::api::ConnectionFactory can not pase address %1")
+            NX_LOG( lm("nx::cdb::api::ConnectionFactory can not parse address %1")
                      .arg( address ), cl_logERROR );
         }
     }

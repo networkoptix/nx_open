@@ -471,12 +471,18 @@ bool CloudStreamSocket::startAsyncConnect(
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> cloudConnection)
                 {
+                    //NOTE: this handler is called from unspecified thread
                     auto operationLock = sharedOperationGuard->lock();
                     if (!operationLock)
                         return; //operation has been cancelled
-                    onCloudConnectDone(
-                        errorCode,
-                        std::move(cloudConnection));
+                    dispatch(
+                        [this, errorCode, 
+                            cloudConnection = std::move(cloudConnection)]() mutable
+                        {
+                            onCloudConnectDone(
+                                errorCode,
+                                std::move(cloudConnection));
+                        });
                 });
             return true;
         }

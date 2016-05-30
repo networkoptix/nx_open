@@ -8,9 +8,27 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <utils/common/credentials.h>
 
 
 extern QString getValueFromString(const QString& line);
+
+typedef QList<QnCredentials> DefaultCredentialsList;
+
+namespace
+{
+    unsigned int kDefaultIsdHttpTimeout = 4000;
+    const QString kIsdModelInfoUrl("/api/param.cgi?req=General.Brand.CompanyName&req=General.Brand.ModelName");
+    const QString kIsdMacAddressInfoUrl("/api/param.cgi?req=Network.1.MacAddress");
+    const QString kIsdBrandParamName("General.Brand.CompanyName");
+    const QString kIsdModelParamName("General.Brand.ModelName");
+    const QString kIsdFullVendorName("Innovative Security Designs");
+    const QString kDwFullVendorName("Digital Watchdog");
+    const QString kIsdDefaultResType("ISDcam");
+
+    static const QLatin1String kDefaultIsdUsername( "root" );
+    static const QLatin1String kDefaultIsdPassword( "admin" );
+}
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
@@ -50,108 +68,156 @@ QString QnPlISDResourceSearcher::manufacture() const
     return QnPlIsdResource::MANUFACTURE;
 }
 
-static const QLatin1String DEFAULT_ISD_USERNAME( "root" );
-static const QLatin1String DEFAULT_ISD_PASSWORD( "admin" );
-
-QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& authOriginal, bool isSearchAction)
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
+    const QUrl& url,
+    const QAuthenticator& authOriginal,
+    bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
+    bool needRecheck =
+        authOriginal.user().isEmpty() &&
+        authOriginal.password().isEmpty();
+
+    if (!needRecheck)
+    {
+        return checkHostAddrInternal(url, authOriginal);
+    }
+    else
+    {
+        QList<QnResourcePtr> resList;
+        auto resData = qnCommon->dataPool()->data(manufacture(), lit("*"));
+        auto possibleCreds = resData.value<DefaultCredentialsList>(
+            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+        QnCredentials defaultCreds;
+        defaultCreds.user = kDefaultIsdUsername;
+        defaultCreds.password = kDefaultIsdPassword;
+        possibleCreds << defaultCreds;
+
+        for (const auto& creds: possibleCreds)
+        {
+            if ( creds.user.isEmpty() || creds.password.isEmpty())
+                continue;
+
+            QAuthenticator auth = creds.toAuthenticator();
+            resList = checkHostAddrInternal(url, auth);
+            if (!resList.isEmpty())
+                break;
+        }
+
+        return resList;
+    }
+
+}
+
+
+QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
+    const QUrl &url,
+    const QAuthenticator &authOriginal)
+{
+
     QAuthenticator auth( authOriginal );
-
-    if( auth.user().isEmpty() )
-        auth.setUser( DEFAULT_ISD_USERNAME );
-    if( auth.password().isEmpty() )
-        auth.setPassword( DEFAULT_ISD_PASSWORD );
-
 
     QString host = url.host();
     int port = url.port( nx_http::DEFAULT_HTTP_PORT );
     if (host.isEmpty())
-        host = url.toString(); // in case if url just host address without protocol and port
-
-    int timeout = 2000;
+        host = url.toString();
 
     QString name;
     QString vendor;
 
     CLHttpStatus status;
-    QByteArray data = downloadFile(status, QLatin1String("/api/param.cgi?req=General.Brand.CompanyName&req=General.Brand.ModelName"), host, port, timeout, auth);
+    QByteArray data = downloadFile(
+        status,
+        kIsdModelInfoUrl,
+        host,
+        port,
+        kDefaultIsdHttpTimeout,
+        auth);
+
     for (const QByteArray& line: data.split(L'\n'))
     {
-        if (line.startsWith("General.Brand.ModelName")) {
+        if (line.startsWith(kIsdModelParamName.toLatin1())) {
             name = getValueFromString(QString::fromUtf8(line)).trimmed();
-            name.replace(QLatin1Char(' '), QString()); // remove spaces
-            //name.replace(QLatin1Char('-'), QString()); // remove spaces
-            name.replace(QLatin1Char('\r'), QString()); // remove spaces
-            name.replace(QLatin1Char('\n'), QString()); // remove spaces
-            name.replace(QLatin1Char('\t'), QString()); // remove tabs
+            cleanupSpaces(name);
         }
-        else if (line.startsWith("General.Brand.CompanyName")) {
+        else if (line.startsWith(kIsdBrandParamName.toLatin1())) {
             vendor = getValueFromString(QString::fromUtf8(line)).trimmed();
         }
     }
-    
+
     // 'Digital Watchdog' (with space) is actually ISD cameras. Without space it's old DW cameras
-    if (name.isEmpty() || (vendor != lit("Innovative Security Designs") && vendor != lit("Digital Watchdog")))
+    if (name.isEmpty() || (vendor != kIsdFullVendorName && vendor != kDwFullVendorName))
         return QList<QnResourcePtr>();
 
 
-    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("/api/param.cgi?req=Network.1.MacAddress"), host, port, timeout, auth)));
+    QString mac = QString(QLatin1String(
+        downloadFile(
+            status,
+            kIsdMacAddressInfoUrl,
+            host,
+            port,
+            kDefaultIsdHttpTimeout,
+            auth)));
 
-    mac.replace(QLatin1Char(' '), QString()); // remove spaces
-    mac.replace(QLatin1Char('\r'), QString()); // remove spaces
-    mac.replace(QLatin1Char('\n'), QString()); // remove spaces
-    mac.replace(QLatin1Char('\t'), QString()); // remove tabs
-
+    cleanupSpaces(mac);
 
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
 
-
     mac = getValueFromString(mac).trimmed();
-
-    //int n = mac.length();
 
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);
 
 
-
-
-
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull()) {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
+        rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
             return QList<QnResourcePtr>();
     }
 
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        return QList<QnResourcePtr>(); // model forced by ONVIF
+        return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
     auto isDW = resourceData.value<bool>("isDW");
-    vendor = isDW ? lit("Digital Watchdog") : vendor;
-    name = isDW ? name : lit("ISD-") + name;
+
+    vendor = isDW ? kDwFullVendorName : vendor;
+    name = vendor == kIsdFullVendorName ?
+        lit("ISD-") + name :
+        name;
 
     resource->setTypeId(rt);
     resource->setVendor(vendor);
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
+    resource->setDefaultAuth(auth);
     if (port == 80)
         resource->setHostAddress(host);
     else
-        resource->setUrl(QString(lit("http://%1:%2")).arg(host).arg(port));
-    resource->setDefaultAuth(auth);
+        resource->setUrl(QString(lit("http://%1:%2"))
+            .arg(host)
+            .arg(port));
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
     result << resource;
     return result;
+}
+
+void QnPlISDResourceSearcher::cleanupSpaces(QString& rowWithSpaces) const
+{
+    rowWithSpaces.replace(QLatin1Char(' '), QString());
+    rowWithSpaces.replace(QLatin1Char('\r'), QString());
+    rowWithSpaces.replace(QLatin1Char('\n'), QString());
+    rowWithSpaces.replace(QLatin1Char('\t'), QString());
 }
 
 QString extractWord(int index, const QByteArray& rawData)
@@ -160,6 +226,8 @@ QString extractWord(int index, const QByteArray& rawData)
     for (;endIndex < rawData.size() && rawData.at(endIndex) != ' '; ++endIndex);
     return QString::fromLatin1(rawData.mid(index, endIndex - index));
 }
+
+
 
 /*QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     QnResourceList& result,
@@ -212,7 +280,7 @@ QString extractWord(int index, const QByteArray& rawData)
     for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-    
+
         if (net_res->getMAC().toString() == smac)
         {
             return local_result; // already found;
@@ -247,29 +315,54 @@ QString extractWord(int index, const QByteArray& rawData)
 
 }*/
 
+bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName) const
+{
+    return vendorName.toUpper().startsWith(manufacture()) ||
+        vendorName.toLower().trimmed() == lit("digital watchdog") ||
+        vendorName.toLower().trimmed() == lit("digitalwatchdog");
+}
+
 void QnPlISDResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const SocketAddress& /*deviceEndpoint*/,
+    const SocketAddress& deviceEndpoint,
     const nx_upnp::DeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
     QnResourceList& result )
 {
-
-    if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
+    if (!isDwOrIsd(devInfo.manufacturer))
         return;
 
     QnMacAddress cameraMAC(devInfo.serialNumber);
+    QString model(devInfo.modelName);
     QnNetworkResourcePtr existingRes = qnResPool->getResourceByMacAddress( devInfo.serialNumber );
     QAuthenticator cameraAuth;
-    cameraAuth.setUser(DEFAULT_ISD_USERNAME);
-    cameraAuth.setPassword(DEFAULT_ISD_PASSWORD);
-    if( existingRes )
+
+    if ( existingRes )
     {
         cameraMAC = existingRes->getMAC();
 
         auto existAuth = existingRes->getAuth();
-        if (!existAuth.isNull())
-            cameraAuth = existAuth;
+        cameraAuth = existAuth;
+    }
+    else
+    {
+        auto resData = qnCommon->dataPool()->data(manufacture(), model);
+        auto possibleCreds = resData.value<DefaultCredentialsList>(
+            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+        cameraAuth.setUser(kDefaultIsdUsername);
+        cameraAuth.setPassword(kDefaultIsdPassword);
+
+        for (const auto& creds: possibleCreds)
+        {
+            QAuthenticator auth = creds.toAuthenticator();
+            QUrl url(lit("//") + deviceEndpoint.address.toString());
+            if (testCredentials(url, auth))
+            {
+                cameraAuth = auth;
+                break;
+            }
+        }
     }
 
     createResource( devInfo, cameraMAC, cameraAuth, result );
@@ -285,18 +378,25 @@ void QnPlISDResourceSearcher::createResource(
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), devInfo.modelName);
     if (rt.isNull())
     {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
+        rt = qnResTypePool->getResourceTypeId(manufacture(), kIsdDefaultResType);
         if (rt.isNull())
             return;
     }
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
+    QnResourceData resourceData = qnCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        return; // model forced by ONVIF
+        return;
 
     auto isDW = resourceData.value<bool>("isDW");
-    auto vendor = isDW ? lit("Digital Watchdog") : lit("ISD");
-    auto name = isDW ? devInfo.modelName : lit("ISD-") + devInfo.modelName;
+    auto vendor = isDW ? kDwFullVendorName :
+        (devInfo.manufacturer == lit("ISD") || devInfo.manufacturer == kIsdFullVendorName) ?
+            manufacture() :
+            devInfo.manufacturer;
+
+    auto name = (vendor == manufacture()) ?
+        lit("ISD-") + devInfo.modelName :
+        devInfo.modelName;
+
     QnPlIsdResourcePtr resource( new QnPlIsdResource() );
 
     resource->setTypeId(rt);
@@ -310,12 +410,33 @@ void QnPlISDResourceSearcher::createResource(
         resource->setDefaultAuth(auth);
     } else {
         QAuthenticator defaultAuth;
-        defaultAuth.setUser(DEFAULT_ISD_USERNAME);
-        defaultAuth.setPassword(DEFAULT_ISD_PASSWORD);
+        defaultAuth.setUser(kDefaultIsdUsername);
+        defaultAuth.setPassword(kDefaultIsdPassword);
         resource->setDefaultAuth(defaultAuth);
     }
 
     result << resource;
+}
+
+bool QnPlISDResourceSearcher::testCredentials(const QUrl &url, const QAuthenticator &auth)
+{
+
+    const auto host = url.host();
+    const auto port = url.port(nx_http::DEFAULT_HTTP_PORT);
+
+    if (host.isEmpty())
+        return false;
+
+    CLHttpStatus status = CLHttpStatus::CL_HTTP_AUTH_REQUIRED;
+    auto data = downloadFile(
+        status,
+        kIsdModelInfoUrl,
+        host,
+        port,
+        kDefaultIsdHttpTimeout,
+        auth);
+
+    return status == CLHttpStatus::CL_HTTP_SUCCESS;
 }
 
 #endif // #ifdef ENABLE_ISD

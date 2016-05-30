@@ -317,17 +317,17 @@ void QnTcpListener::run()
             }
             doPeriodicTasks();
         }
-        NX_LOG( lit("TCPListener (%1:%2). Removing all connections before stop").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
-        removeAllConnections();
 
-        destroyServerSocket(d->serverSocket);
-        d->serverSocket = nullptr;
     }
     catch( const std::exception& e )
     {
         NX_LOG( lit("Exception in TCPListener (%1:%2). %3").
             arg(d->serverAddress.toString()).arg(d->localPort).arg(QString::fromLatin1(e.what())), cl_logWARNING );
     }
+    NX_LOG( lit("TCPListener (%1:%2). Removing all connections before stop").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
+    removeAllConnections();
+    destroyServerSocket(d->serverSocket);
+    d->serverSocket = nullptr;
     NX_LOG( lit("Exiting QnTcpListener::run. %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING );
 }
 

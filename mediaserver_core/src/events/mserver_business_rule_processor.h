@@ -18,7 +18,7 @@ public:
     virtual ~QnMServerBusinessRuleProcessor();
 
     virtual QnUuid getGuid() const override;
-    
+
     /*
     * How long to keep event log in usecs
     */
@@ -33,6 +33,7 @@ private:
     bool executePanicAction(const QnPanicBusinessActionPtr& action);
     bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action);
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
+    bool executeHttpRequestAction(const QnAbstractBusinessActionPtr& action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
 
 private:
@@ -92,9 +93,9 @@ private:
     static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
 
     static QVariantHash eventDescriptionMap(
-        const QnAbstractBusinessActionPtr& action, 
-        const QnBusinessAggregationInfo &aggregationInfo, 
-        QnEmailAttachmentList& attachments, 
+        const QnAbstractBusinessActionPtr& action,
+        const QnBusinessAggregationInfo &aggregationInfo,
+        QnEmailAttachmentList& attachments,
         bool useIp);
 
     static QVariantHash eventDetailsMap(

@@ -867,7 +867,7 @@ bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
     QString outputFormats;
     auto status = readAxisParameter(http, AXIS_SUPPORTED_AUDIO_CODECS_PARAM_NAME, &outputFormats);
     if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-        return false;
+        return true;
 
     for (const auto& formatStr: outputFormats.split(','))
     {

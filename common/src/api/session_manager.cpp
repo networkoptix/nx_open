@@ -19,6 +19,7 @@
 #include "utils/common/object_thread_puller.h"
 #include "common/common_module.h"
 #include "app_server_connection.h"
+#include <api/network_proxy_factory.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -27,7 +28,7 @@
 QAtomicInt QnSessionManager::s_handle(1);
 
 QnSessionManager::QnSessionManager(QObject *parent)
-: 
+:
     QObject(parent)
 {
     qRegisterMetaType<AsyncRequestInfo>();
@@ -181,7 +182,7 @@ int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objec
 }
 
 int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QObject *target,
-                                           const char *slot, Qt::ConnectionType connectionType) 
+                                           const char *slot, Qt::ConnectionType connectionType)
 {
     return sendAsyncRequest(nx_http::Method::POST, url, objectName, std::move(headers), params, std::move(msgBody), target, slot, connectionType);
 }
@@ -214,13 +215,33 @@ const std::chrono::minutes kMessageBodyReadTimeout(10);
 
 int QnSessionManager::sendAsyncRequest(
     nx_http::Method::ValueType method,
-    const QUrl& url,
+    const QUrl& _url,
     const QString &objectName,
     nx_http::HttpHeaders headers,
     const QnRequestParamList &params,
     const QByteArray& msgBody,
     AsyncRequestInfo requestInfo)
 {
+    QUrl url(_url);
+    auto proxyList = QNetworkProxyFactory::proxyForQuery(QNetworkProxyQuery(url));
+    if (!proxyList.isEmpty())
+    {
+        QNetworkProxy proxy = proxyList[0];
+        if (proxy.type() == QNetworkProxy::HttpProxy)
+        {
+            url.setHost(proxy.hostName());
+            url.setPort(proxy.port());
+            url.setUserName(proxy.user());
+            url.setPassword(proxy.password());
+        }
+        else if (proxy.type() != QNetworkProxy::NoProxy)
+        {
+            NX_ASSERT(0, Q_FUNC_INFO, "Not implemented!");
+            return -1;
+        }
+    }
+
+
     using namespace std::chrono;
 
     auto clientPtr = nx_http::AsyncHttpClient::create();

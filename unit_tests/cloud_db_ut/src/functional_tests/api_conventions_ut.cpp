@@ -152,6 +152,48 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
     }
 }
 
+TEST_F(CdbFunctionalTest, DISABLED_api_conventions_ok)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    api::AccountData account1;
+    std::string account1Password;
+    auto result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(api::ResultCode::ok, result);
+
+    nx_http::HttpClient client;
+    for (int i = 0; i < 200; ++i)
+    {
+        QUrl url;
+        url.setHost(endpoint().address.toString());
+        url.setPort(endpoint().port);
+        url.setScheme("http");
+        url.setPath("/cdb/account/get");
+        url.setUserName(QString::fromStdString(account1.email));
+        url.setPassword(QString::fromStdString(account1Password));
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response() != nullptr);
+        ASSERT_EQ(
+            nx_http::StatusCode::ok,
+            client.response()->statusLine.statusCode);
+
+        nx_http::BufferType msgBody;
+        while (!client.eof())
+            msgBody += client.fetchMessageBodyBuffer();
+
+        ASSERT_FALSE(msgBody.isEmpty());
+        //nx_http::FusionRequestResult requestResult =
+        //    QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+
+        //ASSERT_EQ(
+        //    nx_http::FusionRequestErrorClass::unauthorized,
+        //    requestResult.errorClass);
+        //ASSERT_EQ(
+        //    QnLexical::serialized(api::ResultCode::notAuthorized),
+        //    requestResult.resultCode);
+    }
+}
+
 TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());

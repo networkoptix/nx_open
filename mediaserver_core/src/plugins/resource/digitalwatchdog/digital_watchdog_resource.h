@@ -41,7 +41,7 @@ private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();
     QString fetchCameraModel();
-
+    bool disableB2FramesForActiDW();
 private:
     bool m_hasZoom;
 

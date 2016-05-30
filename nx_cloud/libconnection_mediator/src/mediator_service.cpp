@@ -88,7 +88,7 @@ int MediatorProcess::executeApplication()
     if (settings.cloudDB().runWithCloud)
     {
         cloudDataProvider = AbstractCloudDataProviderFactory::create(
-            settings.cloudDB().address.toStdString(),
+            settings.cloudDB().endpoint.toStdString(),
             settings.cloudDB().user.toStdString(),
             settings.cloudDB().password.toStdString(),
             settings.cloudDB().updateInterval);

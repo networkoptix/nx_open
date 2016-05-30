@@ -35,6 +35,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
     m_aioTimer.bindToAioThread(m_controlConnection->getAioThread());
+    m_controlConnection->startReadingConnection();
 
     //TODO #ak keep-alive timer
     //m_controlConnection->socket()->registerTimer(
@@ -86,33 +87,18 @@ void OutgoingTunnelConnection::pleaseStop(
             ongoingConnections.swap(m_ongoingConnections);
             lk.unlock();
 
-            BarrierHandler completionHandlerCaller(std::move(completionHandler));
             for (auto& connectionContext: ongoingConnections)
             {
-                connectionContext.second.connection->pleaseStop(
-                    [connectionContext = std::move(connectionContext),
-                        handler = completionHandlerCaller.fork()]()
-                    {
-                        connectionContext.second.completionHandler(
-                            SystemError::interrupted,
-                            nullptr,
-                            true);
-                        handler();
-                    });
+                connectionContext.second.completionHandler(
+                    SystemError::interrupted,
+                    nullptr,
+                    true);
             }
-            auto controlConnection = std::move(m_controlConnection);
-            if (controlConnection)
-            {
-                auto controlConnectionPtr = controlConnection.get();
-                controlConnectionPtr->pleaseStop(
-                    [handler = completionHandlerCaller.fork(), 
-                        controlConnection = std::move(controlConnection)]() mutable
-                    {
-                        controlConnection.reset();
-                        handler();
-                    });
-            }
+            ongoingConnections.clear();
+            m_controlConnection.reset();
             m_aioTimer.pleaseStopSync();
+
+            completionHandler();
         });
 }
 
@@ -277,6 +263,8 @@ void OutgoingTunnelConnection::closeConnection(
         .arg(m_connectionId).arg(SystemError::toString(closeReason)),
         cl_logDEBUG1);
 
+    auto controlConnection = std::move(m_controlConnection);
+
     if (m_controlConnectionClosedHandler)
     {
         auto controlConnectionClosedHandler =
@@ -284,7 +272,6 @@ void OutgoingTunnelConnection::closeConnection(
         controlConnectionClosedHandler();
     }
 
-    auto controlConnection = std::move(m_controlConnection);
     if (!controlConnection)
         return; //pleaseStop has already been called...
 

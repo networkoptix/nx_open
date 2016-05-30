@@ -1316,6 +1316,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncLayout = true;
     }
+    else if (updateName == lit(":/updates/51_http_business_action.sql")) 
+	{
+        if (!m_dbJustCreated)
+            m_needResyncbRules = true;
+    }
 
     return true;
 }

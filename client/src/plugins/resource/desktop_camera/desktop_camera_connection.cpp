@@ -278,7 +278,7 @@ void QnDesktopCameraConnection::run()
 
         {
             QnMutexLocker lock(&m_mutex);
-            tcpSocket = httpClient->takeSocket();
+            tcpSocket = QSharedPointer<AbstractStreamSocket>(httpClient->takeSocket().release());
             httpClient.reset();
             processor.reset(new QnDesktopCameraConnectionProcessor(tcpSocket, 0, m_owner));
         }

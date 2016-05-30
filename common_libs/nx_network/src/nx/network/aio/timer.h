@@ -10,6 +10,7 @@
 
 #include <nx/utils/move_only_func.h>
 
+#include "abstract_pollable.h"
 #include "nx/network/system_socket.h"
 
 
@@ -19,18 +20,23 @@ namespace aio {
 
 /**
  * Single-shot timer that runs in aio thread.
+ //TODO #ak introduce implementation without socket handle
  */
 class NX_NETWORK_API Timer
 :
-    private UDPSocket   //TODO #ak introduce implementation without socket handle
+    public AbstractPollable
 {
 public:
-    using UDPSocket::pleaseStop;
-    using UDPSocket::pleaseStopSync;
-
     Timer() = default;
     Timer(const Timer&) = delete;
     Timer& operator=(const Timer&) = delete;
+
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void pleaseStopSync() override;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> funcToCall) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> funcToCall) override;
+    virtual AbstractAioThread* getAioThread() const override;
+    virtual void bindToAioThread(AbstractAioThread* aioThread) override;
 
     /** 
         \note If timer is already started, this method overwrites timer, not adds a new one!
@@ -39,20 +45,18 @@ public:
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> timerFunc);
     std::chrono::nanoseconds timeToEvent() const;
-    void post(nx::utils::MoveOnlyFunc<void()> funcToCall);
-    void dispatch(nx::utils::MoveOnlyFunc<void()> funcToCall);
     void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
     /** Cancels timer waiting for \a timerFunc to complete.
         Can be safely called within timer's aio thread
     */
     void cancelSync();
 
-    AbstractAioThread* getAioThread() const;
-    void bindToAioThread(AbstractAioThread* aioThread);
+    bool inSelfAioThread() const;
 
 private:
     std::chrono::milliseconds m_timeout;
     std::chrono::steady_clock::time_point m_timerStartClock;
+    UDPSocket m_internalSocket;
 };
 
 }   //aio
