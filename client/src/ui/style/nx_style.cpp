@@ -155,6 +155,21 @@ namespace
         return qobject_cast<const QLineEdit*>(widget) && widget->parentWidget() &&
                qobject_cast<const QAbstractItemView *>(widget->parentWidget()->parentWidget());
     }
+
+    template <class T>
+    bool isWidgetOwnedBy(const QWidget* widget)
+    {
+        if (!widget)
+            return false;
+
+        for (QWidget* parent = widget->parentWidget(); parent != nullptr; parent = parent->parentWidget())
+        {
+            if (qobject_cast<const T*>(parent))
+                return true;
+        }
+
+        return false;
+    }
 }
 
 QnNxStylePrivate::QnNxStylePrivate() :
@@ -559,17 +574,14 @@ void QnNxStyle::drawPrimitive(
 
     case PE_PanelMenu:
         {
-            const int radius = dp(3);
-            QnPaletteColor backgroundColor = findColor(option->palette.color(QPalette::Window));
-            painter->save();
-
-            painter->setPen(backgroundColor.darker(3));
-            painter->setBrush(QBrush(backgroundColor));
-            painter->setRenderHint(QPainter::Antialiasing);
-
-            painter->drawRoundedRect(option->rect, radius, radius);
-
-            painter->restore();
+            QBrush backgroundBrush = option->palette.window();
+            QnScopedPainterPenRollback penRollback(painter, backgroundBrush.color());
+            QnScopedPainterBrushRollback brushRollback(painter, backgroundBrush);
+            QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+            QColor shadowRoundingColor = option->palette.shadow().color();
+            shadowRoundingColor.setAlphaF(0.5);
+            painter->fillRect(QRect(option->rect.bottomRight() - QPoint(2, 2), option->rect.bottomRight()), shadowRoundingColor);
+            painter->drawRoundedRect(QnGeometry::eroded(QRectF(option->rect), 0.5), 2.0, 2.0);
         }
         return;
 
@@ -654,7 +666,18 @@ void QnNxStyle::drawPrimitive(
         return;
 
     case PE_Frame:
-        return;
+        {
+            /* Draw rounded frame for combo box drop-down list: */
+            if (isWidgetOwnedBy<QComboBox>(widget))
+            {
+                QBrush brush = option->palette.midlight();
+                QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+                QnScopedPainterBrushRollback brushRollback(painter, brush);
+                QnScopedPainterPenRollback penRollback(painter, brush.color());
+                painter->drawRoundedRect(QnGeometry::eroded(QRectF(widget->rect()), 0.5), 2.0, 2.0);
+            }
+            return;
+        }
 
     default:
         return;
@@ -1037,34 +1060,44 @@ void QnNxStyle::drawComplexControl(
         break;
 
     case CC_ScrollBar:
-        if (const QStyleOptionSlider *scrollBar =
-                qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (auto scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
-            QRect scrollBarSlider = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
-            QRect scrollBarGroove = proxy()->subControlRect(control, scrollBar, SC_ScrollBarGroove, widget);
+            bool special = isWidgetOwnedBy<QComboBox>(widget);
 
-            QBrush grooveBrush = scrollBar->palette.dark();
-
-            QnPaletteColor mainSliderColor = findColor(scrollBar->palette.color(QPalette::Midlight));
-            QColor sliderColor = mainSliderColor;
-
-            if (scrollBar->state.testFlag(State_Sunken))
+            if (scrollBar->subControls.testFlag(SC_ScrollBarGroove))
             {
-                sliderColor = mainSliderColor.lighter(1);
+                QRect grooveRect = proxy()->subControlRect(control, scrollBar, SC_ScrollBarGroove, widget);
+                painter->fillRect(grooveRect, scrollBar->palette.color(
+                    special ? QPalette::Midlight : QPalette::Dark));
             }
-            else if (scrollBar->state.testFlag(State_MouseOver))
+
+            if (scrollBar->subControls.testFlag(SC_ScrollBarSlider))
             {
-                if (scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider))
-                    sliderColor = mainSliderColor.lighter(2);
+                QRect sliderRect = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
+
+                QnPaletteColor mainSliderColor = findColor(scrollBar->palette.color(
+                    special ? QPalette::WindowText : QPalette::Midlight));
+
+                int colorShift = 0;
+                if (scrollBar->state.testFlag(State_Sunken))
+                    colorShift = 1;
+                else if (scrollBar->state.testFlag(State_MouseOver))
+                    colorShift = scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1;
+
+                QColor sliderColor = mainSliderColor.lighter(colorShift);
+
+                if (special)
+                {
+                    QnScopedPainterAntialiasingRollback aaRollback(painter, true);
+                    QnScopedPainterBrushRollback brushRollback(painter, sliderColor);
+                    QnScopedPainterPenRollback penRollback(painter, sliderColor);
+                    painter->drawRoundedRect(QRectF(sliderRect).adjusted(1.5, 0.0, -1.5, 0.0), 2.0, 2.0);
+                }
                 else
-                    sliderColor = mainSliderColor.lighter(1);
+                {
+                    painter->fillRect(sliderRect, sliderColor);
+                }
             }
-
-            if (scrollBar->subControls & SC_ScrollBarGroove)
-                painter->fillRect(scrollBarGroove, grooveBrush);
-
-            if (scrollBar->subControls & SC_ScrollBarSlider)
-                painter->fillRect(scrollBarSlider, sliderColor);
 
             return;
         }
@@ -1340,8 +1373,7 @@ void QnNxStyle::drawControl(
         break;
 
     case CE_HeaderEmptyArea:
-        if (const QStyleOptionHeader *header =
-                qstyleoption_cast<const QStyleOptionHeader*>(option))
+        if (auto header = qstyleoption_cast<const QStyleOptionHeader*>(option))
         {
             painter->fillRect(header->rect, header->palette.window());
             return;
@@ -1349,30 +1381,23 @@ void QnNxStyle::drawControl(
         break;
 
     case CE_MenuItem:
-        if (const QStyleOptionMenuItem *menuItem =
-                qstyleoption_cast<const QStyleOptionMenuItem*>(option))
+        if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
         {
             if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
             {
-                painter->save();
-
+                QnScopedPainterPenRollback penRollback(painter, menuItem->palette.color(QPalette::Midlight));
                 int y = menuItem->rect.top() + menuItem->rect.height() / 2;
-                painter->setPen(findColor(menuItem->palette.color(QPalette::Window)).darker(2));
                 painter->drawLine(Metrics::kMenuItemHPadding, y,
                                   menuItem->rect.right() - Metrics::kMenuItemHPadding, y);
-
-                painter->restore();
                 break;
             }
-
-            painter->save();
 
             bool enabled = menuItem->state.testFlag(State_Enabled);
             bool selected = enabled && menuItem->state.testFlag(State_Selected);
 
             QColor textColor = menuItem->palette.color(QPalette::WindowText);
             QColor backgroundColor = menuItem->palette.color(QPalette::Window);
-            QColor shortcutColor = menuItem->palette.color(QPalette::Midlight);
+            QColor shortcutColor = menuItem->palette.color(QPalette::ButtonText);
 
             if (selected)
             {
@@ -1398,8 +1423,11 @@ void QnNxStyle::drawControl(
 
             if (!menuItem->text.isEmpty())
             {
+                QnScopedPainterPenRollback penRollback(painter);
+
                 QString text = menuItem->text;
                 QString shortcut;
+
                 int tabPosition = text.indexOf(QLatin1Char('\t'));
                 if (tabPosition >= 0)
                 {
@@ -1431,7 +1459,6 @@ void QnNxStyle::drawControl(
                           textColor);
             }
 
-            painter->restore();
             return;
         }
         break;
@@ -2305,7 +2332,7 @@ int QnNxStyle::pixelMetric(
     case PM_MenuVMargin:
         return dp(2);
     case PM_SubMenuOverlap:
-        return 0;
+        return dp(1);
 
     case PM_SliderControlThickness:
         return dp(16);
@@ -2373,7 +2400,7 @@ int QnNxStyle::styleHint(
     case SH_ComboBox_ListMouseTracking:
         return 1;
     case SH_ComboBox_PopupFrameStyle:
-        return QFrame::NoFrame;
+        return QFrame::StyledPanel;
     case QStyle::SH_DialogButtonBox_ButtonsHaveIcons:
         return 0;
     case SH_Slider_AbsoluteSetButtons:
@@ -2492,9 +2519,15 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (QAbstractItemView *view = qobject_cast<QAbstractItemView *>(widget))
+    if (auto view = qobject_cast<QAbstractItemView*>(widget))
     {
         view->viewport()->setAttribute(Qt::WA_Hover);
+
+        if (isWidgetOwnedBy<QComboBox>(view))
+        {
+            /* Set margins for drop-down list container: */
+            view->parentWidget()->setContentsMargins(0, 2, 0, 2);
+        }
     }
 
     if (qobject_cast<QMenu*>(widget))
@@ -2506,7 +2539,7 @@ void QnNxStyle::polish(QWidget *widget)
     }
 }
 
-void QnNxStyle::unpolish(QWidget *widget)
+void QnNxStyle::unpolish(QWidget* widget)
 {
     if (qobject_cast<QAbstractButton*>(widget) ||
         qobject_cast<QHeaderView*>(widget) ||
@@ -2523,6 +2556,15 @@ void QnNxStyle::unpolish(QWidget *widget)
         {
             comboBox->setProperty(kComboBoxDelegateClass, QVariant::fromValue<void*>(nullptr));
             comboBox->setItemDelegate(static_cast<QAbstractItemDelegate*>(delegateClass->newInstance()));
+        }
+    }
+
+    if (auto view = qobject_cast<QAbstractItemView*>(widget))
+    {
+        if (isWidgetOwnedBy<QComboBox>(view))
+        {
+            /* Reset margins for drop-down list container: */
+            view->parentWidget()->setContentsMargins(0, 0, 0, 0);
         }
     }
 

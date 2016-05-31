@@ -148,12 +148,16 @@
     "QMenu": {
         "palette": {
             "default": {
-                "window":           "light4",
-                "windowText":       "dark4",
-                "midlight":         "light16"
+                "window":           "dark13",
+                "windowText":       "light4",
+                "buttonText":       "light12",
+                "highlight":        "brand_core",
+                "highlightedText":  "brand_contrast",
+                "midlight":         "dark11"
             },
             "disabled": {
-                "windowText":       "dark4.setAlpha(75)"
+                "windowText":       "light4.setAlpha(75)",
+                "buttonText":       "light12.setAlpha(75)"
             }
         }
     },
