@@ -46,6 +46,7 @@ EventConnection::~EventConnection()
         m_httpClient->pleaseStopSync();
         m_httpClient.reset();
     }
+    m_reconnectTimer.pleaseStopSync();
 }
 
 void EventConnection::start(
@@ -128,7 +129,7 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
 
         case State::reconnecting:
         {
-            //retrying 
+            //retrying
             const bool nextTryScheduled = m_reconnectTimer.scheduleNextTry(
                 [this]
                 {
@@ -154,7 +155,7 @@ void EventConnection::connectionAttemptHasFailed(api::ResultCode result)
 
 void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpClient)
 {
-    const nx_http::StatusCode::Value responseStatusCode = 
+    const nx_http::StatusCode::Value responseStatusCode =
         static_cast<nx_http::StatusCode::Value>(
             httpClient->response()->statusLine.statusCode);
     if (!nx_http::StatusCode::isSuccessCode(responseStatusCode))
@@ -168,7 +169,7 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
     }
 
     //checking cdb result code
-    auto cdbResultCodeIter = 
+    auto cdbResultCodeIter =
         httpClient->response()->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
     if (cdbResultCodeIter == httpClient->response()->headers.end())
     {
@@ -177,7 +178,7 @@ void EventConnection::onHttpResponseReceived(nx_http::AsyncHttpClientPtr httpCli
         return connectionAttemptHasFailed(
             api::ResultCode::invalidFormat);
     }
-    const auto cdbResultCode = 
+    const auto cdbResultCode =
         QnLexical::deserialized<api::ResultCode>(cdbResultCodeIter->second);
     if (cdbResultCode != api::ResultCode::ok)
     {
