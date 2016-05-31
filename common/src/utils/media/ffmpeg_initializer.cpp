@@ -10,18 +10,24 @@ extern "C"
 static int lockmgr(void **mtx, enum AVLockOp op)
 {
     QnMutex** qMutex = (QnMutex**)mtx;
-    switch (op) {
+    switch (op)
+    {
     case AV_LOCK_CREATE:
+        NX_ASSERT(*qMutex == nullptr);
         *qMutex = new QnMutex();
         return 0;
     case AV_LOCK_OBTAIN:
+        NX_ASSERT(*qMutex);
         (*qMutex)->lock();
         return 0;
     case AV_LOCK_RELEASE:
+        NX_ASSERT(*qMutex);
         (*qMutex)->unlock();
         return 0;
     case AV_LOCK_DESTROY:
+        NX_ASSERT(*qMutex);
         delete *qMutex;
+        *qMutex = nullptr;
         return 0;
     }
     return 1;
