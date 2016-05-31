@@ -1,3 +1,5 @@
+syntax:glob
+
 front_end/node_modules
 front_end/app/styles/custom 
 front_end/dist 
@@ -16,6 +18,8 @@ cloud/notifications/static/templates/email_logo.png
 .DS_Store
 .idea
 
-.*\.pyc$
-.*\.pid$
-.*\.log$
+*.pyc
+*.pid
+*.log
+
+cloud/build_scripts/*.ts
