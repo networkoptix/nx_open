@@ -102,10 +102,8 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
             return isForeign
                 ? foreignText
                 : elideString(
-                    QnResourceDisplayInfo(
-                        qnResPool->getResourceByUniqueId(value.uniqueId))
-                    .toString(qnSettings->extraInfoInTree())
-                    , maxLength);
+                    QnResourceDisplayInfo(qnResPool->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
+                    maxLength);
         }
     case BytesColumn:
         return formatBytesString(value.recordedBytes);
