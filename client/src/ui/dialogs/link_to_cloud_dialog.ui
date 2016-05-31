@@ -23,7 +23,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="passwordLabel">
         <property name="text">
-         <string>Password (PIN)</string>
+         <string>Password</string>
         </property>
        </widget>
       </item>

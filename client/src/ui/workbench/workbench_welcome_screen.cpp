@@ -35,18 +35,11 @@ namespace
         qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
         qmlRegisterType<QnRecentUserConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentUserConnectionsData");
 
-        const auto quickWidget = new QQuickWidget();
-        quickWidget->rootContext()->setContextProperty(
+        const auto quickView = new QQuickView();
+        quickView->rootContext()->setContextProperty(
             kContextVariableName, context);
-        quickWidget->setSource(kWelcomeScreenSource);
-
-        // Welcome screen holders prevents blinking of QML widget.
-        // Moreover, QQuickWidget can't be placed as direct child of
-        // other widget - thus we use this "proxy" holder + layout
-        QWidget *welcomeScreenHolder = new QWidget();
-        QHBoxLayout *layout = new QHBoxLayout(welcomeScreenHolder);
-        layout->addWidget(quickWidget);
-        return welcomeScreenHolder;
+        quickView->setSource(kWelcomeScreenSource);
+        return QWidget::createWindowContainer(quickView);
     }
 
     QnGenericPalette extractPalette()

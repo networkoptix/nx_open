@@ -7,13 +7,17 @@
 #include <QtCore/QTimer>
 
 #include <api/global_settings.h>
+
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <common/common_module.h>
+#include <core/resource/resource_display_info.h>
+
+#include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
 #include <ui/common/palette.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -731,7 +735,7 @@ QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList
         if (!result.isEmpty())
             result += lit("\n");
 
-        QString name = getResourceName(server);
+        QString name = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
         result.append(fontMetrics().elidedText(name, Qt::ElideMiddle, maxLabelWidth));
     }
 

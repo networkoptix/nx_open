@@ -5,11 +5,12 @@
 #include <QtGui/QDesktopServices>
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_display_info.h>
 
-#include <ui/common/ui_resource_name.h>
+#include <client/client_settings.h>
+
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -733,11 +734,14 @@ bool QnCameraAdditionDialog::tryClose(bool force) {
 }
 
 void QnCameraAdditionDialog::updateTitle() {
-    if (m_server) {
-        QString name = getResourceName(m_server);
+    if (m_server)
+    {
+        QString name = QnResourceDisplayInfo(m_server).toString(qnSettings->extraInfoInTree());
         setWindowTitle(tr("Add devices to %1").arg(name));
         ui->serverNameLabel->setText(name);
-    } else {
+    }
+    else
+    {
         setWindowTitle(tr("Add devices..."));
         ui->serverNameLabel->setText(tr("Select target server..."));
     }

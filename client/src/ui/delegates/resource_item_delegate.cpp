@@ -7,7 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
@@ -149,8 +149,8 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay) && !editing)
     {
         QString baseName;
-        QString extInfo;
-        getDisplayInfo(index, baseName, extInfo);
+        QString extraInfo;
+        getDisplayInfo(index, baseName, extraInfo);
 
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
@@ -164,7 +164,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QRect actualRect;
         painter->drawText(textRect, textFlags, elidedName, &actualRect);
 
-        if (elidedName == baseName && !extInfo.isEmpty())
+        if (elidedName == baseName && !extraInfo.isEmpty())
         {
             option.font.setWeight(QFont::Normal);
             QFontMetrics extraMetrics(option.font);
@@ -173,7 +173,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
             textRect.setLeft(startPos + textPadding * 2);
-            QString elidedHost = extraMetrics.elidedText(extInfo, option.textElideMode, textRect.width(), textFlags);
+            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width(), textFlags);
 
             painter->setFont(option.font);
             painter->setPen(extraColor);
@@ -236,8 +236,8 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
     {
         QString baseName;
-        QString extInfo;
-        getDisplayInfo(index, baseName, extInfo);
+        QString extraInfo;
+        getDisplayInfo(index, baseName, extraInfo);
 
         const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
         int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
@@ -248,12 +248,12 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         /* Width of the main text: */
         width += option.fontMetrics.width(baseName, -1, kTextFlags);
 
-        if (!extInfo.isEmpty())
+        if (!extraInfo.isEmpty())
         {
             /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-            width += option.fontMetrics.width(extInfo, -1, kTextFlags) + leftRightPadding;
+            width += option.fontMetrics.width(extraInfo, -1, kTextFlags) + leftRightPadding;
         }
 
         /* Add paddings: */
@@ -393,11 +393,10 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     const QString customExtInfoTemplate = lit(" - %1");
 
     baseName = index.data(Qt::DisplayRole).toString();
-    extInfo = QString();
 
     /* Two-component text from resource information: */
-    bool showExtraInfo = qnSettings->extraInfoInTree();
-    if (!showExtraInfo)
+    auto showExtraInfo = qnSettings->extraInfoInTree();
+    if (showExtraInfo == Qn::RI_NameOnly)
         return;
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -412,7 +411,9 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     }
     else
     {
-        getResourceDisplayInformation(resource, baseName, extInfo);
+        QnResourceDisplayInfo info(resource);
+        extInfo = info.extraInfo();
+
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
             extInfo = customExtInfoTemplate.arg(extInfo);
     }

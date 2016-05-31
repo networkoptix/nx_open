@@ -8,6 +8,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 
 #include <ui/common/palette.h>
+#include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
@@ -58,17 +59,22 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
         ui->comboBoxTimeTo->addItem(t.toString(defaultTimeFormat), i * 3600);
     }
 
-    auto updateLimitControls = [this]{
+    auto updateLimitControls = [this]
+    {
         bool enabled = ui->limitBandwithCheckBox->isChecked();
         ui->spinBoxBandwidth->setEnabled(enabled);
         ui->bandwidthLabel->setEnabled(enabled);
+        ui->warningLabel->setVisible(enabled);
     };
+    setWarningStyle(ui->warningLabel);
 
     connect(ui->limitBandwithCheckBox, &QCheckBox::stateChanged, this, updateLimitControls);
     updateLimitControls();
+
+
 }
 
-QnBackupScheduleDialog::~QnBackupScheduleDialog() 
+QnBackupScheduleDialog::~QnBackupScheduleDialog()
 {}
 
 const QnBackupScheduleColors & QnBackupScheduleDialog::colors() const {
@@ -98,7 +104,7 @@ void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
         ui->weekDaysLayout->addWidget(checkbox);
 
         m_dowCheckboxes[dayToIndex(day)] = checkbox;
-        checkbox->setFont(nameFont);       
+        checkbox->setFont(nameFont);
         day = nextDay(day);
     }
 
@@ -154,7 +160,7 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
         setNearestValue(ui->comboBoxTimeTo, (value.backupStartSec + value.backupDurationSec) % secsPerDay);
 
     ui->spinBoxBandwidth->setValue(qAbs(bytesToMBits(value.backupBitrate)));
-        
+
     ui->limitBandwithCheckBox->setChecked(value.backupBitrate > 0);
 }
 

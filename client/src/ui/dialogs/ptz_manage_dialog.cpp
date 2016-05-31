@@ -7,6 +7,13 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <common/common_globals.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/ptz/abstract_ptz_controller.h>
+#include <core/ptz/ptz_tour.h>
+#include <core/resource/resource_display_info.h>
+
 #include <client/client_settings.h>
 
 #include <utils/common/event_processors.h>
@@ -16,13 +23,7 @@
 #include <utils/local_file_cache.h>
 #include <utils/threaded_image_loader.h>
 
-#include <core/resource/resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/ptz/abstract_ptz_controller.h>
-#include <core/ptz/ptz_tour.h>
-
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
-#include <ui/common/ui_resource_name.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
@@ -623,7 +624,8 @@ QnResourcePtr QnPtzManageDialog::resource() const {
     return m_resource;
 }
 
-void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
+void QnPtzManageDialog::setResource(const QnResourcePtr &resource)
+{
     if (m_resource == resource)
         return;
 
@@ -633,7 +635,7 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     m_resource = resource;
     m_adaptor->setResource(resource);
 
-    setWindowTitle(tr("Manage PTZ for %1...").arg(getResourceName(m_resource)));
+    setWindowTitle(tr("Manage PTZ for %1...").arg(QnResourceDisplayInfo(m_resource).toString(qnSettings->extraInfoInTree())));
 }
 
 bool QnPtzManageDialog::isModified() const {

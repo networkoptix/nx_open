@@ -34,7 +34,7 @@
         <item row="1" column="0">
          <widget class="QLabel" name="serverLabel">
           <property name="text">
-           <string>SMTP &amp;Server:</string>
+           <string>SMTP Server:</string>
           </property>
           <property name="buddy">
            <cstring>serverLineEdit</cstring>
@@ -47,7 +47,7 @@
         <item row="2" column="0">
          <widget class="QLabel" name="userLabel">
           <property name="text">
-           <string>&amp;User:</string>
+           <string>User:</string>
           </property>
           <property name="buddy">
            <cstring>userLineEdit</cstring>
@@ -60,7 +60,7 @@
         <item row="3" column="0">
          <widget class="QLabel" name="passwordLabel">
           <property name="text">
-           <string>&amp;Password:</string>
+           <string>Password:</string>
           </property>
           <property name="buddy">
            <cstring>passwordLineEdit</cstring>
@@ -94,7 +94,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="portLabel">
           <property name="text">
-           <string>P&amp;ort:</string>
+           <string>Port:</string>
           </property>
           <property name="buddy">
            <cstring>portComboBox</cstring>
@@ -187,7 +187,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="signatureLabel">
        <property name="text">
-        <string>&amp;System Signature:</string>
+        <string>System Signature:</string>
        </property>
        <property name="buddy">
         <cstring>signatureLineEdit</cstring>

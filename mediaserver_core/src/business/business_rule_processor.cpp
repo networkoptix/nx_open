@@ -25,7 +25,6 @@
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "core/resource/resource_name.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
