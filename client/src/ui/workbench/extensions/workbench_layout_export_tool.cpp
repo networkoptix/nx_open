@@ -435,19 +435,22 @@ void QnLayoutExportTool::at_camera_exportFinished(
 
     camera->deleteLater();
 
-    if (error) {
+    if (error)
+    {
         QnVirtualCameraResourcePtr camRes = camera->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
         //: "Could not export camera AXIS1334"
         m_errorMessage = QnDeviceDependentStrings::getNameFromSet(
-                QnCameraDeviceStringSet(
-                    tr("Could not export device %1."),
-                    tr("Could not export camera %1."),
-                    tr("Could not export I/O module %1.")
-                ), camRes
-            ).arg(QnResourceDisplayInfo(camRes).toString(Qn::RI_NameOnly));
+            QnCameraDeviceStringSet(
+                tr("Could not export device %1."),
+                tr("Could not export camera %1."),
+                tr("Could not export I/O module %1.")
+            ), camRes)
+            .arg(QnResourceDisplayInfo(camRes).toString(Qn::RI_NameOnly));
         finishExport(false);
-    } else {
+    }
+    else
+    {
         exportNextCamera();
     }
 }
