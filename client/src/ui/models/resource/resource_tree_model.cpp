@@ -1067,11 +1067,13 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
                 medias.push_back(res);
         }
         if (!medias.isEmpty())
+        {
             menu()->trigger(
                 QnActions::OpenInLayoutAction,
                 QnActionParameters(medias).
                 withArgument(Qn::LayoutResourceRole, layout)
             );
+        }
     }
 
     /* Drop layout on user means sharing this layout. */
