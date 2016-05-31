@@ -149,8 +149,8 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay) && !editing)
     {
         QString baseName;
-        QString extInfo;
-        getDisplayInfo(index, baseName, extInfo);
+        QString extraInfo;
+        getDisplayInfo(index, baseName, extraInfo);
 
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
@@ -164,7 +164,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QRect actualRect;
         painter->drawText(textRect, textFlags, elidedName, &actualRect);
 
-        if (elidedName == baseName && !extInfo.isEmpty())
+        if (elidedName == baseName && !extraInfo.isEmpty())
         {
             option.font.setWeight(QFont::Normal);
             QFontMetrics extraMetrics(option.font);
@@ -236,8 +236,8 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
     if (option.features.testFlag(QStyleOptionViewItem::HasDisplay))
     {
         QString baseName;
-        QString extInfo;
-        getDisplayInfo(index, baseName, extInfo);
+        QString extraInfo;
+        getDisplayInfo(index, baseName, extraInfo);
 
         const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
         int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
@@ -248,12 +248,12 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         /* Width of the main text: */
         width += option.fontMetrics.width(baseName, -1, kTextFlags);
 
-        if (!extInfo.isEmpty())
+        if (!extraInfo.isEmpty())
         {
             /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-            width += option.fontMetrics.width(extInfo, -1, kTextFlags) + leftRightPadding;
+            width += option.fontMetrics.width(extraInfo, -1, kTextFlags) + leftRightPadding;
         }
 
         /* Add paddings: */
