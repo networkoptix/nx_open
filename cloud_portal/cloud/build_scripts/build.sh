@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo "Set customization (pass customization name as a single parameter for this script)"
 
 if  [ -z $CLOUD_PORTAL_CONF_DIR ]; then
