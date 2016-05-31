@@ -38,7 +38,7 @@ namespace
         return readBytes(socket, (quint8*) buffer.data(), toRead);
     }
 
-    static QMutex m_mutex;
+    static QnMutex m_mutex;
     static QMap<QString, QSharedPointer<QnProxyDesktopDataProvider>> m_proxyProviders;
 }
 
@@ -79,7 +79,7 @@ public:
     void setSocket(const QSharedPointer<AbstractStreamSocket>& socket)
     {
         stop();
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_socket = socket;
     }
 
@@ -87,7 +87,7 @@ protected:
 
     QnAbstractMediaDataPtr getNextData()
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         while (!m_needStop && m_socket->isConnected())
         {
             if (!readBytes(m_socket, m_recvBuffer, 4))
@@ -129,7 +129,7 @@ protected:
 
 private:
     QSharedPointer<AbstractStreamSocket> m_socket;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnUuid m_cameraId;
 };
 
@@ -175,7 +175,7 @@ void QnAudioProxyReceiver::run()
 
     QSharedPointer<QnProxyDesktopDataProvider> desktopDataProvider;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         QString key = clientId.toString() + resourceId;
         auto itr = m_proxyProviders.find(key);
         if (itr == m_proxyProviders.end())

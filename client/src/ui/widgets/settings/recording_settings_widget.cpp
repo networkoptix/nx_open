@@ -19,7 +19,7 @@
 #   include <plugins/resource/desktop_win/win_audio_device_info.h>
 #endif
 
-#include <ui/workbench/watchers/workbench_desktop_camera_watcher_win.h>
+#include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
 
 

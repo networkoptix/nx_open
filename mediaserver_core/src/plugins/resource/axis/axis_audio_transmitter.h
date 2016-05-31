@@ -36,7 +36,7 @@ public slots:
         nx_http::AsyncHttpClientPtr http,
         bool isRetryAfterUnauthorizedResponse);
 
-    void handleStreamErrors(nx_http::AsyncHttpClientPtr http);
+    void at_httpDone(nx_http::AsyncHttpClientPtr http);
 
 protected:
     virtual void pleaseStop() override;
@@ -61,4 +61,5 @@ private:
 
     TransmitterState m_state;
     QnWaitCondition m_wait;
+    QElapsedTimer m_timer;
 };

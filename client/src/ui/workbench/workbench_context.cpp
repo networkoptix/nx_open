@@ -29,7 +29,7 @@
 #include <ui/statistics/modules/graphics_statistics_module.h>
 #include <ui/statistics/modules/durations_statistics_module.h>
 
-#include "watchers/workbench_desktop_camera_watcher_win.h"
+#include "watchers/workbench_desktop_camera_watcher.h"
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent),

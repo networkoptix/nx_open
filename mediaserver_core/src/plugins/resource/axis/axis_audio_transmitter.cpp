@@ -123,13 +123,24 @@ void QnAxisAudioTransmitter::at_requestHeadersHasBeenSent(
     }
 }
 
-void QnAxisAudioTransmitter::handleStreamErrors(nx_http::AsyncHttpClientPtr http)
+void QnAxisAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr http)
 {
     if (http->state() == nx_http::AsyncHttpClient::State::sFailed)
     {
         m_state = TransmitterState::Failed;
-        m_socket.clear();
-        m_httpClient.reset();
+
+        if (m_socket)
+        {
+            m_socket->cancelAsyncIO();
+            m_socket.clear();
+        }
+
+        if (m_httpClient)
+        {
+            m_httpClient->terminate();
+            m_httpClient.reset();
+        }
+
         m_wait.wakeOne();
     }
 }
@@ -146,10 +157,12 @@ bool QnAxisAudioTransmitter::startTransmission()
     if (!mServer)
         return false;
 
-    if (!m_httpClient)
-        m_httpClient = nx_http::AsyncHttpClient::create();
+    if (m_httpClient)
+        m_httpClient->terminate();
 
-    if(m_socket)
+    m_httpClient = nx_http::AsyncHttpClient::create();
+
+    if (m_socket)
     {
         m_socket->cancelAsyncIO();
         m_socket.clear();
@@ -188,7 +201,7 @@ bool QnAxisAudioTransmitter::startTransmission()
         m_httpClient.get(),
         &nx_http::AsyncHttpClient::done,
         this,
-        &QnAxisAudioTransmitter::handleStreamErrors,
+        &QnAxisAudioTransmitter::at_httpDone,
         Qt::DirectConnection);
 
     url.setScheme(lit("http"));
@@ -207,12 +220,27 @@ bool QnAxisAudioTransmitter::startTransmission()
             contentBody,
             true);
 
-
+    m_timer.restart();
     QnMutexLocker lock(&m_mutex);
-    while (m_state == TransmitterState::WaitingForConnection)
-        m_wait.wait(lock.mutex());
+    while (m_state == TransmitterState::WaitingForConnection &&
+           m_timer.elapsed() < kTransmissionTimeout )
+    {
+        auto waitDuration = kTransmissionTimeout - m_timer.elapsed();
+        if (waitDuration <= 0)
+            break;
 
-    return m_state == TransmitterState::ReadyForTransmission;
+        m_wait.wait(lock.mutex(), waitDuration);
+    }
+
+    if (m_state == TransmitterState::ReadyForTransmission)
+    {
+        return true;
+    }
+    else
+    {
+        m_state = TransmitterState::Failed;
+        return false;
+    }
 
 }
 
@@ -248,7 +276,7 @@ bool QnAxisAudioTransmitter::processAudioData(QnConstAbstractMediaDataPtr &data)
     if (!m_socket)
         m_socket = m_httpClient->takeSocket();
 
-    if(!m_socket)
+    if (!m_socket)
         return true;
 
     m_socket->cancelAsyncIO();

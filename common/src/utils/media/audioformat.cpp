@@ -39,11 +39,11 @@
 **
 ****************************************************************************/
 
-#ifdef CUSTOM_AUDIO_FORMAT_CLASS
 
 #include <QtCore/QDebug>
 #include "audioformat.h"
 
+#ifdef CUSTOM_AUDIO_FORMAT_CLASS
 
 QT_BEGIN_NAMESPACE
 
