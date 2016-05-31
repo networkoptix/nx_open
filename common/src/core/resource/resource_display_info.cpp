@@ -36,8 +36,7 @@ QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource) :
     m_name(),
     m_url(),
     m_extraInfo()
-{
-}
+{}
 
 QString QnResourceDisplayInfo::name() const
 {
@@ -62,16 +61,22 @@ QString QnResourceDisplayInfo::toString(Qn::ResourceInfoLevel detailLevel) const
     ensureConstructed(detailLevel);
     switch (detailLevel)
     {
-    case Qn::RI_NameOnly:
-        return m_name;
-    case Qn::RI_WithUrl:
-        if (m_url.isEmpty())
+        case Qn::RI_NameOnly:
             return m_name;
-        return kFormatTemplate.arg(m_name, m_url);
-    case Qn::RI_FullInfo:
-        if (m_extraInfo.isEmpty())
-            return m_name;
-        return m_name;
+        case Qn::RI_WithUrl:
+        {
+            if (m_url.isEmpty())
+                return m_name;
+            return kFormatTemplate.arg(m_name, m_url);
+        }
+        case Qn::RI_FullInfo:
+        {
+            if (m_extraInfo.isEmpty())
+                return m_name;
+            return kFormatTemplate.arg(m_name, m_extraInfo);
+        }
+        default:
+            break;
     }
     return QString();
 }
@@ -93,8 +98,10 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     {
         m_name = m_resource->getName();
         if (m_resource->hasFlags(Qn::live_cam)) /* Quick check */
+        {
             if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>())
                 m_name = camera->getUserDefinedName();
+        }
     }
 
     if (detailLevel == Qn::RI_NameOnly)
@@ -118,7 +125,5 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     {
         m_extraInfo = m_url;
     }
-
-
 }
 
