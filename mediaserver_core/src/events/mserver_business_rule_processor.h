@@ -33,6 +33,7 @@ private:
     bool executePanicAction(const QnPanicBusinessActionPtr& action);
     bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action);
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
+    bool executeHttpRequestAction(const QnAbstractBusinessActionPtr& action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
 
 private:

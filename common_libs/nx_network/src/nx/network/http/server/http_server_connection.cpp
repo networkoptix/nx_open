@@ -181,12 +181,25 @@ namespace nx_http
                 nx_http::HttpHeader( "Content-Length", "0" ) );
         }
 
-        m_currentMsgBody = std::move(responseMsgBody);
-        if (m_currentMsgBody)
-            m_currentMsgBody->bindToAioThread(getAioThread());
+        if (responseMsgBody)
+            responseMsgBody->bindToAioThread(getAioThread());
+
+        //posting request to the queue 
+        m_responseQueue.emplace_back(
+            std::move(msg),
+            std::move(responseMsgBody));
+        if (m_responseQueue.size() == 1)
+            sendNextResponse();
+    }
+
+    void HttpServerConnection::sendNextResponse()
+    {
+        NX_ASSERT(!m_responseQueue.empty());
+
+        m_currentMsgBody = std::move(m_responseQueue.front().responseMsgBody);
         sendMessage(
-            std::move( msg ),
-            std::bind( &HttpServerConnection::responseSent, this ) );
+            std::move(m_responseQueue.front().msg),
+            std::bind(&HttpServerConnection::responseSent, this));
     }
 
     void HttpServerConnection::responseSent()
@@ -235,10 +248,19 @@ namespace nx_http
 
     void HttpServerConnection::fullMessageHasBeenSent()
     {
+        NX_ASSERT(!m_responseQueue.empty());
+        m_responseQueue.pop_front();
+
         //if connection is NOT persistent then closing it
         m_currentMsgBody.reset();
         if (!m_isPersistent)
+        {
             closeConnection(SystemError::noError);
+            return;
+        }
+
+        if (!m_responseQueue.empty())
+            sendNextResponse();
     }
 
     void HttpServerConnection::checkForConnectionPersistency( const Message& msg )

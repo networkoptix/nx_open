@@ -481,8 +481,12 @@ bool PlayerPrivate::createArchiveReader()
     QnResourcePtr resource;
     if (isLocalFile)
     {
+#ifdef ENABLE_ARCHIVE
         resource = QnAviResourcePtr(new QnAviResource(path));
         resource->setStatus(Qn::Online);
+#else
+        return false;
+#endif
     }
     else
     {
@@ -495,9 +499,15 @@ bool PlayerPrivate::createArchiveReader()
     archiveReader.reset(new QnArchiveStreamReader(resource));
     QnAbstractArchiveDelegate* archiveDelegate;
     if (isLocalFile)
+    {
+#ifdef ENABLE_ARCHIVE
         archiveDelegate = new QnAviArchiveDelegate();
+#endif
+    }
     else
+    {
         archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+    }
 
     archiveReader->setArchiveDelegate(archiveDelegate);
     return true;

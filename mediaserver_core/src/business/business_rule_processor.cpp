@@ -83,6 +83,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         case QnBusiness::SayTextAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
+        case QnBusiness::ExecHttpRequestAction:
             return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
         default:
             if (!res)

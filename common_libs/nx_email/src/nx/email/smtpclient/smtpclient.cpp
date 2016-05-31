@@ -105,8 +105,8 @@ void SmtpClient::setConnectionType(ConnectionType ct)
 
     m_lineSpliter.reset();
     m_socket = SocketFactory::createStreamSocket(
-                connectionType == SslConnection ||
-                connectionType == TlsConnection ).release();
+        connectionType == SslConnection ||
+        connectionType == TlsConnection);
 }
 
 const QString& SmtpClient::getHost() const
@@ -208,7 +208,8 @@ bool SmtpClient::connectToHost()
             break;
 
         case TlsConnection:
-            if( !static_cast<AbstractEncryptedStreamSocket*>(m_socket)->connectWithoutEncryption( host, port, connectionTimeout ) )
+            if( !static_cast<AbstractEncryptedStreamSocket*>(m_socket.get())
+                ->connectWithoutEncryption( host, port, connectionTimeout ) )
             {
                 emit smtpError( ConnectionTimeoutError );
                 return false;
@@ -255,7 +256,8 @@ bool SmtpClient::connectToHost()
                 return false;
             };
 
-            if( !static_cast<AbstractEncryptedStreamSocket*>(m_socket)->enableClientEncryption() )
+            if( !static_cast<AbstractEncryptedStreamSocket*>(m_socket.get())
+                ->enableClientEncryption() )
             {
                 //qDebug() << ((QSslSocket*) socket)->errorString();
                 emit smtpError(ConnectionTimeoutError);

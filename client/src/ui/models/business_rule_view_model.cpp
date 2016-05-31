@@ -185,7 +185,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
                 return (int)m_actionParams.userGroup;
             case QnBusiness::PlaySoundAction:
             case QnBusiness::PlaySoundOnceAction:
-                return m_actionParams.soundUrl;
+                return m_actionParams.url;
             case QnBusiness::SayTextAction:
                 return m_actionParams.sayText;
             default:
@@ -276,7 +276,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::PlaySoundOnceAction:
         {
             QnBusinessActionParameters params;
-            params.soundUrl = value.toString();
+            params.url = value.toString();
             setActionParams(params);
             break;
         }
@@ -812,7 +812,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.soundUrl.isEmpty();
+            return !m_actionParams.url.isEmpty();
         case QnBusiness::SayTextAction:
             return !m_actionParams.sayText.isEmpty();
         case QnBusiness::ExecutePtzPresetAction:
@@ -826,6 +826,13 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             if (canUseSource)
                 return true;
             break;
+        }
+        case QnBusiness::ExecHttpRequestAction:
+        {
+            QUrl url(m_actionParams.url);
+            return url.isValid() && !url.isEmpty() &&
+                   (url.scheme().isEmpty() || url.scheme().toLower() == lit("http")) &&
+                   !url.host().isEmpty();
         }
         default:
             break;
@@ -932,7 +939,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::PlaySoundAction:
     case QnBusiness::PlaySoundOnceAction:
     {
-        QString filename = m_actionParams.soundUrl;
+        QString filename = m_actionParams.url;
         if (filename.isEmpty())
             return tr("Select Sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
@@ -963,6 +970,8 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         }
         break;
     }
+    case QnBusiness::ExecHttpRequestAction:
+        return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo);
     default:
         break;
     }

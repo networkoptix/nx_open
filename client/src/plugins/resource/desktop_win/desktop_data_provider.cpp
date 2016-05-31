@@ -796,6 +796,8 @@ void QnDesktopDataProvider::run()
             m_grabber->pleaseStop();
             putAudioData();
         }
+        if (needToStop())
+            break;
     }
     if (!m_capturingStopped)
         stopCapturing();

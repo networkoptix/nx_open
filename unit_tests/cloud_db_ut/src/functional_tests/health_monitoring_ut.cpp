@@ -130,5 +130,55 @@ TEST_F(HealthMonitoring, reconnect)
     eventConnection.reset();
 }
 
+TEST_F(HealthMonitoring, badCredentials)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    api::ResultCode result = api::ResultCode::ok;
+
+    for (int i = 0; i < 2; ++i)
+    {
+        std::unique_ptr<nx::cdb::api::EventConnection> eventConnection;
+
+        if (i == 0)
+            eventConnection = connectionFactory()->createEventConnection(
+                "bla-bla-bla",
+                "be-be-be");
+        else
+            eventConnection = connectionFactory()->createEventConnection(
+                "",
+                "");
+
+        api::SystemEventHandlers eventHandlers;
+        std::tie(result) = makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::EventConnection::start,
+                eventConnection.get(),
+                std::move(eventHandlers),
+                std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+    }
+
+    //currently, events are for systems only
+
+    api::AccountData account1;
+    std::string account1Password;
+    result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(api::ResultCode::ok, result);
+
+    auto eventConnection = connectionFactory()->createEventConnection(
+        account1.email,
+        account1Password);
+
+    api::SystemEventHandlers eventHandlers;
+    std::tie(result) = makeSyncCall<api::ResultCode>(
+        std::bind(
+            &nx::cdb::api::EventConnection::start,
+            eventConnection.get(),
+            std::move(eventHandlers),
+            std::placeholders::_1));
+    ASSERT_EQ(api::ResultCode::forbidden, result);
+}
+
 }   //namespace cdb
 }   //namespace nx

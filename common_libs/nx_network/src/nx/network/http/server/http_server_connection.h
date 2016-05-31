@@ -59,10 +59,26 @@ namespace nx_http
         void processMessage(nx_http::Message&& request);
 
     private:
+        struct ResponseContext
+        {
+            nx_http::Message msg;
+            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody;
+
+            ResponseContext(
+                nx_http::Message _msg,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> _responseMsgBody)
+            :
+                msg(std::move(_msg)),
+                responseMsgBody(std::move(_responseMsgBody))
+            {
+            }
+        };
+
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;
+        std::deque<ResponseContext> m_responseQueue;
 
         bool authenticateRequest(
             const nx_http::Request& request,
@@ -71,6 +87,7 @@ namespace nx_http
             nx_http::MimeProtoVersion version,
             nx_http::Message&& response,
             std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody );
+        void sendNextResponse();
         void responseSent();
         void someMsgBodyRead( SystemError::ErrorCode, BufferType buf );
         void readMoreMessageBodyData();

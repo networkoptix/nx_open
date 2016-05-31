@@ -1324,7 +1324,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                     keepAliveHeader.timeout);
         }
 
-        m_incomingDataSocket = m_httpClient->takeSocket();
+        m_incomingDataSocket = QSharedPointer<AbstractStreamSocket>(m_httpClient->takeSocket().release());
         if( m_connectionType == ConnectionType::bidirectional )
         {
             m_outgoingDataSocket = m_incomingDataSocket;
