@@ -9,17 +9,18 @@
 #include <nx/utils/uuid.h>
 #include <utils/fs/file.h>
 #include <utils/common/buffered_file.h>
+#include "../utils.h"
 
 void doTestInternal(int systemFlags)
 {
-    const QByteArray kTestFileName("test_data1.bin");
+    nx::ut::utils::WorkDirResource workDir;
+    ASSERT_TRUE((bool)workDir.getDirName());
+
+    const QString kTestFileName = QDir(workDir.getDirName()).absoluteFilePath("test_data1.bin");
     const QByteArray kTestPattern("1234567890");
     const int kPatternRepCnt = 2000 * 499;
 
     // write file
-
-    QFile::remove(kTestFileName);
-
     std::unique_ptr<QBufferedFile> testFile(
         new QBufferedFile(
         std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
