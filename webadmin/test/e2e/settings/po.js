@@ -6,18 +6,17 @@ var SettingsPage = function () {
 
     this.portInput = element(by.model('settings.port'));
 
-
     this.dialog = element(by.css(".modal-dialog"));
     this.dialogButtonOk = element(by.buttonText("Ok"));
     this.dialogButtonClose = element(by.buttonText("Close"));
 
     this.saveButton = element(by.buttonText("Save"));
     this.mustBeEqualSpan = element(by.id('mustBeEqualSpan'));
-    this.resetButton = element(by.partialButtonText("Restart"));
     this.mergeButton = element(by.buttonText("Merge Systems"));
 
     this.mediaServersLinks = element.all(by.repeater("server in mediaServers")).all(by.tagName('a'));
-    this.activeMediaServerLink = element.all(by.repeater("server in mediaServers")).all(by.css(".active>a")).first();
+    this.currentMediaServer = element(by.css('ul.serversList')).element(by.cssContainingText('li', '(current)'));
+    this.currentMediaServerLink = this.currentMediaServer.element(by.css('a'));
 
     this.connectToCloudButton = element(by.buttonText('Connect to Nx Cloud'));
     this.createCloudAccButton = element(by.linkText('Create Nx Cloud Account'));
