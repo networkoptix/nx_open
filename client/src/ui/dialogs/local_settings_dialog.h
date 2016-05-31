@@ -13,12 +13,14 @@ namespace Ui
 class QnGeneralPreferencesWidget;
 class QnLookAndFeelPreferencesWidget;
 
-class QnLocalSettingsDialog: public QnGenericTabbedDialog, public QnWorkbenchContextAware {
+class QnLocalSettingsDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware
+{
     Q_OBJECT
 
     typedef QnGenericTabbedDialog base_type;
 public:
-    enum DialogPage {
+    enum DialogPage
+    {
         GeneralPage,
         LookAndFeelPage,
         RecordingPage,
@@ -31,7 +33,6 @@ public:
     ~QnLocalSettingsDialog();
 
 protected:
-
     virtual void applyChanges() override;
 
 private:
