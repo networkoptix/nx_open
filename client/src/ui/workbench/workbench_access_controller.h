@@ -78,8 +78,11 @@ public:
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
-
-
+    bool canCreateStorage(const QnUuid& serverId) const;
+    bool canCreateLayout(const QnUuid& layoutParentId) const;
+    bool canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateVideoWall() const;
+    bool canCreateWebPage() const;
 signals:
     /**
      * \param resource                  Resource for which permissions have changed.

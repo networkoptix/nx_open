@@ -45,10 +45,36 @@ namespace
     {
         QStringList usedNames;
         QnUuid parentId = user ? user->getId() : QnUuid();
-        for (const QnLayoutResourcePtr &resource : qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
-            usedNames.push_back(resource->getName().toLower());
+        for (const auto layout : qnResPool->getResources<QnLayoutResource>())
+        {
+            if (layout->isShared() || layout->getParentId() == parentId)
+                usedNames.push_back(layout->getName());
+        }
 
         return generateUniqueString(usedNames, defaultName, nameTemplate);
+    }
+
+    /**
+     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
+     * @param name                      Suggested new name.
+     * @param parentId                  Layout owner.
+     * @param layout                    Layout that we want to rename (if any).
+     * @return                          List of existing layouts with same name.
+     */
+    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &parentId, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr())
+    {
+        QnLayoutResourceList result;
+        for (const auto& existingLayout : qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
+        {
+            if (existingLayout == layout)
+                continue;
+
+            if (existingLayout->getName().toLower() != name.toLower())
+                continue;
+
+            result << existingLayout;
+        }
+        return result;
     }
 }
 
@@ -84,9 +110,7 @@ ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const
 
 void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
 {
-    QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(layout->getParentId());
-
-    QnLayoutResourceList existing = alreadyExistingLayouts(newName, user, layout);
+    QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
         QnMessageBox::warning(
@@ -223,7 +247,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
             /* Check if we have rights to overwrite the layout */
             QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
-            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, excludingSelfLayout);
+            QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
                 QnMessageBox::warning(
@@ -250,7 +274,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     }
     else
     {
-        QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+        QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
             QnMessageBox::warning(
@@ -319,20 +343,6 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     snapshotManager()->save(newLayout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
-}
-
-QnLayoutResourceList QnWorkbenchLayoutsHandler::alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout)
-{
-    QnLayoutResourceList result;
-    foreach(const QnLayoutResourcePtr &existingLayout, resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
-    {
-        if (existingLayout == layout)
-            continue;
-        if (existingLayout->getName().toLower() != name.toLower())
-            continue;
-        result << existingLayout;
-    }
-    return result;
 }
 
 QDialogButtonBox::StandardButton QnWorkbenchLayoutsHandler::askOverrideLayout(QDialogButtonBox::StandardButtons buttons,
@@ -511,7 +521,10 @@ bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force)
 void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
 {
     QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
-    if (user.isNull())
+    if (!user)
+        user = context()->user();
+
+    if (!user)
         return;
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
@@ -527,7 +540,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
             return;
 
         button = QDialogButtonBox::Yes;
-        QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user);
+        QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
 
         if (!canRemoveLayouts(existing))
         {

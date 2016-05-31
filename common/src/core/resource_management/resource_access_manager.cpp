@@ -227,20 +227,20 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
     /* Check new layouts creating. */
     if (QnLayoutResourcePtr layout = target.dynamicCast<QnLayoutResource>())
-        return canCreateLayoutInternal(user, layout->getParentId());
+        return canCreateLayout(user, layout->getParentId());
 
     /* Check new users creating. */
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
-        return canCreateUserInternal(user, targetUser->getRawPermissions(), targetUser->isOwner());
+        return canCreateUser(user, targetUser->getRawPermissions(), targetUser->isOwner());
 
     if (QnStorageResourcePtr storage = target.dynamicCast<QnStorageResource>())
-        return canCreateStorageInternal(user, storage->getParentId());
+        return canCreateStorage(user, storage->getParentId());
 
     if (QnVideoWallResourcePtr videoWall = target.dynamicCast<QnVideoWallResource>())
-        return canCreateVideoWallInternal(user);
+        return canCreateVideoWall(user);
 
     if (QnWebPageResourcePtr webPage = target.dynamicCast<QnWebPageResource>())
-        return canCreateWebPageInternal(user);
+        return canCreateWebPage(user);
 
     /* Other resources cannot be added manually. */
     return false;
@@ -248,29 +248,29 @@ bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, c
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiStorageData& data) const
 {
-    return canCreateStorageInternal(user, data.parentId);
+    return canCreateStorage(user, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiLayoutData& data) const
 {
-    return canCreateLayoutInternal(user, data.parentId);
+    return canCreateLayout(user, data.parentId);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const
 {
-    return canCreateUserInternal(user, data.permissions, data.isAdmin);
+    return canCreateUser(user, data.permissions, data.isAdmin);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const
 {
     Q_UNUSED(data);
-    return canCreateVideoWallInternal(user);
+    return canCreateVideoWall(user);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const
 {
     Q_UNUSED(data);
-    return canCreateWebPageInternal(user);
+    return canCreateWebPage(user);
 }
 
 void QnResourceAccessManager::invalidateResourceCache(const QnResourcePtr& resource)
@@ -575,7 +575,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
     return hasGlobalPermission(user, requiredPermission());
 }
 
-bool QnResourceAccessManager::canCreateStorageInternal(const QnUserResourcePtr& user, const QnUuid& storageParentId) const
+bool QnResourceAccessManager::canCreateStorage(const QnUserResourcePtr& user, const QnUuid& storageParentId) const
 {
     if (!user || qnCommon->isReadOnly())
         return false;
@@ -583,7 +583,7 @@ bool QnResourceAccessManager::canCreateStorageInternal(const QnUserResourcePtr& 
     return hasPermission(user, server, Qn::SavePermission);
 }
 
-bool QnResourceAccessManager::canCreateLayoutInternal(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const
+bool QnResourceAccessManager::canCreateLayout(const QnUserResourcePtr& user, const QnUuid& layoutParentId) const
 {
     /* Everybody can create own layouts. */
     if (layoutParentId == user->getId())
@@ -594,14 +594,14 @@ bool QnResourceAccessManager::canCreateLayoutInternal(const QnUserResourcePtr& u
         return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
     QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(layoutParentId);
-    if (owner)
+    if (!owner)
         return false;
 
     /* We can create layout for user if we can modify this user. */
     return hasPermission(user, owner, Qn::SavePermission);
 }
 
-bool QnResourceAccessManager::canCreateUserInternal(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const
+bool QnResourceAccessManager::canCreateUser(const QnUserResourcePtr& user, Qn::GlobalPermissions targetPermissions, bool isOwner) const
 {
     /* Nobody can create owners. */
     if (isOwner)
@@ -615,13 +615,13 @@ bool QnResourceAccessManager::canCreateUserInternal(const QnUserResourcePtr& use
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
-bool QnResourceAccessManager::canCreateVideoWallInternal(const QnUserResourcePtr& user) const
+bool QnResourceAccessManager::canCreateVideoWall(const QnUserResourcePtr& user) const
 {
     /* Only admins can create new videowalls (and attach new screens). */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 }
 
-bool QnResourceAccessManager::canCreateWebPageInternal(const QnUserResourcePtr& user) const
+bool QnResourceAccessManager::canCreateWebPage(const QnUserResourcePtr& user) const
 {
     /* Only admins can add new web pages. */
     return hasGlobalPermission(user, Qn::GlobalAdminPermission);

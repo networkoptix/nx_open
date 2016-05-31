@@ -46,15 +46,6 @@ private:
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 
     /**
-     * @brief alreadyExistingLayouts    Check if layouts with same name already exist.
-     * @param name                      Suggested new name.
-     * @param user                      User that will own the layout.
-     * @param layout                    Layout that we want to rename (if any).
-     * @return                          List of existing layouts with same name.
-     */
-    QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUserResourcePtr &user, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
-
-    /**
      * @brief askOverrideLayout     Show messagebox asking user if he really wants to override existsing layout.
      * @param buttons               Messagebox buttons.
      * @param defaultButton         Default button.

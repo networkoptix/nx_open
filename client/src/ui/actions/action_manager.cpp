@@ -633,13 +633,6 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory.beginSubMenu();
     {
-        factory(QnActions::NewUserLayoutAction).
-            flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-            requiredTargetPermissions(Qn::WritePermission). //TODO: #GDM #access check canCreateResource
-            text(tr("Layout...")).
-            pulledText(tr("New Layout...")).
-            condition(hasFlags(Qn::user));
-
         factory(QnActions::OpenNewTabAction).
             flags(Qn::Main | Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::GlobalHotkey).
             mode(QnActionTypes::DesktopMode).
@@ -696,6 +689,15 @@ QnActionManager::QnActionManager(QObject *parent):
 
     }
     factory.endSubMenu();
+
+    factory(QnActions::NewUserLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
+        text(tr("New Layout...")).
+        condition(new QnConjunctionActionCondition(
+            new QnNewUserLayoutActionCondition(this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)
+        );
 
     factory(QnActions::OpenCurrentUserLayoutMenu).
         flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
@@ -1186,7 +1188,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::SaveLayoutAsAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
         requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission).    //TODO: #GDM #access check canCreateResource permission
-        text(tr("Save Layout As...")).
+        text(lit("If you see this string, notify me. #GDM")).
         condition(new QnSaveLayoutAsActionCondition(false, this));
 
     factory(QnActions::SaveLayoutForCurrentUserAsAction).
