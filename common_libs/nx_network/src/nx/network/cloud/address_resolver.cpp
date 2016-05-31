@@ -298,13 +298,7 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     // TODO: make DnsResolver QnStoppableAsync
     m_dnsResolver.stop();
-
-    QnMutexLocker lk(&m_mutex);
-    if (m_mediatorConnection)
-    {
-        lk.unlock();
-        m_mediatorConnection->pleaseStop(std::move(handler));
-    }
+    m_mediatorConnection->pleaseStop(std::move(handler));
 }
 
 AddressResolver::HostAddressInfo::HostAddressInfo(const HostAddress& hostAddress)

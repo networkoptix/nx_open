@@ -126,7 +126,7 @@ void removeByClient(Container* container, void* client)
 void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler)
 {
     NX_ASSERT(client);
-    m_timer.post(
+    m_timer.dispatch(
         [this, client, handler = std::move(handler)]()
         {
             QnMutexLocker lock(&m_mutex);
@@ -134,6 +134,7 @@ void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handl
             removeByClient(&m_indicationHandlers, client);
             m_reconnectHandlers.erase(client);
             removeByClient(&m_requestsInProgress, client);
+            NX_LOGX(lm("Cancel requests from %1").arg(client), cl_logDEBUG2);
 
             lock.unlock();
             handler();
@@ -287,6 +288,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     m_timer.reset();
     NX_ASSERT(!m_baseConnection);
+    NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logDEBUG1);
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
     m_baseConnection->setMessageHandler( 
@@ -322,15 +324,18 @@ void AsyncClient::processMessage(Message message)
             // find corresponding handler by transactionId
             const auto it = m_requestsInProgress.find( message.header.transactionId );
             if( it == m_requestsInProgress.end() )
-                return; // request is already canceled
+            {
+                NX_LOGX(lm("Response to canceled request %1")
+                    .arg(message.header.transactionId.toHex()), cl_logDEBUG2);
+                return;
+            }
 
             // use and erase the handler (transactionId is unique per transaction)
             RequestHandler handler( std::move( it->second.second ) );
             m_requestsInProgress.erase( it );
 
             lock.unlock();
-            handler( SystemError::noError, std::move( message ) );
-            return;
+            return handler( SystemError::noError, std::move( message ) );
         }
 
         case MessageClass::indication:

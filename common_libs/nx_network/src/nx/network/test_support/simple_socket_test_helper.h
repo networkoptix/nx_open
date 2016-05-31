@@ -160,12 +160,6 @@ void socketSimpleSync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    //auto failClient = clientMaker();
-    //EXPECT_FALSE(failClient->connect(endpointToConnectTo, kTestTimeout.count()));
-    //ASSERT_NE(SystemError::noError, SystemError::getLastOSErrorCode());
-    //failClient.reset();
-
-    nx::utils::promise<void> promise;
     auto server = serverMaker();
     nx::utils::thread serverThread(
         &syncSocketServerMainFunc<decltype(server)>,
@@ -173,10 +167,9 @@ void socketSimpleSync(
         testMessage,
         clientCount,
         std::move(server),
-        &promise);
+        nullptr);
 
-    promise.get_future().wait();
-
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     nx::utils::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
     {
@@ -194,7 +187,7 @@ void socketSimpleSync(
                     << SystemError::getLastOSErrorText().toStdString();
 
             const auto incomingMessage = readNBytes(client.get(), testMessage.size());
-            ASSERT_TRUE(!incomingMessage.isEmpty())
+            ASSERT_TRUE(!incomingMessage.isEmpty()) << i << ": "
                 << SystemError::getLastOSErrorText().toStdString();
             ASSERT_EQ(testMessage, incomingMessage);
 
@@ -259,6 +252,7 @@ void socketSimpleAsync(
     };
 
     server->acceptAsync(acceptor);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     for (int i = clientCount; i > 0; --i)
     {
         auto testClient = clientMaker();
@@ -283,9 +277,9 @@ void socketSimpleAsync(
                 });
         });
 
-        ASSERT_EQ(serverResults.pop(), SystemError::noError); // accept
-        ASSERT_EQ(clientResults.pop(), SystemError::noError); // send
-        ASSERT_EQ(serverResults.pop(), SystemError::noError); // recv
+        ASSERT_EQ(serverResults.pop(), SystemError::noError) << i; // accept
+        ASSERT_EQ(clientResults.pop(), SystemError::noError) << i; // send
+        ASSERT_EQ(serverResults.pop(), SystemError::noError) << i; // recv
 
         stopSocket(std::move(testClient));
     }
@@ -479,6 +473,7 @@ void socketSimpleAcceptMixed(
     // no clients yet
     ASSERT_EQ(server->accept(), nullptr);
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setSendTimeout(1000));
@@ -494,12 +489,12 @@ void socketSimpleAcceptMixed(
     // let the client get in the server listen queue
     ASSERT_EQ(
         std::future_status::ready,
-        connectionEstablishedFuture.wait_for(std::chrono::seconds(7)));
+        connectionEstablishedFuture.wait_for(std::chrono::seconds(1)));
     ASSERT_EQ(SystemError::noError, connectionEstablishedFuture.get());
 
     //if connect returned, it does not mean that accept has actually returned,
         //so giving internal socket implementation some time...
-    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     ASSERT_NE(server->accept(), nullptr)
         << SystemError::getLastOSErrorText().toStdString();
@@ -674,7 +669,7 @@ void socketAcceptCancel(
                 break;
             case StopType::pleaseStop:
                 server->pleaseStopSync();
-                break;
+                return; // is not recoverable
             default:
                 NX_CRITICAL(false);
         };

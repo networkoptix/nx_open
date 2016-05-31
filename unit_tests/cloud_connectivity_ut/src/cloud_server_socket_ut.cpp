@@ -25,20 +25,25 @@ class FakeTcpTunnelConnection
 {
 public:
     FakeTcpTunnelConnection(
-        String connectionId, SocketAddress address, size_t sockets = 1000)
+        aio::AbstractAioThread* thread, String connectionId,
+        SocketAddress address, size_t sockets, bool bindAssert)
     :
         AbstractIncomingTunnelConnection(std::move(connectionId)),
         m_sockets(sockets),
         m_server(std::make_unique<TCPServerSocket>())
     {
+        m_server->bindToAioThread(thread);
         NX_CRITICAL(m_server->setNonBlockingMode(true));
         NX_CRITICAL(m_server->setReuseAddrFlag(true));
         if (!m_server->bind(address) || !m_server->listen())
-            m_sockets = 0;
+            NX_CRITICAL(!bindAssert);
+        NX_LOGX(lm("listening %1 for %2 sockets")
+            .str(address.toString()).arg(m_sockets), cl_logDEBUG1);
+    }
 
-        NX_LOGX(lm("for %1 listen %2 for %3 sockets")
-                .arg(connectionId).arg(address.toString())
-                .arg(m_sockets), cl_logDEBUG1);
+    ~FakeTcpTunnelConnection()
+    {
+        NX_LOGX(lm("removed, %1 sockets left").arg(m_sockets), cl_logDEBUG1);
     }
 
     void accept(std::function<void(
@@ -46,11 +51,10 @@ public:
         std::unique_ptr<AbstractStreamSocket>)> handler) override
     {
         if (m_sockets == 0)
-            return m_server->post(
-                [handler]()
-                {
-                    handler(SystemError::connectionReset, nullptr);
-                });
+        {
+            return m_server->dispatch(
+                [handler]() { handler(SystemError::connectionReset, nullptr); });
+        }
 
         m_server->acceptAsync(
             [this, handler](
@@ -58,6 +62,7 @@ public:
             {
                 EXPECT_EQ(c, SystemError::noError);
                 --m_sockets;
+                NX_LOGX(lm("accepted, %1 left").arg(m_sockets), cl_logDEBUG2);
                 handler(c, std::unique_ptr<AbstractStreamSocket>(s));
             });
     }
@@ -67,7 +72,6 @@ public:
         m_server->pleaseStop(
             [this, handler = std::move(handler)]
             {
-                NX_LOGX(lm("exhausted"), cl_logDEBUG1);
                 m_server.reset();
                 handler();
             });
@@ -86,28 +90,52 @@ struct FakeTcpTunnelAcceptor
     public AbstractTunnelAcceptor
 {
     FakeTcpTunnelAcceptor(
+        aio::AbstractAioThread* designatedAioThread,
         boost::optional<SocketAddress> address,
-        size_t socketsPerConnection = 1000)
+        size_t socketsPerConnection = 1000, bool assertBind = true)
     :
+        m_designatedAioThread(designatedAioThread),
         m_address(std::move(address)),
         m_socketsPerConnection(socketsPerConnection),
+        m_assertBind(assertBind),
         m_ioThreadSocket(new TCPSocket)
     {
+        if (designatedAioThread)
+            m_ioThreadSocket->bindToAioThread(designatedAioThread);
+
+        NX_LOGX(lm("prepare to listen '%1' for %2 sockets (thread=%3)")
+            .arg(address ? address.get().toString() : QString())
+            .arg(m_socketsPerConnection).arg(designatedAioThread), cl_logDEBUG1);
+    }
+
+    ~FakeTcpTunnelAcceptor()
+    {
+        NX_LOGX(lm("removed (%1)").arg(bool(m_address)), cl_logDEBUG1);
     }
 
     void accept(std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) override
     {
-        if (!m_address)
-            return m_ioThreadSocket->registerTimer(
-                100, [handler](){ handler(SystemError::timedOut, nullptr); });
+        if (!m_designatedAioThread)
+        {
+            m_designatedAioThread = m_mediatorConnection->getAioThread();
+            m_ioThreadSocket->bindToAioThread(m_designatedAioThread);
+        }
 
-        auto connection = std::make_unique<FakeTcpTunnelConnection>(
-            m_remotePeerId, std::move(*m_address), m_socketsPerConnection);
+        m_ioThreadSocket->dispatch([this, handler = std::move(handler)]()
+        {
+            if (!m_address)
+                return m_ioThreadSocket->registerTimer(
+                    100, [handler](){ handler(SystemError::timedOut, nullptr); });
 
-        m_address = boost::none;
-        handler(SystemError::noError, std::move(connection));
+            auto connection = std::make_unique<FakeTcpTunnelConnection>(
+                m_ioThreadSocket->getAioThread(), m_connectionId,
+                std::move(*m_address), m_socketsPerConnection, m_assertBind);
+
+            m_address = boost::none;
+            handler(SystemError::noError, std::move(connection));
+        });
     }
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
@@ -115,8 +143,10 @@ struct FakeTcpTunnelAcceptor
         m_ioThreadSocket->pleaseStop(std::move(handler));
     }
 
+    aio::AbstractAioThread* m_designatedAioThread;
     boost::optional<SocketAddress> m_address;
     size_t m_socketsPerConnection;
+    bool m_assertBind;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
 };
 
@@ -139,18 +169,22 @@ struct CloudServerSocketTcpTester
     {
         initTunnelPool(queueLen);
         moveToListeningState();
-        for (quint16 i = 0; i < nAcceptors; i++)
-        {
-            auto addr = nx::network::test::kServerAddress;
+        m_mediatorRegistrationRetryTimer.dispatch(
+            [this]()
+            {
+                for (quint16 i = 0; i < nAcceptors; i++)
+                {
+                    auto addr = nx::network::test::kServerAddress;
 
-            // IP based acceptor
-            startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                SocketAddress(addr.address, addr.port + i)));
+                    // IP based acceptor
+                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
+                        getAioThread(), SocketAddress(addr.address, addr.port + i)));
 
-            // also start useless acceptors
-            startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                boost::none));
-        }
+                    // also start useless acceptors
+                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
+                        getAioThread(), boost::none));
+                }
+            });
 
         return true;
     }
@@ -259,7 +293,7 @@ TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
         [](hpm::api::ConnectionRequestedEvent)
         {
             return std::make_unique<FakeTcpTunnelAcceptor>(
-                network::test::kServerAddress);
+                nullptr, network::test::kServerAddress, 5, false);
         });
 
     auto server = std::make_unique<CloudServerSocket>(
@@ -333,7 +367,7 @@ protected:
                 NX_ASSERT(it != m_peerAddresses.end());
 
                 return std::make_unique<FakeTcpTunnelAcceptor>(
-                    it->second, kClientCount);
+                    nullptr, it->second, kClientCount, false);
             });
 
         auto cloudServerSocket = std::make_unique<CloudServerSocket>(
@@ -415,6 +449,7 @@ protected:
             [this, socket, peer, counter](SystemError::ErrorCode code)
             {
                 if (code != SystemError::noError)
+                {
                     return retryOnClient(
                         socket,
                         [this, peer, counter]()
@@ -422,6 +457,7 @@ protected:
                             requestAcceptor(peer->first);
                             connectClient(peer, counter.addIndication());
                         });
+                }
 
                 readOnClient(socket, peer, counter);
             });
@@ -480,7 +516,8 @@ protected:
     void retryOnClient(AbstractStreamSocket* socket, std::function<void()> action)
     {
         socket->registerTimer(
-            300, [this, socket, action = std::move(action)]()
+            300,
+            [this, socket, action = std::move(action)]()
             {
                 {
                     QnMutexLocker lock(&m_mutex);
@@ -564,15 +601,6 @@ TEST_F(CloudServerSocketTest, reconnect)
         cloudServerSocket.pleaseStopSync();
     }
 }
-
-//TEST_F(CloudServerSocketTest, aioCancellation)
-//{
-//    CloudServerSocket sock(
-//        nx::network::SocketGlobals::mediatorConnector().systemConnection());
-//    sock.listen(128);
-//    
-//    sock.acceptAsync();
-//}
 
 } // namespace cloud
 } // namespace network

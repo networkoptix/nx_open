@@ -265,6 +265,9 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         tunnelAcceptor->pleaseStopSync();
         tunnelAcceptor.reset();
+
+        if (!acceptResults.isEmpty())
+            ASSERT_NE(acceptResults.pop(), SystemError::noError);
         ASSERT_TRUE(acceptResults.isEmpty());
     }
 }

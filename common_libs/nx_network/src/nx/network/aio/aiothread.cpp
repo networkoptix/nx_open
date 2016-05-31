@@ -297,7 +297,7 @@ void AIOThread::run()
     static const int ERROR_RESET_TIMEOUT = 1000;
 
     initSystemThreadId();
-    NX_LOG(QLatin1String("AIO thread started"), cl_logDEBUG1);
+    NX_LOG(QLatin1String("AIO thread started"), cl_logDEBUG2);
 
     while (!needToStop())
     {
@@ -361,7 +361,7 @@ void AIOThread::run()
             m_impl->processSocketEvents(curClock);
     }
 
-    NX_LOG(QLatin1String("AIO thread stopped"), cl_logDEBUG1);
+    NX_LOG(QLatin1String("AIO thread stopped"), cl_logDEBUG2);
 }
 
 }   //aio
