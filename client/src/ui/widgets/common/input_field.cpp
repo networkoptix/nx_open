@@ -44,7 +44,7 @@ public:
         if (hideHint != hint->isHidden())
         {
             hint->setVisible(!hideHint);
-            hint->parentWidget()->layout()->activate();
+            parent->layout()->activate();
         }
 
         QPalette palette = parent->palette();
