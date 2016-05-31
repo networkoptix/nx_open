@@ -240,6 +240,7 @@ bool AxHDWitness::doInitialize() {
     win32_exception::installGlobalUnhandledExceptionHandler();
     AllowSetForegroundWindow(ASFW_ANY);
 
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QStringList pluginDirs = QCoreApplication::libraryPaths();
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
