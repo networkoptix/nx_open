@@ -482,7 +482,8 @@ void QnNxStyle::drawPrimitive(
                     hoveredRow = value.toInt();
             }
 
-            bool hasHover = item->index.row() == hoveredRow;
+            bool hasHover = item->index.row() == hoveredRow ||
+                item->state.testFlag(State_MouseOver) && !qobject_cast<const QTreeView*>(widget);
 
             /* Draw hover marker if needed: */
             if (hasHover && !selectionOpaque)
