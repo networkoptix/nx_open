@@ -111,7 +111,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>&amp;Browse...</string>
+             <string>Browse...</string>
             </property>
            </widget>
           </item>
@@ -178,7 +178,7 @@
               <item>
                <widget class="QPushButton" name="addExtraMediaFolderButton">
                 <property name="text">
-                 <string>&amp;Add...</string>
+                 <string>Add...</string>
                 </property>
                </widget>
               </item>
@@ -188,7 +188,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>&amp;Remove</string>
+                 <string>Remove</string>
                 </property>
                </widget>
               </item>

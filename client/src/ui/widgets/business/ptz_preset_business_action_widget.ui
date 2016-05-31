@@ -29,7 +29,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&amp;PTZ preset:</string>
+      <string>PTZ preset:</string>
      </property>
      <property name="buddy">
       <cstring>presetComboBox</cstring>

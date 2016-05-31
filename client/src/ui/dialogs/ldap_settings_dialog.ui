@@ -26,7 +26,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="serverLabel">
         <property name="text">
-         <string>Server UR&amp;L:</string>
+         <string>Server URL:</string>
         </property>
         <property name="buddy">
          <cstring>serverLineEdit</cstring>
@@ -43,7 +43,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="adminDnLabel">
         <property name="text">
-         <string>Ad&amp;min DN:</string>
+         <string>Admin DN:</string>
         </property>
         <property name="buddy">
          <cstring>adminDnLineEdit</cstring>
@@ -56,7 +56,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="passwordLabel">
         <property name="text">
-         <string>&amp;Password:</string>
+         <string>Password:</string>
         </property>
         <property name="buddy">
          <cstring>passwordLineEdit</cstring>
