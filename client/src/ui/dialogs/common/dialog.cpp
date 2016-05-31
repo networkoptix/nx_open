@@ -7,6 +7,12 @@ QnDialog::QnDialog(QWidget * parent, Qt::WindowFlags flags)
     : QDialog(parent, flags)
 {
     cancelDrag(this);
+    qDebug() << "dialog created";
+}
+
+QnDialog::~QnDialog()
+{
+    qDebug() << "dialog destroyed";
 }
 
 void QnDialog::show(QDialog *dialog)

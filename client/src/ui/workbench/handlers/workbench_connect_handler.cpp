@@ -393,6 +393,10 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     }
     m_connectingHandle = 0;
 
+    /* Preliminary exit if application was closed while we were in the inner loop. */
+    if (context()->closingDown())
+        return ec2::ErrorCode::ok;
+
     const QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     // TODO: check me!
     QnConnectionDiagnosticsHelper::Result status = silent

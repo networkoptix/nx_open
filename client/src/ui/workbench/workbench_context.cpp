@@ -37,9 +37,11 @@
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent),
     m_userWatcher(NULL),
-    m_layoutWatcher(NULL)
+    m_layoutWatcher(NULL),
+    m_closingDown(false)
 {
-    if(resourcePool == NULL) {
+    if(resourcePool == NULL)
+    {
         qnNullWarning(resourcePool);
         resourcePool = new QnResourcePool();
         resourcePool->setParent(this);
@@ -65,7 +67,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     instance<QnWorkbenchDesktopCameraWatcher>();
 #endif
 
-    connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 
     /* Create dependent objects. */
@@ -144,10 +145,13 @@ void QnWorkbenchContext::setUserName(const QString &userName) {
 }
 
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnWorkbenchContext::at_resourcePool_aboutToBeDestroyed() {
-    delete this;
+bool QnWorkbenchContext::closingDown() const
+{
+    return m_closingDown;
+}
+
+void QnWorkbenchContext::setClosingDown(bool value)
+{
+    m_closingDown = value;
 }
 
