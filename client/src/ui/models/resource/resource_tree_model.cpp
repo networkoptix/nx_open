@@ -98,7 +98,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
     connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
-    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
+    connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
     {
         Q_UNUSED(value);
         m_rootNodes[rootNodeTypeForScope()]->updateRecursive();

@@ -173,7 +173,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
             textRect.setLeft(startPos + textPadding * 2);
-            QString elidedHost = extraMetrics.elidedText(extInfo, option.textElideMode, textRect.width(), textFlags);
+            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width(), textFlags);
 
             painter->setFont(option.font);
             painter->setPen(extraColor);
