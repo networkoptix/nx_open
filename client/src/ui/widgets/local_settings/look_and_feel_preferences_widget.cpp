@@ -56,19 +56,20 @@ QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 void QnLookAndFeelPreferencesWidget::applyChanges()
 {
     qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
-    qnSettings->setExtraInfoInTree(ui->showIpInTreeCheckBox->isChecked()
+    qnSettings->setExtraInfoInTree(
+        ui->showIpInTreeCheckBox->isChecked()
         ? Qn::RI_FullInfo
         : Qn::RI_NameOnly
     );
     qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
 
     QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
-    if(!translation.isEmpty())
+    if (!translation.isEmpty())
     {
-        if(!translation.filePaths().isEmpty())
+        if (!translation.filePaths().isEmpty())
         {
             QString currentTranslationPath = qnSettings->translationPath();
-            if(!translation.filePaths().contains(currentTranslationPath))
+            if (!translation.filePaths().contains(currentTranslationPath))
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
     }
