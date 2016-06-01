@@ -77,7 +77,7 @@ void Pollable::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
     nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
 }
 
-bool Pollable::isisInSelfAioThread() const
+bool Pollable::isInSelfAioThread() const
 {
     return m_impl->aioThread.load() == QThread::currentThread();
 }

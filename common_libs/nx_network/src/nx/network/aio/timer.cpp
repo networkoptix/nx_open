@@ -72,9 +72,9 @@ void Timer::cancelSync()
     m_internalSocket.cancelIOSync(etTimedOut);
 }
 
-bool Timer::isisInSelfAioThread() const
+bool Timer::isInSelfAioThread() const
 {
-    return m_internalSocket.isisInSelfAioThread();
+    return m_internalSocket.isInSelfAioThread();
 }
 
 }   //aio
