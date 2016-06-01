@@ -12,39 +12,56 @@ namespace nx {
 namespace network {
 namespace test {
 
-template<quint16 kShift>
 class MultipleServerSocketTester
     : public MultipleServerSocket
 {
 public:
-    MultipleServerSocketTester()
+    MultipleServerSocketTester(AddressBinder* addressBinder, size_t count)
+    :
+        m_addressBinder(addressBinder)
     {
-        for (int i = 0; i < kShift; ++i)
+        for (int i = 0; i < count; ++i)
             addSocket(std::make_unique<TCPServerSocket>());
     }
 
     bool bind(const SocketAddress& localAddress) override
     {
-        auto port = localAddress.port;
+        m_boundAddress = m_addressBinder->bind();
         for(auto& socket : m_serverSockets)
         {
-            SocketAddress modifiedAddress(localAddress.address, port++);
-            NX_LOGX(lm("bind %1 to %2")
-                    .arg(modifiedAddress.toString()).arg(&socket), cl_logDEBUG1);
-            if (!socket->bind(modifiedAddress))
+            if (!socket->bind(SocketAddress()))
                 return false;
+
+            m_addressBinder->add(m_boundAddress, socket->getLocalAddress());
         }
 
         return true;
     }
+
+    SocketAddress getLocalAddress()
+    {
+        return m_boundAddress;
+    }
+
+private:
+    AddressBinder* m_addressBinder;
+    SocketAddress m_boundAddress;
 };
 
-NX_NETWORK_SERVER_SOCKET_TEST_CASE(
-    TEST, MultipleServerSocket,
-    &std::make_unique<MultipleServerSocketTester<4>>,
-    &std::make_unique<MultipleClientSocketTester<3>>)
+class MultipleServerSocketTest : public ::testing::Test
+{
+protected:
+    static AddressBinder ab;
+};
 
-TEST(MultipleServerSocket, add_remove)
+AddressBinder MultipleServerSocketTest::ab;
+
+NX_NETWORK_SERVER_SOCKET_TEST_CASE(
+    TEST_F, MultipleServerSocketTest,
+    [](){ return std::make_unique<MultipleServerSocketTester>(&ab, 5); },
+    [](){ return std::make_unique<MultipleClientSocketTester>(&ab); })
+
+TEST_F(MultipleServerSocketTest, add_remove)
 {
     MultipleServerSocket sock;
 

@@ -25,32 +25,39 @@ class FakeTcpTunnelConnection
 {
 public:
     FakeTcpTunnelConnection(
-        aio::AbstractAioThread* thread, String connectionId,
-        SocketAddress address, size_t sockets, bool bindAssert)
+        aio::AbstractAioThread* thread,
+        network::test::AddressBinder::Manager addressManager,
+        size_t clientsLimit)
     :
-        AbstractIncomingTunnelConnection(std::move(connectionId)),
-        m_sockets(sockets),
-        m_server(std::make_unique<TCPServerSocket>())
+        AbstractIncomingTunnelConnection(
+            addressManager.key.address.toString().toUtf8()),
+        m_clientsLimit(clientsLimit),
+        m_server(new TCPServerSocket),
+        m_addressManager(std::move(addressManager))
     {
         m_server->bindToAioThread(thread);
         NX_CRITICAL(m_server->setNonBlockingMode(true));
         NX_CRITICAL(m_server->setReuseAddrFlag(true));
-        if (!m_server->bind(address) || !m_server->listen())
-            NX_CRITICAL(!bindAssert);
+        NX_CRITICAL(m_server->bind(network::test::kAnyPrivateAddress));
+        NX_CRITICAL(m_server->listen());
+
+        auto address = m_server->getLocalAddress();
         NX_LOGX(lm("listening %1 for %2 sockets")
-            .str(address.toString()).arg(m_sockets), cl_logDEBUG1);
+            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
+        m_addressManager.add(std::move(address));
     }
 
     ~FakeTcpTunnelConnection()
     {
-        NX_LOGX(lm("removed, %1 sockets left").arg(m_sockets), cl_logDEBUG1);
+        m_addressManager.remove(m_server->getLocalAddress());
+        NX_LOGX(lm("removed, %1 sockets left").arg(m_clientsLimit), cl_logDEBUG1);
     }
 
     void accept(std::function<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> handler) override
     {
-        if (m_sockets == 0)
+        if (m_clientsLimit == 0)
         {
             return m_server->dispatch(
                 [handler]() { handler(SystemError::connectionReset, nullptr); });
@@ -61,25 +68,21 @@ public:
                 SystemError::ErrorCode c, AbstractStreamSocket* s)
             {
                 EXPECT_EQ(c, SystemError::noError);
-                --m_sockets;
-                NX_LOGX(lm("accepted, %1 left").arg(m_sockets), cl_logDEBUG2);
+                --m_clientsLimit;
+                NX_LOGX(lm("accepted, %1 left").arg(m_clientsLimit), cl_logDEBUG2);
                 handler(c, std::unique_ptr<AbstractStreamSocket>(s));
             });
     }
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
-        m_server->pleaseStop(
-            [this, handler = std::move(handler)]
-            {
-                m_server.reset();
-                handler();
-            });
+        m_server->pleaseStop(std::move(handler));
     }
 
 private:
-    size_t m_sockets;
+    size_t m_clientsLimit;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
+    network::test::AddressBinder::Manager m_addressManager;
 };
 
 /**
@@ -90,27 +93,28 @@ struct FakeTcpTunnelAcceptor
     public AbstractTunnelAcceptor
 {
     FakeTcpTunnelAcceptor(
-        aio::AbstractAioThread* designatedAioThread,
-        boost::optional<SocketAddress> address,
-        size_t socketsPerConnection = 1000, bool assertBind = true)
+        network::test::AddressBinder::Manager addressManager,
+        aio::AbstractAioThread* designatedAioThread = nullptr,
+        bool hasConnection = true,
+        size_t clientsLimit = 5)
     :
         m_designatedAioThread(designatedAioThread),
-        m_address(std::move(address)),
-        m_socketsPerConnection(socketsPerConnection),
-        m_assertBind(assertBind),
-        m_ioThreadSocket(new TCPSocket)
+        m_ioThreadSocket(new TCPSocket),
+        m_addressManager(std::move(addressManager)),
+        m_hasConnection(hasConnection),
+        m_clientsLimit(clientsLimit)
     {
         if (designatedAioThread)
             m_ioThreadSocket->bindToAioThread(designatedAioThread);
 
-        NX_LOGX(lm("prepare to listen '%1' for %2 sockets (thread=%3)")
-            .arg(address ? address.get().toString() : QString())
-            .arg(m_socketsPerConnection).arg(designatedAioThread), cl_logDEBUG1);
+        NX_LOGX(lm("prepare to listen '%1', c=%2, lim=%3, thread=%4")
+            .str(addressManager.key).arg(hasConnection).arg(clientsLimit)
+            .arg(designatedAioThread), cl_logDEBUG1);
     }
 
     ~FakeTcpTunnelAcceptor()
     {
-        NX_LOGX(lm("removed (%1)").arg(bool(m_address)), cl_logDEBUG1);
+        NX_LOGX(lm("removed, c=%1").str(m_hasConnection), cl_logDEBUG1);
     }
 
     void accept(std::function<void(
@@ -125,15 +129,14 @@ struct FakeTcpTunnelAcceptor
 
         m_ioThreadSocket->dispatch([this, handler = std::move(handler)]()
         {
-            if (!m_address)
+            if (!m_hasConnection)
                 return m_ioThreadSocket->registerTimer(
                     100, [handler](){ handler(SystemError::timedOut, nullptr); });
 
             auto connection = std::make_unique<FakeTcpTunnelConnection>(
-                m_ioThreadSocket->getAioThread(), m_connectionId,
-                std::move(*m_address), m_socketsPerConnection, m_assertBind);
+                m_ioThreadSocket->getAioThread(), m_addressManager, m_clientsLimit);
 
-            m_address = boost::none;
+            m_hasConnection = false;
             handler(SystemError::noError, std::move(connection));
         });
     }
@@ -144,50 +147,10 @@ struct FakeTcpTunnelAcceptor
     }
 
     aio::AbstractAioThread* m_designatedAioThread;
-    boost::optional<SocketAddress> m_address;
-    size_t m_socketsPerConnection;
-    bool m_assertBind;
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
-};
-
-/**
- * Creates @param nAcceptors @class FakeTcpTunnelAcceptor(s) instead of real ones
- */
-template<quint16 nAcceptors>
-struct CloudServerSocketTcpTester
-:
-    CloudServerSocket
-{
-    CloudServerSocketTcpTester()
-    :
-        CloudServerSocket(
-            nx::network::SocketGlobals::mediatorConnector().systemConnection())
-    {
-    }
-
-    bool listen(int queueLen) override
-    {
-        initTunnelPool(queueLen);
-        moveToListeningState();
-        m_mediatorRegistrationRetryTimer.dispatch(
-            [this]()
-            {
-                for (quint16 i = 0; i < nAcceptors; i++)
-                {
-                    auto addr = nx::network::test::kServerAddress;
-
-                    // IP based acceptor
-                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                        getAioThread(), SocketAddress(addr.address, addr.port + i)));
-
-                    // also start useless acceptors
-                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
-                        getAioThread(), boost::none));
-                }
-            });
-
-        return true;
-    }
+    network::test::AddressBinder::Manager m_addressManager;
+    bool m_hasConnection;
+    size_t m_clientsLimit;
 };
 
 class CloudServerSocketTest
@@ -230,58 +193,82 @@ private:
     }
 };
 
-template<typename ServerSocket>
+struct CloudServerSocketTcpTester
+:
+    public CloudServerSocket
+{
+    CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder)
+    :
+        CloudServerSocket(
+            nx::network::SocketGlobals::mediatorConnector().systemConnection()),
+        m_addressManager(addressBinder)
+    {
+    }
+
+    SocketAddress getLocalAddress() const override
+    {
+        return m_addressManager.key;
+    }
+
+    bool listen(int queueLen) override
+    {
+        initTunnelPool(queueLen);
+        moveToListeningState();
+        m_mediatorRegistrationRetryTimer.dispatch(
+            [this]()
+            {
+                for (size_t i = 0; i < 2; ++i)
+                {
+                    // normal acceptor
+                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
+                        m_addressManager, getAioThread(), true, 100));
+
+                    // acceptor without sockets
+                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
+                        m_addressManager, getAioThread(), true, 0));
+
+                    // brocken acceptor
+                    startAcceptor(std::make_unique<FakeTcpTunnelAcceptor>(
+                        m_addressManager, getAioThread(), false));
+                }
+            });
+
+        return true;
+    }
+
+    network::test::AddressBinder::Manager m_addressManager;
+};
+
 class CloudServerSocketTcpTest
 :
-    public CloudServerSocketTest
+    public ::testing::Test
 {
 protected:
-    std::unique_ptr<ServerSocket> makeServerSocket()
+    std::unique_ptr<CloudServerSocketTcpTester> makeServerTester()
     {
-        return std::make_unique<ServerSocket>();
+        return std::make_unique<CloudServerSocketTcpTester>(
+            &addressBinder);
     }
+
+    std::unique_ptr<network::test::MultipleClientSocketTester> makeClientTester()
+    {
+        return std::make_unique<network::test::MultipleClientSocketTester>(
+            &addressBinder);
+    }
+
+    network::test::AddressBinder addressBinder;
 };
 
-struct CloudServerSocketSingleTcpTest
-    : CloudServerSocketTcpTest<CloudServerSocketTcpTester<1>> {};
-
 NX_NETWORK_SERVER_SOCKET_TEST_CASE(
-    TEST_F, CloudServerSocketSingleTcpTest,
-    [this](){ return makeServerSocket(); },
-    &std::make_unique<TCPSocket>);
+    TEST_F, CloudServerSocketTcpTest,
+    [this](){ return makeServerTester(); },
+    [this](){ return makeClientTester(); });
 
-struct CloudServerSocketMultiTcpAcceptorTest
-    : CloudServerSocketTcpTest<CloudServerSocketTcpTester<5>> {};
-
-NX_NETWORK_SERVER_SOCKET_TEST_CASE(
-    TEST_F, CloudServerSocketMultiTcpAcceptorTest,
-    [this](){ return makeServerSocket(); },
-    &std::make_unique<network::test::MultipleClientSocketTester<3>>);
-
-static void testTunnelConnect(bool isSuccessExpected)
+TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 {
-    auto client = std::make_unique<TCPSocket>(false);
-    ASSERT_TRUE(client->setNonBlockingMode(true));
-    ASSERT_TRUE(client->setSendTimeout(500));
+    network::test::AddressBinder addressBinder;
+    const network::test::AddressBinder::Manager addressManager(&addressBinder);
 
-    nx::utils::promise<SystemError::ErrorCode> result;
-    client->connectAsync(
-        network::test::kServerAddress,
-        [&](SystemError::ErrorCode c){ result.set_value(c); });
-
-    const auto code = result.get_future().get();
-    EXPECT_EQ(code == SystemError::noError, isSuccessExpected) << code;
-    client->pleaseStopSync();
-}
-
-class CloudServerSocketBaseTcpTest
-:
-    public CloudServerSocketTest
-{
-};
-
-TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
-{
     auto stunAsyncClient = std::make_shared<stun::test::AsyncClientMock>();
     EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
         stun::cc::indications::connectionRequested,
@@ -290,10 +277,9 @@ TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
 
     std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
     acceptorMakers.push_back(
-        [](hpm::api::ConnectionRequestedEvent)
+        [&](hpm::api::ConnectionRequestedEvent)
         {
-            return std::make_unique<FakeTcpTunnelAcceptor>(
-                nullptr, network::test::kServerAddress, 5, false);
+            return std::make_unique<FakeTcpTunnelAcceptor>(addressManager);
         });
 
     auto server = std::make_unique<CloudServerSocket>(
@@ -306,8 +292,8 @@ TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     ASSERT_TRUE(server->listen(1));
     server->moveToListeningState();
 
-    // there is no tunnel yet
-    testTunnelConnect(false);
+    // there is no tunnels yet
+    ASSERT_EQ(addressBinder.get(addressManager.key).size(), 0);
 
     hpm::api::ConnectionRequestedEvent event;
     event.connectSessionId = String("someSessionId");
@@ -322,8 +308,20 @@ TEST_F(CloudServerSocketBaseTcpTest, OpenTunnelOnIndication)
     //giving server socket time to process indication
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    // now we can use estabilished tunnel
-    testTunnelConnect(true);
+    auto list = addressBinder.get(addressManager.key);
+    ASSERT_EQ(list.size(), 1);
+
+    auto client = std::make_unique<TCPSocket>(false);
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(500));
+
+    nx::utils::promise<SystemError::ErrorCode> result;
+    client->connectAsync(
+        *list.begin(),
+        [&](SystemError::ErrorCode c){ result.set_value(c); });
+
+    EXPECT_EQ(result.get_future().get(), SystemError::noError);
+    client->pleaseStopSync();
     server->pleaseStopSync();
 }
 
@@ -347,11 +345,9 @@ protected:
         SocketGlobals::mediatorConnector().setSystemCredentials(
             std::move(systemCredentials));
 
-        const auto addr = network::test::kServerAddress;
+        const auto addr = network::test::kAnyPrivateAddress;
         for (size_t i = 0; i < kPeerCount; i++)
-            m_peerAddresses.emplace(
-                QnUuid::createUuid().toSimpleString().toUtf8(),
-                SocketAddress(addr.address, addr.port + i));
+            m_boundPeers.insert(m_addressBinder.bind());
 
         m_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         EXPECT_CALL(*m_stunClient, setIndicationHandler(
@@ -363,11 +359,10 @@ protected:
         acceptorMakers.push_back(
             [this](hpm::api::ConnectionRequestedEvent event)
             {
-                const auto it = m_peerAddresses.find(event.originatingPeerID);
-                NX_ASSERT(it != m_peerAddresses.end());
-
+                SocketAddress address(QLatin1String(event.originatingPeerID));
                 return std::make_unique<FakeTcpTunnelAcceptor>(
-                    nullptr, it->second, kClientCount, false);
+                    network::test::AddressBinder::Manager(
+                        &m_addressBinder, std::move(address)));
             });
 
         auto cloudServerSocket = std::make_unique<CloudServerSocket>(
@@ -408,63 +403,67 @@ protected:
     void startClientThread(size_t clientCount)
     {
         nx::utils::thread thread(
-            [this, clientCount]()
+            [=]()
             {
                 for (size_t i = 0; i < clientCount; ++i)
-                    for (auto it = m_peerAddresses.begin();
-                        it != m_peerAddresses.end(); ++it)
-                            connectClient(it);
+                {
+                    for (const auto peer: m_boundPeers)
+                        startClient(peer);
+                }
             });
 
         m_threads.push_back(std::move(thread));
     }
 
-    struct Counters
+    void startClient(const SocketAddress& peer)
     {
-        size_t indications, retries;
+        auto socketPtr = std::make_unique<TCPSocket>();
+        auto socket = socketPtr.get();
+        ASSERT_TRUE(socketPtr->setSendTimeout(100));
+        ASSERT_TRUE(socketPtr->setRecvTimeout(100));
+        ASSERT_TRUE(socketPtr->setNonBlockingMode(true));
 
-        Counters(size_t i = 0, size_t r = 0): indications(i), retries(r) {}
-        Counters addIndication() const { return {indications + 1, retries }; }
-        Counters addRetry() const { return {indications, retries + 1 }; }
-    };
-
-    void connectClient(
-        std::map<String, SocketAddress>::iterator peer,
-        Counters counter = Counters())
-    {
-        AbstractStreamSocket* socket;
         {
-            auto socketPtr = std::make_unique<TCPSocket>();
-            socket = socketPtr.get();
-            ASSERT_TRUE(socketPtr->setSendTimeout(100));
-            ASSERT_TRUE(socketPtr->setRecvTimeout(100));
-            ASSERT_TRUE(socketPtr->setNonBlockingMode(true));
-
             QnMutexLocker lock(&m_mutex);
             m_connectSockets.emplace(socket, std::move(socketPtr));
         }
 
-        socket->connectAsync(
-            peer->second,
-            [this, socket, peer, counter](SystemError::ErrorCode code)
-            {
-                if (code != SystemError::noError)
-                {
-                    return retryOnClient(
-                        socket,
-                        [this, peer, counter]()
-                        {
-                            requestAcceptor(peer->first);
-                            connectClient(peer, counter.addIndication());
-                        });
-                }
-
-                readOnClient(socket, peer, counter);
-            });
+        connectClient(socket, peer);
     }
 
-    void requestAcceptor(String peerId)
+    void connectClient(AbstractStreamSocket* socket, const SocketAddress& peer)
     {
+        if (auto address = m_addressBinder.random(peer))
+        {
+            socket->connectAsync(
+                address.get(),
+                [=](SystemError::ErrorCode code)
+                {
+                    if (code == SystemError::noError)
+                        readOnClient(socket, peer);
+                    else
+                        connectClient(socket, peer);
+                });
+        }
+        else
+        {
+            socket->registerTimer(
+                rand() % 1000 + 100,
+                [=]()
+                {
+                    if (auto address = m_addressBinder.random(peer))
+                        return connectClient(socket, peer);
+
+                    emitIndication(peer);
+                    socket->registerTimer(
+                        500, [=](){ connectClient(socket, peer); });
+                });
+        }
+    }
+
+    void emitIndication(SocketAddress peer)
+    {
+        String peerId = peer.address.toString().toUtf8();
         NX_LOGX(lm("request acceptor from %1").arg(peerId), cl_logDEBUG2);
 
         hpm::api::ConnectionRequestedEvent event;
@@ -479,68 +478,36 @@ protected:
         m_stunClient->emulateIndication(message);
     }
 
-    void readOnClient(
-        AbstractStreamSocket* socket,
-        std::map<String, SocketAddress>::iterator peer,
-        Counters counter)
+    void readOnClient(AbstractStreamSocket* socket, const SocketAddress& peer)
     {
         auto buffer = std::make_shared<Buffer>();
         buffer->reserve(network::test::kTestMessage.size() + 1);
         socket->readSomeAsync(
             buffer.get(),
-            [this, socket, peer, counter, buffer](
-                SystemError::ErrorCode code, size_t size)
+            [=](SystemError::ErrorCode code, size_t size)
             {
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_connectSockets.erase(socket);
+                }
+
                 if (code != SystemError::noError ||
                     size != static_cast<size_t>(
                         network::test::kTestMessage.size()))
                 {
-                    return retryOnClient(
-                        socket,
-                        [this, peer, counter]()
-                        {
-                            connectClient(peer, counter.addRetry());
-                        });
-                }
-
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    m_connectSockets.erase(socket);
+                    return startClient(peer);
                 }
 
                 EXPECT_EQ(*buffer, network::test::kTestMessage);
-                m_connectedResults.push(counter);
-            });
-    }
-
-    void retryOnClient(AbstractStreamSocket* socket, std::function<void()> action)
-    {
-        socket->registerTimer(
-            300,
-            [this, socket, action = std::move(action)]()
-            {
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    m_connectSockets.erase(socket);
-                }
-
-                action();
+                m_connectedResults.push(code);
             });
     }
 
     void TearDown() override
     {
         const auto kTotalConnects = kThreadCount * kClientCount * kPeerCount;
-        Counters totalCounters;
         for (size_t i = 0; i < kTotalConnects; ++i)
-        {
-            const auto c = m_connectedResults.pop();
-            totalCounters.indications += c.indications;
-            totalCounters.retries += c.retries;
-        }
-
-        EXPECT_GE(totalCounters.indications, kPeerCount * kThreadCount);
-        EXPECT_GE(totalCounters.retries, kTotalConnects / kQueueLimit);
+            m_connectedResults.pop();
 
         m_server->pleaseStopSync();
         for (auto& thread : m_threads)
@@ -551,10 +518,12 @@ protected:
             socket->pleaseStopSync();
     }
 
-    std::map<String, SocketAddress> m_peerAddresses;
+    network::test::AddressBinder m_addressBinder;
+    std::set<SocketAddress> m_boundPeers;
+
     std::shared_ptr<stun::test::AsyncClientMock> m_stunClient;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
-    TestSyncQueue<Counters> m_connectedResults;
+    TestSyncQueue<SystemError::ErrorCode> m_connectedResults;
     std::vector<nx::utils::thread> m_threads;
 
     QnMutex m_mutex;
