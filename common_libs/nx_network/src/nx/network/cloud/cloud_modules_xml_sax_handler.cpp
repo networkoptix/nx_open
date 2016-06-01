@@ -56,9 +56,10 @@ bool CloudModulesXmlHandler::startElement(
                 return false;
             m_state = readingModuleEndpoint;
             return true;
-    }
 
-    return false;
+        default:
+            return false;
+    }
 }
 
 bool CloudModulesXmlHandler::characters(const QString& ch)

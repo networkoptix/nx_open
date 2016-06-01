@@ -58,6 +58,9 @@ namespace
     const QLatin1String kDbMaxConnections( "db/maxConnections" );
     const QLatin1String kDefaultDbMaxConnections( "1" );
 
+    const QLatin1String kDbInactivityTimeout("db/inactivityTimeout");
+    const std::chrono::seconds kDefaultDbInactivityTimeout = std::chrono::minutes(10);
+
     const QLatin1String kChangeUser( "changeUser" );
 
     //notification settings
@@ -256,6 +259,10 @@ void Settings::loadConfiguration()
     m_dbConnectionOptions.maxConnectionCount = m_settings.value( kDbMaxConnections, kDefaultDbMaxConnections ).toUInt();
     if( m_dbConnectionOptions.maxConnectionCount == 0 )
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
+    m_dbConnectionOptions.inactivityTimeout = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kDbInactivityTimeout).toString(),
+            kDefaultDbInactivityTimeout));
 
     m_changeUser = m_settings.value( kChangeUser ).toString();
 
