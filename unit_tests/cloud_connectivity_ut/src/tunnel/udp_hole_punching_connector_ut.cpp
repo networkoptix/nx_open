@@ -294,6 +294,83 @@ TEST_F(TunnelConnector, cancellation)
     }
 }
 
+/** problem: server peer does not see connecting peer 
+    on the same address that mediator sees connecting peer
+*/
+TEST_F(TunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
+{
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto system1 = mediator().addRandomSystem();
+    const auto server1 = mediator().addRandomServer(system1);
+    //const auto connectTimeout = std::chrono::seconds(10);
+    const auto connectTimeout = std::chrono::seconds::zero();
+
+    nx::utils::promise<hpm::api::ConnectionRequestedEvent> connectionRequestedPromise;
+
+    //starting mediaserver emulator with specified host name
+    server1->setOnConnectionRequestedHandler(
+        [&connectionRequestedPromise](hpm::api::ConnectionRequestedEvent eventData)
+            -> MediaServerEmulator::ActionToTake
+        {
+            connectionRequestedPromise.set_value(eventData);
+            return MediaServerEmulator::ActionToTake::proceedWithConnection;
+        });
+    server1->setConnectionAckResponseHandler(
+        [](hpm::api::ResultCode resultCode)
+            -> MediaServerEmulator::ActionToTake
+        {
+            return MediaServerEmulator::ActionToTake::proceedWithConnection;
+        });
+
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
+
+    nx::utils::promise<ConnectResult> connectedPromise;
+    udp::TunnelConnector connector(
+        SocketAddress((server1->serverId() + "." + system1.id).constData()));
+    connector.replaceOriginatingHostAddress("192.168.0.1");
+
+    connector.connect(
+        connectTimeout,
+        [&connectedPromise](
+            SystemError::ErrorCode errorCode,
+            std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+        {
+            //ConnectResult result;
+            //result.errorCode = errorCode;
+            //result.connection = std::move(connection);
+            //connectedPromise.set_value(std::move(result));
+        });
+
+    auto connectionRequestedFuture = connectionRequestedPromise.get_future();
+    ASSERT_EQ(
+        std::future_status::ready,
+        connectionRequestedFuture.wait_for(std::chrono::seconds(7)));
+
+    const auto connectionRequestedEvent = connectionRequestedFuture.get();
+    ASSERT_EQ(1, connectionRequestedEvent.udpEndpointList.size());
+    //ASSERT_EQ(
+    //    xxx,
+    //    connectionRequestedEvent.udpEndpointList.begin()->port);
+    ASSERT_EQ(
+        HostAddress("192.168.0.1"),
+        connectionRequestedEvent.udpEndpointList.begin()->address);
+
+
+    //auto connectedFuture = connectedPromise.get_future();
+    //ASSERT_EQ(
+    //    std::future_status::ready,
+    //    connectedFuture.wait_for(
+    //        connectTimeout == std::chrono::milliseconds::zero()
+    //        ? kDefaultTestTimeout
+    //        : connectTimeout * 2));
+    //const auto connectResult = connectedFuture.get();
+    //ASSERT_EQ(SystemError::noError, connectResult.errorCode);
+
+    connector.pleaseStopSync();
+    //connectResult.connection->pleaseStopSync();
+}
+
 }   //namespace test
 }   //namespace udp
 }   //namespace cloud

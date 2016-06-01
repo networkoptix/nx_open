@@ -24,6 +24,10 @@ void PrintTo(const SocketAddress& val, ::std::ostream* os) {
     *os << val.toString().toStdString();
 }
 
+void PrintTo(const HostAddress& val, ::std::ostream* os) {
+    *os << val.toString().toStdString();
+}
+
 namespace std {
 namespace chrono {
 

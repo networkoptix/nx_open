@@ -144,6 +144,11 @@ const AddressEntry& TunnelConnector::targetPeerAddress() const
     return m_targetHostAddress;
 }
 
+void TunnelConnector::replaceOriginatingHostAddress(const nx::String& hostAddress)
+{
+    //TODO #ak
+}
+
 void TunnelConnector::messageReceived(
     SocketAddress sourceAddress,
     stun::Message msg)

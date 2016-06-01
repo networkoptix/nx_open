@@ -64,6 +64,9 @@ public:
             std::unique_ptr<AbstractOutgoingTunnelConnection>)> handler) override;
     virtual const AddressEntry& targetPeerAddress() const override;
 
+    /** \a hostAddress will be used by mediator instead of request source address */
+    void replaceOriginatingHostAddress(const nx::String& hostAddress);
+
 protected:
     virtual void messageReceived(
         SocketAddress sourceAddress,
