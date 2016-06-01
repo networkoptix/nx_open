@@ -810,7 +810,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.soundUrl.isEmpty();
+            return !m_actionParams.url.isEmpty();
         case QnBusiness::SayTextAction:
             return !m_actionParams.sayText.isEmpty();
         case QnBusiness::ExecutePtzPresetAction:
