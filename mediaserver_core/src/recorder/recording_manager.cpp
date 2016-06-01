@@ -240,13 +240,15 @@ bool QnRecordingManager::startOrStopRecording(
     bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
     if (!cameraRes->isInitialized() && needRecordCamera) {
         cameraRes->initAsync(true);
-        return false; // wait for initialization
     }
 
     bool someRecordingIsPresent = false;
 
     if (needRecordCamera && res->getStatus() != Qn::Offline)
     {
+        if (!cameraRes->isInitialized())
+            return false; // wait for initialization
+
         QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
         QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
 

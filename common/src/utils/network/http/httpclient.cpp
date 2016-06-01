@@ -10,6 +10,7 @@
 
 namespace nx_http
 {
+
     HttpClient::HttpClient()
     :
         m_done( false ),
@@ -43,12 +44,15 @@ namespace nx_http
         nx_http::StringType messageBody )
     {
         using namespace std::placeholders;
+
+
         return doRequest(std::bind(
             &nx_http::AsyncHttpClient::doPost,
             _1,
             url,
             contentType,
-            std::move(messageBody)));
+            std::move(messageBody),
+            true));
     }
 
     const Response* HttpClient::response() const
@@ -100,6 +104,16 @@ namespace nx_http
     void HttpClient::setTotalReconnectTries( int reconnectTries )
     {
         m_reconnectTries = reconnectTries;
+    }
+
+    void HttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
+    {
+        m_sendTimeoutMs = sendTimeoutMs;
+    }
+
+    void HttpClient::setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs)
+    {
+        m_responseReadTimeoutMs = responseReadTimeoutMs;
     }
 
     void HttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
@@ -154,6 +168,10 @@ namespace nx_http
                 m_asyncHttpClient->setSubsequentReconnectTries(m_subsequentReconnectTries.get());
             if (m_reconnectTries)
                 m_asyncHttpClient->setTotalReconnectTries(m_reconnectTries.get());
+            if (m_sendTimeoutMs)
+                m_asyncHttpClient->setSendTimeoutMs(m_sendTimeoutMs.get());
+            if (m_responseReadTimeoutMs)
+                m_asyncHttpClient->setResponseReadTimeoutMs(m_responseReadTimeoutMs.get());
             if (m_messageBodyReadTimeoutMs)
                 m_asyncHttpClient->setMessageBodyReadTimeoutMs(m_messageBodyReadTimeoutMs.get());
             if (m_userAgent)
@@ -201,5 +219,13 @@ namespace nx_http
     void HttpClient::onReconnected()
     {
         //TODO/IMPL
+    }
+
+    QSharedPointer<AbstractStreamSocket> HttpClient::takeSocket()
+    {
+        if (!m_asyncHttpClient->socket() || !m_asyncHttpClient->socket()->setNonBlockingMode(false))
+            return QSharedPointer<AbstractStreamSocket>();
+
+        return m_asyncHttpClient->takeSocket();
     }
 }

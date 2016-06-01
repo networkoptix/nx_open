@@ -10,6 +10,9 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 #include <utils/common/singleton.h>
+#include <utils/media/audioformat.h>
+
+#include <libavcodec/avcodec.h>
 
 // TODO: #Elric this header does not belong in the source root.
 
@@ -30,6 +33,9 @@ public:
     virtual ~TextToWaveServer();
 
     virtual void pleaseStop() override;
+
+    QnAudioFormat getAudioFormat();
+    CodecID getCodecId();
 
 public slots:
     //!Adds task to the queue
@@ -75,6 +81,7 @@ private:
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
+    QnAudioFormat m_audioFormat;
 
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };

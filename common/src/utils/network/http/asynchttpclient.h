@@ -47,7 +47,6 @@ namespace nx_http
         Q_OBJECT
 
     public:
-        // TODO: #Elric #enum
         enum AuthType {
             authBasicAndDigest,
             authDigest,
@@ -89,12 +88,14 @@ namespace nx_http
         //!Start POST request to \a url
         /*!
             \todo Infinite POST message body support
+            \param includeContentLength TODO #ak this parameter is a hack. Replace it with AbstractMsgBodySource if future version
             \return true, if socket is created and async connect is started. false otherwise
         */
         bool doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            nx_http::StringType messageBody );
+            nx_http::StringType messageBody,
+            bool includeContentLength = true );
         bool doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
@@ -124,8 +125,13 @@ namespace nx_http
         void setSubsequentReconnectTries( int reconnectTries );
         void setTotalReconnectTries( int reconnectTries );
         void setUserAgent( const QString& userAgent );
-        void setUserName( const QString& userAgent );
-        void setUserPassword( const QString& userAgent );
+        void setUserName( const QString& userName);
+        void setUserPassword( const QString& userPassword );
+        void setProxyUserName( const QString& userName );
+        void setProxyUserPassword( const QString& userPassword );
+
+        //!If set to \a true client will not try to add Authorization header to the first request. \a false by default
+        void setDisablePrecalculatedAuthorization(bool val);
 
         //!Set socket send timeout
         void setSendTimeoutMs( unsigned int sendTimeoutMs );
@@ -197,6 +203,11 @@ namespace nx_http
 
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
+        //!Invoked after request has been sent
+        /*!
+            \param isRetryAfterUnauthorized set to \a true if request has been sent as after receiving 401 unauthorized response
+        */
+        void requestHasBeenSent( nx_http::AsyncHttpClientPtr, bool isRetryAfterUnauthorizedResponse );
         //!Emitted when response headers has been read
         void responseReceived( nx_http::AsyncHttpClientPtr );
         //!Message body buffer is not empty
@@ -229,7 +240,10 @@ namespace nx_http
         QString m_userAgent;
         QString m_userName;
         QString m_userPassword;
+        QString m_proxyUserName;
+        QString m_proxyUserPassword;
         bool m_authorizationTried;
+        bool m_proxyAuthorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
         mutable QnMutex m_mutex;
@@ -245,6 +259,7 @@ namespace nx_http
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
+        bool m_precalculatedAuthorizationDisabled;
 
         AsyncHttpClient();
 
@@ -266,7 +281,9 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::Response& response );
+        bool resendRequestWithAuthorization(
+            const nx_http::Response& response,
+            bool isProxy = false);
         void doSomeCustomLogic(
             const nx_http::Response& response,
             Request* const request );

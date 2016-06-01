@@ -41,6 +41,7 @@ namespace nx_http
         m_connectionClosed( false ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
+        m_proxyAuthorizationTried( false ),
         m_ha1RecalcTried( false ),
         m_terminated( false ),
         m_totalBytesRead( 0 ),
@@ -51,7 +52,8 @@ namespace nx_http
         m_authType(authBasicAndDigest),
         m_awaitedMessageNumber( 0 ),
         m_lastSysErrorCode(SystemError::noError),
-        m_requestSequence( 0 )
+        m_requestSequence( 0 ),
+        m_precalculatedAuthorizationDisabled( false )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -131,7 +133,8 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        nx_http::StringType messageBody)
+        nx_http::StringType messageBody,
+        bool includeContentLength)
     {
         if( !url.isValid() )
             return false;
@@ -140,7 +143,8 @@ namespace nx_http
         m_url = url;
         composeRequest( nx_http::Method::POST );
         m_request.headers.insert( make_pair("Content-Type", contentType) );
-        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        if (includeContentLength)
+            m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = std::move(messageBody);
@@ -248,6 +252,21 @@ namespace nx_http
     void AsyncHttpClient::setUserPassword( const QString& userPassword )
     {
         m_userPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setProxyUserName(const QString& userName)
+    {
+        m_proxyUserName = userName;
+    }
+
+    void AsyncHttpClient::setProxyUserPassword(const QString& userPassword)
+    {
+        m_proxyUserPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
+    {
+        m_precalculatedAuthorizationDisabled = val;
     }
 
     void AsyncHttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
@@ -359,6 +378,17 @@ namespace nx_http
         }
 
         NX_LOG( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
+
+        const auto requestSequenceBak = m_requestSequence;
+        lk.unlock();
+        emit requestHasBeenSent(sharedThis, m_authorizationTried);
+        lk.relock();
+        if (m_terminated || //user cancelled futher action
+            (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
+        {
+            return;
+        }
+
         m_state = sReceivingResponse;
         m_responseBuffer.resize( 0 );
         if( !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) ||
@@ -470,6 +500,14 @@ namespace nx_http
                     {
                         //trying authorization
                         if( resendRequestWithAuthorization( *response ) )
+                            return;
+                    }
+                }
+                else if (response->statusLine.statusCode == StatusCode::proxyAuthenticationRequired)
+                {
+                    if (!m_proxyAuthorizationTried && (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
+                    {
+                        if (resendRequestWithAuthorization(*response))
                             return;
                     }
                 }
@@ -587,6 +625,7 @@ namespace nx_http
     {
         ++m_requestSequence;
         m_authorizationTried = false;
+        m_proxyAuthorizationTried = false;
         m_ha1RecalcTried = false;
         m_request = nx_http::Request();
     }
@@ -769,6 +808,9 @@ namespace nx_http
                 &m_request.headers,
                 HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
 
+        if (m_precalculatedAuthorizationDisabled)
+            return;
+
         //if that url has already been authenticated, adding same authentication info to the request
         //first request per tcp-connection always uses authentication
         //    This is done due to limited AuthInfoCache implementation
@@ -927,12 +969,19 @@ namespace nx_http
         return AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient>( new AsyncHttpClient() ) );
     }
 
-    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
+    bool AsyncHttpClient::resendRequestWithAuthorization(
+        const nx_http::Response& response,
+        bool isProxy)
     {
-        //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
+        const StringType authenticateHeaderName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+        const StringType authorizationHeaderName = isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
+        const QString userName = isProxy ? m_proxyUserName : m_userName;
+        const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
 
-        HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find( "WWW-Authenticate" );
+        //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
+        Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized || response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired );
+
+        HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find(authenticateHeaderName);
         if( wwwAuthenticateIter == response.headers.end() )
             return false;
 
@@ -940,18 +989,18 @@ namespace nx_http
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
         if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
         {
-            header::BasicAuthorization basicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() );
+            header::BasicAuthorization basicAuthorization(userName.toLatin1(), userPassword.toLatin1() );
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
-                    header::Authorization::NAME,
+                    authorizationHeaderName,
                     basicAuthorization.toString() ) );
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
                 m_url,
                 m_request.requestLine.method,
-                m_userName.toLatin1(),
-                m_userPassword.toLatin1(),
+                userName.toLatin1(),
+                userPassword.toLatin1(),
                 boost::optional<BufferType>(),
                 std::move(wwwAuthenticateHeader),
                 std::move(basicAuthorization) );
@@ -973,15 +1022,15 @@ namespace nx_http
             BufferType ha1;
             QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
             if (m_authType == authDigestWithPasswordHash) {
-                ha1 = m_userPassword.toUtf8();
+                ha1 = userPassword.toUtf8();
             }
             else {
                 //HA1
-                md5HashCalc.addData( m_userName.toLatin1() );
+                md5HashCalc.addData(userName.toLatin1() );
                 md5HashCalc.addData( ":" );
                 md5HashCalc.addData( realm );
                 md5HashCalc.addData( ":" );
-                md5HashCalc.addData( m_userPassword.toLatin1() );
+                md5HashCalc.addData(userPassword.toLatin1() );
                 ha1 = md5HashCalc.result().toHex();
             }
             //HA2, qop=auth-int is not supported
@@ -992,7 +1041,7 @@ namespace nx_http
             const BufferType& ha2 = md5HashCalc.result().toHex();
             //response
             header::DigestAuthorization digestAuthorizationHeader;
-            digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
+            digestAuthorizationHeader.addParam( "username", userName.toLatin1() );
             digestAuthorizationHeader.addParam( "realm", realm );
             digestAuthorizationHeader.addParam( "nonce", nonce );
             digestAuthorizationHeader.addParam( "uri", m_url.path().toLatin1() );
@@ -1025,17 +1074,17 @@ namespace nx_http
 
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
-                nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+                nx_http::HttpHeader(authorizationHeaderName, authorizationStr ) );
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
                 m_url,
                 m_request.requestLine.method,
-                m_userName.toLatin1(),
+                userName.toLatin1(),
                 m_authType == authDigestWithPasswordHash
                     ? boost::optional<BufferType>()
-                    : boost::optional<BufferType>(m_userPassword.toLatin1()),
+                    : boost::optional<BufferType>(userPassword.toLatin1()),
                 m_authType == authDigestWithPasswordHash
-                    ? boost::optional<BufferType>(m_userPassword.toLatin1())
+                    ? boost::optional<BufferType>(userPassword.toLatin1())
                     : boost::optional<BufferType>(),
                 std::move(wwwAuthenticateHeader),
                 std::move(digestAuthorizationHeader) );
@@ -1048,7 +1097,10 @@ namespace nx_http
 
         doSomeCustomLogic( response, &m_request );
 
-        m_authorizationTried = true;
+        if (isProxy)
+            m_proxyAuthorizationTried = true;
+        else
+            m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
     }
 

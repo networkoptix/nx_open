@@ -47,7 +47,14 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <providers/speach_synthesis_data_provider.h>
+#include <providers/stored_file_data_provider.h>
+#include <streaming/audio_streamer_pool.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+#include <utils/common/systemerror.h>
+#include <utils/network/http/httptypes.h>
+#include "utils/network/http/asynchttpclient.h"
+#include <plugins/resource/avi/avi_resource.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -224,6 +231,13 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::ExecHttpRequestAction:
             result = executeHttpRequestAction(action);
 			break;
+
+        case QnBusiness::SayTextAction:
+            result = executeSayTextAction(action);
+            break;
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
+            result = executePlaySoundAction(action);
         default:
             break;
         }
@@ -233,6 +247,108 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         qnServerDb->saveActionToDB(action);
 
     return result;
+}
+
+bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
+{
+    const auto params = action->getParams();
+    const auto resources = qnResPool
+        ->getResources<QnSecurityCamResource>(params.additionalResources);
+
+    QList<QnAudioTransmitterPtr> transmitters;
+
+    if (resources.empty())
+        return true;
+
+    for (const auto& res: resources)
+    {
+        if (res->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        {
+            auto transmitter = res->getAudioTransmitter();
+            if (transmitter)
+                transmitters << transmitter;
+        }
+    }
+
+    if (transmitters.isEmpty())
+        return true;
+
+
+    if (action->actionType() == QnBusiness::PlaySoundOnceAction)
+    {
+        auto url = lit("dbfile://notifications/") + params.url;
+
+        QnAviResourcePtr resource(new QnAviResource(url));
+        resource->setStatus(Qn::Online);
+        QnAbstractStreamDataProviderPtr provider(
+            resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+
+        provider.dynamicCast<QnAbstractArchiveReader>()->setCycleMode(false);
+
+        for (const auto& t: transmitters)
+            t->subscribe(provider, QnDataProviderInfo::kSingleNotificationPriority);
+
+        provider->startIfNotRunning();
+    }
+    else
+    {
+
+        QnAbstractStreamDataProviderPtr provider;
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+
+            for (const auto& t: transmitters)
+                t->subscribe(provider, QnDataProviderInfo::kContinuousNotificationPriority);
+
+            provider->startIfNotRunning();
+        }
+        else if (action->getToggleState() == QnBusiness::InactiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+
+            for (const auto& t: transmitters)
+                t->unsubscribe(provider);
+
+            QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+        }
+    }
+
+    return true;
+
+}
+
+bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
+{
+    const auto params = action->getParams();
+    const auto text = params.sayText;
+    const auto resources = qnResPool
+        ->getResources<QnSecurityCamResource>(params.additionalResources);
+
+    QList<QnAudioTransmitterPtr> transmitters;
+
+    if (resources.empty())
+        return true;
+
+    for (const auto& res: resources)
+    {
+        if (res->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        {
+            auto transmitter = res->getAudioTransmitter();
+            if (transmitter)
+                transmitters << transmitter;
+        }
+    }
+
+    if (transmitters.isEmpty())
+        return true;
+
+    QnAbstractStreamDataProviderPtr speachProvider(new QnSpeachSynthesisDataProvider(text));
+    for(const auto& transmitter: transmitters)
+        transmitter->subscribe(speachProvider, QnDataProviderInfo::kSingleNotificationPriority);
+
+    speachProvider->startIfNotRunning();
+    return true;
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
@@ -289,7 +405,7 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
             }
         };
 
-        return uploadDataAsync(url,
+        return nx_http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             kExecHttpActionContentType,
             nx_http::HttpHeaders(),
@@ -742,7 +858,7 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources()))
         unfiltered << user->getEmail();
 
     auto recipientsFilter = [](const QString& email)
