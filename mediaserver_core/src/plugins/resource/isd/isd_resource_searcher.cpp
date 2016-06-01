@@ -9,6 +9,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include <utils/common/credentials.h>
+#include <plugins/resource/mdns/mdns_packet.h>
 
 
 extern QString getValueFromString(const QString& line);
@@ -32,6 +33,7 @@ namespace
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
+    QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
 }
 
 QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
@@ -110,6 +112,22 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         return resList;
     }
 
+}
+
+QnResourceList QnPlISDResourceSearcher::findResources(void)
+{
+    auto upnpResults = QnUpnpResourceSearcherAsync::findResources();
+    QnResourceList mdnsResults;
+
+    auto mdnsDataList = QnMdnsListener::instance()->getData((std::uintptr_t) this);
+    for (const auto& response: mdnsDataList)
+    {
+        auto resource = processMdnsResponse(response, upnpResults);
+        if (resource)
+            mdnsResults << resource;
+    }
+
+    return upnpResults + mdnsResults;
 }
 
 
@@ -228,18 +246,21 @@ QString extractWord(int index, const QByteArray& rawData)
 }
 
 
-
-/*QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
-    QnResourceList& result,
-    const QByteArray& responseData,
-    const QHostAddress& discoveryAddress,
-    const QHostAddress& foundHostAddress )
+bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName) const
 {
-    Q_UNUSED(discoveryAddress)
-    Q_UNUSED(foundHostAddress)
+    return vendorName.toUpper().startsWith(manufacture()) ||
+        vendorName.toLower().trimmed() == lit("digital watchdog") ||
+        vendorName.toLower().trimmed() == lit("digitalwatchdog");
+}
 
-    QList<QnNetworkResourcePtr> local_result;
 
+
+QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
+    const QnMdnsListener::ConsumerData& mdnsResponse,
+    const QnResourceList& alreadyFoundResources)
+{
+
+    auto responseData = mdnsResponse.response;
 
     QString smac;
     QString name(lit("ISDcam"));
@@ -249,20 +270,22 @@ QString extractWord(int index, const QByteArray& rawData)
         int modelPos = responseData.indexOf("DWCA-");
         if (modelPos == -1)
             modelPos = responseData.indexOf("DWCS-");
-		if (modelPos == -1)
-			modelPos = responseData.indexOf("DWEA-");
         if (modelPos == -1)
-            return local_result; // not found
-        name = extractWord(modelPos, responseData);
+            modelPos = responseData.indexOf("DWEA-");
+        if (modelPos == -1 && !responseData.contains("ISD"))
+            return QnResourcePtr(); // not found
+
+        if(modelPos != -1)
+            name = extractWord(modelPos, responseData);
     }
 
     int macpos = responseData.indexOf("macaddress=");
     if (macpos < 0)
-        return local_result;
+        return QnResourcePtr();
 
     macpos += QString(QLatin1String("macaddress=")).length();
     if (macpos + 12 > responseData.size())
-        return local_result;
+        return QnResourcePtr();
 
     for (int i = 0; i < 12; i++)
     {
@@ -272,55 +295,100 @@ QString extractWord(int index, const QByteArray& rawData)
         smac += QLatin1Char(responseData[macpos + i]);
     }
 
+    quint16 port = nx_http::DEFAULT_HTTP_PORT;
+    QnMdnsPacket packet;
 
-    //response.fromDatagram(responseData);
+    if (packet.fromDatagram(responseData))
+    {
+        for (const auto& answer: packet.answerRRs)
+        {
+            if(answer.recordType == QnMdnsPacket::kSrvRecordType)
+            {
+                QnMdnsSrvData srvData;
+                srvData.decode(answer.data);
+                port = srvData.port;
+                break;
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "There are errors in mdns packet parsing";
+    }
 
     smac = smac.toUpper();
 
-    for(const QnResourcePtr& res: result)
+    for (const QnResourcePtr& res: alreadyFoundResources)
     {
-        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-    
-        if (net_res->getMAC().toString() == smac)
-        {
-            return local_result; // already found;
-        }
+        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+
+        if (netRes->getMAC().toString() == smac)
+            return QnResourcePtr(); // already found;
     }
 
-
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
+
+
+    QAuthenticator cameraAuth;
+    if (auto existingRes = qnResPool->getResourceByMacAddress( smac ) )
+        cameraAuth = existingRes->getAuth();
 
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
     {
         rt = qnResTypePool->getResourceTypeId(manufacture(), lit("ISDcam"));
         if (rt.isNull())
-            return local_result;
+            return QnResourcePtr();
     }
 
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
-        return local_result; // model forced by ONVIF
+        return QnResourcePtr();
 
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(smac));
+
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setHost(mdnsResponse.remoteAddress);
+    url.setPort(port);
+
+    resource->setUrl(url.toString());
+
     if (name == lit("DWcam"))
-        resource->setDefaultAuth(QLatin1String("admin"), QLatin1String("admin"));
-    local_result.push_back(resource);
+        resource->setDefaultAuth(lit("admin"), lit("admin"));
+    else
+        resource->setDefaultAuth(lit("root"), lit("admin"));
 
-    return local_result;
 
+    if(!cameraAuth.isNull())
+    {
+        resource->setAuth(cameraAuth);
+    }
+    else
+    {
+        auto resData = qnCommon->dataPool()->data(manufacture(), name);
+        auto possibleCreds = resData.value<DefaultCredentialsList>(
+            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-}*/
+        for (const auto& creds: possibleCreds)
+        {
+            QAuthenticator auth = creds.toAuthenticator();
+            QUrl url(lit("//") + mdnsResponse.remoteAddress);
+            url.setPort(port);
+            if (testCredentials(url, auth))
+            {
+                resource->setDefaultAuth(auth);
+                break;
+            }
+        }
+    }
 
-bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName) const
-{
-    return vendorName.toUpper().startsWith(manufacture()) ||
-        vendorName.toLower().trimmed() == lit("digital watchdog") ||
-        vendorName.toLower().trimmed() == lit("digitalwatchdog");
+    return resource;
 }
+
 
 void QnPlISDResourceSearcher::processPacket(
         const QHostAddress& discoveryAddr,
