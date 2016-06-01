@@ -33,7 +33,7 @@ namespace
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
-    QnMdnsListener::instance()->registerConsumer((long) this);
+    QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
 }
 
 QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
@@ -119,7 +119,7 @@ QnResourceList QnPlISDResourceSearcher::findResources(void)
     auto upnpResults = QnUpnpResourceSearcherAsync::findResources();
     QnResourceList mdnsResults;
 
-    auto mdnsDataList = QnMdnsListener::instance()->getData((long) this);
+    auto mdnsDataList = QnMdnsListener::instance()->getData((std::uintptr_t) this);
     for (const auto& response: mdnsDataList)
     {
         auto resource = processMdnsResponse(response, upnpResults);
@@ -354,8 +354,6 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     url.setScheme(lit("http"));
     url.setHost(mdnsResponse.remoteAddress);
     url.setPort(port);
-
-    qDebug() << "URL to string" << url.toString();
 
     resource->setUrl(url.toString());
 
