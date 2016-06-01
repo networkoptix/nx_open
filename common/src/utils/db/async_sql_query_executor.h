@@ -144,6 +144,7 @@ private:
             \a false in case of failure to open connection when required
     */
     bool openOneMoreConnectionIfNeeded();
+    void dropClosedConnections(QnMutexLockerBase* const lk);
 };
 
 }   //db
