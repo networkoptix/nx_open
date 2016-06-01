@@ -4,7 +4,6 @@
 <table class="description">
     <thead>
         <tr>
-            <th>#</th>
             <th>Reason</th>
             <th>Time</th>
         </tr>
@@ -12,7 +11,6 @@
     <tbody>
         {{#aggregated}}
             <tr>
-                <td>{{number}}</td>
                 <td>{{reason}}</td>
                 <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
             </tr>
