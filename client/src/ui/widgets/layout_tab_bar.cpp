@@ -85,9 +85,10 @@ Qn::ActionScope QnLayoutTabBar::currentScope() const {
     return Qn::TitleBarScope;
 }
 
-QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
-    if(scope != Qn::TitleBarScope)
-        return QVariant();
+QnActionParameters QnLayoutTabBar::currentParameters(Qn::ActionScope scope) const
+{
+    if (scope != Qn::TitleBarScope)
+        return QnActionParameters();
 
     QnWorkbenchLayoutList result;
 
@@ -95,7 +96,7 @@ QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
     if(currentIndex >= 0 && currentIndex < m_layouts.size())
         result.push_back(m_layouts[currentIndex]);
 
-    return QVariant::fromValue(result);
+    return QnActionParameters(result);
 }
 
 void QnLayoutTabBar::submitCurrentLayout() {

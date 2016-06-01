@@ -7,7 +7,6 @@
 #include "../mdns/mdns_resource_searcher.h"
 #include "../upnp/upnp_resource_searcher.h"
 
-
 class QnPlISDResourceSearcher : public QnUpnpResourceSearcherAsync
 {
 
@@ -19,7 +18,10 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(
+        const QUrl& url,
+        const QAuthenticator& auth,
+        bool doMultichannelCheck) override;
 
 protected:
 
@@ -38,6 +40,17 @@ private:
         const QAuthenticator& auth,
         QnResourceList& result );
 
+    QList<QnResourcePtr> checkHostAddrInternal(
+        const QUrl& url,
+        const QAuthenticator& auth);
+
+    bool testCredentials(
+        const QUrl& url,
+        const QAuthenticator& auth);
+
+    void cleanupSpaces(QString& rowWithSpaces) const;
+
+    bool isDwOrIsd(const QString& vendorName) const;
 };
 
 #endif // #ifdef ENABLE_ISD

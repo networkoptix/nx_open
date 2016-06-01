@@ -108,9 +108,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemNameChangeRequested,
-        this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) {
-        changeSystemName(nx::SystemName(systemName), sysIdTime, tranLogTime, Qn::kDefaultUserAccess.userId);
-    });
+        this, [this](const QString &systemName, qint64 sysIdTime, qint64 tranLogTime) { changeSystemName(nx::SystemName(systemName), sysIdTime, tranLogTime, false); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {

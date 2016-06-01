@@ -686,7 +686,7 @@ nx::db::DBResult SystemManager::updateSharingInDB(
             "  WHERE account_id=:accountID AND system_id=:systemID");
     else
         updateRemoveSharingQuery.prepare(
-            "INSERT OR REPLACE INTO system_to_account( account_id, system_id, access_role_id ) "
+            "REPLACE INTO system_to_account( account_id, system_id, access_role_id ) "
             " VALUES( :accountID, :systemID, :accessRole )");
     QnSql::bind(sharing, &updateRemoveSharingQuery);
     updateRemoveSharingQuery.bindValue(

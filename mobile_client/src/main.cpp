@@ -18,7 +18,7 @@ class FlagConfig: public nx::utils::FlagConfig
 {
 public:
     using nx::utils::FlagConfig::FlagConfig;
-    NX_FLAG(0, enableEc2TranLog);
+    NX_FLAG(0, enableEc2TranLog, "");
 };
 FlagConfig conf("mobile_client");
 

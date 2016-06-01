@@ -9,6 +9,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
+#define OUTPUT_PREFIX "ProxyVideoDecoder<gl>: "
 #include "proxy_video_decoder_utils.h"
 
 namespace nx {

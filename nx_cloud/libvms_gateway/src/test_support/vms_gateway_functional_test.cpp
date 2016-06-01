@@ -29,15 +29,22 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
+namespace {
+QString sTemporaryDirectoryPath;
+}
+
 VmsGatewayFunctionalTest::VmsGatewayFunctionalTest()
 :
-    m_httpPort(0)
+    m_httpPort(0),
+    m_testHttpServer(std::make_unique<TestHttpServer>())
 {
     //starting clean test
     nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
     m_httpPort = (std::rand() % 10000) + 50000;
-    m_tmpDir = QDir::homePath() + "/vms_gateway_ut.data";
+    m_tmpDir = 
+        (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath(): sTemporaryDirectoryPath) +
+        "/vms_gateway_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     addArg("/path/to/bin");
@@ -52,6 +59,32 @@ VmsGatewayFunctionalTest::~VmsGatewayFunctionalTest()
     stop();
 
     QDir(m_tmpDir).removeRecursively();
+}
+
+bool VmsGatewayFunctionalTest::startAndWaitUntilStarted()
+{
+    if (!m_testHttpServer->bindAndListen())
+        return false;
+
+    addArg("-http/proxyTargetPort");
+    addArg(QByteArray::number(m_testHttpServer->serverAddress().port).constData());
+
+    return utils::test::ModuleLauncher<VmsGatewayProcessPublic>::startAndWaitUntilStarted();
+}
+
+SocketAddress VmsGatewayFunctionalTest::endpoint() const
+{
+    return SocketAddress(HostAddress::localhost, m_httpPort);
+}
+
+const std::unique_ptr<TestHttpServer>& VmsGatewayFunctionalTest::testHttpServer() const
+{
+    return m_testHttpServer;
+}
+
+void VmsGatewayFunctionalTest::setTemporaryDirectoryPath(const QString& path)
+{
+    sTemporaryDirectoryPath = path;
 }
 
 }   // namespace gateway

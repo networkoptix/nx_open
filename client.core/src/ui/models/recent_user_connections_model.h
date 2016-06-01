@@ -10,6 +10,7 @@ class QnRecentUserConnectionsModel : public QAbstractListModel
 
     Q_PROPERTY(QString systemName READ systemName WRITE setSystemName NOTIFY systemNameChanged)
     Q_PROPERTY(bool hasConnections READ hasConnections NOTIFY hasConnectionsChanged)
+    Q_PROPERTY(QString firstUser READ firstUser NOTIFY firstUserChanged)
 
 public:
     QnRecentUserConnectionsModel(QObject *parent = nullptr);
@@ -23,24 +24,24 @@ public: // properties
 
     bool hasConnections() const;
 
+    QString firstUser() const;
+
 public: // overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    QHash<int, QByteArray> roleNames() const;
+    QHash<int, QByteArray> roleNames() const override;
 
     void updateData(const QnUserRecentConnectionDataList &newData);
 
 public slots:
-    QVariant getData(const QString &dataRole
-        , int row);
+    QVariant getData(const QString &dataRole, int row);
 
 signals:
     void systemNameChanged();
-
     void hasConnectionsChanged();
-
+    void firstUserChanged();
 
 private:
     QString m_systemName;

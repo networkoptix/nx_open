@@ -10,7 +10,6 @@ public:
     virtual void afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner) override;
 private:
     int changePort(const QnUuid & userId, int port);
-    void resetConnections();
 };
 
 #endif // CONFIGURE_REST_HANDLER_H

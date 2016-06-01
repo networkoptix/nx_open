@@ -7,25 +7,27 @@
 namespace Qn
 {
     /**
-     * Type of a node in resource tree displayed to the user.
+     * Type of a node in resource tree displayed to the user. Ordered as it should be displayed on the screen.
      */
     enum NodeType
     {
         RootNode,               /**< Root node for the tree (current system node). */
-        LocalNode,              /**< Root node for local resources. */
-        CurrentSystemNode,      /**< Root node for remote resources if we are the admin. */
-        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
-        UsersNode,              /**< Root node for user resources. */
-        WebPagesNode,           /**< Root node for web pages. */
+        CurrentSystemNode,      /**< Root node, displaying current system name. */
+        SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
+        ServersNode,            /**< Root node for servers for admin user. */
         UserDevicesNode,        /**< Root node for cameras and i/o modules for non-admin user. */
-        UserLayoutsNode,        /**< Root node for layouts for non-admin user. */
-        UserServersNode,        /**< Root node for servers for non-admin user. */
-        GlobalLayoutsNode,      /**< Root node for global layouts. */
+        LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
+        WebPagesNode,           /**< Root node for web pages. */
+        UsersNode,              /**< Root node for user resources. */
+        LocalResourcesNode,     /**< Root node for local resources. */
+        LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
+        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
+        SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
-        ItemNode,               /**< Node that represents a layout item. Has both guid and resource. */
+        LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
 
@@ -36,6 +38,8 @@ namespace Qn
 
         NodeTypeCount
     };
+
+    inline bool isSeparatorNode(NodeType t) { return t == SeparatorNode || t == LocalSeparatorNode;  }
 
     /**
      * Role of an item on the scene.

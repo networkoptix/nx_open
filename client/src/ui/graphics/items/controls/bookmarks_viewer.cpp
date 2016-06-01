@@ -438,12 +438,13 @@ namespace
     {
         enum
         {
-            kTailHeight = 10
-            , kTailWidth = 20
-            , kHalfTailWidth = kTailWidth / 2
-            , kTailOffset = 15
-            , kTailDefaultOffsetLeft = kTailOffset + kHalfTailWidth
-            , kTailDefaultOffsetRight = kBookmarkFrameWidth - kTailDefaultOffsetLeft
+            kTailHeight = 10,
+            kTailWidth = 20,
+            kHalfTailWidth = kTailWidth / 2,
+            kTailOffset = 15,
+            kTailDefaultOffsetLeft = kTailOffset + kHalfTailWidth,
+            kTailDefaultOffsetRight = kBookmarkFrameWidth - kTailDefaultOffsetLeft,
+            kTailMargin = 4
         };
 
         setTailWidth(kTailWidth);
@@ -462,7 +463,7 @@ namespace
             : kTailDefaultOffsetLeft));
 
         setTailPos(QPointF(finalTailOffset, totalHeight));
-        pointTo(pos);
+        pointTo(pos - QPointF(0.0, kTailMargin));
     }
 
     ///
@@ -542,7 +543,7 @@ public:
 
     void setReadOnly(bool readonly);
 
-    void setTargetTimestamp(qint64 timestamp);
+    void setTargetLocation(qint64 location);
 
     void updateOnWindowChange();
 
@@ -567,7 +568,7 @@ private:
 
     bool event(QEvent *event) override;
 
-    void updateTimestampInternal(qint64 timestamp);
+    void updateLocationInternal(qint64 location);
 
 private:
     const GetBookmarksFunc m_getBookmarks;
@@ -579,7 +580,7 @@ private:
     HoverFocusProcessor *m_hoverProcessor;
     QnBookmarkColors m_colors;
 
-    qint64 m_targetTimestamp;
+    qint64 m_targetLocation;
 
     QnCameraBookmarkList m_bookmarks;
     bool m_readonly;
@@ -606,7 +607,7 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_hoverProcessor(nullptr)
     , m_colors()
 
-    , m_targetTimestamp(kInvalidTimstamp)
+    , m_targetLocation(kInvalidTimstamp)
 
     , m_bookmarks()
     , m_readonly(false)
@@ -666,15 +667,15 @@ void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
     m_readonly = readonly;
 }
 
-void QnBookmarksViewer::Impl::updateTimestampInternal(qint64 timestamp)
+void QnBookmarksViewer::Impl::updateLocationInternal(qint64 location)
 {
     m_updateDelayedTimer.reset();
 
-    if (m_targetTimestamp == timestamp)
+    if (m_targetLocation == location)
         return;
 
     m_forceUpdateTimer.invalidate();
-    const auto newBookmarks = m_getBookmarks(timestamp);
+    const auto newBookmarks = m_getBookmarks(location);
     if (m_bookmarks == newBookmarks)
         return;
 
@@ -684,26 +685,26 @@ void QnBookmarksViewer::Impl::updateTimestampInternal(qint64 timestamp)
         return;
     }
 
-    m_targetTimestamp = timestamp;
+    m_targetLocation = location;
     updateOnWindowChange();
 }
 
-void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
+void QnBookmarksViewer::Impl::setTargetLocation(qint64 location)
 {
-    const bool differentBookmarks = (m_getBookmarks(timestamp) != m_bookmarks);
+    const bool differentBookmarks = (m_getBookmarks(location) != m_bookmarks);
     if (differentBookmarks && !m_forceUpdateTimer.isValid())
         m_forceUpdateTimer.start();
 
     if (m_bookmarks.empty() || m_forceUpdateTimer.hasExpired(kUpdateDelay))
     {
         // Updates tooltips immediately
-        updateTimestampInternal(timestamp);
+        updateLocationInternal(location);
         return;
     }
 
-    const auto updateTimeStamp = [this, timestamp]()
+    const auto updateTimeStamp = [this, location]()
     {
-        updateTimestampInternal(timestamp);
+        updateLocationInternal(location);
     };
 
     m_updateDelayedTimer.reset(executeDelayedParented(updateTimeStamp, kUpdateDelay, this));
@@ -711,10 +712,10 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
 
 void QnBookmarksViewer::Impl::updateOnWindowChange()
 {
-    if (m_targetTimestamp == kInvalidTimstamp)
+    if (m_targetLocation == kInvalidTimstamp)
         return;
 
-    const auto params = m_getPos(m_targetTimestamp);
+    const auto params = m_getPos(m_targetLocation);
     const auto bounds = params.second;
     if (params.first.isNull() || ((bounds.second - bounds.first) < kBookmarkFrameWidth))
     {
@@ -722,7 +723,7 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
         return;
     }
 
-    updateBookmarks(m_getBookmarks(m_targetTimestamp));
+    updateBookmarks(m_getBookmarks(m_targetLocation));
 
     updatePosition(params);
 }
@@ -731,10 +732,10 @@ void QnBookmarksViewer::Impl::resetBookmarks()
 {
     m_updateDelayedTimer.reset();
 
-    if (m_targetTimestamp == kInvalidTimstamp)
+    if (m_targetLocation == kInvalidTimstamp)
         return;
 
-    m_targetTimestamp = kInvalidTimstamp;
+    m_targetLocation = kInvalidTimstamp;
     updateBookmarks(QnCameraBookmarkList());
 }
 
@@ -865,9 +866,9 @@ int QnBookmarksViewer::helpTopicAt(const QPointF &pos) const
     return Qn::Bookmarks_Usage_Help;
 }
 
-void QnBookmarksViewer::setTargetTimestamp(qint64 timestamp)
+void QnBookmarksViewer::setTargetLocation(qint64 location)
 {
-    m_impl->setTargetTimestamp(timestamp);
+    m_impl->setTargetLocation(location);
 }
 
 void QnBookmarksViewer::updateOnWindowChange()

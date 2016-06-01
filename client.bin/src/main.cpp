@@ -109,7 +109,6 @@ extern "C"
 #include "text_to_wav.h"
 
 #include "common/common_module.h"
-#include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
@@ -173,14 +172,6 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 void ffmpegInit()
 {
-    //avcodec_init();
-    av_register_all();
-
-    if(av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
     // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
@@ -634,16 +625,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnAppServerConnectionFactory::setUrl(QUrl());
 
-    /* Write out settings. */
-    qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
-    av_lockmgr_register(NULL);
-
-    //restoring default message handler
-    qInstallMessageHandler( defaultMsgHandler );
-
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher::initStaticInstance( NULL );
 #endif
+
+    /* Write out settings. */
+    qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
+
+    //restoring default message handler
+    qInstallMessageHandler( defaultMsgHandler );
 
     return result;
 }
@@ -686,8 +676,16 @@ int main(int argc, char **argv)
     mac_restoreFileAccess();
 #endif
 
+    //avcodec_init();
+    av_register_all();
+    if (av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
+
     int result = runApplication(application.data(), argc, argv);
 
+    av_lockmgr_register(NULL);
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();

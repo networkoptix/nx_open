@@ -202,7 +202,7 @@
           <item row="4" column="1">
            <widget class="QCheckBox" name="showIpInTreeCheckBox">
             <property name="text">
-             <string>Show IP in tree</string>
+             <string>Show extra info in tree</string>
             </property>
            </widget>
           </item>

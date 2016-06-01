@@ -196,7 +196,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     /* Check if no archive available on any server. */
     /* Or check if archive belong to the current server only */
     if (mediaServerList.isEmpty() ||
-        mediaServerList.size() == 1 && mediaServerList[0] == camera->getParentServer())
+        (mediaServerList.size() == 1 && mediaServerList[0] == camera->getParentServer()))
     {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
@@ -348,7 +348,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
     m_closing = true;
     QnMutexLocker lock(&m_rtpDataMutex);
     if (m_rtpData)
-        m_rtpData->getMediaSocket()->shutdown();
+        m_rtpData->shutdown();
 }
 
 void QnRtspClientArchiveDelegate::close()

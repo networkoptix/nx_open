@@ -398,7 +398,6 @@ void fromApiToResource(const ApiLayoutData& src, QnLayoutResourcePtr& dst)
 
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.horizontalSpacing, src.verticalSpacing);
-    dst->setUserCanEdit(src.editable);
     dst->setLocked(src.locked);
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
@@ -420,7 +419,6 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, ApiLayoutData& dst)
     dst.cellAspectRatio = src->cellAspectRatio();
     dst.horizontalSpacing = src->cellSpacing().width();
     dst.verticalSpacing = src->cellSpacing().height();
-    dst.editable = src->userCanEdit();
     dst.locked = src->locked();
     dst.backgroundImageFilename = src->backgroundImageFilename();
     dst.backgroundWidth = src->backgroundSize().width();
@@ -745,6 +743,7 @@ void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst)
     dst->setEmail(src.email);
     dst->setHash(src.hash);
     dst->setUserGroup(src.groupId);
+    dst->setFullName(src.fullName);
 
     dst->setRawPermissions(src.permissions);
     dst->setDigest(src.digest);
@@ -767,6 +766,7 @@ void fromResourceToApi(const QnUserResourcePtr& src, ApiUserData& dst)
     dst.realm = src->getRealm();
     dst.isCloud = userType == QnUserType::Cloud;
     dst.groupId = src->userGroup();
+    dst.fullName = src->fullName();
 }
 
 template<class List>

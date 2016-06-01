@@ -15,10 +15,10 @@
 #include <tuple>
 
 #include <cdb/account_manager.h>
+#include <nx/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
 #include <utils/common/app_info.h>
-#include <nx/network/http/auth_tools.h>
 
 #include <libcloud_db/src/managers/email_manager.h>
 
@@ -28,13 +28,20 @@
 namespace nx {
 namespace cdb {
 
+namespace {
+QString sTemporaryDirectoryPath;
+nx::db::ConnectionOptions sConnectionOptions;
+}
+
 CdbFunctionalTest::CdbFunctionalTest()
 :
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
     m_port = (std::rand() % 10000) + 50000;
-    m_tmpDir = QDir::homePath() + "/cdb_ut.data";
+    m_tmpDir =
+        (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
+        "/cdb_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
     addArg("/path/to/bin");
@@ -42,8 +49,50 @@ CdbFunctionalTest::CdbFunctionalTest()
     addArg("-listenOn"); addArg(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
     addArg("-log/logLevel"); addArg("DEBUG2");
     addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-db/driverName"); addArg("QSQLITE");
-    addArg("-db/name"); addArg(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+    
+    addArg("-db/driverName");
+    if (!sConnectionOptions.driverName.isEmpty())
+        addArg(sConnectionOptions.driverName.toLatin1().constData());
+    else
+        addArg("QSQLITE");
+
+    if (!sConnectionOptions.hostName.isEmpty())
+    {
+        addArg("-db/hostName");
+        addArg(sConnectionOptions.hostName.toUtf8().constData());
+    }
+
+    if (sConnectionOptions.port != 0)
+    {
+        addArg("-db/port");
+        addArg(QByteArray::number(sConnectionOptions.port).constData());
+    }
+    
+    addArg("-db/name");
+    if (!sConnectionOptions.dbName.isEmpty())
+        addArg(sConnectionOptions.dbName.toUtf8().constData());
+    else
+        addArg(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+
+    if (!sConnectionOptions.userName.isEmpty())
+    {
+        addArg("-db/userName");
+        addArg(sConnectionOptions.userName.toUtf8().constData());
+    }
+
+    if (!sConnectionOptions.password.isEmpty())
+    {
+        addArg("-db/password");
+        addArg(sConnectionOptions.password.toUtf8().constData());
+    }
+
+    if (!sConnectionOptions.connectOptions.isEmpty())
+    {
+        addArg("-db/connectOptions");
+        addArg(sConnectionOptions.connectOptions.toUtf8().constData());
+    }
+
+    addArg("-db/maxConnections"); addArg("3");
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
 
@@ -571,6 +620,17 @@ api::ResultCode CdbFunctionalTest::fetchSystemData(
         }
     }
     return api::ResultCode::notFound;
+}
+
+void CdbFunctionalTest::setTemporaryDirectoryPath(const QString& path)
+{
+    sTemporaryDirectoryPath = path;
+}
+
+void CdbFunctionalTest::setDbConnectionOptions(
+    const nx::db::ConnectionOptions& connectionOptions)
+{
+    sConnectionOptions = connectionOptions;
 }
 
 namespace api {

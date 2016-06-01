@@ -3,15 +3,15 @@
 COMPANY_NAME=${deb.customization.company.name}
 BETA=
 
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
+if [[ "${beta}" == "true" ]]; then
+  BETA="-beta"
+fi
 
 DISTRIB=${installer.name}-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}$BETA.deb
 
 update () {
     export DEBIAN_FRONTEND=noninteractive
-    dpkg -i $DISTRIB
+    dpkg -iB $DISTRIB
 }
 
 if [ "$1" != "" ]

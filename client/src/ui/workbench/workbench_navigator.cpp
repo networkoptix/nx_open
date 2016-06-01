@@ -445,14 +445,15 @@ Qn::ActionScope QnWorkbenchNavigator::currentScope() const {
     return Qn::SliderScope;
 }
 
-QVariant QnWorkbenchNavigator::currentTarget(Qn::ActionScope scope) const {
+QnActionParameters QnWorkbenchNavigator::currentParameters(Qn::ActionScope scope) const
+{
     if(scope != Qn::SliderScope)
-        return QVariant();
+        return QnActionParameters();
 
     QnResourceWidgetList result;
     if(m_currentWidget)
         result.push_back(m_currentWidget);
-    return QVariant::fromValue<QnResourceWidgetList>(result);
+    return QnActionParameters(result);
 }
 
 bool QnWorkbenchNavigator::isLiveSupported() const {
@@ -1697,7 +1698,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     qint64 position = m_timeSlider->valueFromPosition(pos);
 
-    QnActionParameters parameters(currentTarget(Qn::SliderScope));
+    QnActionParameters parameters = currentParameters(Qn::SliderScope);
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));

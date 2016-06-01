@@ -33,6 +33,8 @@ private slots:
     void at_saveCurrentLayoutAsAction_triggered();
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
+    void at_shareLayoutAction_triggered();
+    void at_stopSharingLayoutAction_triggered();
 
     void at_workbench_layoutsChanged();
 

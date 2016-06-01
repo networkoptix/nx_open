@@ -59,10 +59,11 @@ const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 *
 
 QnAuthHelper::QnAuthHelper(CloudConnectionManager* const cloudConnectionManager)
 :
+    m_timeBasedNonceProvider(std::make_shared<TimeBasedNonceProvider>()),
     m_nonceProvider(
         new CdbNonceFetcher(
             cloudConnectionManager,
-            std::make_unique<TimeBasedNonceProvider>())),
+            m_timeBasedNonceProvider)),
     m_userDataProvider(
         new CloudUserAuthenticator(
             cloudConnectionManager,
@@ -279,6 +280,20 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
 
             authResult = doDigestAuth(
                 request.requestLine.method, authorizationHeader, response, isProxy, authUserId);
+
+            // update user information if authorization by server authKey and user-name is specified
+            if (authUserId &&
+                authResult == Qn::Auth_OK &&
+                qnResPool->getResourceById<QnMediaServerResource>(*authUserId))
+            {
+                auto itr = request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME);
+                if (itr != request.headers.end())
+                {
+                    auto userRes = findUserByName(itr->second);
+                    if (userRes)
+                        *authUserId = userRes->getId();
+                }
+            }
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic) {
             if (usedAuthMethod)
@@ -355,8 +370,7 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
     const nx_http::header::Authorization& authorization,
     nx_http::Response& responseHeaders,
     bool isProxy,
-    QnUuid* authUserId,
-    QnUserResourcePtr* const outUserResource)
+    QnUuid* authUserId)
 {
     const QByteArray userName = authorization.digest->userid;
     const QByteArray response = authorization.digest->params["response"];
@@ -387,11 +401,13 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
             method,
             authorization,
             &responseHeaders.headers);
+
+        if (res && authUserId)
+            *authUserId = res->getId();
+
         bool tryOnceAgain = false;
         if (userResource = res.dynamicCast<QnUserResource>())
         {
-            if (outUserResource)
-                *outUserResource = userResource;
             if (userResource->passwordExpired())
             {
                 //user password has expired, validating password
@@ -401,8 +417,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
                 //have to call m_userDataProvider->authorize once again with password prolonged
                 tryOnceAgain = true;
             }
-            if (authUserId)
-                *authUserId = userResource->getId();
         }
 
         if (tryOnceAgain)
@@ -419,8 +433,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         if( userResource )
         {
             errCode = Qn::Auth_WrongPassword;
-            if( outUserResource )
-                *outUserResource = userResource;
 
             if( userResource->passwordExpired() )
             {
@@ -584,7 +596,6 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
     const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
 {
     nx_http::Response tmpHeaders;
-    QnUserResourcePtr outUserResource;
 
     QMap<nx_http::BufferType, nx_http::BufferType> params;
     nx_http::header::parseDigestAuthParams( authData, &params, ';' );
@@ -598,8 +609,7 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
             QUrl::fromPercentEncoding(params.value(URL_QUERY_AUTH_KEY_NAME)).toUtf8(),
             method,
             responseHeaders,
-            &userID,
-            &outUserResource);
+            &userID);
         if( authUserId )
             *authUserId = userID;
     }
@@ -608,20 +618,10 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         nx_http::header::Authorization authorization(nx_http::header::AuthScheme::digest);
         authorization.digest->parse(authData, ';');
         authResult = doDigestAuth(
-            method, authorization, tmpHeaders, false, authUserId, &outUserResource);
+            method, authorization, tmpHeaders, false, authUserId);
     }
     if( authResult != Qn::Auth_OK)
     {
-#if 0
-        nx_http::insertHeader(
-            &responseHeaders.headers,
-            nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(outUserResource ? outUserResource->getRealm() : QnAppInfo::realm()).toUtf8() ));
-
-        QString nonce = lit("nonce=%1; Path=/").arg(QLatin1String(m_nonceProvider->generateNonce()));
-        nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
-        QString clientGuid = lit("%1=%2").arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME)).arg(QnUuid::createUuid().toString());
-        nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
-#endif        
     }
     return authResult;
 }
@@ -653,9 +653,12 @@ void QnAuthHelper::addAuthHeader(
         auth.arg(realm).arg(QLatin1String(m_nonceProvider->generateNonce())).toLatin1() ) );
 }
 
-QByteArray QnAuthHelper::generateNonce() const
+QByteArray QnAuthHelper::generateNonce(NonceProvider provider) const
 {
-    return m_nonceProvider->generateNonce();
+    if (provider == NonceProvider::automatic)
+        return m_nonceProvider->generateNonce();
+    else
+        return m_timeBasedNonceProvider->generateNonce();
 }
 
 #ifndef USE_USER_RESOURCE_PROVIDER
@@ -694,8 +697,7 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
     const QByteArray& authRecordBase64,
     const QByteArray& method,
     nx_http::Response& response,
-    QnUuid* authUserId,
-    QnUserResourcePtr* const outUserResource) const
+    QnUuid* authUserId) const
 {
     auto authRecord = QByteArray::fromBase64( authRecordBase64 );
     auto authFields = authRecord.split( ':' );
@@ -728,12 +730,6 @@ Qn::AuthResult QnAuthHelper::authenticateByUrl(
             *authUserId = user->getId();
     }
 
-    if (errCode == Qn::Auth_OK)
-    {
-        if (auto user = res.dynamicCast<QnUserResource>())
-            if (outUserResource)
-                *outUserResource = user;
-    }
     return errCode;
 #else
     QnMutexLocker lock( &m_mutex );

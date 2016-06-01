@@ -30,6 +30,8 @@ namespace
 
     const QLatin1String kGeneralChangeUser("general/changeUser");
 
+    const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
+
     //log settings
     const QLatin1String kLogLevel( "log/logLevel" );
 #ifdef _DEBUG
@@ -161,12 +163,14 @@ void Settings::loadConfiguration()
         QString varDirName = m_settings.value("varDir", defVarDirName).toString();
         m_general.dataDir = varDirName;
 #else
+        //TODO #ak get rid of QStandardPaths::standardLocations call here since it requies QApplication instance
         const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
     }
 
     m_general.changeUser = m_settings.value(kGeneralChangeUser).toString();
+    m_general.mediatorEndpoint = m_settings.value(kGeneralMediatorEndpoint).toString();
 
     //log
     m_logging.logLevel = m_settings.value(kLogLevel, kDefaultLogLevel).toString();

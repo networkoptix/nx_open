@@ -84,6 +84,10 @@ public:
     bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiUserData& data) const;
     bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiVideowallData& data) const;
     bool canCreateResource(const QnUserResourcePtr& user, const ec2::ApiWebPageData& data) const;
+
+signals:
+    void accessibleResourcesChanged(const QnUuid& userId);
+
 private:
     /** Clear all cache values, bound to the given resource. */
     void invalidateResourceCache(const QnResourcePtr& resource);

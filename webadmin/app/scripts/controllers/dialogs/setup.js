@@ -69,9 +69,9 @@ angular.module('webadminApp')
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
             if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
+                nativeClientObject.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
             }else{
-                window.open(Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
+                window.open(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
             }
             $scope.next('cloudLogin');
         };
@@ -101,30 +101,22 @@ angular.module('webadminApp')
                 return;
             }
 
-            mediaserver.getModuleInformation(reload).then(function(r){
-                $scope.serverInfo = r.data.reply;
-                $scope.hasInternetOnServer = $scope.serverInfo.serverFlags && $scope.serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0;
-
-                $log.log("internet on server: " + $scope.hasInternetOnServer + ", flags: " + $scope.serverInfo.serverFlags);
-            },function(error){
-                $scope.hasInternetOnServer = false ;
-                logMediaserverError(error, "Failed to check internet on server:");
+            mediaserver.checkInternet().then(function(hasInternetOnServer){
+                $log.log("internet on server: " + $scope.hasInternetOnServer);
+                $scope.hasInternetOnServer = hasInternetOnServer;
             });
 
-            cloudAPI.ping().then(function(message){
-                if(message.data.resultCode && message.data.resultCode !== 'ok'){
-                    $scope.settings.internetError = formatError(error.data.resultCode);
-                    $scope.hasInternetOnClient = false;
-                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
-                    return;
-                }
+            cloudAPI.checkConnection().then(function(){
                 $scope.hasInternetOnClient = true;
-                $log.log("internet on client: " + $scope.hasInternetOnClient);
             },function(error){
                 $scope.hasInternetOnClient = false;
-                logMediaserverError(error, "Failed to check internet on client:");
+                if(error.data && error.data.resultCode){
+                    $scope.settings.internetError = formatError(error.data.resultCode);
+                    $log.log("internet on client: " + $scope.hasInternetOnClient + ", error: " + formatError(error.data.resultCode));
+                }else{
+                    logMediaserverError(error, "Failed to check internet on client:");
+                }
             });
-
         }
 
         /* Common helpers: error handling, check current system, error handler */
@@ -364,8 +356,8 @@ angular.module('webadminApp')
             }
             $scope.settings.cloudError = false;
             if(debugMode){
-                $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
-                $scope.portalShortLink = Config.cloud.portalShortLink;
+                $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
+                $scope.portalShortLink = Config.cloud.portalUrl;
                 $scope.next('cloudSuccess');
                 return;
             }
@@ -418,13 +410,15 @@ angular.module('webadminApp')
                     //2. Save settings to local server
                     $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
-                    $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
+                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
 
                     $log.log("Request /api/setupCloudSystem on mediaserver ...");
                     mediaserver.setupCloudSystem($scope.settings.systemName,
                         message.data.id,
                         message.data.authKey,
-                        $scope.settings.cloudEmail).then(function(r){
+                        $scope.settings.cloudEmail,
+                        $scope.systemSettings
+                    ).then(function(r){
                             if(r.data.error !== 0 && r.data.error !=='0') {
                                 errorHandler(r.data);
                                 return;
@@ -465,7 +459,11 @@ angular.module('webadminApp')
             }
 
             $log.log("Request /api/setupLocalSystem on cloud portal ...");
-            mediaserver.setupLocalSystem($scope.settings.systemName, $scope.settings.localLogin, $scope.settings.localPassword).then(function(r){
+            mediaserver.setupLocalSystem($scope.settings.systemName,
+                $scope.settings.localLogin,
+                $scope.settings.localPassword,
+                $scope.systemSettings
+            ).then(function(r){
                 if(r.data.error !== 0 && r.data.error !=='0') {
                     offlineErrorHandler(r);
                     return;
@@ -487,7 +485,9 @@ angular.module('webadminApp')
                 window.close();
             }else{
                 $location.path('/settings');
-                window.location.reload();
+                setTimeout(function(){
+                    window.location.reload();
+                })
             }
         };
 
@@ -556,7 +556,6 @@ angular.module('webadminApp')
             return !!val && (!val.trim || val.trim() != '');
         }
 
-
         /* Wizard workflow */
 
         $scope.wizardFlow = {
@@ -584,6 +583,10 @@ angular.module('webadminApp')
                 valid: function(){
                     return required($scope.settings.systemName);
                 }
+            },
+            advanced:{
+                back: 'systemName',
+                next: 'systemName'
             },
             noInternetOnServer:{
                 retry:function(){
@@ -681,9 +684,37 @@ angular.module('webadminApp')
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
 
+        function getAdvancedSettings(){
+            mediaserver.systemSettings().then(function(r){
+                var systemSettings = r.data.reply.settings;
+                if(r.data.reply.settings.cloudPortalUrl){
+                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
+                }
+                $scope.systemSettings = {};
+
+                for(var settingName in $scope.Config.settingsConfig){
+                    if(!$scope.Config.settingsConfig[settingName].setupWizard){
+                        continue;
+                    }
+                    $scope.systemSettings[settingName] = systemSettings[settingName];
+
+                    if($scope.Config.settingsConfig[settingName].type === 'number'){
+                        $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
+                    }
+                    if($scope.systemSettings[settingName] === 'true'){
+                        $scope.systemSettings[settingName] = true;
+                    }
+                    if($scope.systemSettings[settingName] === 'false'){
+                        $scope.systemSettings[settingName] = false;
+                    }
+                    $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+                }
+            });
+        }
         function initWizard(){
             $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
+                getAdvancedSettings();
                 discoverSystems();
             },function(error){
                 $log.log("Couldn't run setup wizard: auth failed");
@@ -694,7 +725,9 @@ angular.module('webadminApp')
                 }else {
                     $log.log("Reload page to try again");
                     $location.search("retry","true");
-                    window.location.reload();
+                    setTimeout(function(){
+                        window.location.reload();
+                    });
                 }
             });
         }

@@ -48,8 +48,8 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     addArg("-e");
     addArg("-stun/addrToListenList"); addArg(lit("127.0.0.1:%1").arg(m_stunPort).toLatin1().constData());
     addArg("-http/addrToListenList"); addArg(lit("127.0.0.1:%1").arg(m_httpPort).toLatin1().constData());
-    addArg("-log/logLevel"); addArg("DEBUG2");
-    addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    //addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
 
     network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
     registerCloudDataProvider(&m_cloudDataProvider);

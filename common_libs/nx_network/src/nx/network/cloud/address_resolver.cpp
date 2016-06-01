@@ -297,7 +297,7 @@ bool AddressResolver::isRequestIdKnown(void* requestId) const
 void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     // TODO: make DnsResolver QnStoppableAsync
-    m_dnsResolver.pleaseStop();
+    m_dnsResolver.stop();
 
     QnMutexLocker lk(&m_mutex);
     if (m_mediatorConnection)

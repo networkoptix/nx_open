@@ -37,7 +37,6 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         if (const QnLayoutResourcePtr& layout = resource.dynamicCast<QnLayoutResource>())
         {
             connect(layout, &QnResource::parentIdChanged,           this, &QnResourceAccessManager::invalidateResourceCache); /* To make layouts global */
-            connect(layout, &QnLayoutResource::userCanEditChanged,  this, &QnResourceAccessManager::invalidateResourceCache);
             connect(layout, &QnLayoutResource::lockedChanged,       this, &QnResourceAccessManager::invalidateResourceCache);
         }
 
@@ -121,16 +120,22 @@ QSet<QnUuid> QnResourceAccessManager::accessibleResources(const QnUuid& userId) 
 
 void QnResourceAccessManager::setAccessibleResources(const QnUuid& userId, const QSet<QnUuid>& resources)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_accessibleResources[userId] = resources;
-
-    for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
     {
-        if (iter.key().userId == userId)
-            iter = m_permissionsCache.erase(iter);
-        else
-            ++iter;
+        QnMutexLocker lk(&m_mutex);
+        if (m_accessibleResources[userId] == resources)
+            return;
+
+        m_accessibleResources[userId] = resources;
+
+        for (auto iter = m_permissionsCache.begin(); iter != m_permissionsCache.end();)
+        {
+            if (iter.key().userId == userId)
+                iter = m_permissionsCache.erase(iter);
+            else
+                ++iter;
+        }
     }
+    emit accessibleResourcesChanged(userId);
 }
 
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(const QnUserResourcePtr& user) const
@@ -342,16 +347,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUserResourcePtr& user, const QnMediaServerResourcePtr& server) const
 {
     NX_ASSERT(server);
-
-    if (!isAccessibleResource(user, server))
-        return Qn::NoPermissions;
-
-    if (hasGlobalPermission(user, Qn::GlobalEditServersPermissions))
+    if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
     {
         if (qnCommon->isReadOnly())
             return Qn::ReadPermission;
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     }
+
+    /* All users must have at least ReadPermission to send api requests (recorded periods, bookmarks, etc). */
     return Qn::ReadPermission;
 }
 
@@ -452,14 +455,14 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 
         QnUuid ownerId = layout->getParentId();
 
-        /* Access to global layouts. */
+        /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
         if (ownerId.isNull())
         {
             if (!isAccessibleResource(user, layout))
                 return Qn::NoPermissions;
 
             /* Global layouts editor. */
-            if (hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission))
+            if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
                 return Qn::FullLayoutPermissions;
 
             return Qn::ModifyLayoutPermission;
@@ -489,11 +492,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
         }
 
         /* User can do whatever he wants with own layouts. */
-        if (layout->userCanEdit())
-            return Qn::FullLayoutPermissions;
-
-        /* Can structurally modify but cannot save. */
-        return Qn::ModifyLayoutPermission;
+        return Qn::FullLayoutPermissions;
     };
 
     return checkLocked(checkReadOnly(base()));
@@ -503,35 +502,46 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(const QnUs
 {
     NX_ASSERT(targetUser);
 
+    auto checkReadOnly = [this](Qn::Permissions permissions)
+    {
+        if (!qnCommon->isReadOnly())
+            return permissions;
+        return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+    };
+
+    auto checkUserType = [targetUser](Qn::Permissions permissions)
+    {
+        switch (targetUser->userType())
+        {
+        case QnUserType::Ldap:
+            return permissions &~ (Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+        case QnUserType::Cloud:
+            return permissions &~ (Qn::WritePasswordPermission | Qn::WriteEmailPermission);
+        default:
+            break;
+        }
+        return permissions;
+    };
+
     Qn::Permissions result = Qn::NoPermissions;
     if (targetUser == user)
     {
-        if (qnCommon->isReadOnly())
-            return result | Qn::ReadPermission;
-
-        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
+        result |= Qn::ReadPermission | Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
     }
-
-    if ((targetUser != user) && hasGlobalPermission(user, Qn::GlobalAdminPermission))
+    else
     {
-        result |= Qn::ReadPermission;
-        if (qnCommon->isReadOnly())
-            return result;
+        if (hasGlobalPermission(user, Qn::GlobalViewLogsPermission))
+            result |= Qn::ReadPermission;
 
-        /* Admins can only be edited by owner, other users - by all admins. */
-        if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
-            result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
+        if (hasGlobalPermission(user, Qn::GlobalAdminPermission))
+        {
+            /* Admins can only be edited by owner, other users - by all admins. */
+            if (user->isOwner() || !hasGlobalPermission(targetUser, Qn::GlobalAdminPermission))
+                result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
+        }
     }
 
-    /* Nobody can edit LDAP-provided parameters. */
-    if (targetUser->isLdap())
-    {
-        result &= ~Qn::WriteNamePermission;
-        result &= ~Qn::WritePasswordPermission;
-        result &= ~Qn::WriteEmailPermission;
-    }
-
-    return result;
+    return checkReadOnly(checkUserType(result));
 }
 
 bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user, const QnResourcePtr& resource) const
@@ -549,14 +559,8 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
 
     auto requiredPermission = [this, resource]()
     {
-        if (resource.dynamicCast<QnLayoutResource>())
-            return Qn::GlobalAccessAllLayoutsPermission;
-
         if (resource.dynamicCast<QnVirtualCameraResource>())
             return Qn::GlobalAccessAllCamerasPermission;
-
-        if (resource.dynamicCast<QnMediaServerResource>())
-            return Qn::GlobalAccessAllServersPermission;
 
         if (resource.dynamicCast<QnVideoWallResource>())
             return Qn::GlobalControlVideoWallPermission;
@@ -565,7 +569,7 @@ bool QnResourceAccessManager::isAccessibleResource(const QnUserResourcePtr& user
         if (resource.dynamicCast<QnWebPageResource>())
             return Qn::GlobalAccessAllCamerasPermission;
 
-        /* Default value (e.g. for users). */
+        /* Default value (e.g. for users, servers and layouts). */
         return Qn::GlobalAdminPermission;
     };
 
@@ -586,9 +590,9 @@ bool QnResourceAccessManager::canCreateLayoutInternal(const QnUserResourcePtr& u
     if (layoutParentId == user->getId())
         return true;
 
-    /* Somebody can create global layouts. */
+    /* Only admins can create global layouts. */
     if (layoutParentId.isNull())
-        return hasGlobalPermission(user, Qn::GlobalEditLayoutsPermission);
+        return hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
     QnUserResourcePtr owner = qnResPool->getResourceById<QnUserResource>(layoutParentId);
     if (owner)

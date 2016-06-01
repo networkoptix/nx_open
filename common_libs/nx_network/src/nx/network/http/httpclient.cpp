@@ -6,6 +6,7 @@
 #include "httpclient.h"
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/std/future.h>
 
 
 namespace nx_http
@@ -137,14 +138,27 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
-    AbstractStreamSocket* HttpClient::socket()
+    const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
     {
         return m_asyncHttpClient->socket();
     }
 
-    QSharedPointer<AbstractStreamSocket> HttpClient::takeSocket()
+    std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     {
-        return m_asyncHttpClient->takeSocket();
+        //NOTE m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio thread
+        std::unique_ptr<AbstractStreamSocket> sock;
+        nx::utils::promise<void> socketTakenPromise;
+        m_asyncHttpClient->dispatch(
+            [this, &sock, &socketTakenPromise]()
+            {
+                sock = std::move(m_asyncHttpClient->takeSocket());
+                socketTakenPromise.set_value();
+            });
+        socketTakenPromise.get_future().wait();
+
+        if (!sock || !sock->setNonBlockingMode(false))
+            return nullptr;
+        return sock;
     }
 
     void HttpClient::instanciateHttpClient()

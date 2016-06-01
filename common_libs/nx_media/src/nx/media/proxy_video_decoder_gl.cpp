@@ -4,9 +4,6 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLShaderProgram>
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder<gl>: "
-#include "proxy_video_decoder_utils.h"
-
 #include "proxy_video_decoder_gl_utils.h"
 
 namespace nx {

@@ -17,11 +17,17 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran )
         {
             if( tran.command == ApiCommand::addStoredFile )
+            {
                 emit added( tran.params.path );
+            }
             else if( tran.command == ApiCommand::updateStoredFile )
+            {
                 emit updated( tran.params.path );
+            }
             else
+            {
                 NX_ASSERT( false );
+            }
         }
 
         void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran )

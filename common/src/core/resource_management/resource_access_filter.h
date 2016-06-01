@@ -18,15 +18,11 @@ public:
     enum Filter
     {
         CamerasFilter,
-        LayoutsFilter,
-        ServersFilter
+        LayoutsFilter
     };
 
     static QList<QnResourceAccessFilter::Filter> allFilters();
 
     static QnResourceList filteredResources(Filter filter, const QnResourceList& source);
     static QSet<QnUuid> filteredResources(Filter filter, const QSet<QnUuid>& source);
-
-    static Qn::GlobalPermission accessPermission(Filter filter);
-    static QnResourceAccessFilter::Filter filterByPermission(Qn::GlobalPermission permission);
 };

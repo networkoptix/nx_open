@@ -472,7 +472,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 m_spsFound = true;
             }
 
-            if (!m_spsFound)
+            if (!m_spsFound && m_context->extradata_size == 0)
                 return false; // no sps has found yet. skip frame
         }
         else if (data->context)

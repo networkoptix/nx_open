@@ -63,9 +63,6 @@ public:
 
     virtual void setUrl(const QString& value) override;
 
-    bool userCanEdit() const;
-    void setUserCanEdit(bool value);
-
     /** Size of background image - in cells */
     QSize backgroundSize() const;
     void setBackgroundSize(QSize size);
@@ -85,8 +82,8 @@ public:
     /** Check if layout is an exported file. */
     bool isFile() const;
 
-    /** Check if layout is global. */
-    bool isGlobal() const;
+    /** Check if layout is shared. */
+    bool isShared() const;
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -94,7 +91,6 @@ signals:
     void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
-    void userCanEditChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
@@ -117,7 +113,6 @@ private:
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
-    bool m_userCanEdit;
     QSize m_backgroundSize;
     QString m_backgroundImageFilename;
     qreal m_backgroundOpacity;

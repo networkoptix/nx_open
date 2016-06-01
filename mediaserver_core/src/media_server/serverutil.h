@@ -30,7 +30,7 @@ namespace nx
         void resetToDefault();
         bool isDefault() const;
 
-        void saveToConfig();
+        bool saveToConfig();
         void loadFromConfig();
     private:
         QString m_value;
@@ -59,7 +59,10 @@ namespace nx
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, const QnUuid &userId);
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections);
+
+void resetTransactionTransportConnections();
+
 
 struct PasswordData
 {

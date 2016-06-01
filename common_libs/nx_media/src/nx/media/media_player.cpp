@@ -17,6 +17,9 @@
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <nx/utils/flag_config.h>
 
 namespace nx {
 namespace media {
@@ -42,6 +45,13 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
+struct NxMediaFlagConfig: public nx::utils::FlagConfig
+{
+    NxMediaFlagConfig(const char* moduleName): nx::utils::FlagConfig(moduleName) { reload(); }
+
+    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
+
+} conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -144,6 +154,7 @@ private:
     void presentNextFrame();
     qint64 getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame);
     qint64 getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame);
+    bool createArchiveReader();
     bool initDataProvider();
 
     void setState(Player::State state);
@@ -463,21 +474,56 @@ void PlayerPrivate::updateVideoQuality()
         archiveReader->setQuality(MEDIA_Quality_CustomResolution, true, videoResolution);
 }
 
+bool PlayerPrivate::createArchiveReader()
+{
+    QString path(url.path().mid(1));
+    bool isLocalFile = url.scheme() == lit("file");
+    QnResourcePtr resource;
+    if (isLocalFile)
+    {
+#ifdef ENABLE_ARCHIVE
+        resource = QnAviResourcePtr(new QnAviResource(path));
+        resource->setStatus(Qn::Online);
+#else
+        return false;
+#endif
+    }
+    else
+    {
+        resource = qnResPool->getResourceById(QnUuid(path));
+    }
+
+    if (!resource)
+        return false;
+
+    archiveReader.reset(new QnArchiveStreamReader(resource));
+    QnAbstractArchiveDelegate* archiveDelegate;
+    if (isLocalFile)
+    {
+#ifdef ENABLE_ARCHIVE
+        archiveDelegate = new QnAviArchiveDelegate();
+#endif
+    }
+    else
+    {
+        archiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+    }
+
+    archiveReader->setArchiveDelegate(archiveDelegate);
+    return true;
+}
+
 bool PlayerPrivate::initDataProvider()
 {
-    QnUuid id(url.path().mid(1));
-    QnResourcePtr resource = qnResPool->getResourceById(id);
-    if (!resource)
+    if (!createArchiveReader())
     {
         setMediaStatus(Player::MediaStatus::NoMedia);
         return false;
     }
 
-    archiveReader.reset(new QnArchiveStreamReader(resource));
     updateVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
 
-    archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
     archiveReader->addDataProcessor(dataConsumer.get());
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
         this, &PlayerPrivate::at_gotVideoFrame);
@@ -489,6 +535,7 @@ bool PlayerPrivate::initDataProvider()
             setPosition(kLivePosition);
         });
 
+    auto resource = archiveReader->getResource();
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (camera)
     {
@@ -567,11 +614,11 @@ void Player::setPosition(qint64 value)
 {
     Q_D(Player);
     d->lastSeekTimeMs = value;
-
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
         d->positionMs = value;
+
     d->setLiveMode(value == kLivePosition);
 
     d->at_hurryUp(); //< renew receiving frames
@@ -627,6 +674,14 @@ void Player::stop()
 void Player::setSource(const QUrl& url)
 {
     Q_D(Player);
+
+    if (*conf.substitutePlayerUrl)
+    {
+        QUrl url(conf.substitutePlayerUrl);
+        stop();
+        d->url = url;
+        return;
+    }
 
     if (url == d->url)
         return;

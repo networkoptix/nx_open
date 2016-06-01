@@ -511,6 +511,7 @@ namespace detail
         ErrorCode insertOrReplaceUserGroup(const ApiUserGroupData& data);
         ErrorCode removeUserGroup( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
+        ErrorCode cleanAccessRights(const QnUuid& userOrGroupId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);

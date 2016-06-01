@@ -55,7 +55,7 @@ public:
      * \param resources                 List of resources to get combined permissions for.
      * \returns                         Bitwise AND combination of permissions for the provided resources.
      */
-    Qn::Permissions permissions(const QnResourceList &resources) const;
+    Qn::Permissions combinedPermissions(const QnResourceList &resources) const;
 
     /**
      * \returns                         Global permissions of the current user,
@@ -78,6 +78,8 @@ public:
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
+
+
 signals:
     /**
      * \param resource                  Resource for which permissions have changed.
@@ -90,6 +92,8 @@ protected slots:
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+
+    void at_accessibleResourcesChanged(const QnUuid& userId);
 private:
     void recalculateAllPermissions();
 

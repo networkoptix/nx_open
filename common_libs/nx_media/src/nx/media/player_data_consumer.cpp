@@ -184,11 +184,13 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     if (!m_videoDecoder->decode(data, &decodedFrame))
     {
         qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
-        return true; //False result means we want to repeat this frame later.
+        // False result means we want to repeat this frame later, thus, returning true.
     }
-
-    if (decodedFrame)
-        enqueueVideoFrame(std::move(decodedFrame));
+    else
+    {
+        if (decodedFrame)
+            enqueueVideoFrame(std::move(decodedFrame));
+    }
 
     return true;
 }

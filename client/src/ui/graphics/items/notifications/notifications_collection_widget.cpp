@@ -299,7 +299,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
     QnUuid ruleId = businessAction->getBusinessRuleId();
-    QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree());
+    QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
     QnVirtualCameraResourceList alarmCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
@@ -339,7 +339,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnNotificationWidget *item = new QnNotificationWidget(m_list);
     item->setText(title);
-    item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
+    item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->extraInfoInTree(), false));
     item->setNotificationLevel(QnNotificationLevel::valueOf(businessAction));
     item->setProperty(itemResourcePropertyName,   QVariant::fromValue<QnResourcePtr>(resource));
     item->setProperty(itemActionTypePropertyName, businessAction->actionType());
@@ -347,7 +347,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
     if (businessAction->actionType() == QnBusiness::PlaySoundAction) {
-        QString soundUrl = businessAction->getParams().soundUrl;
+        QString soundUrl = businessAction->getParams().url;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
     }

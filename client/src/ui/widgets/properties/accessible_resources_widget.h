@@ -6,6 +6,7 @@
 
 #include <ui/models/abstract_permissions_model.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui
 {
@@ -15,7 +16,7 @@ namespace Ui
 class QnResourceListModel;
 
 /** Widget for displaying filtered set of accessible resources, for user or user group. */
-class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget
+class QnAccessibleResourcesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -38,6 +39,7 @@ private:
     QScopedPointer<Ui::AccessibleResourcesWidget> ui;
     QnAbstractPermissionsModel* const m_permissionsModel;
     const QnResourceAccessFilter::Filter m_filter;
+    const bool m_controlsVisible;   /*< Should the controls widget be visible and active. */
 
     QScopedPointer<QnResourceListModel> m_resourcesModel;
     QScopedPointer<QnResourceListModel> m_controlsModel;    /*< Workaround to make controls checkboxes look totally like elements in list. */

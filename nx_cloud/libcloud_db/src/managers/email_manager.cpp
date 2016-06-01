@@ -28,6 +28,12 @@ EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_
     m_settings( settings ),
     m_terminated( false )
 {
+    if (!m_settings.notification().serviceEndpoint.isEmpty())
+    {
+        m_notificationModuleEndpoint = SocketAddress(m_settings.notification().serviceEndpoint);
+        return;
+    }
+
     nx::network::cloud::CloudModuleEndPointFetcher endPointFetcher(
         "notification_module",
         std::make_unique<nx::network::cloud::RandomEndpointSelector>());
@@ -49,15 +55,6 @@ EMailManager::~EMailManager()
 {
     //NOTE if we just terminate all ongoing calls then user of this class can dead-lock
     m_startedAsyncCallsCounter.wait();
-
-    //decltype(m_ongoingRequests) ongoingRequests;
-    //{
-    //    QnMutexLocker lk(&m_mutex);
-    //    ongoingRequests = std::move(m_ongoingRequests);
-    //}
-
-    //for (auto httpRequest: ongoingRequests)
-    //    httpRequest->terminate();
 }
 
 void EMailManager::sendAsync(
@@ -110,6 +107,18 @@ void EMailManager::onSendNotificationRequestDone(
     nx_http::AsyncHttpClientPtr client,
     std::function<void(bool)> completionHandler)
 {
+    if (client->failed())
+    {
+        NX_LOGX(lm("Failed (1) to send email notification. %1")
+            .arg(SystemError::toString(client->lastSysErrorCode())), cl_logDEBUG1);
+    }
+    else if (!nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode))
+    {
+        NX_LOGX(lm("Failed (2) to send email notification. Received %1(%2) response")
+            .arg(client->response()->statusLine.statusCode).arg(client->response()->statusLine.reasonPhrase),
+            cl_logDEBUG1);
+    }
+
     if (completionHandler)
         completionHandler(
             client->response() &&

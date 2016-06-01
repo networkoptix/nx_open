@@ -29,6 +29,8 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <utils/common/model_functions.h>
+#include "server_connector.h"
+#include <transaction/transaction_message_bus.h>
 
 namespace
 {
@@ -228,7 +230,19 @@ bool backupDatabase() {
     return true;
 }
 
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, const QnUuid &userId)
+void resetTransactionTransportConnections()
+{
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->stop();
+
+    qnTransactionBus->dropConnections();
+
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->start();
+}
+
+
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections)
 {
     if (qnCommon->localSystemName() == systemName.value())
         return true;
@@ -240,14 +254,22 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
         return false;
     }
 
-    systemName.saveToConfig();
+    if (!systemName.saveToConfig())
+    {
+        NX_LOG("Failed to save new system name to config", cl_logWARNING);
+        return false;
+    }
+    if (resetConnections)
+        resetTransactionTransportConnections();
+
     server->setSystemName(systemName.value());
     qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
 
     if (systemName.isDefault())
         qnGlobalSettings->resetCloudParams();
     qnGlobalSettings->setNewSystem(systemName.isDefault());
-    qnGlobalSettings->synchronizeNowSync();
+    if (qnGlobalSettings->synchronizeNowSync())
+        qnCommon->updateModuleInformation();
 
     QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
 
@@ -342,12 +364,19 @@ QString nx::SystemName::prevValue() const
         return m_prevValue;
 }
 
-void nx::SystemName::saveToConfig()
+bool nx::SystemName::saveToConfig()
 {
+    const auto prevValueBak = m_prevValue;
     m_prevValue = m_value;
     auto settings = MSSettings::roSettings();
+    if (!settings->isWritable())
+    {
+        m_prevValue = prevValueBak;
+        return false;
+    }
     settings->setValue(SYSTEM_NAME_KEY, m_value);
     settings->setValue(PREV_SYSTEM_NAME_KEY, m_prevValue);
+    return true;
 }
 
 void nx::SystemName::loadFromConfig()

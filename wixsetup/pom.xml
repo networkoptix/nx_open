@@ -173,7 +173,7 @@
 
                     <execution>
                         <id>wix-gen</id>
-                        <phase>generate-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -188,7 +188,7 @@
 
                     <execution>
                         <id>wix-compile</id>
-                        <phase>process-resources</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -203,7 +203,7 @@
 
                     <execution>
                         <id>wix-sign</id>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -223,19 +223,6 @@
                         <configuration>
                             <executable>${project.build.directory}/pack.bat</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>    
-                    </execution>
-                    
-                    <execution>
-                        <id>integration-test</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${project.build.directory}/test.bat</executable>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <skip>${skip.test}</skip>                        
                         </configuration>    
                     </execution>
                 </executions>

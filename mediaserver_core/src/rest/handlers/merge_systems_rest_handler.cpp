@@ -142,7 +142,7 @@ int QnMergeSystemsRestHandler::executeGet(
         return nx_http::StatusCode::ok;
     }
 
-    const bool canMerge = 
+    const bool canMerge =
         (remoteModuleInformation.cloudSystemId == qnCommon->moduleInformation().cloudSystemId) ||
         (takeRemoteSettings && qnCommon->moduleInformation().cloudSystemId.isEmpty()) ||
         (!takeRemoteSettings && remoteModuleInformation.cloudSystemId.isEmpty());
@@ -392,7 +392,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
-    if (!changeSystemName(systemName, remoteSysTime, remoteTranLogTime, owner->authUserId()))
+    if (!changeSystemName(systemName, remoteSysTime, remoteTranLogTime, false))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;

@@ -13,6 +13,8 @@
 #include "../socket_global.h"
 #include "../system_socket.h"
 
+#define DELEGATE_SYNC_CALLS
+
 
 namespace nx {
 namespace network {
@@ -177,6 +179,13 @@ bool CloudStreamSocket::connect(
 
 int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
+#ifdef DELEGATE_SYNC_CALLS
+    if (m_socketDelegate)
+        return m_socketDelegate->recv(buffer, bufferLen, flags);
+
+    SystemError::setLastErrorCode(SystemError::notConnected);
+    return -1;
+#else
     Buffer tmpBuffer;
     tmpBuffer.reserve(bufferLen);
 
@@ -195,10 +204,18 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     while ((flags & MSG_WAITALL) && (totallyRead < static_cast<int>(bufferLen)));
 
     return totallyRead;
+#endif
 }
 
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
+#ifdef DELEGATE_SYNC_CALLS
+    if (m_socketDelegate)
+        return m_socketDelegate->send(buffer, bufferLen);
+
+    SystemError::setLastErrorCode(SystemError::notConnected);
+    return -1;
+#else
     nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     {
         QnMutexLocker lk(&m_mutex);
@@ -236,6 +253,7 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
     }
 
     return result.second;
+#endif
 }
 
 SocketAddress CloudStreamSocket::getForeignAddress() const
@@ -404,6 +422,8 @@ bool CloudStreamSocket::startAsyncConnect(
     std::vector<AddressEntry> dnsEntries,
     int port)
 {
+    using namespace std::placeholders;
+
     if (dnsEntries.empty())
     {
         NX_LOGX(lm("No address entry"), cl_logDEBUG1);
@@ -432,7 +452,7 @@ bool CloudStreamSocket::startAsyncConnect(
             }
             m_socketDelegate->connectAsync(
                 SocketAddress(std::move(dnsEntry.host), port),
-                std::move(m_connectHandler));
+                std::bind(&CloudStreamSocket::directConnectDone, this, _1));
             return true;
 
         case AddressType::cloud:
@@ -451,12 +471,18 @@ bool CloudStreamSocket::startAsyncConnect(
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> cloudConnection)
                 {
+                    //NOTE: this handler is called from unspecified thread
                     auto operationLock = sharedOperationGuard->lock();
                     if (!operationLock)
                         return; //operation has been cancelled
-                    onCloudConnectDone(
-                        errorCode,
-                        std::move(cloudConnection));
+                    dispatch(
+                        [this, errorCode, 
+                            cloudConnection = std::move(cloudConnection)]() mutable
+                        {
+                            onCloudConnectDone(
+                                errorCode,
+                                std::move(cloudConnection));
+                        });
                 });
             return true;
         }
@@ -505,10 +531,44 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
     return result.second;
 }
 
+SystemError::ErrorCode CloudStreamSocket::applyRealNonBlockingMode(
+    AbstractStreamSocket* streamSocket)
+{
+    SystemError::ErrorCode errorCode = SystemError::noError;
+
+    if (!m_socketAttributes.nonBlockingMode)
+    {
+        //restoring default non blocking mode on socket
+        if (!streamSocket->setNonBlockingMode(false))
+        {
+            errorCode = SystemError::getLastOSErrorCode();
+            NX_CRITICAL(errorCode != SystemError::noError);
+        }
+    }
+
+    return errorCode;
+}
+
+void CloudStreamSocket::directConnectDone(SystemError::ErrorCode errorCode)
+{
+#ifdef DELEGATE_SYNC_CALLS
+    if (errorCode == SystemError::noError)
+        errorCode = applyRealNonBlockingMode(m_socketDelegate.get());
+#endif
+
+    auto userHandler = std::move(m_connectHandler);
+    userHandler(errorCode);  //this object can be freed in handler, so using local variable for handler
+}
+
 void CloudStreamSocket::onCloudConnectDone(
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractStreamSocket> cloudConnection)
 {
+#ifdef DELEGATE_SYNC_CALLS
+    if (errorCode == SystemError::noError)
+        errorCode = applyRealNonBlockingMode(cloudConnection.get());
+#endif
+
     if (errorCode == SystemError::noError)
     {
         NX_ASSERT(cloudConnection->getAioThread() == m_aioThreadBinder->getAioThread());

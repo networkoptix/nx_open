@@ -11,21 +11,6 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>8</number>
-   </property>
-   <property name="leftMargin">
-    <number>16</number>
-   </property>
-   <property name="topMargin">
-    <number>16</number>
-   </property>
-   <property name="rightMargin">
-    <number>16</number>
-   </property>
-   <property name="bottomMargin">
-    <number>16</number>
-   </property>
    <item>
     <widget class="QPushButton" name="enabledButton">
      <property name="sizePolicy">
@@ -53,59 +38,19 @@
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="propertiesLayout" columnminimumwidth="120,0">
-     <property name="verticalSpacing">
-      <number>8</number>
-     </property>
-     <item row="0" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="loginLabel">
-       <property name="text">
-        <string>Login</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="loginEdit"/>
-     </item>
-     <item row="1" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="emailLabel">
-       <property name="text">
-        <string>Email</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="emailEdit"/>
-     </item>
-     <item row="2" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="passwordLabel">
-       <property name="text">
-        <string>Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="passwordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0" alignment="Qt::AlignRight">
-      <widget class="QLabel" name="confirmPasswordLabel">
-       <property name="text">
-        <string>Confirm Password</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="confirmPasswordEdit">
-       <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QnInputField" name="loginInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="nameInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="emailInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="passwordInputField" native="true"/>
+   </item>
+   <item>
+    <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line_2">
@@ -172,6 +117,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnInputField</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

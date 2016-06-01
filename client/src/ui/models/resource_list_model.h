@@ -5,10 +5,12 @@
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_fwd.h>
+#include <utils/common/connective.h>
 
-class QnResourceListModel: public QAbstractItemModel {
+class QnResourceListModel: public Connective<QAbstractItemModel>
+{
     Q_OBJECT
-    typedef QAbstractItemModel base_type;
+    typedef Connective<QAbstractItemModel> base_type;
 
 public:
     enum Column

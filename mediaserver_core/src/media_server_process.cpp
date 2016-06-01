@@ -478,8 +478,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    if (storage->getStorageType().isEmpty())
-        storage->setStorageType(QnLexical::serialized(storageType));
+    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -1547,8 +1546,8 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
@@ -1708,6 +1707,11 @@ QHostAddress MediaServerProcess::getPublicAddress()
     m_ipDiscovery->update();
     m_ipDiscovery->waitForFinished();
     return m_ipDiscovery->publicIP();
+}
+
+void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGuidList)
+{
+    m_hardwareGuidList = hardwareGuidList;
 }
 
 void MediaServerProcess::run()
@@ -1933,7 +1937,7 @@ void MediaServerProcess::run()
     }
 #endif
 
-    runtimeData.hardwareIds = LLUtil::getAllHardwareIds().toVector();
+    runtimeData.hardwareIds = m_hardwareGuidList;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
@@ -2728,6 +2732,7 @@ protected:
 
         LLUtil::initHardwareId(MSSettings::roSettings());
         updateGuidIfNeeded();
+        m_main->setHardwareGuidList(LLUtil::getAllHardwareIds().toVector());
 
         QnUuid guid = serverGuid();
         if (guid.isNull())

@@ -7,12 +7,11 @@
 
 #include <client/client_globals.h>
 
-class QnActions
-{
-    Q_GADGET
-    Q_ENUMS(IDType)
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
+#endif
+QN_DECLARE_METAOBJECT_HEADER(QnActions, IDType, )
 
-public:
     /**
      * Enum of all menu actions.
      */
@@ -489,6 +488,22 @@ public:
          * <tt>QString ResourceNameRole</tt> --- name for the new layout.
          */
         SaveLayoutAsAction,
+
+        /**
+         * Shares selected layout with another user.
+         *
+         * Parameters:
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share layout with.
+         */
+        ShareLayoutAction,
+
+        /**
+         * Stops sharing selected layout from the selected user.
+         *
+         * Parameters:
+         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to stop sharing layout with.
+         */
+        StopSharingLayoutAction,
 
         /**
          * Saves selected layout under another name in current user's layouts list.

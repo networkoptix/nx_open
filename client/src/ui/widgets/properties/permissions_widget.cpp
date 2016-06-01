@@ -29,10 +29,9 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     };
 
     /* Manager permissions. */
-    createCheckBox(Qn::GlobalEditServersPermissions,        tr("Can edit server settings"));
     createCheckBox(Qn::GlobalEditCamerasPermission,         tr("Can edit camera settings"));
-    createCheckBox(Qn::GlobalEditLayoutsPermission,         tr("Can create and edit global layouts"));
     createCheckBox(Qn::GlobalControlVideoWallPermission,    tr("Can control videowalls"));
+    createCheckBox(Qn::GlobalViewLogsPermission,            tr("Can view audit trail and event log"));
 
     /* Viewer permissions. */
     createCheckBox(Qn::GlobalViewArchivePermission,         tr("Can view archives of available cameras"));
@@ -50,7 +49,7 @@ QnPermissionsWidget::~QnPermissionsWidget()
 bool QnPermissionsWidget::hasChanges() const
 {
     Qn::GlobalPermissions value = m_permissionsModel->rawPermissions();
-    value &= ~Qn::GlobalAccessResourcesPermissionsSet;
+    value &= ~Qn::GlobalAccessAllCamerasPermission; /*< This permission is handled separately. */
 
     return selectedPermissions() != value;
 }

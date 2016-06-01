@@ -511,7 +511,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget
             | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         icon(qnSkin->icon("events/log.png")).
         shortcut(lit("Ctrl+L")).
         text(tr("Event Log..."));
@@ -632,7 +632,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::TitleBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
-    factory.beginSubMenu(); {
+    factory.beginSubMenu();
+    {
         factory(QnActions::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
             requiredTargetPermissions(Qn::WritePermission). //TODO: #GDM #access check canCreateResource
@@ -694,7 +695,8 @@ QnActionManager::QnActionManager(QObject *parent):
                 ).
             autoRepeat(false);
 
-    } factory.endSubMenu();
+    }
+    factory.endSubMenu();
 
     factory(QnActions::OpenCurrentUserLayoutMenu).
         flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
@@ -754,6 +756,14 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+Alt+S"), QnActionBuilder::Windows, true).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
+
+    factory(QnActions::ShareLayoutAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        text(lit("Share_Layout_with")).
+        autoRepeat(false).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        condition(new QnForbiddenInSafeModeCondition(this));
 
     factory(QnActions::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
@@ -889,7 +899,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenAuditLogAction).
         flags(Qn::Main).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         text(tr("Audit Trail..."));
 
     factory(QnActions::OpenBookmarksSearchAction).
@@ -1392,6 +1402,14 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
+    factory(QnActions::StopSharingLayoutAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Stop Sharing Layout")).
+        shortcut(lit("Del")).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
+        autoRepeat(false).
+        condition(new QnTreeNodeTypeCondition(Qn::SharedLayoutNode, this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -1454,7 +1472,7 @@ QnActionManager::QnActionManager(QObject *parent):
                 tr("Check Camera Issues..."),       tr("Check Cameras Issues..."),
                 tr("Check I/O Module Issues..."),    tr("Check I/O Modules Issues...")
             ), this)).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this),
             new QnPreviewSearchModeCondition(true, this),
@@ -1515,6 +1533,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add Device(s)...")).   //intentionally hardcode devices here
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
@@ -1528,6 +1547,7 @@ QnActionManager::QnActionManager(QObject *parent):
             tr("Devices List by Server..."),
             tr("Cameras List by Server...")
         )).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnEdgeServerCondition(false, this),
@@ -1541,6 +1561,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerLogsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Logs...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
@@ -1549,6 +1570,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Diagnostics...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
@@ -1557,7 +1579,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
-        requiredGlobalPermission(Qn::GlobalEditServersPermissions).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
