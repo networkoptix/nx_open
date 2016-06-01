@@ -95,8 +95,7 @@ private:
     static QVariantHash eventDescriptionMap(
         const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo &aggregationInfo,
-        QnEmailAttachmentList& attachments,
-        Qn::ResourceInfoLevel detailLevel);
+        QnEmailAttachmentList& attachments);
 
     static QVariantHash eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,

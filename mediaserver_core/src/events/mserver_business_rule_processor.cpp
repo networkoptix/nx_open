@@ -71,6 +71,10 @@ namespace {
     static const QString tpEvent(lit("event"));
     static const QString tpSource(lit("source"));
 	static const QString tpSourceIP(lit("sourceIp"));
+	
+	static const QString tpCameraName(lit("name"));
+	static const QString tpCameraIP(lit("cameraIP"));
+	
     static const QString tpUrlInt(lit("urlint"));
     static const QString tpUrlExt(lit("urlext"));
 	static const QString tpCount(lit("count"));
@@ -459,7 +463,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
-    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, Qn::RI_WithUrl);
+    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); // TODO: We do not need event logo anymore - remove it from code and from resources, pls
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
@@ -467,12 +471,12 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
 	attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
-	attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
 //    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
 	contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
 	if (!cloudOwner.isEmpty()) 
 	{
+		attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
 		contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
 		contextMap[tpCloudOwner] = cloudOwner;
 	}
@@ -491,7 +495,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpDescription] = action->getRuntimeParams().description;
     contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
 	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
-
+	
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
@@ -570,8 +574,7 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
 
 QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
                                                                  const QnBusinessAggregationInfo &aggregationInfo,
-                                                                 QnEmailAttachmentList& attachments,
-                                                                 Qn::ResourceInfoLevel detailLevel)
+                                                                 QnEmailAttachmentList& attachments)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
@@ -580,7 +583,9 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
+	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_UrlOnly);
+
     if (eventType == QnBusiness::CameraMotionEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
@@ -610,7 +615,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
                 {
                     QVariantMap camera;
 
-                    camera[QLatin1String("name")] = QnResourceDisplayInfo(camRes).toString(detailLevel);
+					contextMap[tpCameraName] = QnResourceDisplayInfo(camRes).toString(Qn::ResourceInfoLevel::RI_NameOnly);
+					contextMap[tpCameraIP] = QnResourceDisplayInfo(camRes).toString(Qn::ResourceInfoLevel::RI_UrlOnly);
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
@@ -634,8 +640,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
         }
     }
 
-    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, detailLevel);
-
+    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, Qn::ResourceInfoLevel::RI_NameOnly);
+	// TODO: CHECK!
     return contextMap;
 }
 
