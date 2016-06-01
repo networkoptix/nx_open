@@ -26,7 +26,7 @@ static const int CACHE_UPDATE_TIME = 60 * 1000;
 
 QnActiResourceSearcher::QnActiResourceSearcher()
 {
-    QnMdnsListener::instance()->registerConsumer((long) this);
+    QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
 }
 
@@ -43,7 +43,7 @@ QnResourceList QnActiResourceSearcher::findResources(void)
 
     // find via MDNS
     QList<QByteArray> processedUuid;
-    QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((long) this);
+    QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((std::uintptr_t) this);
     for (int i = 0; i < data.size(); ++i)
     {
         if (shouldStop())

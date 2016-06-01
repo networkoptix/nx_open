@@ -33,10 +33,10 @@ public:
 
     typedef QList<ConsumerData> ConsumerDataList;
 
-    typedef QMap<long, ConsumerDataList> ConsumersMap;
+    typedef QMap<std::uintptr_t, ConsumerDataList> ConsumersMap;
 
-    void registerConsumer(long handle);
-    ConsumerDataList getData(long handle);
+    void registerConsumer(std::uintptr_t handle);
+    ConsumerDataList getData(std::uintptr_t handle);
 
     static QnMdnsListener* instance();
 
@@ -54,7 +54,7 @@ private:
     AbstractDatagramSocket* m_receiveSocket;
     QElapsedTimer m_socketLifeTime;
     //!list<pair<consumer id, consumer data> >. List is required to garantee, that consumers receive data in order they were registered
-    std::list<std::pair<long, ConsumerDataList> > m_data;
+    std::list<std::pair<std::uintptr_t, ConsumerDataList> > m_data;
     QStringList m_localAddressList;
 };
 
