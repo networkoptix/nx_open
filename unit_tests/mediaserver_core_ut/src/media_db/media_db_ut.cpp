@@ -26,7 +26,7 @@
 #   include <platform/platform_abstraction.h>
 #endif
 
-bool recursiveClean(const QString &path);
+#include "../utils.h"
 
 template<qint64 From, qint64 To>
 qint64 genRandomNumber()
@@ -401,12 +401,9 @@ private:
 };
 
 
-void initDbFile(QFile *dbFile)
+void initDbFile(QFile *dbFile, const QString &workDirPath)
 {
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    QDir().mkpath(workDirPath);
-
-    dbFile->setFileName(workDirPath + lit("/file.mdb"));
+    dbFile->setFileName(QDir(workDirPath).absoluteFilePath("file.mdb"));
     dbFile->open(QIODevice::ReadWrite);
 }
 
@@ -476,9 +473,12 @@ TEST(MediaDbTest, BitsTwiddling)
 
 TEST(MediaDbTest, ReadWrite_Simple)
 {
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    const QString workDirPath = *workDirResource.getDirName();
     QFile dbFile;
-    initDbFile(&dbFile);
+    initDbFile(&dbFile, workDirPath);
 
     nx::media_db::Error error;
     TestDataManager tdm(10000);
@@ -515,7 +515,6 @@ TEST(MediaDbTest, ReadWrite_Simple)
         dbHelper.readRecord();
 
     dbFile.close();
-    recursiveClean(workDirPath);
 
     size_t readRecords = std::count_if(tdm.dataVector.cbegin(), tdm.dataVector.cend(),
                                        [](const TestData &td) { return td.visited; });
@@ -524,13 +523,16 @@ TEST(MediaDbTest, ReadWrite_Simple)
 
 TEST(MediaDbTest, DbFileTruncate)
 {
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    const QString workDirPath = *workDirResource.getDirName();
     int truncateCount = 1000;
 
     while (truncateCount-- >= 0)
     {
         QFile dbFile;
-        initDbFile(&dbFile);
+        initDbFile(&dbFile, workDirPath);
 
         nx::media_db::Error error;
         TestDataManager tdm(1);
@@ -552,7 +554,7 @@ TEST(MediaDbTest, DbFileTruncate)
         // truncating randomly last record
         content.truncate(content.size() - genRandomNumber<1, sizeof(qint64) * 2 - 1>());
 
-        initDbFile(&dbFile);
+        initDbFile(&dbFile, workDirPath);
         dbFile.write(content);
         dbFile.close();
 
@@ -577,14 +579,16 @@ TEST(MediaDbTest, DbFileTruncate)
         // we've read all except the very last record
         ASSERT_TRUE(readRecords == tdm.dataVector.size() - 1) << readRecords;
     }
-    recursiveClean(workDirPath);
 }
 
 TEST(MediaDbTest, ReadWrite_MT)
 {
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    const QString workDirPath = *workDirResource.getDirName();
     QFile dbFile;
-    initDbFile(&dbFile);
+    initDbFile(&dbFile, workDirPath);
 
     const size_t threadsNum = 4;
     const size_t recordsCount = 1000;
@@ -684,13 +688,14 @@ TEST(MediaDbTest, ReadWrite_MT)
                                 [](const TestData &td) { return td.visited; });
     ASSERT_TRUE(readRecords == tdm.dataVector.size()) << readRecords;
     dbFile.close();
-    recursiveClean(workDirPath);
 }
 
 TEST(MediaDbTest, StorageDB)
 {
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    QDir().mkpath(workDirPath);
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    const QString workDirPath = *workDirResource.getDirName();
 
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
@@ -829,7 +834,6 @@ TEST(MediaDbTest, StorageDB)
         qWarning() << lit("Not visited count: %1").arg(notVisited);
     }
     ASSERT_EQ(allVisited, true);
-    recursiveClean(workDirPath);
 }
 
 TEST(MediaDbTest, Migration_from_sqlite)
@@ -861,9 +865,10 @@ TEST(MediaDbTest, Migration_from_sqlite)
     }
     auto dbPoolPtr = dbPool->create();
 
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    recursiveClean(workDirPath);
-    QDir().mkpath(workDirPath);
+    nx::ut::utils::WorkDirResource workDirResource;
+    ASSERT_TRUE((bool)workDirResource.getDirName());
+
+    const QString workDirPath = *workDirResource.getDirName();
     QString simplifiedGUID = QnStorageDbPool::getLocalGuid();
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
@@ -954,8 +959,3 @@ TEST(MediaDbTest, Migration_from_sqlite)
     }
 }
 
-TEST(MediaDbTest, Cleanup)
-{
-    const QString workDirPath = qApp->applicationDirPath() + lit("/tmp/media_db");
-    recursiveClean(workDirPath);
-}
