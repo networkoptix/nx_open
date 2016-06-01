@@ -405,37 +405,8 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
-
-static int lockmgr(void **mtx, enum AVLockOp op)
-{
-    QnMutex** qMutex = (QnMutex**) mtx;
-    switch(op) {
-        case AV_LOCK_CREATE:
-            *qMutex = new QnMutex();
-            return 0;
-        case AV_LOCK_OBTAIN:
-            (*qMutex)->lock();
-            return 0;
-        case AV_LOCK_RELEASE:
-            (*qMutex)->unlock();
-            return 0;
-        case AV_LOCK_DESTROY:
-            delete *qMutex;
-            return 0;
-    }
-    return 1;
-}
-
 void ffmpegInit()
 {
-    //avcodec_init();
-    av_register_all();
-
-    if(av_lockmgr_register(lockmgr) != 0)
-    {
-        qCritical() << "Failed to register ffmpeg lock manager";
-    }
-
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
 }
@@ -464,8 +435,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
         { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    if (storage->getStorageType().isEmpty())
-        storage->setStorageType(QnLexical::serialized(storageType));
+    storage->setStorageType(QnLexical::serialized(storageType));
 
     return storage;
 }
@@ -1534,7 +1504,7 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
@@ -2524,8 +2494,6 @@ void MediaServerProcess::run()
     ec2ConnectionFactory.reset();
 
     mserverResourceDiscoveryManager.reset();
-
-    av_lockmgr_register(NULL);
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();

@@ -25,7 +25,6 @@ namespace conf {
 class General
 {
 public:
-    QString configFilePath;
     QString systemUserToRunUnder;
     QString dataDir;
 };
@@ -41,7 +40,7 @@ class CloudDB
 {
 public:
     bool runWithCloud;
-    QString address;
+    QString endpoint;
     QString user;
     QString password;
     std::chrono::seconds updateInterval;

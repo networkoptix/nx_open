@@ -10,7 +10,7 @@
 #include <client/client_runtime_settings.h>
 
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 
 #include <api/media_server_statistics_manager.h>
 #include <ui/actions/action_parameters.h>
@@ -770,7 +770,7 @@ QString QnServerResourceWidget::calculateTitleText() const {
         kMaxNameLength = 30
     };
 
-    QString name = elideString(getFullResourceName(m_resource, true), kMaxNameLength);
+    QString name = elideString(QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl), kMaxNameLength);
 
     qint64 uptimeMs = m_resource->getStatus() == Qn::Online
         ? m_manager->uptimeMs(m_resource)

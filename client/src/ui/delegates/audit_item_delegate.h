@@ -23,9 +23,10 @@ signals:
     void descriptionClicked(const QModelIndex& index);
 
 private:
-    void paintDateTime(QPainter* painter, const QStyleOptionViewItem& option, int dateTimeSecs) const;
-    void paintDescription(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const;
-    void paintUserActivity(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    void paintDateTime(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, int dateTimeSecs) const;
+    void paintDescription(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index, const QnAuditRecord* record) const;
+    void paintUserActivity(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    void paintFocusRect(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const;
 
     int textWidth(const QFont& font, const QString& textData, bool isBold = false) const;
 

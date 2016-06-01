@@ -88,6 +88,41 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
     return data.notifier;
 }
 
+bool QnWorkbenchAccessController::canCreateStorage(const QnUuid& serverId) const
+{
+    if (!m_user)
+        return false;
+    return qnResourceAccessManager->canCreateStorage(m_user, serverId);
+}
+
+bool QnWorkbenchAccessController::canCreateLayout(const QnUuid& layoutParentId) const
+{
+    if (!m_user)
+        return false;
+    return qnResourceAccessManager->canCreateLayout(m_user, layoutParentId);
+}
+
+bool QnWorkbenchAccessController::canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const
+{
+    if (!m_user)
+        return false;
+    return qnResourceAccessManager->canCreateUser(m_user, targetPermissions, isOwner);
+}
+
+bool QnWorkbenchAccessController::canCreateVideoWall() const
+{
+    if (!m_user)
+        return false;
+    return qnResourceAccessManager->canCreateVideoWall(m_user);
+}
+
+bool QnWorkbenchAccessController::canCreateWebPage() const
+{
+    if (!m_user)
+        return false;
+    return qnResourceAccessManager->canCreateWebPage(m_user);
+}
+
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) const
 {
     NX_ASSERT(resource);

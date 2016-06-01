@@ -230,6 +230,17 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
    //if (m_bBroken || m_bClosing)
    //   throw CUDTException(2, 1, 0);
 
+    //applying options that do not require synchronization
+    switch (optName)
+    {
+        case UDT_LINGER:
+            m_Linger = *(linger*)optval;
+            break;
+
+        default:
+            break;
+    }
+
    CGuard cg(m_ConnectionLock);
    CGuard sendguard(m_SendLock);
    CGuard recvguard(m_RecvLock);
@@ -310,10 +321,6 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
       if (m_iRcvBufSize > m_iFlightFlagSize)
          m_iRcvBufSize = m_iFlightFlagSize;
 
-      break;
-
-   case UDT_LINGER:
-      m_Linger = *(linger*)optval;
       break;
 
    case UDP_SNDBUF:

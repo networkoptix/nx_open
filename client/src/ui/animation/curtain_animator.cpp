@@ -10,116 +10,123 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/common/color_to_vector_converter.h>
 
-#include "variant_animator.h"
+#include <ui/animation/opacity_animator.h>
+#include <ui/animation/variant_animator.h>
+
+namespace
+{
+    const qreal kTransparent = 0.0;
+    const qreal kOpaque = 1.0;
+
+}
 
 QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
     AnimatorGroup(parent),
     m_curtained(false),
-    m_curtainColorAnimator(NULL),
-    m_frameOpacityAnimator(NULL)
+    m_curtainOpacityAnimator(nullptr),
+    m_frameOpacityAnimator(nullptr)
 {
-    m_curtainColorAnimator = new VariantAnimator(this);
-    m_curtainColorAnimator->setAccessor(new PropertyAccessor("color"));
-    m_curtainColorAnimator->setConverter(new QnColorToVectorConverter());
-    m_curtainColorAnimator->setTargetObject(NULL);
-
     m_frameOpacityAnimator = new VariantAnimator(this);
     m_frameOpacityAnimator->setAccessor(new PropertyAccessor("frameOpacity"));
     m_frameOpacityAnimator->setTargetObject(NULL);
 
-    addAnimator(m_curtainColorAnimator);
     addAnimator(m_frameOpacityAnimator);
 
     connect(this, SIGNAL(finished()), this, SLOT(at_animation_finished()));
 }
 
-QnCurtainAnimator::~QnCurtainAnimator() {
+QnCurtainAnimator::~QnCurtainAnimator()
+{
     stop();
 }
 
-void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain) {
-    if(curtainItem() != NULL) {
+void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain)
+{
+    if (m_curtainOpacityAnimator)
+    {
         stop();
-
-        m_curtainColorAnimator->setTargetObject(NULL);
+        removeAnimator(m_curtainOpacityAnimator);
+        m_curtainOpacityAnimator = nullptr;
     }
 
-    if(curtain != NULL) {
-        m_curtainColorAnimator->setTargetObject(curtain);
-
-        m_curtainColor = curtain->color();
-        curtain->setColor(toTransparent(m_curtainColor));
-        curtain->hide();
+    if (curtain)
+    {
+        m_curtainOpacityAnimator = opacityAnimator(curtain, m_frameOpacityAnimator->speed());
+        curtain->setOpacity(kTransparent);
+        addAnimator(m_curtainOpacityAnimator);
     }
 }
 
-QnCurtainItem *QnCurtainAnimator::curtainItem() const {
-    return checked_cast<QnCurtainItem *>(m_curtainColorAnimator->targetObject());
+QnCurtainItem *QnCurtainAnimator::curtainItem() const
+{
+    return checked_cast<QnCurtainItem *>(m_curtainOpacityAnimator->targetObject());
 }
 
-void QnCurtainAnimator::setSpeed(qreal speed) {
-    m_curtainColorAnimator->setSpeed(speed);
+void QnCurtainAnimator::setSpeed(qreal speed)
+{
+    if (m_curtainOpacityAnimator)
+        m_curtainOpacityAnimator->setSpeed(speed);
     m_frameOpacityAnimator->setSpeed(speed);
 }
 
-void QnCurtainAnimator::at_animation_finished() {
+void QnCurtainAnimator::at_animation_finished()
+{
     QnCurtainItem *curtain = curtainItem();
-
-    setCurtained(curtain != NULL && curtain->color().alpha() != 0);
+    setCurtained(curtain && !qFuzzyIsNull(curtain->opacity()));
 }
 
-void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget) {
+void QnCurtainAnimator::curtain(QnResourceWidget *frontWidget)
+{
     QnCurtainItem *curtain = curtainItem();
-    if(curtain == NULL)
-        return; 
+    if (!curtain)
+        return;
 
     pause();
 
     restoreFrameColor();
     m_frameOpacity = frontWidget->frameOpacity();
     m_frameOpacityAnimator->setTargetObject(frontWidget);
-    m_frameOpacityAnimator->setTargetValue(0.0);
-
-    m_curtainColorAnimator->setTargetValue(m_curtainColor);
-    curtain->show();
-
+    m_frameOpacityAnimator->setTargetValue(kTransparent);
+    m_curtainOpacityAnimator->setTargetValue(kOpaque);
     start();
 }
 
-void QnCurtainAnimator::uncurtain() {
+void QnCurtainAnimator::uncurtain()
+{
     QnCurtainItem *curtain = curtainItem();
     if(curtain == NULL)
-        return; 
+        return;
 
     stop();
     restoreFrameColor();
-    curtain->setColor(toTransparent(m_curtainColor));
-    curtain->hide();
+    curtain->setOpacity(kTransparent);
     setCurtained(false);
 }
 
-bool QnCurtainAnimator::isCurtained() const {
+bool QnCurtainAnimator::isCurtained() const
+{
     return m_curtained;
 }
 
-void QnCurtainAnimator::restoreFrameColor() {
+void QnCurtainAnimator::restoreFrameColor()
+{
     QnResourceWidget *frontWidget = static_cast<QnResourceWidget *>(m_frameOpacityAnimator->targetObject());
-    if(frontWidget == NULL)
+    if (frontWidget == NULL)
         return;
 
     frontWidget->setFrameOpacity(m_frameOpacity);
 }
 
-void QnCurtainAnimator::setCurtained(bool curtained) {
-    if(m_curtained == curtained)
+void QnCurtainAnimator::setCurtained(bool value)
+{
+    if(m_curtained == value)
         return;
 
-    m_curtained = curtained;
+    m_curtained = value;
 
-    if(m_curtained) {
-        emit this->curtained();
-    } else {
-        emit this->uncurtained();
-    }
+    if (m_curtained)
+        emit curtained();
+    else
+        emit uncurtained();
 }
 

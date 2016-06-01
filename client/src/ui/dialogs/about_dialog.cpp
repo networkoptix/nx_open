@@ -15,7 +15,7 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
@@ -93,23 +93,23 @@ QString QnAboutDialog::connectedServers() const
         latestMsVersion = latestVersion;
 
     QString servers;
-    foreach(const QnAppInfoMismatchData &data, watcher->mismatchData())
+    for (const QnAppInfoMismatchData &data: watcher->mismatchData())
     {
         if (data.component != Qn::ServerComponent)
             continue;
 
-        QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
-        if (!resource)
+        QnMediaServerResourcePtr server = data.resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
             continue;
 
-        QString server = lit("%1: v%2<br/>").arg(getFullResourceName(resource, true)).arg(data.version.toString());
+        QString serverText = lit("%1: v%2<br/>").arg(QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl)).arg(data.version.toString());
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            server = setWarningStyleHtml(server);
+            serverText = setWarningStyleHtml(serverText);
 
-        servers += server;
+        servers += serverText;
     }
 
     return servers;

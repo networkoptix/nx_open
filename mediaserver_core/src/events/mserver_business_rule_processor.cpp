@@ -8,6 +8,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -37,7 +38,6 @@
 #include <nx/email/mustache/mustache_helper.h>
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
-#include "core/resource/resource_name.h"
 #include "business/events/mserver_conflict_business_event.h"
 #include "core/resource/camera_history.h"
 #include <utils/common/synctime.h>
@@ -46,6 +46,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
+#include <nx/network/http/asynchttpclient.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -89,6 +90,8 @@ namespace {
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
+
+    static const QByteArray kExecHttpActionContentType("text/plain");
 };
 
 struct QnEmailAttachmentData {
@@ -222,6 +225,9 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::ExecutePtzPresetAction:
             result = executePtzAction(action);
             break;
+        case QnBusiness::ExecHttpRequestAction:
+            result = executeHttpRequestAction(action);
+			break;
         default:
             break;
         }
@@ -248,6 +254,53 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     mediaServer->setPanicMode(val);
     propertyDictionary->saveParams(mediaServer->getId());
     return true;
+}
+
+bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBusinessActionPtr& action)
+{
+    QUrl url(action->getParams().url);
+
+    if (action->getParams().text.isEmpty())
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                    << "osErrorCode:" << osErrorCode
+                    << "HTTP result:" << statusCode
+                    << "message:" << messageBody;
+            }
+        };
+
+        nx_http::downloadFileAsync(
+            url,
+            callback );
+        return true;
+    }
+    else
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                           << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                           << "osErrorCode:" << osErrorCode
+                           << "HTTP result:" << statusCode;
+            }
+        };
+
+        nx_http::uploadDataAsync(url,
+            action->getParams().text.toUtf8(),
+            kExecHttpActionContentType,
+            nx_http::HttpHeaders(),
+            callback);
+        return true;
+    }
 }
 
 bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)
@@ -321,7 +374,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getUniqueId();
-    bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
+    bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
@@ -402,7 +455,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
-    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, true);
+    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, Qn::RI_WithUrl);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); // TODO: We do not need event logo anymore - remove it from code and from resources, pls
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
@@ -422,7 +475,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams());
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
 	contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
@@ -431,8 +484,8 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     ec2::ApiEmailData data(
         recipients,
         aggregatedResCount > 1
-        ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams(), aggregatedResCount)
-        : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+        ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams())
+        : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl),
         messageBody,
         emailSettings.timeout,
         attachments
@@ -504,7 +557,7 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
 QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
                                                                  const QnBusinessAggregationInfo &aggregationInfo,
                                                                  QnEmailAttachmentList& attachments,
-                                                                 bool useIp)
+                                                                 Qn::ResourceInfoLevel detailLevel)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
@@ -513,7 +566,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
     if (eventType == QnBusiness::CameraMotionEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
@@ -543,7 +596,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
                 {
                     QVariantMap camera;
 
-                    camera[QLatin1String("name")] = getFullResourceName(camRes, useIp);
+                    camera[QLatin1String("name")] = QnResourceDisplayInfo(camRes).toString(detailLevel);
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
@@ -567,22 +620,23 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
         }
     }
 
-    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, useIp);
+    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, detailLevel);
 
     return contextMap;
 }
 
-QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
-                                                                const QnBusinessAggregationInfo& aggregationInfo,
-                                                                bool useIp)
+QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QnBusinessAggregationInfo& aggregationInfo,
+    Qn::ResourceInfoLevel detailLevel)
 {
     QVariantList result;
     if (aggregationInfo.isEmpty()) {
-        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
+        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), detailLevel);
     }
 
     for (const QnInfoDetail& detail: aggregationInfo.toList()) {
-        result << eventDetailsMap(action, detail, useIp);
+        result << eventDetailsMap(action, detail, detailLevel);
     }
     return result;
 }
@@ -590,11 +644,11 @@ QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnA
 QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QList<QnInfoDetail>& aggregationDetailList,
-    bool useIp )
+    Qn::ResourceInfoLevel detailLevel)
 {
     QVariantList result;
     for (const QnInfoDetail& detail: aggregationDetailList)
-        result << eventDetailsMap(action, detail, useIp);
+        result << eventDetailsMap(action, detail, detailLevel);
     return result;
 }
 
@@ -602,7 +656,7 @@ QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
 QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QnInfoDetail& aggregationData,
-    bool useIp,
+    Qn::ResourceInfoLevel detailLevel,
     bool addSubAggregationData )
 {
     using namespace QnBusiness;
@@ -616,8 +670,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     {
         const QnBusinessAggregationInfo& subAggregationData = aggregationData.subAggregationData();
         detailsMap[tpAggregated] = !subAggregationData.isEmpty()
-            ? aggregatedEventDetailsMap(action, subAggregationData, useIp)
-            : (QVariantList() << eventDetailsMap(action, aggregationData, useIp, false));
+            ? aggregatedEventDetailsMap(action, subAggregationData, detailLevel)
+            : (QVariantList() << eventDetailsMap(action, aggregationData, detailLevel, false));
     }
 
 	detailsMap[tpCount] = QString::number(aggregationCount);
@@ -627,7 +681,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {
-        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
+        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
         break;
     }
 
@@ -638,7 +692,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 
     case NetworkIssueEvent:
         {
-            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
+            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }
@@ -701,7 +755,7 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
 void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
+    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources()))
         unfiltered << user->getEmail();
 
     auto recipientsFilter = [](const QString& email)

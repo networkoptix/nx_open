@@ -75,7 +75,7 @@ namespace nx_http
                         *bytesProcessed = currentDataPos;
                     m_state = m_nextState;
                     if( m_breakAfterReadingHeaders ||
-                        m_state == messageDone )    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                        m_state == messageDone )    //MUST break parsing on message boundary so that calling entity has a chance to handle message
                     {
                         return true;
                     }
@@ -159,7 +159,7 @@ namespace nx_http
                     }
                     //we can move to messageDone state in parseLine function if no message body present
                     if( m_state == messageDone )
-                        return true;    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                        return true;    //MUST break parsing on message boundary so that calling entity has chance to handle message
                     break;
                 }
             }

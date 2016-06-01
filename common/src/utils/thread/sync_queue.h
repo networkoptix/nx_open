@@ -15,6 +15,8 @@ template<typename Result>
 class SyncQueue
 {
 public:
+    typedef Result ResultType;
+
     Result pop();
     boost::optional<Result> pop(std::chrono::milliseconds timeout);
 
@@ -107,35 +109,37 @@ std::function< void( R1, R2 ) > SyncMultiQueue<R1, R2>::pusher()
 // --- test features ---
 
 // Every test MUST be finite!
-static const std::chrono::seconds kTestSyncQueueTimeout(10);
+static const std::chrono::minutes kTestSyncQueueTimeout(1);
 
-template<typename Result>
-class TestSyncQueue
+template<typename Base>
+class TestSyncQueueBase
 :
-    public SyncQueue<Result>
+    public Base
 {
 public:
-    Result pop() /* overlap */
+    explicit TestSyncQueueBase(
+        std::chrono::milliseconds timeout = kTestSyncQueueTimeout)
+    :
+        m_timeout(timeout)
     {
-        auto value = SyncQueue<Result>::pop(kTestSyncQueueTimeout);
+    }
+
+    typename Base::ResultType pop() /* overlap */
+    {
+        auto value = Base::pop(m_timeout);
         NX_ASSERT(value, "TestSyncQueue::pop() timeout");
         return std::move(*value);
     }
+
+private:
+    std::chrono::milliseconds m_timeout;
 };
 
+template<typename Result>
+using TestSyncQueue = TestSyncQueueBase<SyncQueue<Result>>;
+
 template<typename R1, typename R2>
-struct TestSyncMultiQueue
-:
-    public SyncMultiQueue<R1, R2>
-{
-public:
-    std::pair<R1, R2> pop() /* overlap */
-    {
-        auto value = SyncMultiQueue<R1, R2>::pop(kTestSyncQueueTimeout);
-        NX_ASSERT(value, "TestSyncMultiQueue::pop() timeout");
-        return std::move(*value);
-    }
-};
+using TestSyncMultiQueue = TestSyncQueueBase<SyncMultiQueue<R1, R2>>;
 
 } // namespace nx
 

@@ -172,6 +172,10 @@
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <!-- only systems can receive events at the moment -->
+                    <condition value="/cdb/event/subscribe" resName="auth.systemID" matchType="presence">
+                        <set value="false" resName="authorized" resValue="false"/>
+                    </condition>
                 </condition>
             </condition>
         </sequence>

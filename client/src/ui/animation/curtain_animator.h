@@ -44,10 +44,9 @@ private:
     void setCurtained(bool curtained);
 
 private:
-    QColor m_curtainColor;
     qreal m_frameOpacity;
     bool m_curtained;
-    VariantAnimator *m_curtainColorAnimator;
+    VariantAnimator *m_curtainOpacityAnimator;
     VariantAnimator *m_frameOpacityAnimator;
 };
 

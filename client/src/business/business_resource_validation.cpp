@@ -1,14 +1,20 @@
 #include "business_resource_validation.h"
 
 #include <core/resource/resource.h>
-#include <core/resource/resource_name.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
 #include <utils/email/email.h>
 
-namespace {
+namespace
+{
+
+    QString getShortResourceName(const QnResourcePtr& resource)
+    {
+        return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+    }
 
     class QnBusinessResourceValidationStrings {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
@@ -68,6 +74,7 @@ namespace {
             return getShortResourceName(cameras.first());
         return QnDeviceDependentStrings::getNumericName(cameras);
     }
+
 
 }
 

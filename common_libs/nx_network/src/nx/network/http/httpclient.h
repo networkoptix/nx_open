@@ -76,9 +76,9 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
-        AbstractStreamSocket* socket();
+        const std::unique_ptr<AbstractStreamSocket>& socket();
         /** Returns socket in blocking mode */
-        QSharedPointer<AbstractStreamSocket> takeSocket();
+        std::unique_ptr<AbstractStreamSocket> takeSocket();
 
     private:
         nx_http::AsyncHttpClientPtr m_asyncHttpClient;

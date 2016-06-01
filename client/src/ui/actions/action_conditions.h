@@ -565,6 +565,13 @@ private:
     bool m_all;
 };
 
+class QnNewUserLayoutActionCondition : public QnActionCondition
+{
+public:
+    QnNewUserLayoutActionCondition(QObject* parent) : QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnOpenInCurrentLayoutActionCondition: public QnActionCondition
 {
 public:
