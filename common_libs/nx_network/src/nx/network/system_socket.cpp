@@ -1257,7 +1257,7 @@ TCPServerSocket::TCPServerSocket()
 
 TCPServerSocket::~TCPServerSocket()
 {
-    if (inSelfAioThread())
+    if (isInSelfAioThread())
     {
         TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
         d->asyncServerSocketHelper.stopPolling();

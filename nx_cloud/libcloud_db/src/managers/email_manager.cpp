@@ -107,6 +107,18 @@ void EMailManager::onSendNotificationRequestDone(
     nx_http::AsyncHttpClientPtr client,
     std::function<void(bool)> completionHandler)
 {
+    if (client->failed())
+    {
+        NX_LOGX(lm("Failed (1) to send email notification. %1")
+            .arg(SystemError::toString(client->lastSysErrorCode())), cl_logDEBUG1);
+    }
+    else if (!nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode))
+    {
+        NX_LOGX(lm("Failed (2) to send email notification. Received %1(%2) response")
+            .arg(client->response()->statusLine.statusCode).arg(client->response()->statusLine.reasonPhrase),
+            cl_logDEBUG1);
+    }
+
     if (completionHandler)
         completionHandler(
             client->response() &&

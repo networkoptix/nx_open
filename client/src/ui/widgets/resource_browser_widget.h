@@ -125,8 +125,6 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
 
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
     virtual QString toolTipAt(const QPointF& pos) const override;
     virtual bool showOwnTooltip(const QPointF& pos) override;
 
@@ -160,8 +158,6 @@ private slots:
     void at_workbench_itemChanged(Qn::ItemRole role);
     void at_layout_itemAdded(QnWorkbenchItem* item);
     void at_layout_itemRemoved(QnWorkbenchItem* item);
-
-    void at_showUrlsInTree_changed();
 
     void at_thumbnailReady(QnUuid resourceId, const QPixmap& pixmap);
     void at_thumbnailClicked();

@@ -63,6 +63,9 @@ public:
     QString getEmail() const;
     void setEmail(const QString& email);
 
+    QString fullName() const;
+    void setFullName(const QString& value);
+
     virtual Qn::ResourceStatus getStatus() const override;
 
     //!Millis since epoch (1970-01-01, UTC)
@@ -80,6 +83,7 @@ signals:
     void permissionsChanged(const QnResourcePtr& user);
     void userGroupChanged(const QnResourcePtr& user);
     void emailChanged(const QnResourcePtr& user);
+    void fullNameChanged(const QnResourcePtr& user);
 	void realmChanged(const QnResourcePtr& user);
     void enabledChanged(const QnResourcePtr& user);
 
@@ -98,6 +102,7 @@ private:
     bool m_isOwner;
     bool m_isEnabled;
     QString m_email;
+    QString m_fullName;
     qint64 m_passwordExpirationTimestamp;
 };
 

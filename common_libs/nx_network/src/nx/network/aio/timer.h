@@ -51,7 +51,7 @@ public:
     */
     void cancelSync();
 
-    bool inSelfAioThread() const;
+    bool isisInSelfAioThread() const;
 
 private:
     std::chrono::milliseconds m_timeout;

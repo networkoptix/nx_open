@@ -39,15 +39,8 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
         at_resourcePool_resourceAdded(layout);
 }
 
-QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
-    disconnect(qnResPool, nullptr, this, nullptr);
-
-    for(const QnLayoutResourcePtr &layout: qnResPool->getResources<QnLayoutResource>())
-        at_resourcePool_resourceRemoved(layout);
-
-    m_storage->clear();
-    m_flagsByLayout.clear();
-}
+QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
+{}
 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const {
     if(!resource) {
@@ -179,6 +172,7 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
 
 void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource) {
     connect(resource,  &QnResource::nameChanged,                    this,   &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource,  &QnResource::parentIdChanged,                this,   &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
     connect(resource,  &QnLayoutResource::itemAdded,                this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
     connect(resource,  &QnLayoutResource::itemRemoved,              this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
     connect(resource,  &QnLayoutResource::lockedChanged,            this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
@@ -238,12 +232,16 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
     disconnectFrom(layoutResource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
+void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource)
+{
     setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_resource_changed(const QnResourcePtr &resource) {
-    if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
+void QnWorkbenchLayoutSnapshotManager::at_resource_changed(const QnResourcePtr &resource)
+{
+    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+    NX_ASSERT(layoutResource);
+    if (layoutResource)
         at_layout_changed(layoutResource);
 }
 

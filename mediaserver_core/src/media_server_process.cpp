@@ -1532,8 +1532,8 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/getHardwareInfo", new QnGetHardwareInfoHandler());
     QnRestProcessorPool::instance()->registerHandler("api/testLdapSettings", new QnTestLdapSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/recStats", new QnRecordingStatsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/auditLog", new QnAuditLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/checkDiscovery", new QnCanAcceptCameraRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/pingSystem", new QnPingSystemRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());

@@ -81,7 +81,7 @@ namespace nx_http
 
     std::unique_ptr<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
-        NX_ASSERT(m_aioThreadBinder.inSelfAioThread());
+        NX_ASSERT(m_aioThreadBinder.isisInSelfAioThread());
 
         m_terminated = true;
 
@@ -111,7 +111,7 @@ namespace nx_http
 
     void AsyncHttpClient::pleaseStopSync()
     {
-        if (m_aioThreadBinder.inSelfAioThread())
+        if (m_aioThreadBinder.isisInSelfAioThread())
             stopWhileInAioThread();
         else
             QnStoppableAsync::pleaseStopSync();

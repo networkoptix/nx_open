@@ -69,9 +69,9 @@ angular.module('webadminApp')
         /* Funсtions for external calls (open links) */
         $scope.createAccount = function(event){
             if(nativeClientObject && nativeClientObject.openUrlInBrowser) {
-                nativeClientObject.openUrlInBrowser(Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
+                nativeClientObject.openUrlInBrowser(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.clientSetupContext);
             }else{
-                window.open(Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
+                window.open(Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminSetupContext);
             }
             $scope.next('cloudLogin');
         };
@@ -356,8 +356,8 @@ angular.module('webadminApp')
             }
             $scope.settings.cloudError = false;
             if(debugMode){
-                $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
-                $scope.portalShortLink = Config.cloud.portalShortLink;
+                $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",'some_system_id');
+                $scope.portalShortLink = Config.cloud.portalUrl;
                 $scope.next('cloudSuccess');
                 return;
             }
@@ -410,7 +410,7 @@ angular.module('webadminApp')
                     //2. Save settings to local server
                     $log.log("Cloud portal returned success: " + JSON.stringify(message.data));
 
-                    $scope.portalSystemLink = Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
+                    $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}",message.data.id);
 
                     $log.log("Request /api/setupCloudSystem on mediaserver ...");
                     mediaserver.setupCloudSystem($scope.settings.systemName,
@@ -485,7 +485,9 @@ angular.module('webadminApp')
                 window.close();
             }else{
                 $location.path('/settings');
-                window.location.reload();
+                setTimeout(function(){
+                    window.location.reload();
+                })
             }
         };
 
@@ -553,31 +555,6 @@ angular.module('webadminApp')
         function required(val){
             return !!val && (!val.trim || val.trim() != '');
         }
-
-
-        mediaserver.systemSettings().then(function(r){
-            var systemSettings = r.data.reply.settings;
-            $scope.systemSettings = {};
-
-            for(var settingName in $scope.Config.settingsConfig){
-                if(!$scope.Config.settingsConfig[settingName].setupWizard){
-                    continue;
-                }
-                $scope.systemSettings[settingName] = systemSettings[settingName];
-
-                if($scope.Config.settingsConfig[settingName].type === 'number'){
-                    $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
-                }
-                if($scope.systemSettings[settingName] === 'true'){
-                    $scope.systemSettings[settingName] = true;
-                }
-                if($scope.systemSettings[settingName] === 'false'){
-                    $scope.systemSettings[settingName] = false;
-                }
-                $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
-            }
-        });
-
 
         /* Wizard workflow */
 
@@ -707,9 +684,37 @@ angular.module('webadminApp')
         $log.log("Wizard initiated, let's go");
         /* initiate wizard */
 
+        function getAdvancedSettings(){
+            mediaserver.systemSettings().then(function(r){
+                var systemSettings = r.data.reply.settings;
+                if(r.data.reply.settings.cloudPortalUrl){
+                    Config.cloud.portalUrl = r.data.reply.settings.cloudPortalUrl;
+                }
+                $scope.systemSettings = {};
+
+                for(var settingName in $scope.Config.settingsConfig){
+                    if(!$scope.Config.settingsConfig[settingName].setupWizard){
+                        continue;
+                    }
+                    $scope.systemSettings[settingName] = systemSettings[settingName];
+
+                    if($scope.Config.settingsConfig[settingName].type === 'number'){
+                        $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
+                    }
+                    if($scope.systemSettings[settingName] === 'true'){
+                        $scope.systemSettings[settingName] = true;
+                    }
+                    if($scope.systemSettings[settingName] === 'false'){
+                        $scope.systemSettings[settingName] = false;
+                    }
+                    $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+                }
+            });
+        }
         function initWizard(){
             $scope.next(0);
             updateCredentials(Config.defaultLogin, Config.defaultPassword, false).then(function() {
+                getAdvancedSettings();
                 discoverSystems();
             },function(error){
                 $log.log("Couldn't run setup wizard: auth failed");
@@ -720,7 +725,9 @@ angular.module('webadminApp')
                 }else {
                     $log.log("Reload page to try again");
                     $location.search("retry","true");
-                    window.location.reload();
+                    setTimeout(function(){
+                        window.location.reload();
+                    });
                 }
             });
         }

@@ -348,7 +348,7 @@ void QnRtspClientArchiveDelegate::beforeClose()
     m_closing = true;
     QnMutexLocker lock(&m_rtpDataMutex);
     if (m_rtpData)
-        m_rtpData->getMediaSocket()->shutdown();
+        m_rtpData->shutdown();
 }
 
 void QnRtspClientArchiveDelegate::close()

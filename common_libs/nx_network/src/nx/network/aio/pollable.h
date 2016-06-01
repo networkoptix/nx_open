@@ -62,7 +62,7 @@ public:
 
     nx::network::aio::AbstractAioThread* getAioThread() const;
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread);
-    bool inSelfAioThread() const;
+    bool isisInSelfAioThread() const;
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;

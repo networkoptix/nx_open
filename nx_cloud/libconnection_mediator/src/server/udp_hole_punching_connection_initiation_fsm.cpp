@@ -136,11 +136,11 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             connectResponse.params = m_settings.connectionParameters();
             connectResponse.udpEndpointList = std::move(request.udpEndpointList);
 
+            m_state = State::waitingConnectionResult;
             connectResponseSender(
                 api::ResultCode::ok,
                 std::move(connectResponse));
             completionHandler(api::ResultCode::ok);
-            m_state = State::waitingConnectionResult;
             m_timer.start(
                 kConnectionResultWaitTimeout,
                 std::bind(
@@ -154,15 +154,15 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionResultRequest(
     api::ConnectionResultRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_timer.dispatch([this, request, completionHandler]()
-    {
-        //TODO #ak saving connection result
-        completionHandler(api::ResultCode::ok);
-        m_timer.post(std::bind(
-            &UDPHolePunchingConnectionInitiationFsm::done,
-            this,
-            api::ResultCode::ok));
-    });
+    m_timer.dispatch(
+        [this, request, completionHandler = std::move(completionHandler)]()
+        {
+            completionHandler(api::ResultCode::ok);
+            m_timer.post(std::bind(
+                &UDPHolePunchingConnectionInitiationFsm::done,
+                this,
+                api::ResultCode::ok));
+        });
 }
 
 void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)

@@ -76,7 +76,7 @@ CloudServerSocket::~CloudServerSocket()
         pleaseStopSync();
     }
     else
-    if (m_mediatorConnection->inSelfAioThread())
+    if (m_mediatorConnection->isInSelfAioThread())
     {
         // Will not block as all delegates are in the same AIO thread
         pleaseStopSync();
@@ -370,7 +370,7 @@ void CloudServerSocket::startAcceptor(
             SystemError::ErrorCode code,
             std::unique_ptr<AbstractIncomingTunnelConnection> connection)
         {
-            NX_ASSERT(m_mediatorConnection->inSelfAioThread());
+            NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
             NX_LOGX(lm("acceptor %1 returned %2: %3")
                     .arg(acceptorPtr).arg(connection)
                     .arg(SystemError::toString(code)), cl_logDEBUG2);

@@ -22,7 +22,8 @@ angular.module('webadminApp')
         }
 
         function getModuleInformation(){
-            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true');
+            var salt = (new Date().getTime()) + '_' + Math.ceil(Math.random()*1000);
+            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt);
         }
 
         var offlineDialog = null;
@@ -57,7 +58,7 @@ angular.module('webadminApp')
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
-                getModuleInformation(true).catch(function (/*error*/) {
+                getModuleInformation().catch(function (/*error*/) {
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',
@@ -206,9 +207,9 @@ angular.module('webadminApp')
                 url = url || proxy;
                 if(url === true){//force reload cache
                     cacheModuleInfo = null;
-                    return getModuleInformation();
+                    url = proxy;
                 }
-                if(url===''){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
+                if(url === proxy){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
                     if(cacheModuleInfo === null){
                         cacheModuleInfo = wrapRequest(getModuleInformation());
                     }
@@ -435,8 +436,9 @@ angular.module('webadminApp')
 
                 this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly){
-                        $location.path("/setup");
+                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly &&
+                        $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
+                        $location.path('/setup');
                         deferred.resolve(null);
                         return;
                     }

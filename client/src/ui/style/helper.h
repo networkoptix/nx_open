@@ -23,8 +23,14 @@ namespace style
         static const int kViewRowHeight;
         static const int kSortIndicatorSize;
         static const int kRounding;
-        static const QSize kSwitchSize;
-        static const int kSwitchMargin;   /**< Margin between switch subcontrol and right side of a control, eg. push button */
+        static const QSize kButtonSwitchSize;
+        static const QSize kStandaloneSwitchSize;
+        static const int kSwitchMargin;                 /**< Margin between switch subcontrol and right side of a control, eg. push button */
+        static const QSize kSeparatorSize;              /**< Default separator item size. */
+        static const qreal kCheckboxCornerRadius;       /**< Checkbox corner rounding radius */
+        static const int kDefaultTopLevelMargin;        /**< Default layout margin for top-level widgets */
+        static const int kDefaultChildMargin;           /**< Default layout margin for child widgets */
+        static const QSize kDefaultLayoutSpacing;       /**< Default layout horizontal and vertical spacing */
     };
 
     class Properties

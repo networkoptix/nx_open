@@ -72,7 +72,6 @@
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_widget.h>
 #include <ui/style/skin.h>
-#include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
@@ -505,26 +504,16 @@ QnActionParameters QnWorkbenchUi::currentParameters(Qn::ActionScope scope) const
     {
     case Qn::TreeScope:
         return m_treeWidget ? m_treeWidget->currentParameters(scope) : QnActionParameters();
-
-    default:
-        return QnActionParameters(currentTarget(scope));
-    }
-}
-
-QVariant QnWorkbenchUi::currentTarget(Qn::ActionScope scope) const {
-    /* Get items. */
-    switch (scope)
-    {
     case Qn::SliderScope:
-        return QVariant::fromValue(navigator()->currentWidget());
-
+        return QnActionParameters(navigator()->currentWidget());
     case Qn::SceneScope:
-        return QVariant::fromValue(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
-
+        return QnActionParameters(QnActionParameterTypes::widgets(display()->scene()->selectedItems()));
     default:
-        return QVariant();
+        break;
     }
+    return QnActionParameters();
 }
+
 
 void QnWorkbenchUi::setProxyUpdatesEnabled(bool updatesEnabled) {
 	if (m_treeItem)
@@ -2471,7 +2460,7 @@ void QnWorkbenchUi::createSliderWidget(const QnPaneSettings& settings)
 
     const auto getActionParamsFunc = [this](const QnCameraBookmark &bookmark) -> QnActionParameters
     {
-        QnActionParameters bookmarkParams(currentTarget(Qn::SliderScope));
+        QnActionParameters bookmarkParams(currentParameters(Qn::SliderScope));
         bookmarkParams.setArgument(Qn::CameraBookmarkRole, bookmark);
         return bookmarkParams;
     };

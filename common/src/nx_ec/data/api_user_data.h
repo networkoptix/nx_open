@@ -6,13 +6,15 @@
 
 namespace ec2
 {
-    struct ApiUserData : ApiResourceData {
+    struct ApiUserData : ApiResourceData
+    {
         ApiUserData():
             isAdmin(false),
             permissions(Qn::NoGlobalPermissions),
             isLdap(false),
             isEnabled(true),
-            isCloud(false)
+            isCloud(false),
+            fullName()
         {}
 
         /** Really this flag must be named isOwner, but we must keep it to maintain mobile client compatibility. */
@@ -35,8 +37,11 @@ namespace ec2
 
         /** Flag if user is created from the Cloud. */
         bool isCloud;
+
+        /** Full user name. */
+        QString fullName;
     };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)(groupId)(isCloud)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)(groupId)(isCloud)(fullName)
 
 }
 

@@ -18,7 +18,7 @@ IncomingTunnelPool::IncomingTunnelPool(
 void IncomingTunnelPool::addNewTunnel(
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    NX_CRITICAL(m_aioThread.inSelfAioThread());
+    NX_CRITICAL(m_aioThread.isInSelfAioThread());
     auto insert = m_pool.emplace(std::move(connection));
     NX_ASSERT(insert.second);
     acceptTunnel(insert.first);

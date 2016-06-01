@@ -82,7 +82,7 @@ void TunnelAcceptor::pleaseStop(
 void TunnelAcceptor::connectionAckResult(
     nx::hpm::api::ResultCode code)
 {
-    NX_ASSERT(m_mediatorConnection->inSelfAioThread());
+    NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     if (code != hpm::api::ResultCode::ok)
     {
         NX_LOGX(lm("connectionAck error: %1")
@@ -114,7 +114,7 @@ void TunnelAcceptor::connectionAckResult(
 
 void TunnelAcceptor::initiateUdtConnection()
 {
-    NX_ASSERT(m_mediatorConnection->inSelfAioThread());
+    NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
         .arg(m_udtConnectionSocket->getLocalAddress().toString())
@@ -150,7 +150,7 @@ void TunnelAcceptor::executeAcceptHandler(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    NX_ASSERT(m_mediatorConnection->inSelfAioThread());
+    NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_ASSERT(m_acceptHandler);
 
     const auto handler = std::move(m_acceptHandler);

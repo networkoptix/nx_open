@@ -840,6 +840,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
         ReadEmailPermission             = ReadPermission,
         WriteEmailPermission            = WritePasswordPermission,
+        WriteFullNamePermission         = WritePasswordPermission,
         FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
                                             WritePasswordPermission | WriteAccessRightsPermission,
 
@@ -872,7 +873,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Manager permissions. */
         GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
-        GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls */
+        GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
+        GlobalViewLogsPermission                = 0x00000008,   /**< Can access event log and audit trail. */
 
         /* Viewer permissions. */
         GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
@@ -896,13 +898,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
 
         /* Advanced viewer can manage bookmarks and use various input methods. */
-        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission,
-
-        /* Camera and videowall manager. */
-        GlobalManagerPermissionSet          = GlobalAccessAllCamerasPermission | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission | GlobalViewLogsPermission,
 
         /* Admin can do everything. */
-        GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalManagerPermissionSet,
+        GlobalAdminPermissionsSet           = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
         GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission,

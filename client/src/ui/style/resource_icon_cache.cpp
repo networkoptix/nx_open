@@ -176,7 +176,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;
-        else if (layout->isGlobal())
+        else if (layout->isShared())
             key = SharedLayout;
         else
             status = layout->locked() ? Locked : Unknown;

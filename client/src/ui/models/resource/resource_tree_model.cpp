@@ -6,6 +6,10 @@
 
 #include <common/common_module.h>
 
+#include <client/client_settings.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_access_manager.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -20,14 +24,8 @@
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
 
-#include <core/resource/videowall_resource.h>
-#include <core/resource/videowall_item.h>
-#include <core/resource/videowall_item_index.h>
-#include <core/resource/videowall_pc_data.h>
-
 #include <api/global_settings.h>
 
-#include <core/resource_management/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/delegates/resource_tree_model_custom_column_delegate.h>
@@ -52,19 +50,6 @@ namespace
         return false;
     }
 
-    Qn::NodeType rootNodeTypeForScope(QnResourceTreeModel::Scope scope)
-    {
-        switch (scope)
-        {
-        case QnResourceTreeModel::CamerasScope:
-            return Qn::ServersNode;
-        case QnResourceTreeModel::UsersScope:
-            return Qn::UsersNode;
-        default:
-            return Qn::RootNode;
-        }
-    }
-
     /** Set of top-level node types */
     QList<Qn::NodeType> rootNodeTypes()
     {
@@ -72,13 +57,15 @@ namespace
         if (result.isEmpty())
         {
             result
-                << Qn::LocalNode
                 << Qn::CurrentSystemNode
+                << Qn::SeparatorNode
                 << Qn::UsersNode
                 << Qn::ServersNode
                 << Qn::UserDevicesNode
                 << Qn::LayoutsNode
                 << Qn::WebPagesNode
+                << Qn::LocalResourcesNode
+                << Qn::LocalSeparatorNode
                 << Qn::OtherSystemsNode
                 << Qn::RootNode
                 << Qn::BastardNode;
@@ -94,7 +81,6 @@ namespace
 QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_urlsShown(true),
     m_scope(scope)
 {
     /* Create top-level nodes. */
@@ -112,7 +98,13 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
     connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourceTreeModel::at_commonModule_systemNameChanged);
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourceTreeModel::rebuildTree,                      Qt::QueuedConnection);
-    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnGlobalSettings,   &QnGlobalSettings::serverAutoDiscoveryChanged,      this,   &QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged);
+    connect(qnSettings->notifier(QnClientSettings::EXT_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, this, [this](int value)
+    {
+        Q_UNUSED(value);
+        m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
+    });
+    connect(qnResourceAccessManager, &QnResourceAccessManager::accessibleResourcesChanged, this, &QnResourceTreeModel::at_accessibleResourcesChanged);
 
     rebuildTree();
 
@@ -134,12 +126,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex &index) c
 {
     /* Root node. */
     if (!index.isValid())
-        return m_rootNodes[rootNodeTypeForScope(m_scope)];
+        return m_rootNodes[rootNodeTypeForScope()];
 
     return static_cast<QnResourceTreeModelNode *>(index.internalPointer())->toSharedPointer();
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::getResourceNode(const QnResourcePtr &resource)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureResourceNode(const QnResourcePtr &resource)
 {
     if (!resource)
         return m_rootNodes[Qn::BastardNode];
@@ -153,21 +145,21 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::getResourceNode(const QnResource
                 nodeType = Qn::EdgeNode;
 
         pos = m_resourceNodeByResource.insert(resource, QnResourceTreeModelNodePtr(new QnResourceTreeModelNode(this, resource, nodeType)));
+        m_nodesByResource[resource].push_back(*pos);
         m_allNodes.append(*pos);
     }
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::getItemNode(const QnUuid& uuid, const QnResourcePtr& parentResource, Qn::NodeType nodeType)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType)
 {
-    auto parent = getResourceNode(parentResource);
-    ItemHash& items = m_itemNodesByParent[parent];
+    ItemHash& items = m_itemNodesByParent[parentNode];
 
     auto pos = items.find(uuid);
     if (pos == items.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, uuid, nodeType));
-        node->setParent(parent);
+        node->setParent(parentNode);
 
         pos = items.insert(uuid, node);
         m_allNodes.append(*pos);
@@ -175,7 +167,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::getItemNode(const QnUuid& uuid, 
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::getRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString& groupId, const QString& groupName)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode, const QString& groupId, const QString& groupName)
 {
     RecorderHash& recorders = m_recorderHashByParent[parentNode];
     auto pos = recorders.find(groupId);
@@ -190,7 +182,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::getRecorderNode(const QnResource
     return *pos;
 }
 
-QnResourceTreeModelNodePtr QnResourceTreeModel::getSystemNode(const QString &systemName)
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSystemNode(const QString &systemName)
 {
     auto pos = m_systemNodeBySystemName.find(systemName);
     if (pos == m_systemNodeBySystemName.end())
@@ -203,6 +195,30 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::getSystemNode(const QString &sys
 
         pos = m_systemNodeBySystemName.insert(systemName, node);
         m_allNodes.append(*pos);
+    }
+    return *pos;
+}
+
+QnResourceTreeModelNodePtr QnResourceTreeModel::ensureSharedLayoutNode(const QnResourceTreeModelNodePtr& parentNode, const QnLayoutResourcePtr& sharedLayout)
+{
+    NX_ASSERT(sharedLayout->isShared());
+
+    ResourceHash& layouts = m_sharedLayoutNodesByParent[parentNode];
+    auto pos = layouts.find(sharedLayout);
+    if (pos == layouts.end())
+    {
+        QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(this, sharedLayout, Qn::SharedLayoutNode));
+        node->setParent(parentNode);
+
+        pos = layouts.insert(sharedLayout, node);
+        m_nodesByResource[sharedLayout].push_back(*pos);
+        m_allNodes.append(*pos);
+
+        for (auto item : sharedLayout->getItems())
+        {
+            auto itemNode = ensureItemNode(*pos, item.uuid);
+            updateNodeResource(itemNode, qnResPool->getResourceByDescriptor(item.resource));
+        }
     }
     return *pos;
 }
@@ -230,9 +246,10 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
     for (auto child : children)
         removeNode(child);
 
-    /* Remove node from all hashes. */
+    /* Remove node from all hashes where node can be the key. */
     m_recorderHashByParent.remove(node);
     m_itemNodesByParent.remove(node);
+    m_sharedLayoutNodesByParent.remove(node);
 
     switch (node->type())
     {
@@ -242,14 +259,19 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         break;
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
-    case Qn::ItemNode:
+    case Qn::LayoutItemNode:
         if (node->parent())
         {
             ItemHash& hash = m_itemNodesByParent[node->parent()];
             hash.remove(hash.key(node));
         }
-        if (node->resource() && m_itemNodesByResource.contains(node->resource()))
-            m_itemNodesByResource[node->resource()].removeAll(node);
+        break;
+    case Qn::SharedLayoutNode:
+        if (node->parent())
+        {
+            ResourceHash& hash = m_sharedLayoutNodesByParent[node->parent()];
+            hash.remove(hash.key(node));
+        }
         break;
     case Qn::SystemNode:
         m_systemNodeBySystemName.remove(m_systemNodeBySystemName.key(node));
@@ -265,6 +287,7 @@ void QnResourceTreeModel::removeNode(const QnResourceTreeModelNodePtr& node)
         break;
     }
 
+    updateNodeResource(node, QnResourcePtr());
     node->setParent(QnResourceTreeModelNodePtr());
 }
 
@@ -287,7 +310,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case Qn::BastardNode:
         return QnResourceTreeModelNodePtr();
 
-    case Qn::LocalNode:
+    case Qn::LocalResourcesNode:
         if (m_scope != FullScope)
             return bastardNode;
         return rootNode;
@@ -300,14 +323,24 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::ServersNode:
-        if (m_scope == CamerasScope)
+        if (m_scope == CamerasScope && isAdmin)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
         if (m_scope == FullScope && isAdmin)
             return rootNode;
         return bastardNode;
 
     case Qn::CurrentSystemNode:
-        if (m_scope == FullScope && isAdmin)
+        if (m_scope == FullScope && isLoggedIn)
+            return rootNode;
+        return bastardNode;
+
+    case Qn::SeparatorNode:
+        if (m_scope == FullScope && isLoggedIn)
+            return rootNode;
+        return bastardNode;
+
+    case Qn::LocalSeparatorNode:
+        if (m_scope == FullScope && !isLoggedIn)
             return rootNode;
         return bastardNode;
 
@@ -322,15 +355,15 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         return bastardNode;
 
     case Qn::UserDevicesNode:
+        if (m_scope == CamerasScope && !isAdmin)
+            return QnResourceTreeModelNodePtr(); /*< Be the root node in this scope. */
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
-            return getResourceNode(context()->user());
+            return rootNode;
         return bastardNode;
 
     case Qn::WebPagesNode:
-        if (m_scope == FullScope && isAdmin)
+        if (m_scope == FullScope && isLoggedIn)
             return rootNode;
-        if (m_scope == FullScope && isLoggedIn && !isAdmin)
-            return getResourceNode(context()->user());
         return bastardNode;
 
     case Qn::EdgeNode:
@@ -346,12 +379,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         break;
     }
 
+    /* LayoutItem nodes and SharedLayout nodes should not change their parents. */
     NX_ASSERT(false, "Should never get here.");
     return bastardNode;
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node)
 {
+    bool isLoggedIn = !context()->user().isNull();
     auto rootNode = m_rootNodes[Qn::RootNode];
     auto bastardNode = m_rootNodes[Qn::BastardNode];
     bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
@@ -365,17 +400,16 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
             return m_rootNodes[Qn::UsersNode];
 
         if (m_scope == CamerasScope)
-            return m_rootNodes[Qn::BastardNode];
-
-        if (isAdmin)
-            return m_rootNodes[Qn::UsersNode];
+            return bastardNode;
 
         if (node->resource() == context()->user())
             return rootNode;
 
+        if (isAdmin)
+            return m_rootNodes[Qn::UsersNode];
+
         //TODO: #GDM #access remove comment when access rights check will be implemented on server
         //NX_ASSERT(false, "Non-admin user can't see other users.");
-
         return bastardNode;
     }
 
@@ -403,7 +437,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
         if (systemName == qnCommon->localSystemName())
             return m_rootNodes[Qn::ServersNode];
 
-        return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : getSystemNode(systemName);
+        return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : ensureSystemNode(systemName);
 
     }
 
@@ -424,17 +458,17 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
     {
         if (layout->isFile())
-            return m_rootNodes[Qn::LocalNode];
+            return m_rootNodes[Qn::LocalResourcesNode];
 
-        if (layout->isGlobal())
+        if (layout->isShared())
             return m_rootNodes[Qn::LayoutsNode];
 
         QnResourcePtr owner = layout->getParentResource();
         if (!owner || owner == context()->user())
-            return m_rootNodes[Qn::LayoutsNode];;
+            return m_rootNodes[Qn::LayoutsNode];
 
         if (isAdmin)
-            return getResourceNode(owner);
+            return ensureResourceNode(owner);
 
         return bastardNode;
     }
@@ -448,7 +482,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (!parentResource || parentResource->flags().testFlag(Qn::local_server))
     {
         if (node->resourceFlags().testFlag(Qn::local))
-            return m_rootNodes[Qn::LocalNode];
+        {
+            if (isLoggedIn)
+                return m_rootNodes[Qn::LocalResourcesNode];
+            return rootNode;
+        }
         return bastardNode;
     }
 
@@ -456,20 +494,20 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     if (parentResource->flags().testFlag(Qn::local_layout))
     {
         if (node->resourceFlags().testFlag(Qn::local))
-            return getResourceNode(parentResource);
+            return ensureResourceNode(parentResource);
         return bastardNode;
     }
 
     if (QnVirtualCameraResourcePtr camera = node->resource().dynamicCast<QnVirtualCameraResource>())
     {
         auto parentNode = isAdmin
-            ? getResourceNode(parentResource)
+            ? ensureResourceNode(parentResource)
             : m_rootNodes[Qn::UserDevicesNode];
 
         QString groupName = camera->getGroupName();
         QString groupId = camera->getGroupId();
         if (!groupId.isEmpty())
-            return getRecorderNode(parentNode, groupId, groupName);
+            return ensureRecorderNode(parentNode, groupId, groupName);
 
         return parentNode;
     }
@@ -481,6 +519,134 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 void QnResourceTreeModel::updateNodeParent(const QnResourceTreeModelNodePtr& node)
 {
     node->setParent(expectedParent(node));
+}
+
+void QnResourceTreeModel::updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource)
+{
+    if (node->resource() == resource)
+        return;
+
+    if (node->resource())
+        m_nodesByResource[node->resource()].removeAll(node);
+    node->setResource(resource);
+    if (resource)
+        m_nodesByResource[resource].push_back(node);
+}
+
+void QnResourceTreeModel::updateSharedLayoutNodes(const QnLayoutResourcePtr& layout)
+{
+    QnUserResourceList usersToUpdate;
+
+    /* Here we should add or update shared layout nodes in all existing in the tree users. */
+    for (auto iter = m_resourceNodeByResource.cbegin(); iter != m_resourceNodeByResource.cend(); ++iter)
+    {
+        QnResourcePtr resource = iter.key();
+        if (!resource->flags().testFlag(Qn::user))
+            continue;
+
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        NX_ASSERT(user);
+        if (!user)
+            continue;
+
+        /* User is already removed, we still haven't deleted node from the nodes list. */
+        if (!user->resourcePool())
+            continue;
+
+        auto parentNode = *iter;
+
+        /* Copy of the list before all changes. */
+        auto sharedLayoutNodes = m_sharedLayoutNodesByParent[parentNode].values();
+
+        /* No shared layouts nodes must exist under current user node. */
+        if (user == context()->user())
+        {
+            usersToUpdate << user;
+            continue;
+        }
+
+        /* Add node if required. */
+        if (qnResourceAccessManager->hasPermission(user, layout, Qn::ReadPermission))
+        {
+            usersToUpdate << user;
+            continue;
+        }
+
+        /* Check if we need to remove node */
+        for (auto childNode : sharedLayoutNodes)
+        {
+            if (childNode->resource() != layout)
+                continue;
+
+            usersToUpdate << user;
+            break;
+        }
+    }
+
+    for (const auto& user : usersToUpdate)
+        updateSharedLayoutNodesForUser(user);
+}
+
+void QnResourceTreeModel::updateSharedLayoutNodesForUser(const QnUserResourcePtr& user)
+{
+    auto iter = m_resourceNodeByResource.find(user);
+    if (iter == m_resourceNodeByResource.end())
+        return;
+
+    QList<QnResourceTreeModelNodePtr> nodesToDelete;
+    auto parentNode = *iter;
+
+    /* Copy of the list before all changes. */
+    auto sharedLayoutNodes = m_sharedLayoutNodesByParent[parentNode].values();
+
+    /* No shared layouts nodes must exist under current user node. */
+    if (user == context()->user())
+    {
+        nodesToDelete << sharedLayoutNodes;
+    }
+    else
+    {
+        auto accessibleResources = qnResourceAccessManager->accessibleResources(user->getId());
+
+        /* Add new shared layouts and forcibly update them. */
+        for (const QnUuid& id : accessibleResources)
+        {
+            QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(id);
+            if (!layout || !layout->isShared())
+                continue;
+
+            ensureSharedLayoutNode(parentNode, layout)->update();
+        }
+
+        /* Cleanup nodes that are not available anymore. */
+        for (auto existingNode : sharedLayoutNodes)
+        {
+            NX_ASSERT(existingNode && existingNode->resource());
+            if (!existingNode || !existingNode->resource())
+                continue;
+
+            if (!accessibleResources.contains(existingNode->resource()->getId()))
+                nodesToDelete << existingNode;
+        }
+    }
+
+    for (auto node : nodesToDelete)
+        removeNode(node);
+}
+
+Qn::NodeType QnResourceTreeModel::rootNodeTypeForScope() const
+{
+    switch (m_scope)
+    {
+    case QnResourceTreeModel::CamerasScope:
+        return accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+            ? Qn::ServersNode
+            : Qn::UserDevicesNode;
+    case QnResourceTreeModel::UsersScope:
+        return Qn::UsersNode;
+    default:
+        return Qn::RootNode;
+    }
 }
 
 void QnResourceTreeModel::cleanupSystemNodes()
@@ -499,22 +665,6 @@ void QnResourceTreeModel::cleanupSystemNodes()
         removeNode(node);
 }
 
-bool QnResourceTreeModel::isUrlsShown()
-{
-    return m_urlsShown;
-}
-
-void QnResourceTreeModel::setUrlsShown(bool urlsShown)
-{
-    if (urlsShown == m_urlsShown)
-        return;
-
-    m_urlsShown = urlsShown;
-
-    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
-    m_rootNodes[rootNodeType]->updateRecursive();
-}
-
 QnResourceTreeModelCustomColumnDelegate* QnResourceTreeModel::customColumnDelegate() const {
     return m_customColumnDelegate.data();
 }
@@ -531,7 +681,7 @@ void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColum
     auto notifyCustomColumnChanged = [this]()
     {
         //TODO: #GDM update only custom column and changed rows
-        Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+        Qn::NodeType rootNodeType = rootNodeTypeForScope();
         m_rootNodes[rootNodeType]->updateRecursive();
     };
 
@@ -682,7 +832,7 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
             if (node && node->resource() && !resources.contains(node->resource()))
                 resources.append(node->resource());
 
-            if (node && (node->type() == Qn::ItemNode))
+            if (node && (node->type() == Qn::LayoutItemNode))
                 pureTreeResourcesOnly = false;
         }
 
@@ -715,7 +865,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         return false;
 
     /* Check if the action is supported. */
-    if (!(action & supportedDropActions()))
+    if (!supportedDropActions().testFlag(action))
         return false;
 
     /* Check if the format is supported. */
@@ -723,72 +873,32 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         return base_type::dropMimeData(mimeData, action, row, column, parent);
 
     /* Decode. */
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
+    QnResourceList sourceResources = QnWorkbenchResource::deserializeResources(mimeData);
 
     /* Check where we're dropping it. */
     auto node = this->node(parent);
 
-    if (node->type() == Qn::ItemNode)
+    if (node->type() == Qn::LayoutItemNode)
         node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
 
-    if (node->parent() && (node->parent()->resourceFlags() & Qn::server))
+    if (node->parent() && (node->parent()->resourceFlags().testFlag(Qn::server)))
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
+
+    /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
         QnActionParameters parameters;
         if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
             parameters = QnActionParameters(qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
         else
-            parameters = QnActionParameters(resources);
+            parameters = QnActionParameters(sourceResources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(QnActions::DropOnVideoWallItemAction, parameters);
     }
-    else if (QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>())
+    else
     {
-        QnResourceList medias;
-        for (const QnResourcePtr& res : resources)
-        {
-            if (res.dynamicCast<QnMediaResource>())
-                medias.push_back(res);
-        }
-
-        menu()->trigger(QnActions::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
-    }
-    else if (QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>())
-    {
-        for (const QnResourcePtr &resource : resources)
-        {
-            if (resource->getParentId() == user->getId())
-                continue; /* Dropping resource into its owner does nothing. */
-
-            QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-            if (!layout)
-                continue; /* Can drop only layout resources on user. */
-
-            menu()->trigger(
-                QnActions::SaveLayoutAsAction,
-                QnActionParameters(layout).
-                withArgument(Qn::UserResourceRole, user).
-                withArgument(Qn::ResourceNameRole, layout->getName())
-            );
-        }
-
-
-    }
-    else if (QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>())
-    {
-        if (QnMediaServerResource::isFakeServer(server))
-            return true;
-
-        if (mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1"))
-        {
-            /* Allow drop of non-layout item data, from tree only. */
-
-            QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
-            if (!cameras.empty())
-                menu()->trigger(QnActions::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
-        }
+        handleDrop(sourceResources, node->resource(), mimeData);
     }
 
     return true;
@@ -816,7 +926,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource,       &QnResource::flagsChanged,                   this,  &QnResourceTreeModel::at_resource_resourceChanged);
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-    if(layout)
+    if (layout)
     {
         connect(layout,     &QnLayoutResource::itemAdded,               this,   &QnResourceTreeModel::at_layout_itemAdded);
         connect(layout,     &QnLayoutResource::itemRemoved,             this,   &QnResourceTreeModel::at_layout_itemRemoved);
@@ -866,10 +976,8 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(user, &QnUserResource::enabledChanged, this, &QnResourceTreeModel::at_user_enabledChanged);
     }
 
-    auto node = getResourceNode(resource);
-
-    at_resource_parentIdChanged(resource);
-    at_resource_resourceChanged(resource);
+    auto node = ensureResourceNode(resource);
+    updateNodeParent(node);
 
     if (server)
     {
@@ -884,6 +992,8 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     {
         for (const QnLayoutItemData &item : layout->getItems())
             at_layout_itemAdded(layout, item);
+        if (layout->isShared())
+            updateSharedLayoutNodes(layout);
     }
 
     if (videoWall)
@@ -892,6 +1002,11 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             at_videoWall_itemAddedOrChanged(videoWall, item);
         for (const QnVideoWallMatrix &matrix : videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
+    }
+
+    if (user)
+    {
+          updateSharedLayoutNodesForUser(user);
     }
 }
 
@@ -909,7 +1024,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
             continue;
 
         if (node->type() == Qn::VideoWallItemNode)
-            node->setResource(QnResourcePtr());
+            updateNodeResource(node, QnResourcePtr());
         else
             nodesToDelete << node;
     }
@@ -917,7 +1032,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     for (auto node: nodesToDelete)
         removeNode(node);
 
-    m_itemNodesByResource.remove(resource);
+    m_nodesByResource.remove(resource);
     m_resourceNodeByResource.remove(resource);
 
     if (QnMediaServerResource::isFakeServer(resource))
@@ -938,12 +1053,73 @@ void QnResourceTreeModel::rebuildTree()
         updateNodeParent(node);
 }
 
+void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, const QnResourcePtr& targetResource, const QMimeData *mimeData)
+{
+    if (sourceResources.isEmpty() || !targetResource)
+        return;
+
+    /* We can add media resources to layout */
+    if (QnLayoutResourcePtr layout = targetResource.dynamicCast<QnLayoutResource>())
+    {
+        QnResourceList medias;
+        for (const QnResourcePtr& res : sourceResources)
+        {
+            if (res.dynamicCast<QnMediaResource>())
+                medias.push_back(res);
+        }
+        if (!medias.isEmpty())
+            menu()->trigger(
+                QnActions::OpenInLayoutAction,
+                QnActionParameters(medias).
+                withArgument(Qn::LayoutResourceRole, layout)
+            );
+    }
+
+    /* Drop layout on user means sharing this layout. */
+    else if (QnUserResourcePtr targetUser = targetResource.dynamicCast<QnUserResource>())
+    {
+        for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())
+        {
+            if (sourceLayout->getParentId() == targetUser->getId())
+                continue; /* Dropping resource into its owner does nothing. */
+
+            if (sourceLayout->isFile())
+                continue;
+
+            menu()->trigger(
+                QnActions::ShareLayoutAction,
+                QnActionParameters(sourceLayout).
+                withArgument(Qn::UserResourceRole, targetUser)
+            );
+        }
+    }
+
+    /* Drop camera on server allows to move servers between cameras. */
+    else if (QnMediaServerResourcePtr server = targetResource.dynamicCast<QnMediaServerResource>())
+    {
+        if (QnMediaServerResource::isFakeServer(server))
+            return;
+
+        /* Do not allow to drop camera items from layouts. */
+        if (mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) != QByteArray("1"))
+            return;
+
+        QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
+        if (!cameras.empty())
+            menu()->trigger(
+                QnActions::MoveCameraAction,
+                QnActionParameters(cameras).
+                withArgument(Qn::MediaServerResourceRole, server)
+            );
+    }
+}
+
 void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout)
 {
     QnVideoWallResourcePtr videowall = layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
     auto node = videowall
-        ? getResourceNode(videowall)
-        : getResourceNode(layout);
+        ? ensureResourceNode(videowall)
+        : ensureResourceNode(layout);
 
     node->setModified(snapshotManager()->isModified(layout));
     node->update();
@@ -951,14 +1127,25 @@ void QnResourceTreeModel::at_snapshotManager_flagsChanged(const QnLayoutResource
 
 void QnResourceTreeModel::at_accessController_permissionsChanged(const QnResourcePtr &resource)
 {
-    getResourceNode(resource)->update();
     if (resource == context()->user())
+    {
         rebuildTree();
+        return;
+    }
+
+    for (auto node : m_nodesByResource[resource])
+        node->update();
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        if (layout->isShared())
+            updateSharedLayoutNodes(layout);
+    }
 }
 
 void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resource)
 {
-    auto node = getResourceNode(resource);
+    auto node = ensureResourceNode(resource);
 
     /* Update edge resource if we are the admin. */
     if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
@@ -976,7 +1163,7 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
                 removeNode(node);
 
                 /* Re-create node with changed type. */
-                node = getResourceNode(camera);
+                node = ensureResourceNode(camera);
                 if (serverNode)
                     serverNode->update();
             }
@@ -984,63 +1171,63 @@ void QnResourceTreeModel::at_resource_parentIdChanged(const QnResourcePtr &resou
     }
 
     updateNodeParent(node);
+
+    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+        updateSharedLayoutNodes(layout);
 }
 
-//TODO: #GDM get rid of resourceChanged signal
 void QnResourceTreeModel::at_resource_resourceChanged(const QnResourcePtr &resource)
 {
-    auto node = getResourceNode(resource);
-
-    node->update();
-
-    if (m_itemNodesByResource.contains(resource))
-        for (auto node: m_itemNodesByResource[resource])
+    if (m_nodesByResource.contains(resource))
+        for (auto node: m_nodesByResource[resource])
             node->update();
 }
 
 void QnResourceTreeModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
 {
-    auto node = getItemNode(item.uuid, layout);
-    NX_ASSERT(!node->resource());   /* Make sure item is just created. */
-    QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
-    node->setResource(resource);
-    if (resource)
-        m_itemNodesByResource[resource].push_back(node);
+    for (auto parentNode : m_nodesByResource[layout])
+    {
+        if (parentNode->type() != Qn::ResourceNode && parentNode->type() != Qn::SharedLayoutNode)
+            continue;
+
+        auto node = ensureItemNode(parentNode, item.uuid);
+        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
+        updateNodeResource(node, resource); /* In case item is just created. */
+    }
+
 }
 
 void QnResourceTreeModel::at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item)
 {
-    auto parentNode = getResourceNode(layout);
-    auto node = m_itemNodesByParent[parentNode].take(item.uuid);
-    if (node)
-        removeNode(node);
+    for (auto parentNode : m_nodesByResource[layout])
+    {
+        if (parentNode->type() != Qn::ResourceNode && parentNode->type() != Qn::SharedLayoutNode)
+            continue;
+
+        auto node = m_itemNodesByParent[parentNode].take(item.uuid);
+        if (node)
+            removeNode(node);
+    }
 }
 
 void QnResourceTreeModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
 {
-    auto node = getItemNode(item.uuid, videoWall, Qn::VideoWallItemNode);
+    auto parentNode = ensureResourceNode(videoWall);
+    auto node = ensureItemNode(parentNode, item.uuid, Qn::VideoWallItemNode);
 
     QnResourcePtr resource;
     if (!item.layout.isNull())
         resource = resourcePool()->getResourceById(item.layout);
 
     if (node->resource() != resource)
-    {
-        if (node->resource())
-            m_itemNodesByResource[node->resource()].removeAll(node);
-        node->setResource(resource);
-        if (resource)
-            m_itemNodesByResource[resource].push_back(node);
-    }
+        updateNodeResource(node, resource);
     else
-    {
         node->update(); // in case of _changed method call, where setResource will exit instantly
-    }
 }
 
 void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item)
 {
-    auto parentNode = getResourceNode(videoWall);
+    auto parentNode = ensureResourceNode(videoWall);
     auto node = m_itemNodesByParent[parentNode].take(item.uuid);
     if (node)
         removeNode(node);
@@ -1048,13 +1235,14 @@ void QnResourceTreeModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr 
 
 void QnResourceTreeModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)
 {
-    auto node = getItemNode(matrix.uuid, videoWall, Qn::VideoWallMatrixNode);
+    auto parentNode = ensureResourceNode(videoWall);
+    auto node = ensureItemNode(parentNode, matrix.uuid, Qn::VideoWallMatrixNode);
     node->update(); //TODO: #GDM what for?
 }
 
 void QnResourceTreeModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix)
 {
-    auto parentNode = getResourceNode(videoWall);
+    auto parentNode = ensureResourceNode(videoWall);
     auto node = m_itemNodesByParent[parentNode].take(matrix.uuid);
     if (node)
         removeNode(node);
@@ -1086,14 +1274,14 @@ void QnResourceTreeModel::at_server_systemNameChanged(const QnResourcePtr &resou
     if (!server)
         return;
 
-    auto node = getResourceNode(resource);
+    auto node = ensureResourceNode(resource);
     updateNodeParent(node);
     cleanupSystemNodes();
 }
 
 void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resource)
 {
-    auto node = getResourceNode(resource);
+    auto node = ensureResourceNode(resource);
     node->update();
 
     /* Update edge nodes if we are the admin. */
@@ -1105,7 +1293,7 @@ void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resou
             removeNode(existingNode);
 
             /* Re-create node as it should change its NodeType from ResourceNode to EdgeNode or vice versa. */
-            auto updatedNode = getResourceNode(cameraResource);
+            auto updatedNode = ensureResourceNode(cameraResource);
             updateNodeParent(updatedNode);
         }
     }
@@ -1118,11 +1306,20 @@ void QnResourceTreeModel::at_commonModule_systemNameChanged()
 
 void QnResourceTreeModel::at_user_enabledChanged(const QnResourcePtr &resource)
 {
-    auto node = getResourceNode(resource);
+    auto node = ensureResourceNode(resource);
     node->update();
 }
 
 void QnResourceTreeModel::at_serverAutoDiscoveryEnabledChanged()
 {
     m_rootNodes[Qn::OtherSystemsNode]->update();
+}
+
+void QnResourceTreeModel::at_accessibleResourcesChanged(const QnUuid& userId)
+{
+    auto user = qnResPool->getResourceById<QnUserResource>(userId);
+    if (context()->user() == user)
+        rebuildTree();
+    else
+        updateSharedLayoutNodesForUser(user);
 }
