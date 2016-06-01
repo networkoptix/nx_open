@@ -18,7 +18,7 @@ class QnSystemUriPrivate;
 * Auth is encoded as base64(login:pass).
 * All query parameters are url-encoded.
 */
-class QnSystemUri
+class NX_VMS_UTILS_API QnSystemUri
 {
 public:
     enum class Protocol
@@ -78,7 +78,7 @@ private:
 * Main option is a target action list - login to cloud, connect to server, etc.
 * Additional options are action parameters.
 */
-class QnSystemUriResolver
+class NX_VMS_UTILS_API QnSystemUriResolver
 {
 public:
     enum class Action

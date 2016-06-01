@@ -123,12 +123,14 @@ win* {
     DEFINES += \
         NX_NETWORK_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
+        NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
         NX_NETWORK_API= \
         NX_UTILS_API= \
+        NX_VMS_UTILS_API= \
         UDT_API= \
 
 }
