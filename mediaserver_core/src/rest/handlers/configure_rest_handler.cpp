@@ -72,7 +72,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
             return CODE_OK;
         }
 
-        if (!changeSystemName(systemName, sysIdTime, tranLogTime, !wholeSystem))
+        if (!changeSystemName(systemName, sysIdTime, tranLogTime, !wholeSystem, Qn::UserAccessData(owner->authUserId())))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;

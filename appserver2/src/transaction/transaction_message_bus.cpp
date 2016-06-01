@@ -759,7 +759,7 @@ namespace ec2
         case ApiCommand::changeSystemName:
         {
             auto userResource = Qn::getUserResourceByAccessData(sender->getUserAccessData());
-            bool userHasAdminRights = userResource && qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+            bool userHasAdminRights = userResource && qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 
             if (!userHasAdminRights)
             {

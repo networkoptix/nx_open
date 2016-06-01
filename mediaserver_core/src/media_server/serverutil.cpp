@@ -242,7 +242,7 @@ void resetTransactionTransportConnections()
 }
 
 
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections)
+bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime, bool resetConnections, const Qn::UserAccessData &userAccessData)
 {
     if (qnCommon->localSystemName() == systemName.value())
         return true;
@@ -279,7 +279,7 @@ bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLo
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(userId)->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(userAccessData)->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
 }

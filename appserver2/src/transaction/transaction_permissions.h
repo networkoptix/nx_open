@@ -139,19 +139,19 @@ inline bool hasPermission(const QnUuid &/*userId*/, const ApiTransactionData &/*
 inline bool hasPermission(const QnUuid &userId, const ApiLicenseData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiLicenseOverflowData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiDatabaseDumpData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &/*userId*/, const ApiVideowallControlMessageData &/*data*/, Qn::Permission /*permission*/)
@@ -167,45 +167,45 @@ inline bool hasPermission(const QnUuid &/*userId*/, const ApiVideowallControlMes
 inline bool hasPermission(const QnUuid &userId, const ApiBusinessRuleData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiBusinessActionData &/*data*/, Qn::Permission permission)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
     if (permission == Qn::Permission::SavePermission)
-        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+        return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
     else return true;
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiUpdateUploadData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiUpdateInstallData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiUpdateUploadResponceData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiPeerSystemTimeData &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 inline bool hasPermission(const QnUuid &userId, const ApiSystemStatistics &/*data*/, Qn::Permission /*permission*/)
 {
     auto userResource = qnResPool->getResourceById(userId).dynamicCast<QnUserResource>();
-    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermissionsSet);
+    return qnResourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalPermission::GlobalAdminPermission);
 }
 
 } // namespace ec2

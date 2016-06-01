@@ -376,7 +376,7 @@ void QnResourcesChangesManager::saveAccessibleResources(const QnUuid& userId, co
     accessRights.userId = userId;
     for (const auto &id : accessibleResources)
         accessRights.resourceIds.push_back(id);
-    connection->getUserManager()->setAccessRights(accessRights, this,
+    connection->getUserManager(Qn::kDefaultUserAccess)->setAccessRights(accessRights, this,
         [this,userId, sessionGuid, accessibleResourcesBackup](int reqID, ec2::ErrorCode errorCode)
     {
         QN_UNUSED(reqID);

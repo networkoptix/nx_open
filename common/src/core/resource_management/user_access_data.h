@@ -11,7 +11,7 @@ struct UserAccessData
     QnUuid userId;
 
     UserAccessData() {}
-    UserAccessData(const QnUuid &userId) : userId(userId) {}
+    explicit UserAccessData(const QnUuid &userId) : userId(userId) {}
 
     bool isNull() const { return userId.isNull(); }
 };

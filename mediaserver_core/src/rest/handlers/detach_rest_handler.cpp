@@ -50,7 +50,7 @@ int QnDetachFromSystemRestHandler::execute(PasswordData passwordData, const QnUu
     // change system name first to detatch from other servers
     nx::SystemName systemName;
     systemName.resetToDefault();
-    if (!changeSystemName(systemName, 0, 0, true))
+    if (!changeSystemName(systemName, 0, 0, true, Qn::UserAccessData(userId)))
     {
         result.setError(QnRestResult::CantProcessRequest, lit("Internal server error.  Can't change system name."));
         return nx_http::StatusCode::internalServerError;
