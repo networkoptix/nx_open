@@ -41,6 +41,7 @@
 #include "business/events/mserver_conflict_business_event.h"
 #include "core/resource/camera_history.h"
 #include <utils/common/synctime.h>
+#include <common/common_module.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -52,6 +53,9 @@ namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
     const QString tpEventLogoFilename(lit("eventLogoFilename"));
     const QString tpProductLogo(lit("logo"));
+	const QString tpSystemIcon(lit("systemIcon"));
+	const QString tpOwnerIcon(lit("ownerIcon"));
+	const QString tpCloudOwner(lit("cloudOwner"));
     const QString tpCompanyName(lit("companyName"));
     const QString tpCompanyUrl(lit("companyUrl"));
     const QString tpSupportLink(lit("supportLink"));
@@ -459,10 +463,20 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType); // TODO: We do not need event logo anymore - remove it from code and from resources, pls
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
+	QString cloudOwner = QnGlobalSettings::instance()->cloudAccountName();
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+	attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+	attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
 //    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+	contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+	if (!cloudOwner.isEmpty()) 
+	{
+		contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+		contextMap[tpCloudOwner] = cloudOwner;
+	}
+	
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
@@ -470,7 +484,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         ? lit("mailto:%1").arg(emailSettings.supportEmail)
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = emailSettings.signature; // TODO: We need system name here!
+    contextMap[tpSystemName] = qnCommon->moduleInformation().systemName;
     contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
