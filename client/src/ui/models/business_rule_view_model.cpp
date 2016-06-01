@@ -273,14 +273,14 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
         {
-            QnBusinessActionParameters params;
+            QnBusinessActionParameters params = m_actionParams;
             params.url = value.toString();
             setActionParams(params);
             break;
         }
         case QnBusiness::SayTextAction:
         {
-            QnBusinessActionParameters params;
+            QnBusinessActionParameters params = m_actionParams;
             params.sayText = value.toString();
             setActionParams(params);
             break;
@@ -810,7 +810,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.url.isEmpty();
+            return !m_actionParams.soundUrl.isEmpty();
         case QnBusiness::SayTextAction:
             return !m_actionParams.sayText.isEmpty();
         case QnBusiness::ExecutePtzPresetAction:

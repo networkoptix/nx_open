@@ -91,6 +91,7 @@
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
+#include <plugins/storage/file_storage/db_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
 
 #include <recorder/file_deletor.h>
@@ -224,6 +225,9 @@
 #include "rest/handlers/script_list_rest_handler.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
+#include <nx_speach_synthesizer/text_to_wav.h>
+#include <streaming/audio_streamer_pool.h>
+#include <proxy/2wayaudio/proxy_audio_receiver.h>
 
 #ifdef __arm__
 #include "nx1/info.h"
@@ -433,7 +437,9 @@ void ffmpegInit()
     }
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+    // true means use it plugin if no <protocol>:// prefix
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
+    QnStoragePluginFactory::instance()->registerStoragePlugin("dbfile", QnDbStorageResource::instance, false);
 }
 
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
@@ -1514,6 +1520,7 @@ bool MediaServerProcess::initTcpListener()
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
+    m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
@@ -2186,6 +2193,10 @@ void MediaServerProcess::run()
 #endif //ENABLE_ONVIF
 #endif
 
+    std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
+    speechSynthesizer->start();
+
+    std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     // Roman asked Ivan to comment it for Brian
     // QnResourceDiscoveryManager::instance()->addDTSServer(&QnColdStoreDTSSearcher::instance());

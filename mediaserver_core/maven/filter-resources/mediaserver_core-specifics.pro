@@ -9,7 +9,8 @@ exists( ${libdir}/libcreateprocess.pri ) {
 
 INCLUDEPATH += ${root.dir}/appserver2/src/
 INCLUDEPATH += ${root.dir}/common_libs/nxemail/src/
-
+INCLUDEPATH += ${root.dir}/common_libs/nx_speach_synthesizer/src/
+PRE_TARGETDEPS += $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_speach_synthesizer.a
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug
   ext_debug2.depends = $(DESTDIR)$(TARGET)

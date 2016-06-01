@@ -4,10 +4,19 @@
 #include <core/resource/security_cam_resource.h>
 #include <utils/network/system_socket.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
+#include <utils/network/http/asynchttpclient.h>
+
 
 class QnAxisAudioTransmitter : public QnAbstractAudioTransmitter
 {
     typedef QnAbstractAudioTransmitter base_type;
+
+    enum class TransmitterState
+    {
+        WaitingForConnection,
+        ReadyForTransmission,
+        Failed
+    };
 
     Q_OBJECT
 public:
@@ -19,21 +28,38 @@ public:
     virtual bool isCompatible(const QnAudioFormat& format) const override;
     virtual void setOutputFormat(const QnAudioFormat& format) override;
     virtual bool isInitialized() const override;
+
+    virtual void prepare() override;
+
+public slots:
+    void at_requestHeadersHasBeenSent(
+        nx_http::AsyncHttpClientPtr http,
+        bool isRetryAfterUnauthorizedResponse);
+
+    void at_httpDone(nx_http::AsyncHttpClientPtr http);
+
 protected:
     virtual void pleaseStop() override;
+
 private:
-    bool establishConnection();
-    SocketAddress getSocketAddress() const;
-    QByteArray buildTransmitRequest() const;
-    QString getAudioMimeType() const;
-    int sendData(const char* data, int dataSize);
+    bool startTransmission();
+    nx_http::StringType mimeType() const;
+    bool sendData(
+        QSharedPointer<AbstractStreamSocket> socket,
+        const char* buffer,
+        size_t size);
 
 private:
     mutable QnMutex m_mutex;
     QnSecurityCamResource* m_resource;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_transcoder;
-    std::atomic<bool> m_connectionEstablished;
-    bool m_canProcessData;
-    std::unique_ptr<TCPSocket> m_socket;
     QnAudioFormat m_outputFormat;
+    nx_http::AsyncHttpClientPtr m_httpClient;
+    QSharedPointer<AbstractStreamSocket> m_socket;
+
+    bool m_noAuth;
+
+    TransmitterState m_state;
+    QnWaitCondition m_wait;
+    QElapsedTimer m_timer;
 };

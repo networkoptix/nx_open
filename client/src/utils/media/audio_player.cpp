@@ -12,21 +12,9 @@
 #include <core/resource/resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
-#include <text_to_wav.h>
-
-#include "../../camera/audio_stream_display.h"
-
-
-class LocalAudioFileResource
-:
-    public QnResource
-{
-public:
-    virtual QString getUniqueId() const { return QString(); }
-    virtual void setStatus(Qn::ResourceStatus, bool /*silenceMode*/ ) override {}
-    virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
-};
-
+#include <nx_speach_synthesizer/text_to_wav.h>
+#include <core/resource/local_audio_file_resource.h>
+#include <camera/audio_stream_display.h>
 
 AudioPlayer::AudioPlayer( const QString& filePath )
 :

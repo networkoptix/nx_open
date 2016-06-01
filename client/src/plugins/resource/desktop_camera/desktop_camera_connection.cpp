@@ -7,7 +7,7 @@
 #include "api/app_server_connection.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 
-#include <plugins/resource/desktop_win/desktop_resource.h>
+#include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <http/custom_headers.h>
 
 
@@ -18,7 +18,7 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 {
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
-        QnAbstractDataConsumer(20), 
+        QnAbstractDataConsumer(50),
         m_sequence(0),
         m_owner(owner),
         m_needVideoData(false)
@@ -101,7 +101,10 @@ public:
     QnMutex sendMutex;
 };
 
-QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, void* sslContext, QnDesktopResource* desktop):
+QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    void* sslContext,
+    QnDesktopResource* desktop):
   QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
 {
     Q_UNUSED(sslContext)
