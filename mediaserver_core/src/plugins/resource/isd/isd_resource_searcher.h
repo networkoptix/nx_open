@@ -3,20 +3,25 @@
 
 #ifdef ENABLE_ISD
 
-#include "core/resource_management/resource_searcher.h"
-#include "../mdns/mdns_resource_searcher.h"
-#include "../upnp/upnp_resource_searcher.h"
+#include <core/resource_management/resource_searcher.h>
+#include <plugins/resource/upnp/upnp_resource_searcher.h>
+#include <plugins/resource/mdns/mdns_listener.h>
 
-class QnPlISDResourceSearcher : public QnUpnpResourceSearcherAsync
+class QnPlISDResourceSearcher :
+    public QnUpnpResourceSearcherAsync
 {
 
 public:
     QnPlISDResourceSearcher();
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(
+        const QnUuid &resourceTypeId,
+        const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const;
+
+    virtual QnResourceList findResources(void) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const QUrl& url,
@@ -25,6 +30,7 @@ public:
 
 protected:
 
+    //Upnp resource searcher
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
         const HostAddress& host,
@@ -51,6 +57,10 @@ private:
     void cleanupSpaces(QString& rowWithSpaces) const;
 
     bool isDwOrIsd(const QString& vendorName) const;
+
+    QnResourcePtr processMdnsResponse (
+        const QnMdnsListener::ConsumerData& mdnsResponse,
+        const QnResourceList& alreadyFoundResources);
 };
 
 #endif // #ifdef ENABLE_ISD
